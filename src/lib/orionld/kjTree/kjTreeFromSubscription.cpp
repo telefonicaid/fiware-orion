@@ -333,15 +333,35 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // notification::endpoint
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
 
+  // notification::endpoint::uri
   nodeP = kjString(orionldState.kjsonP, "uri", subscriptionP->notification.httpInfo.url.c_str());
   kjChildAdd(endpointP, nodeP);
 
+  // notification::endpoint::accept
   const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
   char        dateTime[128];
 
   nodeP = kjString(orionldState.kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
 
+
+  // notification::endpoint::notifierInfo
+  if (subscriptionP->notification.httpInfo.notifierInfo.size() > 0)
+  {
+    KjNode* niArray = kjArray(orionldState.kjsonP, "notifierInfo");
+
+    for (unsigned int ix = 0; ix < subscriptionP->notification.httpInfo.notifierInfo.size(); ix++)
+    {
+      KjNode* kvObject = kjObject(orionldState.kjsonP, NULL);
+      KjNode* keyP     = kjString(orionldState.kjsonP, "key",   subscriptionP->notification.httpInfo.notifierInfo[ix]->key);
+      KjNode* valueP   = kjString(orionldState.kjsonP, "value", subscriptionP->notification.httpInfo.notifierInfo[ix]->value);
+
+      kjChildAdd(kvObject, keyP);
+      kjChildAdd(kvObject, valueP);
+      kjChildAdd(niArray,  kvObject);
+    }
+    kjChildAdd(endpointP, niArray);
+  }
   kjChildAdd(objectP, endpointP);
 
 

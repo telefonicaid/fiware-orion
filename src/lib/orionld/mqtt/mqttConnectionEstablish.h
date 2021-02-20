@@ -33,6 +33,6 @@
 //
 // mqttConnectionEstablish -
 //
-extern bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port);
+extern bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONESTABLISH_H_

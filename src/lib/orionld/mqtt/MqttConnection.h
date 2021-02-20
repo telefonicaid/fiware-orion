@@ -37,6 +37,9 @@ typedef struct MqttConnection
 {
   char*           host;
   unsigned short  port;
+  char*           username;
+  char*           password;
+  char*           version;
   MQTTClient      client;
 } MqttConnection;
 

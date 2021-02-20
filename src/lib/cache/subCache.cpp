@@ -581,14 +581,10 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 */
 void subCacheDestroy(void)
 {
-  LM_T(LmtSubCache, ("destroying subscription cache"));
-
   CachedSubscription* cSubP  = subCache.head;
 
   if (subCache.head == NULL)
-  {
     return;
-  }
 
   while (cSubP->next)
   {
@@ -596,12 +592,10 @@ void subCacheDestroy(void)
 
     cSubP = cSubP->next;
     subCacheItemDestroy(prev);
-    LM_T(LmtSubCache,  ("removing CachedSubscription at %p", prev));
     delete prev;
   }
 
   subCacheItemDestroy(cSubP);
-  LM_T(LmtSubCache,  ("removing CachedSubscription at %p", cSubP));
   delete cSubP;
 
   subCache.head  = NULL;
@@ -749,6 +743,10 @@ void subCacheItemInsert
 #ifdef ORIONLD
   const std::string&                 name,
   const std::string&                 ldContext,
+  const char*                        mqttUserName,
+  const char*                        mqttPassword,
+  const char*                        mqttVersion,
+  int                                mqttQoS,
 #endif
   const std::string&                 q,
   const std::string&                 geometry,
@@ -784,9 +782,10 @@ void subCacheItemInsert
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
 #ifdef ORIONLD
-  cSubP->name                  = name;
-  cSubP->ldContext             = ldContext;
-  cSubP->expression.geoproperty = geoproperty;
+  cSubP->name                    = name;
+  cSubP->ldContext               = ldContext;
+  cSubP->expression.geoproperty  = geoproperty;
+  cSubP->mqtt                    = httpInfo.mqtt;
 #endif
   cSubP->expression.q           = q;
   cSubP->expression.geometry    = geometry;
@@ -797,7 +796,6 @@ void subCacheItemInsert
   cSubP->notifyConditionV       = conditionAttrs;
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
-
 
   //
   // String filters

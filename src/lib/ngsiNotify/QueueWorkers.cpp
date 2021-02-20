@@ -100,7 +100,6 @@ static void* workerFunc(void* pSyncQ)
   for (;;)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
-
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
       struct timespec     now;
@@ -135,15 +134,13 @@ static void* workerFunc(void* pSyncQ)
         LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
         __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       }
-      else if (params->protocol == "mqtt:")
+      else if (params->protocol == "mqtt")  // Notification to be sent via MQTT broker
       {
         char* topic = (char*) params->resource.c_str();
 
-        ++topic;  // step over the initial '/'
-
-        r = mqttNotification(params->ip.c_str(), params->port, topic, params->content.c_str(), params->content_type.c_str());
+        r = mqttNotification(params->ip.c_str(), params->port, topic, params->content.c_str(), params->content_type.c_str(), params->mqttQoS, params->mqttUserName, params->mqttPassword, params->mqttVersion);
       }
-      else // we'll send the notification
+      else // Send HTTP notification
       {
         std::string  out;
 

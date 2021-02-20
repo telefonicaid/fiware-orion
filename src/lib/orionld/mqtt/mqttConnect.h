@@ -33,6 +33,6 @@
 //
 // mqttConnect -
 //
-extern bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const char* password, const char* host, unsigned short port);
+extern bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECT_H_

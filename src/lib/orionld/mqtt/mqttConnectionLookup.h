@@ -35,6 +35,6 @@
 //
 // mqttConnectionLookup -
 //
-extern MqttConnection* mqttConnectionLookup(const char* host, unsigned short port);
+extern MqttConnection* mqttConnectionLookup(const char* host, unsigned short port, const char* username, const char* password, const char* version);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONLOOKUP_H_

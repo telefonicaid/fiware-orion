@@ -26,6 +26,7 @@
 * Author: Orion dev team
 */
 #include <string>
+#include <vector>
 #include <map>
 
 #include "mongo/client/dbclient.h"
@@ -34,6 +35,36 @@
 #ifdef ORIONLD
 #include "common/MimeType.h"              // MimeType
 #endif
+
+
+
+/* ****************************************************************************
+*
+* KeyValue - FIXME: move!
+*/
+typedef struct KeyValue
+{
+  char key[64];
+  char value[64];
+} KeyValue;
+
+
+
+/* ****************************************************************************
+*
+* MqttInfo - FIXME: move!
+*/
+typedef struct MqttInfo
+{
+  bool            mqtts;
+  char            host[64];
+  unsigned short  port;
+  char            topic[128];
+  char            username[128];
+  char            password[128];
+  char            version[16];
+  int             qos;
+} MqttInfo;
 
 
 
@@ -53,6 +84,8 @@ struct HttpInfo
   bool                                custom;
 #ifdef ORIONLD
   MimeType                            mimeType;
+  MqttInfo                            mqtt;
+  std::vector<KeyValue*>              notifierInfo;
 #endif
   HttpInfo();
   explicit HttpInfo(const std::string& _url);

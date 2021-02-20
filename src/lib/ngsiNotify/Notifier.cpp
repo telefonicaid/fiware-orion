@@ -448,8 +448,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
-    CachedSubscription*  subP    = NULL;
-    char*                toFree  = NULL;
+    CachedSubscription*               subP    = NULL;
+    char*                             toFree  = NULL;
 #endif
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
@@ -572,7 +572,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string  uriPath;
     std::string  protocol;
 
-    if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
+    if (strncmp(httpInfo.url.c_str(), "mqtt", 4) == 0)
+    {
+      host     = subP->mqtt.host;
+      port     = subP->mqtt.port;
+      uriPath  = subP->mqtt.topic;
+      protocol = (char*) ((subP->mqtt.mqtts == false)? "mqtt" : "mqtts");
+    }
+    else if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
       return paramsV;  //empty vector
@@ -600,6 +607,18 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 #ifdef ORIONLD
     params->toFree           = toFree;
     params->mimeType         = httpInfo.mimeType;
+    params->mqttQoS          = httpInfo.mqtt.qos;
+
+    params->mqttVersion[0]  = 0;
+    params->mqttUserName[0] = 0;
+    params->mqttPassword[0] = 0;
+
+    if (httpInfo.mqtt.version[0] != 0)
+      strncpy(params->mqttVersion, httpInfo.mqtt.version, sizeof(params->mqttVersion));
+    if (httpInfo.mqtt.username[0] != 0)
+      strncpy(params->mqttUserName, httpInfo.mqtt.username, sizeof(params->mqttUserName));
+    if (httpInfo.mqtt.password[0] != 0)
+      strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword));
 #else
     params->mimeType         = JSON;
 #endif

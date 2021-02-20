@@ -64,6 +64,10 @@ typedef struct SenderThreadParams
   std::map<std::string, std::string> extraHeaders;
   std::string                        subscriptionId;
   bool                               registration;
+  int                                mqttQoS;
+  char                               mqttVersion[16];
+  char                               mqttUserName[128];
+  char                               mqttPassword[128];
 } SenderThreadParams;
 
 

@@ -37,7 +37,7 @@
 //
 // mqttConnectionLookup -
 //
-MqttConnection* mqttConnectionLookup(const char* host, unsigned short port)
+MqttConnection* mqttConnectionLookup(const char* host, unsigned short port, const char* username, const char* password, const char* version)
 {
   for (int ix = 0; ix < mqttConnectionListIx; ix++)
   {
@@ -45,8 +45,17 @@ MqttConnection* mqttConnectionLookup(const char* host, unsigned short port)
 
     if (mqP->port != port)
       continue;
-    if (strcmp(host, mqP->host) == 0)
-      return mqP;
+
+    if (strcmp(host, mqP->host) != 0)
+      continue;
+    if ((mqP->username != NULL) && (strcmp(username, mqP->username) != 0))
+      continue;
+    if ((mqP->password != NULL) && (strcmp(password, mqP->password) != 0))
+      continue;
+    if ((mqP->version != NULL) && (strcmp(version, mqP->version)    != 0))
+      continue;
+
+    return mqP;
   }
 
   return NULL;

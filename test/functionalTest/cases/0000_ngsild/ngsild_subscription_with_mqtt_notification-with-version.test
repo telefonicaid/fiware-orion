@@ -1,0 +1,196 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications via MQTT, setting the MQTT version for the MQTT broker
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
+
+--SHELL--
+
+#
+# 01. Create subscription with MQTT broker as endpoint, including the MQTT version for the MQTT broker
+# 02. GET the subscripion to see the MQTT info
+# 03. Create an entity matching the subscription
+# 04. Dump the MQTT test client and see one notification
+#
+
+
+echo "01. Create subscription with MQTT broker as endpoint, including the MQTT version for the MQTT broker"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-Version",
+          "value": "mqtt5.0"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the subscripion to see the MQTT info"
+echo "============================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+echo
+echo
+
+
+echo "03. Create an entity matching the subscription"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:Test:Mqtt",
+  "type": "AirQualityObserved",
+  "temperature": {
+    "type": "Property",
+    "value": 21
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. Dump the MQTT test client and see one notification"
+echo "======================================================"
+mqttTestClientDump entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with MQTT broker as endpoint, including the MQTT version for the MQTT broker
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+Date: REGEX(.*)
+
+
+
+02. GET the subscripion to see the MQTT info
+============================================
+HTTP/1.1 200 OK
+Content-Length: 445
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:ngsi-ld:Test:Mqtt",
+            "type": "AirQualityObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "notification": {
+        "attributes": [
+            "temperature"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                }
+            ],
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized"
+    },
+    "q": "https://uri.fiware.org/ns/data-models#temperature>20",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "temperature"
+    ]
+}
+
+
+03. Create an entity matching the subscription
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt
+Date: REGEX(.*)
+
+
+
+04. Dump the MQTT test client and see one notification
+======================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "type": "AirQualityObserved", 
+        "id": "urn:ngsi-ld:Test:Mqtt", 
+        "temperature": {
+          "type": "Property", 
+          "value": 21
+        }
+      }
+    ], 
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification", 
+    "type": "Notification", 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)"
+  }, 
+  "metadata": {
+    "Content-Type": "application/json"
+  }
+}
+=======================================
+
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB
+mqttTestClientStop entities

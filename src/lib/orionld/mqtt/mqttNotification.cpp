@@ -44,10 +44,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// mqttTimeout
 //
-//
-int  mqttQos    = 1;      // FIXME: This variable should be a CLI for Orion-LD
-int  mqttTimout = 10000;  // FIXME: This variable should be a CLI for Orion-LD
+int  mqttTimeout = 10000;  // FIXME: This variable should be a CLI for Orion-LD
 
 
 
@@ -55,7 +54,18 @@ int  mqttTimout = 10000;  // FIXME: This variable should be a CLI for Orion-LD
 //
 // mqttNotification -
 //
-int mqttNotification(const char* host, unsigned short port, const char* topic, const char* body, const char* mimeType)
+int mqttNotification
+(
+  const char*     host,
+  unsigned short  port,
+  const char*     topic,
+  const char*     body,
+  const char*     mimeType,
+  int             QoS,
+  const char*     username,
+  const char*     password,
+  const char*     mqttVersion
+)
 {
   KjNode*  metadataNodeP     = kjObject(orionldState.kjsonP, "metadata");
   KjNode*  contentTypeNodeP  = kjString(orionldState.kjsonP, "Content-Type", mimeType);
@@ -77,7 +87,7 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
 
   snprintf(totalBuf, totalLen, "{\"metadata\": %s,\"body\": %s}", metadataBuf, body);
 
-  MqttConnection*           mqttP   = mqttConnectionLookup(host, port);
+  MqttConnection*           mqttP   = mqttConnectionLookup(host, port, username, password, mqttVersion);
   MQTTClient_message        mqttMsg = MQTTClient_message_initializer;
   MQTTClient_deliveryToken  mqttToken;
 
@@ -89,12 +99,12 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
 
   mqttMsg.payload    = (void*) totalBuf;
   mqttMsg.payloadlen = strlen(totalBuf);
-  mqttMsg.qos        = mqttQos;
+  mqttMsg.qos        = QoS;
   mqttMsg.retained   = 0;
 
   MQTTClient_publishMessage(mqttP->client, topic, &mqttMsg, &mqttToken);
 
-  int rc = MQTTClient_waitForCompletion(mqttP->client, mqttToken, mqttTimout);
+  int rc = MQTTClient_waitForCompletion(mqttP->client, mqttToken, mqttTimeout);
   if (rc != 0)
   {
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));

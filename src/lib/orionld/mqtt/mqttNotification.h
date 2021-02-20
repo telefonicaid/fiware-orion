@@ -32,6 +32,17 @@
 //
 // mqttNotification -
 //
-extern int mqttNotification(const char* host, unsigned short port, const char* topic, const char* body, const char* mimeType);
+extern int mqttNotification
+(
+  const char*     host,
+  unsigned short  port,
+  const char*     topic,
+  const char*     body,
+  const char*     mimeType,
+  int             QoS,
+  const char*     username,
+  const char*     password,
+  const char*     mqttVersion
+);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTNOTIFICATION_H_
