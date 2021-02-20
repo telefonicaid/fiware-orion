@@ -31,6 +31,8 @@
 #include "common/JsonHelper.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "orionld/common/orionldState.h"
+
 #include "apiTypesV2/HttpInfo.h"
 
 
@@ -48,7 +50,7 @@ namespace ngsiv2
 {
 /* ****************************************************************************
 *
-* HttpInfo::HttpInfo - 
+* HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
 HttpInfo::HttpInfo() : verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
@@ -56,13 +58,16 @@ HttpInfo::HttpInfo() : verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
 HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 #endif
 {
+#ifdef ORIONLD
+  bzero(&mqtt, sizeof(mqtt));
+#endif
 }
 
 
 
 /* ****************************************************************************
 *
-* HttpInfo::HttpInfo - 
+* HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
 HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
@@ -70,6 +75,9 @@ HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(fa
 HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false)
 #endif
 {
+#ifdef ORIONLD
+  bzero(&mqtt, sizeof(mqtt));
+#endif
 }
 
 
@@ -126,6 +134,25 @@ void HttpInfo::fill(const BSONObj& bo)
 
   mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo, CSUB_MIMETYPE) : "application/json";  // Default
   this->mimeType = longStringToMimeType(mimeTypeString);
+
+  if (bo.hasField("notifierInfo"))
+  {
+    BSONObj ni = getObjectFieldF(bo, "notifierInfo");
+
+    for (BSONObj::iterator iter = ni.begin(); iter.more();)
+    {
+      mongo::BSONElement be = iter.next();
+
+      const char*  key   = be.fieldName();
+      const char*  value = be.String().c_str();
+      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
+
+      strncpy(kvP->key,   key,   sizeof(kvP->key));
+      strncpy(kvP->value, value, sizeof(kvP->value));
+
+      notifierInfo.push_back(kvP);
+    }
+  }
 #endif
 
   if (this->custom)

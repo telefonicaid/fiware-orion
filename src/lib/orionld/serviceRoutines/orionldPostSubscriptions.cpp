@@ -136,7 +136,49 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
         return false;
       }
 
-      if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort) == false)
+      if (mqttUser     != NULL) strncpy(sub.notification.httpInfo.mqtt.username, mqttUser,     sizeof(sub.notification.httpInfo.mqtt.username));
+      if (mqttPassword != NULL) strncpy(sub.notification.httpInfo.mqtt.password, mqttPassword, sizeof(sub.notification.httpInfo.mqtt.password));
+      if (mqttHost     != NULL) strncpy(sub.notification.httpInfo.mqtt.host,     mqttHost,     sizeof(sub.notification.httpInfo.mqtt.host));
+      if (mqttTopic    != NULL) strncpy(sub.notification.httpInfo.mqtt.topic,    mqttTopic,    sizeof(sub.notification.httpInfo.mqtt.topic));
+
+      sub.notification.httpInfo.mqtt.mqtts = mqtts;
+      sub.notification.httpInfo.mqtt.port  = mqttPort;
+
+      //
+      // Get MQTT-Version from notification:endpoint:notifierInfo Array, "key == MQTT-Version"
+      //
+      char*   mqttVersion   = NULL;
+      int     mqttQoS;
+      KjNode* notifierInfoP = kjLookup(endpointP, "notifierInfo");
+
+      if (notifierInfoP)
+      {
+        for (KjNode* kvPairP = notifierInfoP->value.firstChildP; kvPairP != NULL; kvPairP = kvPairP->next)
+        {
+          KjNode* keyP   = kjLookup(kvPairP, "key");
+          KjNode* valueP = kjLookup(kvPairP, "value");
+
+          if ((keyP != NULL) && (valueP != NULL) && (keyP->type == KjString) && (valueP->type == KjString))
+          {
+            if (strcmp(keyP->name, "MQTT-Version") == 0)
+            {
+              mqttVersion = valueP->value.s;
+              strncpy(sub.notification.httpInfo.mqtt.version, mqttVersion, sizeof(sub.notification.httpInfo.mqtt.version));
+            }
+            else if (strcmp(keyP->name, "MQTT-QoS") == 0)
+            {
+              mqttQoS = valueP->value.i;
+              sub.notification.httpInfo.mqtt.qos = mqttQoS;
+            }
+          }
+        }
+      }
+
+
+      //
+      // Establish connection qith MQTT broker
+      //
+      if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
       {
         LM_E(("Internal Error (unable to connect to MQTT server)"));
         orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");
@@ -175,8 +217,8 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   ciP->httpHeaders.xauthToken,
                                   ciP->httpHeaders.correlator,
                                   sub.ldContext);
+  // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 
-  // FIXME: Check oError for failure!
   orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
 

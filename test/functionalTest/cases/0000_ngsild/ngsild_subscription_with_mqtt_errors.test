@@ -1,0 +1,579 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling for MQTT subscriptions
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Attempt to create an MQTT subscription with a notifierInfo key that is not a string - see error
+# 02. Attempt to create an MQTT subscription with a notifierInfo key that is empty - see error
+# 03. Attempt to create an MQTT subscription with a notifierInfo value that is not a string - see	error
+# 04. Attempt to create an MQTT subscription with a notifierInfo value that is empty - see error
+# 05. Attempt to create an MQTT subscription with a notifierInfo that is missing the key
+# 06. Attempt to create an MQTT subscription with a notifierInfo that is missing the value
+# 07. Attempt to create an MQTT subscription with a notifierInfo with a duplicated key - see error
+# 08. Attempt to create an MQTT subscription with a notifierInfo with a duplicated value - see error
+# 09. Attempt to create an MQTT subscription with a notifierInfo with unknown key Mq - see error
+# 10. Attempt to create an MQTT subscription with a notifierInfo MQTT-Version with an unsupported version - see error
+# 11. Attempt to create an MQTT subscription with a notifierInfo MQTT-QoS that is not supported - see error
+#
+
+
+echo "01. Attempt to create an MQTT subscription with a notifierInfo key that is not a string - see error"
+echo "==================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": 4,
+          "value": "abc"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Attempt to create an MQTT subscription with a notifierInfo key that is empty - see error"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "",
+          "value": "abc"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Attempt to create an MQTT subscription with a notifierInfo value that is not a string - see	error"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "abc",
+          "value": 14
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. Attempt to create an MQTT subscription with a notifierInfo value that is empty - see error"
+echo "=============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "abc",
+          "value": ""
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. Attempt to create an MQTT subscription with a notifierInfo that is missing the key"
+echo "======================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "value": "abc"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06. Attempt to create an MQTT subscription with a notifierInfo that is missing the value"
+echo "========================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "abc"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "07. Attempt to create an MQTT subscription with a notifierInfo with a duplicated key - see error"
+echo "================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "abc",
+          "key": "def",
+          "value": "abc"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "08. Attempt to create an MQTT subscription with a notifierInfo with a duplicated value - see error"
+echo "=================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "abc",
+          "value": "abc",
+          "value": "def"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "09. Attempt to create an MQTT subscription with a notifierInfo with unknown key Mq - see error"
+echo "=============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "Mq",
+          "value": "1"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "10. Attempt to create an MQTT subscription with a notifierInfo MQTT-Version with an unsupported version - see error"
+echo "==================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-Version",
+          "value": "3"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "11. Attempt to create an MQTT subscription with a notifierInfo MQTT-QoS that is not supported - see error"
+echo "========================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Test:Mqtt",
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "q": "temperature>20",
+  "notification": {
+    "attributes": [ "temperature" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "mgtt1.1"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an MQTT subscription with a notifierInfo key that is not a string - see error
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Endpoint::notifierInfo::key",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an MQTT subscription with a notifierInfo key that is empty - see error
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Incomplete Endpoint::notifierInfo key-value pair - one of them is empty",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an MQTT subscription with a notifierInfo value that is not a string - see	error
+=====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Endpoint::notifierInfo::value",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create an MQTT subscription with a notifierInfo value that is empty - see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Incomplete Endpoint::notifierInfo key-value pair - one of them is empty",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create an MQTT subscription with a notifierInfo that is missing the key
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Incomplete Endpoint::notifierInfo key-value pair - one of them is missing",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create an MQTT subscription with a notifierInfo that is missing the value
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Incomplete Endpoint::notifierInfo key-value pair - one of them is missing",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create an MQTT subscription with a notifierInfo with a duplicated key - see error
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Endpoint::notifierInfo::key",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create an MQTT subscription with a notifierInfo with a duplicated value - see error
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Endpoint::notifierInfo::value",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to create an MQTT subscription with a notifierInfo with unknown key Mq - see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid key in Endpoint::notifierInfo",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to create an MQTT subscription with a notifierInfo MQTT-Version with an unsupported version - see error
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid value for MQTT-Version Endpoint::notifierInfo key-value pair",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to create an MQTT subscription with a notifierInfo MQTT-QoS that is not supported - see error
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 157
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid value for MQTT-QoS Endpoint::notifierInfo key-value pair",
+    "title": "Bad Input",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

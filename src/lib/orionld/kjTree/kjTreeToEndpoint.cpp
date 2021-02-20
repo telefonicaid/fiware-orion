@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
@@ -93,6 +94,98 @@ static bool kjTreeToReceiverInfo(KjNode* receiverInfoP, ngsiv2::HttpInfo* httpIn
 
 // -----------------------------------------------------------------------------
 //
+// kjTreeToNotifierInfo -
+//
+static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpInfoP)
+{
+  for (KjNode* kvP = notifierInfoP->value.firstChildP; kvP != NULL; kvP = kvP->next)
+  {
+    char* key   = NULL;
+    char* value = NULL;
+
+    OBJECT_CHECK(kvP, "notifierInfo key-value");
+
+    for (KjNode* nodeP = kvP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      if (SCOMPARE4(nodeP->name, 'k', 'e', 'y', 0))
+      {
+        DUPLICATE_CHECK(key, "Endpoint::notifierInfo::key", nodeP->value.s);
+        STRING_CHECK(nodeP, "Endpoint::notifierInfo::key");
+      }
+      else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
+      {
+        DUPLICATE_CHECK(value, "Endpoint::notifierInfo::value", nodeP->value.s);
+        STRING_CHECK(nodeP, "Endpoint::notifierInfo::value");
+      }
+      else
+      {
+        LM_E(("Bad Input (Invalid Endpoint::notifierInfo field: '%s')", nodeP->name));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::notifierInfo field", nodeP->name);
+        return false;
+      }
+    }
+
+    if ((key == NULL) || (value == NULL))
+    {
+      LM_W(("Bad Input (Incomplete Endpoint::notifierInfo key-value pair - one of them is missing)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is missing");
+      return false;
+    }
+
+    if ((*key == 0) || (*value == 0))
+    {
+      LM_W(("Bad Input (Incomplete Endpoint::notifierInfo key-value pair - one of them is empty)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is empty");
+      return false;
+    }
+
+    KeyValue* keyValueP = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
+
+    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key));
+    strncpy(keyValueP->value, value, sizeof(keyValueP->value));
+    httpInfoP->notifierInfo.push_back(keyValueP);
+
+    //
+    // Known key-values are extracted
+    //
+    if (strcmp(key, "MQTT-Version") == 0)
+    {
+      if ((strcmp(value, "mqtt3.1.1") != 0) && (strcmp(value, "mqtt5.0") != 0))
+      {
+        LM_W(("Bad Input (Invalid value for MQTT-Version in Endpoint::notifierInfo key-value pair - '%s')", value));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-Version Endpoint::notifierInfo key-value pair");
+        return false;
+      }
+
+      strncpy(httpInfoP->mqtt.version, value, sizeof(httpInfoP->mqtt.version));
+    }
+    else if (strcmp(key, "MQTT-QoS") == 0)
+    {
+      if      ((value[0] == '0') && (value[1] == 0))   httpInfoP->mqtt.qos = 0;
+      else if ((value[0] == '1') && (value[1] == 0))   httpInfoP->mqtt.qos = 1;
+      else if ((value[0] == '2') && (value[1] == 0))   httpInfoP->mqtt.qos = 2;
+      else
+      {
+        LM_W(("Bad Input (Invalid value for MQTT-QoS in Endpoint::notifierInfo key-value pair - '%s')", value));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-QoS Endpoint::notifierInfo key-value pair");
+        return false;
+      }
+    }
+    else
+    {
+      LM_W(("Bad Input (Invalid key in Endpoint::notifierInfo)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid key in Endpoint::notifierInfo");
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeToEndpoint -
 //
 bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
@@ -100,6 +193,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
   char*   uriP          = NULL;
   char*   acceptP       = NULL;
   KjNode* receiverInfoP = NULL;
+  KjNode* notifierInfoP = NULL;
   char*   detail;
 
   // Set default values
@@ -162,6 +256,14 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
       ARRAY_CHECK(itemP, "Endpoint::receiverInfo");
 
       if (kjTreeToReceiverInfo(receiverInfoP, httpInfoP) == false)
+        return false;
+    }
+    else if (SCOMPARE13(itemP->name, 'n', 'o', 't', 'i', 'f', 'i', 'e', 'r', 'I', 'n', 'f', 'o', 0))
+    {
+      DUPLICATE_CHECK(notifierInfoP, "Endpoint::notifierInfo", itemP);
+      ARRAY_CHECK(itemP, "Endpoint::notifierInfo");
+
+      if (kjTreeToNotifierInfo(notifierInfoP, httpInfoP) == false)
         return false;
     }
     else

@@ -163,6 +163,20 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 
     b->append(CSUB_HEADERS, headersObj);
   }
+
+  if (sub.notification.httpInfo.notifierInfo.size() > 0)
+  {
+    BSONObjBuilder  bo;
+
+    for (unsigned int ix = 0; ix  < sub.notification.httpInfo.notifierInfo.size(); ix++)
+    {
+      const KeyValue*   kvP = sub.notification.httpInfo.notifierInfo[ix];
+
+      bo.append(kvP->key, kvP->value);
+    }
+
+    b->append("notifierInfo", bo.obj());
+  }
 #endif
 
   if (sub.notification.httpInfo.custom)

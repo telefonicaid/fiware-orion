@@ -125,6 +125,10 @@ static void insertInCache
 #ifdef ORIONLD
                      sub.name,
                      sub.ldContext,
+                     sub.notification.httpInfo.mqtt.username,
+                     sub.notification.httpInfo.mqtt.password,
+                     sub.notification.httpInfo.mqtt.version,
+                     sub.notification.httpInfo.mqtt.qos,
 #endif
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
@@ -207,6 +211,7 @@ std::string mongoCreateSubscription
   // need to adapt the code to 'timeInterval' now being a 'double' and not an 'int'
   //
   // setTimeInterval(sub, &b);
+
 #endif
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
@@ -214,10 +219,7 @@ std::string mongoCreateSubscription
   // We need to insert the csub in the cache before (potentially) sending the
   // initial notification (have a look to issue #2974 for details)
   if (!noCache)
-  {
     insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
-  }
-
 
   setCondsAndInitialNotify(sub,
                            subId,

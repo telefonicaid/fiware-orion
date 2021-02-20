@@ -36,7 +36,7 @@
 //
 // mqttConnectionAdd -
 //
-MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
+MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version)
 {
   if (mqttConnectionListIx >= mqttConnectionListSize)
   {
@@ -46,10 +46,13 @@ MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* 
 
   MqttConnection* mqP = &mqttConnectionList[mqttConnectionListIx];
 
-  mqP->host = strdup(host);
-  mqP->port = port;
+  mqP->host     = strdup(host);
+  mqP->port     = port;
+  mqP->username = (username != NULL)? strdup(username) : NULL;
+  mqP->password = (password != NULL)? strdup(password) : NULL;
+  mqP->version  = (version  != NULL)? strdup(version)  : NULL;
 
-  if (mqttConnect(mqP, mqtts, username, password, host, port) == false)
+  if (mqttConnect(mqP, mqtts, username, password, host, port, version) == false)
   {
     LM_E(("Internal Error (mqttConnect failed)"));
     return NULL;

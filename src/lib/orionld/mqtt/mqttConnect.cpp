@@ -37,7 +37,7 @@
 //
 // mqttConnect -
 //
-bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
+bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version)
 {
   MQTTClient_connectOptions  connectOptions = MQTTClient_connectOptions_initializer;
   char                       address[64];
@@ -45,14 +45,31 @@ bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const ch
 
   snprintf(address, sizeof(address), "%s:%d", host, port);
   MQTTClient_create(&mqP->client, address, "Orion-LD", MQTTCLIENT_PERSISTENCE_NONE, NULL);
+
   connectOptions.keepAliveInterval = 20;
   connectOptions.cleansession      = 1;
   connectOptions.username          = username;
   connectOptions.password          = password;
 
+  //
+  // connectOptions.MQTTVersion: Sets the version of MQTT to be used on the connect.
+  //   MQTTVERSION_DEFAULT (0) = default: start with 3.1.1, and if that fails, fall back to 3.1
+  //   MQTTVERSION_3_1     (3) = only try version 3.1
+  //   MQTTVERSION_3_1_1   (4) = only try version 3.1.1
+  //   MQTTVERSION_5       (5) = only try version 5.0
+  //
+  if      (version == NULL)                     connectOptions.MQTTVersion = MQTTVERSION_DEFAULT;
+  else if (strcmp(version, "mqtt3.1.1") == 0)   connectOptions.MQTTVersion = MQTTVERSION_DEFAULT;
+  else if (strcmp(version, "mqtt5.0")   == 0)   connectOptions.MQTTVersion = MQTTVERSION_5;
+  else                                          connectOptions.MQTTVersion = MQTTVERSION_DEFAULT;
+
   if (mqtts)
     LM_W(("WARNING - MQTT/SSL is not implemented yet - using unsecure MQTT for now. Sorry ... "));
 
+
+  //
+  // Connecting the to MQTT Broker
+  //
   if ((status = MQTTClient_connect(mqP->client, &connectOptions)) != MQTTCLIENT_SUCCESS)
   {
     LM_E(("Internal Error (unable to connect to MQTT server (%s:%d): MQTTClient_connect error %d", host, port, status));
