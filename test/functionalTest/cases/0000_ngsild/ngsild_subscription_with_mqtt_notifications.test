@@ -56,7 +56,17 @@ payload='{
     "format": "normalized",
     "endpoint": {
       "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
-      "accept": "application/json"
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "123"
+        },
+        {
+          "key": "H2",
+          "value": "456"
+        }
+      ]
     }
   },
   "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
@@ -129,6 +139,9 @@ Notifications: 1
     "notifiedAt": "REGEX(.*)"
   }, 
   "metadata": {
+    "H2": "456", 
+    "Link": "REGEX(.*)", 
+    "H1": "123", 
     "Content-Type": "application/json"
   }
 }
