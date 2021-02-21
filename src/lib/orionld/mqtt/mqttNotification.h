@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <map>                                                 // std::map
 
 
 

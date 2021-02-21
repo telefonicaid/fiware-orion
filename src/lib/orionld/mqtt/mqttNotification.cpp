@@ -24,6 +24,8 @@
 */
 #include <string.h>                                            // strlen
 #include <MQTTClient.h>                                        // MQTT Client header
+#include <string>                                              // std::string
+#include <map>                                                 // std::map
 
 extern "C"
 {
