@@ -183,6 +183,7 @@ Notifications: 1
     "notifiedAt": "REGEX(.*)"
   }, 
   "metadata": {
+    "Link": "REGEX(.*)",
     "Content-Type": "application/json"
   }
 }
@@ -192,5 +193,5 @@ Notifications: 1
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
 mqttTestClientStop entities

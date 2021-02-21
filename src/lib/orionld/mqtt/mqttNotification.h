@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <map>                                                 // std::map
 
 
 
@@ -34,15 +36,17 @@
 //
 extern int mqttNotification
 (
-  const char*     host,
-  unsigned short  port,
-  const char*     topic,
-  const char*     body,
-  const char*     mimeType,
-  int             QoS,
-  const char*     username,
-  const char*     password,
-  const char*     mqttVersion
+  const char*                         host,
+  unsigned short                      port,
+  const char*                         topic,
+  const char*                         body,
+  const char*                         mimeType,
+  int                                 QoS,
+  const char*                         username,
+  const char*                         password,
+  const char*                         mqttVersion,
+  const char*                         xauthToken,
+  std::map<std::string, std::string>& extraHeaders
 );
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTNOTIFICATION_H_

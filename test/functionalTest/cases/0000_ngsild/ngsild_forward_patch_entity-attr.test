@@ -186,5 +186,5 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
-#dbDrop CB
+dbDrop CB
 dbDrop CP1

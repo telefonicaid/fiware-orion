@@ -24,6 +24,8 @@
 */
 #include <string.h>                                            // strlen
 #include <MQTTClient.h>                                        // MQTT Client header
+#include <string>                                              // std::string
+#include <map>                                                 // std::map
 
 extern "C"
 {
@@ -56,20 +58,22 @@ int  mqttTimeout = 10000;  // FIXME: This variable should be a CLI for Orion-LD
 //
 int mqttNotification
 (
-  const char*     host,
-  unsigned short  port,
-  const char*     topic,
-  const char*     body,
-  const char*     mimeType,
-  int             QoS,
-  const char*     username,
-  const char*     password,
-  const char*     mqttVersion
+  const char*                         host,
+  unsigned short                      port,
+  const char*                         topic,
+  const char*                         body,
+  const char*                         mimeType,
+  int                                 QoS,
+  const char*                         username,
+  const char*                         password,
+  const char*                         mqttVersion,
+  const char*                         xauthToken,
+  std::map<std::string, std::string>& extraHeaders
 )
 {
-  KjNode*  metadataNodeP     = kjObject(orionldState.kjsonP, "metadata");
-  KjNode*  contentTypeNodeP  = kjString(orionldState.kjsonP, "Content-Type", mimeType);
-  char*    metadataBuf       = kaAlloc(&orionldState.kalloc, 1024);
+  KjNode*  metadataNodeP      = kjObject(orionldState.kjsonP, "metadata");
+  KjNode*  contentTypeNodeP   = kjString(orionldState.kjsonP, "Content-Type", mimeType);
+  char*    metadataBuf        = kaAlloc(&orionldState.kalloc, 4096);
   int      totalLen;
   char*    totalBuf;
 
@@ -80,7 +84,52 @@ int mqttNotification
   }
 
   kjChildAdd(metadataNodeP, contentTypeNodeP);
-  kjFastRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 1024);
+
+  bool     xauthTokenIncluded = false;
+  if ((xauthToken != NULL) && (*xauthToken != 0))
+  {
+    KjNode* xauthTokenNodeP = kjString(orionldState.kjsonP, "X-Auth-Token", xauthToken);
+    kjChildAdd(metadataNodeP, xauthTokenNodeP);
+    xauthTokenIncluded = true;
+  }
+
+
+  //
+  // Extra headers
+  //
+  for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
+  {
+    char*  key   = (char*) it->first.c_str();
+    char*  value = (char*) it->second.c_str();
+
+    if (strcmp(key, "Link") == 0)
+    {
+      //
+      // Link: <PATH>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+      //
+      // We only want the "LINK" value - the rest fucks up the JSON
+      //
+      char* closingBracket = strchr(value, '>');
+      char* openingBracket = strchr(value, '<');
+
+      if ((openingBracket == NULL) || (closingBracket == NULL))
+      {
+        LM_E(("Internal Error (invalid Link header: '%s')", value));
+        continue;
+      }
+
+      value = &openingBracket[1];
+      *closingBracket = 0;
+    }
+    else if ((xauthTokenIncluded == true) && (strcmp(key, "X-Auth-Token") == 0))
+      continue;
+
+    KjNode* kvP = kjString(orionldState.kjsonP, key, value);
+    kjChildAdd(metadataNodeP, kvP);
+  }
+
+
+  kjFastRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 4096);
 
   totalLen = strlen(body) + strlen(metadataBuf) + 50;
   totalBuf = kaAlloc(&orionldState.kalloc, totalLen);

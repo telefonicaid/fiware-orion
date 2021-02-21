@@ -144,4 +144,4 @@ Content-Type: application/json; charset=utf-8
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
-#dbDrop CB
+dbDrop CB

@@ -138,7 +138,17 @@ static void* workerFunc(void* pSyncQ)
       {
         char* topic = (char*) params->resource.c_str();
 
-        r = mqttNotification(params->ip.c_str(), params->port, topic, params->content.c_str(), params->content_type.c_str(), params->mqttQoS, params->mqttUserName, params->mqttPassword, params->mqttVersion);
+        r = mqttNotification(params->ip.c_str(),
+                             params->port,
+                             topic,
+                             params->content.c_str(),
+                             params->content_type.c_str(),
+                             params->mqttQoS,
+                             params->mqttUserName,
+                             params->mqttPassword,
+                             params->mqttVersion,
+                             params->xauthToken.c_str(),
+                             params->extraHeaders);
       }
       else // Send HTTP notification
       {
