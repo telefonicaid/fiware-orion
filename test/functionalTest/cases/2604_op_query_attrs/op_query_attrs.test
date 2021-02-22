@@ -33,10 +33,10 @@ brokerStart CB
 # 01. Create entity E1 with attributes A, B, C
 # 02. Create entity E2 with attributes B, C
 # 03. Create entity E3 with attribute C
-# 04. Query attrs: A, without q: E1-A
+# 04. Query attrs: A, without q: E1-A, E2-none, E3-none
 # 05. Query attrs: A, with q=A: E1-A
 # 06. Query attrs: C, with q=A: E1-C
-# 07. Query attrs: A, with q=!A: nothing
+# 07. Query attrs: A, with q=!A: E2-none, E3-none
 # 08. Query attrs: C, with q=!A: E2-C, E3-C
 #
 
@@ -98,8 +98,8 @@ echo
 echo
 
 
-echo "04. Query attrs: A, without q: E1-A"
-echo "==================================="
+echo "04. Query attrs: A, without q: E1-A, E2-none, E3-none"
+echo "====================================================="
 payload='{
   "entities": [
     {
@@ -152,8 +152,8 @@ echo
 echo
 
 
-echo "07. Query attrs: A, with q=!A: nothing"
-echo "======================================"
+echo "07. Query attrs: A, with q=!A: E2-none, E3-none"
+echo "==============================================="
 payload='{
   "entities": [
     {
@@ -221,10 +221,10 @@ Date: REGEX(.*)
 
 
 
-04. Query attrs: A, without q: E1-A
-===================================
+04. Query attrs: A, without q: E1-A, E2-none, E3-none
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 117
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,6 +237,14 @@ Date: REGEX(.*)
             "value": "1A"
         },
         "id": "E1",
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "id": "E3",
         "type": "T"
     }
 ]
@@ -284,15 +292,24 @@ Date: REGEX(.*)
 ]
 
 
-07. Query attrs: A, with q=!A: nothing
-======================================
+07. Query attrs: A, with q=!A: E2-none, E3-none
+===============================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 47
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[]
+[
+    {
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "type": "T"
+    }
+]
 
 
 08. Query attrs: C, with q=!A: E2-C, E3-C
@@ -328,4 +345,3 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

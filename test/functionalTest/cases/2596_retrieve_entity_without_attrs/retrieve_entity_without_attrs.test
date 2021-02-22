@@ -32,7 +32,7 @@ brokerStart CB
 #
 # 01. Create Person entity 100
 # 02. Create Person entity 101
-# 03. Get entities filtering by nonexisting attribute, to get nothing
+# 03. Get entities filtering by nonexisting attribute, to get only id and type
 #
 
 echo "01. Create Person entity 100"
@@ -74,8 +74,8 @@ echo
 
 
 
-echo "03. Get entities filtering by nonexisting attribute, to get nothing"
-echo "==================================================================="
+echo "03. Get entities filtering by nonexisting attribute, to get only id and type"
+echo "============================================================================"
 orionCurl --url /v2/entities?attrs=blabla
 echo
 echo
@@ -102,15 +102,24 @@ Date: REGEX(.*)
 
 
 
-03. Get entities filtering by nonexisting attribute, to get nothing
-===================================================================
+03. Get entities filtering by nonexisting attribute, to get only id and type
+============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 59
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[]
+[
+    {
+        "id": "100",
+        "type": "Person"
+    },
+    {
+        "id": "101",
+        "type": "Person"
+    }
+]
 
 
 --TEARDOWN--
