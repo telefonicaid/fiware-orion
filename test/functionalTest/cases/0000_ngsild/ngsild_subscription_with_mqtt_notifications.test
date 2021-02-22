@@ -33,10 +33,15 @@ mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROK
 
 #
 # 01. Create subscription with MQTT broker as endpoint
-# 02. Create an entity matching the subscription
-# 03. Dump the MQTT test client and see one notification
+# 02. See the subscription in mongo
+# 03. GET the subscription
+# 04. Create an entity matching the subscription
+# 05. Dump and Reset the MQTT test client and see one notification
+# 06. Restart the broker
+# 07. GET the subscription
+# 08. Create another entity matching the subscription
+# 09. Dump the MQTT test client and see one notification
 #
-
 
 echo "01. Create subscription with MQTT broker as endpoint"
 echo "===================================================="
@@ -45,14 +50,13 @@ payload='{
   "type": "Subscription",
   "entities": [
     {
-      "id": "urn:ngsi-ld:Test:Mqtt",
       "type": "AirQualityObserved"
+    },
+    {
+      "type": "AirQualityObserved2"
     }
   ],
-  "watchedAttributes": ["temperature"],
-  "q": "temperature>20",
   "notification": {
-    "attributes": [ "temperature" ],
     "format": "normalized",
     "endpoint": {
       "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
@@ -76,10 +80,24 @@ echo
 echo
 
 
-echo "02. Create an entity matching the subscription"
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+echo
+echo
+
+
+echo "04. Create an entity matching the subscription"
 echo "=============================================="
 payload='{
-  "id": "urn:ngsi-ld:Test:Mqtt",
+  "id": "urn:ngsi-ld:Test:Mqtt1",
   "type": "AirQualityObserved",
   "temperature": {
     "type": "Property",
@@ -92,7 +110,47 @@ echo
 echo
 
 
-echo "03. Dump the MQTT test client and see one notification"
+echo "05. Dump and Reset the MQTT test client and see one notification"
+echo "================================================================"
+mqttTestClientDump entities
+mqttTestClientReset entities
+echo
+echo
+
+
+echo "06. Restart the broker"
+echo "======================"
+brokerStop CB
+export BROKER=orionld
+brokerStart CB 0-255
+sleep 2  # give the poor broker some time to start (not really necessary)
+echo
+echo
+
+
+echo "07. GET the subscription"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+echo
+echo
+
+
+echo "08. Create another entity matching the subscription"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:Test:Mqtt2",
+  "type": "AirQualityObserved2",
+  "temperature": {
+    "type": "Property",
+    "value": 21
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'X-Auth-Token: x-auth-token-is-not-verified'
+echo
+echo
+
+
+echo "09. Dump the MQTT test client and see one notification"
 echo "======================================================"
 mqttTestClientDump entities
 echo
@@ -109,24 +167,115 @@ Date: REGEX(.*)
 
 
 
-02. Create an entity matching the subscription
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:mqttNotification",
+	"expiration" : REGEX(.*),
+	"reference" : "mqtt://localhost:1883/entities",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"headers" : {
+		"H1" : "123",
+		"H2" : "456"
+	},
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.fiware.org/ns/data-models#AirQualityObserved",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/AirQualityObserved2",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "REGEX(.*)"
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+03. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 336
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "AirQualityObserved"
+        },
+        {
+            "type": "AirQualityObserved2"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "123"
+                },
+                {
+                    "key": "H2",
+                    "value": "456"
+                }
+            ],
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized"
+    },
+    "type": "Subscription"
+}
+
+
+04. Create an entity matching the subscription
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt1
 Date: REGEX(.*)
 
 
 
-03. Dump the MQTT test client and see one notification
-======================================================
+05. Dump and Reset the MQTT test client and see one notification
+================================================================
 Notifications: 1
 {
   "body": {
     "data": [
       {
         "type": "AirQualityObserved", 
-        "id": "urn:ngsi-ld:Test:Mqtt", 
+        "id": "urn:ngsi-ld:Test:Mqtt1", 
         "temperature": {
           "type": "Property", 
           "value": 21
@@ -143,6 +292,90 @@ Notifications: 1
     "Link": "REGEX(.*)", 
     "H1": "123", 
     "Content-Type": "application/json"
+  }
+}
+=======================================
+
+
+
+06. Restart the broker
+======================
+
+
+07. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 374
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
+        },
+        {
+            "type": "AirQualityObserved2"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "123"
+                },
+                {
+                    "key": "H2",
+                    "value": "456"
+                }
+            ],
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized"
+    },
+    "type": "Subscription"
+}
+
+
+08. Create another entity matching the subscription
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt2
+Date: REGEX(.*)
+
+
+
+09. Dump the MQTT test client and see one notification
+======================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "type": "AirQualityObserved2", 
+        "id": "urn:ngsi-ld:Test:Mqtt2", 
+        "temperature": {
+          "type": "Property", 
+          "value": 21
+        }
+      }
+    ], 
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification", 
+    "type": "Notification", 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)"
+  }, 
+  "metadata": {
+    "H2": "456", 
+    "Link": "REGEX(.*)", 
+    "H1": "123", 
+    "Content-Type": "application/json",
+    "X-Auth-Token": "x-auth-token-is-not-verified"
   }
 }
 =======================================

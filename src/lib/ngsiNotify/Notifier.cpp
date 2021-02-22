@@ -574,10 +574,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     if (strncmp(httpInfo.url.c_str(), "mqtt", 4) == 0)
     {
-      host     = subP->mqtt.host;
-      port     = subP->mqtt.port;
-      uriPath  = subP->mqtt.topic;
-      protocol = (char*) ((subP->mqtt.mqtts == false)? "mqtt" : "mqtts");
+      host     = subP->httpInfo.mqtt.host;
+      port     = subP->httpInfo.mqtt.port;
+      uriPath  = subP->httpInfo.mqtt.topic;
+      protocol = (char*) ((subP->httpInfo.mqtt.mqtts == false)? "mqtt" : "mqtts");
     }
     else if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
     {

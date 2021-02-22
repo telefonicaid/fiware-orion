@@ -31,7 +31,8 @@
 #include "common/JsonHelper.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
-#include "orionld/common/orionldState.h"
+#include "orionld/mqtt/mqttParse.h"                            // mqttParse
+#include "orionld/common/orionldState.h"                       // orionldState
 
 #include "apiTypesV2/HttpInfo.h"
 
@@ -129,6 +130,8 @@ void HttpInfo::fill(const BSONObj& bo)
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
+  bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
+
 #ifdef ORIONLD
   std::string mimeTypeString;
 
@@ -145,7 +148,7 @@ void HttpInfo::fill(const BSONObj& bo)
 
       const char*  key   = be.fieldName();
       const char*  value = be.String().c_str();
-      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
+      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));  // FIXME: what about initial cache fill?
 
       strncpy(kvP->key,   key,   sizeof(kvP->key));
       strncpy(kvP->value, value, sizeof(kvP->value));
@@ -176,7 +179,10 @@ void HttpInfo::fill(const BSONObj& bo)
         this->qs[e.fieldName()] = e.String();
       }
     }
+  }
 
+  if (this->custom || mqtt)
+  {
     // headers
     if (bo.hasField(CSUB_HEADERS))
     {
@@ -190,5 +196,35 @@ void HttpInfo::fill(const BSONObj& bo)
       }
     }
   }
+
+  if (mqtt)
+  {
+    char*           url           = strdup(this->url.c_str());
+    bool            mqtts         = false;
+    char*           mqttUser      = NULL;
+    char*           mqttPassword  = NULL;
+    char*           mqttHost      = NULL;
+    unsigned short  mqttPort      = 0;
+    char*           mqttTopic     = NULL;
+    char*           detail        = NULL;
+
+    if (mqttParse(url, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+    {
+      free(url);
+      LM_E(("Internal Error (unable to parse mqtt URL)"));
+      return;
+    }
+
+    if (mqttUser     != NULL) strncpy(this->mqtt.username, mqttUser,     sizeof(this->mqtt.username));
+    if (mqttPassword != NULL) strncpy(this->mqtt.password, mqttPassword, sizeof(this->mqtt.password));
+    if (mqttHost     != NULL) strncpy(this->mqtt.host,     mqttHost,     sizeof(this->mqtt.host));
+    if (mqttTopic    != NULL) strncpy(this->mqtt.topic,    mqttTopic,    sizeof(this->mqtt.topic));
+
+    this->mqtt.mqtts = mqtts;
+    this->mqtt.port  = mqttPort;
+
+    free(url);
+  }
 }
-}
+
+}  // namespace ngsiv2

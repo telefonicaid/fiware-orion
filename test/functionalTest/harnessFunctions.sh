@@ -788,6 +788,7 @@ function mqttTestClientStart()
 
   rm -f /tmp/mqttTestClient.log
   rm -f /tmp/mqttTestClient.dump
+  date > /tmp/mqttSend.log
 
   $REPO_HOME/scripts/mqttTestClient.py $*   &
   sleep 0.2
@@ -818,6 +819,19 @@ function mqttTestClientDump()
   topic=$1
   $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload dump
   cat /tmp/mqttTestClient.dump
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttTestClientReset -
+#
+function mqttTestClientReset()
+{
+  sleep 0.2
+  topic=$1
+  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload reset
 }
 
 
@@ -1581,6 +1595,7 @@ export -f dateDiff
 export -f mqttTestClientStart
 export -f mqttTestClientStop
 export -f mqttTestClientDump
+export -f mqttTestClientReset
 export -f eqTimestamp
 export -f neqTimestamp
 export -f postgresCmd

@@ -785,7 +785,6 @@ void subCacheItemInsert
   cSubP->name                    = name;
   cSubP->ldContext               = ldContext;
   cSubP->expression.geoproperty  = geoproperty;
-  cSubP->mqtt                    = httpInfo.mqtt;
 #endif
   cSubP->expression.q           = q;
   cSubP->expression.geometry    = geometry;

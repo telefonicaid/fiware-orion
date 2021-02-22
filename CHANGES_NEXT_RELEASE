@@ -7,3 +7,4 @@
 * Issue  #280   Some requests don't use the @context - e.g. DELETE /etntities/{entityId} - those requests now ignore the context
 * Issue  #280   username, password, and QoS for MQTT notifications
 * Issue  #280   Custom headers for MQTT notifications (using receiverInfo)
+* Issue  #280   Included notification::httpInfo::receiverInfo for subscription retrieval

@@ -107,7 +107,6 @@ struct CachedSubscription
 #ifdef ORIONLD
   std::string                 name;
   std::string                 ldContext;
-  MqttInfo                    mqtt;
 #endif
   int64_t                     count;
   RenderFormat                renderFormat;
