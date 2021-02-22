@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
+#include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
 #include "orionld/mqtt/mqttNotification.h"                     // Own interface
 
 
@@ -128,7 +129,6 @@ int mqttNotification
     kjChildAdd(metadataNodeP, kvP);
   }
 
-
   kjFastRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 4096);
 
   totalLen = strlen(body) + strlen(metadataBuf) + 50;
@@ -142,8 +142,12 @@ int mqttNotification
 
   if (mqttP == NULL)
   {
-    LM_E(("Internal Error (MQTT connection for %s:%d not found)", host, port));
-    return -1;
+    mqttP = mqttConnectionAdd(false, username, password, host, port, mqttVersion);
+    if (mqttP == NULL)
+    {
+      LM_E(("Internal Error (unable to connec t to MQTT broker at %s:%d)", host, port));
+      return -1;
+    }
   }
 
   mqttMsg.payload    = (void*) totalBuf;

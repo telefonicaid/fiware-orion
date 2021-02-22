@@ -68,7 +68,7 @@ import json
 #
 # log file
 #
-logFile = open("/tmp/mqttSend.log", "w")
+logFile = open("/tmp/mqttSend.log", "a+")
 logFile.write("mqttSend.py has started\n")
 logFile.flush()
 
@@ -142,6 +142,9 @@ for opt, arg in opts:
 client = mqtt.Client()
 client.connect(host, port, 60)
 logFile.write("MQTT Send Client connected to " + host + ":" + str(port) + "\n")
-logFile.write("Publishinbg on '" + topic + "': " + payload)
+logFile.write("Publishing on '" + topic + "': " + payload + "\n")
 client.publish(topic, payload)
+
+logFile.write("mqttSend.py has ended\n\n")
+logFile.flush()
 sys.exit(0)

@@ -23,6 +23,8 @@
 * Author: Ken Zangelin
 */
 #include <strings.h>                                             // bzero
+#include <string>                                                // std::string
+#include <map>                                                   // std::map
 
 extern "C"
 {
@@ -36,6 +38,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "apiTypesV2/Subscription.h"                             // Subscription
+#include "apiTypesV2/HttpInfo.h"                                 // HttpInfo
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -362,6 +365,29 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
     }
     kjChildAdd(endpointP, niArray);
   }
+
+
+  // notification::endpoint::receiverInfo
+  if (subscriptionP->notification.httpInfo.headers.size() > 0)
+  {
+    KjNode*           riArray   = kjArray(orionldState.kjsonP, "receiverInfo");
+    ngsiv2::HttpInfo* httpInfoP = &subscriptionP->notification.httpInfo;
+
+    for (std::map<std::string, std::string>::const_iterator it = httpInfoP->headers.begin(); it != httpInfoP->headers.end(); ++it)
+    {
+      const char* key      = it->first.c_str();
+      const char* value    = it->second.c_str();
+      KjNode*     kvObject = kjObject(orionldState.kjsonP, NULL);
+      KjNode*     keyP     = kjString(orionldState.kjsonP, "key",   key);
+      KjNode*     valueP   = kjString(orionldState.kjsonP, "value", value);
+
+      kjChildAdd(kvObject, keyP);
+      kjChildAdd(kvObject, valueP);
+      kjChildAdd(riArray,  kvObject);
+    }
+    kjChildAdd(endpointP, riArray);
+  }
+
   kjChildAdd(objectP, endpointP);
 
 
