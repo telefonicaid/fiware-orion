@@ -86,16 +86,13 @@ HttpStatusCode mongoRegisterContext
   bob.append("_id", id);
   bob.append(REG_SERVICE_PATH, sPath);
 
-  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_REGISTRATIONS, bob.obj(), &reg, &err))
+  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_REGISTRATIONS, bob.obj(), &reg, &err) && (err != ""))
   {
-    // FIXME OLD-DR: at the present moment we are unable to know if false means: "no result" or
-    // "fail in cursor". Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-find-function
-    // We assume "no result" by the moment, so disabling this code.
-    /*reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
+    reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
     ++noOfRegistrationUpdateErrors;
 
-    return SccOk;*/
+    return SccOk;
   }
 
   if (reg.isEmpty())

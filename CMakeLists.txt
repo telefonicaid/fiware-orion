@@ -55,6 +55,8 @@ add_definitions(-fPIC)
 
 # Baseline compiler flags, any change here will affect all build types
 
+# FIXME #3775 currently the only place in which std::auto_ptr<std::auto_ptr> is being used
+# isthe code in commonMocks.h. Thus. probably this can be removed and #2979 definitively solved.
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.
@@ -63,8 +65,6 @@ add_definitions(-fPIC)
 #   disabling the -Werror flag makes the problem go away (warnings will still be found and give errors in other distros).
 #
 #   One example of this warning (there are many warnings, but as in header files, just a few places):
-#
-#   FIXME OLD-DR: replace the example (this one no longer exists)
 #
 #   mongoBackend/safeMongo.h:
 #   ----------------------------------------------------------------
@@ -212,12 +212,15 @@ SET (BOOST_MT
     boost_regex-mt
 )
 
+# See http://mongoc.org/libmongoc/current/tutorial.html#cmake
+# This find_package() command provides the mongo::mongoc_static used in
+# SET for common static libs. We use 1.17.4 as reference version.
+find_package (mongoc-1.0 1.17.4 EXACT)
+
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
-    # FIXME OLD-DR: not working... using dynamic
-    #libmongoc-static-1.0.a
-    #libbson-static-1.0.a
+    mongo::mongoc_static
 )
 
 SET (DYNAMIC_LIBS
@@ -229,10 +232,6 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
-    # FIXME OLD-DR: I prefer static...
-    # (https://stackoverflow.com/questions/65937063/undefined-reference-to-symbol-error-when-linking-mongo-c-driver-static-library)
-    mongoc-1.0
-    bson-1.0
 )
 
 #

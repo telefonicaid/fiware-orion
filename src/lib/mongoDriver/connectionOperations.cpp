@@ -75,26 +75,28 @@ bool orion::collectionQuery
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'", ns.c_str(), bsonStr));
   mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
-  cursor->set(mongoc_collection_find_with_opts(collection, q, NULL, NULL));
+  mongoc_cursor_t* c = mongoc_collection_find_with_opts(collection, q, NULL, NULL);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: how to manage errors? this function doesn't use bson_error_t...
-  // Is enough just checking for return cursor pointer NULL-ness? Note that
-  // doc http://mongoc.org/libmongoc/1.17.3/mongoc_collection_find_with_opts.html
-  // doesn't describes NULL as a possible return value...
-  // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
-  if (cursor->isNull())
+  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  bson_error_t error;
+  if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
       " - query(): " + bsonStr +
-      " - exception: Null cursor from mongo (details on this is found in the source code";
+      " - exception: " + error.message;
 
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
 
+    mongoc_cursor_destroy(c);
+
     return false;
   }
 
+  LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", bsonStr));
+
+  cursor->set(c);
   alarmMgr.dbErrorReset();
 
   bson_free(bsonStr);
@@ -177,30 +179,30 @@ bool orion::collectionRangedQuery
   BSON_APPEND_INT32(opt, "limit", limit);
   BSON_APPEND_INT32(opt, "skip", offset);
 
-  cursor->set(mongoc_collection_find_with_opts(collection, q, opt, NULL));
+  mongoc_cursor_t* c = mongoc_collection_find_with_opts(collection, q, opt, NULL);
 
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: how to manage errors? this function doesn't use bson_error_t...
-  // Is enough just checking for return cursor pointer NULL-ness? Note that
-  // doc http://mongoc.org/libmongoc/1.17.3/mongoc_collection_find_with_opts.html
-  // doesn't describes NULL as a possible return value...
-  // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
-  if (cursor->isNull())
+  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  bson_error_t error;
+  if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
       " - query(): " + bsonStr +
-      " - exception: Null cursor from mongo (details on this is found in the source code";
+      " - exception: " + error.message;
 
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
+
+    mongoc_cursor_destroy(c);
 
     return false;
   }
 
   LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", bsonStr));
 
+  cursor->set(c);
   alarmMgr.dbErrorReset();
 
   bson_free(bsonStr);
@@ -282,9 +284,15 @@ bool orion::collectionCount
 *
 * orion::collectionFindOne -
 *
-* FIXME OLD-DR: is seems there is no findOne native operation in the driver
-* (asked at https://stackoverflow.com/questions/66030072/is-there-a-findone-operation-in-the-mongo-c-driver)
-* By the moment this function implements findOne on top of collectionFindRangedQuery
+* Note there is no native findOne function in the Mongo C driver,
+* see https://stackoverflow.com/questions/66030072/is-there-a-findone-operation-in-the-mongo-c-driver.
+* Thus, this function uses orion::collectionRangedQuery() internally
+*
+* This function return:
+*
+* - true and err = "": result was found (returned in doc parameter) and no error
+* - false and err = "": no result was found and no error in the operation
+* - false and err != "": error was found in the operation
 */
 bool orion::collectionFindOne
 (
@@ -300,6 +308,8 @@ bool orion::collectionFindOne
   orion::DBConnection connection = orion::getMongoConnection();
 
   orion::DBCursor cursor;
+
+  *err = "";
 
   if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), 1, 0, &cursor, NULL, err))
   {
@@ -615,27 +625,28 @@ bool orion::collectionAggregate
   LM_T(LmtMongo, ("aggregate() in '%s' collection: '%s'", ns.c_str(), bsonStr));
   mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
-  cursor->set(mongoc_collection_aggregate(collection, MONGOC_QUERY_NONE, pipeline, opt, NULL));
+  mongoc_cursor_t* c = mongoc_collection_aggregate(collection, MONGOC_QUERY_NONE, pipeline, opt, NULL);
 
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: how to manage errors? this function doesn't use bson_error_t...
-  // Is enough just checking for return cursor pointer NULL-ness? Note that
-  // doc http://mongoc.org/libmongoc/1.17.3/mongoc_collection_find_with_opts.html
-  // doesn't describes NULL as a possible return value...
-  // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
-  if (cursor->isNull())
+  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  bson_error_t error;
+  if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
       " - aggregate(): " + bsonStr +
-      " - exception: Null cursor from mongo (details on this is found in the source code";
+      " - exception: " + error.message;
 
     *err = "Database Error (" + msg + ")";
     alarmMgr.dbError(msg);
 
+    mongoc_cursor_destroy(c);
+
     return false;
   }
+
+  cursor->set(c);
 
   alarmMgr.dbErrorReset();
 
@@ -685,12 +696,7 @@ bool orion::runDatabaseCommand
   bson_t reply;
   bson_error_t error;
 
-  // FIXME OLD-DR: there is also a function mongoc_database_write_command_with_opts, pretty similar
-  // but for write operations  (this is the one we use for createIndex). As far as I checked, all
-  // the usages are for read operations (aggregate, listDatabases and buildInfo), but maybe we should
-  // make the name of the function more explicit, i.e. runCollectionReadCommand
-  // Moreover, there are more functions for command... Unclear. Asked (for collections commands, but
-  // I guess it's pretty much the same) here: https://stackoverflow.com/questions/66031779/several-functions-in-mongo-c-driver-to-run-commands-on-collections-in-which-cas
+  // FIXME #3788: not sure if mongoc_database_command_with_opts is the best choice
   bool success = mongoc_database_command_with_opts(database, doc, NULL, NULL, &reply, &error);
 
   mongoc_database_destroy(database);
@@ -820,11 +826,7 @@ bool orion::runCollectionCommand
   bson_t reply;
   bson_error_t error;
 
-  // FIXME OLD-DR: there is also a function mongoc_collection_write_command_with_opts, pretty similar
-  // but for write operations  (this is the one we use for createIndex). As far as I checked, all
-  // the usages are for read operations (aggregate, listDatabases and buildInfo), but maybe we should
-  // make the name of the function more explicit, i.e. runCollectionReadCommand
-  // Moreover, there are more functions for command... Unclear. Asked here: https://stackoverflow.com/questions/66031779/several-functions-in-mongo-c-driver-to-run-commands-on-collections-in-which-cas
+  // FIXME #3788: not sure if mongoc_collection_command_with_opts is the best choice
   bool success = mongoc_collection_command_with_opts(collection, doc, NULL, NULL, &reply, &error);
 
   mongoc_collection_destroy(collection);
@@ -858,50 +860,29 @@ bool orion::runCollectionCommand
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * setWriteConcern -
 */
-bool setWriteConcern
-(
-  const orion::DBConnection&  connection,
-  const WriteConcern&  wc,
-  std::string*         err
-)
+void orion::setWriteConcern(const orion::DBConnection& connection, const orion::WriteConcern& _wc)
 {
-  LM_T(LmtMongo, ("setWritteConcern(): '%d'", wc.nodes()));
+  mongoc_write_concern_t* wc = mongoc_write_concern_new();
 
-  try
+  if (_wc == orion::WCAcknowledged)
   {
-    connection->setWriteConcern(wc);
-    LM_T(LmtOldInfo, ("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
+    LM_T(LmtMongo, ("setWritteConcern(): 1"));
+    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_DEFAULT);
   }
-  catch (const std::exception &e)
+  else  // orion::WCUnAcknowledged
   {
-    // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
-    std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() +*/
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
-    std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() + */
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
+    LM_T(LmtMongo, ("setWritteConcern(): 0"));
+    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_UNACKNOWLEDGED);
   }
 
-  alarmMgr.dbErrorReset();
-  return true;
+  mongoc_client_set_write_concern(connection.get(), wc);
+
+  mongoc_write_concern_destroy(wc);
 }
 
 
@@ -910,47 +891,26 @@ bool setWriteConcern
 *
 * getWriteConcern -
 */
-bool getWriteConcern
-(
-  const orion::DBConnection&  connection,
-  WriteConcern*  wc,
-  std::string*   err
-)
+orion::WriteConcern orion::getWriteConcern(const orion::DBConnection& connection)
 {
   LM_T(LmtMongo, ("getWriteConcern()"));
 
-  try
+  const mongoc_write_concern_t* wc = mongoc_client_get_write_concern(connection.get());
+
+  switch (mongoc_write_concern_get_w(wc))
   {
-    *wc = connection->getWriteConcern();
-    LM_T(LmtOldInfo, ("Database Operation Successful (getWriteConcern)"));
+    case MONGOC_WRITE_CONCERN_W_DEFAULT:
+      return orion::WCAcknowledged;
+    case MONGOC_WRITE_CONCERN_W_UNACKNOWLEDGED:
+      return orion::WCUnAcknowledged;
+    default:
+      LM_E(("Runtime Error (unknown WC %d, returning Acknowledged as failsafe)", wc));
+      return orion::WCAcknowledged;
   }
-  catch (const std::exception &e)
-  {
-    std::string msg = std::string("getWritteConern()") +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    std::string msg = std::string("getWritteConern()") +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * connectionAuth -

@@ -30,6 +30,8 @@
 
 #include "mongoDriver/BSONObj.h"
 
+#include "logMsg/logMsg.h"
+
 namespace orion
 {
 /* ****************************************************************************
@@ -84,6 +86,7 @@ int BSONObj::getFieldNames(std::set<std::string>* fields) const
      return n;
   }
 
+  LM_E(("Runtime Error (fail initializing BSON iterator)"));
   return -1;
 }
 
@@ -145,17 +148,23 @@ void BSONObj::toStringMap(std::map<std::string, std::string>* m)
   bson_iter_t iter;
   if (bson_iter_init(&iter, b))
   {
-     while (bson_iter_next(&iter))
-     {
-       if (bson_iter_type(&iter) == BSON_TYPE_UTF8)
-       {
-         (*m)[bson_iter_key(&iter)] = bson_iter_utf8(&iter, NULL);
-       }
-       else
-       {
-         // FIXME OLD-DR: trace as fatal error
-       }
-     }
+    unsigned int ix = 0;
+    while (bson_iter_next(&iter))
+    {
+      if (bson_iter_type(&iter) == BSON_TYPE_UTF8)
+      {
+        (*m)[bson_iter_key(&iter)] = bson_iter_utf8(&iter, NULL);
+        ix++;
+      }
+      else
+      {
+        LM_E(("Runtime Error (item %d, expected BSON string type but got type %d)", ix, bson_iter_type(&iter)));
+      }
+    }
+  }
+  else
+  {
+    LM_E(("Runtime Error (fail initializing BSON iterator)"));
   }
 }
 
@@ -170,10 +179,14 @@ void BSONObj::toElementsVector(std::vector<BSONElement>* v)
   bson_iter_t iter;
   if (bson_iter_init(&iter, b))
   {
-     while (bson_iter_next(&iter))
-     {
-        v->push_back(BSONElement(bson_iter_key(&iter), bson_iter_value(&iter)));
-     }
+    while (bson_iter_next(&iter))
+    {
+      v->push_back(BSONElement(bson_iter_key(&iter), bson_iter_value(&iter)));
+    }
+  }
+  else
+  {
+    LM_E(("Runtime Error (fail initializing BSON iterator)"));
   }
 }
 

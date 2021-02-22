@@ -31,6 +31,7 @@
 #include "mongoDriver/DBCursor.h"
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/BSONArray.h"
+#include "mongoDriver/WriteConcern.h"
 
 namespace orion
 
@@ -223,17 +224,12 @@ extern bool runCollectionCommand
 );
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * setWriteConcern -
 */
-extern bool setWriteConcern
-(
-  const orion::DBConnection&  connection,
-  const mongo::WriteConcern&  wc,
-  std::string*                err
-);
+extern void setWriteConcern(const orion::DBConnection& connection, const orion::WriteConcern& wc);
 
 
 
@@ -241,15 +237,10 @@ extern bool setWriteConcern
 *
 * getWriteConcern -
 */
-extern bool getWriteConcern
-(
-  const orion::DBConnection&  connection,
-  mongo::WriteConcern*        wc,
-  std::string*                err
-);
+extern orion::WriteConcern getWriteConcern(const orion::DBConnection& connection);
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * connectionAuth -

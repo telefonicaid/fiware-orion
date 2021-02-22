@@ -39,12 +39,6 @@ namespace orion
 // Forward declaration
 class BSONElement;
 
-// FIXME OLD-DR (this applies to several classes but I'm including only here)
-// According to http://mongoc.org/libbson/current/bson_t.html#performance-notes
-// we could use bson_t instead of bson_t* to take advantage of stack for
-// small BSON objects. However, not sure how bson_destroy() has teo be used
-// in that case. Create an issue about this
-
 /* ****************************************************************************
 *
 * BSONObj -
