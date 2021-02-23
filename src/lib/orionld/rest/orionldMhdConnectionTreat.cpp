@@ -993,7 +993,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     kTimeGet(&timestamps.renderStart);
 #endif
 
-    if (orionldState.acceptGeojson == true)
+    if ((orionldState.acceptGeojson == true) && (serviceRoutineResult == true))
     {
       if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
         orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues);
