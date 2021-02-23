@@ -40,6 +40,7 @@ brokerStart CB 0-255
 # 07. Retrieve E1 in GeoJSON format with URI param geometryProperty=otherGeoProp
 # 08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)
 # 09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values
+# 10. Attempts to retrieve non-existing E2 in GeoJSON format
 #
 
 echo "01. Create an entity with a location GeoProperty"
@@ -127,6 +128,13 @@ echo
 echo "09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values"
 echo "========================================================================================================"
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid?geometryProperty=P1&options=keyValues' --out "application/geo+json"
+echo
+echo
+
+
+echo "10. Attempts to retrieve non-existing E2 in GeoJSON format"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:E2 --out "application/geo+json"
 echo
 echo
 
@@ -512,6 +520,20 @@ Date: REGEX(.*)
         "type": "City"
     },
     "type": "Feature"
+}
+
+
+10. Attempts to retrieve non-existing E2 in GeoJSON format
+==========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 116
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:E2",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
