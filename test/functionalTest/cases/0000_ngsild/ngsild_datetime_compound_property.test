@@ -1,0 +1,163 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity with a DateTime Property as compound with @type and @value
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities with a DateTime Property
+# 02. Check contents in database
+# 03. GET entity
+# 04. GET entity with key-values
+#
+
+echo "01. POST /ngsi-ld/v1/entities with a DateTime Property"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "TP1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2021-02-23T09:26:33.123Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Check contents in database"
+echo "=============================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET entity"
+echo "=============="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
+echo
+echo
+
+
+echo "04. GET entity with key-values"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?options=keyValues
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities with a DateTime Property
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
+Date: REGEX(.*)
+
+
+
+02. Check contents in database
+==============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:12:13:14",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/TP1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/TP1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "DateTime",
+				"@value" : "2021-02-23T09:26:33.123Z"
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "TP1": {
+        "type": "Property",
+        "value": {
+            "@type": "DateTime",
+            "@value": "2021-02-23T09:26:33.123Z"
+        }
+    },
+    "id": "urn:ngsi-ld:T:12:13:14",
+    "type": "T"
+}
+
+
+04. GET entity with key-values
+==============================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "TP1": {
+        "@type": "DateTime",
+        "@value": "2021-02-23T09:26:33.123Z"
+    },
+    "id": "urn:ngsi-ld:T:12:13:14",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

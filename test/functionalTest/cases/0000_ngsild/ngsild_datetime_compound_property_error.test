@@ -1,0 +1,137 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity with a DateTime Property as compound with @type and @value - error handling
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Attempt to create a DateTime Property whose @value item is missing
+# 02. Attempt to create a DateTime Property whose @value is not a string
+# 03. Attempt to create a DateTime Property whose @value is not a a valid ISO8601
+#
+
+echo "01. Attempt to create a DateTime Property whose @value item is missing"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "TP1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a DateTime Property whose @value is not a string"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "TP1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": true
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create a DateTime Property whose @value is not a a valid ISO8601"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:12:13:14",
+  "type": "T",
+  "TP1": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "Not a valid ISO8601 string"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a DateTime Property whose @value item is missing
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "@value is mandatory",
+    "title": "missing @value in @value/@type compound",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create a DateTime Property whose @value is not a string
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "@value of DateTime @type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create a DateTime Property whose @value is not a a valid ISO8601
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 173
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Not a valid ISO8601 string",
+    "title": "DateTime value of @value/@type compound must be a valid ISO8601",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
