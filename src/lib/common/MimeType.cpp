@@ -43,10 +43,10 @@ const char* mimeTypeToString(MimeType mimeType)
   switch (mimeType)
   {
   case JSON:        return "JSON";
-  case TEXT:        return "TEXT";
-  case HTML:        return "HTML";
   case JSONLD:      return "JSONLD";
   case GEOJSON:     return "GEOJSON";
+  case TEXT:        return "TEXT";
+  case HTML:        return "HTML";
   case NOMIMETYPE:  return "NOMIMETYPE";
   }
 
@@ -61,10 +61,12 @@ const char* mimeTypeToString(MimeType mimeType)
 */
 MimeType stringToMimeType(const std::string& s)
 {
-  if (s == "JSON")
-  {
-    return JSON;
-  }
+  if      (s == "JSON")        return JSON;
+  else if (s == "JSONLD")      return JSONLD;
+  else if (s == "GEOJSON")     return GEOJSON;
+  else if (s == "TEXT")        return TEXT;
+  else if (s == "HTML")        return HTML;
+  else if (s == "NOMIMETYPE")  return NOMIMETYPE;
 
   return NOMIMETYPE;
 }
@@ -77,14 +79,12 @@ MimeType stringToMimeType(const std::string& s)
 */
 MimeType longStringToMimeType(const std::string& s)
 {
-  if (s == "application/json")
-  {
-    return JSON;
-  }
-  else if (s == "application/ld+json")
-  {
-    return JSONLD;
-  }
+  if      (s == "application/json")      return JSON;
+  else if (s == "application/ld+json")   return JSONLD;
+  else if (s == "application/geo+json")  return GEOJSON;
+  else if (s == "plain/text")            return TEXT;
+  else if (s == "application/html")      return HTML;
+  else if (s == "NOMIMETYPE")            return NOMIMETYPE;
 
   return NOMIMETYPE;
 }
@@ -101,14 +101,14 @@ const char* mimeTypeToLongString(MimeType mimeType)
   switch (mimeType)
   {
   case JSON:        return "application/json";
-  case TEXT:        return "plain/text";
-  case HTML:        return "application/html";
   case JSONLD:      return "application/ld+json";
   case GEOJSON:     return "application/geo+json";
+  case TEXT:        return "plain/text";
+  case HTML:        return "application/html";
   case NOMIMETYPE:  return "NOMIMETYPE";
   }
 
-  return "Unknown mimeType";
+  return "NOMIMETYPE";
 }
 
 
@@ -139,6 +139,9 @@ MimeType mimeTypeParse(const std::string& mimeTypeString, std::string* charsetP)
   if      (mimeType == "*/*")                               return JSON;
   else if (mimeType == "text/json")                         return JSON;
   else if (mimeType == "application/json")                  return JSON;
+  else if (mimeType == "application/ld+json")               return JSONLD;
+  else if (mimeType == "application/geo+json")              return GEOJSON;
+  else if (mimeType == "application/html")                  return HTML;
   else if (mimeType == "text/plain")                        return TEXT;
 
   return JSON;

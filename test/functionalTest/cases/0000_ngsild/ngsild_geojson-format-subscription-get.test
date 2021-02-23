@@ -1,0 +1,169 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create a Subscription with notifications in GeoJSON, and GET it
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription with notifications in GeoJSON format
+# 02. See the subscription in mongo
+# 03. GET the subscription
+#
+
+echo "01. Create a subscription with notifications in GeoJSON format"
+echo "=============================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Sub 01",
+  "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "attributes": [ ],
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/geo+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 0
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with notifications in GeoJSON format
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "http://a.b.c/subs/sub01",
+	"expiration" : 1861869600,
+	"reference" : "http://127.0.0.1:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/geo+json",
+	"throttling" : 0,
+	"servicePath" : "/",
+	"description" : "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Sub 01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+03. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 355
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+    "entities": [
+        {
+            "id": "urn:ngsi-ld:E01",
+            "type": "T"
+        }
+    ],
+    "expires": "2028-12-31T10:00:00.000Z",
+    "id": "http://a.b.c/subs/sub01",
+    "name": "Sub 01",
+    "notification": {
+        "endpoint": {
+            "accept": "application/geo+json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized"
+    },
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

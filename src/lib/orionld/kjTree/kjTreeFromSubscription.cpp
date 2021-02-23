@@ -103,6 +103,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   unsigned int     size;
   unsigned int     ix;
   OrionldContext*  contextP = orionldContextCacheLookup(subscriptionP->ldContext.c_str());
+  char             dateTime[128];
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", subscriptionP->id.c_str());
@@ -132,7 +133,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // sysAttrs - createdAt and modifiedAt
   if (orionldState.uriParamOptions.sysAttrs == true)
   {
-    char    dateTime[64];
     KjNode* nodeP;
 
     if (subscriptionP->createdAt != -1)
@@ -341,8 +341,12 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   kjChildAdd(endpointP, nodeP);
 
   // notification::endpoint::accept
-  const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
-  char        dateTime[128];
+  const char* mimeType = mimeTypeToLongString(subscriptionP->notification.httpInfo.mimeType);
+  if (strcmp(mimeType, "NOMIMETYPE") == 0)
+  {
+    LM_W(("Internal Warning (notification mime type %d is not known - defaults to application/ld+json)", subscriptionP->notification.httpInfo.mimeType));
+    mimeType = (char*) "application/ld+json";   // Default value ?
+  }
 
   nodeP = kjString(orionldState.kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
