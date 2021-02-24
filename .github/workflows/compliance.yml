@@ -15,4 +15,4 @@ jobs:
 
       - name: Run Test
         run: |
-          ci/rpm7/build.sh -s compliance -tp $(pwd)
+          ci/rpm8/build.sh -s compliance -tp $(pwd)
