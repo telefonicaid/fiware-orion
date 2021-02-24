@@ -51,29 +51,25 @@ echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && cd cmake-build \
 && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
-&& make install \
-&& rm -Rf /opt/mongo-c-driver-1.17.4
+&& make install
 
 echo "INSTALL: rapidjson" \
 && curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
-&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
-&& rm -Rf /opt/rapidjson-1.1.0
+&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 echo "INSTALL: libmicrohttpd" \
 && curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
 && cd /opt/libmicrohttpd-0.9.70  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
-&& make install \
-&& rm -Rf /opt/libmicrohttpd-0.9.70
+&& make install
 
 echo "INSTALL: gmock" \
 && curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
-&& make install \
-&& rm -Rf /opt/gmock-1.5.0
+&& make install
 
 # FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
 # which the same procedure described in "Build from source" documentation
@@ -81,8 +77,8 @@ echo "INSTALL: gmock" \
 #  && curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
 #  && cd /opt/mosquitto-1.5 \
 #  && make \
-#  && make install \
-#  && rm -Rf /opt/mosquitto-1.5
+#  && make install
+#  && rm -Rf /opt/mosquitto-1.5 (this one moved to the end)
 
 # FIXME: review this with CentOS 8. Probably CentOS 8 uses Flask >0.10.1 but, anyway
 # using virtual env seems to be a good idea
@@ -111,4 +107,8 @@ ldconfig
 
 yum -y remove \
 && yum -y clean all \
-&& rm -rf /var/cache/yum
+&& rm -rf /var/cache/yum \
+&& rm -Rf /opt/mongo-c-driver-1.17.4 \
+&& rm -Rf /opt/rapidjson-1.1.0 \
+&& rm -Rf /opt/libmicrohttpd-0.9.70 \
+&& rm -Rf /opt/gmock-1.5.0
