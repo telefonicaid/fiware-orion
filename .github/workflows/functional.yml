@@ -7,7 +7,7 @@ on:
       - master
 
 env:
-   TEST_IMAGE_NAME: fiware/orion-ci:rpm7
+   TEST_IMAGE_NAME: fiware/orion-ci:rpm8
 
 jobs:
   functional-1:
