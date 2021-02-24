@@ -41,12 +41,13 @@ from getopt import getopt, GetoptError
 from datetime import datetime
 from math import trunc
 from time import sleep
-import sys
-import os
-import atexit
-import string
-import signal
-import json
+from sys import exit, argv, stderr
+from os.path import basename, isfile
+from os import unlink, getpid, kill
+from atexit import register
+from signal import SIGTERM, SIGINT, SIGKILL
+from json import loads, dumps
+
 
 def usage_and_exit(msg):
     """
@@ -56,11 +57,10 @@ def usage_and_exit(msg):
     """
 
     if msg != '':
-        print msg
-        print
+        print("{}\n".format(msg))
 
     usage()
-    sys.exit(1)
+    exit(1)
 
 
 def usage():
@@ -68,43 +68,46 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
-    print "  --port <port>: port to use (default is 1028)"
-    print "  --url <server url>: server URL to use (default is /accumulate)"
-    print "  --pretty-print: pretty print mode"
-    print "  --https: start in https"
-    print "  --key: key file (only used if https is enabled)"
-    print "  --cert: cert file (only used if https is enabled)"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
+    print('Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u\n'
+          % basename(__file__))
+
+    print('Parameters:')
+    print("  --host <host>: host to use database to use (default is '0.0.0.0')")
+    print("  --port <port>: port to use (default is 1028)")
+    print("  --url <server url>: server URL to use (default is /accumulate)")
+    print("  --pretty-print: pretty print mode")
+    print("  --https: start in https")
+    print("  --key: key file (only used if https is enabled)")
+    print("  --cert: cert file (only used if https is enabled)")
+    print("  -v: verbose mode")
+    print("  -u: print this usage message")
 
 
 # This function is registered to be called upon termination
 def all_done():
-    os.unlink(pidfile)
+    unlink(pidFile)
+
 
 # Default arguments
-port       = 1028
-host       = '0.0.0.0'
+port = 1028
+host = '0.0.0.0'
 server_url = '/accumulate'
-verbose    = 0
-pretty     = False
-https      = False
-key_file   = None
-cert_file  = None
+verbose = 0
+pretty = False
+https = False
+key_file = None
+cert_file = None
 
+opts = []
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
+    opts, args = getopt(argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert='])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
 for opt, arg in opts:
     if opt == '-u':
         usage()
-        sys.exit(0)
+        exit(0)
     elif opt == '--host':
         host = arg
     elif opt == '--url':
@@ -125,26 +128,26 @@ for opt, arg in opts:
     elif opt == '--cert':
         cert_file = arg
     else:
-        usage_and_exit()
+        usage_and_exit(msg='')
 
 if https:
     if key_file is None or cert_file is None:
-        print "if --https is used then you have to provide --key and --cert"
-        sys.exit(1)
+        print("if --https is used then you have to provide --key and --cert")
+        exit(1)
 
 if verbose:
-    print "verbose mode is on"
-    print "port: " + str(port)
-    print "host: " + str(host)
-    print "server_url: " + str(server_url)
-    print "pretty: " + str(pretty)
-    print "https: " + str(https)
+    print("verbose mode is on")
+    print("port: " + str(port))
+    print("host: " + str(host))
+    print("server_url: " + str(server_url))
+    print("pretty: " + str(pretty))
+    print("https: " + str(https))
     if https:
-        print "key file: " + key_file
-        print "cert file: " + cert_file
+        print("key file: " + key_file)
+        print("cert file: " + cert_file)
 
-pid     = str(os.getpid())
-pidfile = "/tmp/accumulator." + str(port) + ".pid"
+pid = str(getpid())
+pidFile = "/tmp/accumulator." + str(port) + ".pid"
 
 #
 # If an accumulator process is already running, it is killed.
@@ -152,52 +155,56 @@ pidfile = "/tmp/accumulator." + str(port) + ".pid"
 # The exception handling is needed as this process dies in case
 # a kill is issued on a non-running process ...
 #
-if os.path.isfile(pidfile):
-    oldpid = file(pidfile, 'r').read()
-    opid   = string.atoi(oldpid)
-    print "PID file %s already exists, killing the process %s" % (pidfile, oldpid)
+if isfile(pidFile):
+    oldPid = file(pidFile, 'r').read()
+    oPid = int(oldPid)
+    print("PID file %s already exists, killing the process %s" % (pidFile, oldPid))
 
     try: 
-        oldstderr = sys.stderr
-        sys.stderr = open("/dev/null", "w")
-        os.kill(opid, signal.SIGTERM);
+        oldStderr = stderr
+        stderr = open("/dev/null", "w")
+        kill(oPid, SIGTERM);
         sleep(0.1)
-        os.kill(opid, signal.SIGINT);
+        kill(oPid, SIGINT);
         sleep(0.1)
-        os.kill(opid, signal.SIGKILL);
-        sys.stderr = oldstderr
+        kill(oPid, SIGKILL);
+        stderr = oldStderr
     except:
-        print "Process %d killed" % opid
+        print("Process %d killed" % oPid)
 
 
 #
-# Creating the pidfile of the currently running process
+# Creating the pidFile of the currently running process
 #
-file(pidfile, 'w').write(pid)
+file(pidFile, 'w').write(pid)
 
 #
 # Making the function all_done being executed on exit of this process.
-# all_done removes the pidfile
+# all_done removes the pidFile
 #
-atexit.register(all_done)
+register(all_done)
 
 
 app = Flask(__name__)
 
+
 @app.route("/noresponse", methods=['POST'])
-def noresponse():
+def no_response():
     sleep(10)
     return Response(status=200)
+
 
 @app.route("/noresponse/updateContext", methods=['POST'])
-def unoresponse():
+def uno_response():
     sleep(10)
     return Response(status=200)
 
+
 @app.route("/noresponse/queryContext", methods=['POST'])
-def qnoresponse():
+def qno_response():
     sleep(10)
     return Response(status=200)
+
 
 # This response has been designed to test the #2360 case, but is general enough to be
 # used in other future cases
@@ -210,7 +217,7 @@ def bad_response():
 
 def record_request(request):
     """
-    Common function used by serveral route methods to save request content
+    Common function used by several route methods to save request content
 
     :param request: the request to save
     """
@@ -220,7 +227,7 @@ def record_request(request):
 
     # First request? Then, set reference datetime. Otherwise, add the
     # timedelta to the list
-    if (t0 == ''):
+    if t0 == '':
         t0 = datetime.now()
         times.append(0)
     else:
@@ -244,12 +251,12 @@ def record_request(request):
     # Check for query params
     params = ''
     for k in request.args:
-        if (params == ''):
+        if params == '':
             params = k + '=' + request.args[k]
         else:
             params += '&' + k + '=' + request.args[k]
 
-    if (params == ''):
+    if params == '':
         s += '\n'
     else:
         s += '?' + params + '\n'
@@ -259,11 +266,11 @@ def record_request(request):
         s += h + ': ' + request.headers[h] + '\n'
 
     # Store payload
-    if ((request.data is not None) and (len(request.data) != 0)):
+    if (request.data is not None) and (len(request.data) != 0):
         s += '\n'
-        if pretty == True:
-            raw = json.loads(request.data)
-            s += json.dumps(raw, indent=4, sort_keys=True)
+        if pretty:
+            raw = loads(request.data)
+            s += dumps(raw, indent=4, sort_keys=True)
             s += '\n'
         else:
             s += request.data
@@ -275,7 +282,7 @@ def record_request(request):
     ac += s
 
     if verbose:
-        print s
+        print(s)
 
 
 def send_continue(request):
@@ -287,7 +294,7 @@ def send_continue(request):
     """
 
     for h in request.headers.keys():
-        if ((h == 'Expect') and (request.headers[h] == '100-continue')):
+        if (h == 'Expect') and (request.headers[h] == '100-continue'):
             send_continue = True
 
     return False
@@ -328,8 +335,8 @@ def dump():
 
 
 @app.route('/times', methods=['GET'])
-def times():
-    return ', '.join(map(str,times)) + '\n'
+def get_times():
+    return ', '.join(map(str, times)) + '\n'
 
 
 @app.route('/number', methods=['GET'])
@@ -347,26 +354,29 @@ def reset():
 
 
 @app.route('/pid', methods=['GET'])
-def getPid():
-    return str(os.getpid())
+def get_pid():
+    return str(getpid())
+
 
 # This is the accumulation string
 ac = ''
 t0 = ''
 times = []
 
+
 if __name__ == '__main__':
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
-    # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
+    # makes the calle os.path.isfile(pidFile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    if (https):
-      # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
-      # original way of using context is deprecated. New way is simpler. However, we are still testing this... some environments
-      # fail in some configurations (the current one is an attempt to make this to work at jenkins)
-      context = SSL.Context(SSL.SSLv23_METHOD)
-      context.use_privatekey_file(key_file)
-      context.use_certificate_file(cert_file)
-      #context = (cert_file, key_file)
-      app.run(host=host, port=port, debug=False, ssl_context=context)
+    if https:
+        # According to http://stackoverflow.com
+        # /questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
+        # original way of using context is deprecated. New way is simpler. However, we are still testing this...
+        # some environments fail in some configurations (the current one is an attempt to make this to work at jenkins)
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.use_privatekey_file(key_file)
+        context.use_certificate_file(cert_file)
+        # context = (cert_file, key_file)
+        app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
-      app.run(host=host, port=port)
+        app.run(host=host, port=port)
