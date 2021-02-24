@@ -84,6 +84,9 @@ echo "INSTALL: gmock" \
 #  && make install \
 #  && rm -Rf /opt/mosquitto-1.5
 
+# FIXME: review this with CentOS 8. Probably CentOS 8 uses Flask >0.10.1 but, anyway
+# using virtual env seems to be a good idea
+#
 # CentOS 7 installs Flask==0.10.1 which depends on Werkzeug==0.9.1. There is a bug
 # in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
 # dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
@@ -92,9 +95,11 @@ echo "INSTALL: gmock" \
 # In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
 # may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
 # (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
+# This installation is done using pip2 (the one that comes with CentOS 8) but, after that,
+# pip gets installed with the usal name and next pip commands doesn't need pip2
 echo "INSTALL: python special dependencies" \
 && cd /opt \
-&& pip install --upgrade "pip < 21.0" \
+&& pip2 install --upgrade "pip < 21.0" \
 && pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
