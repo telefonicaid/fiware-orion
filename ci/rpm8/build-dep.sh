@@ -37,20 +37,10 @@ yum -y install \
   make \
   mongodb-org-shell \
   nc \
-  python \
-  python-pip \
+  python2 \
   rpm-build \
-  scons \
   tar \
   cyrus-sasl-devel
-
-# FIXME: remove legacy driver when it gets discontinued in the code
-echo "INSTALL: mongodb legacy c++ driver" \
-&& curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-cxx-driver-legacy-1.1.2 \
-&& scons --disable-warnings-as-errors --use-sasl-client --ssl \
-&& scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
-&& rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
@@ -115,6 +105,5 @@ echo "INSTALL: python special dependencies" \
 ldconfig
 
 yum -y remove \
-  scons \
 && yum -y clean all \
 && rm -rf /var/cache/yum
