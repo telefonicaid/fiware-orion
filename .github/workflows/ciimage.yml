@@ -4,7 +4,7 @@ name: Build CI Image
 on:
   push:
     paths:
-      - ci/**
+      - ci/rpm7/**
 
 env:
   IMAGE_NAME: fiware/orion-ci:rpm7
