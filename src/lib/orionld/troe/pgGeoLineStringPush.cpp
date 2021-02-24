@@ -80,28 +80,28 @@ bool pgGeoLineStringPush
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, lineStringCoordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, lineStringCoordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, lineStringCoordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, lineStringCoordsString);
   }
 

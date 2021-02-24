@@ -79,28 +79,28 @@ bool pgGeoPolygonPush
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, polygonCoordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, polygonCoordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, polygonCoordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, polygonCoordsString);
   }
 

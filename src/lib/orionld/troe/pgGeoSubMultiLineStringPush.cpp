@@ -76,14 +76,14 @@ bool pgGeoSubMultiLineStringPush
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
              "instanceId, ts, id, entityId, attrInstanceId, observedAt, valueType, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, observedAt, coordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
              "instanceId, ts, id, entityId, attrInstanceId, valueType, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, coordsString);
   }
 

@@ -89,10 +89,10 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "datetime            TIMESTAMP,"
     "compound            JSONB,"
     "geoPoint            GEOGRAPHY(POINTZ, 4326),"
-    "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
-    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
-    "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
+    "geoPolygon          GEOGRAPHY(POLYGON, 4326),"
+    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4326),"
+    "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
+    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
     "ts                  TIMESTAMP NOT NULL)";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
@@ -109,10 +109,10 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "datetime            TIMESTAMP,"
     "compound            JSONB,"
     "geoPoint            GEOGRAPHY(POINTZ, 4326),"
-    "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
-    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
-    "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
+    "geoPolygon          GEOGRAPHY(POLYGON, 4326),"
+    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4326),"
+    "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
+    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
     "ts                  TIMESTAMP NOT NULL)";
 
 #if 0
