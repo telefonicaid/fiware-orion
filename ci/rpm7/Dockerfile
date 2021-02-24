@@ -1,4 +1,5 @@
-FROM centos:centos7.9.2009
+#FIXME: by the moment some tokens use 'rpm7' but we will fix that at some moment...
+FROM centos8.3.2011
 
 ADD mongodb.repo /etc/yum.repos.d/
 ADD build.sh /opt/bin/

@@ -83,10 +83,13 @@ add_definitions(-fPIC)
 if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.3)
   message ("gcc version less than 6.3, compiling without -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
-else()
+elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.3)
   # Formerly this was a condition based in distribution, set for Ubuntu_17.*, Ubuntu_18.* and Debian_9.*
-  message("gcc version 6.3 or higher, compiling with -Wno-deprecated-declarations")
+  message("gcc version between 6.3 and 8.3, compiling with -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+else()
+  message("gcc version higher than 8.3, compiling with -Wno-deprecated-declarations")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments -Wno-format-truncation -Wno-stringop-truncation -Wno-maybe-uninitialized")
 endif()
 
 #

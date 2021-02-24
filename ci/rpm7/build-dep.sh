@@ -27,7 +27,6 @@ yum -y install \
   boost-devel \
   bzip2 \
   cmake \
-  cmake3 \
   gcc-c++ \
   git \
   gnutls-devel \
@@ -60,7 +59,7 @@ echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && cd /opt/mongo-c-driver-1.17.4 \
 && mkdir cmake-build \
 && cd cmake-build \
-&& cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
+&& cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
 && rm -Rf /opt/mongo-c-driver-1.17.4
