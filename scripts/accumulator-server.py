@@ -21,6 +21,7 @@
 # iot_support at tid dot es
 
 from __future__ import division   # need for seconds calculation (could be removed with Python 2.7)
+
 __author__ = 'fermin'
 
 # This program stores everything it receives by HTTP in a given URL (pased as argument),
@@ -156,27 +157,27 @@ pidFile = "/tmp/accumulator." + str(port) + ".pid"
 # a kill is issued on a non-running process ...
 #
 if isfile(pidFile):
-    oldPid = file(pidFile, 'r').read()
+    oldPid = open(pidFile, 'r').read()
     oPid = int(oldPid)
     print("PID file %s already exists, killing the process %s" % (pidFile, oldPid))
 
     try: 
         oldStderr = stderr
         stderr = open("/dev/null", "w")
-        kill(oPid, SIGTERM);
+        kill(oPid, SIGTERM)
         sleep(0.1)
-        kill(oPid, SIGINT);
+        kill(oPid, SIGINT)
         sleep(0.1)
-        kill(oPid, SIGKILL);
-        stderr = oldStderr
-    except:
+        kill(oPid, SIGKILL)
+        stderr = oldStderr  # !!!
+    except OSError:
         print("Process %d killed" % oPid)
 
 
 #
 # Creating the pidFile of the currently running process
 #
-file(pidFile, 'w').write(pid)
+open(pidFile, 'w').write(pid)
 
 #
 # Making the function all_done being executed on exit of this process.
@@ -215,11 +216,11 @@ def bad_response():
     return r
 
 
-def record_request(request):
+def record_request(req):
     """
     Common function used by several route methods to save request content
 
-    :param request: the request to save
+    :param req: the request to save
     """
 
     global ac, t0, times
@@ -246,15 +247,15 @@ def record_request(request):
     #
     #  request.url = request.scheme + '://' + request.host + request.path
     #
-    s += request.method + ' ' + request.scheme + '://' + request.host + request.path
+    s += req.method + ' ' + req.scheme + '://' + req.host + req.path
 
     # Check for query params
     params = ''
-    for k in request.args:
+    for k in req.args:
         if params == '':
-            params = k + '=' + request.args[k]
+            params = k + '=' + req.args[k]
         else:
-            params += '&' + k + '=' + request.args[k]
+            params += '&' + k + '=' + req.args[k]
 
     if params == '':
         s += '\n'
@@ -262,18 +263,18 @@ def record_request(request):
         s += '?' + params + '\n'
 
     # Store headers
-    for h in request.headers.keys():
-        s += h + ': ' + request.headers[h] + '\n'
+    for h in req.headers.keys():
+        s += h + ': ' + req.headers[h] + '\n'
 
     # Store payload
-    if (request.data is not None) and (len(request.data) != 0):
+    if (req.data is not None) and (len(req.data) != 0):
         s += '\n'
         if pretty:
-            raw = loads(request.data)
+            raw = loads(req.data)
             s += dumps(raw, indent=4, sort_keys=True)
             s += '\n'
         else:
-            s += request.data
+            s += req.data
 
     # Separator
     s += '=======================================\n'
@@ -285,17 +286,17 @@ def record_request(request):
         print(s)
 
 
-def send_continue(request):
+def send_continue(req):
     """
     Inspect request header in order to look if we have to continue or not
 
-    :param request: the request to look
+    :param req: the request to look
     :return: true if we  have to continue, false otherwise
     """
 
-    for h in request.headers.keys():
-        if (h == 'Expect') and (request.headers[h] == '100-continue'):
-            send_continue = True
+    for h in req.headers.keys():
+        if (h == 'Expect') and (req.headers[h] == '100-continue'):
+            return True  # send_continue = True
 
     return False
 
@@ -325,7 +326,33 @@ def record_2871():
     else:
         # Ad hoc response related with issue #2871, see https://github.com/telefonicaid/fiware-orion/issues/2871
         r = Response(status=200)
-        r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],"id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+
+        # r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],
+        #            "id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+
+        r.data = {
+                    "contextResponses": [
+                        {
+                            "contextElement": {
+                                "attributes": [
+                                    {
+                                        "name": "turn",
+                                        "type": "string",
+                                        "value": ""
+                                    }
+                                ],
+                                "id": "entity1",
+                                "isPattern": False,
+                                "type": "device"
+                            },
+                            "statusCode": {
+                                "code": 200,
+                                "reasonPhrase": "OK"
+                            }
+                        }
+                    ]
+        }
+
         return r
 
 
