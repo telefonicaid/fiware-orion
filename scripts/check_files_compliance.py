@@ -68,7 +68,7 @@ header2.append('\s*$')
 header2.append('\s*For those usages not covered by this license please contact with$')
 header2.append('\s*orionld at fiware dot org$')
 
-verbose    = True
+verbose = True
 is_orionld = False
 
 
@@ -176,7 +176,7 @@ def ignore(root, file):
         return True
 
     # Apib files have an "inline" license, so they are ignored
-    extensions_to_ignore = [ 'apib', 'md' ]
+    extensions_to_ignore = ['apib', 'md']
     if os.path.splitext(file)[1][1:] in extensions_to_ignore:
         return True
 
@@ -194,11 +194,17 @@ def ignore(root, file):
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu', 'orionld.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml',
                    '.dockerignore', '.jmeter.json']
+
     if file in files_names:
         return True
-    if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
-                                      or file == 'cmake2junit.xsl'):
+
+    if 'scripts' in root and \
+            file in ['cpplint.py', 'pdi-pep8.py', 'uncrustify.cfg', 'cmake2junit.xsl', 'requirements.txt']:
         return True
+
+    if 'test' in root and file == 'requirements.txt':
+        return True
+
     if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
@@ -212,9 +218,9 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'c', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld', 'supp' ]
-    names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld' ]
+    extensions = ['py', 'cpp', 'c', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED',
+                  'xtest', 'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld', 'supp']
+    names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld']
 
     # Check extensions
     if os.path.splitext(file)[1][1:] in extensions:
@@ -232,13 +238,13 @@ def supported_extension(root, file):
         return True
     
     filename = os.path.join(root, file)
-    print 'not supported extension: {filename}'.format(filename=filename)
+    print('not supported extension: {filename}'.format(filename=filename))
     return False
 
 if len(argv) > 1:
     dir = argv[1]
 else:
-    print 'Usage:   ./check_files_compliance.py <directory>'
+    print('Usage:   ./check_files_compliance.py <directory>')
     exit(1)
 
 good = 0
@@ -287,18 +293,18 @@ for root, dirs, files in os.walk(dir):
             error = check_file(filename)
 
         if len(error) > 0:
-            print filename + ': ' + error
+            print(filename + ': ' + error)
             bad += 1
         else:
             good += 1
 
 # src/lib/orionld/
 # src/app/orionld
-print '--------------'
-print 'Summary:'
-print '   good:    {good}'.format(good=str(good))
-print '   bad:     {bad}'.format(bad=str(bad))
-print 'Total: {total}'.format(total=str(good + bad))
+print('--------------')
+print('Summary:')
+print('   good:    {good}'.format(good=str(good)))
+print('   bad:     {bad}'.format(bad=str(bad)))
+print('Total: {total}'.format(total=str(good + bad)))
 
 if bad > 0:
     exit(1)
