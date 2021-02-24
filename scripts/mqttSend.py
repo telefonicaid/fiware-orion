@@ -42,7 +42,6 @@
 # orionld at fiware dot org
 
 
-
 # -----------------------------------------------------------------------------
 #
 # To install paho:
@@ -51,17 +50,14 @@
 #
 
 
-
 # -----------------------------------------------------------------------------
 #
 # Imports
 #
 import paho.mqtt.client as mqtt
 from getopt import getopt, GetoptError
-import sys
-import os
-import json
-
+from os.path import basename
+from sys import exit, argv
 
 
 # -----------------------------------------------------------------------------
@@ -82,61 +78,60 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --host <broker ip> --port <port number> --topic <topic> --payload <payload> -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --host <MQTT Broker IP-address>: (default is 'localhost')"
-    print "  --port <port number>: MQTT broker port (default is 1883)"
-    print "  --topic <topic>: MQTT topic to subscribe to (default is 'notification')"
-    print "  --payload <payload>: payload of the command (default is 'ping')"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
-
+    print('Usage: %s --host <broker ip> --port <port number> --topic <topic> --payload <payload> -v -u'
+          % basename(__file__))
+    print('')
+    print('Parameters:')
+    print("  --host <MQTT Broker IP-address>: (default is 'localhost')")
+    print("  --port <port number>: MQTT broker port (default is 1883)")
+    print("  --topic <topic>: MQTT topic to subscribe to (default is 'notification')")
+    print("  --payload <payload>: payload of the command (default is 'ping')")
+    print("  -v: verbose mode")
+    print("  -u: print this usage message")
 
 
 # -----------------------------------------------------------------------------
 #
 # Command Line Arguments
 #
-verbose  = 0
-host     = "localhost"
-port     = 1883
-topic    = "notification"
-payload  = 'ping'
-qos      = 0
+verbose = 0
+host = "localhost"
+port = 1883
+topic = "notification"
+payload = 'ping'
+qos = 0
 
 logFile.write("Parsing Command Line Arguments\n")
 logFile.flush()
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', [ 'host=', 'port=', 'topic=', 'payload=' ])
+    opts, args = getopt(argv[1:], 'vu', ['host=', 'port=', 'topic=', 'payload='])
+
+    for opt, arg in opts:
+        if opt == '-u':
+            usage()
+            exit(0)
+        elif opt == '-v':
+            verbose = 1
+        elif opt == '--host':
+            host = arg
+        elif opt == '--port':
+            try:
+                port = int(arg)
+            except ValueError:
+                print('the "--port" value must be an integer')
+                exit(1)
+        elif opt == '--topic':
+            topic = arg
+        elif opt == '--payload':
+            payload = arg
+        else:
+            print("no such command-line argument: " + opt)
+            exit(1)
 except GetoptError:
-    print 'Invalid command-line argument\n'
+    print('Invalid command-line argument\n')
     usage()
-    sys.exit(1)
-
-
-for opt, arg in opts:
-    if opt == '-u':
-        usage()
-        sys.exit(0)
-    elif opt == '-v':
-        verbose = 1
-    elif opt == '--host':
-        host = arg
-    elif opt == '--port':
-        try:
-            port = int(arg)
-        except ValueError:
-            print 'the "--port" value must be an integer'
-            sys.exit(1)
-    elif opt == '--topic':
-        topic = arg
-    elif opt == '--payload':
-        payload = arg
-    else:
-        print "no such command-line argument: " + opt
-        sys.exit(1)
+    exit(1)
 
 
 client = mqtt.Client()
@@ -147,4 +142,4 @@ client.publish(topic, payload)
 
 logFile.write("mqttSend.py has ended\n\n")
 logFile.flush()
-sys.exit(0)
+exit(0)

@@ -23,11 +23,12 @@
 
 from getopt import getopt, GetoptError
 
-import os
-import sys
-import re
-import tempfile
 from operator import add
+from re import match
+from os import rename, remove, listdir
+from os.path import splitext, isdir, basename, dirname, isfile
+from sys import argv
+from tempfile import NamedTemporaryFile
 
 __author__ = 'fermin'
 
@@ -45,7 +46,7 @@ def msg(m):
     global verbose
 
     if verbose:
-        print m
+        print(m)
 
 
 def usage_and_exit(m):
@@ -56,11 +57,11 @@ def usage_and_exit(m):
     """
 
     if m != '':
-        print m
-        print
+        print(m)
+        print()
 
     usage()
-    sys.exit(1)
+    exit(1)
 
 
 def usage():
@@ -68,17 +69,17 @@ def usage():
     Print usage message
     """
 
-    print 'Modifies each "Content-Length" line in .test files, based on the same values in the corresponding .out file'
-    print ''
-    print 'Usage: %s -f <file> [-c] [-d] [-v] [-u]' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print '  -f <file>: .test or .out file to modify. Alternatively, it can be a directory in which case'
-    print '             all the .test/.out files in that directory are checked, recursively.'
-    print '  -d: dry-run mode, i.e. .test files are not modified'
-    print '  -c: only-check mode, i.e. just resport if the file differs only in Content-Length or not'
-    print '  -v: verbose mode'
-    print '  -u: print this usage message'
+    print('Modifies each "Content-Length" line in .test files, based on the same values in the corresponding .out file')
+    print('')
+    print('Usage: %s -f <file> [-c] [-d] [-v] [-u]' % basename(__file__))
+    print('')
+    print('Parameters:')
+    print('  -f <file>: .test or .out file to modify. Alternatively, it can be a directory in which case')
+    print('             all the .test/.out files in that directory are checked, recursively.')
+    print('  -d: dry-run mode, i.e. .test files are not modified')
+    print('  -c: only-check mode, i.e. just resport if the file differs only in Content-Length or not')
+    print('  -v: verbose mode')
+    print('  -u: print this usage message')
 
 
 def patch_content_lengths(file_name, cl):
@@ -102,9 +103,9 @@ def patch_content_lengths(file_name, cl):
     n = 0
 
     try:
-        file_temp = tempfile.NamedTemporaryFile(delete=False)
+        file_temp = NamedTemporaryFile(delete=False)
         for line in open(file_name):
-            m = re.match('^Content-Length: (\S+)', line)
+            m = match(r'^Content-Length: (\S+)', line)
             if m is not None:
                 if cl[n][1] == '*':
                     # This case corresponds to 'Content-Lenght: REGEX(\d+)', so it must not be touched
@@ -120,10 +121,10 @@ def patch_content_lengths(file_name, cl):
         file_temp.close()
 
         # Remove old file, replacing by the edited one
-        os.remove(file_name)
-        os.rename(file_temp.name, file_name)
+        remove(file_name)
+        rename(file_temp.name, file_name)
     except Exception as err:
-        print ('* error processing file %s: %s' % (file_name, str(err)))
+        print('* error processing file %s: %s' % (file_name, str(err)))
 
 
 def content_length_extract(file_name):
@@ -136,27 +137,27 @@ def content_length_extract(file_name):
     """
 
     r = []
-    l = 0
+    number_lines = 0
 
     try:
         for line in open(file_name):
-            l += 1
-            m = re.match('^Content-Length: (\S+)', line)
+            number_lines += 1
+            m = match(r'^Content-Length: (\S+)', line)
             if m is not None:
                 try:
                     cl = int(m.group(1))
-                    msg('    - push [%d, %d]' % (l, cl))
-                    r.append([l, cl])
+                    msg('    - push [%d, %d]' % (number_lines, cl))
+                    r.append([number_lines, cl])
                 except ValueError:
-                    # Some times we have 'Content-Lenght: REGEX(\d+)'. It that case, we put a '*' in the pair
+                    # Some times we have 'Content-Length: REGEX(\d+)'. It that case, we put a '*' in the pair
                     if m.group(1).startswith('REGEX('):
-                        msg('    - push [%d, *]' % l)
-                        r.append([l, '*'])
+                        msg('    - push [%d, *]' % number_lines)
+                        r.append([number_lines, '*'])
                     else:
                         raise 'invalid Content-Length value: <%s> ' % m.group(1)
 
     except Exception as err:
-       print ('* error processing file %s: %s' % (file_name, str(err)))
+        print('* error processing file %s: %s' % (file_name, str(err)))
 
     return r
 
@@ -180,8 +181,8 @@ def check_same_lines(r1, r2):
     acc_r1 = 0
     acc_r2 = 0
 
-    if len(r1) != len (r2):
-        msg ('  - number of content-length entries does no match, skipping!')
+    if len(r1) != len(r2):
+        msg('  - number of content-length entries does no match, skipping!')
         return [False, 0, 0, 0]
 
     for i in range(0, len(r1)):
@@ -192,7 +193,7 @@ def check_same_lines(r1, r2):
             r1_val = r1[i][1]
             r2_val = r2[i][1]
             if r1_val == '*' or r2_val == '*':
-                msg ("  - item #%d uses '*', so no actual check done" % i)
+                msg("  - item #%d uses '*', so no actual check done" % i)
             elif r1_val != r2_val:
                 not_equal += 1
                 acc_r1 += r1_val
@@ -201,12 +202,12 @@ def check_same_lines(r1, r2):
     return [True, not_equal, acc_r1, acc_r2]
 
 
-def process_dir(dir_name, mode):
+def process_dir(dir_name, file_mode):
     """
     Recursive dir processing.
 
     :param dir_name: directory to be processed
-    :param mode: working mode (either PATCH, DRY_RUN or ONLY_CHECK)
+    :param file_mode: working mode (either PATCH, DRY_RUN or ONLY_CHECK)
     :return: a list with the following items:
        * True if the process was ok, False otherwise
        * number of processed files (only makes sense if first item is True)
@@ -222,26 +223,26 @@ def process_dir(dir_name, mode):
     accum = [0, 0, 0, 0, 0]
 
     try:
-        files = os.listdir(dir_name_clean)
+        list_files = listdir(dir_name_clean)
     except Exception as err:
-        print ('* error processing directory %s: %s' % (dir_name_clean, str(err)))
+        print('* error processing directory %s: %s' % (dir_name_clean, str(err)))
         return accum
 
-    for file in files:
+    for file_name in list_files:
 
-        file_name = dir_name_clean + '/' + file
+        file_name = dir_name_clean + '/' + file_name
 
-        if os.path.isdir(file_name):
-            accum = map(add, accum, process_dir(file_name, mode))
+        if isdir(file_name):
+            accum = map(add, accum, process_dir(file_name, file_mode))
         else:
-            extension = os.path.splitext(os.path.basename(file_name))[1]
+            extension = splitext(basename(file_name))[1]
             if extension == '.out':
-                accum = map(add, accum, process_file(file_name, mode))
+                accum = map(add, accum, process_file(file_name, file_mode))
 
     return accum
 
 
-def process_file(file_name, mode):
+def process_file(file_name, file_mode):
     """
     Process the file pass as argument, In can be either .test or .out. The process is as follows
 
@@ -254,7 +255,7 @@ def process_file(file_name, mode):
     7. Go through .test modifying Content-Length based the results in the .out file
 
     :param file_name: file to be processed
-    :param mode: working mode (either PATCH, DRY_RUN or ONLY_CHECK)
+    :param file_mode: working mode (either PATCH, DRY_RUN or ONLY_CHECK)
     :return: a list with the following items:
        * True if the process was ok, False otherwise
        * number of processed files (always 1) (only makes sense if first item is True)
@@ -267,38 +268,38 @@ def process_file(file_name, mode):
     msg('* processing file %s' % file_name)
 
     # Step 1 to 3
-    path = os.path.dirname(file_name)
-    basename = os.path.splitext(os.path.basename(file_name))[0]
+    path = dirname(file_name)
+    basename_file = splitext(basename(file_name))[0]
 
-    file_test = '%s/%s.test' % (path, basename)
-    file_out = '%s/%s.out' % (path, basename)
-    file_exp = '%s/%s.regexpect' % (path, basename)
+    file_test = '%s/%s.test' % (path, basename_file)
+    file_out = '%s/%s.out' % (path, basename_file)
+    file_exp = '%s/%s.regexpect' % (path, basename_file)
 
     for f in [file_test, file_out, file_exp]:
-        if not os.path.isfile(f):
+        if not isfile(f):
             msg('  - cannot find %s, skipping!' % f)
             return [False, 0, 0, 0, 0]
 
     # Step 4 and 5
-    msg ('  - extracting content length in .regexpect file')
+    msg('  - extracting content length in .regexpect file')
     cl_exp = content_length_extract(file_exp)
-    msg ('  - extracting content length in .out file')
+    msg('  - extracting content length in .out file')
     cl_out = content_length_extract(file_out)
 
     # Step 6
-    [result, not_equal, acc_exp, acc_out] = check_same_lines(cl_exp, cl_out)
+    [result_check, not_equal, acc_exp, acc_out] = check_same_lines(cl_exp, cl_out)
     if mode == 'ONLY_CHECK':
-        if result:
-            print '= OK:  %s' % file_out
+        if result_check:
+            print('= OK:  %s' % file_out)
         else:
-            print '= NOK: %s' % file_out
+            print('= NOK: %s' % file_out)
         return [False, 0, 0, 0, 0]
     else:
-        if not result:
+        if not result_check:
             return [False, 0, 0, 0, 0]
 
     # Step 7
-    if mode == 'DRY_RUN':
+    if file_mode == 'DRY_RUN':
         msg('  - dry run mode: not touching file')
     else:
         patch_content_lengths(file_test, cl_out)
@@ -314,41 +315,42 @@ def process_file(file_name, mode):
 
 
 try:
-    opts, args = getopt(sys.argv[1:], 'f:cdvu', [])
+    opts, args = getopt(argv[1:], 'f:cdvu', [])
+
+    # Defaults
+    file = ''
+    verbose = False
+    mode = 'PATCH'
+
+    for opt, arg in opts:
+        if opt == '-u':
+            usage()
+            exit(0)
+        elif opt == '-v':
+            verbose = True
+        elif opt == '-d':
+            mode = 'DRY_RUN'
+        elif opt == '-c':
+            mode = 'ONLY_CHECK'
+        elif opt == '-f':
+            file = arg
+        else:
+            usage_and_exit('')
+
+    if file == '':
+        usage_and_exit('missing -f parameter')
+
+    if isdir(file):
+        result = process_dir(file, mode)
+    else:
+        result = process_file(file, mode)
+
+    files = result[1]
+    changes = result[2]
+    result_exp = result[3]
+    result_out = result[4]
+
+    msg('TOTAL: files: %d, changes: %d, length .regexpect: %d, length .out %d'
+        % (files, changes, result_exp, result_out))
 except GetoptError:
     usage_and_exit('wrong parameter')
-
-# Defaults
-file = ''
-verbose = False
-mode = 'PATCH'
-
-for opt, arg in opts:
-    if opt == '-u':
-        usage()
-        sys.exit(0)
-    elif opt == '-v':
-        verbose = True
-    elif opt == '-d':
-        mode = 'DRY_RUN'
-    elif opt == '-c':
-        mode = 'ONLY_CHECK'
-    elif opt == '-f':
-        file = arg
-    else:
-        usage_and_exit('')
-
-if file == '':
-    usage_and_exit('missing -f parameter')
-
-if os.path.isdir(file):
-    result = process_dir(file, mode)
-else:
-    result = process_file(file, mode)
-
-files = result[1]
-changes = result[2]
-result_exp = result[3]
-result_out = result[4]
-
-msg('TOTAL: files: %d, changes: %d, length .regexpect: %d, length .out %d' % (files, changes, result_exp, result_out))

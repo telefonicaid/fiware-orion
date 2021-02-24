@@ -21,27 +21,26 @@
 # iot_support at tid dot es
 
 from optparse import OptionParser
-import re
-import os
-import sys
+from re import match
+from os.path import exists
 
 
 def validation_error(input_line, ref_line):
-    print "VALIDATION ERROR: input line:"
-    print "   " + input_line
-    print "does not match ref line:"
-    print "   " + ref_line
+    print("VALIDATION ERROR: input line:")
+    print("   " + input_line)
+    print("does not match ref line:")
+    print("   " + ref_line)
     exit(1)
 
 
 def line_count(file_name):
-    input = open(file_name, 'r')
+    input_file = open(file_name, 'r')
     lines = 0
 
-    for input_line in input.readlines():
+    for _ in input_file.readlines():
         lines = lines + 1
 
-    input.close()
+    input_file.close()
     return lines
 
 
@@ -53,37 +52,37 @@ def escape(s):
 
 def diff_files(input_file, ref_file):
 
-    input = open(input_file, 'r')
+    input_file = open(input_file, 'r')
     ref = open(ref_file, 'r')
 
-    input_lines = input.readlines()
+    input_lines = input_file.readlines()
 
     for ref_line in ref.readlines():
         # Get line from input file
         try:
             input_line = input_lines.pop(0)
+
+            # Removing trailing whitespace(to avoid "noisy" input/reference files)
+            ref_line = ref_line.rstrip()
+            input_line = input_line.rstrip()
+
+            # Check if normal line or regex(using regex itself
+            m = match('(.*)REGEX\((.*)\)(.*)', ref_line)
+            if m is not None:
+                # We build the regex, concatenating preamble,
+                # regex expression itself and the last part
+                regex = escape(m.group(1)) + m.group(2) + escape(m.group(3))
+
+                if not match(regex, input_line):
+                    validation_error(input_line, ref_line)
+            else:
+                if not ref_line == input_line:
+                    validation_error(input_line, ref_line)
         except IndexError:
-            print "VALIDATION ERROR: input file has less lines than reference"
+            print("VALIDATION ERROR: input file has less lines than reference")
             exit(1)
 
-        # Removing trailing whitespace(to avoid "noisy" input/reference files)
-        ref_line = ref_line.rstrip()
-        input_line = input_line.rstrip()
-
-        # Check if normal line or regex(using regex itself
-        m = re.match('(.*)REGEX\((.*)\)(.*)', ref_line)
-        if m is not  None:
-            # We build the regex, concatenating preamble,
-            # regex expression itself and the last part
-            regex = escape(m.group(1)) + m.group(2) + escape(m.group(3))
-
-            if not re.match(regex, input_line):
-                validation_error(input_line, ref_line)
-        else:
-            if not ref_line == input_line:
-                validation_error(input_line, ref_line)
-
-    print "Validation ok"
+    print("Validation ok")
     exit(0)
 
 
@@ -98,32 +97,31 @@ def main():
     if not options.input_file:
         parser.error("Missing input file")
     else:
-        if not os.path.exists(options.input_file):
+        if not exists(options.input_file):
             parser.error("Input file %s does not exist" % options.input_file)
 
     if not options.ref_file:
         parser.error("Missing test file")
     else:
-        if not os.path.exists(options.ref_file):
+        if not exists(options.ref_file):
             parser.error("Reference file %s does not exist" % options.ref_file)
 
-    ilines = line_count(options.input_file)
-    rlines = line_count(options.ref_file)
+    i_lines = line_count(options.input_file)
+    r_lines = line_count(options.ref_file)
 
-    if ilines == 0:
-        print "VALIDATION ERROR: input file is EMPTY"
+    if i_lines == 0:
+        print("VALIDATION ERROR: input file is EMPTY")
         exit(1)
 
-    if rlines == 0:
-        print "VALIDATION ERROR: reference file is EMPTY"
+    if r_lines == 0:
+        print("VALIDATION ERROR: reference file is EMPTY")
         exit(1)
 
-    if not ilines == rlines:
-        print "VALIDATION ERROR: input file and reference file have different line count"
+    if not i_lines == r_lines:
+        print("VALIDATION ERROR: input file and reference file have different line count")
         exit(1)
 
     diff_files(options.input_file, options.ref_file)
-
 
 
 if __name__ == "__main__":
