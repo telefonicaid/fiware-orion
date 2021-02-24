@@ -95,6 +95,7 @@ echo "INSTALL: gmock" \
 # pip gets installed with the usal name and next pip commands doesn't need pip2
 echo "INSTALL: python special dependencies" \
 && cd /opt \
+&& alternatives --set python /usr/bin/python2 \
 && pip2 install --upgrade "pip < 21.0" \
 && pip install virtualenv \
 && virtualenv /opt/ft_env \
