@@ -284,6 +284,11 @@ typedef struct OrionldConnectionState
   KjNode*                 duplicateArray;
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
+
+  //
+  // GeoJSON
+  //
+  KjNode*                 geoPropertyNode;
 } OrionldConnectionState;
 
 

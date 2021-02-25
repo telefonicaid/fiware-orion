@@ -367,9 +367,14 @@ static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[]
 
   for (int ix = 0; ix < items; ix++)
   {
-    eqAttrV[ix]  = orionldContextItemExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
-    dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-    dotForEq(eqAttrV[ix]);
+    if (strcmp(eqAttrV[ix], "location") != 0)
+    {
+      eqAttrV[ix]  = orionldContextItemExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
+      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
+      dotForEq(eqAttrV[ix]);
+    }
+    else
+      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
   }
 
   *attrsCountP = items;
@@ -467,12 +472,26 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       attrsMandatory = true;
   }
 
+  char* geometryProperty = NULL;
+  if (orionldState.acceptGeojson == true)
+  {
+    if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
+    {
+      geometryProperty = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
+      dotForEq(geometryProperty);  // Copy before overwriting?
+    }
+    else
+      geometryProperty = (char*) "location";
+  }
+
   orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
                                                eqAttrs,
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
                                                orionldState.uriParamOptions.keyValues,
-                                               orionldState.uriParams.datasetId);
+                                               orionldState.uriParams.datasetId,
+                                               geometryProperty,
+                                               &orionldState.geoPropertyNode);
 #endif
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
