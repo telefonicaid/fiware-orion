@@ -67,5 +67,5 @@ done
 
 OPTIONS="/C="$country"/ST="$state"/L="$city"/O="$company"/OU="$unit"/CN="$name"/"
 
-openssl genrsa -out "$keyFileName" 1024 > /dev/null 2>&1
+openssl genrsa -out "$keyFileName" 2048 > /dev/null 2>&1
 openssl req -days 365 -out "$certFileName" -new -x509 -key "$keyFileName" -subj "$OPTIONS" > /dev/null 2>&1

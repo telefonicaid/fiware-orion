@@ -82,11 +82,10 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
 
   if (r)
   {
+    // According to http://mongoc.org/libmongoc/current/mongoc_cursor_next.html#lifecycle note we don't have
+    // to do a bson_destroy(&doc)
     *nextDoc = BSONObj(doc);
   }
-
-  // FIXME OLD-DR: should bson_destroy(doc)? According to http://mongoc.org/libmongoc/1.17.3/mongoc_cursor_next.html#lifecycle
-  // is emphemeral so it is not needed...
 
   bson_error_t error;
   if (mongoc_cursor_error(c, &error))
@@ -141,7 +140,6 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
 */
 void DBCursor::set(mongoc_cursor_t* _c)
 {
-  // FIXME OLD-DR: is this safe? who is using this function?
   c = _c;
 }
 }

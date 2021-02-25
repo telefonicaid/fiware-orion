@@ -27,10 +27,7 @@
 
 #include "mongoDriver/BSONObjBuilder.h"
 
-// FIXME OLD-DR: general comment. Do we really need builder vs. no-builder classes or
-// only just one family? What about using the bson_append_document_begin() and
-// bson_append_document_end() methods (maybe performance is
-// better: http://mongoc.org/libbson/current/bson_append_array_begin.html#description)?
+#include "logMsg/logMsg.h"
 
 namespace orion
 {
@@ -52,6 +49,17 @@ BSONObjBuilder::BSONObjBuilder(void)
 BSONObjBuilder::~BSONObjBuilder(void)
 {
   bson_destroy(b);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::nFields -
+*/
+int BSONObjBuilder::nFields(void) const
+{
+  return bson_count_keys(b);
 }
 
 
@@ -95,7 +103,6 @@ void BSONObjBuilder::append(const std::string& key, const char* value)
 */
 void BSONObjBuilder::append(const std::string& key, int value)
 {
-  // FIXME OLD-DR: or maybe BSON_APPEND_INT64 ?
   BSON_APPEND_INT32(b, key.c_str(), value);
 }
 
@@ -107,7 +114,6 @@ void BSONObjBuilder::append(const std::string& key, int value)
 */
 void BSONObjBuilder::append(const std::string& key, long long value)
 {
-  // FIXME OLD-DR: or maybe BSON_APPEND_INT32 ?
   BSON_APPEND_INT64(b, key.c_str(), value);
 }
 
@@ -285,14 +291,14 @@ void BSONObjBuilder::appendElements(orion::BSONObj _b)
           append(key, (long long) bson_iter_int64(&iter));
           continue;
         default:
-          // FIXME OLD-DR: we should raise error here?
+          LM_E(("Runtime Error (unknown BSON type %d)", bson_iter_type(&iter)));
           continue;
         }
      }
   }
   else
   {
-    // FIME OLD-DR: raise error?
+    LM_E(("Runtime Error (fail initializing BSON iterator)"));
   }
 }
 

@@ -28,6 +28,8 @@
 
 #include "mongoDriver/BSONElement.h"
 
+#include "logMsg/logMsg.h"
+
 namespace orion
 {
 /* ****************************************************************************
@@ -36,7 +38,6 @@ namespace orion
 */
 BSONElement::BSONElement(void)
 {
-  // FIXME OLD-DR: really needed?
 }
 
 
@@ -74,17 +75,9 @@ BSONType BSONElement::type(void) const
   case BSON_TYPE_MINKEY:     return orion::MinKey;
   }
 
-  // FIXME: maybe we should return some other thing...
+  LM_E(("Runtime Error (unknown BSON type %d, returning EOO as failsafe)", bv.value_type));
   return orion::EOO;
 }
-
-// FIXME OLD-DR: type check should be enformed in Double(), String(), eg:
-//
-// value = bson_iter_value(&iter);
-//
-// if (value->value_type == BSON_TYPE_INT32) {
-//   printf ("%d\n", value->value.v_int32);
-// }
 
 
 /* ****************************************************************************
@@ -93,7 +86,6 @@ BSONType BSONElement::type(void) const
 */
 bool BSONElement::isNull(void) const
 {
-  // FIXME OLD-DR: who calls this method?
   return (bv.value_type == BSON_TYPE_NULL);
 }
 
@@ -105,6 +97,12 @@ bool BSONElement::isNull(void) const
 */
 std::string BSONElement::OID(void) const
 {
+  if (bv.value_type != BSON_TYPE_OID)
+  {
+    LM_E(("Runtime Error (expected BSON OID type but got type %d)", bv.value_type));
+    return "000000000000000000000000";
+  }
+
   char str[25];  // OID fixed length is 24 chars
   bson_oid_to_string(&bv.value.v_oid, str);
   return std::string(str);
@@ -118,6 +116,12 @@ std::string BSONElement::OID(void) const
 */
 std::string BSONElement::String(void) const
 {
+  if (bv.value_type != BSON_TYPE_UTF8)
+  {
+    LM_E(("Runtime Error (expected BSON String type but got type %d)", bv.value_type));
+    return "";
+  }
+
   return std::string(bv.value.v_utf8.str);
 }
 
@@ -129,6 +133,12 @@ std::string BSONElement::String(void) const
 */
 bool BSONElement::Bool(void) const
 {
+  if (bv.value_type != BSON_TYPE_BOOL)
+  {
+    LM_E(("Runtime Error (expected BSON Bool type but got type %d)", bv.value_type));
+    return false;
+  }
+
   return bv.value.v_bool;
 }
 
@@ -139,6 +149,12 @@ bool BSONElement::Bool(void) const
 */
 double BSONElement::Number(void) const
 {
+  if (bv.value_type != BSON_TYPE_DOUBLE)
+  {
+    LM_E(("Runtime Error (expected BSON Double type but got type %d)", bv.value_type));
+    return -1;
+  }
+
   return bv.value.v_double;
 }
 
@@ -151,6 +167,12 @@ double BSONElement::Number(void) const
 std::vector<BSONElement> BSONElement::Array(void) const
 {
   std::vector<BSONElement> v;
+
+  if (bv.value_type != BSON_TYPE_ARRAY)
+  {
+    LM_E(("Runtime Error (expected BSON Array type but got type %d)", bv.value_type));
+    return v;
+  }
 
   // First, get the bson_t corresponding to the array, from bv
   size_t len    = (size_t) bv.value.v_doc.data_len;
@@ -167,6 +189,10 @@ std::vector<BSONElement> BSONElement::Array(void) const
         v.push_back(BSONElement(bson_iter_key(&iter), bson_iter_value(&iter)));
      }
   }
+  else
+  {
+    LM_E(("Runtime Error (fail initializing BSON iterator)"));
+  }
 
   // Free bson_t memory
   bson_destroy(b);
@@ -182,6 +208,12 @@ std::vector<BSONElement> BSONElement::Array(void) const
 */
 BSONObj BSONElement::embeddedObject(void) const
 {
+  if (bv.value_type != BSON_TYPE_DOCUMENT)
+  {
+    LM_E(("Runtime Error (expected BSON Object type but got type %d)", bv.value_type));
+    return BSONObj();
+  }
+
   size_t len    = (size_t) bv.value.v_doc.data_len;
   uint8_t* data = bv.value.v_doc.data;
 
@@ -202,6 +234,12 @@ BSONObj BSONElement::embeddedObject(void) const
 */
 BSONDate BSONElement::date(void) const
 {
+  if (bv.value_type != BSON_TYPE_DATE_TIME)
+  {
+    LM_E(("Runtime Error (expected BSON Date type but got type %d)", bv.value_type));
+    return BSONDate(0);
+  }
+
   return BSONDate(bv.value.v_datetime);
 }
 
@@ -224,7 +262,7 @@ std::string BSONElement::fieldName(void) const
 */
 bool BSONElement::eoo(void) const
 {
-  return (bv.value_type == BSON_TYPE_NULL);
+  return (bv.value_type == BSON_TYPE_EOD);
 }
 
 

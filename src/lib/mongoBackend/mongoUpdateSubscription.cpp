@@ -877,15 +877,12 @@ std::string mongoUpdateSubscription
   std::string err;
   orion::BSONObjBuilder bob;
   bob.append("_id", id);
-  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bob.obj(), &subOrig, &err))
+  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bob.obj(), &subOrig, &err) && (err != ""))
   {
-    // FIXME OLD-DR: at the present moment we are unable to know if false means: "no result" or
-    // "fail in cursor". Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-find-function
-    // We assume "no result" by the moment, so disabling this code.
-    /*reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
 
-    return "";*/
+    return "";
   }
 
   if (subOrig.isEmpty())

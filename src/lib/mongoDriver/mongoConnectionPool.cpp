@@ -40,7 +40,6 @@
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/BSONObjBuilder.h"
 
-// FIXME OLD-DR: mongo c driver has pool functionality. Analyze it
 
 /* ****************************************************************************
 *
@@ -111,9 +110,6 @@ static orion::DBConnection mongoConnect
   double       timeout
 )
 {
-  std::string       err;
-  mongoc_client_t*  connection = NULL;
-
   LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
 
 #if 0
@@ -192,31 +188,9 @@ static orion::DBConnection mongoConnect
   LM_T(LmtOldInfo, ("Successful connection to database"));
 #endif
 
+
 #if 0
-  // FIXME OLD-DR: no write concerns or authenticatio by the moment
-
-  //
-  // WriteConcern
-  //
-  mongo::WriteConcern writeConcernCheck;
-
-  //
-  // In the legacy driver, writeConcern is no longer an int, but a class.
-  // We need a small conversion step here
-  //
-  mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
-
-  setWriteConcern(connection, wc, &err);
-  getWriteConcern(connection, &writeConcernCheck, &err);
-
-  if (writeConcernCheck.nodes() != wc.nodes())
-  {
-    alarmMgr.dbError("Write Concern not set as desired)");
-    return NULL;
-  }
-  alarmMgr.dbErrorReset();
-
-  LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
+  // FIXME OLD-DR: no authentication yet
 
   /* Authentication is different depending if multiservice is used or not. In the case of not
    * using multiservice, we authenticate in the single-service database. In the case of using
@@ -246,9 +220,30 @@ static orion::DBConnection mongoConnect
   }
 #endif
 
-  // FIXME OLD-DR: mongoc_client_destroy() should be called some point
-  // FIXME OLD-DR: unhardwire localhost
-  connection = mongoc_client_new("mongodb://localhost:27017");
+  std::string mongoUri = "mongodb://" + std::string(host);
+  orion::DBConnection connection = orion::DBConnection(mongoc_client_new(mongoUri.c_str()));
+  if (connection.isNull())
+  {
+    return orion::DBConnection(NULL);
+  }
+
+  //
+  // WriteConcern
+  //
+  orion::WriteConcern wc = (writeConcern == 1 ? orion::WCAcknowledged : orion::WCUnAcknowledged);
+
+  orion::setWriteConcern(connection, wc);
+  orion::WriteConcern writeConcernCheck = orion::getWriteConcern(connection);
+
+  if (writeConcernCheck != wc)
+  {
+    mongoc_client_destroy(connection.get());
+    alarmMgr.dbError("Write Concern not set as desired)");
+    return orion::DBConnection(NULL);
+  }
+  alarmMgr.dbErrorReset();
+
+  LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
   return orion::DBConnection(connection);
 }
@@ -261,12 +256,14 @@ static orion::DBConnection mongoConnect
 */
 static void shutdownClient(void)
 {
-  // FIXME OLD-DR: do proper shutdown here
-  /*mongo::Status status = mongo::client::shutdown();
-  if (!status.isOK())
+  for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
-    LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
-  }*/
+    if (!connectionPool[ix].connection.isNull())
+    {
+      mongoc_client_destroy(connectionPool[ix].connection.get());
+    }
+  }
+  mongoc_cleanup();
 }
 
 
@@ -340,7 +337,6 @@ int orion::mongoConnectionPoolInit
   if (dbSSL)
   {
     // FIXME OLD-DR: auth not taken into account by the moment
-    // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
     mongoc_init();
     // mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
     // statusOk = status.isOK();
@@ -349,7 +345,6 @@ int orion::mongoConnectionPoolInit
   }
   else
   {
-    // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
     mongoc_init();
     // mongo::Status status = mongo::client::initialize();
     // statusOk = status.isOK();

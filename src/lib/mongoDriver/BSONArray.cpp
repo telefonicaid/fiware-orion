@@ -35,7 +35,6 @@ namespace orion
 */
 BSONArray::BSONArray()
 {
-  // FIXME OLD-DR: is this constructor really needed?
   b = bson_new();
 }
 

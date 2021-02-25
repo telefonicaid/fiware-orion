@@ -3007,7 +3007,7 @@ static unsigned int updateEntity
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
-  std::string     locAttr = "";
+  std::string            locAttr = "";
   orion::BSONObj         currentGeoJson;
   orion::BSONObj         newGeoJson;
   orion::BSONObj         finalGeoJson;
@@ -3187,14 +3187,7 @@ static unsigned int updateEntity
     toSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
   }
 
-  /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
-   * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
-  // FIXME OLD-DR: I think new BSONObjBuilder would allow to to this
   orion::BSONObjBuilder  updatedEntity;
-  orion::BSONObj         toSetObj    = toSet.obj();
-  orion::BSONObj         toUnsetObj  = toUnset.obj();
-  orion::BSONArray       toPushArr   = toPush.arr();
-  orion::BSONArray       toPullArr   = toPull.arr();
 
   if (action == ActionTypeReplace)
   {
@@ -3206,8 +3199,8 @@ static unsigned int updateEntity
     // we use a BSONObjBuilder instead the BSON stream macro.
     // Note entity replacement could be caused by a notification request
     // (with cbnotif= in the correlator) so we need to use correlatorRoot()
-    replaceSet.append(ENT_ATTRS, toSetObj);
-    replaceSet.append(ENT_ATTRNAMES, toPushArr);
+    replaceSet.append(ENT_ATTRS, toSet.obj());
+    replaceSet.append(ENT_ATTRNAMES, toPush.arr());
     replaceSet.append(ENT_MODIFICATION_DATE, now);
     replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
@@ -3228,7 +3221,7 @@ static unsigned int updateEntity
 
     if (!dateExpirationInPayload || newGeoJson.nFields() == 0)
     {
-      updatedEntity.append("$unset", toUnsetObj);
+      updatedEntity.append("$unset", toUnset.obj());
     }
 
     notifyCerP->entity.modDate = now;
@@ -3236,30 +3229,30 @@ static unsigned int updateEntity
   else
   {
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
-    if (toSetObj.nFields() > 0)
+    if (toSet.nFields() > 0)
     {
-      updatedEntity.append("$set", toSetObj);
+      updatedEntity.append("$set", toSet.obj());
     }
 
-    if (toUnsetObj.nFields() > 0)
+    if (toUnset.nFields() > 0)
     {
-      updatedEntity.append("$unset", toUnsetObj);
+      updatedEntity.append("$unset", toUnset.obj());
     }
 
-    if (toPushArr.nFields() > 0)
+    if (toPush.arrSize() > 0)
     {
       orion::BSONObjBuilder bobEach;
       orion::BSONObjBuilder bobAttrs;
-      bobEach.append("$each", toPushArr);
+      bobEach.append("$each", toPush.arr());
       bobAttrs.append(ENT_ATTRNAMES, bobEach.obj());
 
       updatedEntity.append("$addToSet", bobAttrs.obj());
     }
 
-    if (toPullArr.nFields() > 0)
+    if (toPull.arrSize() > 0)
     {
       orion::BSONObjBuilder bobAttrs;
-      bobAttrs.append(ENT_ATTRNAMES, toPullArr);
+      bobAttrs.append(ENT_ATTRNAMES, toPull.arr());
       updatedEntity.append("$pullAll", bobAttrs.obj());
     }
   }

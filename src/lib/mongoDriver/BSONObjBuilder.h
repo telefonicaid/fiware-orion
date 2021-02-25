@@ -62,6 +62,7 @@ class BSONObjBuilder
   void appendDate(const std::string& key, const BSONDate& value);
   void appendNull(const std::string& key);
   void appendElements(orion::BSONObj b);
+  int nFields(void) const;
   BSONObj obj(void);
   BSONObjBuilder& operator= (BSONObjBuilder rhs);
 
