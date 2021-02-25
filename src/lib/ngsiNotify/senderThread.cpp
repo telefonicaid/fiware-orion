@@ -90,7 +90,7 @@ void* startSenderThread(void* p)
       if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
-        alarmMgr.notificationErrorReset(url);
+        alarmMgr.forwardingErrorReset(url);
 
         if (params->registration == false)
         {
@@ -99,7 +99,7 @@ void* startSenderThread(void* p)
       }
       else
       {
-        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+        alarmMgr.forwardingError(url, "forwarding error: " + out);
 
         if (params->registration == false)
         {
