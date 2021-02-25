@@ -74,7 +74,7 @@ RUN \
     cd mongo-c-driver-1.17.4 && \
     mkdir cmake-build && \
     cd cmake-build && \
-    cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
     make && \
     sudo make install && \
     # Install rapidjson from source
@@ -166,4 +166,3 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
-
