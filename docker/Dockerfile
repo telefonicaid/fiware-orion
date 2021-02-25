@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos7.9.2009
+ARG  IMAGE_TAG=centos8.3.2011
 FROM centos:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -55,7 +55,6 @@ RUN \
       nc \
       git \
       gcc-c++ \
-      scons \
       tar \
       which \
       cyrus-sasl-devel && \
@@ -70,11 +69,14 @@ RUN \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
-    tar xfz legacy-1.1.2.tar.gz && \
-    cd mongo-cxx-driver-legacy-1.1.2 && \
-    scons --use-sasl-client --ssl && \
-    scons install --prefix=/usr/local --use-sasl-client --ssl && \
+    wget https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz && \
+    tar xfvz mongo-c-driver-1.16.0.tar.gz && \
+    cd mongo-c-driver-1.16.0 && \
+    mkdir cmake-build && \
+    cd cmake-build && \
+    cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
+    make && \
+    sudo make install && \
     # Install rapidjson from source
     cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
@@ -99,8 +101,7 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           /opt/legacy-1.1.2.tar.gz \
-           /opt/mongo-cxx-driver-legacy-1.1.2 \
+           /opt/mongo-c-driver-1.16.0 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.1.0 \
