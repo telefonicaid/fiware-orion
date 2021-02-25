@@ -69,7 +69,7 @@ RUN \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    wget https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz && \
+    wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz && \
     tar xfvz mongo-c-driver-1.17.4.tar.gz && \
     cd mongo-c-driver-1.17.4 && \
     mkdir cmake-build && \
