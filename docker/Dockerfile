@@ -101,7 +101,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           /opt/mongo-c-driver-1.16.0 \
+           /opt/mongo-c-driver-1.17.4.tar.gz \
+           /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.1.0 \
