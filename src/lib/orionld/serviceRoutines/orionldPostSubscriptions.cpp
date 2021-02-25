@@ -45,11 +45,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
-#include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
-#include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
-#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // kjTreeToSubscriptionExpression
-#include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
-#include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish

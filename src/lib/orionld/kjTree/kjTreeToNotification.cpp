@@ -43,6 +43,72 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// pcheckSubscriptionAcceptAndFormat - check that the 'format' and the 'accept' are compatible
+//
+// format                                    valid 'accept'
+// ----------------------------------        ---------------------------------------------
+// NGSI_V1_LEGACY                            application/json
+// NGSI_V2_NORMALIZED                        application/json
+// NGSI_V2_KEYVALUES                         application/json
+// NGSI_V2_VALUES                            application/json
+// NGSI_V2_UNIQUE_VALUES                     application/json
+// NGSI_V2_CUSTOM                            application/json
+// NGSI_LD_V1_NORMALIZED                     application/json, application/ld+json, application/geo+json
+// NGSI_LD_V1_KEYVALUES                      application/json, application/ld+json, application/geo+json
+// NGSI_LD_V1_V2_NORMALIZED                  application/json
+// NGSI_LD_V1_V2_KEYVALUES                   application/json
+// NGSI_LD_V1_V2_NORMALIZED_COMPACT          application/json
+// NGSI_LD_V1_V2_KEYVALUES_COMPACT           application/json
+//
+static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType accept)
+{
+  switch (format)
+  {
+  case NGSI_V1_LEGACY:
+  case NGSI_V2_NORMALIZED:
+  case NGSI_V2_KEYVALUES:
+  case NGSI_V2_VALUES:
+  case NGSI_V2_UNIQUE_VALUES:
+  case NGSI_V2_CUSTOM:
+    LM_W(("Bad Input (invalid notification-format for an NGSI-LD subscription)"));
+    return false;
+    break;
+
+  case NGSI_LD_V1_NORMALIZED:
+  case NGSI_LD_V1_KEYVALUES:
+    if ((accept != JSON) && (accept != JSONLD) && (accept != GEOJSON))
+    {
+      LM_W(("Bad Input (invalid notification-accept MimeType for an NGSI-LD notification) - '%s'", mimeTypeToLongString(accept)));
+      return false;
+    }
+    return true;
+    break;
+
+  case NGSI_LD_V1_V2_NORMALIZED:
+  case NGSI_LD_V1_V2_KEYVALUES:
+  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:
+  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:
+    if (accept != JSON)
+    {
+      LM_W(("Bad Input (invalid notification-accept MimeType for a cross NGSI-LD to NGSIv2 notification) - '%s'", mimeTypeToLongString(accept)));
+      return false;
+    }
+    return true;
+    break;
+
+  case NO_FORMAT:
+    break;
+  }
+
+  LM_W(("Bad Input (unknown notification-format for an NGSI-LD subscription)"));
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // formatExtract -
 //
 static bool formatExtract(char* format, ngsiv2::Subscription* subP)
@@ -146,6 +212,13 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       orionldErrorResponseCreate(OrionldBadRequestData, "Unknown Notification field", itemP->name);
       return false;
     }
+  }
+
+  if (pcheckSubscriptionAcceptAndFormat(subP->attrsFormat, subP->notification.httpInfo.mimeType) == false)
+  {
+    LM_W(("Bad Input (Non-compatible 'format' (%s) and 'accept' (%s) fields)", renderFormatToString(subP->attrsFormat), mimeTypeToLongString(subP->notification.httpInfo.mimeType)));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Non-compatible 'format' and 'accept' fields");
+    return false;
   }
 
   return true;
