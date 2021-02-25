@@ -45,7 +45,7 @@ jobs:
   deploy-debug:
 
     runs-on: ubuntu-18.04
-    if: ${{ github.event_name == 'push' && GITHUB_REPOSITORY == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
