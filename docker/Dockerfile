@@ -70,8 +70,8 @@ RUN \
     # Install mongodb driver from source
     cd /opt && \
     wget https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz && \
-    tar xfvz mongo-c-driver-1.16.0.tar.gz && \
-    cd mongo-c-driver-1.16.0 && \
+    tar xfvz mongo-c-driver-1.17.4.tar.gz && \
+    cd mongo-c-driver-1.17.4 && \
     mkdir cmake-build && \
     cd cmake-build && \
     cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
@@ -166,5 +166,4 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
-
 
