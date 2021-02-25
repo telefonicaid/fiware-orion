@@ -38,12 +38,6 @@ brokerStart CP4
 --SHELL--
 
 #
-# FIXME: Step 11 should be just "Query entities of type T and with attr A1 - see E1 with A1",
-#        I.e. without "and E2+E3 without attrs".
-#        To do so, the CB should be more precise in the way it invokes CPrs or in the way
-#        it filters the CPr results before responding to the client.
-#        Note that this is not a NGSIv2-specific flaw, NGSIv1 forwarding behaves the same way.
-#
 # 01. Register entities of type T, with ID .*, and attribute A1, for CP1
 # 02. Register entities of type T, with ID .*, and attribute A2, for CP2
 # 03. Register entities of type T, with ID .*, and attribute A3, for CP3
@@ -54,7 +48,7 @@ brokerStart CP4
 # 08. Create E4/U in CP4
 # 09. Query entities of type T - see E1, E2 and E3
 # 10. Query entities of type U - see E4
-# 11. Query entities of type T and with attr A1 - see E1 with A1, and E2+E3 without attrs
+# 11. Query entities of type T and with attr A1 - see E1 with A1
 #
 
 echo "01. Register entities of type T, with ID .*, and attribute A1, for CP1"
@@ -215,8 +209,8 @@ echo
 echo
 
 
-echo "11. Query entities of type T and with attr A1 - see E1 with A1, and E2+E3 without attrs"
-echo "======================================================================================="
+echo "11. Query entities of type T and with attr A1 - see E1 with A1"
+echo "=============================================================="
 orionCurl --url '/v2/entities?type=T&attrs=A1'
 echo
 echo
@@ -363,10 +357,10 @@ Date: REGEX(.*)
 ]
 
 
-11. Query entities of type T and with attr A1 - see E1 with A1, and E2+E3 without attrs
-=======================================================================================
+11. Query entities of type T and with attr A1 - see E1 with A1
+==============================================================
 HTTP/1.1 200 OK
-Content-Length: 118
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -379,14 +373,6 @@ Date: REGEX(.*)
             "value": 11
         }, 
         "id": "E1", 
-        "type": "T"
-    }, 
-    {
-        "id": "E2", 
-        "type": "T"
-    }, 
-    {
-        "id": "E3", 
         "type": "T"
     }
 ]

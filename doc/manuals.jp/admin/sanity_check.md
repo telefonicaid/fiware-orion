@@ -85,7 +85,6 @@ mongo コンソールの次のコマンドを使用して、broker が使用す�
 > db.registrations.count()
 > db.entities.count()
 > db.csubs.count()
-> db.casubs.count()
 ```
 
 [トップ](#top)

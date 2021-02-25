@@ -153,6 +153,9 @@ function usage()
   echo "CB_THREADPOOL:            Start the broker without thread pool (if set to 'OFF')"
   echo "CB_DIFF_TOOL:             To view diff of failing tests with diff/tkdiff/meld/... (e.g. export CB_DIFF_TOOL=tkdiff)"
   echo "CB_WITH_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo ""
+  echo "FT_FROM_IX: alternative to commandline parameter  'fromIx', index of test where to start (inclusive) "
+  echo "FT_TO_IX: alternative to commandline parameter  'toIx', index of test where to end (inclusive)"
   echo
   echo "Please note that, if using CB_WITH_EXTERNAL_BROKER (or --xbroker, which is the same), only a single test case should be run."
   echo
@@ -289,8 +292,6 @@ done
 
 vMsg "options parsed"
 
-
-
 # -----------------------------------------------------------------------------
 #
 # The function brokerStart looks at the env var CB_NO_CACHE to decide
@@ -312,7 +313,27 @@ then
   export CB_THREADPOOL=$threadpool
 fi
 
+# -----------------------------------------------------------------------------
+#
+# Check if fromIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
+then
+  fromIx=$FT_FROM_IX
+fi
 
+# -----------------------------------------------------------------------------
+#
+# Check if toIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
+then
+  toIx=$FT_TO_IX
+fi
+
+echo "Run tests $fromIx to $toIx"
 
 # ------------------------------------------------------------------------------
 #

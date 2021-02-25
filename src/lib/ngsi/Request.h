@@ -40,13 +40,6 @@ typedef enum RequestType
   NoRequest,
   RegisterContext = 1,
   DiscoverContextAvailability,
-  SubscribeContextAvailability,
-  RtSubscribeContextAvailabilityResponse,
-  UpdateContextAvailabilitySubscription,
-  RtUpdateContextAvailabilitySubscriptionResponse,
-  UnsubscribeContextAvailability,
-  RtUnsubscribeContextAvailabilityResponse,
-  NotifyContextAvailability,
 
   QueryContext = 11,
   RtQueryContextResponse,
@@ -65,7 +58,6 @@ typedef enum RequestType
   ContextEntityTypes,
   ContextEntityTypeAttributeContainer,
   ContextEntityTypeAttribute,
-  Ngsi9SubscriptionsConvOp,
 
   IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,

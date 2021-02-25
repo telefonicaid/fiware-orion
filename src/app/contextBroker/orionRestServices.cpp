@@ -35,16 +35,11 @@
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/postRegisterContext.h"
 #include "serviceRoutines/postSubscribeContext.h"
-#include "serviceRoutines/postSubscribeContextAvailability.h"
-#include "serviceRoutines/postUnsubscribeContextAvailability.h"
 #include "serviceRoutines/postUpdateContext.h"
-#include "serviceRoutines/postUpdateContextAvailabilitySubscription.h"
 #include "serviceRoutines/postUpdateContextSubscription.h"
 #include "serviceRoutines/postUnsubscribeContext.h"
 #include "serviceRoutines/postNotifyContext.h"
-#include "serviceRoutines/postNotifyContextAvailability.h"
 #include "serviceRoutines/postSubscribeContextConvOp.h"
-#include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
@@ -55,8 +50,6 @@
 #include "serviceRoutines/postContextEntityTypes.h"
 #include "serviceRoutines/getContextEntityTypeAttribute.h"
 #include "serviceRoutines/postContextEntityTypeAttribute.h"
-#include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
-#include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -234,22 +227,10 @@ static RestService postServiceV[] =
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, postRegistration                                  },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, postSubscribeContextAvailability                  },
-  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, postUnsubscribeContextAvailability                },
-  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, postUpdateContextAvailabilitySubscription         },
-  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, postNotifyContextAvailability                     },
   { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, postRegisterContext                               },
   { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
-  { SubscribeContextAvailability,                  3, { "v1", "registry", "subscribeContextAvailability"                               }, postSubscribeContextAvailability                  },
-  { UnsubscribeContextAvailability,                3, { "v1", "registry", "unsubscribeContextAvailability"                             }, postUnsubscribeContextAvailability                },
-  { UpdateContextAvailabilitySubscription,         3, { "v1", "registry", "updateContextAvailabilitySubscription"                      }, postUpdateContextAvailabilitySubscription         },
-  { NotifyContextAvailability,                     3, { "v1", "registry", "notifyContextAvailability"                                  }, postNotifyContextAvailability                     },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, postSubscribeContextAvailability                  },
-  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, postUnsubscribeContextAvailability                },
-  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, postUpdateContextAvailabilitySubscription         },
-  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, postNotifyContextAvailability                     },
   { UpdateContext,                                 2, { "v1",      "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
   { QueryContext,                                  2, { "v1",      "queryContext"                                                      }, postQueryContext                                  },
   { SubscribeContext,                              2, { "v1",      "subscribeContext"                                                  }, postSubscribeContext                              },
@@ -262,14 +243,12 @@ static RestService postServiceV[] =
   { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, postContextEntityTypes                            },
   { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, postContextEntityTypes                            },
   { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, postContextEntityTypeAttribute                    },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "contextAvailabilitySubscriptions"                           }, postSubscribeContextAvailabilityConvOp            },
   { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, postContextEntitiesByEntityId                     },
   { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, postContextEntityAttributes                       },
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, postEntityByIdAttributeByName                     },
   { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, postContextEntityTypes                            },
   { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, postContextEntityTypes                            },
   { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, postContextEntityTypeAttribute                    },
-  { SubscribeContextAvailability,                  3, { "v1", "registry", "contextAvailabilitySubscriptions"                           }, postSubscribeContextAvailability                  },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, postIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, postIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, postIndividualContextEntityAttribute              },
@@ -304,8 +283,6 @@ static RestService putServiceV[] =
   { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, putEntity                                        },
   { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, putEntityAttributeValue                          },
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, putEntityAttribute                               },
-  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                    }, putAvailabilitySubscriptionConvOp                },
-  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                    }, putAvailabilitySubscriptionConvOp                },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, putIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, putIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, putIndividualContextEntityAttribute              },  
@@ -351,8 +328,6 @@ static RestService deleteServiceV[] =
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, deleteEntity                                        },
   { IndividualSubscriptionRequest,                 3, { "v2", "subscriptions", "*"                                                   }, deleteSubscription                                  },
   { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                   }, deleteRegistration                                  },
-  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                    }, deleteAvailabilitySubscriptionConvOp                },
-  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                    }, deleteAvailabilitySubscriptionConvOp                },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, deleteIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, deleteIndividualContextEntity                       },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, deleteIndividualContextEntityAttribute              },
@@ -404,22 +379,10 @@ static RestService badVerbV[] =
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbGetPostOnly        },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, badVerbPostOnly           },
-  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, badVerbPostOnly           },
-  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, badVerbPostOnly           },
-  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, badVerbPostOnly           },
   { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, badVerbPostOnly           },
   { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { SubscribeContextAvailability,                  3, { "v1", "registry", "subscribeContextAvailability"                               }, badVerbPostOnly           },
-  { UnsubscribeContextAvailability,                3, { "v1", "registry", "unsubscribeContextAvailability"                             }, badVerbPostOnly           },
-  { UpdateContextAvailabilitySubscription,         3, { "v1", "registry", "updateContextAvailabilitySubscription"                      }, badVerbPostOnly           },
-  { NotifyContextAvailability,                     3, { "v1", "registry", "notifyContextAvailability"                                  }, badVerbPostOnly           },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, badVerbPostOnly           },
-  { UnsubscribeContextAvailability,                2, { "ngsi9",          "unsubscribeContextAvailability"                             }, badVerbPostOnly           },
-  { UpdateContextAvailabilitySubscription,         2, { "ngsi9",          "updateContextAvailabilitySubscription"                      }, badVerbPostOnly           },
-  { NotifyContextAvailability,                     2, { "ngsi9",          "notifyContextAvailability"                                  }, badVerbPostOnly           },
   { UpdateContext,                                 2, { "v1",             "updateContext"                                              }, badVerbPostOnly           },
   { QueryContext,                                  2, { "v1",             "queryContext"                                               }, badVerbPostOnly           },
   { SubscribeContext,                              2, { "v1",             "subscribeContext"                                           }, badVerbPostOnly           },
@@ -432,16 +395,12 @@ static RestService badVerbV[] =
   { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
   { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
   { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
-  { SubscribeContextAvailability,                  2, { "ngsi9",          "contextAvailabilitySubscriptions"                           }, badVerbPostOnly           },
-  { Ngsi9SubscriptionsConvOp,                      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*"                      }, badVerbPutDeleteOnly      },
   { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, badVerbGetPostOnly        },
   { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
   { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
   { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
-  { SubscribeContextAvailability,                  3, { "v1", "registry", "contextAvailabilitySubscriptions"                           }, badVerbPostOnly           },
-  { Ngsi9SubscriptionsConvOp,                      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*"                      }, badVerbPutDeleteOnly      },
+  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },   
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, badVerbAllFour            },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },

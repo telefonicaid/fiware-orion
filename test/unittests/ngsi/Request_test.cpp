@@ -46,14 +46,7 @@ TEST(Request, requestType)
   Req   req[] =
   {
     { RegisterContext,                                 "RegisterContextRequest"                                 },
-    { DiscoverContextAvailability,                     "DiscoverContextAvailabilityRequest"                     },
-    { SubscribeContextAvailability,                    "SubscribeContextAvailabilityRequest"                    },
-    { RtSubscribeContextAvailabilityResponse,          "SubscribeContextAvailabilityResponse"                   },
-    { UpdateContextAvailabilitySubscription,           "UpdateContextAvailabilitySubscriptionRequest"           },
-    { RtUpdateContextAvailabilitySubscriptionResponse, "UpdateContextAvailabilitySubscriptionResponse"          },
-    { UnsubscribeContextAvailability,                  "UnsubscribeContextAvailabilityRequest"                  },
-    { RtUnsubscribeContextAvailabilityResponse,        "UnsubscribeContextAvailabilityResponse"                 },
-    { NotifyContextAvailability,                       "NotifyContextAvailabilityRequest"                       },
+    { DiscoverContextAvailability,                     "DiscoverContextAvailabilityRequest"                     },    
 
     { QueryContext,                                "QueryContextRequest"                                    },
     { SubscribeContext,                            "SubscribeContextRequest"                                },
@@ -68,7 +61,6 @@ TEST(Request, requestType)
     { ContextEntityTypeAttributeContainer,         "ContextEntityTypeAttributeContainer"                    },
     { ContextEntityTypeAttribute,                  "ContextEntityTypeAttribute"                             },
     { EntityByIdAttributeByName,                   "EntityByIdAttributeByName"                              },
-    { Ngsi9SubscriptionsConvOp,                    "Ngsi9SubscriptionsConvOp"                               },
 
     { IndividualContextEntity,                     "IndividualContextEntity"                                },
     { IndividualContextEntityAttributes,           "IndividualContextEntityAttributes"                      },

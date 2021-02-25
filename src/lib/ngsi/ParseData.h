@@ -36,10 +36,6 @@
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
-#include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -148,20 +144,6 @@ struct QueryContextResponseData
 
 /* ****************************************************************************
 *
-* SubscribeContextAvailabilityData - 
-*/
-struct SubscribeContextAvailabilityData
-{
-  SubscribeContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
-  SubscribeContextAvailabilityRequest  res;
-  EntityId*                            entityIdP;
-  Scope*                               scopeP;
-};
-
-
-
-/* ****************************************************************************
-*
 * SubscribeContextData -
 */
 struct SubscribeContextData
@@ -175,17 +157,6 @@ struct SubscribeContextData
   Scope*                         scopeP;
   orion::Point*                  vertexP;
 };
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextAvailabilityData -
-*/
-typedef struct UnsubscribeContextAvailabilityData
-{
-  UnsubscribeContextAvailabilityRequest        res;
-} UnsubscribeContextAvailabilityData;
 
 
 
@@ -211,37 +182,6 @@ struct NotifyContextData
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                attributeMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityData -
-*/
-struct NotifyContextAvailabilityData
-{
-  NotifyContextAvailabilityData(): crrP(NULL), entityIdP(NULL), craP(NULL), attributeMetadataP(NULL), regMetadataP(NULL) {}
-  NotifyContextAvailabilityRequest     res;
-  ContextRegistrationResponse*         crrP;
-  EntityId*                            entityIdP;
-  ContextRegistrationAttribute*        craP;
-  Metadata*                            attributeMetadataP;
-  Metadata*                            regMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextAvailabilitySubscriptionData -
-*/
-struct UpdateContextAvailabilitySubscriptionData
-{
-  UpdateContextAvailabilitySubscriptionData(): entityIdP(NULL), scopeP(NULL) {}
-  UpdateContextAvailabilitySubscriptionRequest  res;
-  EntityId*                                     entityIdP;
-  Scope*                                        scopeP;
 };
 
 
@@ -413,9 +353,6 @@ typedef struct ParseData
   ContextAttribute*                           lastContextAttribute;
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
-  SubscribeContextAvailabilityData            scar;
-  UnsubscribeContextAvailabilityData          ucar;
-  UpdateContextAvailabilitySubscriptionData   ucas;
 
   QueryContextData                            qcr;
   SubscribeContextData                        scr;
@@ -423,7 +360,6 @@ typedef struct ParseData
   UpdateContextData                           upcr;
   UpdateContextSubscriptionData               ucsr;
   NotifyContextData                           ncr;
-  NotifyContextAvailabilityData               ncar;
 
   RegisterProviderRequestData                 rpr;
   UpdateContextElementData                    ucer;
