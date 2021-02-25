@@ -76,14 +76,14 @@ bool pgGeoSubMultiPolygonPush
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
              "instanceId, id, entityId, attrInstanceId, ts, observedAt, valueType, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
              instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, observedAt, coordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
              "instanceId, id, entityId, attrInstanceId, ts, valueType, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
              instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, coordsString);
   }
 

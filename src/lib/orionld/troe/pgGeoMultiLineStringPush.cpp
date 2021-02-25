@@ -80,28 +80,28 @@ bool pgGeoMultiLineStringPush
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, createdAt, modifiedAt, observedAt, valueType, subProperties, datasetId, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, coordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, coordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, coordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, coordsString);
   }
 
