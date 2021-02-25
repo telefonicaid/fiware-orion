@@ -1,0 +1,540 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of entities in the GeoJSON format WITH URI param attrs not including the geometryProperty
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E1 with a Property named P1 and a GeoProperty named 'P2'
+# 02. Create entity E2 with a Property named P1 and a GeoProperty named 'location'
+#
+# 03. Retrieve E1 in geo+json format - no matching GeoProperty => geometry: null
+# 04. Retrieve E2 in geo+json format - location is default GeoProperty, so => geometry: location-value
+#
+# 05. Retrieve E1 in geo+json format AND geometryProperty=P2 => geometry: P2-value
+# 06. Retrieve E2 in geo+json format AND geometryProperty=P2 => geometry: null, as P2 doesn't exist
+#
+# 07. Retrieve E1 in geo+json format AND attrs=P1 => geometry: null (as geometryProperty==location by default), and properties=P1
+# 08. Retrieve E2 in geo+json format AND attrs=P1 => geometry: location-value (as geometryProperty==location by default), and properties=P1
+#
+# 09. Retrieve E1 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: P2-value, and properties=P1
+# 10. Retrieve E1 in geo+json format AND attrs=P1,P2 AND geometryProperty=P2 => geometry: P2-value, and properties=P1,P2
+#
+# 11. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: null (as P2 doesn't exist), and properties=P1
+# 12. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=location => geometry: location-value, and properties=P1
+# 13. Retrieve E2 in geo+json format AND attrs=P1,location => geometry: location-value, and properties=P1,location
+#
+
+echo "01. Create entity E1 with a Property named P1 and a GeoProperty named 'P2'"
+echo "=========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "City",
+  "P1": {
+    "type": "Property",
+    "value": "P1"
+  },
+  "P2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.691944, 40.418889]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Create entity E2 with a Property named P1 and a GeoProperty named 'location'"
+echo "================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "City",
+  "P1": {
+    "type": "Property",
+    "value": "P1"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.691944, 40.418889]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "03. Retrieve E1 in geo+json format - no matching GeoProperty => geometry: null"
+echo "=============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1 --out "application/geo+json"
+echo
+echo
+
+
+echo "04. Retrieve E2 in geo+json format - location is default GeoProperty, so => geometry: location-value"
+echo "===================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2 --out "application/geo+json"
+echo
+echo
+
+
+echo "05. Retrieve E1 in geo+json format AND geometryProperty=P2 => geometry: P2-value"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?geometryProperty=P2 --out "application/geo+json"
+echo
+echo
+
+
+echo "06. Retrieve E2 in geo+json format AND geometryProperty=P2 => geometry: null, as P2 doesn't exist"
+echo "================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?geometryProperty=P2 --out "application/geo+json"
+echo
+echo
+
+
+echo "07. Retrieve E1 in geo+json format AND attrs=P1 => geometry: null (as geometryProperty==location by default), and properties=P1"
+echo "==============================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1' --out "application/geo+json"
+echo
+echo
+
+
+echo "08. Retrieve E2 in geo+json format AND attrs=P1 => geometry: location-value (as geometryProperty==location by default), and properties=P1"
+echo "========================================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=P1' --out "application/geo+json"
+echo
+echo
+
+
+echo "09. Retrieve E1 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: P2-value, and properties=P1"
+echo "================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1&geometryProperty=P2' --out "application/geo+json"
+echo
+echo
+
+
+echo "10. Retrieve E1 in geo+json format AND attrs=P1,P2 AND geometryProperty=P2 => geometry: P2-value, and properties=P1,P2"
+echo "======================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,P2&geometryProperty=P2' --out "application/geo+json"
+echo
+echo
+
+
+echo "11. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: null (as P2 doesn't exist), and properties=P1"
+echo "=================================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=P1&geometryProperty=P2' --out "application/geo+json"
+echo
+echo
+
+
+echo "12. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=location => geometry: location-value, and properties=P1"
+echo "============================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=P1&geometryProperty=location' --out "application/geo+json"
+echo
+echo
+
+
+echo "13. Retrieve E2 in geo+json format AND attrs=P1,location => geometry: location-value, and properties=P1,location"
+echo "================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=P1,location' --out "application/geo+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with a Property named P1 and a GeoProperty named 'P2'
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with a Property named P1 and a GeoProperty named 'location'
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+03. Retrieve E1 in geo+json format - no matching GeoProperty => geometry: null
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 294
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:entities:E1",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "P2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+04. Retrieve E2 in geo+json format - location is default GeoProperty, so => geometry: location-value
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 348
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+05. Retrieve E1 in geo+json format AND geometryProperty=P2 => geometry: P2-value
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 342
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "P2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+06. Retrieve E2 in geo+json format AND geometryProperty=P2 => geometry: null, as P2 doesn't exist
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 300
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+07. Retrieve E1 in geo+json format AND attrs=P1 => geometry: null (as geometryProperty==location by default), and properties=P1
+===============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 205
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:entities:E1",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+08. Retrieve E2 in geo+json format AND attrs=P1 => geometry: location-value (as geometryProperty==location by default), and properties=P1
+=========================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+09. Retrieve E1 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: P2-value, and properties=P1
+================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+10. Retrieve E1 in geo+json format AND attrs=P1,P2 AND geometryProperty=P2 => geometry: P2-value, and properties=P1,P2
+======================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 342
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "P2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+11. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: null (as P2 doesn't exist), and properties=P1
+==================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 205
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+12. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=location => geometry: location-value, and properties=P1
+============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+13. Retrieve E2 in geo+json format AND attrs=P1,location => geometry: location-value, and properties=P1,location
+================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 348
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:entities:E2",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": "P1"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

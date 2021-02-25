@@ -341,8 +341,19 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 //                   is present in the entity
 //   sysAttrs        include 'createdAt' and 'modifiedAt'
 //   keyValues       short representation of the attributes
+//   geoProperty     long name of geopoperty - only if geo-json represenatation (else NULL)
 //
-KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool attrMandatory, bool sysAttrs, bool keyValues, const char* datasetId)
+KjNode* mongoCppLegacyEntityRetrieve
+(
+  const char*  entityId,
+  char**       attrs,
+  bool         attrMandatory,
+  bool         sysAttrs,
+  bool         keyValues,
+  const char*  datasetId,
+  const char*  geoPropertyName,
+  KjNode**     geoPropertyP
+)
 {
   char    collectionPath[256];
   KjNode* attrTree  = NULL;
@@ -414,6 +425,10 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     return NULL;
 
 
+  //
+  // FIXME: The DB stuff is over - everything that follows just manipulates the KjNode tree
+  //        So, all of it should be moved to a module under src/lib/orionsld/db/
+  //
   KjNode*  dbAttrsP           = kjLookup(dbTree, "attrs");      // Must be there
   KjNode*  dbDataSetsP        = kjLookup(dbTree, "@datasets");  // May not be there
 
@@ -479,6 +494,8 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     }
     else  // No datasets - simply use dbAttrsP
       attrTree = dbAttrsP;
+
+    *geoPropertyP = kjLookup(dbAttrsP, geoPropertyName);
   }
   else  // Filter attributes according to the 'attrs' URI param
   {
@@ -488,11 +505,18 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     KjNode* datasetP;
     int     includedAttributes = 0;
     int     ix                 = 0;
+    bool    geoPropertyPresent = false;
 
     while (attrs[ix] != NULL)
     {
       attrP    = kjLookup(dbAttrsP, attrs[ix]);
       datasetP = (dbDataSetsP == NULL)? NULL : kjLookup(dbDataSetsP, attrs[ix]);
+
+      if ((geoPropertyName != NULL) && (geoPropertyPresent == false) && (strcmp(attrs[ix], geoPropertyName) == 0))
+      {
+        geoPropertyPresent = true;
+        *geoPropertyP      = attrP;
+      }
 
       if (attrP != NULL)
       {
@@ -523,6 +547,12 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
       }
 
       ++ix;
+    }
+
+    if (geoPropertyName != NULL)
+    {
+      if (geoPropertyPresent == false)
+        *geoPropertyP = kjLookup(dbAttrsP, geoPropertyName);
     }
 
     if ((includedAttributes == 0) && (attrMandatory == true))

@@ -121,8 +121,16 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
   // No expansion of 'geoPropertyName' is necessary/needed as the tree context has been compressed already
   // FIXME: Only problem is if orionldState.uriParams.geometryProperty is given in its expanded form ...
   //
-  const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-  KjNode*     geoPropertyP    = kjLookup(tree, geoPropertyName);
+  KjNode* geoPropertyP = NULL;
+
+  if (orionldState.geoPropertyNode == NULL)
+  {
+    const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+
+    geoPropertyP = kjLookup(tree, geoPropertyName);
+  }
+  else
+    geoPropertyP = orionldState.geoPropertyNode;
 
   if (geoPropertyP != NULL)
   {
