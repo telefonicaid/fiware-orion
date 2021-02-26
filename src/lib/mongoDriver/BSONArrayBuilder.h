@@ -59,7 +59,7 @@ class BSONArrayBuilder
   void append(bool value);
   void appendNull(void);
   void appendRegex(const std::string& value);
-  BSONArrayBuilder& operator= (BSONArrayBuilder rhs);
+  BSONArrayBuilder& operator= (const BSONArrayBuilder& rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   ~BSONArrayBuilder(void);

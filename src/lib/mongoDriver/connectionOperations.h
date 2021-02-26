@@ -31,7 +31,6 @@
 #include "mongoDriver/DBCursor.h"
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/BSONArray.h"
-#include "mongoDriver/WriteConcern.h"
 
 namespace orion
 
@@ -197,6 +196,10 @@ extern bool runDatabaseCommand
 /* ****************************************************************************
 *
 * orion::runCollectionCommand -
+*
+* Currently this operation doesn't have any use from outside mongoDriver.
+* However, we keep in the .h as part of mongoDriver API because makes sense
+* as collection operation.
 */
 extern bool runCollectionCommand
 (
@@ -207,54 +210,5 @@ extern bool runCollectionCommand
   std::string*        err
 );
 
-
-
-/* ****************************************************************************
-*
-* orion::runCollectionCommand -
-*/
-extern bool runCollectionCommand
-(
-  const DBConnection&  connection,
-  const std::string&   db,
-  const std::string&   col,
-  const BSONObj&       command,
-  BSONObj*             result,
-  std::string*         err
-);
-
-
-
-/* ****************************************************************************
-*
-* setWriteConcern -
-*/
-extern void setWriteConcern(const orion::DBConnection& connection, const orion::WriteConcern& wc);
-
-
-
-/* ****************************************************************************
-*
-* getWriteConcern -
-*/
-extern orion::WriteConcern getWriteConcern(const orion::DBConnection& connection);
-
-
-#if 0
-/* ****************************************************************************
-*
-* connectionAuth -
-*/
-extern bool connectionAuth
-(
-  const orion::DBConnection&  connection,
-  const std::string&          db,
-  const std::string&          user,
-  const std::string&          password,
-  const std::string&          mechanism,
-  std::string*                err
-);
-#endif
 }
-
 #endif  // SRC_LIB_MONGODRIVER_CONNECTIONOPERATIONS_H_

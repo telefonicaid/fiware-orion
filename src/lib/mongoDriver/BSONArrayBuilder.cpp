@@ -172,10 +172,8 @@ void BSONArrayBuilder::appendRegex(const std::string& value)
 /* ****************************************************************************
 *
 * BSONArrayBuilder::BSONArrayBuilder= -
-*
-* FIXME OLD-DR: we should try to use const BSONArrayBuilder& as argument
 */
-BSONArrayBuilder& BSONArrayBuilder::operator= (BSONArrayBuilder rhs)
+BSONArrayBuilder& BSONArrayBuilder::operator= (const BSONArrayBuilder& rhs)
 {
   // check not self-assignment
   if (this != &rhs)

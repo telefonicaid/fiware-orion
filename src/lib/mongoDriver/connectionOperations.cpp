@@ -78,7 +78,7 @@ bool orion::collectionQuery
   mongoc_cursor_t* c = mongoc_collection_find_with_opts(collection, q, NULL, NULL);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   if (mongoc_cursor_error(c, &error))
   {
@@ -184,7 +184,7 @@ bool orion::collectionRangedQuery
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   if (mongoc_cursor_error(c, &error))
   {
@@ -630,7 +630,7 @@ bool orion::collectionAggregate
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME OLD-DR: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
+  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   if (mongoc_cursor_error(c, &error))
   {
@@ -729,10 +729,8 @@ bool orion::runDatabaseCommand
 
 /* ****************************************************************************
 *
-* orion::runCollectionCommand -
+* runCollectionCommand -
 *
-* FIXME OLD-DR: after the creation of runDatabaseCommand() this function is completely
-* unneded
 */
 bool orion::runCollectionCommand
 (
@@ -743,76 +741,21 @@ bool orion::runCollectionCommand
   std::string*           err
 )
 {
-  orion::DBConnection connection;
-
-  // Note that connection has a NULL mongo::DBConnection inside, so having the same
-  // effect that the version of this method for the old driver.
-
-  return orion::runCollectionCommand(connection, db, col, command, result, err);
-}
-
-
-/* ****************************************************************************
-*
-* runCollectionCommand -
-*
-* NOTE
-*   Different from other functions in this module, this function can get the connection
-*   in the params, instead of using getMongoConnection().
-*   This is only done from DB connection bootstrapping code .
-*
-* FIXME OLD-DR: after the creation of runDatabaseCommand() this function is could
-* be modified to ommit 'connection' from parameters and make it similar to other
-* fucntions such as collectionInsert, collectionUpdate, etc. Maybe it is not used a this
-* moment but it's a good function for a module containing collection operations on DB
-*
-* FIXME OLD-DR: check if a the end we have calls to this function in client code
-* (probably we should include it in mongoDriver API but warng about no-usage in
-* a comment in that case)
-*/
-bool orion::runCollectionCommand
-(
-  const orion::DBConnection&  _connection,
-  const std::string&          db,
-  const std::string&          col,
-  const orion::BSONObj&       command,
-  orion::BSONObj*             result,
-  std::string*                err
-)
-{
-  // The call to TIME_STAT_MONGO_COMMAND_WAIT_START must be on toplevel so that local variables
-  // are visible for TIME_STAT_MONGO_COMMAND_WAIT_STOP()
-  //
-  // FIXME OLD-DR: but TIME_STAT_MONGO_COMMAND_WAIT_STOP is not always called... it depends on
-  // releaseConnection value. Check original implementation (it's the same)
-  //
   TIME_STAT_MONGO_COMMAND_WAIT_START();
 
   std::string ns = db + "." + col;
 
-  bool releaseConnection = false;
-
-  // FIXME OLD-DR: try to unify both runCollectionCommand functions
-  // into just one (the one that needs connection as parameters, assuming not NULL as other functions
-  // in this file)
-
-  orion::DBConnection connection;
-  if (_connection.isNull())
+  // Getting & checking connection
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (connection.isNull())
   {
-    connection        = orion::getMongoConnection();
-    releaseConnection = true;
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
-    if (connection.isNull())
-    {
-      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-      LM_E(("Fatal Error (null DB connection)"));
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
 
-      return false;
-    }
-  }
-  else
-  {
-    connection = _connection;
+    orion::releaseMongoConnection(connection);
+    return false;
   }
 
   // Get low level driver object
@@ -830,12 +773,8 @@ bool orion::runCollectionCommand
   bool success = mongoc_collection_command_with_opts(collection, doc, NULL, NULL, &reply, &error);
 
   mongoc_collection_destroy(collection);
-
-  if (releaseConnection)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-  }
+  orion::releaseMongoConnection(connection);
+  TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   if (success)
   {
@@ -858,105 +797,3 @@ bool orion::runCollectionCommand
 
   return success;
 }
-
-
-
-/* ****************************************************************************
-*
-* setWriteConcern -
-*/
-void orion::setWriteConcern(const orion::DBConnection& connection, const orion::WriteConcern& _wc)
-{
-  mongoc_write_concern_t* wc = mongoc_write_concern_new();
-
-  if (_wc == orion::WCAcknowledged)
-  {
-    LM_T(LmtMongo, ("setWritteConcern(): 1"));
-    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_DEFAULT);
-  }
-  else  // orion::WCUnAcknowledged
-  {
-    LM_T(LmtMongo, ("setWritteConcern(): 0"));
-    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_UNACKNOWLEDGED);
-  }
-
-  mongoc_client_set_write_concern(connection.get(), wc);
-
-  mongoc_write_concern_destroy(wc);
-}
-
-
-
-/* ****************************************************************************
-*
-* getWriteConcern -
-*/
-orion::WriteConcern orion::getWriteConcern(const orion::DBConnection& connection)
-{
-  LM_T(LmtMongo, ("getWriteConcern()"));
-
-  const mongoc_write_concern_t* wc = mongoc_client_get_write_concern(connection.get());
-
-  switch (mongoc_write_concern_get_w(wc))
-  {
-    case MONGOC_WRITE_CONCERN_W_DEFAULT:
-      return orion::WCAcknowledged;
-    case MONGOC_WRITE_CONCERN_W_UNACKNOWLEDGED:
-      return orion::WCUnAcknowledged;
-    default:
-      LM_E(("Runtime Error (unknown WC %d, returning Acknowledged as failsafe)", wc));
-      return orion::WCAcknowledged;
-  }
-}
-
-
-#if 0
-/* ****************************************************************************
-*
-* connectionAuth -
-*/
-extern bool connectionAuth
-(
-  const orion::DBConnection&   connection,
-  const std::string&           db,
-  const std::string&           user,
-  const std::string&           password,
-  const std::string&           mechanism,
-  std::string*                 err
-)
-{
-  try
-  {
-    mongo::BSONObj params = BSON("mechanism" << mechanism << "user" << user << "db" << db << "pwd" << password);
-    connection->auth(params);
-  }
-  catch (const std::exception &e)
-  {
-    std::string msg = std::string("authentication fails: db=") + db +
-        ", username='" + user + "'" +
-        ", password='*****'" +
-        ", mechanism='" + mechanism + "'" +
-        ", expection='" + e.what() + "'";
-
-    *err = "Database Startup Error (" + msg + ")";
-    LM_E((err->c_str()));
-
-    return false;
-  }
-  catch (...)
-  {
-    std::string msg = std::string("authentication fails: db=") + db +
-        ", username='" + user + "'" +
-        ", password='*****'" +
-        ", mechanism='" + mechanism + "'" +
-        ", expection=generic";
-
-    *err = "Database Startup Error (" + msg + ")";
-    LM_E((err->c_str()));
-
-    return false;
-  }
-
-  return true;
-}
-#endif
