@@ -9,3 +9,4 @@
 * Issue  #280   Custom headers for MQTT notifications (using receiverInfo)
 * Issue  #280   Included notification::httpInfo::receiverInfo for subscription retrieval
 * Issue  #280   Fixed a bug about geo+json subscriptions returning the wrong Mime Type (in the notification::endpoint::accept field) 
+* Issue  #280   Important concurrency fix - avoiding to download the same context mopre than once
