@@ -518,8 +518,22 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
   if ((remote == NULL) && (local == NULL))
   {
-    KjNode* emptyArray = kjArray(orionldState.kjsonP, NULL);
-    return emptyArray;
+    char entityTypesId[64];
+
+    strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
+    uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
+
+    KjNode* noTypesObject = kjObject(orionldState.kjsonP,  NULL);
+    KjNode* idP           = kjString(orionldState.kjsonP, "id",   entityTypesId);
+    KjNode* typeP         = kjString(orionldState.kjsonP, "type", "EntityTypeList");
+    KjNode* typeArray     = kjArray(orionldState.kjsonP, "typeList");
+    // No data in payload body - no need for @context
+
+    kjChildAdd(noTypesObject, idP);
+    kjChildAdd(noTypesObject, typeP);
+    kjChildAdd(noTypesObject, typeArray);
+
+    return noTypesObject;
   }
   else if (remote == NULL)
     arrayP = local;
