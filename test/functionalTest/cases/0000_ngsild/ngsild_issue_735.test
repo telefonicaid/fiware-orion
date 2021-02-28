@@ -1,0 +1,127 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with attrs URI param but just one attr
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attrs 'category' and 'temperature'
+# 02. GET E1 - see 'category' and	'temperature' compacted
+# 03. GET E1 with attrs=temperature - see 'temperature' compacted
+#
+
+echo "01. Create entity E1 with attrs 'category' and 'temperature'"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:TemperatureSensor:001",
+  "type": "TemperatureSensor",
+  "category": {
+    "type": "Property",
+    "value": "sensor"
+  },
+  "temperature": {
+    "type": "Property",
+    "value": 25,
+    "unitCode": "CEL"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. GET E1 - see 'category' and 'temperature' compacted"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "03. GET E1 with attrs=temperature - see 'temperature' compacted"
+echo "==============================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001?attrs=temperature' -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attrs 'category' and 'temperature'
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+Date: REGEX(.*)
+
+
+
+02. GET E1 - see 'category' and 'temperature' compacted
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "category": {
+        "type": "Property",
+        "value": "sensor"
+    },
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+03. GET E1 with attrs=temperature - see 'temperature' compacted
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -371,6 +371,9 @@ static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[]
     {
       eqAttrV[ix]  = orionldContextItemExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
       dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
+
+      // Copy eqAttrV[ix] before converting '.' to '=' - to not destroy the @context
+      eqAttrV[ix]  = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
       dotForEq(eqAttrV[ix]);
     }
     else
@@ -478,7 +481,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
     {
       geometryProperty = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
-      dotForEq(geometryProperty);  // Copy before overwriting?
+      geometryProperty = kaStrdup(&orionldState.kalloc, geometryProperty);
+      dotForEq(geometryProperty);
     }
     else
       geometryProperty = (char*) "location";
