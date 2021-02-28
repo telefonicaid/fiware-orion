@@ -10,3 +10,4 @@
 * Issue  #280   Included notification::httpInfo::receiverInfo for subscription retrieval
 * Issue  #280   Fixed a bug about geo+json subscriptions returning the wrong Mime Type (in the notification::endpoint::accept field) 
 * Issue  #732   Fixed the response payload body for GET /types when no types found
+* Issue  #280   Important concurrency fix - avoiding to download the same context mopre than once

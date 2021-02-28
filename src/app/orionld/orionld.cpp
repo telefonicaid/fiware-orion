@@ -125,6 +125,9 @@ extern "C"
 
 using namespace orion;
 
+extern void contextDownloadListInit(void);     // FIXME PR: include header ...
+extern void contextDownloadListRelease(void);  // FIXME PR: include header ...
+
 
 
 /* ****************************************************************************
@@ -608,6 +611,9 @@ void exitFunc(void)
 
   // Disconnect from all MQTT btokers and free the connections
   mqttRelease();
+
+  // Free up the context download list, if needed
+  contextDownloadListRelease();
 }
 
 
@@ -1119,6 +1125,7 @@ int main(int argC, char* argV[])
   //
   // Initialize orionld
   //
+  contextDownloadListInit();
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
   dbInit(dbHost, dbName);
 
