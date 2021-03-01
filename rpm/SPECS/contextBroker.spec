@@ -21,6 +21,14 @@
 %define name contextBroker
 %define owner orion 
 
+# To avoid problems in CentOS 8
+%define debug_package %{nil}
+
+# To avoid /usr/lib/.build-id files in the package. This seems to be a
+# new feature of CentOS 8 (see https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo)
+# but by the moment we are going to disable it to build as in CentOS 7
+%define _build_id_links none
+
 # Don't byte compile python code
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
@@ -134,6 +142,8 @@ cp etc/init.d/contextBroker.centos $RPM_BUILD_ROOT/etc/init.d/%{name}
 chmod 755 $RPM_BUILD_ROOT/etc/init.d/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 cp etc/config/contextBroker $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+# remove spureous files we have detected are generated in CentOS 8 build
+rm -rf $RPM_BUILD_ROOT/usr/lib/.build-id
 
 echo "%%defattr(-, root, root, - )" > MANIFEST
 (cd %{buildroot}; find . -type f -or -type l | sed -e s/^.// -e /^$/d) >>MANIFEST
@@ -155,7 +165,8 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 #    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 #
 %package tests
-Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
+#FIXME: obsolete packcages names. Probably it's better to remove the contextBroker-test packages at all that solve this...
+#Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}

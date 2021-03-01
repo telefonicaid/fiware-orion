@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # -*- coding: latin-1 -*-
 # Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
