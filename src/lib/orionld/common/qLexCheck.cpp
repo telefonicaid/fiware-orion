@@ -38,6 +38,10 @@
 //
 static bool qNodeVariableChars(char* s, char** titleP, char** detailsP)
 {
+  //
+  // Pretty much ALL characters should be accepted ...
+  //
+#if 0
   while (*s != 0)
   {
     if ((*s >= '0') && (*s <= '9'))
@@ -56,7 +60,7 @@ static bool qNodeVariableChars(char* s, char** titleP, char** detailsP)
     {}
     else
     {
-      LM_W(("Bad Input (invalid character '%s')", *s));
+      LM_W(("Bad Input (invalid character '0x%x')", *s & 0xFF));
       *titleP = (char*) "ngsi-ld query language: invalid character in variable name";
       *detailsP = s;
       s[1] = 0;
@@ -64,7 +68,7 @@ static bool qNodeVariableChars(char* s, char** titleP, char** detailsP)
     }
     ++s;
   }
-
+#endif
   return true;
 }
 

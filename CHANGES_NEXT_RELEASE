@@ -11,3 +11,4 @@
 * Issue  #280   Fixed a bug about geo+json subscriptions returning the wrong Mime Type (in the notification::endpoint::accept field) 
 * Issue  #732   Fixed the response payload body for GET /types when no types found
 * Issue  #280   Important concurrency fix - avoiding to download the same context mopre than once
+* Issue  #737   Removed the check for forbidden characters in variable names in the 'q' URL parameter
