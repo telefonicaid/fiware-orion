@@ -1,0 +1,112 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Multi-byte characters in attribute names and Q-filters
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attribute 'name', as multi-byte characters
+# 02. GET E1
+# 03. Query for entities with an attribute called 'name' having a value of 1 - see E1
+#
+
+echo "01. Create entity E1 with attribute 'name', as multi-byte characters"
+echo "===================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "ｎａｍｅ": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "03. Query for entities with an attribute called 'name' having a value of 1 - see E1"
+echo "==================================================================================="
+curl localhost:9999/ngsi-ld/v1/entities?prettyPrint=yes -X GET --data-urlencode "q=ｎａｍｅ==1" -G -H "Accept: application/json" 2> /dev/null
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attribute 'name', as multi-byte characters
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "\uff4e\uff41\uff4d\uff45": {
+        "type": "Property",
+        "value": 1
+    }
+}
+
+
+03. Query for entities with an attribute called 'name' having a value of 1 - see E1
+===================================================================================
+[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "REGEX(.*)": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

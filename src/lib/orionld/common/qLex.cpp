@@ -373,7 +373,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      while ((*sP != 0) && (*sP != '"'))
+      while ((*sP != 0) && (*sP != '"'))  // Accept anything inside double quotes
         ++sP;
 
       if (*sP == 0)
@@ -446,6 +446,11 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       // - Variable: a-zA-Z0-9_.
       // - DateTime: Z0-9_:.
       //
+
+      //
+      // Pretty much ALL characters should be accepted ...
+      //
+#if 0
       if ((*sP >= '0') && (*sP <= '9'))
       {}
       else if ((*sP >= 'a') && (*sP <= 'z'))
@@ -470,6 +475,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         sP[1] = 0;
         return NULL;
       }
+#endif
       ++sP;
     }
   }
