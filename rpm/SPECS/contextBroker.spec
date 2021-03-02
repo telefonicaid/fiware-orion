@@ -142,8 +142,6 @@ cp etc/init.d/contextBroker.centos $RPM_BUILD_ROOT/etc/init.d/%{name}
 chmod 755 $RPM_BUILD_ROOT/etc/init.d/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 cp etc/config/contextBroker $RPM_BUILD_ROOT/etc/sysconfig/%{name}
-# remove spureous files we have detected are generated in CentOS 8 build
-rm -rf $RPM_BUILD_ROOT/usr/lib/.build-id
 
 echo "%%defattr(-, root, root, - )" > MANIFEST
 (cd %{buildroot}; find . -type f -or -type l | sed -e s/^.// -e /^$/d) >>MANIFEST
@@ -165,7 +163,7 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 #    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 #
 %package tests
-#FIXME: obsolete packcages names. Probably it's better to remove the contextBroker-test packages at all that solve this...
+#FIXME: obsolete packages names. Probably it's better to remove the contextBroker-test packages at all that solve this...
 #Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
