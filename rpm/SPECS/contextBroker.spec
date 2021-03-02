@@ -21,13 +21,15 @@
 %define name contextBroker
 %define owner orion 
 
-# To avoid problems in CentOS 8
+%if 0%{?rhel} > 7
+# To avoid problems in CentOS 8 with empty files in debug package
+# see https://www.programmersought.com/article/24984333483/
 %define debug_package %{nil}
-
 # To avoid /usr/lib/.build-id files in the package. This seems to be a
 # new feature of CentOS 8 (see https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo)
 # but by the moment we are going to disable it to build as in CentOS 7
 %define _build_id_links none
+%endif
 
 # Don't byte compile python code
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
