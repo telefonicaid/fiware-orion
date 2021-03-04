@@ -56,7 +56,7 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  connectionP = pgConnectionGet(dbName);
+  connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 

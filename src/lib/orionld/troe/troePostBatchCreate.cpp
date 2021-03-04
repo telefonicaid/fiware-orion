@@ -62,7 +62,7 @@ bool troePostBatchCreate(ConnectionInfo* ciP)
   // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchCreate.cpp has been fixed to do that
   troeEntityArrayExpand(orionldState.requestTree);
 
-  connectionP = pgConnectionGet(dbName);
+  connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 

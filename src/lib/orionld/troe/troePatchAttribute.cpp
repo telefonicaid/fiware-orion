@@ -62,7 +62,7 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
   troeSubAttrsExpand(orionldState.requestTree);
 
-  PGconn* connectionP = pgConnectionGet(dbName);
+  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 

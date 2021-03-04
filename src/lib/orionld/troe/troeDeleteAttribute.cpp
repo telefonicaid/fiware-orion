@@ -46,9 +46,9 @@
 //
 bool troeDeleteAttribute(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(dbName);
+  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+    LM_RE(false, ("no connection to postgres at %s", orionldState.tenant));
 
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));

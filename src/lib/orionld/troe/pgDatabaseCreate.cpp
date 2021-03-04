@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgDatabaseCreate.h"                     // Own interface

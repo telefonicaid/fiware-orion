@@ -52,7 +52,7 @@ extern "C"
 //
 bool troePostEntityNoOverwrite(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(dbName);
+  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
