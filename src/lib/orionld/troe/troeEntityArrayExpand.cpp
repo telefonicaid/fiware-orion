@@ -25,12 +25,16 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
+#include "orionld/context/orionldContextCacheLookup.h"         // orionldContextCacheLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/troe/troeEntityArrayExpand.h"                // Own interface
 
@@ -44,15 +48,29 @@ void troeEntityArrayExpand(KjNode* tree)
 {
   for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
+    //
+    // 1. GET @context, extract it if present
+    //
+    OrionldContext* contextP    = NULL;
+    KjNode*         contextNodeP = kjLookup(entityP, "@context");
+
+    if (contextNodeP != NULL)
+    {
+      kjChildRemove(entityP, contextNodeP);
+      contextP = orionldContextCacheLookup(contextNodeP->value.s);
+    }
+    if (contextP == NULL)
+      contextP = orionldCoreContextP;
+
     for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
       if (strcmp(attrP->name, "type") == 0)
-        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+        attrP->value.s = orionldContextItemExpand(contextP, attrP->value.s, true, NULL);
       else if (strcmp(attrP->name, "id")       == 0) {}
       else if (strcmp(attrP->name, "location") == 0) {}
       else
       {
-        attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+        attrP->name = orionldContextItemExpand(contextP, attrP->name, true, NULL);
 
         if (attrP->type == KjObject)
         {
@@ -67,7 +85,7 @@ void troeEntityArrayExpand(KjNode* tree)
             else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
             else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
             else
-              subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
+              subAttrP->name = orionldContextItemExpand(contextP, subAttrP->name, true, NULL);
           }
         }
       }
