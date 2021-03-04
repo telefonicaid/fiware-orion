@@ -170,5 +170,5 @@ Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,,P1 of E2,,,,202
 
 --TEARDOWN--
 brokerStop CB
-#pgDrop $CB_DB_NAME
-#dbDrop CB
+pgDrop $CB_DB_NAME
+dbDrop CB
