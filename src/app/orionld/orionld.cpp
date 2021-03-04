@@ -132,6 +132,19 @@ extern void contextDownloadListRelease(void);  // FIXME PR: include header ...
 
 /* ****************************************************************************
 *
+* USE_PIDFILE - uncomment to use PID-file
+*
+* Note that the CLI option is maintained even though USE_PIDFILE is not defined.
+* This is because the entire functest suite uses the -pidPath CLI and to fix that would
+* take a lot of work - and if we want to go back to using pid-file, that work would have to be rollbacked.
+*
+*/
+// #define USE_PIDFILE 1
+
+
+
+/* ****************************************************************************
+*
 * DB_NAME_MAX_LEN - max length of database name
 */
 #define DB_NAME_MAX_LEN  10
@@ -401,6 +414,7 @@ static const char* validLogLevels[] =
 
 
 
+#ifdef USE_PIDFILE
 /* ****************************************************************************
 *
 * fileExists -
@@ -463,6 +477,7 @@ int pidFile(bool justCheck)
 
   return 0;
 }
+#endif
 
 
 
@@ -600,11 +615,12 @@ void exitFunc(void)
   //
   kaBufferReset(&kalloc, false);
 
+#ifdef USE_PIDFILE
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
-
+#endif
   // Free the tenant list
   for (unsigned int ix = 0; ix < tenants; ix++)
     free(tenantV[ix]);
@@ -864,8 +880,6 @@ static void versionInfo(void)
 */
 int main(int argC, char* argV[])
 {
-  int s;
-
   lmTransactionReset();
 
   uint16_t       rushPort = 0;
@@ -978,7 +992,7 @@ int main(int argC, char* argV[])
   //
   dbNameLen = strlen(dbName);
 
-
+#ifdef USE_PIDFILE
   //
   // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
   //       The exit-function removes the PID-file and we don't want that. We want
@@ -990,10 +1004,12 @@ int main(int argC, char* argV[])
   //       The creation of the PID-file must be done AFTER "daemonize()" as here we still don't know the
   //       PID of the broker. The father process dies and the son-process continues, in "daemonize()".
   //
+  int s;
   if ((s = pidFile(true)) != 0)
   {
     _exit(s);
   }
+#endif
 
   paCleanup();
 
@@ -1040,10 +1056,12 @@ int main(int argC, char* argV[])
   }
 
 
+#ifdef USE_PIDFILE
   if ((s = pidFile(false)) != 0)
   {
     _exit(s);
   }
+#endif
 
 #if 0
   //
