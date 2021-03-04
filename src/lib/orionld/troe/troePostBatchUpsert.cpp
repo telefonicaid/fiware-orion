@@ -55,9 +55,9 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  connectionP = pgConnectionGet(dbName);
+  connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+    LM_RE(false, ("unable to connect to postgres DB '%s'", orionldState.tenant));
 
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
