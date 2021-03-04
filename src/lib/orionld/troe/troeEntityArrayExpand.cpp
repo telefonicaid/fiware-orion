@@ -52,13 +52,20 @@ void troeEntityArrayExpand(KjNode* tree)
     // 1. GET @context, extract it if present
     //
     OrionldContext* contextP    = NULL;
-    KjNode*         contextNodeP = kjLookup(entityP, "@context");
 
-    if (contextNodeP != NULL)
+    if (orionldState.linkHttpHeaderPresent == true)
+      contextP = orionldState.contextP;
+    else
     {
-      kjChildRemove(entityP, contextNodeP);
-      contextP = orionldContextCacheLookup(contextNodeP->value.s);
+      KjNode* contextNodeP = kjLookup(entityP, "@context");
+
+      if (contextNodeP != NULL)
+      {
+        kjChildRemove(entityP, contextNodeP);
+        contextP = orionldContextCacheLookup(contextNodeP->value.s);
+      }
     }
+
     if (contextP == NULL)
       contextP = orionldCoreContextP;
 
