@@ -22,12 +22,12 @@
 *
 * Author: Fermín Galán
 */
+#include <mongoc/mongoc.h>
+
 #include <time.h>
 #include <semaphore.h>
 #include <string>
 #include <vector>
-
-#include <mongoc/mongoc.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"

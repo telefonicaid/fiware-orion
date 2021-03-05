@@ -209,6 +209,5 @@ extern bool runCollectionCommand
   BSONObj*            result,
   std::string*        err
 );
-
 }
 #endif  // SRC_LIB_MONGODRIVER_CONNECTIONOPERATIONS_H_
