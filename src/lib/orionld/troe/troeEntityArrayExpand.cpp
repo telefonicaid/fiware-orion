@@ -69,12 +69,18 @@ void troeEntityArrayExpand(KjNode* tree)
     if (contextP == NULL)
       contextP = orionldCoreContextP;
 
+    //
+    // FIXME: Call instead troeEntityExpand (currently in troePostEntities.cpp)
+    //        Move the function to its own module troe/troeEntityExpand.h/cpp
+    //
     for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
       if (strcmp(attrP->name, "type") == 0)
         attrP->value.s = orionldContextItemExpand(contextP, attrP->value.s, true, NULL);
       else if (strcmp(attrP->name, "id")       == 0) {}
       else if (strcmp(attrP->name, "location") == 0) {}
+      else if (strcmp(attrP->name, "observationSpace") == 0) {}
+      else if (strcmp(attrP->name, "operationSpace")   == 0) {}
       else
       {
         attrP->name = orionldContextItemExpand(contextP, attrP->name, true, NULL);

@@ -58,8 +58,10 @@ void troeEntityExpand(KjNode* entityP)
       attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
       LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
     }
-    else if (strcmp(attrP->name, "id")       == 0) {}
-    else if (strcmp(attrP->name, "location") == 0) {}
+    else if (strcmp(attrP->name, "id")               == 0) {}
+    else if (strcmp(attrP->name, "location")         == 0) {}
+    else if (strcmp(attrP->name, "observationSpace") == 0) {}
+    else if (strcmp(attrP->name, "operationSpace")   == 0) {}
     else
     {
       attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
