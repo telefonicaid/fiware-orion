@@ -179,6 +179,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
+  orionldState.batchEntities = idTypeAndCreDateFromDb;  // So that TRoE knows what entities existed prior to the upsert call
+  LM_TMP(("orionldState.batchEntities at %p", orionldState.batchEntities));
   //
   // 03. Creation Date from DB entities, and type-check
   //

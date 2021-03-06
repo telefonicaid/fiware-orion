@@ -83,7 +83,7 @@ bool troePostEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* entityType = (char*) "REPLACE";
   LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ATTRIBUTE_REPLACE) == false)
+  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ENTITY_UPDATE, TROE_ATTRIBUTE_REPLACE) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)

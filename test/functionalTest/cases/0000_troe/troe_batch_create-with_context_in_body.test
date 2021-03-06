@@ -157,7 +157,7 @@ Date: REGEX(.*)
 opmode,id,type
 Create,urn:ngsi-ld:entities:E1,http://example.org/T
 Replace,urn:ngsi-ld:entities:E1,http://example.org/T
-Replace,urn:ngsi-ld:entities:E2,http://example.org/T
+Create,urn:ngsi-ld:entities:E2,http://example.org/T
 
 
 06. See the attributes in the temporal database

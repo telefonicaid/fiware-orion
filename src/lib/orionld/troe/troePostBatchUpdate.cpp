@@ -63,15 +63,15 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
 
-  bool      ok       = true;
-  TroeMode  troeMode = (orionldState.uriParamOptions.noOverwrite == true)? TROE_ATTRIBUTE_APPEND : TROE_ATTRIBUTE_REPLACE;
+  bool      ok                = true;
+  TroeMode  attributeTroeMode = (orionldState.uriParamOptions.noOverwrite == true)? TROE_ATTRIBUTE_APPEND : TROE_ATTRIBUTE_REPLACE;
 
   if (orionldState.duplicateArray != NULL)
   {
     troeEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpdate.cpp has been fixed to do this
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_UPDATE, attributeTroeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;
@@ -89,7 +89,7 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
       if (troeIgnored(entityP) == true)
         continue;
 
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_UPDATE, attributeTroeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;

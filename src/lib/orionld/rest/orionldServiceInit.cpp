@@ -46,6 +46,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                             // orionldState
 #include "orionld/common/urlCheck.h"                                 // urlCheck
+#include "orionld/common/orionldTenantInit.h"                        // orionldTenantInit
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -78,16 +79,16 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"        // orionldPatchSubscription
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"       // orionldDeleteSubscription
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"           // orionldGetEntityTypes
-#include "orionld/troe/troePostEntities.h"                   // troePostEntities
-#include "orionld/troe/troePostBatchDelete.h"                // troePostBatchDelete
-#include "orionld/troe/troeDeleteAttribute.h"                // troeDeleteAttribute
-#include "orionld/troe/troeDeleteEntity.h"                   // troeDeleteEntity
-#include "orionld/troe/troePatchAttribute.h"                 // troePatchAttribute
-#include "orionld/troe/troePatchEntity.h"                    // troePatchEntity
-#include "orionld/troe/troePostBatchCreate.h"                // troePostBatchCreate
-#include "orionld/troe/troePostBatchUpsert.h"                // troePostBatchUpsert
-#include "orionld/troe/troePostBatchUpdate.h"                // troePostBatchUpdate
-#include "orionld/troe/troePostEntity.h"                     // troePostEntity
+#include "orionld/troe/troePostEntities.h"                           // troePostEntities
+#include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
+#include "orionld/troe/troeDeleteAttribute.h"                        // troeDeleteAttribute
+#include "orionld/troe/troeDeleteEntity.h"                           // troeDeleteEntity
+#include "orionld/troe/troePatchAttribute.h"                         // troePatchAttribute
+#include "orionld/troe/troePatchEntity.h"                            // troePatchEntity
+#include "orionld/troe/troePostBatchCreate.h"                        // troePostBatchCreate
+#include "orionld/troe/troePostBatchUpsert.h"                        // troePostBatchUpsert
+#include "orionld/troe/troePostBatchUpdate.h"                        // troePostBatchUpdate
+#include "orionld/troe/troePostEntity.h"                             // troePostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
 #include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
@@ -523,4 +524,9 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   // Initialize NQTT notifications
   //
   mqttConnectionInit();
+
+  //
+  // Initialize Tenant list
+  //
+  orionldTenantInit();
 }

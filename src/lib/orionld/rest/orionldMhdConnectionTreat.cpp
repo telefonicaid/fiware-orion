@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strncpy
+#include <semaphore.h>                                           // sem_wait, sem_post
 #include <string>                                                // std::string
 
 extern "C"
@@ -890,15 +891,50 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
       {
+        //
+        // A tenant is in use, and it's a possible creation of an entity/sub/reg.
+        //
+        // FIXME: Add ORIONLD_SERVICE_OPTION_TENANT_CREATION in OrionLdRestService.h
+        //        and look at that bit, instead of just the verb ...
+        //        Some POST (on /attrs for example) DO NOT create anything
+        //
+        // If that tenant does not exist, it is to be created automatically.
+        // To make sure the lookup and insertion have no race conditions,  the tenant list
+        // is protected with a semaphore (tenantSem).
+        // This sem-protextion needs to span over the entirety of lookup-and-create.
+        // Meaning, I have to take the semaphore before even knowing if a creation will be necessary (it's necesary
+        // only once per tenant - i.e. almost never).
+        // It's costly to give and take the semaphore, so instead we will do a double lookup:
+        //
+        // 1. Lookup the tenant.
+        // 2. If it exists - all good - simply use it
+        // 3. If it did not exist (needs to be created):
+        //    - Take the tenantSem
+        //    - Look up the tenant again
+        //    - If the tenant does not exist, create it
+        //    - Post the tenantSem
+        //
         if (orionldTenantLookup(orionldState.tenant) == NULL)
         {
-          char prefixed[64];
+          LM_TMP(("TROE: Waiting for the Tenant semaphore"));
+          sem_wait(&tenantSem);
+          LM_TMP(("TROE: Got the Tenant semaphore"));
+          if (orionldTenantLookup(orionldState.tenant) == NULL)  // Second lookup - this time sem-protected
+          {
+            char prefixed[64];
 
-          snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-          orionldTenantCreate(prefixed);
+            snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
+            LM_TMP(("TROE: Creating Tenant '%s' (prefixed: '%s')", orionldState.tenant, prefixed));
+            orionldTenantCreate(prefixed);
 
-          if (idIndex == true)
-            dbIdIndexCreate(prefixed);
+            if (idIndex == true)
+              dbIdIndexCreate(prefixed);
+          }
+          else
+            LM_TMP(("TROE: Tenant '%s' already exists", orionldState.tenant));
+
+          sem_post(&tenantSem);
+          LM_TMP(("TROE: Released the Tenant semaphore"));
         }
       }
     }

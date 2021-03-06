@@ -50,6 +50,7 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   // Create the database (using an already established connection to the "NULL" database)
   //
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
+  LM_TMP(("TROE: SQL to create database: '%s'", sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));

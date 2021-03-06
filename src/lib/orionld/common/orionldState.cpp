@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strlen
+#include <semaphore.h>                                           // sem_t
 
 extern "C"
 {
@@ -94,6 +95,7 @@ unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
+sem_t             tenantSem;
 
 
 //

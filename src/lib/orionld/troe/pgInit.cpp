@@ -190,7 +190,7 @@ bool pgDbPopulate(const char* dbPrefix)
     if (strncmp(dbNameP, dbPrefix, strlen(dbPrefix)) != 0)
       continue;
 
-    LM_TMP(("PGPOOL: matching DB: '%s'", dbNameP));
+    LM_TMP(("TROE: matching DB: '%s'", dbNameP));
     // FIXME: Check all tables are present and 100% OK
     pgDbAppend(dbNameP);
   }

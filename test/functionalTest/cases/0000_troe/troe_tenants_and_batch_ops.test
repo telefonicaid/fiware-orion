@@ -89,7 +89,7 @@ Date: REGEX(.*)
 ===============================================================================================
 ENTITIES:
 opmode,id,type,ts
-Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts

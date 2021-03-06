@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTINIT_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTINIT_H_
+
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,20 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-#include <semaphore.h>                                           // sem_t
-
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldContextCache.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Context Cache Internals
+// orionldTenantInit
 //
-sem_t             orionldContextCacheSem;
-OrionldContext*   orionldContextCacheArray[100];  // When 100 is not enough, a realloc is done (automatically)
-OrionldContext**  orionldContextCache         = orionldContextCacheArray;
-int               orionldContextCacheSlots    = 100;
-int               orionldContextCacheSlotIx   = 0;
+extern void orionldTenantInit(void);
+
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTINIT_H_
