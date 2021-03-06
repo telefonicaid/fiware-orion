@@ -44,6 +44,8 @@ extern "C"
 //
 void orionldTenantCreate(char* tenant)
 {
+  LM_TMP(("TROE: New tenant: '%s'", tenant));
+
   if (tenants >= K_VEC_SIZE(tenantV))
     LM_X(1, ("Too many tenants in the system - increase the size of tenantV and recompile!"));
 

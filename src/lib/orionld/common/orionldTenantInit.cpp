@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,20 +22,21 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-#include <semaphore.h>                                           // sem_t
+#include <semaphore.h>                                           // sem_init
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldContextCache.h"                 // Own interface
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "orionld/common/orionldState.h"                         // tenantSem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Context Cache Internals
+// orionldTenantInit
 //
-sem_t             orionldContextCacheSem;
-OrionldContext*   orionldContextCacheArray[100];  // When 100 is not enough, a realloc is done (automatically)
-OrionldContext**  orionldContextCache         = orionldContextCacheArray;
-int               orionldContextCacheSlots    = 100;
-int               orionldContextCacheSlotIx   = 0;
+void orionldTenantInit(void)
+{
+  if (sem_init(&tenantSem, 0, 1) == -1)
+    LM_X(1, ("Runtime Error (error initializing semaphore for orionld tenants: %s)", strerror(errno)));
+}

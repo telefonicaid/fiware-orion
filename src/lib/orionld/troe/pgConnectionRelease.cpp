@@ -22,7 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn, PQfinish
+#include <postgresql/libpq-fe.h>                               // PGconn, PQfinish
+
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 
 
@@ -32,5 +35,6 @@
 //
 void pgConnectionRelease(PGconn* connectionP)
 {
+  LM_TMP(("TROE: disconnecting the connection at 0x%x", connectionP));
   PQfinish(connectionP);
 }

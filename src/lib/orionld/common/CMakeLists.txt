@@ -51,6 +51,7 @@ SET (SOURCES
     typeCheckForNonExistingEntities.cpp
     entityIdAndTypeGet.cpp
     qAliasCompact.cpp
+    orionldTenantInit.cpp
     orionldTenantLookup.cpp
     orionldTenantCreate.cpp
     attributeUpdated.cpp

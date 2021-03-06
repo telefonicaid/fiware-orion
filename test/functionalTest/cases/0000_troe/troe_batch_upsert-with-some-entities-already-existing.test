@@ -1,0 +1,232 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert with some entities already existing
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create entities E1 and E2
+# 02. Batch Upsert entities E1-E4
+# 03. See entities in TRoE - make sure E3 and E4 have opMode Create, while E1 and E2 have Create + Replace
+# 04. Batch Upsert entities E3-E6, with options=update
+# 05. See entities in TRoE - make sure E5 and E6 have opMode Create, while E3 and E4 have Create only (updates aren't recorded)
+#
+
+echo "01. Create entities E1 and E2"
+echo "============================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2021-01-05T12:00:40.228Z"
+    },
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2021-02-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2021-03-05T12:00:40.228Z"
+    },
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2021-04-05T12:00:40.228Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "02. Batch Upsert entities E1-E4"
+echo "==============================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2020-01-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2020-02-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2020-03-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E4",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2020-04-05T12:00:40.228Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "03. See entities in TRoE - make sure E3 and E4 have opMode Create, while E1 and E2 have Create + Replace"
+echo "========================================================================================================"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "04. Batch Upsert entities E3-E6, with options=update"
+echo "===================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2019-01-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E4",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2019-02-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E5",
+    "type": "T",
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2019-03-05T12:00:40.228Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E6",
+    "type": "T",
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2019-04-05T12:00:40.228Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "05. See entities in TRoE - make sure E5 and E6 have opMode Create, while E3 and E4 have Create only (updates aren't recorded)"
+echo "============================================================================================================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1 and E2
+=============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+02. Batch Upsert entities E1-E4
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. See entities in TRoE - make sure E3 and E4 have opMode Create, while E1 and E2 have Create + Replace
+========================================================================================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Replace,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E4,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+
+
+04. Batch Upsert entities E3-E6, with options=update
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See entities in TRoE - make sure E5 and E6 have opMode Create, while E3 and E4 have Create only (updates aren't recorded)
+=============================================================================================================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Replace,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E4,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E5,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Create,urn:ngsi-ld:entities:E6,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME
