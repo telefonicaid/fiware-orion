@@ -1,0 +1,709 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Exhaustive test of adding attributes to an entity - attrs are not overwritten (options=noOverwrite)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Create E1,E3,E5 on default tenant
+# 02. Create E2,E4,E6 on T1 tenant
+# 03. Append attributes R1,status,owner,batteryLevel to E1 on default tenant and without context
+# 04. Append attributes R1,status,owner,batteryLevel to E2 on T1 tenant and without context
+# 05. Append attributes R1,status,owner,batteryLevel to E3 on default tenant and with user context in Link Header
+# 06. Append attributes R1,status,owner,batteryLevel to E4 on T1 tenant and with user context in Link Header
+# 07. Append attributes R1,status,owner,batteryLevel to E5 on default tenant and with user context in payload body
+# 08. Append attributes R1,status,owner,batteryLevel to E6 on T1 tenant and with user context in payload body
+# 09. See all entities in TRoE DB, default tenant
+# 10. See all attributes in TRoE DB, default tenant
+# 11. See all sub-attributes in TRoE DB, default tenant - there aren't any
+# 12. See all entities in TRoE DB, tenant T1
+# 13. See all attributes in TRoE DB, tenant T1
+# 14. See all sub-attributes in TRoE DB, tenant T1 - there aren't any
+#
+
+echo "01. Create E1,E3,E5 on default tenant"
+echo "====================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E5",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2,E4,E6 on T1 tenant"
+echo "================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E6",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "03. Append attributes R1,status,owner,batteryLevel to E1 on default tenant and without context"
+echo "=============================================================================================="
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite' --payload "$payload"
+echo
+echo
+
+
+echo "04. Append attributes R1,status,owner,batteryLevel to E2 on T1 tenant and without context"
+echo "========================================================================================="
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite' --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "05. Append attributes R1,status,owner,batteryLevel to E3 on default tenant and with user context in Link Header"
+echo "==============================================================================================================="
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E3/attrs?options=noOverwrite' --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "06. Append attributes R1,status,owner,batteryLevel to E4 on T1 tenant and with user context in Link Header"
+echo "========================================================================================================================"
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E4/attrs?options=noOverwrite' --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --tenant t1
+echo
+echo
+
+
+echo "07. Append attributes R1,status,owner,batteryLevel to E5 on default tenant and with user context in payload body"
+echo "================================================================================================================"
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E5/attrs?options=noOverwrite' --payload "$payload" --in "application/ld+json"
+echo
+echo
+
+
+echo "08. Append attributes R1,status,owner,batteryLevel to E6 on T1 tenant and with user context in payload body"
+echo "==========================================================================================================="
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:R:1"
+  },
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-07T08:33:00.123Z"
+  },
+  "batteryLevel": {
+    "type": "Property",
+    "value": 47.6,
+    "unitCode": "%"
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E6/attrs?options=noOverwrite' --payload "$payload" --in "application/ld+json" --tenant t1
+echo
+echo
+
+
+echo "09. See all entities in TRoE DB, default tenant"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "10. See all attributes in TRoE DB, default tenant"
+echo "================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
+echo
+echo
+
+
+echo "11. See all sub-attributes in TRoE DB, default tenant - there aren't any"
+echo "========================================================================"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+echo "12. See all entities in TRoE DB, tenant T1"
+echo "=========================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" -t ftest_t1
+echo
+echo
+
+
+echo "13. See all attributes in TRoE DB, tenant T1"
+echo "============================================"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes" -t ftest_t1
+echo
+echo
+
+
+echo "14. See all sub-attributes in TRoE DB, tenant T1 - there aren't any"
+echo "==================================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes" -t ftest_t1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1,E3,E5 on default tenant
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E3",
+        "urn:ngsi-ld:entity:E5"
+    ]
+}
+
+
+02. Create E2,E4,E6 on T1 tenant
+================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E4",
+        "urn:ngsi-ld:entity:E6"
+    ]
+}
+
+
+03. Append attributes R1,status,owner,batteryLevel to E1 on default tenant and without context
+==============================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 312
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/owner",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/R1",
+        "https://uri.etsi.org/ngsi-ld/status",
+        "https://uri.etsi.org/ngsi-ld/default-context/batteryLevel"
+    ]
+}
+
+
+04. Append attributes R1,status,owner,batteryLevel to E2 on T1 tenant and without context
+=========================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 312
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/owner",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/R1",
+        "https://uri.etsi.org/ngsi-ld/status",
+        "https://uri.etsi.org/ngsi-ld/default-context/batteryLevel"
+    ]
+}
+
+
+05. Append attributes R1,status,owner,batteryLevel to E3 on default tenant and with user context in Link Header
+===============================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Append attributes R1,status,owner,batteryLevel to E4 on T1 tenant and with user context in Link Header
+========================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. Append attributes R1,status,owner,batteryLevel to E5 on default tenant and with user context in payload body
+================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. Append attributes R1,status,owner,batteryLevel to E6 on T1 tenant and with user context in payload body
+===========================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. See all entities in TRoE DB, default tenant
+===============================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+Create,urn:ngsi-ld:entity:E3,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+Create,urn:ngsi-ld:entity:E5,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+10. See all attributes in TRoE DB, default tenant
+=================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E3,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E3,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E5,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E5,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E1,f,%,,,47.6,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E3,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E3,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E3,f,,,urn:ngsi-ld:owner:2,,,2021-03-07 08:33:00.123,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E3,f,%,,,47.6,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E5,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E5,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E5,f,,,urn:ngsi-ld:owner:2,,,2021-03-07 08:33:00.123,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E5,f,%,,,47.6,,,202REGEX(.*)
+
+
+11. See all sub-attributes in TRoE DB, default tenant - there aren't any
+========================================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+
+
+12. See all entities in TRoE DB, tenant T1
+==========================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E2,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+Create,urn:ngsi-ld:entity:E4,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+Create,urn:ngsi-ld:entity:E6,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+13. See all attributes in TRoE DB, tenant T1
+============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E4,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E4,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E6,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E6,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E2,f,%,,,47.6,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E4,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E4,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E4,f,,,urn:ngsi-ld:owner:2,,,2021-03-07 08:33:00.123,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E4,f,%,,,47.6,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E6,f,,,urn:ngsi-ld:R:1,,,,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E6,f,,,OK,,,,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E6,f,,,urn:ngsi-ld:owner:2,,,2021-03-07 08:33:00.123,202REGEX(.*)
+Append,https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E6,f,%,,,47.6,,,202REGEX(.*)
+
+
+14. See all sub-attributes in TRoE DB, tenant T1 - there aren't any
+===================================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_t1

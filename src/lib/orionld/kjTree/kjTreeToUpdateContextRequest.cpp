@@ -115,6 +115,10 @@ static bool kjTreeToContextElementAttributes
       continue;
     else if (SCOMPARE8(itemP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
       continue;
+    else if (SCOMPARE10(itemP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+      continue;
+    else if (SCOMPARE11(itemP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+      continue;
     else if (itemP->type != KjObject)  // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
     {
       LM_E(("Attribute '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
