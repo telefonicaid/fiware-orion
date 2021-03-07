@@ -271,6 +271,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   if (orionldState.httpStatusCode == SccOk)
   {
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+    orionldState.noLinkHeader = true;
 
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {
