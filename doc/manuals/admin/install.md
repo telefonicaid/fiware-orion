@@ -24,7 +24,7 @@ building from sources, check [this document](build_source.md).
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 7.4.1708
   but it should work also in any later CentOS/RedHat 7.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version
-  is 3.6 (Orion may work with older versions but we don't recommend it at all!).
+  is 4.2 (Orion may work with older versions but we don't recommend it at all!).
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
     * The contextBroker package (mandatory) depends on the following packages: libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate and libuuid
 

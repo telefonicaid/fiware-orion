@@ -27,7 +27,7 @@ Follow these steps:
 2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
 	
 		mongo:
-		  image: mongo:3.6
+		  image: mongo:4.2
 		  command: --nojournal
 		orion:
 		  image: fiware/orion

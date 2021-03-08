@@ -88,7 +88,7 @@ services:
     command: -dbhost mongo
 
   mongo:
-    image: mongo:3.6
+    image: mongo:4.2
     command: --nojournal
 ```
 

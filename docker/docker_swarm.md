@@ -86,7 +86,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
     services:
 
       mongo:
-        image: mongo:3.6
+        image: mongo:4.2
         entrypoint: [ "/usr/bin/mongod", "--replSet", "rs", "--journal", "--smallfiles", "--bind_ip", "0.0.0.0"]
         volumes:
           - mongodata:/data/db
