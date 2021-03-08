@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
