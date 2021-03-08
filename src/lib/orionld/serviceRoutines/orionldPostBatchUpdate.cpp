@@ -77,6 +77,9 @@ extern "C"
 //
 bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 {
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
   //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array with objects

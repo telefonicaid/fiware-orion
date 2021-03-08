@@ -124,6 +124,9 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 //
 bool orionldPostBatchCreate(ConnectionInfo* ciP)
 {
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
   //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array
@@ -271,7 +274,6 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   if (orionldState.httpStatusCode == SccOk)
   {
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-    orionldState.noLinkHeader = true;
 
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {

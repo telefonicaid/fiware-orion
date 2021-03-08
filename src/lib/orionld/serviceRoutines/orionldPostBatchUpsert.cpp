@@ -137,6 +137,9 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 //
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
   //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)
@@ -406,10 +409,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
-  {
     orionldState.httpStatusCode = SccMultiStatus;
-    orionldState.noLinkHeader   = true;
-  }
   else
   {
     orionldState.httpStatusCode = SccNoContent;

@@ -59,6 +59,9 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
   KjNode* errorObj;
   KjNode* nodeP;
 
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
   if (orionldState.requestTree->type != KjArray)
   {
     LM_W(("Bad Input (Payload must be a JSON Array)"));

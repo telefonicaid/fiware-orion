@@ -41,7 +41,7 @@ brokerStart CB 212-249
 # 08. Remove entities E10 and E11 that do not exist in database. - see error
 # 09. Remove entities E4 (exists in database) and E5 (does not exist in database)
 # 10. Create entities E1 and E2
-# 11. Attempt to batch remove E1 twice (E1 present twice in the entity id array of the payload body)
+# 11. Attempt to batch delete E1 twice (E1 present twice in the entity id array of the payload body)
 #
 
 echo "01. POST /ngsi-ld/v1/entityOperations/delete, with a JSON object as payload - see error"
@@ -195,7 +195,7 @@ echo
 echo
 
 
-echo "11. Attempt to batch remove E1 twice (E1 present twice in the entity id array of the payload body)"
+echo "11. Attempt to batch delete E1 twice (E1 present twice in the entity id array of the payload body)"
 echo "=================================================================================================="
 payload='[
   "urn:ngsi-ld:entity:E1",
@@ -387,12 +387,11 @@ Date: REGEX(.*)
 
 
 
-11. Attempt to batch remove E1 twice (E1 present twice in the entity id array of the payload body)
+11. Attempt to batch delete E1 twice (E1 present twice in the entity id array of the payload body)
 ==================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 49
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
