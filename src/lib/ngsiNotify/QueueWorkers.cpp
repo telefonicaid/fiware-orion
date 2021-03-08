@@ -169,7 +169,7 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
+            subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
           }
         }
         else
@@ -179,7 +179,7 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
+            subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
           }
         }
       }

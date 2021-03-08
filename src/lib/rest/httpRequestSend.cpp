@@ -290,7 +290,7 @@ int httpRequestSendWithCurl
   }
 
   // Note that the corresponding lmTransactionEnd() is not done in this function, but in the caller, as we
-  // need to wait to subCacheItemNotificationErrorStatus() before ending (or the logs in this operation
+  // need to wait to subNotificationErrorStatus() before ending (or the logs in this operation
   // will show unwanted N/A fields)
   std::string protocol = _protocol + "//";
   correlatorIdSet(fiwareCorrelation.c_str());

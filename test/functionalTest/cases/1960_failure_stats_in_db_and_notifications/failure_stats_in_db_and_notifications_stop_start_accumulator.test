@@ -25,7 +25,7 @@ failure stats in db and notifications
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -subCacheIval 3
+brokerStart CB 0 IPv4 --cache -subCacheIval 3
 accumulatorStart --pretty-print
 
 --SHELL--
