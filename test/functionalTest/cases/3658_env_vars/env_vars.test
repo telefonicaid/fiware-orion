@@ -87,11 +87,11 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-rplSet' <replica set>]                                                    ORION_MONGO_REPLICA_SET           '' /''/
                                [option '-dbuser' <database user>]                                                  ORION_MONGO_USER                  '' /''/
                                [option '-dbpwd' <database password>]                                               ORION_MONGO_PASSWORD              '' /''/
-                               [option '-dbAuthMech' <database authentication mechanism (either SCRAM-SHA-1 or ]   ORION_MONGO_AUTH_MECH             'SCRAM-SHA-1' /'SCRAM-SHA-1'/
+                               [option '-dbAuthMech' <database authentication mechanism (either SCRAM-SHA-1 or ]   ORION_MONGO_AUTH_MECH             '' /''/
                                [option '-dbAuthDb' <database used for authentication>]                             ORION_MONGO_AUTH_SOURCE           '' /''/
                                [option '-dbSSL' (enable SSL connection to DB)]                                     ORION_MONGO_SSL                   FALSE /FALSE/
                                [option '-db' <database name>]                                                      ORION_MONGO_DB                    'orion' /'orion'/
-                               [option '-dbTimeout' <timeout in milliseconds for connections to the replica set]   ORION_MONGO_TIMEOUT               10000.000000 /10000.000000/
+                               [option '-dbTimeout' <timeout in milliseconds for connections to the replica set]   ORION_MONGO_TIMEOUT               0 <= 10000 /10000/ <= 900000
                                [option '-dbPoolSize' <database connection pool size>]                              ORION_MONGO_POOL_SIZE             1 <= 10 /10/ <= 10000
                                [option '-ipv4' (use ip v4 only)]                                                   ORION_USEIPV4                     FALSE /FALSE/
                                [option '-ipv6' (use ip v6 only)]                                                   ORION_USEIPV6                     FALSE /FALSE/
