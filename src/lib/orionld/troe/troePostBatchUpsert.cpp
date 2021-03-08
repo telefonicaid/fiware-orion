@@ -122,17 +122,21 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
         {
           // If the entity already existed, the entity op mode must be "REPLACE"
           if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
-            troeEntityMode = TROE_ENTITY_CREATE;
+          {
+            troeEntityMode    = TROE_ENTITY_CREATE;
+            troeAttributeMode = TROE_ENTITY_CREATE;
+          }
           else
           {
-            if (orionldState.uriParamOptions.update == true)
-              troeEntityMode = TROE_ENTITY_UPDATE;
-            else
-              troeEntityMode = TROE_ENTITY_REPLACE;
+            troeEntityMode    = (orionldState.uriParamOptions.update == true)? TROE_ENTITY_UPDATE : TROE_ENTITY_REPLACE;
+            troeAttributeMode = TROE_ATTRIBUTE_REPLACE;
           }
         }
         else
-          troeEntityMode = TROE_ENTITY_CREATE;
+        {
+          troeEntityMode    = TROE_ENTITY_CREATE;
+          troeAttributeMode = TROE_ENTITY_CREATE;
+        }
       }
 
       if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeEntityMode, troeAttributeMode) == false)
