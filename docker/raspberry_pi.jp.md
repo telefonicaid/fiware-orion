@@ -89,7 +89,7 @@ services:
     command: -dbhost mongo
 
   mongo:
-    image: mongo:4.2
+    image: mongo:4.4
     command: --nojournal
 ```
 
