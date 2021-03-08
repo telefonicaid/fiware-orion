@@ -129,11 +129,7 @@ std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 
   if (xString.empty())
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||
@@ -174,11 +170,7 @@ bool SubscriptionId::rendered(RequestType container)
 {
   if ((string.empty()) || (string == "000000000000000000000000"))
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||

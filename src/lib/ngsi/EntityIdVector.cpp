@@ -92,8 +92,6 @@ std::string EntityIdVector::check(RequestType requestType)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == SubscribeContextAvailability)          ||
-      (requestType == UpdateContextAvailabilitySubscription) ||
       (requestType == QueryContext)                          ||
       (requestType == SubscribeContext))
   {

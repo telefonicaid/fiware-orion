@@ -9,6 +9,10 @@
     * [Migrating the data stored in DB](#migrating-the-data-stored-in-db)
     * [Standard upgrade](#standard-upgrade)
 
+---
+> :warning: **If you plan to run orion in production, also read the information about [high availability](extra/ha.md) and [performance tuning](perf_tuning.md).**
+---
+
 ## Introduction
 
 The recommended procedure is to install using RPM packages in CentOS 7.x. If you are interested in

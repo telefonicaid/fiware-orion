@@ -2778,7 +2778,7 @@ static void searchContextProviders
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -2800,7 +2800,7 @@ static void searchContextProviders
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {

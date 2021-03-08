@@ -3,6 +3,7 @@
 *.bak
 .*
 !.travis.yml
+!.github
 *.autosave
 BUILD_*
 ToDo

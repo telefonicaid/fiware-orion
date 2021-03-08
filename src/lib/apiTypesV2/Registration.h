@@ -71,7 +71,8 @@ typedef enum ForwardingMode
   ForwardAll,
   ForwardNone,
   ForwardQuery,
-  ForwardUpdate
+  ForwardUpdate,
+  ForwardUnknown
 } ForwardingMode;
 
 
@@ -86,6 +87,17 @@ inline std::string forwardingModeToString(ForwardingMode f)
   case ForwardUpdate:  return "update";
   default:             return "Undefined";
   }
+}
+
+
+
+inline ForwardingMode stringToForwardingMode(std::string s)
+{
+  if (s == "all")          return ForwardAll;
+  else if (s == "none")    return ForwardNone;
+  else if (s == "query")   return ForwardQuery;
+  else if (s == "update")  return ForwardUpdate;
+  else                     return ForwardUnknown;
 }
 
 

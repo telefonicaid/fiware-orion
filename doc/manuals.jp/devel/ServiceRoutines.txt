@@ -84,18 +84,6 @@ V0 STANDARD REGISTRY REQUESTS:
   POST    /ngsi9/discoverContextAvailability                                      postDiscoverContextAvailability ------------------------------------------------------------------------------------------> mongoDiscoverContextAvailability
   *       /ngsi9/discoverContextAvailability                                      badVerbPostOnly
 
-  POST    /ngsi9/subscribeContextAvailability                                     postSubscribeContextAvailability -----------------------------------------------------------------------------------------> mongoSubscribeContextAvailability
-  *       /ngsi9/subscribeContextAvailability                                     badVerbPostOnly
-
-  POST    /ngsi9/unsubscribeContextAvailability                                   postUnsubscribeContextAvailability ---------------------------------------------------------------------------------------> mongoUnsubscribeContextAvailability
-  *       /ngsi9/unsubscribeContextAvailability                                   badVerbPostOnly
-
-  POST    /ngsi9/updateContextAvailabilitySubscription                            postUpdateContextAvailabilitySubscription --------------------------------------------------------------------------------> mongoUpdateContextAvailabilitySubscription
-  *       /ngsi9/updateContextAvailabilitySubscription                            badVerbPostOnly
-
-  POST    /ngsi9/notifyContextAvailability                                        postNotifyContextAvailability --------------------------------------------------------------------------------------------> mongoNotifyContextAvailability
-  *       /ngsi9/notifyContextAvailability                                        badVerbPostOnly
-
 
 V1 STANDARD REGISTRY REQUESTS:
 ====================================================================================================
@@ -104,18 +92,6 @@ V1 STANDARD REGISTRY REQUESTS:
 
   POST    /v1/discoverContextAvailability                                         postDiscoverContextAvailability ------------------------------------------------------------------------------------------> mongoDiscoverContextAvailability
   *       /v1/discoverContextAvailability                                         badVerbPostOnly
-
-  POST    /v1/subscribeContextAvailability                                        postSubscribeContextAvailability -----------------------------------------------------------------------------------------> mongoSubscribeContextAvailability
-  *       /v1/subscribeContextAvailability                                        badVerbPostOnly
-
-  POST    /v1/unsubscribeContextAvailability                                      postUnsubscribeContextAvailability ---------------------------------------------------------------------------------------> mongoUnsubscribeContextAvailability
-  *       /v1/unsubscribeContextAvailability                                      badVerbPostOnly
-
-  POST    /v1/updateContextAvailabilitySubscription                               postUpdateContextAvailabilitySubscription --------------------------------------------------------------------------------> mongoUpdateContextAvailabilitySubscription
-  *       /v1/updateContextAvailabilitySubscription                               badVerbPostOnly
-
-  POST    /v1/notifyContextAvailability                                           postNotifyContextAvailability --------------------------------------------------------------------------------------------> mongoNotifyContextAvailability
-  *       /v1/notifyContextAvailability                                           badVerbPostOnly
 
 
 V0 STANDARD REQUESTS:
@@ -186,13 +162,6 @@ V0 REGISTRY CONVENIENCE OPERATIONS:
   POST    /ngsi9/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                 postContextEntityTypeAttribute ----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
   *       /ngsi9/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}                 badVerbGetPostOnly
 
-  POST    /ngsi9/contextAvailabilitySubscriptions                                 postSubscribeContextAvailabilityConvOp  -------------------> postSubscribeContextAvailability ----------------------------> mongoSubscribeContextAvailability
-  *       /ngsi9/contextAvailabilitySubscriptions                                 badVerbPostOnly
-
-  PUT     /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         putAvailabilitySubscriptionConvOp -------------------------> postUpdateContextAvailabilitySubscription -------------------> mongoUpdateContextAvailabilitySubscription
-  DELETE  /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         deleteAvailabilitySubscriptionConvOp ----------------------> postUnsubscribeContextAvailability --------------------------> mongoUnsubscribeContextAvailability
-  *       /ngsi9/contextAvailabilitySubscriptions/{SUBID}                         badVerbPutDeleteOnly
-
 
 V1 REGISTRY CONVENIENCE OPERATIONS:
 ====================================================================================================
@@ -219,14 +188,6 @@ V1 REGISTRY CONVENIENCE OPERATIONS:
   GET     /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           getContextEntityTypeAttribute -----------------------------> postDiscoverContextAvailability -----------------------------> mongoDiscoverContextAvailability
   POST    /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           postContextEntityTypeAttribute ----------------------------> postRegisterContext -----------------------------------------> mongoRegisterContext
   *       /v1/registry/contextEntityTypes/{ETYPE}/attributes/{ATTRNAME}           badVerbGetPostOnly
-
-  POST    /v1/registry/contextAvailabilitySubscriptions                           postSubscribeContextAvailabilityConvOp  -------------------> postSubscribeContextAvailability ----------------------------> mongoSubscribeContextAvailability
-  *       /v1/registry/contextAvailabilitySubscriptions                           badVerbPostOnly
-
-  PUT     /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   putAvailabilitySubscriptionConvOp -------------------------> postUpdateContextAvailabilitySubscription -------------------> mongoUpdateContextAvailabilitySubscription
-  DELETE  /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   deleteAvailabilitySubscriptionConvOp ----------------------> postUnsubscribeContextAvailability --------------------------> mongoUnsubscribeContextAvailability
-  *       /v1/registry/contextAvailabilitySubscriptions/{SUBID}                   badVerbPutDeleteOnly
-
 
 V0 CONVENIENCE OPERATIONS:
 ====================================================================================================

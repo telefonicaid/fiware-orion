@@ -251,7 +251,6 @@ void mongoInit
   setEntitiesCollectionName(COL_ENTITIES);
   setRegistrationsCollectionName(COL_REGISTRATIONS);
   setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
 
   //
   // Note that index creation operation is idempotent.
@@ -435,17 +434,6 @@ void setSubscribeContextCollectionName(const std::string& name)
 
 /* ***************************************************************************
 *
-* setSubscribeContextAvailabilityCollectionName -
-*/
-void setSubscribeContextAvailabilityCollectionName(const std::string& name)
-{
-  subscribeContextAvailabilityCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
 * composeCollectionName -
 *
 * Common helper function for composing collection names
@@ -513,17 +501,6 @@ std::string getRegistrationsCollectionName(const std::string& tenant)
 std::string getSubscribeContextCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 
@@ -1948,6 +1925,7 @@ bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -1976,7 +1954,8 @@ bool registrationsQuery
   //   ],
   //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
   //   servicePath: ... ,
-  //   expiration: { $gt: ... }
+  //   expiration: { $gt: ... },
+  //   fwdMode: ...                           (only when forwardingMode is update or query)
   // }
   //
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
@@ -2056,6 +2035,16 @@ bool registrationsQuery
     queryBuilder.appendElements(fillQueryServicePath(REG_SERVICE_PATH, servicePathV));
   }
 
+  // Forwarding mode filter (only when forwardingMode is update or query)
+  // Note that "all" and null (omission of the field) is always included in the filter
+  if (forwardingMode == ngsiv2::ForwardQuery)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("query" << "all" << mongo::BSONNULL)));
+  }
+  else if (forwardingMode == ngsiv2::ForwardUpdate)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("update" << "all" << mongo::BSONNULL)));
+  }
 
   //
   // Do the query in MongoDB
@@ -2712,88 +2701,6 @@ BSONArray processConditionVector
   ncV.release();
 
   return arr;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoUpdateCasubNewNotification -
-*/
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant)
-{
-  LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
-
-  /* Update the document */
-  BSONObj     query  = BSON("_id" << OID(subId));
-  BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) <<
-                            "$inc" << BSON(CASUB_COUNT << 1));
-
-  collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);
-
-  return SccOk;
-}
-
-
-
-/* ****************************************************************************
-*
-* processAvailabilitySubscription -
-*
-* This function is called from two places:
-*
-* 1) initial processing of subscribeContextAvailability (and updateContextAvailabilitySubscription),
-*   so an "initial" notification for all matching context registrations is sent
-* 2) registerContext processing logic when the new (or updated) context registration
-*   matches an availability subscription
-*
-* The enV arguments is set with all the entities included in the subscription (case 1) or
-* with only the triggering entities (case 2).
-*
-* This method returns true if the notification was actually send. Otherwise, false
-* is returned.
-*/
-bool processAvailabilitySubscription
-(
-  const EntityIdVector& enV,
-  const StringList&     attrL,
-  const std::string&    subId,
-  const std::string&    notifyUrl,
-  RenderFormat          renderFormat,
-  const std::string&    tenant,
-  const std::string&    fiwareCorrelator
-)
-{
-  std::string                       err;
-  NotifyContextAvailabilityRequest  ncar;
-  std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
-  servicePathV.push_back("");                      // While this gets implemented, "" default is used.
-
-  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
-  {
-    ncar.contextRegistrationResponseVector.release();
-    return false;
-  }
-
-  if (ncar.contextRegistrationResponseVector.size() > 0)
-  {
-    /* Complete the fields in NotifyContextRequest */
-    ncar.subscriptionId.set(subId);
-
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
-    ncar.contextRegistrationResponseVector.release();
-
-    /* Update database fields due to new notification */
-    if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk)
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  ncar.contextRegistrationResponseVector.release();
-  return false;
 }
 
 

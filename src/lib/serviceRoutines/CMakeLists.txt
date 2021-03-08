@@ -28,9 +28,6 @@ logTraceTreat.cpp
 postRegisterContext.cpp
 postDiscoverContextAvailability.cpp
 getContextEntitiesByEntityId.cpp
-postUnsubscribeContextAvailability.cpp
-postSubscribeContextAvailability.cpp
-postUpdateContextAvailabilitySubscription.cpp
 postUpdateContext.cpp
 postQueryContext.cpp
 postSubscribeContext.cpp
@@ -57,8 +54,6 @@ getNgsi10ContextEntityTypes.cpp
 getNgsi10ContextEntityTypesAttribute.cpp
 putSubscriptionConvOp.cpp
 deleteSubscriptionConvOp.cpp
-putAvailabilitySubscriptionConvOp.cpp
-deleteAvailabilitySubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbAllFive.cpp
@@ -73,7 +68,6 @@ badNgsi9Request.cpp
 badNgsi10Request.cpp
 badRequest.cpp
 postNotifyContext.cpp
-postNotifyContextAvailability.cpp
 statisticsTreat.cpp
 getEntityTypes.cpp
 getAttributesForEntityType.cpp
@@ -91,7 +85,6 @@ postContextEntitiesByEntityIdAndType.cpp
 getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
 postSubscribeContextConvOp.cpp
-postSubscribeContextAvailabilityConvOp.cpp
 optionsVersionRequest.cpp
 )
 
@@ -102,9 +95,6 @@ logTraceTreat.h
 postRegisterContext.h
 postDiscoverContextAvailability.h
 getContextEntitiesByEntityId.h
-postUnsubscribeContextAvailability.h
-postSubscribeContextAvailability.h
-postUpdateContextAvailabilitySubscription.h
 postUpdateContext.h
 postQueryContext.h
 postSubscribeContext.h
@@ -142,7 +132,6 @@ badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h
 postNotifyContext.h
-postNotifyContextAvailability.h
 statisticsTreat.h
 getEntityTypes.h
 getAttributesForEntityType.h

@@ -266,14 +266,6 @@ Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy c
 * `RegisterContextResponse`
 * `DiscoverContextAvailabilityRequest`
 * `DiscoverContextAvailabilityResponse`
-* `SubscribeContextAvailabilityRequest`
-* `SubscribeContextAvailabilityResponse`
-* `UnsubscribeContextAvailabilityRequest`
-* `UnsubscribeContextAvailabilityResponse`
-* `UpdateContextAvailabilitySubscriptionRequest`
-* `UpdateContextAvailabilitySubscriptionResponse`
-* `NotifyContextAvailabilityRequest` (outgoing request, sent by Orion, to notify subscribers)
-* `NotifyContextAvailabilityResponse` (incoming response from subscriber)
 
 See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
 
@@ -432,22 +424,6 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 * One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
 * The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
-
-### Context availability notifications
-
-<a name="flow-nf-02"></a>
-![Notification on entity-attribute availability Registration/Update](images/Flow-NF-02.png)
-
-_NF-02: Notification on entity-attribute availability Registration/Update_
-
-* Extract IP, port and path from the value of the second parameter (url) to the method `sendNotifyContextAvailabilityRequest()` (step 1).
-* Create an instance of `SenderThreadParams` and fill it in with the data for the notification (step 2). Then create a vector of `SenderThreadParams` and push the instance to the vector. This is the input that is expected by `startSenderThread()` that is shared between `sendNotifyContextAvailabilityRequest()` and `sendNotifyContextRequest()`. In the case of `sendNotifyContextAvailabilityRequest()`, the vector will always contain only one item.
-* `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result (step 3). The control is returned to mongoBackend.
-* `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 4).
-* `startSenderThread()` sends the notification described by the `SenderThreadParams` item in the vector (step 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
-
-[Top](#top)
-
 
 ## src/lib/alarmMgr/
 [Alarms](../admin/logs.md#alarms) are special log messages inserted into the log file. However, to record the number of consecutive alarms of the same type, and to not repeat them when they're already active, etc. a manager has been implemented. This *Alarm Manager* resides in the library **alarmMgr**.

@@ -4,7 +4,7 @@ Orion Context Broker は、FIWARE セキュリティフレームワーク (PEP p
 
 マルチテナント/マルチサービスは、あるサービス/テナントのエンティティ/属性/サブスクリプションが他のサービス/テントに対して "不可視" であることを保証します。たとえば、tenantA スペースの queryContext は、テナント B スペースからエンティティ/属性を返すことはありません。この隔離は、データベースの分離に基づいています。詳細については、[インストールおよび管理のマニュアル](../admin/database_admin.md#multiservicemultitenant-database-separation)で説明しています。
 
-さらに、"-multiservice" が使用されている場合、Orion は、指定されたテナント/サービスのサブスクリプションに関連する notifyContextRequest および notifyContextAvailability リクエストメッセージに "Fiware-Service" ヘッダを含めます (ただし、デフォルトのサービス/テナントは例外です。ヘッダは存在しません)。例 :
+さらに、"-multiservice" が使用されている場合、Orion は、指定されたテナント/サービスのサブスクリプションに関連する notifyContextRequest リクエスト・メッセージに "Fiware-Service" ヘッダを含めます (ただし、デフォルトのサービス/テナントは例外です。ヘッダは存在しません)。例 :
 
     POST http://127.0.0.1:9977/notify
     Content-Length: 725
