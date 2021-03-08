@@ -22,9 +22,10 @@
 *
 * Author: Fermín Galán
 */
+#include <mongoc/mongoc.h>
+
 #include <time.h>
 #include <semaphore.h>
-#include <mongoc/mongoc.h>
 #include <string>
 #include <vector>
 
@@ -92,160 +93,158 @@ void orion::mongoVersionGet(int* mayor, int* minor)
 
 /* ****************************************************************************
 *
-* mongoConnect -
+* pingConnection -
 *
-* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
+* return:
+*   0: ping is ok
+*   1: ping fails due to auth
+*   2: ping fails not due to auth
 */
-static orion::DBConnection mongoConnect
-(
-  const char*  host,
-  const char*  db,
-  const char*  rplSet,
-  const char*  username,
-  const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         multitenant,
-  int          writeConcern,
-  double       timeout
-)
+static int pingConnection(mongoc_client_t* conn, const char* db, bool mtenat)
 {
-  LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+  // MongoDB has a ping command, but we are not using it, as it doesn't not
+  // provides auth checking when user and pass are empty (it provides auth
+  // when we have user and pass, but that is not enough).
+  //
+  // In addition, note that command and database depend on mtenant. If we
+  // are in mtenant mode we
+  // will need at some point to look for all orion* databases, so command to
+  // ping will be listDatabases in the admin DB. But if we run in not mtenant
+  // mode listCollections in the default database will suffice
 
-#if 0
-  // FIXME OLD-DR: we are skiping a lot of code to deal with reaplica sets and errors. It return NULL on fail
+  std::string  cmd;
+  std::string  effectiveDb;
 
-  bool connected     = false;
-  int  retries       = RECONNECT_RETRIES;
-
-  if (strlen(rplSet) == 0)
+  if (mtenat)
   {
-    // No replica set. Setting the first argument to true is to use autoreconnect
-    connection = new mongo::DBClientConnection(true);
+    cmd = "listDatabases";
+    effectiveDb = "admin";
   }
   else
   {
-    // Replica set
-    LM_T(LmtMongo, ("Using replica set %s", rplSet));
-
-    // autoReconnect is always on for DBClientReplicaSet connections.
-    std::vector<std::string>  hostTokens;
-    int components = stringSplit(host, ',', hostTokens);
-
-    std::vector<mongo::HostAndPort> rplSetHosts;
-    for (int ix = 0; ix < components; ix++)
-    {
-      LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
-      rplSetHosts.push_back(mongo::HostAndPort(hostTokens[ix]));
-    }
-
-    connection = new mongo::DBClientReplicaSet(rplSet, rplSetHosts, timeout);
+    cmd = "listCollections";
+    effectiveDb = db;
   }
 
-  for (int tryNo = 0; tryNo < retries; ++tryNo)
+  bson_t* ping = bson_new();
+  BSON_APPEND_INT32(ping, cmd.c_str(), 1);
+  mongoc_database_t* database = mongoc_client_get_database(conn, effectiveDb.c_str());
+
+  bson_error_t error;
+  int r = 0;
+  if (!mongoc_database_command_with_opts(database, ping, NULL, NULL, NULL, &error))
   {
-    try
-    {
-      connected = (strlen(rplSet) == 0) ?
-            ((mongo::DBClientConnection*) connection)->connect(std::string(host), err) :  // No repl set
-            ((mongo::DBClientReplicaSet*) connection)->connect();                         // Rpls set
-    }
-    catch (const std::exception &e)
-    {
-      LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
-    }
-
-    if (connected)
-    {
-      break;
-    }
-
-    if (tryNo == 0)
-    {
-      LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
-            retries,
-            RECONNECT_DELAY));
+    LM_T(LmtMongo, ("ping command (%s at db %s) falied: %s", cmd.c_str(), effectiveDb.c_str(), error.message));
+    // Reference error message: Authentication failed
+    // Reference error message: command listCollections requires authentication
+    if ((strstr(error.message, "Authentication failed") != NULL) || (strstr(error.message, "requires authentication") != NULL)) {
+      r = 1;
     }
     else
     {
-      LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+      r = 2;
     }
-
-    usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
   }
 
-  if (connected == false)
+  mongoc_database_destroy(database);
+  bson_destroy(ping);
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoConnect -
+*
+*/
+static orion::DBConnection mongoConnect
+(
+  const std::string  mongoUri,
+  const char*        db,
+  bool               mtenant,
+  int                writeConcern
+)
+{
+  // Old C++ legacy driver establishes connection at connection object
+  // creation time. Note that the C driver behaves different.
+  // From http://mongoc.org/libmongoc/current/connection-pooling.html#single-mode
+  // "the client connects on demand when your program first uses it for a MongoDB operation".
+  // Thus, we are using a ping command just to "stimulate" the connection
+  //
+  // FIXME #3789: does this make sense makes sense or should we just to create the
+  // connection object here and let if fail (if necessary) in its first use? Note
+  // current implemetation tries to use a similar approach (reconnection loop)
+  // as Orion 2.6.0 did, but maybe this is completely unnecessary if we move
+  // to native pool management in the C driver
+
+  bool connected = false;
+  mongoc_client_t* conn;
+  for (int tryNo = 0; tryNo < RECONNECT_RETRIES; ++tryNo)
   {
-    char cV[64];
-    snprintf(cV, sizeof(cV), "connection failed, after %d retries", retries);
-    std::string details = std::string(cV) + ": " + err;
-
-    alarmMgr.dbError(details);
-    return orion::DBConnection();
-  }
-  alarmMgr.dbErrorReset();
-
-  LM_T(LmtOldInfo, ("Successful connection to database"));
-#endif
-
-
-#if 0
-  // FIXME OLD-DR: no authentication yet
-
-  /* Authentication is different depending if multiservice is used or not. In the case of not
-   * using multiservice, we authenticate in the single-service database. In the case of using
-   * multiservice, it isn't a default database that we know at contextBroker start time (when
-   * this connection function is invoked) so we authenticate on the admin database, which provides
-   * access to any database.
-   *
-   * This behaviour can be overriden by the -dbAuthDb parameter in the CLI
-   */
-
-  const char* effectiveAuthDb;
-  if (strlen(authDb) > 0)
-  {
-    effectiveAuthDb = authDb;
-  }
-  else
-  {
-    effectiveAuthDb = multitenant ? "admin" : db;
-  }
-
-  if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
-  {
-    if (!connectionAuth(connection, std::string(effectiveAuthDb), std::string(username), std::string(passwd), std::string(mechanism), &err))
+    conn = mongoc_client_new(mongoUri.c_str());
+    if (conn == NULL)
     {
-      return NULL;
+      // If URI is wrong it is wrong for all the attemps: we early end in this case
+      LM_E(("Database Startup Error (mongoUri is wrong: <%s>)", mongoUri.c_str()));
+      return orion::DBConnection(NULL);
+    }
+
+    int check = pingConnection(conn, db, mtenant);
+
+    if (check == 0)
+    {
+      // Connection ok
+      connected = true;
+      break;
+    }
+    else if (check == 1)
+    {
+      // Connection fails due to auth
+      LM_E(("Database Startup Error (auth failed)"));
+      mongoc_client_destroy(conn);
+      return orion::DBConnection(NULL);
+    }
+    else  // check == 2
+    {
+      LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
     }
   }
-#endif
 
-  std::string mongoUri = "mongodb://" + std::string(host);
-  orion::DBConnection connection = orion::DBConnection(mongoc_client_new(mongoUri.c_str()));
-  if (connection.isNull())
+  if (!connected)
   {
+    LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
+          RECONNECT_RETRIES,
+          RECONNECT_DELAY));
+    mongoc_client_destroy(conn);
     return orion::DBConnection(NULL);
   }
 
   //
   // WriteConcern
   //
-  orion::WriteConcern wc = (writeConcern == 1 ? orion::WCAcknowledged : orion::WCUnAcknowledged);
-
-  orion::setWriteConcern(connection, wc);
-  orion::WriteConcern writeConcernCheck = orion::getWriteConcern(connection);
-
-  if (writeConcernCheck != wc)
+  // Alternatively, write concern could be established as part of the mongoUri,
+  // see https://docs.mongodb.com/manual/reference/connection-string/#write-concern-options
+  //
+  mongoc_write_concern_t* wc = mongoc_write_concern_new();
+  if (writeConcern == 0)
   {
-    mongoc_client_destroy(connection.get());
-    alarmMgr.dbError("Write Concern not set as desired)");
-    return orion::DBConnection(NULL);
+    LM_T(LmtMongo, ("connection created with Write Concern: 0"));
+    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_UNACKNOWLEDGED);
   }
-  alarmMgr.dbErrorReset();
+  else   // writeConcern == 1
+  {
+    LM_T(LmtMongo, ("connection created with Write Concern: 1"));
+    mongoc_write_concern_set_w(wc, MONGOC_WRITE_CONCERN_W_DEFAULT);
+  }
 
-  LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
+  mongoc_client_set_write_concern(conn, wc);
 
-  return orion::DBConnection(connection);
+  mongoc_write_concern_destroy(wc);
+
+  return orion::DBConnection(conn);
 }
 
 
@@ -303,6 +302,75 @@ static void mongoDriverLogger
 
 /* ****************************************************************************
 *
+* mongoConnectionPoolInit -
+*/
+static std::string composeMongoUri
+(
+  const char*  host,
+  const char*  rplSet,
+  const char*  username,
+  const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
+  int64_t      timeout
+)
+{
+  // Compose the mongoUri, taking into account all information
+
+  std::string uri = "mongodb://";
+
+  // Add auth parameter if included
+  if (strlen(username) != 0 && strlen(passwd) != 0)
+  {
+    uri += username + std::string(":") + passwd + "@";
+  }
+
+  uri += host + std::string("/");
+
+  if (strlen(authDb) != 0)
+  {
+    uri += authDb;
+  }
+
+  // First option prefix is '?' symbol
+  std::string optionPrefix = "?";
+
+  if (strlen(rplSet) != 0)
+  {
+    uri += optionPrefix + "replicaSet=" + rplSet;
+    optionPrefix = "&";
+  }
+
+  if (strlen(mechanism) != 0)
+  {
+    uri += optionPrefix + "authMechanism=" + mechanism;
+    optionPrefix = "&";
+  }
+
+  if (dbSSL)
+  {
+    uri += optionPrefix + "tls=true&tlsAllowInvalidCertificates=true";
+    optionPrefix = "&";
+  }
+
+  if (timeout > 0)
+  {
+    char buf[STRING_SIZE_FOR_LONG];
+    i2s(timeout, buf, sizeof(buf));
+    uri += optionPrefix + "connectTimeoutMS=" + buf;
+    optionPrefix = "&";
+  }
+
+  LM_T(LmtMongo, ("MongoDB connection URI: '%s'", offuscatePassword(uri, passwd).c_str()));
+
+  return uri;
+}
+
+
+
+/* ****************************************************************************
+*
 * orion::mongoConnectionPoolInit -
 */
 int orion::mongoConnectionPoolInit
@@ -315,17 +383,13 @@ int orion::mongoConnectionPoolInit
   const char*  mechanism,
   const char*  authDb,
   bool         dbSSL,
-  bool         multitenant,
-  double       timeout,
+  bool         mtenant,
+  int64_t      timeout,
   int          writeConcern,
   int          poolSize,
   bool         semTimeStat
 )
 {
-  // We cannot move status variable declaration outside the if block. That fails at compilation time
-  bool statusOk = false;
-  std::string statusString;
-
   // Contrary to intuition (as you would expect that mongoc_init is the very first
   // driver function you have to call :) the mongoc_log_set_handler function
   // has to be called *before* or some problems with some traces will occur.
@@ -334,41 +398,23 @@ int orion::mongoConnectionPoolInit
   // Ref: http://mongoc.org/libmongoc/current/logging.html
   mongoc_log_set_handler(mongoDriverLogger, NULL);
 
-  if (dbSSL)
-  {
-    // FIXME OLD-DR: auth not taken into account by the moment
-    mongoc_init();
-    // mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
-    // statusOk = status.isOK();
-    statusOk = true;
-    // statusString = status.toString();
-  }
-  else
-  {
-    mongoc_init();
-    // mongo::Status status = mongo::client::initialize();
-    // statusOk = status.isOK();
-    statusOk = true;
-    // statusString = status.toString();
-  }
+  mongoc_init();
 
-  if (!statusOk)
-  {
-    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
-    return -1;
-  }
   atexit(shutdownClient);
+
+  // Set mongo Uri to connect
+  std::string uri = composeMongoUri(host, rplSet, username, passwd, mechanism, authDb, dbSSL, timeout);
 
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  orion::setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
+  orion::setMongoConnectionForUnitTest(mongoConnect(uri, db, mtenant, writeConcern));
   return 0;
 #else
   //
   // Create the pool
   //
-  connectionPool  = (MongoConnection*) calloc(sizeof(MongoConnection), poolSize);
+  connectionPool = (MongoConnection*) calloc(sizeof(MongoConnection), poolSize);
   if (connectionPool == NULL)
   {
     LM_E(("Runtime Error (insufficient memory to create connection pool of %d connections)", poolSize));
@@ -382,8 +428,8 @@ int orion::mongoConnectionPoolInit
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     connectionPool[ix].free       = true;
-    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, mechanism,
-                                                 authDb, multitenant, writeConcern, timeout);
+    connectionPool[ix].connection = mongoConnect(uri, db, mtenant, writeConcern);
+
     if (connectionPool[ix].connection.isNull())
     {
       return -1;
@@ -423,17 +469,23 @@ int orion::mongoConnectionPoolInit
   orion::BSONObjBuilder bob;
   bob.append("buildinfo", 1);
 
-  orion::runDatabaseCommand("admin", bob.obj(), &result, &err);
+  if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
+  {
+    LM_X(1, ("Fatal Error (error getting MongoDB server version: %s)", err.c_str()));
+  }
+
   std::string versionString = std::string(getStringFieldF(result, "version"));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
-    LM_X(1, ("Fatal Error (MongoDB invalid version format: %s)", versionString.c_str()));
+    LM_X(1, ("Fatal Error (MongoDB invalid version format: <%s>)", versionString.c_str()));
   }
   LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)",
                   versionString.c_str(),
                   mongoVersionMayor,
                   mongoVersionMinor,
                   extra.c_str()));
+
+  LM_I(("Connected to %s (dbName: %s, poolsize: %d)", offuscatePassword(uri, passwd).c_str(), db, poolSize));
 
   return 0;
 #endif

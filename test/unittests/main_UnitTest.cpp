@@ -109,7 +109,7 @@ PaArgument paArgs[] =
   { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
-  { "-dbAuthMech",     authMech,      "DB_AUTH_MECH",   PaString, PaOpt, (int64_t) "SCRAM-SHA-1", PaNL, PaNL,  "" },
+  { "-dbAuthMech",     authMech,      "DB_AUTH_MECH",   PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbAuthDb",       authDb,        "DB_AUTH_DB",     PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  ""  },
   { "-dbSSL",          &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,                  false, true,  "" },
   { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL, PaNL,  "" },
