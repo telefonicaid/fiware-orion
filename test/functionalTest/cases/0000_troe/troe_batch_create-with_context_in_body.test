@@ -164,7 +164,7 @@ Create,urn:ngsi-ld:entities:E2,http://example.org/T
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
 Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1,,,,2021-03-03 18:14:42.123
 Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1 - again,,,,2021-03-03 18:15:42.123
-Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,,P1 of E2,,,,2021-03-03 18:15:42.123
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,,P1 of E2,,,,2021-03-03 18:15:42.123
 
 
 --TEARDOWN--
