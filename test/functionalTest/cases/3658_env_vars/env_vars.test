@@ -22,6 +22,8 @@
 broker env vars set on command line
 
 --SHELL-INIT--
+# Just in case some testing contextBroker is running before starting this test
+localBrokerStop CB
 
 --SHELL--
 
