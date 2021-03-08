@@ -59,6 +59,7 @@ void setupDatabase(void)
     /* In fact, the mongoConnectionPoolInit() parameters related with the pool, e.g. pool size, are irrelevant,
      * given that the connection creation is mocked under UNIT_TEST in the mongoBackend library
      */
+    // FIXME #3775: mongoConnectionPoolInit() signature changed. Review this specially.
     mongoConnectionPoolInit("localhost", "", "", "", "", "", "", false, false, 0, 10);
     mongoStarted = true;
   }

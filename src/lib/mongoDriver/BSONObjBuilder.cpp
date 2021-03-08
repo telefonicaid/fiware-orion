@@ -307,10 +307,8 @@ void BSONObjBuilder::appendElements(orion::BSONObj _b)
 /* ****************************************************************************
 *
 * BSONObjBuilder::operator= -
-*
-* FIXME OLD-DR: we should try to use const BSONObjBuilder& as argument
 */
-BSONObjBuilder& BSONObjBuilder::operator= (BSONObjBuilder rhs)
+BSONObjBuilder& BSONObjBuilder::operator= (const BSONObjBuilder& rhs)
 {
   // check not self-assignment
   if (this != &rhs)

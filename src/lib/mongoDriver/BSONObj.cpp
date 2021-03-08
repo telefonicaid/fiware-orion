@@ -195,10 +195,8 @@ void BSONObj::toElementsVector(std::vector<BSONElement>* v)
 /* ****************************************************************************
 *
 * BSONObj::operator= -
-*
-* FIXME OLD-DR: we should try to use const BSONObj& as argument
 */
-BSONObj& BSONObj::operator= (BSONObj rhs)
+BSONObj& BSONObj::operator= (const BSONObj& rhs)
 {
   // check not self-assignment
   if (this != &rhs)

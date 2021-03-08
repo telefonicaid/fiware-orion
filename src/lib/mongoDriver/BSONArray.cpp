@@ -90,10 +90,8 @@ std::string BSONArray::toString(void) const
 /* ****************************************************************************
 *
 * BSONArray::operator= -
-*
-* FIXME OLD-DR: we should try to use const BSONArray& as argument
 */
-BSONArray& BSONArray::operator= (BSONArray rhs)
+BSONArray& BSONArray::operator= (const BSONArray& rhs)
 {
   // check not self-assignment
   if (this != &rhs)
