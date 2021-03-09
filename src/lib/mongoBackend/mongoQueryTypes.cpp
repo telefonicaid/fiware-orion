@@ -588,48 +588,46 @@ HttpStatusCode mongoEntityTypes
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
-    if (!attrsArray[0].isNull())
+    for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
     {
-      for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+      /* This is where NULL-elements in the resulting attrs vector are pruned */
+      if (attrsArray[jx].isNull())
       {
-        /* This is where NULL-elements in the resulting attrs vector are pruned */
-        if (attrsArray[jx].isNull())
-        {
-          continue;
-        }
+        continue;
+      }
 
-        /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
+      /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
          * This could be inefficient, especially if the number of attributes is large */
-        if (!noAttrDetail)
+      if (!noAttrDetail)
+      {
+        std::vector<std::string> attrTypes;
+
+        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].String(), &attrTypes);
+
+        for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
-          std::vector<std::string> attrTypes;
+          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].String(), attrTypes[kx], "");
 
-          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].String(), &attrTypes);
+          entityType->contextAttributeVector.push_back(ca);
 
-          for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+          // For backward compability, NGSIv1 only accepts one element
+          if (apiVersion == V1)
           {
-            ContextAttribute* ca = new ContextAttribute(attrsArray[jx].String(), attrTypes[kx], "");
-
-            entityType->contextAttributeVector.push_back(ca);
-
-            // For backward compability, NGSIv1 only accepts one element
-            if (apiVersion == V1)
-            {
-              break;
-            }
+            break;
           }
         }
-        else
-        {
-          //
-          // NOTE: here we add a ContextAttribute with empty type, as a marker for
-          //       this special condition of 'No Attribute Detail'
-          //
-          ContextAttribute* caP = new ContextAttribute(attrsArray[jx].String(), "", "");
-          entityType->contextAttributeVector.push_back(caP);
-        }
+      }
+      else
+      {
+        //
+        // NOTE: here we add a ContextAttribute with empty type, as a marker for
+        //       this special condition of 'No Attribute Detail'
+        //
+        ContextAttribute* caP = new ContextAttribute(attrsArray[jx].String(), "", "");
+        entityType->contextAttributeVector.push_back(caP);
       }
     }
+
     responseP->entityTypeVector.push_back(entityType);
   }
   orion::releaseMongoConnection(connection);
