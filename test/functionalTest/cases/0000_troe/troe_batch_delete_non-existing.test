@@ -109,8 +109,8 @@ Date: REGEX(.*)
 
 02. Delete E1 and E4 using Batch Delete
 =======================================
-HTTP/1.1 200 OK
-Content-Length: 129
+HTTP/1.1 207 Multi-Status
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -118,7 +118,11 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:entities:E4",
-            "error": "Entity not found in database."
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
         }
     ],
     "success": [

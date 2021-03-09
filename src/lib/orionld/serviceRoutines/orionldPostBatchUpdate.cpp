@@ -51,7 +51,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/entitySuccessPush.h"                  // Own interface
+#include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup

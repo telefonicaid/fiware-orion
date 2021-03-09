@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Batch Delete for Mongo Cpp Legacy
+Entity Batch Delete Test
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -307,19 +307,9 @@ Date: REGEX(.*)
 
 06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
 ========================================================================
-HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/ld+json
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2",
-        "urn:ngsi-ld:entity:E3"
-    ]
-}
 
 
 07. Get all entities - see E4
@@ -341,30 +331,50 @@ Date: REGEX(.*)
 
 08. Remove entities that do not exist in the database. - see error
 ==================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 138
+HTTP/1.1 207 Multi-Status
+Content-Length: 325
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Entities were not found in database.",
-    "title": "Entities not found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E10",
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:entity:E11",
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
+        }
+    ],
+    "success": []
 }
 
 
 09. Remove entities E4 (exists in database) and E5 (does not exist in database)
 ===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/ld+json
+HTTP/1.1 207 Multi-Status
+Content-Length: 197
+Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errors": [
         {
             "entityId": "urn:ngsi-ld:entity:E5",
-            "error": "Entity not found in database."
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
         }
     ],
     "success": [
@@ -389,17 +399,9 @@ Date: REGEX(.*)
 
 11. Attempt to batch delete E1 twice (E1 present twice in the entity id array of the payload body)
 ==================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
 
 
 --TEARDOWN--
