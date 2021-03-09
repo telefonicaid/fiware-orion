@@ -35,10 +35,11 @@ accumulatorStart --pretty-print
 # is in step 05b. This test doesn't include lastSuccess and lastSucessInfo fields, while
 # mq_as_uri_param_for_metadata.test does
 #
-# In step 05 there is a race condition between the creation of the sub document
-# at DB and the notification being sent. The notification being create is the one that wins
-# (empirically checked) so the sub document doesn't exist at the DB when it tries to update
-# the lastSuccess and lastSucessInfo
+# In step 05 there is a race condition between the creation of the csub document
+# at DB and the notification being sent. If the notification being created is the one that wins,
+# the csub document doesn't exist at the DB when it tries to update the lastSuccess and
+# lastSucessInfo. The grep -v in step 05b is for skipping these elements and make the checking
+# valir for both cases. The REGEX in Content-Lenght covers both cases.
 #
 #
 # 01. Create an entity E1 with attr A1 with metadata M1=12
@@ -120,7 +121,7 @@ echo
 
 echo "04. Lookup all entities having A1.M1==12, see E1"
 echo "================================================"
-orionCurl --url '/v2/entities?mq=A1.M1==12'
+orionCurl --url '/v2/entities?mq=A1.M1==12' | grep -v lastSuccess
 echo
 echo
 
@@ -411,7 +412,7 @@ Date: REGEX(.*)
 05b. GET subscription to see 'mq' correctly rendered
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: REGEX((379|442))
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
