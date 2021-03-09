@@ -47,6 +47,7 @@ SET (SOURCES
     kjChildAddOrReplace.cpp
     kjGeojsonEntityTransform.cpp
     kjGeojsonEntitiesTransform.cpp
+    kjEntityArrayErrorPurge.cpp
 )
 
 # Include directories

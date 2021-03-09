@@ -70,6 +70,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
 
@@ -415,6 +416,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
+
+  if (troe == true)
+    kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
 
   return true;
 }
