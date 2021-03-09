@@ -320,9 +320,9 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subCacheItemNotificationErrorStatus - 
+* subNotificationErrorStatus -
 */
-extern void subCacheItemNotificationErrorStatus
+extern void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,

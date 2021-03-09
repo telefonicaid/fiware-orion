@@ -1251,7 +1251,7 @@ void subCacheStart(void)
 extern bool noCache;
 /* ****************************************************************************
 *
-* subCacheItemNotificationErrorStatus - 
+* subNotificationErrorStatus -
 *
 * This function marks a subscription to be erroneous, i.e. notifications are
 * not working.
@@ -1260,7 +1260,7 @@ extern bool noCache;
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus
+void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
