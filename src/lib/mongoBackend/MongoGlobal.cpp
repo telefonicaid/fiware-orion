@@ -207,32 +207,21 @@ void mongoInit
   // Set the global multitenant variable
   multitenant = mtenant;
 
-  double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
-
   if (orion::mongoConnectionPoolInit(dbHost,
-                              dbName.c_str(),
-                              rplSet,
-                              user,
-                              pwd,
-                              mechanism,
-                              authDb,
-                              dbSSL,
-                              mtenant,
-                              tmo,
-                              writeConcern,
-                              dbPoolSize,
-                              mutexTimeStat) != 0)
+                                     dbName.c_str(),
+                                     rplSet,
+                                     user,
+                                     pwd,
+                                     mechanism,
+                                     authDb,
+                                     dbSSL,
+                                     mtenant,
+                                     timeout,
+                                     writeConcern,
+                                     dbPoolSize,
+                                     mutexTimeStat) != 0)
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
-  }
-
-  if (user[0] != 0)
-  {
-    LM_I(("Connected to mongo at %s/%s, as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
-  }
-  else
-  {
-    LM_I(("Connected to mongo at %s/%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
   }
 
   setDbPrefix(dbName);

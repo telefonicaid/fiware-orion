@@ -279,12 +279,12 @@ PaArgument paArgs[] =
   { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBUSER_DESC                  },
   { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBPASSWORD_DESC              },
 
-  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "SCRAM-SHA-1",                PaNL,  PaNL,             DBAUTHMECH_DESC              },
+  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHMECH_DESC              },
   { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHDB_DESC                },
   { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,             DBSSL_DESC                   },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,             DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaDouble, PaOpt, 10000,                           PaNL,  PaNL,             DB_TMO_DESC                  },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     MAX_L,            DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,            DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,             USEIPV4_DESC                 },
@@ -409,14 +409,9 @@ static bool fileExists(char* path)
 */
 int pidFile(bool justCheck)
 {
-  if (harakiri)
+  if ((!harakiri) && (fileExists(pidPath)))
   {
-    // In harakiri mode, we skip pidFile checking for convenience
-    return 0;
-  }
-
-  if (fileExists(pidPath))
-  {
+    // In harakiri mode, we skip pidFile existence checking for convenience
     LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
     return 1;
   }
@@ -1028,9 +1023,9 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
-  if ((strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "MONGODB-CR", strlen("MONGODB-CR")) != 0))
+  if ((strlen(authMech) > 0) && (strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "SCRAM-SHA-256", strlen("SCRAM-SHA-256")) != 0))
   {
-    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or MONGODB-CR"));
+    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or SCRAM-SHA-256"));
   }
 
   if (useOnlyIPv6 && useOnlyIPv4)
@@ -1106,9 +1101,9 @@ int main(int argC, char* argV[])
   }
 
   SemOpType policy = policyGet(reqMutexPolicy);
+  alarmMgr.init(relogAlarms);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
-  alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 

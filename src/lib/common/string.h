@@ -201,4 +201,10 @@ extern void toLowercase(char* s);
 
 
 
+/* ****************************************************************************
+*
+* offuscatePassword -
+*/
+extern std::string offuscatePassword(const std::string& uri, const std::string& pwd);
+
 #endif  // SRC_LIB_COMMON_STRING_H_

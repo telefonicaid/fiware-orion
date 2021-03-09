@@ -64,7 +64,7 @@ class BSONObjBuilder
   void appendElements(orion::BSONObj b);
   int nFields(void) const;
   BSONObj obj(void);
-  BSONObjBuilder& operator= (BSONObjBuilder rhs);
+  BSONObjBuilder& operator= (const BSONObjBuilder& rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   ~BSONObjBuilder(void);
