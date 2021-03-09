@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Ken Zangelin, Gabriel Quaresma
 */
 extern "C"
 {
@@ -65,6 +65,7 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
 
 
@@ -222,7 +223,22 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
         if ((strcmp(aP->name, "id") != 0) && (strcmp(aP->name, "type") != 0))
         {
-          char* longName = orionldContextItemExpand(orionldState.contextP, aP->name, true, NULL);
+          char* longName = aP->name;
+
+          if ((strcmp(aP->name, "location")         == 0) ||
+              (strcmp(aP->name, "observationSpace") == 0) ||
+              (strcmp(aP->name, "operationSpace")   == 0))
+          {
+          }
+          else if ((strcmp(aP->name, "createdAt")  == 0) ||
+                   (strcmp(aP->name, "modifiedAt") == 0))
+          {
+            kjChildRemove(entityP, aP);
+            aP = next;
+            continue;
+          }
+          else
+            longName = orionldContextItemExpand(orionldState.contextP, aP->name, true, NULL);
 
           if (kjStringValueLookupInArray(attrNames, longName) != NULL)
             kjChildRemove(entityP, aP);
@@ -242,9 +258,10 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   else
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);                     // attributeReplace == true => existing attrs are replaced
 
-  KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;
-  mongoRequest.updateActionType  = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppendStrict : ActionTypeAppend;
+  KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+
+  mongoRequest.updateActionType  = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppend : ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
 
@@ -284,25 +301,19 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         entitySuccessPush(successArrayP, entityId);
       else
       {
+        LM_W(("mongoBackend Reports Error for entity '%s': %s",
+              entityId,
+              mongoResponse.contextElementResponseVector.vec[ix]->statusCode.details.c_str()));
+
         entityErrorPush(errorsArrayP,
                         entityId,
                         OrionldBadRequestData,
-                        "",
+                        "MongoBackend Reports Error",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400,
+                        mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code,
                         false);
       }
     }
-
-#if 0
-    for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
-    {
-      const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
-
-      if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
-        entitySuccessPush(successArrayP, entityId);
-    }
-#endif
 
     //
     // Add the success/error arrays to the response-tree
@@ -330,6 +341,9 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
+
+  if (troe == true)
+    kjEntityArrayErrorPurge(incomingTree, errorsArrayP, successArrayP);
 
   return true;
 }

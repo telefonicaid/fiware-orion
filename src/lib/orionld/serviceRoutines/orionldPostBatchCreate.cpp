@@ -68,6 +68,7 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"    // Own Interface
 
 
@@ -320,7 +321,10 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   }
 
   if ((troe == true) && (cloneP != NULL))
+  {
     orionldState.requestTree = cloneP;
+    kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
+  }
 
   return true;
 }

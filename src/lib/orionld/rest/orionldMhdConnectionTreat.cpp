@@ -916,25 +916,19 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         //
         if (orionldTenantLookup(orionldState.tenant) == NULL)
         {
-          LM_TMP(("TROE: Waiting for the Tenant semaphore"));
           sem_wait(&tenantSem);
-          LM_TMP(("TROE: Got the Tenant semaphore"));
           if (orionldTenantLookup(orionldState.tenant) == NULL)  // Second lookup - this time sem-protected
           {
             char prefixed[64];
 
             snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-            LM_TMP(("TROE: Creating Tenant '%s' (prefixed: '%s')", orionldState.tenant, prefixed));
             orionldTenantCreate(prefixed);
 
             if (idIndex == true)
               dbIdIndexCreate(prefixed);
           }
-          else
-            LM_TMP(("TROE: Tenant '%s' already exists", orionldState.tenant));
 
           sem_post(&tenantSem);
-          LM_TMP(("TROE: Released the Tenant semaphore"));
         }
       }
     }
@@ -1095,7 +1089,11 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         kTimeGet(&timestamps.troeStart);
 #endif
 
-        orionldState.serviceP->troeRoutine(ciP);
+        //
+        // If the incoming request an empty array/object, then don't call the TRoE routine
+        //
+        if ((orionldState.verb == DELETE) || ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL)))
+          orionldState.serviceP->troeRoutine(ciP);
 
 #ifdef REQUEST_PERFORMANCE
         kTimeGet(&timestamps.troeEnd);
