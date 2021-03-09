@@ -98,18 +98,9 @@ Date: REGEX(.*)
 
 03. Delete both entities and check success in the response
 ==========================================================
-HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
 
 
 --TEARDOWN--
