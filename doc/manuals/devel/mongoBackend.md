@@ -11,11 +11,10 @@
 	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
 	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
 	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-        * [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
+	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
 	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
-* [Connection pool management](#connection-pool-management)
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
 * [Specific purpose modules](#specific-purpose-modules)
 * [The `MongoGlobal` module](#the-mongoglobal-module)
@@ -33,7 +32,7 @@ The entry points of this library are:
 * From [serviceRoutines](sourceCode.md#srclibserviceroutines) and [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
 * Other entry points from other places as initialization routines and helpers methods.
 
-This library makes an extensive use of [MongoDB C++ driver](http://mongodb.github.io/mongo-cxx-driver/), for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations). You should be familiar with this driver in order to understand how the library works.
+This library makes an extensive use of **mongoDriver** library for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations).
 
 This library is also related to the [cache](sourceCode.md#srclibcache) library (if subscription cache is enabled, i.e. the global `noCache` bool variable is set to `false`), in two different ways: 
 
@@ -595,35 +594,8 @@ _MB-27: mongoRegistrationDelete_
 
 [Top](#top)
 
-### Connection pool management
-
-The module `mongoConnectionPool` manages the database connection pool. How the pool works is important and deserves an explanation. Basically, Orion Context Broker keeps a list of connections to the database (the `connectionPool` defined in `mongoConnectionPool.cpp`). The list is sized with 
-`-dbPoolSize` [CLI parameter](../admin/cli.md) (10 by default). Each element in the list is an object of this type:
-
-```
-typedef struct MongoConnection
-{
-  DBClientBase*  connection;
-  bool           free;
-} MongoConnection;
-```
-
-where `connection` is the actual connection (`DBClientBase` is a class in the MongoDB driver) and `free` a flag to know whether the connection is currently in use or not. This is important, as `DBClientBase` objects are not thread safe (see more details in [this post at StackOverflow](http://stackoverflow.com/questions/33945987/thread-safeness-at-mongodb-c-driver-regarding-indirect-connection-usage-throug)) so the Context Broker logic must ensure that the same connections is not being used by two threads at the same time.
-
-Taking this into account, the main functions within the `mongoConnectionPool` module are (there are more than this, but the rest are secondary modules, related to metrics logic):
-
-* `mongoConnectionPoolInit()`: to initialize the pool, called from the Context Broker bootstrapping logic.
-* `mongoPoolConnectionGet()`: to get a free connection from the pool
-* `mongoPoolConnectionRelease()`: to release a connection, so it returns to the pool and it is ready to be selected again by next call to `mongoConnectionGet()`.
-
-A semaphore system is used to protect connection usage. Have a look at [this separate document](semaphores.md#mongo-connection-pool-semaphores) for details.
-
-[Top](#top)
-
 ### Low-level modules related to database interaction
 
-* `connectionOperations`: a wrapper for database operations (such as insert, find, update, etc.), adding Orion specific aspects (e.g. concurrency management in the database connection pool, error handling, logging, etc.). MongoDB driver methods to interact with the database should not be used directly, but using this module (or expand it if you need an operation that is not covered).
-* `safeMongo`: safe methods to get fields from BSON objects. Direct access to BSON objects using MongoDB driver methods should be avoided, use `safeMongo` module instead (or expand it if you need another way of accessing BSON information that is not covered).
 * `dbConstants` (only `.h`): field names used at database level (the same as described [in the database model documentation](../admin/database_model.md)) are defined here. 
 * `dbFieldsEncoding` (only `.h`): inline helper functions to do encoding at database level and metadata string splitting.
 

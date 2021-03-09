@@ -16,7 +16,8 @@
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
 * [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
-* [src/lib/mongoBackend/](#srclibmongobackend) (Database interface to mongodb, using external library libmongoclient)
+* [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
+* [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSIv1 notifications)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
@@ -382,8 +383,61 @@ This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srcli
 
 ## src/lib/mongoBackend/
 
-The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction takes place. This library is described in detail in [a separate document](mongoBackend.md).
+The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction takes place (through the "wrapping" library **mongoDriver**). This library is described in detail in [a separate document](mongoBacDriver).
 
+[Top](#top)
+
+
+## src/lib/mongoDriver/
+
+This library interfaces with MongoDB, wrapping database operations at driver level and BSON data structures. It is based in the
+[Mongo C driver](https://mongoc.org) but the good thing is that relying in the API provided by this library you can ignore
+the internals of the driver (except if you need to expand this library with new operations or BSON information structures).
+
+This API is provided by the following classes:
+
+* `orion::DBConnection`: implementing a connection to the database
+* `orion::DBCursor`: implementing the DB cursor provided by query and aggregation operations
+* Several classes implementing the different BSON data structures:
+    * `orion::BSONObjBuilder` (builder class for `orion::BSONObj`)
+    * `orion::BSONArayBuilder` (builder class for `orion::BSONArray`)
+    * `orion::BSONElement`
+    * `orion::BSONDate`
+    * `orion::OID`
+
+and the following additional modules:
+
+* `mongoConnectionPool`: provides the functions to initialize the MongoDB connection pool at Orion startup and to get/release
+   connection. More on this on [the section below](#connection-pool-management).
+* `connectionOperations`: a wrapper for database operations (such as insert, find, update, etc.), adding Orion specific aspects (e.g. concurrency management in the database connection pool, error handling, logging, etc.).
+* `safeMongo`: safe methods to get fields from BSON objects.
+
+### Connection pool management
+
+The module `mongoConnectionPool` manages the database connection pool. How the pool works is important and deserves an explanation. Basically, Orion Context Broker keeps a list of connections to the database (the `connectionPool` defined in `mongoConnectionPool.cpp`). The list is sized with 
+`-dbPoolSize` [CLI parameter](../admin/cli.md) (10 by default). Each element in the list is an object of this type:
+
+```
+typedef struct MongoConnection
+{
+  orion::DBConnection  connection;
+  bool                 free;
+} MongoConnection;
+```
+
+where `connection` is the actual connection (a `orion::DBConnection` object) and `free` a flag to know whether the connection is currently in use or not. This is important, as `orion::DBConnection` objects are not thread safe so the Context Broker logic must ensure that the same connections is not being used by two threads at the same time.
+
+Taking this into account, the main functions within the `mongoConnectionPool` module are (there are more than this, but the rest are secondary modules, related to metrics logic):
+
+* `mongoConnectionPoolInit()`: to initialize the pool, called from the Context Broker bootstrapping logic.
+* `mongoPoolConnectionGet()`: to get a free connection from the pool
+* `mongoPoolConnectionRelease()`: to release a connection, so it returns to the pool and it is ready to be selected again by next call to `mongoConnectionGet()`.
+
+A semaphore system is used to protect connection usage. Have a look at [this separate document](semaphores.md#mongo-connection-pool-semaphores) for details.
+
+**NOTE:** this way of managing connections is legacy from an old version of the driver not supporting native pool management. With the
+current driver, native pool management is possible, so maybe we will change implementation in the future to use the native capabilities
+of the driver and simplify our codebase. [Issue #3789](https://github.com/telefonicaid/fiware-orion/issues/3789) is about this.
 
 [Top](#top)
 
