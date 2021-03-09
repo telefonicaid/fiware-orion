@@ -121,7 +121,7 @@ echo
 
 echo "04. Lookup all entities having A1.M1==12, see E1"
 echo "================================================"
-orionCurl --url '/v2/entities?mq=A1.M1==12' | grep -v lastSuccess
+orionCurl --url '/v2/entities?mq=A1.M1==12'
 echo
 echo
 
@@ -158,7 +158,7 @@ echo
 
 echo "05b. GET subscription to see 'mq' correctly rendered"
 echo "===================================================="
-orionCurl --url /v2/subscriptions/$subId
+orionCurl --url /v2/subscriptions/$subId | grep -v lastSuccess
 echo
 echo
 
