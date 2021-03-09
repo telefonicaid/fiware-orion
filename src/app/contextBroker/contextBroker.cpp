@@ -409,14 +409,9 @@ static bool fileExists(char* path)
 */
 int pidFile(bool justCheck)
 {
-  if (harakiri)
+  if ((!harakiri) && (fileExists(pidPath)))
   {
-    // In harakiri mode, we skip pidFile checking for convenience
-    return 0;
-  }
-
-  if (fileExists(pidPath))
-  {
+    // In harakiri mode, we skip pidFile existence checking for convenience
     LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
     return 1;
   }

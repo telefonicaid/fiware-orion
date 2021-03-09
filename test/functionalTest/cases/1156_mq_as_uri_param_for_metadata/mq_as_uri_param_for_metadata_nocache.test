@@ -21,15 +21,26 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-mq as URI param for metadata in filters
+mq as URI param for metadata in filters - no subCache variant
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 --cache
+brokerStart CB 0 IPv4 --noCache
 accumulatorStart --pretty-print
 
 --SHELL--
 
+#
+# The only difference regarding the cache version of this test (mq_as_uri_param_for_metadata.test)
+# is in step 05b. This test doesn't include lastSuccess and lastSucessInfo fields, while
+# mq_as_uri_param_for_metadata.test does
+#
+# In step 05 there is a race condition between the creation of the csub document
+# at DB and the notification being sent. If the notification being created is the one that wins,
+# the csub document doesn't exist at the DB when it tries to update the lastSuccess and
+# lastSucessInfo. The grep -v in step 05b is for skipping these elements and make the checking
+# valir for both cases. The REGEX in Content-Lenght covers both cases.
+#
 #
 # 01. Create an entity E1 with attr A1 with metadata M1=12
 # 02. Create an entity E2 with attr A1 with metadata M1=13
@@ -147,7 +158,7 @@ echo
 
 echo "05b. GET subscription to see 'mq' correctly rendered"
 echo "===================================================="
-orionCurl --url /v2/subscriptions/$subId
+orionCurl --url /v2/subscriptions/$subId | grep -v lastSuccess
 echo
 echo
 
@@ -401,7 +412,7 @@ Date: REGEX(.*)
 05b. GET subscription to see 'mq' correctly rendered
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 442
+Content-Length: REGEX((379|442))
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,8 +427,6 @@ Date: REGEX(.*)
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
-        "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
