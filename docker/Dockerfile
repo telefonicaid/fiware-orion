@@ -117,11 +117,14 @@ RUN \
            # dependencies and doing so will uninstall essential packages
            /usr/share/i18n /usr/{lib,lib64}/gconv \
            && \
+    # FIXME: this yum erase probably needs more tunning. It is based in a CentOS 7 version,
+    # removing libarchive and mpfr from the list, as they were causing problems
+    # (removal of protected packages dnf and systemd)
     yum -y erase git perl* rsync \
-        cmake libarchive \
+        cmake \
         gcc-c++ cloog-ppl cpp gcc glibc-devel glibc-headers \
-        kernel-headers libgomp libstdc++-devel mpfr ppl \
-        scons boost-devel libcurl-devel gnutls-devel libgcrypt-devel \
+        kernel-headers libgomp libstdc++-devel ppl \
+        boost-devel libcurl-devel gnutls-devel libgcrypt-devel \
         clang llvm llvm-libs \
         CUnit-devel CUnit \
         autoconf automake m4 libidn-devel \
