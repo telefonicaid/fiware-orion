@@ -137,8 +137,8 @@ RUN \
     rpm -qa groff | xargs -r rpm -e --nodeps && \
     # Clean yum data
     yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
-    # Rebuild rpm data files
-    rm -f /var/lib/rpm/__db* && rpm -vv --rebuilddb && \
+    # Rebuild rpm data files. FIXME: disabled step, doesn't work in CentOS8 ?
+    #rm -f /var/lib/rpm/__db* && rpm -vv --rebuilddb && \
     # Delete unused locales. Only preserve en_US and the locale aliases
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
