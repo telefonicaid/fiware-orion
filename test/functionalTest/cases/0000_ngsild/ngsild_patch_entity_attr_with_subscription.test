@@ -282,7 +282,7 @@ Content-Type: application/json; charset=utf-8
 07. Attempt to add a property A3 - should be ignored
 ====================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 132
+Content-Length: 87
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -290,7 +290,7 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/A3",
+            "attributeName": "A3",
             "reason": "attribute doesn't exist"
         }
     ],

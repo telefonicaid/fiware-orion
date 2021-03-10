@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/context/orionldContextCacheLookup.h"         // orionldContextCacheLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/troe/troeEntityArrayExpand.h"                // Own interface
 
 
@@ -61,8 +62,10 @@ void troeEntityArrayExpand(KjNode* tree)
 
       if (contextNodeP != NULL)
       {
+        OrionldProblemDetails  pd;
+
         kjChildRemove(entityP, contextNodeP);
-        contextP = orionldContextCacheLookup(contextNodeP->value.s);
+        contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
       }
     }
 

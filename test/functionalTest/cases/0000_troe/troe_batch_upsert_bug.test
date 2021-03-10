@@ -1,0 +1,288 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Possible bug in Batch Upsert, not finding an expansion in a user context that is an array
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB openiot
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_openiot
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Use Batch Upsert to create an entity on tenant openiot, with a user context that is an array
+# 02. See the entity in mongo
+# 03. See TRoE entities in the openiot tenant
+#
+
+echo "01. Use Batch Upsert to create an entity on tenant openiot, with a user context that is an array"
+echo "================================================================================================"
+payload='[
+  {
+    "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
+    "id": "urn:ngsi-ld:Device:filling001",
+    "type": "FillingLevelSensor",
+    "filling": {
+      "type": "Property",
+      "value": {
+        "@type": "Intangible",
+        "@value": null
+      },
+      "unitCode": "C62"
+    },
+    "controllingAsset": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Building:farm001"
+    },
+    "supportedProtocol": {
+      "type": "Property",
+      "value": [
+        "ul20"
+      ]
+    },
+    "description": {
+      "type": "Property",
+      "value": "Barn filling Sensor"
+    },
+    "category": {
+      "type": "Property",
+      "value": [
+        "actuator",
+        "sensor"
+      ]
+    },
+    "controlledProperty": {
+      "type": "Property",
+      "value": [
+        "filling"
+      ]
+    },
+    "add_status": {
+      "type": "Property",
+      "value": {
+        "@type": "commandStatus",
+        "@value": "UNKNOWN"
+      }
+    },
+    "add_info": {
+      "type": "Property",
+      "value": {
+        "@type": "commandResult",
+        "@value": " "
+      }
+    },
+    "remove_status": {
+      "type": "Property",
+      "value": {
+        "@type": "commandStatus",
+        "@value": "UNKNOWN"
+      }
+    },
+    "remove_info": {
+      "type": "Property",
+      "value": {
+        "@type": "commandResult",
+        "@value": " "
+      }
+    }
+  }
+]'
+#
+# "headers": {
+#   "fiware-service": "openiot",
+#   "fiware-servicepath": "/",
+#   "NGSILD-Tenant": "openiot",
+#   "NGSILD-Path": "/",
+#   "Content-Type": "application/ld+json"
+# }
+#
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --tenant openiot --in application/ld+json
+echo
+echo
+
+
+echo "02. See the entity in mongo"
+echo "==========================="
+mongoCmd2 ftest-openiot "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. See TRoE entities in the openiot tenant"
+echo "==========================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" -t ftest_openiot
+echo
+echo
+
+
+--REGEXPECT--
+01. Use Batch Upsert to create an entity on tenant openiot, with a user context that is an array
+================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+02. See the entity in mongo
+===========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Device:filling001",
+		"type" : "https://ngsi-ld-tutorials.readthedocs.io/en/latest/datamodels.html#FillingLevelSensor",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://w3id.org/saref#fillingLevel",
+		"https://uri.etsi.org/ngsi-ld/default-context/controllingAsset",
+		"https://uri.fiware.org/ns/data-models#supportedProtocol",
+		"https://uri.etsi.org/ngsi-ld/description",
+		"https://uri.fiware.org/ns/data-models#category",
+		"https://uri.fiware.org/ns/data-models#controlledProperty",
+		"https://uri.etsi.org/ngsi-ld/default-context/add_status",
+		"https://uri.etsi.org/ngsi-ld/default-context/add_info",
+		"https://uri.etsi.org/ngsi-ld/default-context/remove_status",
+		"https://uri.etsi.org/ngsi-ld/default-context/remove_info"
+	],
+	"attrs" : {
+		"https://w3id=org/saref#fillingLevel" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "Intangible",
+				"@value" : null
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "C62"
+				}
+			},
+			"mdNames" : [
+				"unitCode"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/controllingAsset" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:Building:farm001",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#supportedProtocol" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "ul20",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/description" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Barn filling Sensor",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#category" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : [
+				"actuator",
+				"sensor"
+			],
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#controlledProperty" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "filling",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/add_status" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "commandStatus",
+				"@value" : "UNKNOWN"
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/add_info" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "commandResult",
+				"@value" : " "
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/remove_status" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "commandStatus",
+				"@value" : "UNKNOWN"
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/remove_info" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "commandResult",
+				"@value" : " "
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. See TRoE entities in the openiot tenant
+===========================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:Device:filling001,https://ngsi-ld-tutorials.readthedocs.io/en/latest/datamodels.html#FillingLevelSensor,202REGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB openiot
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_openiot
