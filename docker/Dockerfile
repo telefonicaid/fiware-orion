@@ -119,20 +119,18 @@ RUN \
            && \
     # FIXME: this yum erase probably needs more tunning. It is based in a CentOS 7 version,
     # removing libarchive and mpfr from the list, as they were causing problems
-    # (removal of protected packages dnf and systemd)
-    yum -y erase git perl* rsync \
+    # (removal of protected packages dnf and systemd) and many others resulting in
+    # "No match for argument". See Dockerfile for 2.6.0 if needed to see how this was before
+    yum -y erase git perl* \
         cmake \
-        gcc-c++ cloog-ppl cpp gcc glibc-devel glibc-headers \
-        kernel-headers libgomp libstdc++-devel ppl \
+        gcc-c++ cpp gcc glibc-devel glibc-headers \
+        kernel-headers libgomp libstdc++-devel \
         boost-devel libcurl-devel gnutls-devel libgcrypt-devel \
-        clang llvm llvm-libs \
-        CUnit-devel CUnit \
-        autoconf automake m4 libidn-devel \
-        boost-wave boost-serialization boost-python \
+        boost-wave boost-serialization \
         boost-iostreams boost boost-date-time \
         boost-test boost-graph boost-signals \
         boost-program-options boost-math \
-        openssh openssh-clients libedit hwdata dbus-glib fipscheck* *devel sysvinit-tools \
+        openssh openssh-clients libedit *devel \
         && \
     # Erase without dependencies of the document formatting system (man). This cannot be removed using yum 
     # as yum uses hard dependencies and doing so will uninstall essential packages
@@ -140,7 +138,7 @@ RUN \
     # Clean yum data
     yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
     # Rebuild rpm data files
-    rpm -vv --rebuilddb && \
+    rm -f /var/lib/rpm/__db* && rpm -vv --rebuilddb && \
     # Delete unused locales. Only preserve en_US and the locale aliases
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
     bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
