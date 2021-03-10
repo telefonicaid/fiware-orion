@@ -238,13 +238,32 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     KjNode*  dbAttrP;
     char*    title;
     char*    detail;
+    char*    shortName = newAttrP->name;
 
     next = newAttrP->next;
 
-    if ((strcmp(newAttrP->name, "location")         != 0) &&
-        (strcmp(newAttrP->name, "observationSpace") != 0) &&
-        (strcmp(newAttrP->name, "operationSpace")   != 0) &&
-        (strcmp(newAttrP->name, "observedAt")       != 0))
+    if ((strcmp(newAttrP->name, "createdAt") == 0) || (strcmp(newAttrP->name, "modifiedAt") == 0))
+    {
+      attributeNotUpdated(notUpdatedP, newAttrP->name, "built-in timestamps are ignored");
+      newAttrP = next;
+      continue;
+    }
+    else if ((strcmp(newAttrP->name, "id") == 0) || (strcmp(newAttrP->name, "@id") == 0))
+    {
+      attributeNotUpdated(notUpdatedP, newAttrP->name, "the ID of an entity cannot be altered");
+      newAttrP = next;
+      continue;
+    }
+    else if ((strcmp(newAttrP->name, "type") == 0) || (strcmp(newAttrP->name, "@type") == 0))
+    {
+      attributeNotUpdated(notUpdatedP, newAttrP->name, "the TYPE of an entity cannot be altered");
+      newAttrP = next;
+      continue;
+    }
+    else if ((strcmp(newAttrP->name, "location")         != 0) &&
+             (strcmp(newAttrP->name, "observationSpace") != 0) &&
+             (strcmp(newAttrP->name, "operationSpace")   != 0) &&
+             (strcmp(newAttrP->name, "observedAt")       != 0))
     {
       newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
     }
@@ -253,7 +272,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
     {
       LM_E(("attributeCheck: %s: %s", title, detail));
-      attributeNotUpdated(notUpdatedP, newAttrP->name, detail);
+      attributeNotUpdated(notUpdatedP, shortName, detail);
       newAttrP = next;
       continue;
     }
@@ -264,7 +283,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     dbAttrP = kjLookup(inDbAttrsP, eqName);
     if (dbAttrP == NULL)  // Doesn't already exist - must be discarded
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "attribute doesn't exist");
+      attributeNotUpdated(notUpdatedP, shortName, "attribute doesn't exist");
       newAttrP = next;
       continue;
     }
@@ -274,7 +293,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     // Remove the attribute to be updated (from dbEntityP::inDbAttrsP) and insert the attribute from the payload data
     kjChildRemove(inDbAttrsP, dbAttrP);
     kjChildAdd(inDbAttrsP, newAttrP);
-    attributeUpdated(updatedP, newAttrP->name);
+    attributeUpdated(updatedP, shortName);
 
     ++newAttrs;
     newAttrP = next;

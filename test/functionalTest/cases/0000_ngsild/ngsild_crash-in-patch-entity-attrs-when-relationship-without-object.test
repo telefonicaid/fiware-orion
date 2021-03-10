@@ -76,7 +76,7 @@ Date: REGEX(.*)
 02. Update the attribute R1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs, but without 'object' - see error and make sure no crash
 =============================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 153
+Content-Length: 108
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -84,7 +84,7 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "attributeName": "R1",
             "reason": "Mandatory field missing: Relationship object"
         }
     ],
