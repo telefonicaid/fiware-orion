@@ -76,7 +76,7 @@ RUN \
     cd cmake-build && \
     cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
     make && \
-    sudo make install && \
+    make install && \
     # Install rapidjson from source
     cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
