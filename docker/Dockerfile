@@ -132,6 +132,13 @@ RUN \
         boost-program-options boost-math \
         openssh openssh-clients libedit *devel \
         && \
+    # FIXME: the above yum erase is removing 3 dependencies needed by contextBroker. Probably
+    # some of the boost-* is indirectly removing it, but I don't know which one so I'm reinstalling here
+    yum -y install \
+        boost-thread \
+        boost-filesystem \
+        boost-regex \
+        && \
     # Erase without dependencies of the document formatting system (man). This cannot be removed using yum 
     # as yum uses hard dependencies and doing so will uninstall essential packages
     rpm -qa groff | xargs -r rpm -e --nodeps && \
