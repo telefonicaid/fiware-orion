@@ -73,7 +73,7 @@ Check that everything works with
 ### 2B. MongoDB runs on another docker container
 In case you want to run MongoDB on another container you can launch it like this
 
-	sudo docker run --name mongodb -d mongo:3.4
+	sudo docker run --name mongodb -d mongo:4.4
 
 And then run Orion with this command
 
@@ -107,7 +107,7 @@ Steps:
 4. Run Orion...
 	* Using an automated scenario with docker-compose and building your new image: `sudo docker-compose up`. You may also modify the provided `docker-compose.yml` file if you need so.
 	* Manually, running MongoDB on another container: 
-        	1. `sudo docker run --name mongodb -d mongo:3.4`
+		1. `sudo docker run --name mongodb -d mongo:4.4`
 		2. `sudo docker build -t orion .`
 		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
 	* Manually, specifying where to find your MongoDB host:
