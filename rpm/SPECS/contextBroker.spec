@@ -193,6 +193,18 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
+- Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
+- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
+- Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
+- Fix: avoid over-requesting to CPrs attributes that has been filtered out (#3745)
+- Fix: avoid spureous entities spurious entities (eg. '{"id": "E", "type": "T"}') in GET /v2/entities responses
+- Fix: create normal files as 644 permissions for assure backup tools take configuration files in RPM
+- Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
+- Disable logging to /tmp/contextBroker.log file in Dockerfile
+- Remove: NGSIv1 context availability subscriptions
+
 * Fri Oct 30 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.0-1
 - Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
 - ADD: re-worked INFO log level, simplifying traces and making them much more useful (#3694)
