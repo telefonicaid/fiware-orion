@@ -445,6 +445,27 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(false, NULL, keyValues, &mongoResponse);
 
+  //
+  // Bug for Accept: application/geo+json
+  //
+  // If attrs is used and the Geo-Property is not part of the attrs list, then the GeoProperty will be set to NULL
+  // even though it may exist.
+  //
+  // As it will be really hard to modify mongoBackend to include that attribute that is not asked for (in URI param 'attrs'),
+  // a workaround would be to perform an extra query:
+  //
+  // if (Accept: application/geo+json) && (URI param attrs is in use)
+  //   Get the name of the geo-property (default: location)
+  //   If geo-property is NOT in 'attrs' URI param
+  //     Prepare a query for all entities in orionldState.responseTree, for:
+  //     * _id.id and
+  //     * geo-property
+  //   Now go over the tree (orionldState.responseTree) and replace
+  //     "geometry": null
+  //   with whatever was found in this second query to mongo
+  //
+
+
   if (orionldState.responseTree->value.firstChildP == NULL)
     orionldState.noLinkHeader = true;
 

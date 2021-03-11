@@ -552,7 +552,14 @@ KjNode* mongoCppLegacyEntityRetrieve
     if (geoPropertyName != NULL)
     {
       if (geoPropertyPresent == false)
-        *geoPropertyP = kjLookup(dbAttrsP, geoPropertyName);
+      {
+        KjNode* geoP = kjLookup(dbAttrsP, geoPropertyName);
+
+        if (geoP != NULL)
+          *geoPropertyP = kjLookup(geoP, "value");
+        else
+          *geoPropertyP = NULL;
+      }
     }
 
     if ((includedAttributes == 0) && (attrMandatory == true))
