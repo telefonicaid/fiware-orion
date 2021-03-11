@@ -31,6 +31,25 @@
 #include "orionld/troe/pgConnectionGet.h"                      // Own interface
 
 
+#ifdef PG_CONNECTION_COUNT
+static int connectionCount = 0;
+
+void connectionCountIncr(const char* who, void* connectionP)
+{
+  // Just debugging - no semaphore necessary
+  ++connectionCount;
+  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
+}
+
+void connectionCountDecr(const char* who, void* connectionP)
+{
+  // Just debugging - no semaphore necessary
+  --connectionCount;
+  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
+}
+#endif
+
+
 //
 // FIXME:
 //   typedef struct PgConnection
@@ -45,7 +64,6 @@
 // If none is free (for the dbName in question), another connection is opened.
 //
 
-
 // -----------------------------------------------------------------------------
 //
 // pgConnectionGet - get a connection to a postgres database
@@ -56,8 +74,6 @@
 //
 PGconn* pgConnectionGet(const char* db)
 {
-  LM_TMP(("PGPOOL: connect to db '%s'", db));
-
   // Empty tenant => use default db name
   if ((db != NULL) && (*db == 0))
     db = dbName;
@@ -79,23 +95,39 @@ PGconn* pgConnectionGet(const char* db)
   PGconn*  connectionP;
   snprintf(port, sizeof(port), "%d", troePort);
 
-  if (db != NULL)
-  {
-    const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
-    const char*  values[]     = { troeHost, port,     troeUser, troePwd,     db,       NULL };
+  int attemptNo   = 0;
+  int maxAttempts = 100;
 
-    connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
-  }
-  else
+  while (attemptNo < maxAttempts)
   {
-    const char*  keywords[]   = { "host",   "port",   "user",   "password",  NULL };
-    const char*  values[]     = { troeHost, port,     troeUser, troePwd,     NULL };
+    if (db != NULL)
+    {
+      const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
+      const char*  values[]     = { troeHost, port,     troeUser, troePwd,     db,       NULL };
 
-    connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+    }
+    else
+    {
+      const char*  keywords[]   = { "host",   "port",   "user",   "password",  NULL };
+      const char*  values[]     = { troeHost, port,     troeUser, troePwd,     NULL };
+
+      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+    }
+
+    ++attemptNo;
+    if (connectionP != NULL)
+      break;
+
+    usleep(100000);  // Sleep 0.1 seconds before we try again
   }
 
   if (connectionP == NULL)
     LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, db));
 
+  LM_TMP(("TROE: connected to db '%s', at 0x%x (on connection attempt %d)", db, connectionP, attemptNo));
+#ifdef PG_CONNECTION_COUNT
+  connectionCountIncr("pgConnectionGet", connectionP);
+#endif
   return connectionP;
 }

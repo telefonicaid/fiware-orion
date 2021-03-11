@@ -1,0 +1,103 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Link and Tenant header with Batch Op
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgDrop ftest
+pgDrop ftest_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Create an entity E1 on tenant t1, with the context in the Link header using batch upsert
+# 02. Make sure the postgres db ftest_t1 exists and that the entity and its attrs and all sub-attrs are present
+#
+
+echo "01. Create an entity E1 on tenant t1, with the context in the Link header using batch upsert"
+echo "============================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": 1,
+      "observedAt": "2020-12-19T09:54:00.123Z",
+      "P1_R1": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:relationships:PR"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "NGSILD-Tenant: t1" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. Make sure the postgres db ftest_t1 exists and that the entity and its attrs and all sub-attrs are present"
+echo "============================================================================================================="
+echo "ENTITIES:"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 on tenant t1, with the context in the Link header using batch upsert
+============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+02. Make sure the postgres db ftest_t1 exists and that the entity and its attrs and all sub-attrs are present
+=============================================================================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,http://example.org/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,http://example.org/P1,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+http://example.org/P1_R1,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:PR,,
+
+
+--TEARDOWN--
+brokerStop CB
+pgDrop ftest_t1
+dbDrop CB t1

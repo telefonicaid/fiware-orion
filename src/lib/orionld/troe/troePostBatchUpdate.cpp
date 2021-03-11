@@ -56,22 +56,25 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  connectionP = pgConnectionGet(dbName);
+  connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
-  bool      ok       = true;
-  TroeMode  troeMode = (orionldState.uriParamOptions.noOverwrite == true)? TROE_ATTRIBUTE_APPEND : TROE_ATTRIBUTE_REPLACE;
+  bool      ok                = true;
+  TroeMode  attributeTroeMode = (orionldState.uriParamOptions.noOverwrite == true)? TROE_ATTRIBUTE_APPEND : TROE_ATTRIBUTE_REPLACE;
 
   if (orionldState.duplicateArray != NULL)
   {
     troeEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpdate.cpp has been fixed to do this
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_UPDATE, attributeTroeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;
@@ -89,7 +92,7 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
       if (troeIgnored(entityP) == true)
         continue;
 
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_UPDATE, attributeTroeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;
@@ -102,12 +105,16 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
   {
     LM_E(("Database Error (batch create TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);

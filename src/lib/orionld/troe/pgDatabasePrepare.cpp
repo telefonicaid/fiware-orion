@@ -42,7 +42,7 @@
 //
 bool pgDatabasePrepare(const char* dbName)
 {
-  LM_TMP(("PGPOOL: new tenant '%s'", dbName));
+  LM_TMP(("TROE: new tenant '%s'", dbName));
 
   // Connect to the "NULL" database
   PGconn*         connectionP = pgConnectionGet(NULL);
@@ -51,25 +51,25 @@ bool pgDatabasePrepare(const char* dbName)
   if (status != CONNECTION_OK)
     LM_RE(false, ("Database Error (unable to connect to postgres - connection / status: %p / %d)", connectionP, status));
 
-  LM_TMP(("PGPOOL: creating db '%s'", dbName));
+  LM_TMP(("TROE: creating db '%s'", dbName));
 
   //
   // For now, we just create the Postgres database for the default tenant
   // This will fail if the database already exists - that's OK
-  LM_TMP(("PGPOOL: creating db '%s'", dbName));
+  LM_TMP(("TROE: creating db '%s'", dbName));
   if (pgDatabaseCreate(connectionP, dbName) == false)  // FIXME: return the connection to the new DB ?
   {
-    LM_TMP(("PGPOOL: database '%s' seems to exist already", dbName));
+    LM_TMP(("TROE: database '%s' seems to exist already", dbName));
     pgConnectionRelease(connectionP);
     return true;
   }
-  LM_TMP(("PGPOOL: db '%s' has been created", dbName));
+  LM_TMP(("TROE: db '%s' has been created", dbName));
 
   // Disconnect from the "NULL" DB
   pgConnectionRelease(connectionP);
 
   // Connect to the newly created database
-  LM_TMP(("PGPOOL: connecting to db '%s' to create the tables", dbName));
+  LM_TMP(("TROE: connecting to db '%s' to create the tables", dbName));
 
   connectionP = pgConnectionGet(dbName);
   if (connectionP == NULL)
@@ -78,7 +78,7 @@ bool pgDatabasePrepare(const char* dbName)
   bool r;
   if ((r = pgDatabaseTableCreateAll(connectionP)) == false)
     LM_E(("Database Error (error creating postgres database tables)"));
-  LM_TMP(("PGPOOL: created tables for db '%s'", dbName));
+  LM_TMP(("TROE: created tables for db '%s'", dbName));
 
   pgConnectionRelease(connectionP);
 

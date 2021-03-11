@@ -47,12 +47,15 @@
 //
 bool troePostBatchDelete(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(dbName);
+  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
   bool allGood = true;
   for (KjNode* entityIdP = orionldState.requestTree->value.firstChildP; entityIdP != NULL; entityIdP = entityIdP->next)
@@ -71,12 +74,18 @@ bool troePostBatchDelete(ConnectionInfo* ciP)
   if (allGood == true)
   {
     if (pgTransactionCommit(connectionP) != true)
+    {
+      pgConnectionRelease(connectionP);
       LM_RE(false, ("pgTransactionCommit failed"));
+    }
   }
   else
   {
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
 
   pgConnectionRelease(connectionP);

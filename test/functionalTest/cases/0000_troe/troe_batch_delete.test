@@ -115,7 +115,6 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 103
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -130,19 +129,9 @@ Date: REGEX(.*)
 
 02. Delete E1 and E3 using Batch Delete
 =======================================
-HTTP/1.1 200 OK
-Content-Length: 77
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E1",
-        "urn:ngsi-ld:entities:E3"
-    ]
-}
 
 
 03. See the entities in the temporal database
@@ -157,18 +146,9 @@ Delete,urn:ngsi-ld:entities:E3,NULL,REGEX(202.*)
 
 04. Attempt to delete E2 twice
 ==============================
-HTTP/1.1 200 OK
-Content-Length: 51
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E2"
-    ]
-}
 
 
 05. See the entities in the temporal database - E2 should be deleted only once in TRoE

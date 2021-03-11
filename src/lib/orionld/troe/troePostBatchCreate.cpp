@@ -62,18 +62,21 @@ bool troePostBatchCreate(ConnectionInfo* ciP)
   // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchCreate.cpp has been fixed to do that
   troeEntityArrayExpand(orionldState.requestTree);
 
-  connectionP = pgConnectionGet(dbName);
+  connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
   bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
-    if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_CREATE) == false)
+    if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)
     {
       ok = false;
       break;
@@ -84,12 +87,16 @@ bool troePostBatchCreate(ConnectionInfo* ciP)
   {
     LM_E(("Database Error (batch create TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);

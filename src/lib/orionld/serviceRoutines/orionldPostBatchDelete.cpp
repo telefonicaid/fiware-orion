@@ -39,6 +39,8 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
+#include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
@@ -56,8 +58,9 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 {
   KjNode* success  = kjArray(orionldState.kjsonP, "success");
   KjNode* errors   = kjArray(orionldState.kjsonP, "errors");
-  KjNode* errorObj;
-  KjNode* nodeP;
+
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
 
   if (orionldState.requestTree->type != KjArray)
   {
@@ -93,16 +96,9 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 
 
   //
-  // First get the entities from database to check if they exist
+  // First get the entities from database to check which exist
   //
   KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
-  if (dbEntities == NULL)
-  {
-    LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entities not found", "Entities were not found in database.");
-    return false;
-  }
 
   //
   // Now loop in the array of entities from database and compare each id with the id from requestTree
@@ -113,50 +109,40 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     KjNode*  next     = reqEntityId->next;
     bool     idExists = false;
 
-    for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
+    if (dbEntities != NULL)
     {
-      KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
+      for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
+      {
+        KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
 
-      if (dbEntityId == NULL)
-      {
-        // This can't happen ... however, let's make sure the broker never crashes ...
-      }
-      else if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
-      {
-        idExists = true;
-        break;  // Found - no need to keep searching.
+        if ((dbEntityId != NULL) && (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0))
+        {
+          idExists = true;
+          break;  // Found - no need to keep searching.
+        }
       }
     }
 
     if (idExists == false)
     {
-      // Entity not found. Reporting error.
+      entityErrorPush(errors, reqEntityId->value.s, OrionldResourceNotFound, "Entity not found", NULL, 404, true);
 
-      // entityId field
-      errorObj = kjObject(orionldState.kjsonP, NULL);
-      nodeP    = kjString(orionldState.kjsonP, "entityId", reqEntityId->value.s);
-      kjChildAdd(errorObj, nodeP);
-
-      // error field
-      nodeP    = kjString(orionldState.kjsonP, "error", "Entity not found in database.");
-      kjChildAdd(errorObj, nodeP);
-      kjChildAdd(errors, errorObj);
-
-      // Remove id not found from payload
+      // Remove the not found entity from the incoming payload
       kjChildRemove(orionldState.requestTree, reqEntityId);
     }
     else
-      kjChildAdd(success, reqEntityId);
+      entitySuccessPush(success, reqEntityId->value.s);
 
     reqEntityId = next;
   }
 
 
   //
-  // Eliminate any copies
+  // Eliminate possibly duplicated entity ids
   //
   KjNode* eidP = orionldState.requestTree->value.firstChildP;
   KjNode* next;
+
   while (eidP != NULL)
   {
     next = eidP->next;
@@ -179,16 +165,23 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     eidP = next;
   }
 
+
   //
   // Call batch delete function
   //
-  if (dbEntitiesDelete(orionldState.requestTree) == false)
+  if ((orionldState.requestTree->value.firstChildP != NULL) && (dbEntitiesDelete(orionldState.requestTree) == false))
   {
-    LM_E(("dbEntitiesDelete returned false"));
-    orionldState.httpStatusCode = SccBadRequest;
-    if (orionldState.responseTree == NULL)
-      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntitiesDelete");
+    LM_E(("Database Error (dbEntitiesDelete returned error)"));
+    orionldState.httpStatusCode = 500;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntitiesDelete");
+
     return false;
+  }
+
+  if (errors->value.firstChildP == NULL)
+  {
+    orionldState.responseTree   = NULL;
+    orionldState.httpStatusCode = 204;
   }
   else
   {
@@ -196,7 +189,9 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 
     kjChildAdd(orionldState.responseTree, success);
     kjChildAdd(orionldState.responseTree, errors);
-    orionldState.httpStatusCode = SccOk;
+
+    orionldState.httpStatusCode = 207;
+    ciP->outMimeType = JSON;
   }
 
   return true;

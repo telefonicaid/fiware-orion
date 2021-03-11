@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL
+#include <semaphore.h>                                           // sem_t
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCache.h"                 // Own interface

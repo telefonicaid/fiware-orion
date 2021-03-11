@@ -1,0 +1,109 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Make sure the broker creates the DB for a new tenant
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgDrop ftest
+pgDrop ftest_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# Before starting the broker, the postgres database 'ftest_t1' is dropped.
+# This test is to make sure that Orion-LD creates the database, its types and tables and
+# correctly fills in the three DB tables.
+#
+# 01. Create an entity E1 on tenant t1 using batch upsert
+# 02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+#
+
+echo "01. Create an entity E1 on tenant t1 - making the broker create the postgres db"
+echo "==============================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": 1,
+      "observedAt": "2020-12-19T09:54:00.123Z",
+      "PR": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:relationships:PR"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "NGSILD-Tenant: t1"
+echo
+echo
+
+
+echo "02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present"
+echo "==============================================================================================="
+echo "ENTITIES:"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 on tenant t1 - making the broker create the postgres db
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+===============================================================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:PR,,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1
+pgDrop ftest
+pgDrop ftest_t1

@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgDatabaseCreate.h"                     // Own interface
@@ -49,6 +50,7 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   // Create the database (using an already established connection to the "NULL" database)
   //
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
+  LM_TMP(("TROE: SQL to create database: '%s'", sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));

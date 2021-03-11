@@ -1,4 +1,4 @@
-Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2019 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -130,7 +130,6 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 133
 Content-Type: application/json
-Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

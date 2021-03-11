@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <time.h>                                                // struct timespec
+#include <semaphore.h>                                           // sem_t
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -284,6 +285,7 @@ typedef struct OrionldConnectionState
   KjNode*                 duplicateArray;
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
+  KjNode*                 batchEntities;
 
   //
   // GeoJSON
@@ -376,6 +378,7 @@ extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
+extern sem_t             tenantSem;
 
 
 

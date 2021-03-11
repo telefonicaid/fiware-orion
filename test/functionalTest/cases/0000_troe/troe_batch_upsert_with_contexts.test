@@ -1,0 +1,181 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert with context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Upsert/Create the entity E1, with a user context
+# 02. GET the entity without context (core) and see the longnames of entity-type and attributes
+# 03. See entity in TRoE - make sure the entity type is correctly expanded
+# 04. See the attributes in the temporal database - make sure the attribute names are correctly expanded
+# 05. See the sub-attributes in the temporal database (spoiler - there aren't any)
+
+
+echo "01. Upsert/Create the entity E1, with a user context"
+echo "===================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "SoilSensor",
+    "humidity": {
+      "value": 32,
+      "type": "Property",
+      "unitCode": "P1",
+      "observedAt": "2021-03-05T12:00:40.228Z"
+    },
+    "description": {
+        "value": "Soil Humdity Sensor",
+        "type": "Property",
+        "observedAt": "2021-03-05T12:00:40.228Z"
+    },
+    "category": {
+      "type": "Property",
+      "value": "sensor",
+      "observedAt": "2021-03-05T12:00:40.228Z"
+    },
+    "controlledProperty": {
+      "value": "humidity",
+      "type": "Property",
+      "observedAt": "2021-03-05T12:00:40.228Z"
+    },
+    "supportedProtocol": {
+      "value": "ul20",
+      "type": "Property",
+      "observedAt": "2021-03-05T12:00:40.228Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. GET the entity without context (core) and see the longnames of entity-type and attributes"
+echo "============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "03. See entity in TRoE - make sure the entity type is correctly expanded"
+echo "========================================================================"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "04. See the attributes in the temporal database - make sure the attribute names are correctly expanded"
+echo "======================================================================================================"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo
+
+
+echo "05. See the sub-attributes in the temporal database (spoiler - there aren't any)"
+echo "================================================================================"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Upsert/Create the entity E1, with a user context
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+02. GET the entity without context (core) and see the longnames of entity-type and attributes
+=============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 741
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": {
+        "observedAt": "2021-03-05T12:00:40.228Z",
+        "type": "Property",
+        "value": "Soil Humdity Sensor"
+    },
+    "https://uri.fiware.org/ns/data-models#category": {
+        "observedAt": "2021-03-05T12:00:40.228Z",
+        "type": "Property",
+        "value": "sensor"
+    },
+    "https://uri.fiware.org/ns/data-models#controlledProperty": {
+        "observedAt": "2021-03-05T12:00:40.228Z",
+        "type": "Property",
+        "value": "humidity"
+    },
+    "https://uri.fiware.org/ns/data-models#supportedProtocol": {
+        "observedAt": "2021-03-05T12:00:40.228Z",
+        "type": "Property",
+        "value": "ul20"
+    },
+    "https://w3id.org/saref#humidity": {
+        "observedAt": "2021-03-05T12:00:40.228Z",
+        "type": "Property",
+        "unitCode": "P1",
+        "value": 32
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "https://ngsi-ld-tutorials.readthedocs.io/en/latest/datamodels.html#SoilSensor"
+}
+
+
+03. See entity in TRoE - make sure the entity type is correctly expanded
+========================================================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://ngsi-ld-tutorials.readthedocs.io/en/latest/datamodels.html#SoilSensor,REGEX(202.*)
+
+
+04. See the attributes in the temporal database - make sure the attribute names are correctly expanded
+======================================================================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://w3id.org/saref#humidity,Number,urn:ngsi-ld:entities:E1,f,P1,,,32,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/description,String,urn:ngsi-ld:entities:E1,f,,,Soil Humdity Sensor,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#category,String,urn:ngsi-ld:entities:E1,f,,,sensor,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#controlledProperty,String,urn:ngsi-ld:entities:E1,f,,,humidity,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#supportedProtocol,String,urn:ngsi-ld:entities:E1,f,,,ul20,,,202REGEX(.*)
+
+
+05. See the sub-attributes in the temporal database (spoiler - there aren't any)
+================================================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME

@@ -58,8 +58,10 @@ void troeEntityExpand(KjNode* entityP)
       attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
       LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
     }
-    else if (strcmp(attrP->name, "id")       == 0) {}
-    else if (strcmp(attrP->name, "location") == 0) {}
+    else if (strcmp(attrP->name, "id")               == 0) {}
+    else if (strcmp(attrP->name, "location")         == 0) {}
+    else if (strcmp(attrP->name, "observationSpace") == 0) {}
+    else if (strcmp(attrP->name, "operationSpace")   == 0) {}
     else
     {
       attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
@@ -116,7 +118,7 @@ bool troePostEntities(ConnectionInfo* ciP)
   LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
   char* entityId   = orionldState.payloadIdNode->value.s;
   char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
-  if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE) == false)
+  if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)

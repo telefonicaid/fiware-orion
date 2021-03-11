@@ -135,7 +135,7 @@ Date: REGEX(.*)
 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 181
+Content-Length: 91
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -143,12 +143,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "attributeName": "P2",
             "reason": "attribute doesn't exist"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/P1"
+        "P1"
     ]
 }
 

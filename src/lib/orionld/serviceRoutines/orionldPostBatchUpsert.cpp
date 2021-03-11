@@ -70,6 +70,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
 
@@ -137,6 +138,9 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 //
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
   //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)
@@ -179,6 +183,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
+  orionldState.batchEntities = idTypeAndCreDateFromDb;  // So that TRoE knows what entities existed prior to the upsert call
+  LM_TMP(("orionldState.batchEntities at %p", orionldState.batchEntities));
   //
   // 03. Creation Date from DB entities, and type-check
   //
@@ -404,15 +410,15 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
-  {
     orionldState.httpStatusCode = SccMultiStatus;
-    orionldState.noLinkHeader   = true;
-  }
   else
   {
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
+
+  if (troe == true)
+    kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
 
   return true;
 }

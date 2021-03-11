@@ -1,0 +1,173 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity with all types of Attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Batch Create an entity E1 with the context in the payload body
+# 02. See the entity in the temporal database
+# 03. See the attribute in the temporal database
+# 04. Batch Upsert E1 and E2, with the context in the payload body
+# 05. See the entities in the temporal database
+# 06. See the attributes in the temporal database
+#
+
+echo "01. Batch Create an entity with the context in the payload body"
+echo "==============================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "P1": {
+      "type": "Property",
+      "value": "P1 of E1",
+      "observedAt": "2021-03-03T18:14:42.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See the entity in the temporal database"
+echo "==========================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attribute in the temporal database"
+echo "=============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. Batch Upsert E1 and E2, with the context in the payload body"
+echo "================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "P1": {
+      "type": "Property",
+      "value": "P1 of E1 - again",
+      "observedAt": "2021-03-03T18:15:42.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "P1": {
+      "type": "Property",
+      "value": "P1 of E2",
+      "observedAt": "2021-03-03T18:15:42.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. See the entities in the temporal database"
+echo "============================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "06. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Create an entity with the context in the payload body
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 51
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
+
+
+02. See the entity in the temporal database
+===========================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,http://example.org/T
+
+
+03. See the attribute in the temporal database
+==============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1,,,,2021-03-03 18:14:42.123
+
+
+04. Batch Upsert E1 and E2, with the context in the payload body
+================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See the entities in the temporal database
+=============================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,http://example.org/T
+Replace,urn:ngsi-ld:entities:E1,http://example.org/T
+Create,urn:ngsi-ld:entities:E2,http://example.org/T
+
+
+06. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1,,,,2021-03-03 18:14:42.123
+Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1 - again,,,,2021-03-03 18:15:42.123
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,,P1 of E2,,,,2021-03-03 18:15:42.123
+
+
+--TEARDOWN--
+brokerStop CB
+pgDrop $CB_DB_NAME
+dbDrop CB

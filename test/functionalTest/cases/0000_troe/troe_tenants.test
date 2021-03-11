@@ -27,6 +27,7 @@ Make sure the broker creates the DB for a new tenant
 export BROKER=orionld
 dbInit CB
 dbInit CB t1
+pgDrop ftest
 pgDrop ftest_t1
 brokerStart CB 100 IPv4 -troe -multiservice
 
@@ -102,5 +103,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 --TEARDOWN--
 brokerStop CB
+pgDrop ftest
 pgDrop ftest_t1
 dbDrop CB
+dbDrop CB t1

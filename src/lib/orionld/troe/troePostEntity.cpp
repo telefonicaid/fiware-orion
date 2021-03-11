@@ -73,26 +73,32 @@ bool troePostEntity(ConnectionInfo* ciP)
   if (orionldState.uriParamOptions.noOverwrite == true)
     return troePostEntityNoOverwrite(ciP);
 
-  PGconn* connectionP = pgConnectionGet(dbName);
+  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
   char* entityId   = orionldState.wildcard[0];
   char* entityType = (char*) "REPLACE";
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ATTRIBUTE_REPLACE) == false)
+
+  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ENTITY_UPDATE, TROE_ATTRIBUTE_REPLACE) == false)
   {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("Database Error (post entities TRoE layer failed)"));
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);
