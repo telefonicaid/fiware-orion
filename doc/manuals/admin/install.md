@@ -15,14 +15,16 @@
 
 ## Introduction
 
-The recommended procedure is to install using RPM packages in CentOS 7.x. If you are interested in
-building from sources, check [this document](build_source.md).
+The recommended procedure is to install using the official [Orion docker container at dockerhub](https://hub.docker.com/r/fiware/orion/).
+
+However, if you don't have a docker-ized infrastructure, the recommended procedure is to install
+using RPM packages in CentOS 8.x. If you are interested in building from sources, check [this document](build_source.md).
 
 ## Requirements
 
 * System resources: see [these recommendations](diagnosis.md#resource-availability)
-* Operating system: CentOS/RedHat. The reference operating system is CentOS 7.4.1708
-  but it should work also in any later CentOS/RedHat 7.x version.
+* Operating system: CentOS/RedHat. The reference operating system is CentOS 8.3.2011
+  but it should work also in any later CentOS/RedHat 8.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version
   is 4.4 (Orion may work with older versions but we don't recommend it at all!).
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):

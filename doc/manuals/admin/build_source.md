@@ -1,17 +1,17 @@
 # Building from sources
 
-Orion Context Broker reference distribution is CentOS 7.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 7.x; the others are provided "as is" and can get obsolete from time to time.
+Orion Context Broker reference distribution is CentOS 8.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 8.x; the others are provided "as is" and can get obsolete from time to time.
 
-## CentOS 7.x (officially supported)
+## CentOS 8.x (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
-* boost: 1.53
+* boost: 1.66
 * libmicrohttpd: 0.9.70 (from source)
-* libcurl: 7.29.0
-* openssl: 1.0.2k
-* libuuid: 2.23.2
-* Mongo Driver: legacy-1.1.2 (from source)
+* libcurl: 7.61.1
+* openssl: 1.1.1g
+* libuuid: 2.32.1
+* Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -21,7 +21,7 @@ commands that require root privilege):
 
 * Install the needed building tools (compiler, etc.).
 
-        sudo yum install make cmake gcc-c++ scons
+        sudo yum install make cmake gcc-c++
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
@@ -29,11 +29,14 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
-        tar xfvz legacy-1.1.2.tar.gz
-        cd mongo-cxx-driver-legacy-1.1.2
-        scons  --use-sasl-client --ssl                                        # The build/linux2/normal/libmongoclient.a library is generated as outcome
-        sudo scons install --prefix=/usr/local --use-sasl-client --ssl        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz
+        tar xfvz mongo-c-driver-1.17.4.tar.gz
+        cd mongo-c-driver-1.17.4
+        mkdir cmake-build
+        cd cmake-build
+        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        make
+        sudo make install
 
 * Install rapidjson from sources:
 
@@ -51,18 +54,6 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
-
-        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
-        tar xfvj gmock-1.5.0.tar.bz2
-        cd gmock-1.5.0
-        ./configure
-        make
-        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
-        sudo ldconfig      # just in case... it doesn't hurt :)
-
-In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt using yum, and run `./configure` with `--build=arm-linux` option.
-
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
         sudo yum install git
@@ -73,9 +64,7 @@ In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt usi
         cd fiware-orion
         make
 
-* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB as the unit and functional tests
-rely on mongod running in localhost. Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
-for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
+* (Optional but highly recommended) run unit test and functional tests. More on this on [its specific section below](#testing-coverage-and-rpm).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
@@ -85,48 +74,61 @@ for details. Recommended version is 4.4 (it may work with previous versions, but
 
         contextBroker --version
 
-The Orion Context Broker comes with a suite of functional, valgrind and end-to-end tests that you can also run, following the following procedure (optional):
+### Testing, coverage and RPM
 
-* To install mongodb-org-shell using yum, create a /etc/yum.repos.d/mongodb.repo file.
+The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tests that you can also run, following the following procedure (optional but highly recommended):
 
-        [mongodb-org-4.4]
-        name=MongoDB Repository
-        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.4/x86_64/
-        gpgcheck=1
-        enabled=1
-        gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-* Install the required tools:
+        sudo yum install python2
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
+        tar xfvj gmock-1.5.0.tar.bz2
+        cd gmock-1.5.0
+        ./configure
+        make
+        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # just in case... it doesn't hurt :)
 
-        sudo yum install python python-pip curl nc mongodb-org-shell valgrind bc
-        sudo pip install --upgrade pip
+In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt using yum, and run `./configure` with `--build=arm-linux` option.
+
+* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
+
+* Run unit test
+
+        make unit_test
+
+* Install aditional required tools for functional and valgrind tests:
+
+        sudo yum install curl nc valgrind bc
+        sudo pip2 install virtualenv
 
 In the case of the aarch64 architecture, additionally install python-devel and libffi-devel using yum. It is needed when building pyOpenSSL.
 
-* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment to use Flask version 1.0.2 instead of default Flask in CentOS7. Run test harness in this environment.
+* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        pip install virtualenv
-        virtualenv /opt/ft_env
+        virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
         pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
-* Run test harness (it takes some time, please be patient).
+* Run test harness in this environment (it takes some time, please be patient).
 
         make functional_test INSTALL_DIR=~
 
 * Once passed all the functional tests, you can run the valgrind tests (this will take longer than the functional tests, arm yourself with a lot of patience):
 
-        make valgrind
+        make valgrind INSTALL_DIR=~
 
 You can generate coverage reports for the Orion Context Broker using the following procedure (optional):
 
 * Install the lcov tool
 
-        sudo yum install lcov
+        # Download .rpm file from http://downloads.sourceforge.net/ltp/lcov-1.14-1.noarch.rpm
+        sudo yum install lcov-1.14-1.noarch.rpm
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
@@ -147,6 +149,9 @@ You can generate the RPM for the source code (optional):
 * The generated RPMs are placed in directory `~/rpmbuild/RPMS/x86_64`.
 
 ## Ubuntu 18.04 LTS
+
+**FIXME:** this section needs to be reviewed taking into account
+the new procedure to install the mongo C driver.
 
 This instruction is how to build the Orion Context Broker for the x86_64 or the aarch64 architecture on Ubuntu 18.04 LTS.
 And it includes the instruction to build MongoDB 4.4 that the Orion depends on.

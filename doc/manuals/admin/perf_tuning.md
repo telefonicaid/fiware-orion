@@ -3,6 +3,7 @@
 * [MongoDB configuration](#mongodb-configuration)
 * [Database indexes](#database-indexes)
 * [Write concern](#write-concern)
+* [MongoDB driver performance counters](#mongodb-driver-performance-counters)
 * [Notification modes and performance](#notification-modes-and-performance)
 * [Updates flow control mechanism](#updates-flow-control-mechanism)
 * [Payload and message size and performance](#payload-and-message-size-and-performance)
@@ -88,6 +89,33 @@ wait to get confirmation, so it can execute write-operations much faster.
 Note however that there is a tradeoff between performance and reliability. Using "unacknowledged" write
 concern you get better performance, but the risk to lose information is higher (as Orion doesn't get any
 confirmation that the write operation was successful).
+
+[Top](#top)
+
+## MongoDB driver performance counters
+
+The MongoDB driver used by Orion has a nice feature that allows to get some performance counters
+related with DB.
+
+To use this feature you need the `mongoc-stat` tool that comes with the driver, so you would need
+to install de driver following the steps described in [this documentation](build_source.md).
+
+Get the PID of the contextBroker process, e.g.:
+
+```
+ps ax | grep contextBroker
+```
+
+Next, run the `mongoc-stat` tool with that PID as parameter, e.g.:
+
+```
+mongoc-stat <contextBroker PID>
+```
+
+You can disable the generation of peformance counters using `MONGOC_DISABLE_SHM=true` at contextBroker startup.
+
+More information about the available counters and this feature in general can be found in the
+[driver official documentation](http://mongoc.org/libmongoc/current/basic-troubleshooting.html#performance-counters).
 
 [Top](#top)
 
