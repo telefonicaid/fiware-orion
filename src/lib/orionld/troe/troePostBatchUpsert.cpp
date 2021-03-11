@@ -156,18 +156,16 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
   {
     LM_E(("Database Error (batch create TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
-    {
-      pgConnectionRelease(connectionP);
-      LM_RE(false, ("pgTransactionRollback failed"));
-    }
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-    {
-      pgConnectionRelease(connectionP);
-      LM_RE(false, ("pgTransactionCommit failed"));
-    }
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);

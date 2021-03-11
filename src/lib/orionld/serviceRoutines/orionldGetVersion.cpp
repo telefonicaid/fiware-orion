@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <postgresql/libpq-fe.h>                               // Postgres
+#include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
 #include <boost/version.hpp>                                   // BOOST_LIB_VERSION
 #include <microhttpd.h>                                        // MHD_VERSION (returns a number)
 #include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
 #include <mongo/version.h>                                     // MONGOCLIENT_VERSION
 #include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
-#include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 extern "C"
 {
@@ -50,6 +51,8 @@ extern "C"
 #include "cache/subCache.h"                                    // subCacheItems
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
+#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
+#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
 
@@ -73,6 +76,26 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
   snprintf(buff, buflen, "%x.%x.%x-%x", major, minor, bugfix, revision);
 }
 
+
+
+// -----------------------------------------------------------------------------
+//
+// pgVersionToString -
+//
+static void pgVersionToString(int version, char* versionString, int versionStringSize)
+{
+  int major;
+  int minor;
+  int bugfix;
+
+  major    = version / 10000;
+  version -= major * 10000;
+  minor    = version / 100;
+  version -= minor * 100;
+  bugfix   = version;
+
+  snprintf(versionString, versionStringSize - 1, "%d.%d.%d", major, minor, bugfix);
+}
 
 
 
@@ -128,10 +151,47 @@ bool orionldGetVersion(ConnectionInfo* ciP)
     nodeP = kjString(orionldState.kjsonP, "libcurl version", curlVersionP->version);
   else
     nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
-
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  //
+  // libuuid
+  //
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  if (troe)
+  {
+    //
+    // Postgres Client Lib
+    //
+    int     pgLibVersion = PQlibVersion();
+    char    pgLibVersionString[32];
+
+    pgVersionToString(pgLibVersion, pgLibVersionString, sizeof(pgLibVersionString));
+    nodeP = kjString(orionldState.kjsonP, "postgres libpq version", pgLibVersionString);
+    kjChildAdd(orionldState.responseTree, nodeP);
+
+    //
+    // Postgres Server
+    //
+    PGconn* connectionP     = pgConnectionGet(NULL);
+    int     pgServerVersion = -1;
+    char    pgServerVersionString[32];
+
+    if (connectionP != NULL)
+    {
+      pgServerVersion = PQserverVersion(connectionP);
+      pgConnectionRelease(connectionP);
+
+      pgVersionToString(pgServerVersion, pgServerVersionString, sizeof(pgServerVersionString));
+    }
+    else
+      strncpy(pgServerVersionString, "UNKNOWN", sizeof(pgServerVersionString) - 1);
+
+    nodeP = kjString(orionldState.kjsonP, "postgres server version", pgServerVersionString);
+    kjChildAdd(orionldState.responseTree, nodeP);
+  }
+
 
   // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);

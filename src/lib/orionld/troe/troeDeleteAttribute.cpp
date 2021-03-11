@@ -51,7 +51,10 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
     LM_RE(false, ("no connection to postgres at %s", orionldState.tenant));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
   char* entityId      = orionldState.wildcard[0];
   char* attributeName = orionldState.wildcard[1];
@@ -63,13 +66,18 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.requestTimeString) == false)
   {
     LM_E(("Database Error (delete attribute troe layer failed)"));
+
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);

@@ -26,7 +26,7 @@ Test of orionld version service, with branch name
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0-255 IPv3 -troe
 
 --SHELL--
 
@@ -80,6 +80,8 @@ Date: REGEX(.*)
   "rapidjson version": "REGEX(.*)",
   "libcurl version": "REGEX(.*)",
   "libuuid version": "UNKNOWN",
+  "postgres libpq version": "REGEX(.*)",
+  "postgres server version": "REGEX(.*)",
   "branch": "REGEX(.*)",
   "cached subscriptions": 0,
   "Next File Descriptor": REGEX(\d+)
