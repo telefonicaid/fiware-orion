@@ -29,12 +29,17 @@
 
 
 
+#ifdef PG_CONNECTION_COUNT
+extern void connectionCountDecr(const char* who, void* connectionP);
+#endif
 // -----------------------------------------------------------------------------
 //
 // pgConnectionRelease - release a connection to a postgres database
 //
 void pgConnectionRelease(PGconn* connectionP)
 {
-  LM_TMP(("TROE: disconnecting the connection at 0x%x", connectionP));
   PQfinish(connectionP);
+#ifdef PG_CONNECTION_COUNT
+  connectionCountDecr("pgConnectionRelease", connectionP);
+#endif
 }
