@@ -361,7 +361,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     for (int ix = 0; ix < vecItems; ix++)
     {
-      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], true, NULL);
+      const char* longName = shortNameVector[ix];
+
+      if ((strcmp(longName, "location")         != 0) &&
+          (strcmp(longName, "observationSpace") != 0) &&
+          (strcmp(longName, "operationSpace")   != 0))
+      {
+        longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], true, NULL);
+      }
 
       mongoRequest.attributeList.push_back(longName);
     }
