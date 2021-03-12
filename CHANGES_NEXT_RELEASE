@@ -14,3 +14,4 @@
 * Issue  #737   Removed the check for forbidden characters in variable names in the 'q' URL parameter
 * Issue  #280   Fixed the response code and payload body of BATCH Delete
 * Issue  #280   GET /entities?coordinates=[] didn't allow for the altitude to be present
+* Issue  #280   Bugfix - location was not included in the response for GET /entities?attrs=X,location

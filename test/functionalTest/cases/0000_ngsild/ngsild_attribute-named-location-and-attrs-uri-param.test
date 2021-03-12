@@ -1,0 +1,205 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+An attribute named 'location' and URI param attrs including location
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with a GeoProperty named 'location', and two more attributes
+# 02. Check db content, make sure 'location' is not expanded
+# 03. GET entities, using URI param attrs='stocks,location' - see both attributes
+# 04. GET entities, using URI param attrs='stocks,location' with key-values - see oth attributes
+#
+
+echo "01. Create an entity with a GeoProperty named 'location', and two more attributes"
+echo "================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:issue231",
+  "type": "Test",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 2 ]
+    }
+  },
+  "locatedIn": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store001"
+  },
+  "stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Check db content, make sure 'location' is not expanded"
+echo "=========================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET entities, using URI param attrs='stocks,location' - see both attributes"
+echo "==============================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=Test&attrs=stocks,location"
+echo
+echo
+
+
+echo "04. GET entities, using URI param attrs='stocks,location' with key-values - see both attributes"
+echo "==============================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=Test&attrs=stocks,location&options=keyValues"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a GeoProperty named 'location', and two more attributes
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:issue231
+Date: REGEX(.*)
+
+
+
+02. Check db content, make sure 'location' is not expanded
+==========================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:test:issue231",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Test",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location",
+		"https://uri.etsi.org/ngsi-ld/default-context/locatedIn",
+		"https://uri.etsi.org/ngsi-ld/default-context/stocks"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					1,
+					2
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/locatedIn" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:Building:store001",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/stocks" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:Product:001",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET entities, using URI param attrs='stocks,location' - see both attributes
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 197
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:test:issue231",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2
+                ],
+                "type": "Point"
+            }
+        },
+        "stocks": {
+            "object": "urn:ngsi-ld:Product:001",
+            "type": "Relationship"
+        },
+        "type": "Test"
+    }
+]
+
+
+04. GET entities, using URI param attrs='stocks,location' with key-values - see both attributes
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:test:issue231",
+        "location": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        },
+        "stocks": "urn:ngsi-ld:Product:001",
+        "type": "Test"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
