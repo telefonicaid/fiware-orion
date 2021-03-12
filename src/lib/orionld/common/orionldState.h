@@ -290,7 +290,8 @@ typedef struct OrionldConnectionState
   //
   // GeoJSON
   //
-  KjNode*                 geoPropertyNode;
+  KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty
+  bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response
 } OrionldConnectionState;
 
 
