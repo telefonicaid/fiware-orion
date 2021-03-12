@@ -354,7 +354,7 @@ int Scope::fill
 
     coords = stringSplit(pointStringV[ix], ',', coordV);
 
-    if ((coords != 2) && (geometry.areaType == "point"))
+    if ((coords != 2) && (coords != 3) && (geometry.areaType == "point"))
     {
       *errorStringP = "invalid coordinates for point";
       LM_E(("geometry.parse: %s (%d coords)", errorStringP->c_str(), coords));

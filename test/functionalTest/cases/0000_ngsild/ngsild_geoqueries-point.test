@@ -98,7 +98,7 @@ echo
 
 echo "04. Geoquery with Max Distance 15 - nothing found"
 echo "================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.7,40.4,0\]&georel=near;maxDistance==15'
 echo
 echo
 
