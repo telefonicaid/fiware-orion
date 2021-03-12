@@ -32,6 +32,7 @@ extern "C"
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjObject, ...
+#include "kjson/kjRender.h"                                        // TmP
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
@@ -495,7 +496,23 @@ KjNode* mongoCppLegacyEntityRetrieve
     else  // No datasets - simply use dbAttrsP
       attrTree = dbAttrsP;
 
-    *geoPropertyP = kjLookup(dbAttrsP, geoPropertyName);
+
+    // Is it really a GeoProperty?
+    *geoPropertyP = NULL;
+
+    KjNode* geoP = kjLookup(dbAttrsP, geoPropertyName);
+
+    if ((geoP != NULL) && (geoP->type == KjObject))
+    {
+      KjNode* typeP = kjLookup(geoP, "type");
+
+      if ((typeP != NULL) && (typeP->type == KjString) && (strcmp(typeP->value.s, "GeoProperty") == 0))
+        *geoPropertyP = geoP;
+      else
+        orionldState.geoPropertyMissing = true;
+    }
+    else
+      orionldState.geoPropertyMissing = true;
   }
   else  // Filter attributes according to the 'attrs' URI param
   {
@@ -505,7 +522,7 @@ KjNode* mongoCppLegacyEntityRetrieve
     KjNode* datasetP;
     int     includedAttributes = 0;
     int     ix                 = 0;
-    bool    geoPropertyPresent = false;
+    bool    geoPropertyPresent = false;  // The special geo-property is present in the attrs list (URI param)
 
     while (attrs[ix] != NULL)
     {
@@ -549,10 +566,17 @@ KjNode* mongoCppLegacyEntityRetrieve
       ++ix;
     }
 
-    if (geoPropertyName != NULL)
+    if ((geoPropertyName != NULL) && (geoPropertyPresent == false))
     {
-      if (geoPropertyPresent == false)
-        *geoPropertyP = kjLookup(dbAttrsP, geoPropertyName);
+      KjNode* geoP = kjLookup(dbAttrsP, geoPropertyName);
+
+      if (geoP != NULL)
+      {
+        KjNode* typeP = kjLookup(geoP, "type");
+
+        if ((typeP != NULL) && (strcmp(typeP->value.s, "GeoProperty") == 0))
+          *geoPropertyP = kjLookup(geoP, "value");
+      }
     }
 
     if ((includedAttributes == 0) && (attrMandatory == true))

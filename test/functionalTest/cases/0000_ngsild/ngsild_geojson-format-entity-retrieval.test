@@ -41,6 +41,8 @@ brokerStart CB 0-255
 # 08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)
 # 09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values
 # 10. Attempts to retrieve non-existing E2 in GeoJSON format
+# 11. Retrieve Entity with geo+json, attrs (without location) and key-values
+# 12. Retrieve Entity with geo+json, attrs (with location) and key-values
 #
 
 echo "01. Create an entity with a location GeoProperty"
@@ -135,6 +137,20 @@ echo
 echo "10. Attempts to retrieve non-existing E2 in GeoJSON format"
 echo "=========================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:E2 --out "application/geo+json"
+echo
+echo
+
+
+echo "11. Retrieve Entity with geo+json, attrs (without location) and key-values"
+echo "=========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid?attrs=P1,R1&options=keyValues' --out "application/geo+json"
+echo
+echo
+
+
+echo "12. Retrieve Entity with geo+json, attrs (with location) and key-values"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid?attrs=P1,R1,location&options=keyValues' --out "application/geo+json"
 echo
 echo
 
@@ -534,6 +550,65 @@ Date: REGEX(.*)
     "detail": "urn:ngsi-ld:E2",
     "title": "Entity Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+11. Retrieve Entity with geo+json, attrs (without location) and key-values
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 238
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:City:Madrid",
+    "properties": {
+        "P1": 12,
+        "R1": "urn:xxx",
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+12. Retrieve Entity with geo+json, attrs (with location) and key-values
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            -3.691944,
+            40.418889
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:City:Madrid",
+    "properties": {
+        "P1": 12,
+        "R1": "urn:xxx",
+        "location": {
+            "coordinates": [
+                -3.691944,
+                40.418889
+            ],
+            "type": "Point"
+        },
+        "type": "City"
+    },
+    "type": "Feature"
 }
 
 
