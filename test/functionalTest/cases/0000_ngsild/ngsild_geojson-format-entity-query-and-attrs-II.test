@@ -1,0 +1,443 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity query in the GeoJSON format WITH URI param attrs not including the geometryProperty, that is location
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity farm001, with 4 attrs, incl location
+# 02. Create entity barn002, with 4 attrs, incl location
+# 03. GET /entities, as geo+json (location is the default Geo-Property)
+# 04. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address
+# 05. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address,location
+#
+
+echo "01. Create entity farm001, with 4 attrs, incl location"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Building:farm001",
+  "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": ["farm"]
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Grosser Stern",
+      "addressRegion": "Berlin",
+      "addressLocality": "Tiergarten",
+      "postalCode": "10557"
+    },
+    "verified": {
+      "type": "Property",
+      "value": true
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Victory Farm"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3505, 52.5144]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity barn002, with 4 attrs, incl location"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Building:barn002",
+  "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": ["barn"]
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Strasse",
+      "addressRegion": "Berlin",
+      "addressLocality": "Tiergarten",
+      "postalCode": "10557"
+    },
+    "verified": {
+      "type": "Property",
+      "value": true
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3698, 52.5163]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Big Red Barn"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /entities, as geo+json (location is the default Geo-Property)"
+echo "====================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Building' --out "application/geo+json"
+echo
+echo
+
+
+echo "04. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address"
+echo "======================================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?attrs=category,address --out "application/geo+json"
+echo
+echo
+
+
+echo "05. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address,location"
+echo "==============================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?attrs=category,address,location --out "application/geo+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity farm001, with 4 attrs, incl location
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:farm001
+Date: REGEX(.*)
+
+
+
+02. Create entity barn002, with 4 attrs, incl location
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002
+Date: REGEX(.*)
+
+
+
+03. GET /entities, as geo+json (location is the default Geo-Property)
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 1237
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3505,
+                    52.5144
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:farm001",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Grosser Stern"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "farm"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            13.3505,
+                            52.5144
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "name": {
+                    "type": "Property",
+                    "value": "Victory Farm"
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        },
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3698,
+                    52.5163
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:barn002",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Strasse"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "barn"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            13.3698,
+                            52.5163
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "name": {
+                    "type": "Property",
+                    "value": "Big Red Barn"
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+04. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 955
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3505,
+                    52.5144
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:farm001",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Grosser Stern"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "farm"
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        },
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3698,
+                    52.5163
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:barn002",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Strasse"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "barn"
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+05. GET /entities, as geo+json (location is the default Geo-Property), and with attrs=category,address,location
+===============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1137
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3505,
+                    52.5144
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:farm001",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Grosser Stern"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "farm"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            13.3505,
+                            52.5144
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        },
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    13.3698,
+                    52.5163
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:Building:barn002",
+            "properties": {
+                "address": {
+                    "type": "Property",
+                    "value": {
+                        "addressLocality": "Tiergarten",
+                        "addressRegion": "Berlin",
+                        "postalCode": "10557",
+                        "streetAddress": "Strasse"
+                    },
+                    "verified": {
+                        "type": "Property",
+                        "value": true
+                    }
+                },
+                "category": {
+                    "type": "Property",
+                    "value": "barn"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            13.3698,
+                            52.5163
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "Building"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

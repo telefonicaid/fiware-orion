@@ -288,10 +288,14 @@ typedef struct OrionldConnectionState
   KjNode*                 batchEntities;
 
   //
-  // GeoJSON
+  // GeoJSON - help vars for the case:
+  // - Accept: application/geo+json
+  // - URI param 'attrs' used
+  // - The geometryproperty is not part of 'attrs' URI param
   //
-  KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty
-  bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response
+  KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty (for Retrieve Entity only)
+  bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response (for Retrieve Entity only)
+  KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
 } OrionldConnectionState;
 
 
