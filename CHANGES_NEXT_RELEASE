@@ -1,6 +1,5 @@
 * Issue  #280   Implemented a native function for conversion from BSON to a KjNode tree - to gain performance
 * Issue  #280   Implemented GET /types with options=details
-* Issue  #280   Now supporting response in geojson format for Retrieve/Query Entity for Accept: application/geo+json
 * Issue  #280   Much faster response rendering function, giving a performance bump
 * Issue  #280   GeoJSON formated response for GET /entities and GET /entities/{EID}, if Accept header set to "application/geo+json"
 * Issue  #280   GeoJSON formated notifications, if notification:endpoint:accept is set to "application/geo+json"

@@ -56,7 +56,43 @@ extern "C"
 //
 KjNode* dmodelMetadata(KjNode* dbMetadataP, bool sysAttrs, OrionldProblemDetails* pdP)
 {
-  return NULL;
+  char*   longName = kaStrdup(&orionldState.kalloc, dbMetadataP->name);
+  eqForDot(longName);
+
+  char*   alias    = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  KjNode* mdP      = kjObject(orionldState.kjsonP, alias);
+  KjNode* nodeP    = dbMetadataP->value.firstChildP;
+  KjNode* next;
+
+  LM_TMP(("GEO: metadata: '%s'", alias));
+  while (nodeP != NULL)
+  {
+    next = nodeP->next;
+    if      (strcmp(nodeP->name, "type")       == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "value")      == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "object")     == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "unitCode")   == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "observedAt") == 0) kjChildAdd(mdP, nodeP);
+    else if (sysAttrs == true)
+    {
+      if (strcmp(nodeP->name, "creDate") == 0)
+      {
+        nodeP->name = (char*) "createdAt";
+        kjChildAdd(mdP, nodeP);
+      }
+      else if (strcmp(nodeP->name, "modDate") == 0)
+      {
+        nodeP->name = (char*) "modifiedAt";
+        kjChildAdd(mdP, nodeP);
+      }
+    }
+    else
+      LM_W(("Skipping sub-sub-attribute '%s'", nodeP->name));
+
+    nodeP = next;
+  }
+
+  return mdP;
 }
 
 
@@ -74,7 +110,7 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
   char*   alias = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
   KjNode* attrP = kjObject(orionldState.kjsonP, alias);
   KjNode* nodeP = dbAttrP->value.firstChildP;
-  KjNode* mdsP   = NULL;
+  KjNode* mdsP  = NULL;
   KjNode* next;
 
   while (nodeP != NULL)
@@ -84,6 +120,8 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
     if (strcmp(nodeP->name, "type") == 0)
       kjChildAdd(attrP, nodeP);
     else if (strcmp(nodeP->name, "value") == 0)
+      kjChildAdd(attrP, nodeP);
+    else if (strcmp(nodeP->name, "object") == 0)
       kjChildAdd(attrP, nodeP);
     else if (sysAttrs == true)
     {
@@ -110,7 +148,8 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
     {
       KjNode* metadataP;
 
-      if ((metadataP = dmodelMetadata(attrP, sysAttrs, pdP)) == NULL)
+      LM_TMP(("GEO: treating metadata '%s'", mdP->name));
+      if ((metadataP = dmodelMetadata(mdP, sysAttrs, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;

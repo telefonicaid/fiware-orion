@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITYTRANSFORM_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITYTRANSFORM_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_
 
 /*
 *
@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -34,8 +35,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjGeojsonEntityTransform -
+// mongoCppLegacyEntitiesAttributeLookup -
 //
-extern KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoPropertyNode);
+extern KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesInArray, const char* attributeName);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITYTRANSFORM_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_

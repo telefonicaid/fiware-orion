@@ -41,7 +41,14 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjGeojsonEntityTransform -
+// kjGeojsonEntityTransform - transform a KjNode tree into geo+json format
+//
+// PARAMETERS
+//   * tree:               the KjNode tree (in normalized form), that is to be transformed into geo+json form
+//   * keyValues:          Is options=keyValues enabled?
+//   * geoPropertyNode:    if ?attrs=X is used, anf the GeoProperty is not part of the list, then
+//                         the geo-property might come in this parameter, instead of inside the tree itself
+//
 //
 // About GeoJSON Representation of an Entity in the NGSI-LD API spec:
 // --------------------------------------------------------------------------------
@@ -71,7 +78,7 @@ extern "C"
 //   ]
 // }
 //
-KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
+KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoPropertyNode)
 {
   //
   // 1. Find and remove 'id' and 'type' from the original entity
@@ -123,17 +130,18 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
   //
   KjNode* geoPropertyP = NULL;
 
-  if (orionldState.geoPropertyNode == NULL)
+  if (geoPropertyNode == NULL)
   {
     if (orionldState.geoPropertyMissing == false)
     {
+      LM_TMP(("GEO: orionldState.geoPropertyMissing == false"));
       const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
 
       geoPropertyP = kjLookup(tree, geoPropertyName);
     }
   }
   else
-    geoPropertyP = orionldState.geoPropertyNode;
+    geoPropertyP = geoPropertyNode;
 
   if (geoPropertyP != NULL)
   {
