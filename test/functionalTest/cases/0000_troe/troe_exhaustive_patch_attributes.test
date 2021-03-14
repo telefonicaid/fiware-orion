@@ -1,0 +1,1233 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Exhaustive test of patching attributes for an entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Create E1 on default tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+# 02. Create E2 on T1 tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+# 03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+# 04. GET E1 on default tenant - make sure step 03 replaced the attributes
+# 05. Patch E2, all 7 attributes, on T1 tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+# 06. GET E2 on T1 tenant - make sure step 05 replaced the attributes
+# 07. Patch E1, all 7 attributes, on default tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 08. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four
+# 09. Patch E2, all 7 attributes, on T1 tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 10. GET E2 on T1 tenant - make sure step 09 replaced 3 attributes and ignored the other four
+# 11. Patch E1, all 7 attributes, on default tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 12. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four
+# 13. Patch E2, all 7 attributes, on T1 tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 14. GET E2 on T1 tenant - make sure step 13 replaced 3 attributes and ignored the other four
+# 15. See all entities in TRoE DB, default tenant
+# 16. See all attributes in TRoE DB, default tenant
+# 17. See all sub-attributes in TRoE DB, default tenant - there aren't any
+# 18. See all entities in TRoE DB, tenant T1
+# 19. See all attributes in TRoE DB, tenant T1
+# 20. See all sub-attributes in TRoE DB, tenant T1 - there aren't any
+#
+
+echo "01. Create E1 on default tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)"
+echo "=============================================================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 on T1 tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)"
+echo "========================================================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED"
+echo "==================================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 31, 32 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 31, 33 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 31, 34 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 350,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:3",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. GET E1 on default tenant - make sure step 03 replaced the attributes"
+echo "========================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "05. Patch E2, all 7 attributes, on T1 tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED"
+echo "=============================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 51, 52 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 51, 53 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 51, 54 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 550,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:5",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs --payload "$payload" -X PATCH --tenant t1
+echo
+echo
+
+
+echo "06. GET E2 on T1 tenant - make sure step 05 replaced the attributes"
+echo "==================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2 --tenant t1
+echo
+echo
+
+
+echo "07. Patch E1, all 7 attributes, on default tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "======================================================================================================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 71, 72 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 71, 73 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 71, 74 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 750,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:7",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "08. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four"
+echo "================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "09. Patch E2, all 7 attributes, on T1 tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "================================================================================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 9.1, 9.2 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 9.1, 9.3 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 9.1, 9.4 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 950,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:9",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs --payload "$payload" -X PATCH --tenant t1 -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "10. GET E2 on T1 tenant - make sure step 09 replaced 3 attributes and ignored the other four"
+echo "============================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2 --tenant t1
+echo
+echo
+
+
+echo "11. Patch E1, all 7 attributes, on default tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "======================================================================================================================================================================================="
+payload='{
+  "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.2 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.3 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.4 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 1150,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:11",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH --in application/ld+json
+echo
+echo
+
+
+echo "12. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four"
+echo "================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "13. Patch E2, all 7 attributes, on T1 tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "=================================================================================================================================================================================="
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13.1, 13.2 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13.1, 13.3 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13.1, 13.4 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 1350,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:13",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs --payload "$payload" -X PATCH --tenant t1 --in application/ld+json
+echo
+echo
+
+
+echo "14. GET E2 on T1 tenant - make sure step 13 replaced 3 attributes and ignored the other four"
+echo "============================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2 --tenant t1
+echo
+echo
+
+
+echo "15. See all entities in TRoE DB, default tenant"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "16. See all attributes in TRoE DB, default tenant"
+echo "================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
+echo
+echo
+
+
+echo "17. See all sub-attributes in TRoE DB, default tenant - there aren't any"
+echo "========================================================================"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+echo "18. See all entities in TRoE DB, tenant T1"
+echo "=========================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" -t ftest_t1
+echo
+echo
+
+
+echo "19. See all attributes in TRoE DB, tenant T1"
+echo "============================================"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes" -t ftest_t1
+echo
+echo
+
+
+echo "20. See all sub-attributes in TRoE DB, tenant T1 - there aren't any"
+echo "==================================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 on default tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+==============================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+02. Create E2 on T1 tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+=========================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+===================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 453
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace",
+        "weight",
+        "owner"
+    ]
+}
+
+
+04. GET E1 on default tenant - make sure step 03 replaced the attributes
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                31,
+                32
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                31,
+                33
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                31,
+                34
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:3",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 350
+    }
+}
+
+
+05. Patch E2, all 7 attributes, on T1 tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+==============================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 453
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace",
+        "weight",
+        "owner"
+    ]
+}
+
+
+06. GET E2 on T1 tenant - make sure step 05 replaced the attributes
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E2",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                51,
+                52
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                51,
+                53
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                51,
+                54
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:5",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 550
+    }
+}
+
+
+07. Patch E1, all 7 attributes, on default tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+======================================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+08. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                71,
+                72
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                71,
+                73
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                71,
+                74
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:3",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 350
+    }
+}
+
+
+09. Patch E2, all 7 attributes, on T1 tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+=================================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+10. GET E2 on T1 tenant - make sure step 09 replaced 3 attributes and ignored the other four
+============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 509
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E2",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                9.1,
+                9.2
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                9.1,
+                9.3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                9.1,
+                9.4
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:5",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 550
+    }
+}
+
+
+11. Patch E1, all 7 attributes, on default tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+=======================================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+12. GET E1 on default tenant - make sure step 07 replaced 3 attributes and ignored the other four
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                11.1,
+                11.2
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                11.1,
+                11.3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                11.1,
+                11.4
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:3",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 350
+    }
+}
+
+
+13. Patch E2, all 7 attributes, on T1 tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+==================================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+14. GET E2 on T1 tenant - make sure step 13 replaced 3 attributes and ignored the other four
+============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E2",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.1,
+                13.2
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.1,
+                13.3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.1,
+                13.4
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:5",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 550
+    }
+}
+
+
+15. See all entities in TRoE DB, default tenant
+===============================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+16. See all attributes in TRoE DB, default tenant
+=================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,,,350,,2021-03-10 10:31:00.123,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:owner:3,,,2021-03-10 10:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
+
+
+17. See all sub-attributes in TRoE DB, default tenant - there aren't any
+========================================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+
+
+18. See all entities in TRoE DB, tenant T1
+==========================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E2,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+19. See all attributes in TRoE DB, tenant T1
+============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,,,550,,2021-03-10 10:31:00.123,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:owner:5,,,2021-03-10 10:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
+
+
+20. See all sub-attributes in TRoE DB, tenant T1 - there aren't any
+===================================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB
+#dbDrop CB t1
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_t1

@@ -41,9 +41,58 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// metadataAdd - from kjTreeToContextAttribute.cpp - needs its own module under orionld/common
+// metadataAdd - from kjTreeToContextAttribute.cpp
+//
+// FIXME: needs its own module under orionld/common
 //
 extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldSubAttributeExpand - expand the name of a sub-attribute
+//
+// FIXME: needs its own module under orionld/context
+//
+char* orionldSubAttributeExpand
+(
+  OrionldContext*       contextP,
+  char*                 shortName,
+  bool                  useDefaultUrlIfNotFound,
+  OrionldContextItem**  contextItemPP
+)
+{
+  if      (strcmp(shortName, "location")   == 0) return shortName;
+  else if (strcmp(shortName, "observedAt") == 0) return shortName;
+  else if (strcmp(shortName, "unitCode")   == 0) return shortName;
+  else if (strcmp(shortName, "datasetId")  == 0) return shortName;
+
+  return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAttributeExpand - expand the name of an attribute
+//
+// FIXME: needs its own module under orionld/context
+//
+char* orionldAttributeExpand
+(
+  OrionldContext*       contextP,
+  char*                 shortName,
+  bool                  useDefaultUrlIfNotFound,
+  OrionldContextItem**  contextItemPP
+)
+{
+  if      (strcmp(shortName, "location")         == 0) return shortName;
+  else if (strcmp(shortName, "observationSpace") == 0) return shortName;
+  else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
+
+  return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
+}
 
 
 
@@ -64,11 +113,10 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char**
     return false;
   }
 
-
   //
   // Expand sub-attribute name
   //
-  nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
+  nodeP->name = orionldSubAttributeExpand(orionldState.contextP, nodeP->name, true, NULL);
 
   if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
   {
