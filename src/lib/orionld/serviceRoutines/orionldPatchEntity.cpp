@@ -163,6 +163,12 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* detail;
 
+  // <DEBUG>
+  char buf[1024 * 4];
+  kjFastRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
+  LM_TMP(("PATCH: incoming: %s", buf));
+  // </DEBUG>
+
   // 1. Is the Entity ID in the URL a valid URI?
   if (pcheckUri(entityId, &detail) == false)
   {
@@ -221,6 +227,11 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     return false;
   }
 
+  // <DEBUG>
+  kjFastRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
+  LM_TMP(("PATCH: From DB: %s", buf));
+  // </DEBUG>
+
   //
   // 5. Loop over the incoming payload data
   //    Those attrs that don't exist in the DB (dbEntityP) are discarded and added to the 'notUpdated' array
@@ -244,19 +255,19 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     if ((strcmp(newAttrP->name, "createdAt") == 0) || (strcmp(newAttrP->name, "modifiedAt") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "built-in timestamps are ignored");
+      attributeNotUpdated(notUpdatedP, shortName, "built-in timestamps are ignored");
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "id") == 0) || (strcmp(newAttrP->name, "@id") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "the ID of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the ID of an entity cannot be altered");
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "type") == 0) || (strcmp(newAttrP->name, "@type") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "the TYPE of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the TYPE of an entity cannot be altered");
       newAttrP = next;
       continue;
     }
@@ -298,7 +309,10 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     ++newAttrs;
     newAttrP = next;
   }
-
+  // <DEBUG>
+  kjFastRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
+  LM_TMP(("PATCH: inDbAttrsP after processing: %s", buf));
+  // </DEBUG>
 
   if (newAttrs > 0)
   {
