@@ -52,7 +52,10 @@ bool troeDeleteEntity(ConnectionInfo* ciP)
     LM_RE(false, ("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
+  {
+    pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
+  }
 
   char* entityId = orionldState.wildcard[0];
 
@@ -63,12 +66,16 @@ bool troeDeleteEntity(ConnectionInfo* ciP)
   {
     LM_E(("Database Error (delete entities troe layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+      LM_E(("pgTransactionRollback failed"));
+
+    pgConnectionRelease(connectionP);
+    return false;
   }
-  else
+
+  if (pgTransactionCommit(connectionP) != true)
   {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    pgConnectionRelease(connectionP);
+    LM_RE(false, ("pgTransactionCommit failed"));
   }
 
   pgConnectionRelease(connectionP);

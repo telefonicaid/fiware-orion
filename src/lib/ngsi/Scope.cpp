@@ -35,6 +35,7 @@
 
 #include "ngsi/Scope.h"
 #include "parse/forbiddenChars.h"
+#include "orionld/common/orionldState.h"
 
 using namespace orion;
 
@@ -354,13 +355,29 @@ int Scope::fill
 
     coords = stringSplit(pointStringV[ix], ',', coordV);
 
-    if ((coords != 2) && (geometry.areaType == "point"))
+    if (geometry.areaType == "point")
     {
-      *errorStringP = "invalid coordinates for point";
-      LM_E(("geometry.parse: %s (%d coords)", errorStringP->c_str(), coords));
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
+      //
+      // NGSIv2 only allows for 2 coords (no altitude) while NGSI-LD allows for 2 or three
+      //
+      bool error = false;
+
+      if (orionldState.apiVersion == NGSI_LD_V1)
+      {
+        if ((coords != 2) && (coords != 3))
+          error = true;
+      }
+      else if (coords != 2)
+        error = true;
+
+      if (error == true)
+      {
+        *errorStringP = "invalid coordinates for point";
+        LM_E(("geometry.parse: %s (%d coords)", errorStringP->c_str(), coords));
+        pointVectorRelease(pointV);
+        pointV.clear();
+        return -1;
+      }
     }
 
     if (coords < 2)

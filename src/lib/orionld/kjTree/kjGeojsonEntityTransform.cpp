@@ -41,7 +41,14 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjGeojsonEntityTransform -
+// kjGeojsonEntityTransform - transform a KjNode tree into geo+json format
+//
+// PARAMETERS
+//   * tree:               the KjNode tree (in normalized form), that is to be transformed into geo+json form
+//   * keyValues:          Is options=keyValues enabled?
+//   * geoPropertyNode:    if ?attrs=X is used, anf the GeoProperty is not part of the list, then
+//                         the geo-property might come in this parameter, instead of inside the tree itself
+//
 //
 // About GeoJSON Representation of an Entity in the NGSI-LD API spec:
 // --------------------------------------------------------------------------------
@@ -71,7 +78,7 @@ extern "C"
 //   ]
 // }
 //
-KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
+KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoPropertyNode)
 {
   //
   // 1. Find and remove 'id' and 'type' from the original entity
@@ -123,45 +130,48 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
   //
   KjNode* geoPropertyP = NULL;
 
-  if (orionldState.geoPropertyNode == NULL)
+  if (geoPropertyNode == NULL)
   {
-    const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+    if (orionldState.geoPropertyMissing == false)
+    {
+      LM_TMP(("GEO: orionldState.geoPropertyMissing == false"));
+      const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
 
-    geoPropertyP = kjLookup(tree, geoPropertyName);
+      geoPropertyP = kjLookup(tree, geoPropertyName);
+    }
   }
   else
-    geoPropertyP = orionldState.geoPropertyNode;
+    geoPropertyP = geoPropertyNode;
 
   if (geoPropertyP != NULL)
   {
-    if (keyValues == false)
+    if (geoPropertyP->type == KjObject)
     {
-      KjNode* typeP  = kjLookup(geoPropertyP, "type");
+      //
+      // Might be either only the value or the entire GeoProperty
+      //
+      KjNode* type = kjLookup(geoPropertyP, "type");
 
-      if ((typeP == NULL) || (strcmp(typeP->value.s, "GeoProperty") != 0))
-        geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
+      if ((type != NULL) && (strcmp(type->value.s, "GeoProperty") == 0))
+      {
+        geoPropertyP = kjLookup(geoPropertyP, "value");
+
+        if (geoPropertyP != NULL)
+        {
+          geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+          geoPropertyP->name = (char*) "geometry";
+        }
+        else
+          geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
+      }
       else
       {
-        KjNode* valueP      = kjLookup(geoPropertyP, "value");
-        KjNode* valueClone  = kjClone(orionldState.kjsonP, valueP);
-
-        geoPropertyP = valueClone;
+        geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+        geoPropertyP->name = (char*) "geometry";
       }
     }
     else
-    {
-      // FIXME: Is geoPropertyP a GeoProperty?
-      //        As key-values has already removed that info ... no way for me to know t hat - HERE
-      //        I'd have to do this processing BEFORE I remove stuff for key-values
-      //        For now I'll just check for KjObject
-      //
-      if (geoPropertyP->type != KjObject)
-        geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
-      else
-        geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
-    }
-
-    geoPropertyP->name = (char*) "geometry";
+      geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
   }
   else
     geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
@@ -184,6 +194,3 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues)
 
   return geojsonTreeP;
 }
-
-
-

@@ -30,7 +30,10 @@ extern "C"
 #include "kbase/kMacros.h"                                     // K_FT
 #include "kbase/kStringSplit.h"                                // kStringSplit
 #include "kbase/kTime.h"                                       // kTimeGet
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/kjBuilder.h"                                   // kjArray, kjChildAdd, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -48,12 +51,38 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE
+#include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// FIXME - put dmodelEntity in its own module (perhaps even its own library ...)
+//
+extern KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pdP);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// geoPropertyInAttrs -
+//
+static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPropertyName)
+{
+  for (int ix = 0; ix < attrsCount; ix++)
+  {
+    if (strcmp(attrsV[ix], geoPropertyName) == 0)
+      return true;
+  }
+
+  return false;
+}
 
 
 
@@ -352,18 +381,25 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     mongoRequest.entityIdVector.push_back(entityIdP);
   }
 
+  char* attrsV[100];
+  int   attrsCount = 0;
+
   if (attrs != NULL)
   {
-    char* shortNameVector[100];
-    int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);
+    attrsCount = (int) sizeof(attrsV) / sizeof(attrsV[0]);
 
-    vecItems = kStringSplit(attrs, ',', (char**) shortNameVector, vecItems);
+    attrsCount = kStringSplit(attrs, ',', (char**) attrsV, attrsCount);
 
-    for (int ix = 0; ix < vecItems; ix++)
+    for (int ix = 0; ix < attrsCount; ix++)
     {
-      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], true, NULL);
+      if ((strcmp(attrsV[ix], "location")         != 0) &&
+          (strcmp(attrsV[ix], "observationSpace") != 0) &&
+          (strcmp(attrsV[ix], "operationSpace")   != 0))
+      {
+        attrsV[ix] = orionldContextItemExpand(orionldState.contextP, attrsV[ix], true, NULL);
+      }
 
-      mongoRequest.attributeList.push_back(longName);
+      mongoRequest.attributeList.push_back(attrsV[ix]);
     }
   }
 
@@ -444,6 +480,117 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(false, NULL, keyValues, &mongoResponse);
+
+  //
+  // Work-around for Accept: application/geo+json
+  //
+  // If attrs is used and the Geo-Property is not part of the attrs list, then the GeoProperty will be set to NULL
+  // even though it may exist.
+  //
+  // As it will be really hard to modify mongoBackend to include that attribute that is not asked for (in URI param 'attrs'),
+  // a workaround would be to perform an extra query:
+  //
+  // if (Accept: application/geo+json) && (URI param attrs is in use)
+  //   Get the name of the geo-property (default: location)
+  //   If geo-property is NOT in 'attrs' URI param
+  //     Prepare a query for all entities in orionldState.responseTree, for:
+  //     * _id.id and
+  //     * geo-property
+  //   Now go over the tree (orionldState.responseTree) and replace
+  //     "geometry": null
+  //   with whatever was found in this second query to mongo
+  //
+  if ((orionldState.acceptGeojson) && (attrsCount > 0) && (orionldState.responseTree->type == KjArray))
+  {
+    const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(attrsV, attrsCount, geoPropertyName);
+
+    LM_TMP(("GEO: geo+json and attr URI param ..."));
+    LM_TMP(("GEO: geo-property is: '%s'", geoPropertyName));
+
+    int ix = 0;
+    while (ix < attrsCount)
+    {
+      if (strcmp(geoPropertyName, attrsV[ix]) == 0)
+      {
+        geoPropertyNameInAttrs = true;
+        LM_TMP(("GEO: URI-param attrs[%d]: '%s' (this is the geometryProperty URL-param - we are done here)", ix, attrsV[ix]));
+      }
+      else
+        LM_TMP(("GEO: URI-param attrs[%d]: '%s'", ix, attrsV[ix]));
+
+      ++ix;
+    }
+
+    if (geoPropertyNameInAttrs == false)
+    {
+      int entities = 0;
+
+      // Count the number of entities of the response
+      for (KjNode* entityP = orionldState.responseTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+        ++entities;
+      }
+
+      // Allocate array of entity ids
+      char** entityArray = (char**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * entities);
+      int    entityIx    = 0;
+
+      // Populate the array with all entity ids
+      LM_TMP(("GEO: %d matching entities - create an array and then query over id in 'that id-array' AND attribute '%s' exists", entities, geoPropertyName));
+      for (KjNode* entityP = orionldState.responseTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+        KjNode* idP = kjLookup(entityP, "id");
+
+        if (idP != NULL)
+        {
+          LM_TMP(("GEO: Entity '%s'", idP->value.s));
+          entityArray[entityIx++] = idP->value.s;
+        }
+      }
+
+      // DB Query, to extract the needed info from the DB
+      char* geoPropertyNameExpanded = (char*) geoPropertyName;
+      LM_TMP(("GEO: geoPropertyName == '%s' (before expansion)", geoPropertyNameExpanded));
+
+      if ((strcmp(geoPropertyName, "location")         != 0) &&
+          (strcmp(geoPropertyName, "observationSpace") != 0) &&
+          (strcmp(geoPropertyName, "operationSpace")   != 0))
+      {
+        geoPropertyNameExpanded = orionldContextItemExpand(orionldState.contextP, geoPropertyName, true, NULL);
+
+        geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
+        dotForEq(geoPropertyNameExpanded);
+      }
+      LM_TMP(("GEO: geoPropertyName == '%s' (after expansion)", geoPropertyNameExpanded));
+
+      KjNode* dbEntityArray = dbEntitiesAttributeLookup(entityArray, entities, geoPropertyNameExpanded);
+      if (dbEntityArray != NULL)
+      {
+        orionldState.geoPropertyNodes = kjArray(orionldState.kjsonP, NULL);
+
+        // Transform the Database model into a "valid" NGSI-LD tree
+        char buf[1024 * 4];  // DEBUG
+        for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+        {
+          OrionldProblemDetails pd;
+          kjFastRender(orionldState.kjsonP, dbEntityP, buf, sizeof(buf));
+          LM_TMP(("GEO: dbEntityP: %s", buf));
+          KjNode*               entityP = dmodelEntity(dbEntityP, false, &pd);
+          LM_TMP(("GEO: dmodelEntity returned an entity at %p", entityP));
+          kjFastRender(orionldState.kjsonP, entityP, buf, sizeof(buf));
+          LM_TMP(("GEO: ********************* entityP: %s", buf));
+          if (entityP != NULL)
+            kjChildAdd(orionldState.geoPropertyNodes, entityP);
+        }
+
+        // <DEBUG>
+        kjFastRender(orionldState.kjsonP, orionldState.geoPropertyNodes, buf, sizeof(buf));
+        LM_TMP(("GEO: orionldState.geoPropertyNodes: %s", buf));
+        // </DEBUG>
+      }
+    }
+  }
 
   if (orionldState.responseTree->value.firstChildP == NULL)
     orionldState.noLinkHeader = true;

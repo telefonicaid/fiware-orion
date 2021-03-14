@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_
+
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,24 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn, PQfinish
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
-#ifdef PG_CONNECTION_COUNT
-extern void connectionCountDecr(const char* who, void* connectionP);
-#endif
 // -----------------------------------------------------------------------------
 //
-// pgConnectionRelease - release a connection to a postgres database
+// mongoCppLegacyEntitiesAttributeLookup -
 //
-void pgConnectionRelease(PGconn* connectionP)
-{
-  PQfinish(connectionP);
-#ifdef PG_CONNECTION_COUNT
-  connectionCountDecr("pgConnectionRelease", connectionP);
-#endif
-}
+extern KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesInArray, const char* attributeName);
+
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESATTRIBUTELOOKUP_H_

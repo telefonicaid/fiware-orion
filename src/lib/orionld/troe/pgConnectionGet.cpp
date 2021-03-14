@@ -31,6 +31,25 @@
 #include "orionld/troe/pgConnectionGet.h"                      // Own interface
 
 
+#ifdef PG_CONNECTION_COUNT
+static int connectionCount = 0;
+
+void connectionCountIncr(const char* who, void* connectionP)
+{
+  // Just debugging - no semaphore necessary
+  ++connectionCount;
+  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
+}
+
+void connectionCountDecr(const char* who, void* connectionP)
+{
+  // Just debugging - no semaphore necessary
+  --connectionCount;
+  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
+}
+#endif
+
+
 //
 // FIXME:
 //   typedef struct PgConnection
@@ -44,7 +63,6 @@
 // The connection pool will be simply a linked list of PgConnection.
 // If none is free (for the dbName in question), another connection is opened.
 //
-
 
 // -----------------------------------------------------------------------------
 //
@@ -108,5 +126,8 @@ PGconn* pgConnectionGet(const char* db)
     LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, db));
 
   LM_TMP(("TROE: connected to db '%s', at 0x%x (on connection attempt %d)", db, connectionP, attemptNo));
+#ifdef PG_CONNECTION_COUNT
+  connectionCountIncr("pgConnectionGet", connectionP);
+#endif
   return connectionP;
 }
