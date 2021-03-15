@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -50,8 +51,13 @@ extern "C"
 //
 void troeEntityExpand(KjNode* entityP)
 {
-  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  KjNode* attrP = entityP->value.firstChildP;
+  KjNode* nextAttr;
+
+  while (attrP != NULL)
   {
+    nextAttr = attrP->next;
+
     if (strcmp(attrP->name, "type") == 0)
     {
       LM_TMP(("EXPAND: FROM '%s' (entity type value)", attrP->value.s));
@@ -62,14 +68,23 @@ void troeEntityExpand(KjNode* entityP)
     else if (strcmp(attrP->name, "location")         == 0) {}
     else if (strcmp(attrP->name, "observationSpace") == 0) {}
     else if (strcmp(attrP->name, "operationSpace")   == 0) {}
+    else if ((strcmp(attrP->name, "createdAt") == 0) || (strcmp(attrP->name, "modifiedAt") == 0))
+    {
+      kjChildRemove(entityP, attrP);
+    }
     else
     {
       attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
 
       if (attrP->type == KjObject)
       {
-        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+        KjNode* subAttrP = attrP->value.firstChildP;
+        KjNode* nextSubAttr;
+
+        while (subAttrP != NULL)
         {
+          nextSubAttr = subAttrP->next;
+
           if      (strcmp(subAttrP->name, "type")        == 0) {}
           else if (strcmp(subAttrP->name, "id")          == 0) {}
           else if (strcmp(subAttrP->name, "value")       == 0) {}
@@ -78,15 +93,23 @@ void troeEntityExpand(KjNode* entityP)
           else if (strcmp(subAttrP->name, "location")    == 0) {}
           else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
           else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
+          else if ((strcmp(subAttrP->name, "createdAt") == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
+          {
+            kjChildRemove(attrP, subAttrP);
+          }
           else
           {
             LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
             subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name,  true, NULL);
             LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
           }
+
+          subAttrP = nextSubAttr;
         }
       }
     }
+
+    attrP = nextAttr;
   }
 }
 

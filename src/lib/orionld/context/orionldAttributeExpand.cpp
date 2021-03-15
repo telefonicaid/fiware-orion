@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strchr
+#include <string.h>                                              // strcmp
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
@@ -30,6 +30,7 @@
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"   // orionldContextItemAlreadyExpanded
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // Own interface
+
 
 
 // -----------------------------------------------------------------------------
@@ -48,12 +49,12 @@ char* orionldAttributeExpand
   OrionldContextItem**  contextItemPP
 )
 {
-  if (orionldContextItemAlreadyExpanded(shortName) == true)
-    return shortName;
-
   if      (strcmp(shortName, "location")         == 0) return shortName;
   else if (strcmp(shortName, "observationSpace") == 0) return shortName;
   else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
+
+  if (orionldContextItemAlreadyExpanded(shortName) == true)
+    return shortName;
 
   return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
 }
