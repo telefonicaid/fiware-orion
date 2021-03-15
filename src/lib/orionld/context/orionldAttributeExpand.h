@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -22,26 +25,25 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextItemAlreadyExpanded -
+// orionldAttributeExpand.h -
 //
-bool orionldContextItemAlreadyExpanded(const char* value)
-{
-  if (value == NULL)
-    return false;
+// This function expands unless:
+//   - has already been expanded
+//   - is a special attribute such as location, datasetId, ...
+//
+extern char* orionldAttributeExpand
+(
+  OrionldContext*       contextP,
+  char*                 shortName,
+  bool                  useDefaultUrlIfNotFound,
+  OrionldContextItem**  contextItemPP
+);
 
-  for (int ix = 0; ix < 10; ix++)
-  {
-    if (value[ix] == 0)
-      return false;
-    else if (value[ix] == ':')
-      return true;
-  }
-
-  return false;
-}
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_

@@ -29,7 +29,7 @@ dbInit CB
 dbInit CB t1
 pgInit $CB_DB_NAME
 pgInit ${CB_DB_NAME}_t1
-brokerStart CB 100 IPv4 -troe -multiservice
+brokerStart CB 0 IPv4 -troe -multiservice
 
 --SHELL--
 
