@@ -93,11 +93,10 @@ Orion によって公開される [admin API](management_api.md) を使用して
 に関するトレースと、MongoDB データベースへの接続に関する情報が表示されます:
 
 ```
-time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[986]:main | msg=start command line <contextBroker -fg -logLevel INFO>
-time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[873]:logEnvVars | msg=env var ORION_PORT (-port): 1026
-time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1054]:main | msg=Orion Context Broker is running
-time=2020-10-26T09:45:17.301Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[247]:mongoInit | msg=Connected to mongo at localhost/orion (poolsize: 10)
-time=2020-10-26T09:45:17.304Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1180]:main | msg=Startup completed
+time=2021-03-09T16:14:36.055Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1000]:main | msg=start command line <contextBroker -fg -logLevel INFO>
+time=2021-03-09T16:14:36.055Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1068]:main | msg=Orion Context Broker is running
+time=2021-03-09T16:14:36.083Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=mongoConnectionPool.cpp[488]:mongoConnectionPoolInit | msg=Connected to mongodb://localhost/?connectTimeoutMS=10000 (dbName: orion, poolsize: 10)
+time=2021-03-09T16:14:36.086Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1194]:main | msg=Startup completed
 ```
 
 実行時に、INFO レベルには、クライアント・リクエスト、ノーティフィケーション、およびフォワードされた
