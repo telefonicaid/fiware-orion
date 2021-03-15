@@ -31,7 +31,7 @@ Before we get started, here are a few things we expect from you (and that you sh
   Orion Context Broker code.
 
 Note that contribution workflows themselves (e.g. pull requests, etc.) are described in another document 
-([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)).
+([FIWARE Contribution Requirements](https://fiware-requirements.readthedocs.io/en/latest/)).
 
 ## How to contribute
 
@@ -47,7 +47,7 @@ If you don't see your idea listed, and you think it fits into the goals of this 
 
 ### Pull Request protocol
 
-As explained in ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)) 
+As explained in ([FIWARE Contribution Requirements](https://fiware-requirements.readthedocs.io/en/latest/)) 
 contributions are done using a pull request (PR). The detailed "protocol" used in such PR is described below:
 
 * Direct commits to master branch (even single-line modifications) are not allowed. Every modification has to come as a PR
