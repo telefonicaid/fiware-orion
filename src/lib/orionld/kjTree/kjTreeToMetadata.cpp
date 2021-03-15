@@ -34,7 +34,8 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // Own interface
 
 
@@ -46,53 +47,6 @@ extern "C"
 // FIXME: needs its own module under orionld/common
 //
 extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldSubAttributeExpand - expand the name of a sub-attribute
-//
-// FIXME: needs its own module under orionld/context
-//
-char* orionldSubAttributeExpand
-(
-  OrionldContext*       contextP,
-  char*                 shortName,
-  bool                  useDefaultUrlIfNotFound,
-  OrionldContextItem**  contextItemPP
-)
-{
-  if      (strcmp(shortName, "location")   == 0) return shortName;
-  else if (strcmp(shortName, "observedAt") == 0) return shortName;
-  else if (strcmp(shortName, "unitCode")   == 0) return shortName;
-  else if (strcmp(shortName, "datasetId")  == 0) return shortName;
-
-  return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldAttributeExpand - expand the name of an attribute
-//
-// FIXME: needs its own module under orionld/context
-//
-char* orionldAttributeExpand
-(
-  OrionldContext*       contextP,
-  char*                 shortName,
-  bool                  useDefaultUrlIfNotFound,
-  OrionldContextItem**  contextItemPP
-)
-{
-  if      (strcmp(shortName, "location")         == 0) return shortName;
-  else if (strcmp(shortName, "observationSpace") == 0) return shortName;
-  else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
-
-  return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
-}
 
 
 

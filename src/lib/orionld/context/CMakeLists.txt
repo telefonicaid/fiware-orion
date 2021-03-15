@@ -48,6 +48,8 @@ SET (SOURCES
     orionldContextCacheGet.cpp
     orionldContextCacheRelease.cpp
     orionldContextItemAlreadyExpanded.cpp
+    orionldAttributeExpand.cpp
+    orionldSubAttributeExpand.cpp
 )
 
 # Include directories

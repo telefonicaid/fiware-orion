@@ -48,7 +48,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
 
 
@@ -81,14 +81,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     return false;
   }
 
-  if ((strncmp(attrName, "http://", 7) == 0) || (strncmp(attrName, "https://", 8) == 0))
-    attrNameP = attrName;
-  else
-  {
-    attrNameP = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
-    // attrNameP might point to a field inside the context cache - must make our own copy as 'dotForEq' will modifyit
-    attrNameP = kaStrdup(&orionldState.kalloc, attrNameP);
-  }
+  attrNameP = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
 
   // IMPORTANT: Must call dbEntityAttributeLookup before replacing dots for eqs
   if (dbEntityAttributeLookup(entityId, attrNameP) == NULL)
