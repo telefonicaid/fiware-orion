@@ -255,6 +255,8 @@ static orion::DBConnection mongoConnect
 */
 static void shutdownClient(void)
 {
+  LM_T(LmtMongo, ("shutdown mongo client"));
+
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     if (!connectionPool[ix].connection.isNull())
