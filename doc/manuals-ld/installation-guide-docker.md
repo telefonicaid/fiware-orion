@@ -14,7 +14,7 @@ services:
     container_name: fiware-orion
     depends_on:
       - mongo-db
-     expose:
+    expose:
       - "1026"
     ports:
       - "1026:1026" 
