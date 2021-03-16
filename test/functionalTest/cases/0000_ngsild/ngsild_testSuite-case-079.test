@@ -241,7 +241,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/R1",
-		"https://uri.etsi.org/ngsi-ld/location"
+		"location"
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
@@ -288,7 +288,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*)
 		},
-		"https://uri=etsi=org/ngsi-ld/location" : {
+		"location" : {
 			"value" : {
 				"type" : "Point",
 				"coordinates" : [

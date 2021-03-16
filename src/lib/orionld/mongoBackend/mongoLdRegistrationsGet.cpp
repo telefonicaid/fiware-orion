@@ -147,7 +147,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     }
     else
     {
-      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
+      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // entity type
       bsonArray.append(typeExpanded);
     }
   }

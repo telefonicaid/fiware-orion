@@ -59,6 +59,7 @@ extern "C"
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
@@ -92,7 +93,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
   KjNode*          createdAt;
   char*            longName = NULL;
 
-  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
+  longName      = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
   attributeName = kaStrdup(&orionldState.kalloc, longName);
   dotForEq(attributeName);
 
@@ -268,7 +269,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   entityIdP->creDate       = orionldState.requestTime;
   entityIdP->modDate       = orionldState.requestTime;
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
+  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity type
 
 
   //
@@ -354,7 +355,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
+      char*  longName = orionldAttributeExpand(orionldState.contextP, kNodeP->name, true, NULL);
 
       longName = kaStrdup(&orionldState.kalloc, longName);
       dotForEq(longName);

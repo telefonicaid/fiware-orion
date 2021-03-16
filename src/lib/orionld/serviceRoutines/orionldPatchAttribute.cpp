@@ -51,7 +51,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"            // orionldUriExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToEntity.h"                       // kjTreeToEntity
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
@@ -382,7 +382,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
       (strcmp(attrName, "operationSpace")   != 0) &&
       (strcmp(attrName, "observedAt")       != 0))
   {
-    attrName = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
+    attrName = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
   }
 
   if (forwarding)

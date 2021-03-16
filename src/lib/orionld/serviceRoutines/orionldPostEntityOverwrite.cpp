@@ -477,7 +477,7 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
     // FIXME: ignore also createdAt, modifiedAt, ... ?
     //
 
-    attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
 
     //
     // Expand also sub-attr names
@@ -491,7 +491,7 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
       if (strcmp(subAttrP->name, "object") == 0)  // FIXME: Only if "Relationship"
         continue;
 
-      subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
+      subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name, true, NULL);
     }
   }
 

@@ -237,7 +237,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       if (typeInPayload != NULL)
       {
-        char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, true, NULL);
+        char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, true, NULL);  // entity type
 
         if (strcmp(typeInPayloadExpanded, typeInDb) != 0)
         {
