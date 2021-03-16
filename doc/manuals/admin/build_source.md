@@ -98,7 +98,7 @@ In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt usi
 
         make unit_test
 
-* Install aditional required tools for functional and valgrind tests:
+* Install additional required tools for functional and valgrind tests:
 
         sudo yum install curl nc valgrind bc
         sudo pip2 install virtualenv
