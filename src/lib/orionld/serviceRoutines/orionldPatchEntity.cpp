@@ -47,7 +47,7 @@ extern "C"
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
@@ -271,13 +271,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       newAttrP = next;
       continue;
     }
-    else if ((strcmp(newAttrP->name, "location")         != 0) &&
-             (strcmp(newAttrP->name, "observationSpace") != 0) &&
-             (strcmp(newAttrP->name, "operationSpace")   != 0) &&
-             (strcmp(newAttrP->name, "observedAt")       != 0))
-    {
-      newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
-    }
+    else
+      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
 
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)

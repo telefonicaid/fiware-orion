@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
@@ -186,7 +187,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         else if (orionldState.contextP != NULL)  contextP = orionldState.contextP;
         else                                     contextP = orionldCoreContextP;
 
-        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);
+        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);  // entity type
         if (strcmp(expandedType, dbTypeP->value.s) != 0)
         {
           LM_W(("Bad Input (non-matching entity type: '%s' vs '%s')", expandedType, dbTypeP->value.s));
@@ -238,7 +239,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
             continue;
           }
           else
-            longName = orionldContextItemExpand(orionldState.contextP, aP->name, true, NULL);
+            longName = orionldAttributeExpand(orionldState.contextP, aP->name, true, NULL);
 
           if (kjStringValueLookupInArray(attrNames, longName) != NULL)
             kjChildRemove(entityP, aP);

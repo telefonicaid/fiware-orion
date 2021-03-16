@@ -36,7 +36,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
@@ -168,7 +168,7 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, char* entit
     //
     // Got an attribute - if found in 'DB entity' OR in previous instance - then ignore it
     //
-    char*   attrName   = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+    char*   attrName   = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
     KjNode* dbEntityP  = entityInstanceLookup(dbEntityV, entityId, NULL);
     KjNode* attrNamesP = kjLookup(dbEntityP, "attrNames");
     KjNode* oldAttrP   = kjStringValueLookupInArray(attrNamesP, attrName);

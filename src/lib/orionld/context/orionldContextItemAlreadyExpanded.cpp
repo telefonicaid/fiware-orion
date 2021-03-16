@@ -23,6 +23,9 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL
+#include <string.h>                                              // strncmp
+
+#include "orionld/context/orionldContextItemAlreadyExpanded.h"   // Own interface
 
 
 
@@ -35,12 +38,11 @@ bool orionldContextItemAlreadyExpanded(const char* value)
   if (value == NULL)
     return false;
 
-  for (int ix = 0; ix < 10; ix++)
+  if ((strncmp(value, "urn:",     4) == 0) ||
+      (strncmp(value, "http://",  7) == 0) ||
+      (strncmp(value, "https://", 8) == 0))
   {
-    if (value[ix] == 0)
-      return false;
-    else if (value[ix] == ':')
-      return true;
+    return true;
   }
 
   return false;

@@ -30,8 +30,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"         // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckInformationItem.h"         // Own interface
 
@@ -74,8 +73,7 @@ bool pcheckInformationItem(KjNode* informationP)
       {
         STRING_CHECK(propP, "information[X]::properties[X]");
         EMPTY_STRING_CHECK(propP, "information[X]::properties[X]");
-        if (orionldContextItemAlreadyExpanded(propP->value.s) == false)
-          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, true, NULL);
+        propP->value.s = orionldAttributeExpand(orionldState.contextP, propP->value.s, true, NULL);
       }
     }
     else if (strcmp(infoItemP->name, "relationships") == 0)
@@ -87,8 +85,7 @@ bool pcheckInformationItem(KjNode* informationP)
       {
         STRING_CHECK(relP, "information[X]::relationships[X]");
         EMPTY_STRING_CHECK(relP, "information[X]::relationships[X]");
-        if (orionldContextItemAlreadyExpanded(relP->value.s) == false)
-          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, true, NULL);
+        relP->value.s = orionldAttributeExpand(orionldState.contextP, relP->value.s, true, NULL);
       }
     }
     else

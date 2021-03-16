@@ -634,7 +634,7 @@ Date: REGEX(.*)
 =======================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 417
+Content-Length: 388
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized
 Host: REGEX(.*)
@@ -644,7 +644,20 @@ Content-Type: application/json; charset=utf-8
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "observationSpace": {
                 "metadata": {
                     "r1": {
                         "type": "Relationship", 
@@ -657,19 +670,6 @@ Content-Type: application/json; charset=utf-8
                         1, 
                         3, 
                         1
-                    ], 
-                    "type": "Point"
-                }
-            }, 
-            "id": "urn:ngsi-ld:entities:E4", 
-            "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
-                "value": {
-                    "coordinates": [
-                        1, 
-                        2, 
-                        3
                     ], 
                     "type": "Point"
                 }
@@ -693,7 +693,7 @@ Date: REGEX(.*)
 =====================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 594
+Content-Length: 536
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized
 Host: REGEX(.*)
@@ -703,7 +703,20 @@ Content-Type: application/json; charset=utf-8
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "observationSpace": {
                 "metadata": {
                     "r1": {
                         "type": "Relationship", 
@@ -720,7 +733,7 @@ Content-Type: application/json; charset=utf-8
                     "type": "Point"
                 }
             }, 
-            "https://uri.etsi.org/ngsi-ld/operationSpace": {
+            "operationSpace": {
                 "metadata": {
                     "r2": {
                         "type": "Relationship", 
@@ -733,19 +746,6 @@ Content-Type: application/json; charset=utf-8
                         2, 
                         4, 
                         2
-                    ], 
-                    "type": "Point"
-                }
-            }, 
-            "id": "urn:ngsi-ld:entities:E4", 
-            "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
-                "value": {
-                    "coordinates": [
-                        1, 
-                        2, 
-                        3
                     ], 
                     "type": "Point"
                 }

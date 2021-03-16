@@ -37,6 +37,7 @@
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
 #include "mongoBackend/safeMongo.h"                              // moreSafe
 #include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery
@@ -147,7 +148,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     }
     else
     {
-      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
+      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // entity type
       bsonArray.append(typeExpanded);
     }
   }
@@ -173,7 +174,6 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   int                         attrs;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
-  char*                       details;
 
   attrs = stringSplit(attrsList, ',', attrsVec);
 
@@ -188,16 +188,8 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   {
     char* attr = (char*) attrsVec[ix].c_str();
 
-    if ((strncmp(attr, "http", 4) == 0) && (urlCheck(attr, &details) == true))
-    {
-      // No expansion desired, the attr is already a FQN
-      bsonArray.append(attr);
-    }
-    else
-    {
-      char* attrExpanded = orionldContextItemExpand(orionldState.contextP, attr, true, NULL);
-      bsonArray.append(attrExpanded);
-    }
+    attr = orionldAttributeExpand(orionldState.contextP, attr, true, NULL);
+    bsonArray.append(attr);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());

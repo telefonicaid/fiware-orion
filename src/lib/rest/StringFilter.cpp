@@ -48,7 +48,7 @@ extern "C"
 #ifdef ORIONLD
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #endif
 #include "rest/StringFilter.h"
 
@@ -659,7 +659,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    char* expanded = orionldContextItemExpand(orionldState.contextP, attributeName.c_str(), true, NULL);
+    char* expanded = orionldAttributeExpand(orionldState.contextP, (char*) attributeName.c_str(), true, NULL);
 
     //
     // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo

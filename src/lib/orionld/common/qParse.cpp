@@ -32,7 +32,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/qLexRender.h"                         // qLexRender - DEBUG
@@ -206,7 +207,7 @@ static char* varFix(char* varPath, char** detailsP)
   //
   // All OK - let's compose ...
   //
-  char* longNameP = orionldContextItemExpand(orionldState.contextP, attrNameP, true, NULL);
+  char* longNameP = orionldAttributeExpand(orionldState.contextP, attrNameP, true, NULL);
 
   //
   // Now 'longNameP' needs to be adjusted forthe DB model, that changes '.' for '=' in the database.
@@ -233,7 +234,7 @@ static char* varFix(char* varPath, char** detailsP)
   {
     if (strcmp(mdNameP, "observedAt") != 0)  // Don't expand "observedAt", nor ...
     {
-      char* mdLongNameP  = orionldContextItemExpand(orionldState.contextP, mdNameP, true, NULL);
+      char* mdLongNameP  = orionldSubAttributeExpand(orionldState.contextP, mdNameP, true, NULL);
 
       strncpy(mdLongName, mdLongNameP, sizeof(mdLongName) - 1);
 

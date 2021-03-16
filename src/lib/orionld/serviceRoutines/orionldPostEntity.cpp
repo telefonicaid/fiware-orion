@@ -58,7 +58,7 @@ extern "C"
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -262,7 +262,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     //
     // The attribute name must be expanded before any comparisons can take place
     //
-    attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
 
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)

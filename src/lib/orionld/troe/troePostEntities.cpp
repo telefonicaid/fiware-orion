@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -34,6 +35,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
@@ -50,43 +53,58 @@ extern "C"
 //
 void troeEntityExpand(KjNode* entityP)
 {
-  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  KjNode* attrP = entityP->value.firstChildP;
+  KjNode* nextAttr;
+
+  while (attrP != NULL)
   {
+    nextAttr = attrP->next;
+
     if (strcmp(attrP->name, "type") == 0)
     {
       LM_TMP(("EXPAND: FROM '%s' (entity type value)", attrP->value.s));
-      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);  // entity type
       LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
     }
-    else if (strcmp(attrP->name, "id")               == 0) {}
-    else if (strcmp(attrP->name, "location")         == 0) {}
-    else if (strcmp(attrP->name, "observationSpace") == 0) {}
-    else if (strcmp(attrP->name, "operationSpace")   == 0) {}
+    else if (strcmp(attrP->name, "id") == 0) {}
+    else if ((strcmp(attrP->name, "createdAt") == 0) || (strcmp(attrP->name, "modifiedAt") == 0))
+    {
+      kjChildRemove(entityP, attrP);
+    }
     else
     {
-      attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+      attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
 
       if (attrP->type == KjObject)
       {
-        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+        KjNode* subAttrP = attrP->value.firstChildP;
+        KjNode* nextSubAttr;
+
+        while (subAttrP != NULL)
         {
+          nextSubAttr = subAttrP->next;
+
           if      (strcmp(subAttrP->name, "type")        == 0) {}
           else if (strcmp(subAttrP->name, "id")          == 0) {}
           else if (strcmp(subAttrP->name, "value")       == 0) {}
           else if (strcmp(subAttrP->name, "object")      == 0) {}
-          else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
-          else if (strcmp(subAttrP->name, "location")    == 0) {}
-          else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
-          else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
+          else if ((strcmp(subAttrP->name, "createdAt") == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
+          {
+            kjChildRemove(attrP, subAttrP);
+          }
           else
           {
             LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
-            subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name,  true, NULL);
+            subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name,  true, NULL);
             LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
           }
+
+          subAttrP = nextSubAttr;
         }
       }
     }
+
+    attrP = nextAttr;
   }
 }
 
@@ -117,7 +135,7 @@ bool troePostEntities(ConnectionInfo* ciP)
 
   LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
   char* entityId   = orionldState.payloadIdNode->value.s;
-  char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
+  char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // entity type
   if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));
