@@ -36,6 +36,8 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/context/orionldContextCacheLookup.h"         // orionldContextCacheLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/troe/troeEntityArrayExpand.h"                // Own interface
 
@@ -79,14 +81,11 @@ void troeEntityArrayExpand(KjNode* tree)
     for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
       if (strcmp(attrP->name, "type") == 0)
-        attrP->value.s = orionldContextItemExpand(contextP, attrP->value.s, true, NULL);
+        attrP->value.s = orionldContextItemExpand(contextP, attrP->value.s, true, NULL);  // entity type
       else if (strcmp(attrP->name, "id")       == 0) {}
-      else if (strcmp(attrP->name, "location") == 0) {}
-      else if (strcmp(attrP->name, "observationSpace") == 0) {}
-      else if (strcmp(attrP->name, "operationSpace")   == 0) {}
       else
       {
-        attrP->name = orionldContextItemExpand(contextP, attrP->name, true, NULL);
+        attrP->name = orionldAttributeExpand(contextP, attrP->name, true, NULL);
 
         if (attrP->type == KjObject)
         {
@@ -101,7 +100,7 @@ void troeEntityArrayExpand(KjNode* tree)
             else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
             else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
             else
-              subAttrP->name = orionldContextItemExpand(contextP, subAttrP->name, true, NULL);
+              subAttrP->name = orionldSubAttributeExpand(contextP, subAttrP->name, true, NULL);
           }
         }
       }

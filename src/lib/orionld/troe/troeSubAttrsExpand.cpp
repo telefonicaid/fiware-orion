@@ -30,7 +30,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/common/orionldState.h"                       // orionldState
 
 
@@ -46,15 +46,9 @@ void troeSubAttrsExpand(KjNode* treeP)
     if      (strcmp(subAttrP->name, "type")        == 0) {}
     else if (strcmp(subAttrP->name, "value")       == 0) {}
     else if (strcmp(subAttrP->name, "object")      == 0) {}
-    else if (strcmp(subAttrP->name, "location")    == 0) {}
-    else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
-    else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
-    else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
     else
     {
-      LM_TMP(("EXPAND: FROM '%s' (entity type value)", subAttrP->name));
-      subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
-      LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
+      subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name, true, NULL);
     }
   }
 }
