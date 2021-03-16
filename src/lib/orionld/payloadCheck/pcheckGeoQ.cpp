@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/dotForEq.h"                            // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckGeoType.h"                 // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
@@ -204,7 +204,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 
     if (strcmp(pName, "location") != 0)
     {
-      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, true, NULL);
+      geopropertyP->value.s = orionldAttributeExpand(orionldState.contextP, pName, true, NULL);
       dotForEq(geopropertyP->value.s);
     }
   }
