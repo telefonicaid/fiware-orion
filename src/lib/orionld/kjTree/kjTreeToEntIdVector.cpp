@@ -131,7 +131,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
 
-    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);
+    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);  // entity type
     entitiesP->push_back(entityInfo);
   }
 
