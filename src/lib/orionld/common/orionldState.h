@@ -45,6 +45,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
@@ -296,6 +297,9 @@ typedef struct OrionldConnectionState
   KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty (for Retrieve Entity only)
   bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response (for Retrieve Entity only)
   KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
+
+  // Error Handling
+  OrionldProblemDetails   pd;
 } OrionldConnectionState;
 
 

@@ -301,7 +301,7 @@ bye
 05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail
 ===========================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 162
+Content-Length: 117
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -309,7 +309,7 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "attributeName": "P2",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
@@ -374,7 +374,7 @@ bye
 07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response
 ========================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 211
+Content-Length: 121
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -382,12 +382,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "attributeName": "P1",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/P5"
+        "P5"
     ]
 }
 

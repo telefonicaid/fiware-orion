@@ -155,7 +155,7 @@ bye
 02. Attempt to ADD the attribute P2=22 with noOverwrite set
 ===========================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 162
+Content-Length: 117
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -163,7 +163,7 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "attributeName": "P2",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],

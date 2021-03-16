@@ -1,0 +1,119 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an entity E1
+# 02. Attempt to add to E1 an attribute P1 with a unitCode that is an object (as a normal sub-property)
+# 03. GET the entity - make sure P1 is not there
+#
+
+echo "01. Create an entity E1"
+echo "======================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to add to E1 an attribute P1 with a unitCode that is an object (as a normal sub-property)"
+echo "====================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "unitCode": {
+      "type": "Property",
+      "value": "Degrees Celsius"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity - make sure P1 is not there"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Attempt to add to E1 an attribute P1 with a unitCode that is an object (as a normal sub-property)
+=====================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 91
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P1",
+            "reason": "Not a JSON String: unitCode"
+        }
+    ],
+    "updated": []
+}
+
+
+03. GET the entity - make sure P1 is not there
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
