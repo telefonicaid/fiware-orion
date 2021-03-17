@@ -207,7 +207,7 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:ent
 06. Append P1 and R3 with noOverwrite set (P1 will be ignored as it already existed)
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 211
+Content-Length: 121
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -215,12 +215,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "attributeName": "P1",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/R3"
+        "R3"
     ]
 }
 

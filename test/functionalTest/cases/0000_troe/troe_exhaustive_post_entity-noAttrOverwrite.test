@@ -540,7 +540,7 @@ Date: REGEX(.*)
 03. Append attributes R1,status,owner,batteryLevel to E1 on default tenant and without context
 ==============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 312
+Content-Length: 148
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -548,14 +548,14 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/owner",
+            "attributeName": "owner",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/R1",
-        "https://uri.etsi.org/ngsi-ld/status",
-        "https://uri.etsi.org/ngsi-ld/default-context/batteryLevel"
+        "R1",
+        "status",
+        "batteryLevel"
     ]
 }
 
@@ -563,7 +563,7 @@ Date: REGEX(.*)
 04. Append attributes R1,status,owner,batteryLevel to E2 on T1 tenant and without context
 =========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 312
+Content-Length: 148
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -571,14 +571,14 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/owner",
+            "attributeName": "owner",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/R1",
-        "https://uri.etsi.org/ngsi-ld/status",
-        "https://uri.etsi.org/ngsi-ld/default-context/batteryLevel"
+        "R1",
+        "status",
+        "batteryLevel"
     ]
 }
 

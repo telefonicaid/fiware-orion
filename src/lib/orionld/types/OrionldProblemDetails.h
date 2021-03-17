@@ -39,6 +39,8 @@ typedef struct OrionldProblemDetails
   char*                     title;
   char*                     detail;
   int                       status;
+  char                      titleAndDetailBuffer[256];
+  char*                     titleAndDetail;
 } OrionldProblemDetails;
 
 
