@@ -130,6 +130,9 @@ static bool isFatherProcess = false;
 /* ****************************************************************************
 *
 * Option variables
+*
+* No hint on max length for user and pwd (see see https://stackoverflow.com/questions/66671107/username-and-passwor-field-length-limit-in-mongo-uri),
+* but 256 seems to be a reasonable limit
 */
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
@@ -137,8 +140,8 @@ int             port;
 char            dbHost[256];
 char            rplSet[64];
 char            dbName[64];
-char            user[64];
-char            pwd[64];
+char            user[256];
+char            pwd[256];
 char            authMech[64];
 char            authDb[64];
 bool            dbSSL;
@@ -862,7 +865,12 @@ static void logEnvVars(void)
   {
     if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
     {
-      if (aP->type == PaString)
+      if (strcmp(aP->envName, "MONGO_PASSWORD") == 0)
+      {
+        // Offuscate sensible information
+        LM_I(("env var ORION_%s (%s): ******", aP->envName, aP->option));
+      }
+      else if (aP->type == PaString)
       {
         LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
       }
@@ -997,7 +1005,8 @@ int main(int argC, char* argV[])
   }
 
   // print startup info in logs
-  LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
+  std::string cmdLine = offuscatePassword(cmdLineString(argC, argV), std::string(pwd));
+  LM_I(("start command line <%s>", cmdLine.c_str()));
   logEnvVars();
 
   // Argument consistency check (-t AND NOT -logLevel)

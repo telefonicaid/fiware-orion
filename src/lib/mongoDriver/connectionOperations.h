@@ -61,7 +61,7 @@ extern bool collectionRangedQuery
   const std::string&   db,
   const std::string&   col,
   const BSONObj&       q,
-  const BSONObj&       sort,  // FIXME: this change can be propagated independtly to master
+  const BSONObj&       sort,
   int                  limit,
   int                  offset,
   DBCursor*            cursor,

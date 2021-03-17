@@ -58,7 +58,7 @@ add_definitions(-fPIC)
 # Baseline compiler flags, any change here will affect all build types
 
 # FIXME #3775 currently the only place in which std::auto_ptr<std::auto_ptr> is being used
-# isthe code in commonMocks.h. Thus. probably this can be removed and #2979 definitively solved.
+# is the code in commonMocks.h. Thus. probably this can be removed and #2979 definitively solved.
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.

@@ -1095,7 +1095,7 @@ void toLowercase(char* s)
 */
 std::string offuscatePassword(const std::string& uri, const std::string& pwd)
 {
-  if (pwd.empty())
+  if ((pwd.empty()) || (uri.find(pwd) ==  std::string::npos))
   {
     return uri;
   }

@@ -120,7 +120,7 @@ bool orion::collectionRangedQuery
   const std::string&         db,
   const std::string&         col,
   const orion::BSONObj&      _q,
-  const orion::BSONObj&      _sort,  // FIXME: this change can be propagated independtly to master
+  const orion::BSONObj&      _sort,
   int                        limit,
   int                        offset,
   orion::DBCursor*           cursor,
