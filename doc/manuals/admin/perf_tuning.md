@@ -112,7 +112,7 @@ Next, run the `mongoc-stat` tool with that PID as parameter, e.g.:
 mongoc-stat <contextBroker PID>
 ```
 
-You can disable the generation of peformance counters using `MONGOC_DISABLE_SHM=true` at contextBroker startup.
+You can disable the generation of performance counters using `MONGOC_DISABLE_SHM=true` at contextBroker startup.
 
 More information about the available counters and this feature in general can be found in the
 [driver official documentation](http://mongoc.org/libmongoc/current/basic-troubleshooting.html#performance-counters).
