@@ -155,8 +155,8 @@ int main(int argC, char** argV)
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
-  // Note that multitenancy and mutex time stats are disabled for unit test mongo init
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, dbTimeout, writeConcern, dbPoolSize, false);
+  // Note that disableRetryTries, multitenancy and mutex time stats are disabled for unit test mongo init
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   // setupDatabase(); FIXME #3775: pending on mongo unit test re-enabling

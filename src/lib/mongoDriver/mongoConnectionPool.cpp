@@ -261,6 +261,7 @@ static void shutdownClient(void)
   {
     if (!connectionPool[ix].connection.isNull())
     {
+      LM_T(LmtMongo, ("clossing connection #%d", ix));
       mongoc_client_destroy(connectionPool[ix].connection.get());
     }
   }
@@ -315,6 +316,7 @@ static std::string composeMongoUri
   const char*  mechanism,
   const char*  authDb,
   bool         dbSSL,
+  bool         dbDisableRetryWrites,
   int64_t      timeout
 )
 {
@@ -356,6 +358,12 @@ static std::string composeMongoUri
     optionPrefix = "&";
   }
 
+  if (dbDisableRetryWrites)
+  {
+    uri += optionPrefix + "retryWrites=false";
+    optionPrefix = "&";
+  }
+
   if (timeout > 0)
   {
     char buf[STRING_SIZE_FOR_LONG];
@@ -385,6 +393,7 @@ int orion::mongoConnectionPoolInit
   const char*  mechanism,
   const char*  authDb,
   bool         dbSSL,
+  bool         dbDisableRetryWrites,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -405,7 +414,7 @@ int orion::mongoConnectionPoolInit
   atexit(shutdownClient);
 
   // Set mongo Uri to connect
-  std::string uri = composeMongoUri(host, rplSet, username, passwd, mechanism, authDb, dbSSL, timeout);
+  std::string uri = composeMongoUri(host, rplSet, username, passwd, mechanism, authDb, dbSSL, dbDisableRetryWrites, timeout);
 
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods

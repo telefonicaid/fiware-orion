@@ -75,6 +75,8 @@ The list of available options is the following:
     this option if your MongoDB server or replicat set is not using SSL). Note there is
     currently a limitation: Orion uses `tlsAllowInvalidCertificates=true` in this case,
     so the certificate used by MongoDB server is not being validated.
+-   **-dbDisableRetryWrites**. Set retryWrite parameter to false in DB connections (not
+    recommended, only to keep compatibility with old MongoDB instances)
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:

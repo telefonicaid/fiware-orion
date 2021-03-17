@@ -69,6 +69,10 @@ provided using the command line options:
 * `-dbAuthMech`
 * `-dbAuthDb`
 * `-dbSSL`
+* `-dbDisableRetryWrites`
+* `-dbTimeout`
+* `-dbPoolSize`
+* `-writeConcern`
 
 Note that `-dbuser`, `-dbpwd`, `-dbAuthMech` and `-dbAuthDb`.
 are only used if MongoDB runs using authentication, i.e. with `--auth`.

@@ -54,6 +54,7 @@ extern int mongoConnectionPoolInit
   const char* mechanism,
   const char* authDb,
   bool        dbSSL,
+  bool        dbDisableRetryWrites,
   bool        mtenant,
   int64_t     timeout,
   int         writeConcern = 1,
