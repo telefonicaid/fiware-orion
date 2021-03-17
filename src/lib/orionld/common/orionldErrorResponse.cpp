@@ -89,24 +89,17 @@ void orionldErrorResponseCreate
   orionldState.pd.title  = (char*) title;
   orionldState.pd.detail = (char*) detail;
 
-  int titleAndDetailLen = 0;
-
-  if (title != NULL)
-    titleAndDetailLen += strlen(title);
-  if (detail != NULL)
-    titleAndDetailLen += strlen(detail);
-
-  if (titleAndDetailLen > 0)
+  if ((title  != NULL) && (detail != NULL))
   {
-    titleAndDetailLen += 3;  // Room for ': ' and the zero termination
-
-    orionldState.pd.titleAndDetail = (char*) kaAlloc(&orionldState.kalloc, titleAndDetailLen);
-
-    if      ((title  != NULL) && (detail != NULL))  snprintf(orionldState.pd.titleAndDetail, titleAndDetailLen, "%s: %s", title, detail);
-    else if  (title  != NULL)                       orionldState.pd.titleAndDetail = (char*) title;
-    else if  (detail != NULL)                       orionldState.pd.titleAndDetail = (char*) detail;
-    else                                            orionldState.pd.titleAndDetail = (char*) "no error info";
+    snprintf(orionldState.pd.titleAndDetailBuffer, sizeof(orionldState.pd.titleAndDetailBuffer), "%s: %s", title, detail);
+    orionldState.pd.titleAndDetail = orionldState.pd.titleAndDetailBuffer;
   }
+  else if (title != NULL)
+    orionldState.pd.titleAndDetail = (char*) title;
+  else if (detail != NULL)
+    orionldState.pd.titleAndDetail = (char*) detail;
+  else
+    orionldState.pd.titleAndDetail = (char*) "no error info available";
 
   KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldErrorTypeToString(errorType));
   KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
