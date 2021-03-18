@@ -95,8 +95,6 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
     //
     const char* invalidPolygon      = "Exterior shell of polygon is invalid";
     const char* sortError           = "next(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
-    const char* defaultErrorString  = "Error at querying MongoDB";
-
     if (strncmp(error.message, invalidPolygon, strlen(invalidPolygon)) == 0)
     {
       exErr = invalidPolygon;
@@ -111,7 +109,7 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
     }
     else
     {
-      exErr = defaultErrorString;
+      exErr = "Error at querying MongoDB: " + std::string(error.message);
       errType = ON_NEXT_UNMANAGED_ERROR;
     }
   }

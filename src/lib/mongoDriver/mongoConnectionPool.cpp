@@ -261,7 +261,13 @@ static void shutdownClient(void)
   {
     if (!connectionPool[ix].connection.isNull())
     {
-      LM_T(LmtMongo, ("clossing connection #%d", ix));
+      // Setting free to false is a safe guard when the shutdown process
+      // takes too much (which is not usual when MongoDB runs locally to CB
+      // but it may happend with some probability when MongoDB runs on the cloud).
+      // Othewrise, the cache refresh process could start and use a destroyed connection
+      // (thus causing segfault)
+      LM_T(LmtMongo, ("closing connection #%d", ix));
+      connectionPool[ix].free = false;
       mongoc_client_destroy(connectionPool[ix].connection.get());
     }
   }
