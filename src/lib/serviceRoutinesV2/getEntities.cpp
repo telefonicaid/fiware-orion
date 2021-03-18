@@ -309,9 +309,16 @@ std::string getEntities
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
-  // 03. Render Entities response
-
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+  // 03. Check Internal Errors
+  if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
+  {
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
+  }
+  // 04. Render Entities response
+  else if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
     ciP->httpStatusCode = SccOk;
     answer = "[]";
