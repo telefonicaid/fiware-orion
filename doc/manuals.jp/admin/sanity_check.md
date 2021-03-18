@@ -69,6 +69,10 @@ Orion Context Broker は MongoDB データベースを使用します。この�
 * `-dbAuthMech`
 * `-dbAuthDb`
 * `-dbSSL`
+* `-dbDisableRetryWrites`
+* `-dbTimeout`
+* `-dbPoolSize`
+* `-writeConcern`
 
 `-dbuser`, `-dbpwd`, `-dbAuthMech` および `-dbAuthDb` は、MongoDB が認証を使用
 して、つまり `--auth` で実行される場合にのみ使用されることを注意して ください。
