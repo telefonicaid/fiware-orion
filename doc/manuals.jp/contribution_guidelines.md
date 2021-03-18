@@ -19,7 +19,7 @@
 * Orion Context Broker にコントリビューションしたコードは、コードを扱うすべての開発者に共通のプログラミング・スタイルを設定するために、[コード・スタイルのガイドライン](#code-style-guidelines)に従わなければなりません
 * Orion Context Broker のコードで許可されているものと許可されていないものに関する[プログラミング・パターン](#programming-patterns)に関するセクションも参照してください
 
-プル・リクエストなどのコントリビューションのワークフロー自体は別のドキュメントに記載されています。[FIWARE開発ガイドライン](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)を参照してください。
+プル・リクエストなどのコントリビューションのワークフロー自体は別のドキュメントに記載されています。[FIWARE開発ガイドライン](https://fiware-requirements.readthedocs.io/en/latest/)を参照してください。
 
 ## 貢献する方法
 
@@ -32,7 +32,7 @@
 
 ## プル・リクエストの手順
 
-[FIWARE開発ガイドライン](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)で説明したように、コントリビューションはプル・リクエスト (PR) を使用して行われます。このような PR で使用される詳細な "手順"は、以下で説明されます。
+[FIWARE開発ガイドライン](https://fiware-requirements.readthedocs.io/en/latest/)で説明したように、コントリビューションはプル・リクエスト (PR) を使用して行われます。このような PR で使用される詳細な "手順"は、以下で説明されます。
 
 * マスター・ブランチへの直接コミットは、単一行の変更を含み、許可されていません。あらゆる変更は PR として送付しなければなりません
 * PR が番号付きの issue を実装/修正している場合は、作成時に PR の本文で発行番号を参照する必要があります
