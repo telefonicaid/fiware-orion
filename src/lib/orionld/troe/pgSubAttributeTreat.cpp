@@ -77,13 +77,34 @@ bool pgSubAttributeTreat
   char*    observedAt  = NULL;
   KjNode*  valueNodeP  = NULL;
   char*    unitCode    = NULL;
+  KjNode*  subSubAttrP = subAttrP->value.firstChildP;
+  KjNode*  next;
 
-  for (KjNode* subSubAttrP = subAttrP->value.firstChildP; subSubAttrP != NULL; subSubAttrP = subSubAttrP->next)
+  while (subSubAttrP != NULL)
   {
+    next = subSubAttrP->next;
+
     if      (strcmp(subSubAttrP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(subSubAttrP);
     else if (strcmp(subSubAttrP->name, "value")      == 0)  valueNodeP = subSubAttrP;
     else if (strcmp(subSubAttrP->name, "object")     == 0)  valueNodeP = subSubAttrP;
     else if (strcmp(subSubAttrP->name, "unitCode")   == 0)  unitCode   = subSubAttrP->value.s;
+
+    //
+    // FIXME: Already expanded ... not so good - depends on the context
+    //        However, this solution works for all uses, if I also compare and removes non-expanded.
+    //        Let's do it this way for now, but fix it some day ...
+    //        The fix would be that the service routines removes createdAt and modifiedAt before expanding and before calling the TRoE functions
+    //
+    else if ((strcmp(subSubAttrP->name, "https://uri.etsi.org/ngsi-ld/createdAt") == 0) || (strcmp(subSubAttrP->name, "https://uri.etsi.org/ngsi-ld/modifiedAt") == 0))
+    {
+      kjChildRemove(subAttrP, subSubAttrP);
+    }
+    else if ((strcmp(subSubAttrP->name, "createdAt") == 0) || (strcmp(subSubAttrP->name, "modifiedAt") == 0))
+    {
+      kjChildRemove(subAttrP, subSubAttrP);
+    }
+
+    subSubAttrP = next;
   }
 
   // Push the sub-attribute to DB
