@@ -17,7 +17,7 @@ It is a fork of the original [Orion Context Broker](https://github.com/telefonic
 Orion-LD has been tested to be a stable and fast NGSI-LD broker albeit still not fully compliant with the version 1.3.1 of the NGSi-LD API specification.
 The NGSI-LD specification is a living, changing document (on version 1.5 as of March 2021), with features added in a pace that is just not possible to keep up for an NGSI-LD implementation.
 
-The latest release of Orion-LD is ([Beta 2](https://github.com/FIWARE/context.Orion-LD/releases) of March 2021) and it contains the following additions with respect to [Beta 1 (initially alpha-6)](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.6.1-alpha):
+The latest release of Orion-LD is ([Beta 2](https://github.com/FIWARE/context.Orion-LD/releases/tag/0.7.0) of March 2021) and it contains the following additions with respect to [Beta 1 (initially alpha-6)](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.6.1-alpha):
 * Query responses and notifications in GeoJSON format, if so requested (Accept: application/geo+json)
 * Performance improvements
 * Bug fixes
@@ -40,7 +40,7 @@ There are a number of docker images to choose from.
 If you (at your own risk) want to evaluate the bleeding edge development changes, you can use the latest image:
 ```docker run fiware/orion-ld:latest```  or even better: use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
 
-If you instead want to use a more stable image, the latest beta release (as of March 2021) is [0.7.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.7.0)
+If you instead want to use a more stable image, the latest beta release (as of March 2021) is [0.7.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/0.7.0)
 
 ```docker run fiware/orion-ld:0.7.0```
 
