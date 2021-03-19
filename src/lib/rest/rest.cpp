@@ -634,7 +634,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     orionldState.tenant = (char*) value;
     if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
-    LM_TMP(("TROE: orionldState.troeDbName: '%s'", orionldState.troeDbName));
 #endif
     headerP->tenant = value;
     ciP->tenant     = value;
@@ -650,7 +649,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     orionldState.tenant = (char*) value;
     if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
-    LM_TMP(("TROE: orionldState.troeDbName: '%s'", orionldState.troeDbName));
   }
   else if (strcasecmp(ckey, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;

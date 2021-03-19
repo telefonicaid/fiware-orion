@@ -64,7 +64,6 @@ KjNode* dmodelMetadata(KjNode* dbMetadataP, bool sysAttrs, OrionldProblemDetails
   KjNode* nodeP    = dbMetadataP->value.firstChildP;
   KjNode* next;
 
-  LM_TMP(("GEO: metadata: '%s'", alias));
   while (nodeP != NULL)
   {
     next = nodeP->next;
@@ -148,7 +147,6 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
     {
       KjNode* metadataP;
 
-      LM_TMP(("GEO: treating metadata '%s'", mdP->name));
       if ((metadataP = dmodelMetadata(mdP, sysAttrs, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));

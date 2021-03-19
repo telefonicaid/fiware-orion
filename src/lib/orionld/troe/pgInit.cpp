@@ -84,7 +84,6 @@ unsigned int   pgDbs = 0;
 //
 void pgDbInit(void)
 {
-  LM_TMP(("POOL: initializing the PgDb table"));
   sem_init(&pgDbSem, 0, 0);
   bzero(pgDbV, sizeof(pgDbV));
 }
@@ -136,7 +135,6 @@ bool pgDbAppend(char* dbName)
 
   sem_post(&pgDbSem);
 
-  LM_TMP(("POOL: Appended '%s' to the PgDb table", dbName));
   return true;
 }
 
@@ -147,8 +145,6 @@ bool pgDbAppend(char* dbName)
 //
 bool pgDbPoolSetup(PgDb* dbP)
 {
-  LM_TMP(("POOL: Setting up the connection pool for the '%s' database", dbP->name));
-
   dbP->pool = (PgConnection*) calloc(troePoolSize, sizeof(PgConnection));
 
   if (dbP->pool == NULL)
@@ -190,7 +186,6 @@ bool pgDbPopulate(const char* dbPrefix)
     if (strncmp(dbNameP, dbPrefix, strlen(dbPrefix)) != 0)
       continue;
 
-    LM_TMP(("TROE: matching DB: '%s'", dbNameP));
     // FIXME: Check all tables are present and 100% OK
     pgDbAppend(dbNameP);
   }

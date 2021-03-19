@@ -75,7 +75,6 @@ bool troePostBatchCreate(ConnectionInfo* ciP)
   bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
     if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)
     {
       ok = false;

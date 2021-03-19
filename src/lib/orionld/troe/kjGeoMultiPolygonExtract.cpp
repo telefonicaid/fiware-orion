@@ -66,14 +66,10 @@ bool kjGeoMultiPolygonExtract(KjNode* coordinatesP, char* coordsString, int coor
       ++coordsIx;
     }
 
-    LM_TMP(("polygonCoordsString: '%s'", polygonCoordsString));
-    LM_TMP(("Room left: %d bytes", coordsLen - coordsIx));
     strncpy(&coordsString[coordsIx], polygonCoordsString, coordsLen - coordsIx);
     coordsIx += slen;
-    LM_TMP(("coordsString: %s", coordsString));
   }
   coordsString[coordsIx] = ')';
 
-  LM_TMP(("FINAL coordsString: %s", coordsString));
   return true;
 }

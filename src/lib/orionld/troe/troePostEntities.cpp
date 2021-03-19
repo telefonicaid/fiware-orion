@@ -53,11 +53,7 @@ void troeEntityExpand(KjNode* entityP)
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (strcmp(attrP->name, "type") == 0)
-    {
-      LM_TMP(("EXPAND: FROM '%s' (entity type value)", attrP->value.s));
       attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
-      LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
-    }
     else if (strcmp(attrP->name, "id")               == 0) {}
     else if (strcmp(attrP->name, "location")         == 0) {}
     else if (strcmp(attrP->name, "observationSpace") == 0) {}
@@ -79,11 +75,7 @@ void troeEntityExpand(KjNode* entityP)
           else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
           else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
           else
-          {
-            LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
             subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name,  true, NULL);
-            LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
-          }
         }
       }
     }
@@ -115,7 +107,6 @@ bool troePostEntities(ConnectionInfo* ciP)
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
 
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
   char* entityId   = orionldState.payloadIdNode->value.s;
   char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
   if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)

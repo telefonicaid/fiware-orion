@@ -85,10 +85,6 @@ bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int po
 
       int pointBufferLen = strlen(pointBuffer);
 
-      LM_TMP(("polygonCoordsIx  == %d", polygonCoordsIx));
-      LM_TMP(("pointBufferLen   == %d", pointBufferLen));
-      LM_TMP(("polygonCoordsLen == %d", polygonCoordsLen));
-      LM_TMP(("polygonCoordsString: '%s'", polygonCoordsString));
       if (polygonCoordsIx + pointBufferLen + 1 >= polygonCoordsLen)
         LM_RE(false, ("Not enough room in polygonCoordsString - fix and recompile"));
 
@@ -98,7 +94,6 @@ bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int po
         ++polygonCoordsIx;
       }
 
-      LM_TMP(("Appending '%s' to polygonCoordsString", pointBuffer));
       strncpy(&polygonCoordsString[polygonCoordsIx], pointBuffer, polygonCoordsLen - polygonCoordsIx);
       polygonCoordsIx += pointBufferLen;
 
@@ -109,8 +104,6 @@ bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int po
   }
 
   polygonCoordsString[polygonCoordsIx] = ')';
-
-  LM_TMP(("FINAL polygonCoordsString: '%s'", polygonCoordsString));
 
   return true;
 }

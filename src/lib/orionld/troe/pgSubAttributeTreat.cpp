@@ -87,7 +87,6 @@ bool pgSubAttributeTreat
   }
 
   // Push the sub-attribute to DB
-  LM_TMP(("TEMP: Push the sub-attribute '%s' to DB", subAttrP->name));
   if (pgSubAttributePush(connectionP, valueNodeP, instanceId, subAttributeType, entityId, attrInstanceId, subAttrP->name, observedAt, unitCode) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));

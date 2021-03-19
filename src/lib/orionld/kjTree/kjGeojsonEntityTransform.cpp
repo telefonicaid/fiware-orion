@@ -134,7 +134,6 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoProper
   {
     if (orionldState.geoPropertyMissing == false)
     {
-      LM_TMP(("GEO: orionldState.geoPropertyMissing == false"));
       const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
 
       geoPropertyP = kjLookup(tree, geoPropertyName);

@@ -64,7 +64,6 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
 
   for (int ix = 0; ix < entitiesInArray; ix++)
   {
-    LM_TMP(("GEO: Adding entity id '%s' to the $in array", entityArray[ix]));
     idArray.append(entityArray[ix]);
   }
   mongo::BSONObjBuilder in;
@@ -80,7 +79,6 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
   existsObj.append("$exists", true);
 
   snprintf(attrPath, sizeof(attrPath), "attrs.%s", attributeName);
-  LM_TMP(("GEO: attributeName: '%s'", attrPath));
 
   filter.append(attrPath, existsObj.obj());
 
@@ -98,7 +96,6 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
   mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = fields.obj();
 
-  LM_TMP(("GEO: mongo query: %s", query.toString().c_str()));
   cursorP = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
 
   //
@@ -160,6 +157,5 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
     }
   }
 
-  LM_TMP(("GEO: returning entities/attribute tree at %p", kjTree));
   return  kjTree;
 }

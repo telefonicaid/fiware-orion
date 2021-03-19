@@ -38,14 +38,12 @@ void connectionCountIncr(const char* who, void* connectionP)
 {
   // Just debugging - no semaphore necessary
   ++connectionCount;
-  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
 }
 
 void connectionCountDecr(const char* who, void* connectionP)
 {
   // Just debugging - no semaphore necessary
   --connectionCount;
-  LM_TMP(("PG Connection Count == %d (%s:%p)", connectionCount, who, connectionP));
 }
 #endif
 
@@ -125,7 +123,6 @@ PGconn* pgConnectionGet(const char* db)
   if (connectionP == NULL)
     LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, db));
 
-  LM_TMP(("TROE: connected to db '%s', at 0x%x (on connection attempt %d)", db, connectionP, attemptNo));
 #ifdef PG_CONNECTION_COUNT
   connectionCountIncr("pgConnectionGet", connectionP);
 #endif

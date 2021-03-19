@@ -505,19 +505,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
     bool        geoPropertyNameInAttrs = geoPropertyInAttrs(attrsV, attrsCount, geoPropertyName);
 
-    LM_TMP(("GEO: geo+json and attr URI param ..."));
-    LM_TMP(("GEO: geo-property is: '%s'", geoPropertyName));
-
     int ix = 0;
     while (ix < attrsCount)
     {
       if (strcmp(geoPropertyName, attrsV[ix]) == 0)
-      {
         geoPropertyNameInAttrs = true;
-        LM_TMP(("GEO: URI-param attrs[%d]: '%s' (this is the geometryProperty URL-param - we are done here)", ix, attrsV[ix]));
-      }
-      else
-        LM_TMP(("GEO: URI-param attrs[%d]: '%s'", ix, attrsV[ix]));
 
       ++ix;
     }
@@ -537,21 +529,16 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       int    entityIx    = 0;
 
       // Populate the array with all entity ids
-      LM_TMP(("GEO: %d matching entities - create an array and then query over id in 'that id-array' AND attribute '%s' exists", entities, geoPropertyName));
       for (KjNode* entityP = orionldState.responseTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         KjNode* idP = kjLookup(entityP, "id");
 
         if (idP != NULL)
-        {
-          LM_TMP(("GEO: Entity '%s'", idP->value.s));
           entityArray[entityIx++] = idP->value.s;
-        }
       }
 
       // DB Query, to extract the needed info from the DB
       char* geoPropertyNameExpanded = (char*) geoPropertyName;
-      LM_TMP(("GEO: geoPropertyName == '%s' (before expansion)", geoPropertyNameExpanded));
 
       if ((strcmp(geoPropertyName, "location")         != 0) &&
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
@@ -562,7 +549,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
         dotForEq(geoPropertyNameExpanded);
       }
-      LM_TMP(("GEO: geoPropertyName == '%s' (after expansion)", geoPropertyNameExpanded));
 
       KjNode* dbEntityArray = dbEntitiesAttributeLookup(entityArray, entities, geoPropertyNameExpanded);
       if (dbEntityArray != NULL)
@@ -570,24 +556,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         orionldState.geoPropertyNodes = kjArray(orionldState.kjsonP, NULL);
 
         // Transform the Database model into a "valid" NGSI-LD tree
-        char buf[1024 * 4];  // DEBUG
         for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
         {
           OrionldProblemDetails pd;
-          kjFastRender(orionldState.kjsonP, dbEntityP, buf, sizeof(buf));
-          LM_TMP(("GEO: dbEntityP: %s", buf));
           KjNode*               entityP = dmodelEntity(dbEntityP, false, &pd);
-          LM_TMP(("GEO: dmodelEntity returned an entity at %p", entityP));
-          kjFastRender(orionldState.kjsonP, entityP, buf, sizeof(buf));
-          LM_TMP(("GEO: ********************* entityP: %s", buf));
+
           if (entityP != NULL)
             kjChildAdd(orionldState.geoPropertyNodes, entityP);
         }
-
-        // <DEBUG>
-        kjFastRender(orionldState.kjsonP, orionldState.geoPropertyNodes, buf, sizeof(buf));
-        LM_TMP(("GEO: orionldState.geoPropertyNodes: %s", buf));
-        // </DEBUG>
       }
     }
   }
