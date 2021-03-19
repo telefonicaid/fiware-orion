@@ -1,0 +1,1124 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Exhaustive test of adding attributes to an entity, focussing on sub attributes - attrs are NOT overwritten
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Create entity E1 on default tenant and without context
+# 02. Create entity E2 on T1 tenant and without context
+
+# 03. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and without context
+# 04. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and without context
+# 05. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and without context
+# 06. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and without context
+
+# 07. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in Link header
+# 08. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in Link header
+# 09. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in Link header
+# 10. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in Link header
+
+# 11. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in payload body
+# 12. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in payload body
+# 13. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in payload body
+# 14. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in payload body
+
+# 15. See all entities in TRoE DB, default tenant
+# 16. See all attributes in TRoE DB, default tenant
+# 17. See all sub-attributes in TRoE DB, default tenant
+
+# 18. See all entities in TRoE DB, tenant T1
+# 19. See all attributes in TRoE DB, tenant T1
+# 20. See all sub-attributes in TRoE DB, tenant T1
+#
+
+echo "01. Create entity E1 on default tenant and without context"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "owner": {
+    "type": "Property",
+    "value": 1,
+    "unitCode": "kg",
+    "createdAt":  "2021-03-17T00:00:00.001Z",
+    "modifiedAt": "2021-03-17T00:00:00.001Z",
+    "observedAt": "2021-03-17T00:00:00.001Z",
+    "R1": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:R:1",
+      "observedAt": "2021-03-17T00:00:00.001Z",
+      "createdAt":  "2021-03-17T00:00:00.001Z",
+      "modifiedAt": "2021-03-17T00:00:00.001Z"
+    },
+    "weight": {
+      "type": "Property",
+      "value": 250,
+      "observedAt": "2021-03-17T00:00:00.001Z",
+      "createdAt":  "2021-03-17T00:00:00.001Z",
+      "modifiedAt": "2021-03-17T00:00:00.001Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.001Z",
+      "createdAt":  "2021-03-17T00:00:00.001Z",
+      "modifiedAt": "2021-03-17T00:00:00.001Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 on T1 tenant and without context"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "Device",
+  "owner": {
+    "type": "Property",
+    "value": 2,
+    "unitCode": "kg",
+    "createdAt":  "2021-03-17T00:00:00.002Z",
+    "modifiedAt": "2021-03-17T00:00:00.002Z",
+    "observedAt": "2021-03-17T00:00:00.002Z",
+    "R1": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:R:2",
+      "observedAt": "2021-03-17T00:00:00.002Z",
+      "createdAt":  "2021-03-17T00:00:00.002Z",
+      "modifiedAt": "2021-03-17T00:00:00.002Z"
+    },
+    "weight": {
+      "type": "Property",
+      "value": 250,
+      "observedAt": "2021-03-17T00:00:00.002Z",
+      "createdAt":  "2021-03-17T00:00:00.002Z",
+      "modifiedAt": "2021-03-17T00:00:00.002Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.002Z",
+      "createdAt":  "2021-03-17T00:00:00.002Z",
+      "modifiedAt": "2021-03-17T00:00:00.002Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "03. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and without context"
+echo "==============================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 3,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.003Z",
+    "createdAt": "2021-03-17T00:00:00.003Z",
+    "modifiedAt": "2021-03-17T00:00:00.003Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:3",
+      "observedAt": "2021-03-17T00:00:00.003Z",
+      "createdAt": "2021-03-17T00:00:00.003Z",
+      "modifiedAt": "2021-03-17T00:00:00.003Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.003Z",
+      "createdAt": "2021-03-17T00:00:00.003Z",
+      "modifiedAt": "2021-03-17T00:00:00.003Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:3",
+      "observedAt": "2021-03-17T00:00:00.003Z",
+      "createdAt": "2021-03-17T00:00:00.003Z",
+      "modifiedAt": "2021-03-17T00:00:00.003Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 3,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.003Z",
+      "createdAt": "2021-03-17T00:00:00.003Z",
+      "modifiedAt": "2021-03-17T00:00:00.003Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.003Z",
+      "createdAt":  "2021-03-17T00:00:00.003Z",
+      "modifiedAt": "2021-03-17T00:00:00.003Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and without context"
+echo "========================================================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 4,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.004Z",
+    "createdAt": "2021-03-17T00:00:00.004Z",
+    "modifiedAt": "2021-03-17T00:00:00.004Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:4",
+      "observedAt": "2021-03-17T00:00:00.004Z",
+      "createdAt": "2021-03-17T00:00:00.004Z",
+      "modifiedAt": "2021-03-17T00:00:00.004Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.004Z",
+      "createdAt": "2021-03-17T00:00:00.004Z",
+      "modifiedAt": "2021-03-17T00:00:00.004Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:4",
+      "observedAt": "2021-03-17T00:00:00.004Z",
+      "createdAt": "2021-03-17T00:00:00.004Z",
+      "modifiedAt": "2021-03-17T00:00:00.004Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 4,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.004Z",
+      "createdAt": "2021-03-17T00:00:00.004Z",
+      "modifiedAt": "2021-03-17T00:00:00.004Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.004Z",
+      "createdAt":  "2021-03-17T00:00:00.004Z",
+      "modifiedAt": "2021-03-17T00:00:00.004Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "05. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and without context"
+echo "=========================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 5,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.005Z",
+    "createdAt": "2021-03-17T00:00:00.005Z",
+    "modifiedAt": "2021-03-17T00:00:00.005Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:5",
+      "observedAt": "2021-03-17T00:00:00.005Z",
+      "createdAt": "2021-03-17T00:00:00.005Z",
+      "modifiedAt": "2021-03-17T00:00:00.005Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.005Z",
+      "createdAt": "2021-03-17T00:00:00.005Z",
+      "modifiedAt": "2021-03-17T00:00:00.005Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:5",
+      "observedAt": "2021-03-17T00:00:00.005Z",
+      "createdAt": "2021-03-17T00:00:00.005Z",
+      "modifiedAt": "2021-03-17T00:00:00.005Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 5,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.005Z",
+      "createdAt": "2021-03-17T00:00:00.005Z",
+      "modifiedAt": "2021-03-17T00:00:00.005Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 5 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.005Z",
+      "createdAt":  "2021-03-17T00:00:00.005Z",
+      "modifiedAt": "2021-03-17T00:00:00.005Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "06. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E2 for T1 tenant and without context"
+echo "====================================================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 6,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.006Z",
+    "createdAt": "2021-03-17T00:00:00.006Z",
+    "modifiedAt": "2021-03-17T00:00:00.006Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:6",
+      "observedAt": "2021-03-17T00:00:00.006Z",
+      "createdAt": "2021-03-17T00:00:00.006Z",
+      "modifiedAt": "2021-03-17T00:00:00.006Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.006Z",
+      "createdAt": "2021-03-17T00:00:00.006Z",
+      "modifiedAt": "2021-03-17T00:00:00.006Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:6",
+      "observedAt": "2021-03-17T00:00:00.006Z",
+      "createdAt": "2021-03-17T00:00:00.006Z",
+      "modifiedAt": "2021-03-17T00:00:00.006Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 6,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.006Z",
+      "createdAt": "2021-03-17T00:00:00.006Z",
+      "modifiedAt": "2021-03-17T00:00:00.006Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 6 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.006Z",
+      "createdAt":  "2021-03-17T00:00:00.006Z",
+      "modifiedAt": "2021-03-17T00:00:00.006Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "07. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in Link header"
+echo "================================================================================================================================"
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": 7,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.007Z",
+    "createdAt": "2021-03-17T00:00:00.007Z",
+    "modifiedAt": "2021-03-17T00:00:00.007Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:7",
+      "observedAt": "2021-03-17T00:00:00.007Z",
+      "createdAt": "2021-03-17T00:00:00.007Z",
+      "modifiedAt": "2021-03-17T00:00:00.007Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.007Z",
+      "createdAt": "2021-03-17T00:00:00.007Z",
+      "modifiedAt": "2021-03-17T00:00:00.007Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:7",
+      "observedAt": "2021-03-17T00:00:00.007Z",
+      "createdAt": "2021-03-17T00:00:00.007Z",
+      "modifiedAt": "2021-03-17T00:00:00.007Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 7,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.007Z",
+      "createdAt": "2021-03-17T00:00:00.007Z",
+      "modifiedAt": "2021-03-17T00:00:00.007Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 7 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.007Z",
+      "createdAt":  "2021-03-17T00:00:00.007Z",
+      "modifiedAt": "2021-03-17T00:00:00.007Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "08. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in Link header"
+echo "=========================================================================================================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": 8,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.008Z",
+    "createdAt": "2021-03-17T00:00:00.008Z",
+    "modifiedAt": "2021-03-17T00:00:00.008Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:8",
+      "observedAt": "2021-03-17T00:00:00.008Z",
+      "createdAt": "2021-03-17T00:00:00.008Z",
+      "modifiedAt": "2021-03-17T00:00:00.008Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.008Z",
+      "createdAt": "2021-03-17T00:00:00.008Z",
+      "modifiedAt": "2021-03-17T00:00:00.008Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:8",
+      "observedAt": "2021-03-17T00:00:00.008Z",
+      "createdAt": "2021-03-17T00:00:00.008Z",
+      "modifiedAt": "2021-03-17T00:00:00.008Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 8,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.008Z",
+      "createdAt": "2021-03-17T00:00:00.008Z",
+      "modifiedAt": "2021-03-17T00:00:00.008Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 8 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.008Z",
+      "createdAt":  "2021-03-17T00:00:00.008Z",
+      "modifiedAt": "2021-03-17T00:00:00.008Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "09. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in Link header"
+echo "==========================================================================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": 9,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.009Z",
+    "createdAt": "2021-03-17T00:00:00.009Z",
+    "modifiedAt": "2021-03-17T00:00:00.009Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:9",
+      "observedAt": "2021-03-17T00:00:00.009Z",
+      "createdAt": "2021-03-17T00:00:00.009Z",
+      "modifiedAt": "2021-03-17T00:00:00.009Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.009Z",
+      "createdAt": "2021-03-17T00:00:00.009Z",
+      "modifiedAt": "2021-03-17T00:00:00.009Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:9",
+      "observedAt": "2021-03-17T00:00:00.009Z",
+      "createdAt": "2021-03-17T00:00:00.009Z",
+      "modifiedAt": "2021-03-17T00:00:00.009Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 9,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.009Z",
+      "createdAt": "2021-03-17T00:00:00.009Z",
+      "modifiedAt": "2021-03-17T00:00:00.009Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 9 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.009Z",
+      "createdAt":  "2021-03-17T00:00:00.009Z",
+      "modifiedAt": "2021-03-17T00:00:00.009Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1 -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "10. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in Link header"
+echo "====================================================================================================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": 10,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.010Z",
+    "createdAt": "2021-03-17T00:00:00.010Z",
+    "modifiedAt": "2021-03-17T00:00:00.010Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:10",
+      "observedAt": "2021-03-17T00:00:00.010Z",
+      "createdAt": "2021-03-17T00:00:00.010Z",
+      "modifiedAt": "2021-03-17T00:00:00.010Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.010Z",
+      "createdAt": "2021-03-17T00:00:00.010Z",
+      "modifiedAt": "2021-03-17T00:00:00.010Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:10",
+      "observedAt": "2021-03-17T00:00:00.010Z",
+      "createdAt": "2021-03-17T00:00:00.010Z",
+      "modifiedAt": "2021-03-17T00:00:00.010Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 10,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.010Z",
+      "createdAt": "2021-03-17T00:00:00.010Z",
+      "modifiedAt": "2021-03-17T00:00:00.010Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 10 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.010Z",
+      "createdAt":  "2021-03-17T00:00:00.010Z",
+      "modifiedAt": "2021-03-17T00:00:00.010Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1 -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "11. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in payload body"
+echo "================================================================================================================================="
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "P3": {
+    "type": "Property",
+    "value": 11,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.011Z",
+    "createdAt": "2021-03-17T00:00:00.011Z",
+    "modifiedAt": "2021-03-17T00:00:00.011Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:11",
+      "observedAt": "2021-03-17T00:00:00.011Z",
+      "createdAt": "2021-03-17T00:00:00.011Z",
+      "modifiedAt": "2021-03-17T00:00:00.011Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.011Z",
+      "createdAt": "2021-03-17T00:00:00.011Z",
+      "modifiedAt": "2021-03-17T00:00:00.011Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:11",
+      "observedAt": "2021-03-17T00:00:00.011Z",
+      "createdAt": "2021-03-17T00:00:00.011Z",
+      "modifiedAt": "2021-03-17T00:00:00.011Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 11,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.011Z",
+      "createdAt": "2021-03-17T00:00:00.011Z",
+      "modifiedAt": "2021-03-17T00:00:00.011Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 11 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.011Z",
+      "createdAt":  "2021-03-17T00:00:00.011Z",
+      "modifiedAt": "2021-03-17T00:00:00.011Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "12. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in payload body"
+echo "==========================================================================================================================================================="
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "P3": {
+    "type": "Property",
+    "value": 12,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.012Z",
+    "createdAt": "2021-03-17T00:00:00.012Z",
+    "modifiedAt": "2021-03-17T00:00:00.012Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:12",
+      "observedAt": "2021-03-17T00:00:00.012Z",
+      "createdAt": "2021-03-17T00:00:00.012Z",
+      "modifiedAt": "2021-03-17T00:00:00.012Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.012Z",
+      "createdAt": "2021-03-17T00:00:00.012Z",
+      "modifiedAt": "2021-03-17T00:00:00.012Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:12",
+      "observedAt": "2021-03-17T00:00:00.012Z",
+      "createdAt": "2021-03-17T00:00:00.012Z",
+      "modifiedAt": "2021-03-17T00:00:00.012Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 12,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.012Z",
+      "createdAt": "2021-03-17T00:00:00.012Z",
+      "modifiedAt": "2021-03-17T00:00:00.012Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 12 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.012Z",
+      "createdAt":  "2021-03-17T00:00:00.012Z",
+      "modifiedAt": "2021-03-17T00:00:00.012Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs?options=noOverwrite --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "13. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in payload body"
+echo "============================================================================================================================"
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "P3": {
+    "type": "Property",
+    "value": 13,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.013Z",
+    "createdAt": "2021-03-17T00:00:00.013Z",
+    "modifiedAt": "2021-03-17T00:00:00.013Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:13",
+      "observedAt": "2021-03-17T00:00:00.013Z",
+      "createdAt": "2021-03-17T00:00:00.013Z",
+      "modifiedAt": "2021-03-17T00:00:00.013Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.013Z",
+      "createdAt": "2021-03-17T00:00:00.013Z",
+      "modifiedAt": "2021-03-17T00:00:00.013Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:13",
+      "observedAt": "2021-03-17T00:00:00.013Z",
+      "createdAt": "2021-03-17T00:00:00.013Z",
+      "modifiedAt": "2021-03-17T00:00:00.013Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 13,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.013Z",
+      "createdAt": "2021-03-17T00:00:00.013Z",
+      "modifiedAt": "2021-03-17T00:00:00.013Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 13 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.013Z",
+      "createdAt":  "2021-03-17T00:00:00.013Z",
+      "modifiedAt": "2021-03-17T00:00:00.013Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1 --in application/ld+json
+echo
+echo
+
+
+echo "14. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in payload body"
+echo "======================================================================================================================================================"
+payload='{
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+  "P3": {
+    "type": "Property",
+    "value": 14,
+    "unitCode": "mg",
+    "observedAt": "2021-03-17T00:00:00.014Z",
+    "createdAt": "2021-03-17T00:00:00.014Z",
+    "modifiedAt": "2021-03-17T00:00:00.014Z",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:R:14",
+      "observedAt": "2021-03-17T00:00:00.014Z",
+      "createdAt": "2021-03-17T00:00:00.014Z",
+      "modifiedAt": "2021-03-17T00:00:00.014Z"
+    }, 
+    "status": {
+      "type": "Property",
+      "value": "OK",
+      "observedAt": "2021-03-17T00:00:00.014Z",
+      "createdAt": "2021-03-17T00:00:00.014Z",
+      "modifiedAt": "2021-03-17T00:00:00.014Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:14",
+      "observedAt": "2021-03-17T00:00:00.014Z",
+      "createdAt": "2021-03-17T00:00:00.014Z",
+      "modifiedAt": "2021-03-17T00:00:00.014Z"
+    },
+    "batteryLevel": {
+      "type": "Property",
+      "value": 14,
+      "unitCode": "%",
+      "observedAt": "2021-03-17T00:00:00.014Z",
+      "createdAt": "2021-03-17T00:00:00.014Z",
+      "modifiedAt": "2021-03-17T00:00:00.014Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 14 ]
+      },
+      "observedAt": "2021-03-17T00:00:00.014Z",
+      "createdAt":  "2021-03-17T00:00:00.014Z",
+      "modifiedAt": "2021-03-17T00:00:00.014Z"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs?options=noOverwrite --payload "$payload" --tenant t1 --in application/ld+json
+echo
+echo
+
+
+echo "15. See all entities in TRoE DB, default tenant"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "16. See all attributes in TRoE DB, default tenant"
+echo "================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
+echo
+echo
+
+
+echo "17. See all sub-attributes in TRoE DB, default tenant"
+echo "====================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,observedAt,attrInstanceId FROM subAttributes"
+echo
+echo
+
+
+echo "18. See all entities in TRoE DB, tenant T1"
+echo "=========================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" -t ftest_t1
+echo
+echo
+
+
+echo "19. See all attributes in TRoE DB, tenant T1"
+echo "============================================"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes" -t ftest_t1
+echo
+echo
+
+
+echo "20. See all sub-attributes in TRoE DB, tenant T1"
+echo "================================================"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,observedAt,attrInstanceId FROM subAttributes" -t ftest_t1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 on default tenant and without context
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 on T1 tenant and without context
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+Date: REGEX(.*)
+
+
+
+03. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and without context
+===============================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and without context
+=========================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P1",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+05. Append attribute P1 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and without context
+==========================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E2 for T1 tenant and without context
+=====================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P1",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+07. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in Link header
+================================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in Link header
+==========================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P2",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+09. Append attribute P2 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in Link header
+===========================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in Link header
+=====================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P2",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+11. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E1 on default tenant and with user context in payload body
+=================================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in payload body
+===========================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P3",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+13. Append attribute P3 with sub-attrs R1,status,owner,batteryLevel to E2 on T1 tenant and with user context in payload body
+============================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in payload body
+======================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 117
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P3",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+15. See all entities in TRoE DB, default tenant
+===============================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+16. See all attributes in TRoE DB, default tenant
+=================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,1,,2021-03-17 00:00:00.001,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E1,t,mg,,,3,,2021-03-17 00:00:00.003,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E1,t,mg,,,7,,2021-03-17 00:00:00.007,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E1,t,mg,,,11,,2021-03-17 00:00:00.011,202REGEX(.*)
+
+
+17. See all sub-attributes in TRoE DB, default tenant
+=====================================================
+id,valuetype,entityid,unitcode,text,number,boolean,observedat,attrinstanceid
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:1,,,2021-03-17 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,,,250,,2021-03-17 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-17 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:3,,,2021-03-17 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-17 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:3,,,2021-03-17 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,3,,2021-03-17 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-17 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:7,,,2021-03-17 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-17 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:7,,,2021-03-17 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,7,,2021-03-17 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-17 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:11,,,2021-03-17 00:00:00.011,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-17 00:00:00.011,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:11,,,2021-03-17 00:00:00.011,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,11,,2021-03-17 00:00:00.011,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-17 00:00:00.011,urn:ngsi-ld:attribute:instance:REGEX(.*)
+
+
+18. See all entities in TRoE DB, tenant T1
+==========================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E2,https://uri.etsi.org/ngsi-ld/default-context/Device,202REGEX(.*)
+
+
+19. See all attributes in TRoE DB, tenant T1
+============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,2,,2021-03-17 00:00:00.002,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E2,t,mg,,,5,,2021-03-17 00:00:00.005,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E2,t,mg,,,9,,2021-03-17 00:00:00.009,202REGEX(.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E2,t,mg,,,13,,2021-03-17 00:00:00.013,202REGEX(.*)
+
+
+20. See all sub-attributes in TRoE DB, tenant T1
+================================================
+id,valuetype,entityid,unitcode,text,number,boolean,observedat,attrinstanceid
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:2,,,2021-03-17 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,,,250,,2021-03-17 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-17 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:5,,,2021-03-17 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-17 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:5,,,2021-03-17 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,5,,2021-03-17 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-17 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:9,,,2021-03-17 00:00:00.009,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-17 00:00:00.009,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:9,,,2021-03-17 00:00:00.009,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,9,,2021-03-17 00:00:00.009,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-17 00:00:00.009,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:13,,,2021-03-17 00:00:00.013,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-17 00:00:00.013,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:13,,,2021-03-17 00:00:00.013,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,13,,2021-03-17 00:00:00.013,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-17 00:00:00.013,urn:ngsi-ld:attribute:instance:REGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_t1
