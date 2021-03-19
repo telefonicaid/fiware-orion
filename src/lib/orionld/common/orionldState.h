@@ -65,7 +65,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v0.6"
+#define ORIONLD_VERSION "post-v0.7"
 
 
 
