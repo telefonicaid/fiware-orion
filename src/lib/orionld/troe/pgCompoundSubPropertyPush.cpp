@@ -82,7 +82,7 @@ bool pgCompoundSubPropertyPush
              instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, renderedValue);
   }
 
-  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
+  // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
   res = PQexec(connectionP, sql);
   if (res == NULL)

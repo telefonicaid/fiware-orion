@@ -67,7 +67,7 @@ bool pgBoolSubPropertyPush
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
              instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, (boolValue == true)? "true" : "false");
   }
-  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
+  // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
 
   PGresult* res;

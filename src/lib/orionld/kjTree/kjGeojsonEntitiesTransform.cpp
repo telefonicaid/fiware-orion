@@ -49,8 +49,6 @@ static KjNode* geoPropertyNodeLookup(KjNode* geoPropertyNodes, KjNode* entityIdN
 
   const char* entityId = entityIdNode->value.s;
 
-  LM_TMP(("GEO: getting the geo-property '%s' for entity '%s'", geoPropertyName, entityId));
-
   // Lookup the entityId in geoPropertyNodes and return
   if (geoPropertyNodes != NULL)
   {
@@ -63,12 +61,10 @@ static KjNode* geoPropertyNodeLookup(KjNode* geoPropertyNodes, KjNode* entityIdN
 
       // It is OK to return the entire property - kjGeojsonEntityTransform handles both cases
       KjNode* geoP = kjLookup(entityP, geoPropertyName);
-      LM_TMP(("GEO: returning geo-property at %p", geoP));
       return geoP;
     }
   }
 
-  LM_TMP(("GEO: returning geo-property at NULL"));
   return NULL;
 }
 
@@ -95,16 +91,12 @@ KjNode* kjGeojsonEntitiesTransform(KjNode* tree, bool keyValues)
   const char* geometryProperty        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
   bool        geometryPropertyInAttrs = false;
 
-  LM_TMP(("GEO: attrs:            '%s'", orionldState.uriParams.attrs));
-  LM_TMP(("GEO: geometryProperty: '%s'", geometryProperty));
-
   for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode* geoPropertyNode = NULL;
 
     if ((orionldState.uriParams.attrs != NULL) && (geometryPropertyInAttrs == false))
     {
-      LM_TMP(("GEO: attrs used and geometry-property '%s' is not included - searching in orionldState.geoPropertyNodes", geometryProperty));
       KjNode* entityIdNode    = kjLookup(entityP, "id");
       geoPropertyNode = geoPropertyNodeLookup(orionldState.geoPropertyNodes, entityIdNode, geometryProperty);
       // if geoPropertyNode == NULL)

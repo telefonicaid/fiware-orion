@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -163,12 +162,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* detail;
 
-  // <DEBUG>
-  char buf[1024 * 4];
-  kjFastRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
-  LM_TMP(("PATCH: incoming: %s", buf));
-  // </DEBUG>
-
   // 1. Is the Entity ID in the URL a valid URI?
   if (pcheckUri(entityId, &detail) == false)
   {
@@ -226,11 +219,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
-
-  // <DEBUG>
-  kjFastRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
-  LM_TMP(("PATCH: From DB: %s", buf));
-  // </DEBUG>
 
   //
   // 5. Loop over the incoming payload data
@@ -304,10 +292,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     ++newAttrs;
     newAttrP = next;
   }
-  // <DEBUG>
-  kjFastRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
-  LM_TMP(("PATCH: inDbAttrsP after processing: %s", buf));
-  // </DEBUG>
 
   if (newAttrs > 0)
   {

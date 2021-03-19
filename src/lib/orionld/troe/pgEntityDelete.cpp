@@ -42,7 +42,7 @@ bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id)
   PGresult*  res;
 
   snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'Delete', '%s', 'NULL')", instanceId, orionldState.requestTimeString, id);
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
+  // LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

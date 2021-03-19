@@ -17,7 +17,7 @@ It is a fork of the original [Orion Context Broker](https://github.com/telefonic
 Orion-LD has been tested to be a stable and fast NGSI-LD broker albeit still not fully compliant with the version 1.3.1 of the NGSi-LD API specification.
 The NGSI-LD specification is a living, changing document (on version 1.5 as of March 2021), with features added in a pace that is just not possible to keep up for an NGSI-LD implementation.
 
-The latest release of Orion-LD is ([Beta 2](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.7.0) of March 2021) and it contains the following additions with respect to [Beta 1 (initially alpha-6)](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.6.1-alpha):
+The latest release of Orion-LD is ([Beta 2](https://github.com/FIWARE/context.Orion-LD/releases) of March 2021) and it contains the following additions with respect to [Beta 1 (initially alpha-6)](https://github.com/FIWARE/context.Orion-LD/releases/tag/v0.6.1-alpha):
 * Query responses and notifications in GeoJSON format, if so requested (Accept: application/geo+json)
 * Performance improvements
 * Bug fixes

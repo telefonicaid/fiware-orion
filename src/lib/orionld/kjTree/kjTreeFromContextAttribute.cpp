@@ -229,7 +229,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
       //   What was default unit in orion v1 is not default for orionld
       //
-      LM_TMP(("FIXME: something needs to be implemented here!"));
+      LM_K(("FIXME: something needs to be implemented here!"));
       continue;
     }
 

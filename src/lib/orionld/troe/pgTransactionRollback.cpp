@@ -39,7 +39,7 @@ bool pgTransactionRollback(PGconn* connectionP)
 {
   PGresult* res;
 
-  LM_TMP(("SQL[%p]: ROLLBACK", connectionP));
+  // LM_TMP(("SQL[%p]: ROLLBACK", connectionP));
 
   res = PQexec(connectionP, "ROLLBACK");
   if (res == NULL)

@@ -81,14 +81,11 @@ bool kjGeoLineStringExtract(KjNode* coordinatesP, char* lineStringCoordsString, 
       ++lineStringCoordsIx;
     }
 
-    LM_TMP(("Appending '%s' to lineStringCoordsString", pointBuffer));
     strncpy(&lineStringCoordsString[lineStringCoordsIx], pointBuffer, lineStringCoordsLen - lineStringCoordsIx);
     lineStringCoordsIx += pointBufferLen;
 
     pointP = pointP->next;
   }
-
-  LM_TMP(("FINAL lineStringCoordsString: '%s'", lineStringCoordsString));
 
   return true;
 }

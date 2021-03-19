@@ -217,9 +217,11 @@ static bool fileSystemContexts(char* cacheContextDir)
     // FIXME PR: Should the broker die here (Cache Context Directory given but it doesn't exist)
     //           or should the broker continue (downloading the core context) ???
     //           Continue, by returning false.
+    //
     LM_X(1, ("opendir(%s): %s", cacheContextDir, strerror(errno)));
   }
 
+  int files = 0;
   while (readdir_r(dirP, &dirItem, &result) == 0)
   {
     if (result == NULL)
@@ -229,8 +231,13 @@ static bool fileSystemContexts(char* cacheContextDir)
       continue;
 
     contextFileTreat(cacheContextDir, &dirItem);
+    ++files;
   }
   closedir(dirP);
+
+  if (files == 0)
+    LM_X(1, ("Cache Context Directory in use but no context was extracted from it"));
+
   return true;
 }
 #endif  // DEBUG
@@ -255,7 +262,7 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
     if (gotCoreContext == false)
       LM_E(("Unable to cache pre-loaded contexts from '%s'", cacheContextDir));
   }
-  LM_TMP(("ORIONLD_CACHED_CONTEXT_DIRECTORY == '%s'", cacheContextDir));  // #if DEBUG
+  LM_K(("ORIONLD_CACHED_CONTEXT_DIRECTORY == '%s'", cacheContextDir));  // #if DEBUG
 #endif
 
   if (gotCoreContext == false)

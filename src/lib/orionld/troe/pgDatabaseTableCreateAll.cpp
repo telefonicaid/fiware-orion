@@ -129,7 +129,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
 
   for (unsigned int ix = 0; ix < sizeof(sqlV) / sizeof(sqlV[0]); ix++)
   {
-    LM_TMP(("SQL[%p]: %s", connectionP, sqlV[ix]));
+    // LM_TMP(("SQL[%p]: %s", connectionP, sqlV[ix]));
     PGresult*  res = PQexec(connectionP, sqlV[ix]);
     if (res == NULL)
     {

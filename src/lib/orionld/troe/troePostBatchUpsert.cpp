@@ -76,20 +76,15 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  LM_TMP(("TROE: orionldState.troeDbName: '%s'", orionldState.troeDbName));
-
   connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
     LM_RE(false, ("unable to connect to postgres DB '%s'", orionldState.tenant));
-  LM_TMP(("TROE: connection OK"));
 
   if (pgTransactionBegin(connectionP) != true)
   {
     pgConnectionRelease(connectionP);
     LM_RE(false, ("pgTransactionBegin failed"));
   }
-
-  LM_TMP(("TROE: pgTransactionBegin OK"));
 
   bool     ok                 = true;
   TroeMode troeEntityMode     = TROE_ENTITY_REPLACE;
