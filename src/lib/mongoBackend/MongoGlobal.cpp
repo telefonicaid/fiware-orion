@@ -67,7 +67,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 
@@ -1427,18 +1427,14 @@ bool entitiesQuery
       else
       {
         BSONObj areaQuery;
+        bool    result;
 
-        bool result;
         if (scopeP->type == FIWARE_LOCATION_V2)
-        {
           result = processAreaScopeV2(scopeP, &areaQuery);
-        }
         else  // FIWARE Location NGSIv1 (legacy)
-        {
           result = processAreaScope(scopeP, &areaQuery);
-        }
 
-        if (result)
+        if (result == true)
         {
           if (orionldState.apiVersion == NGSI_LD_V1)
           {
@@ -1451,9 +1447,9 @@ bool entitiesQuery
             //
             // After that, "attrs.$ATTRNAME.coordinates" must be used
             //
-            if (orionldState.uriParams.geoproperty != NULL)
+            if ((orionldState.uriParams.geoproperty != NULL) && (strcmp(orionldState.uriParams.geoproperty, "location") != 0))
             {
-              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
+              attrNameP = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
               dotForEq(attrNameP);
             }
 

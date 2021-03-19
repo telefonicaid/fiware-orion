@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -47,7 +46,7 @@ extern "C"
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
@@ -244,29 +243,24 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     if ((strcmp(newAttrP->name, "createdAt") == 0) || (strcmp(newAttrP->name, "modifiedAt") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "built-in timestamps are ignored");
+      attributeNotUpdated(notUpdatedP, shortName, "built-in timestamps are ignored");
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "id") == 0) || (strcmp(newAttrP->name, "@id") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "the ID of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the ID of an entity cannot be altered");
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "type") == 0) || (strcmp(newAttrP->name, "@type") == 0))
     {
-      attributeNotUpdated(notUpdatedP, newAttrP->name, "the TYPE of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the TYPE of an entity cannot be altered");
       newAttrP = next;
       continue;
     }
-    else if ((strcmp(newAttrP->name, "location")         != 0) &&
-             (strcmp(newAttrP->name, "observationSpace") != 0) &&
-             (strcmp(newAttrP->name, "operationSpace")   != 0) &&
-             (strcmp(newAttrP->name, "observedAt")       != 0))
-    {
-      newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
-    }
+    else
+      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
 
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
@@ -298,7 +292,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     ++newAttrs;
     newAttrP = next;
   }
-
 
   if (newAttrs > 0)
   {

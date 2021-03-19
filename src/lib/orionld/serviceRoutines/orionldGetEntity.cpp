@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
@@ -369,7 +369,7 @@ static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[]
   {
     if (strcmp(eqAttrV[ix], "location") != 0)
     {
-      eqAttrV[ix]  = orionldContextItemExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
+      eqAttrV[ix]  = orionldAttributeExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
       dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
 
       // Copy eqAttrV[ix] before converting '.' to '=' - to not destroy the @context
@@ -480,7 +480,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   {
     if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
     {
-      geometryProperty = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
+      geometryProperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
       geometryProperty = kaStrdup(&orionldState.kalloc, geometryProperty);
       dotForEq(geometryProperty);
     }

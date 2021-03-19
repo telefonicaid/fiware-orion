@@ -43,7 +43,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -137,7 +137,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], true, NULL);
+    expandedV[ix] = orionldAttributeExpand(orionldState.contextP, expandedV[ix], true, NULL);
   }
 
   *attrListExpandedVecP = expandedV;

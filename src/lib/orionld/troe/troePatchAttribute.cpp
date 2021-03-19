@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
@@ -79,7 +80,7 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   // pgAttributeTreat assumes the name of the attribute comes as part of the tree.
   // So, let's name the tree then! :)
   //
-  orionldState.requestTree->name = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);  // FIXME: unitCode, datasetId, ... no expansion!!!
+  orionldState.requestTree->name = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
 
   if (pgAttributeTreat(connectionP, orionldState.requestTree, entityId, TROE_ATTRIBUTE_UPDATE) == false)
   {

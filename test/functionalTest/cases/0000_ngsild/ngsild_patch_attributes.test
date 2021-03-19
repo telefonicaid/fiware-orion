@@ -1,0 +1,1001 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Patching attributes for an entity using different contexts => different longnames for same shortname
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01.  Create E1 with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+# 01b. See the entity E1 in mongo
+# 02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+# 02b. See the entity E1 in mongo
+# 03.  GET E1 - make sure step 02 replaced the attributes
+# 04.  PATCH E1, all 7 attributes, and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 04b. See the entity E1 in mongo
+# 05.  GET E1 - make sure step 04 replaced 3 attributes and ignored the other four
+# 06.  PATCH E1, all 7 attributes, and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+# 06b. See the entity E1 in mongo
+# 07.  GET E1 - make sure step 06 replaced 3 attributes and ignored the other four
+#
+
+echo "01.  Create E1 with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)"
+echo "==========================================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 11, 12 ]
+      }
+    },
+    "createdAt": "2021-03-07T08:30:00.123Z",
+    "modifiedAt": "2021-03-07T08:30:00.123Z",
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 11, 13 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 11, 14 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 100,
+      "unitCode": "kg",
+      "observedAt": "2021-03-07T08:31:00.123Z"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "01b. See the entity E1 in mongo"
+echo "==============================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+echo
+echo
+
+
+echo "02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED"
+echo "================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 21, 22 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 21, 23 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 21, 24 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 200,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:2",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "02b. See the entity E1 in mongo"
+echo "==============================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+echo
+echo
+
+
+echo "03.  GET E1 - make sure step 02 replaced the attributes"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "04.  PATCH E1, all 7 attributes, and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "====================================================================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 41, 42 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 41, 43 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 41, 44 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 400,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:4",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04b. See the entity E1 in mongo"
+echo "==============================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+echo
+echo
+
+
+echo "05.  GET E1 - make sure step 04 replaced 3 attributes and ignored the other four"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "06.  PATCH E1, all 7 attributes, and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED"
+echo "======================================================================================================================================================================"
+payload='{
+  "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 6.1, 6.2 ]
+    }
+  },
+  "createdAt": "2021-03-07T08:30:00.123Z",
+  "modifiedAt": "2021-03-07T08:30:00.123Z",
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 6.1, 6.3 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 6.1, 6.4 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 600,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:6",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH --in application/ld+json
+echo
+echo
+
+
+echo "06b. See the entity E1 in mongo"
+echo "==============================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+echo
+echo
+
+
+echo "07.  GET E1 - make sure step 06 replaced 3 attributes and ignored the other four"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+--REGEXPECT--
+01.  Create E1 with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
+===========================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+01b. See the entity E1 in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location",
+		"observationSpace",
+		"operationSpace",
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					11,
+					12
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"observationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					11,
+					13
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"operationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					11,
+					14
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 100,
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615105860.123
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:1",
+			"md" : {
+				"observedAt" : {
+					"value" : 1615105920.123
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
+=================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 453
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace",
+        "weight",
+        "owner"
+    ]
+}
+
+
+02b. See the entity E1 in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location",
+		"observationSpace",
+		"operationSpace",
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					21,
+					22
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"observationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					21,
+					23
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"operationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					21,
+					24
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 200,
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615372260.123
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:2",
+			"md" : {
+				"observedAt" : {
+					"value" : 1615372320.123
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03.  GET E1 - make sure step 02 replaced the attributes
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                21,
+                22
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                21,
+                23
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                21,
+                24
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:2",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 200
+    }
+}
+
+
+04.  PATCH E1, all 7 attributes, and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+=====================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+04b. See the entity E1 in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner",
+		"location",
+		"observationSpace",
+		"operationSpace"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 200,
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615372260.123
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:2",
+			"md" : {
+				"observedAt" : {
+					"value" : 1615372320.123
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					41,
+					42
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"observationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					41,
+					43
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"operationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					41,
+					44
+				]
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05.  GET E1 - make sure step 04 replaced 3 attributes and ignored the other four
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                41,
+                42
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                41,
+                43
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                41,
+                44
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:2",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 200
+    }
+}
+
+
+06.  PATCH E1, all 7 attributes, and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
+======================================================================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 559
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "createdAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "modifiedAt",
+            "reason": "built-in timestamps are ignored"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+06b. See the entity E1 in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner",
+		"location",
+		"observationSpace",
+		"operationSpace"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 200,
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615372260.123
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:2",
+			"md" : {
+				"observedAt" : {
+					"value" : 1615372320.123
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					6.1,
+					6.2
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"observationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					6.1,
+					6.3
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"operationSpace" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					6.1,
+					6.4
+				]
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+07.  GET E1 - make sure step 06 replaced 3 attributes and ignored the other four
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 509
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entity:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6.1,
+                6.2
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6.1,
+                6.3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6.1,
+                6.4
+            ],
+            "type": "Point"
+        }
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:owner:2",
+        "observedAt": "2021-03-10T10:32:00.123Z",
+        "type": "Relationship"
+    },
+    "type": "Device",
+    "weight": {
+        "observedAt": "2021-03-10T10:31:00.123Z",
+        "type": "Property",
+        "unitCode": "kg",
+        "value": 200
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

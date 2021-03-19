@@ -34,16 +34,19 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// metadataAdd - from kjTreeToContextAttribute.cpp - needs its own module under orionld/common
+// metadataAdd - from kjTreeToContextAttribute.cpp
 //
-extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName);
+// FIXME: needs its own module under orionld/common
+//
+extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName);
 
 
 
@@ -51,11 +54,28 @@ extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName);
 //
 // kjTreeToMetadata -
 //
-bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP)
+bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* attributeName, char** detailP)
 {
   //
-  // A sub-attribute must be a JSON object (except if key-values, but that's for GET only in NGSI-LD)
+  // A sub-attribute must be a JSON object (except if key-values, but that's for GET only in NGSI-LD  - for now ...)
+  // Exceptions are:
+  //   - createdAt (to be ignored)
+  //   - modifiedAt (to be ignored)
+  //   - observedAt (should ne made an exception but doesn't seem necessary right now ...)
+  //   - unitCode    -"-
+  //   - datasetId   -"-
   //
+  if ((strcmp(nodeP->name, "createdAt") == 0) || (strcmp(nodeP->name, "modifiedAt") == 0))
+    return true;  // OK, just ignored
+
+  //
+  // About these last three (observedAt, unitCode, datasetId) ...
+  // My gut tells me I should implement special cases for the three but all tests are working ...
+  // And I'm using all three of them!
+  //
+  // I'll probably have to revisit this soon enough ...
+  //
+
   if (nodeP->type != KjObject)
   {
     *detailP = (char*) "sub-attribute must be a JSON object";
@@ -64,11 +84,10 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char**
     return false;
   }
 
-
   //
   // Expand sub-attribute name
   //
-  nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
+  nodeP->name = orionldSubAttributeExpand(orionldState.contextP, nodeP->name, true, NULL);
 
   if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
   {
@@ -78,7 +97,7 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char**
     return false;
   }
 
-  if (metadataAdd(caP, nodeP, caName) == false)
+  if (metadataAdd(caP, nodeP, attributeName) == false)
   {
     // metadataAdd calls orionldErrorResponseCreate
     LM_E(("Error adding metadata '%s' to attribute", nodeP->name));

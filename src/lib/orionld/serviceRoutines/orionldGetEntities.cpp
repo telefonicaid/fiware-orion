@@ -56,6 +56,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
@@ -349,7 +350,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //   null out prefix expansion so, I'veremoved the call to pcheckUri() and
     //   I always expand ...
     //
-    type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
+    type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // entity type
 
     isTypePattern = false;  // Just in case ...
   }
@@ -367,7 +368,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     for (int ix = 0; ix < typeVecItems; ix++)
     {
       if (pcheckUri(typeVector[ix], &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);
+        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // entity type
       else
         typeExpanded = typeVector[ix];
 
@@ -396,7 +397,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
           (strcmp(attrsV[ix], "observationSpace") != 0) &&
           (strcmp(attrsV[ix], "operationSpace")   != 0))
       {
-        attrsV[ix] = orionldContextItemExpand(orionldState.contextP, attrsV[ix], true, NULL);
+        attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);
       }
 
       mongoRequest.attributeList.push_back(attrsV[ix]);
@@ -544,7 +545,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
           (strcmp(geoPropertyName, "operationSpace")   != 0))
       {
-        geoPropertyNameExpanded = orionldContextItemExpand(orionldState.contextP, geoPropertyName, true, NULL);
+        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);
 
         geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
         dotForEq(geoPropertyNameExpanded);

@@ -33,10 +33,10 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/common/CHECK.h"                              // CHECKx()
+#include "orionld/common/CHECK.h"                              // STRING_CHECK()
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToStringList.h"                 // Own interface
 
 
@@ -45,6 +45,9 @@ extern "C"
 //
 // kjTreeToStringList -
 //
+// The list is supposed to contain a list of attribute names, and these names are expanded
+// if necessary, according to the current context.
+//
 bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
 {
   for (KjNode* attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
@@ -52,15 +55,7 @@ bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
     char*   expanded;
 
     STRING_CHECK(attributeP, "String-List item");
-
-    //
-    // Special attributes are not expanded
-    //
-    if (strcmp(attributeP->value.s, "location") == 0)
-      expanded = attributeP->value.s;
-    else
-      expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, true, NULL);
-
+    expanded = orionldAttributeExpand(orionldState.contextP, attributeP->value.s, true, NULL);
     stringListP->push_back(expanded);
   }
 

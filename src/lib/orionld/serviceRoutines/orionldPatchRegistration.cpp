@@ -39,8 +39,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/numberToDate.h"                        // numberToDate
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
 #include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
@@ -603,8 +602,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
     next = propertyP->next;
 
-    if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
-      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, true, NULL);
+    propertyP->name = orionldAttributeExpand(orionldState.contextP, propertyP->name, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {

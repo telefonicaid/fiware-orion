@@ -79,7 +79,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       // If a ':' is found inside the first 10 chars, the value is assumed to be expanded ...
       //
       if (orionldContextItemAlreadyExpanded(entityItemP->value.s) == false)
-        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);
+        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);  // entity type
     }
     else
     {

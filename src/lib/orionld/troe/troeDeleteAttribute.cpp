@@ -29,7 +29,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
@@ -62,7 +62,7 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   char  instanceId[80];
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
-  attributeName = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
+  attributeName = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
   if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.requestTimeString) == false)
   {
     LM_E(("Database Error (delete attribute troe layer failed)"));

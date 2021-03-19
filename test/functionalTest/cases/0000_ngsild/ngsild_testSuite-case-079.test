@@ -241,7 +241,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/R1",
-		"https://uri.etsi.org/ngsi-ld/location"
+		"location"
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
@@ -288,7 +288,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*)
 		},
-		"https://uri=etsi=org/ngsi-ld/location" : {
+		"location" : {
 			"value" : {
 				"type" : "Point",
 				"coordinates" : [
@@ -408,7 +408,7 @@ Date: REGEX(.*)
 08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)
 ===================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 211
+Content-Length: 121
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -416,12 +416,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "attributeName": "P1",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/P2"
+        "P2"
     ]
 }
 

@@ -99,7 +99,7 @@ bool pgAttributeTreat
     else if (strcmp(subAttrP->name, "datasetId")  == 0)      datasetId  = subAttrP->value.s;
     else if (strcmp(subAttrP->name, "value")      == 0)      valueNodeP = subAttrP;
     else if (strcmp(subAttrP->name, "object")     == 0)      valueNodeP = subAttrP;
-    else if (strcmp(subAttrP->name, "unitCode")   == 0)      unitCode = subAttrP->value.s;
+    else if (strcmp(subAttrP->name, "unitCode")   == 0)      unitCode   = subAttrP->value.s;
     else if (strcmp(subAttrP->name, "createdAt")  == 0)      {}  // Skipping
     else if (strcmp(subAttrP->name, "modifiedAt") == 0)      {}  // Skipping
     else
@@ -128,7 +128,19 @@ bool pgAttributeTreat
   //
   for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
-    if (pgSubAttributeTreat(connectionP, subAttrP, entityId, instanceId) == false)
+    //
+    // Skip createdAt and modifiedAt, if present
+    //
+    // FIXME: Already expanded ... not so good - depends on the context
+    //        However, this solution works for all uses, if I also compare and removes non-expanded.
+    //        Let's do it this way for now, but fix it some day ...
+    //        The fix would be that the service routines removes createdAt and modifiedAt before expanding and before calling the TRoE functions
+    //
+    if ((strcmp(subAttrP->name, "https://uri.etsi.org/ngsi-ld/createdAt") == 0) || (strcmp(subAttrP->name, "https://uri.etsi.org/ngsi-ld/modifiedAt") == 0))
+    {}
+    else if ((strcmp(subAttrP->name, "createdAt") == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
+    {}
+    else if (pgSubAttributeTreat(connectionP, subAttrP, entityId, instanceId) == false)
     {
       LM_E(("Internal Error (pgSubAttributeTreat failed)"));
       return false;

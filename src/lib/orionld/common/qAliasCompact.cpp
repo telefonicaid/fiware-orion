@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/qAliasCompact.h"                        // Own interface
 
@@ -108,7 +108,7 @@ bool qAliasCompact(KjNode* qP, bool compact)
       else
       {
         // Expand the variable
-        alias = orionldContextItemExpand(orionldState.contextP, varStart, true, NULL);
+        alias = orionldAttributeExpand(orionldState.contextP, varStart, true, NULL);
       }
 
       if (alias != NULL)

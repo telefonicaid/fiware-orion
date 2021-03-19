@@ -91,7 +91,7 @@ Date: REGEX(.*)
 02. Attempt to overwrite P1 and P2 using POST /ngsi-ld/v1/entities/*/attrs?options=noOverwrite - see error
 ==========================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 159
+Content-Length: 121
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -99,12 +99,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "http://example.org/P1",
+            "attributeName": "P1",
             "reason": "attribute already exists and overwrite is not allowed"
         }
     ],
     "updated": [
-        "http://example.org/P2"
+        "P2"
     ]
 }
 

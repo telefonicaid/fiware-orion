@@ -78,7 +78,7 @@ bool pgNumberSubPropertyPush
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
              instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, numberValue, unitCodeString);
   }
-  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
+  // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
 
   PGresult* res;

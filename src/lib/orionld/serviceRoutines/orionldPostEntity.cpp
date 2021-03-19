@@ -58,7 +58,7 @@ extern "C"
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -261,15 +261,17 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     //
     // The attribute name must be expanded before any comparisons can take place
+    // But, for the "upsdated" / "notUpdated", we need the shortname
     //
-    attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+    char* shortName = attrP->name;
+    attrP->name     = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
 
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)
     {
       if (kjStringValueLookupInArray(inDbAttrNamesP, attrP->name) != NULL)
       {
-        attributeNotUpdated(notUpdatedP, attrP->name, "attribute already exists and overwrite is not allowed");
+        attributeNotUpdated(notUpdatedP, shortName, "attribute already exists and overwrite is not allowed");
 
         // Remove attr from tree
         kjChildRemove(orionldState.requestTree, attrP);
@@ -336,8 +338,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    char*             detail;
-    int               defaultInstances = 0;
+    char*  detail;
+    int    defaultInstances = 0;
+    char*  shortName        = orionldContextItemAliasLookup(orionldState.contextP, attrP->name, NULL, NULL);
 
     //
     // datasetIds?
@@ -396,13 +399,13 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
         {
           LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
-          attributeNotUpdated(notUpdatedP, attrP->name, detail);
+          attributeNotUpdated(notUpdatedP, shortName, detail);
           caP->release();
           free(caP);
           continue;
         }
 
-        attributeUpdated(updatedP, attrP->name);
+        attributeUpdated(updatedP, shortName);
         ceP->contextAttributeVector.push_back(caP);
       }
     }
@@ -415,21 +418,21 @@ bool orionldPostEntity(ConnectionInfo* ciP)
       {
         LM_E(("Bad Input (datasetId given but not an array - should this be allowed?)"));
         detail = (char*) "datasetId given but not an array";
-        attributeNotUpdated(notUpdatedP, attrP->name, detail);
+        attributeNotUpdated(notUpdatedP, shortName, detail);
         continue;
       }
 
       ContextAttribute* caP = new ContextAttribute();
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {
-        LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
-        attributeNotUpdated(notUpdatedP, attrP->name, detail);
+        LM_E(("kjTreeToContextAttribute(%s): %s: %s", attrP->name, orionldState.pd.title, orionldState.pd.detail));
+        attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.titleAndDetail);
         caP->release();
         free(caP);
         continue;
       }
 
-      attributeUpdated(updatedP, attrP->name);
+      attributeUpdated(updatedP, shortName);
       ceP->contextAttributeVector.push_back(caP);
     }
   }
