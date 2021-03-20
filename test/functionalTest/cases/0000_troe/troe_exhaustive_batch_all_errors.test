@@ -1,0 +1,226 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+TRoE test of batch operations when no entity made it and no DB update was necessary
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+#
+# 01. Attempt to Batch Create entity E1 with user context in payload body but Content-Type as application/json
+# 02. Attempt to Batch Upsert entity E1 with user context in payload body but Content-Type as application/json
+# 03. Attempt to Batch Update entity E1 with user context in payload body but Content-Type as application/json
+# 04. Attempt to Batch Delete one entity with non-existing entities
+# 05. Make sure there is nothing in TRoE
+#
+
+echo "01. Attempt to Batch Create entity E1 with user context in payload body but Content-Type as application/json"
+echo "============================================================================================================"
+payload='[
+  {
+    "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "owner": {
+      "type": "Property",
+      "value": "Bertram Wooster"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to Batch Upsert entity E1 with user context in payload body but Content-Type as application/json"
+echo "============================================================================================================"
+payload='[
+  {
+    "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "owner": {
+      "type": "Property",
+      "value": "Bertram Wooster"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to Batch Update entity E1 with user context in payload body but Content-Type as application/json"
+echo "============================================================================================================"
+payload='[
+  {
+    "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "owner": {
+      "type": "Property",
+      "value": "Bertram Wooster"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to Batch Delete one entity with non-existing entities"
+echo "================================================================="
+payload='[
+  "urn:not:an:entity",
+  "urn:also:not:an:entity"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete --payload "$payload"
+echo
+echo
+
+
+echo "05. Make sure there is nothing in TRoE"
+echo "======================================"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to Batch Create entity E1 with user context in payload body but Content-Type as application/json
+============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 249
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E1",
+            "error": {
+                "status": 400,
+                "title": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+02. Attempt to Batch Upsert entity E1 with user context in payload body but Content-Type as application/json
+============================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 276
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E1",
+            "error": {
+                "detail": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "status": 400,
+                "title": "Invalid payload",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+03. Attempt to Batch Update entity E1 with user context in payload body but Content-Type as application/json
+============================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 276
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E1",
+            "error": {
+                "detail": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "status": 400,
+                "title": "Invalid payload",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+04. Attempt to Batch Delete one entity with non-existing entities
+=================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 320
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:not:an:entity",
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
+        },
+        {
+            "entityId": "urn:also:not:an:entity",
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+05. Make sure there is nothing in TRoE
+======================================
+opmode,id,type,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME

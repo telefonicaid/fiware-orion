@@ -228,7 +228,8 @@ typedef struct OrionldConnectionState
   int                     qNodeIx;
   char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
-  char*                   jsonBuf;    // Used by kjTreeFromBsonObj
+  char*                   jsonBuf;           // Used by kjTreeFromBsonObj
+  bool                    noDbUpdate;        // If nothing changed in DB - troe is not invoked
 
 #if 0
   //
