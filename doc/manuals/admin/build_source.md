@@ -85,12 +85,12 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        make
         sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt using yum, and run `./configure` with `--build=arm-linux` option.
+In the case of the aarch64 architecture, install libxslt using yum, and run `./configure` with `--build=arm-linux` option.
 
 * Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
 
@@ -103,7 +103,7 @@ In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt usi
         sudo yum install curl nc valgrind bc
         sudo pip2 install virtualenv
 
-In the case of the aarch64 architecture, additionally install python-devel and libffi-devel using yum. It is needed when building pyOpenSSL.
+In the case of the aarch64 architecture, additionally install python2-devel, rpm-build and libffi-devel using yum. It is needed when building pyOpenSSL.
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
