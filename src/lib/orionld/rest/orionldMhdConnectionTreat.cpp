@@ -1071,8 +1071,9 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Call TRoE Routine (if there is one) to save the TRoE data.
   // Only if the Service Routine was successful, of course
+  // AND if there is any request tree to process
   //
-  if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
+  if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300) && (orionldState.noDbUpdate == false))
   {
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->troeRoutine != NULL))
     {

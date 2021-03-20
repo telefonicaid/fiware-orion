@@ -259,71 +259,90 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
   kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, NULL);
 
-  UpdateContextResponse mongoResponse;
-
-  orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                                   &mongoResponse,
-                                                   orionldState.tenant,
-                                                   ciP->servicePathV,
-                                                   ciP->uriParam,
-                                                   ciP->httpHeaders.xauthToken,
-                                                   ciP->httpHeaders.correlator,
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
-                                                   ciP->apiVersion,
-                                                   NGSIV2_NO_FLAVOUR);
-
-  if (orionldState.httpStatusCode == SccOk)
+  //
+  // DB update - if there is anything to update
+  //
+  orionldState.noDbUpdate = mongoRequest.contextElementVector.size() <= 0;
+  if (orionldState.noDbUpdate == false)
   {
+    UpdateContextResponse mongoResponse;
+
+    orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                                     &mongoResponse,
+                                                     orionldState.tenant,
+                                                     ciP->servicePathV,
+                                                     ciP->uriParam,
+                                                     ciP->httpHeaders.xauthToken,
+                                                     ciP->httpHeaders.correlator,
+                                                     ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                     ciP->apiVersion,
+                                                     NGSIV2_NO_FLAVOUR);
+
+    if (orionldState.httpStatusCode == SccOk)
+    {
+      orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
+      for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
+      {
+        const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
+
+        if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
+          entitySuccessPush(successArrayP, entityId);
+        else
+          entityErrorPush(errorsArrayP,
+                          entityId,
+                          OrionldBadRequestData,
+                          "",
+                          mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
+                          400,
+                          false);
+      }
+
+      for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
+      {
+        const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
+
+        if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
+          entitySuccessPush(successArrayP, entityId);
+      }
+    }
+    else
+    {
+      orionldState.noDbUpdate = true;
+      LM_E(("Database Error (mongoUpdateContext returned %d (!200))", orionldState.httpStatusCode));
+    }
+
+    mongoRequest.release();
+    mongoResponse.release();
+
+    if (orionldState.httpStatusCode != SccOk)
+    {
+      LM_E(("mongoUpdateContext flagged an error"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
+      orionldState.httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
+  }
+
+
+  //
+  // Add the success/error arrays to the response-tree
+  //
+  if (orionldState.responseTree == NULL)
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
-    for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
-    {
-      const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
+  kjChildAdd(orionldState.responseTree, successArrayP);
+  kjChildAdd(orionldState.responseTree, errorsArrayP);
 
-      if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
-        entitySuccessPush(successArrayP, entityId);
-      else
-        entityErrorPush(errorsArrayP,
-                        entityId,
-                        OrionldBadRequestData,
-                        "",
-                        mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400,
-                        false);
-    }
-
-    for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
-    {
-      const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
-
-      if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
-        entitySuccessPush(successArrayP, entityId);
-    }
-
-    //
-    // Add the success/error arrays to the response-tree
-    //
-    kjChildAdd(orionldState.responseTree, successArrayP);
-    kjChildAdd(orionldState.responseTree, errorsArrayP);
-
-    orionldState.httpStatusCode = SccOk;
-  }
-
-  mongoRequest.release();
-  mongoResponse.release();
-
-  if (orionldState.httpStatusCode != SccOk)
-  {
-    LM_E(("mongoUpdateContext flagged an error"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-    orionldState.httpStatusCode = SccReceiverInternalError;
-    return false;
-  }
+  orionldState.httpStatusCode = SccOk;
 
   if ((troe == true) && (cloneP != NULL))
   {
-    orionldState.requestTree = cloneP;
-    kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
+    if (orionldState.noDbUpdate == false)
+    {
+      orionldState.requestTree = cloneP;
+      kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
+    }
   }
 
   return true;
