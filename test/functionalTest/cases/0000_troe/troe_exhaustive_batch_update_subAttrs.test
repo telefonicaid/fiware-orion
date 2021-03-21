@@ -1,0 +1,965 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Exhaustive test of batch update entities, focussing on subattributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_t1
+brokerStart CB 100 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Batch Create entity E1 on default tenant and without context
+# 02. Batch Create entity E2 on T1 tenant and without context
+# 03. Batch Update entity E1+E3 on default tenant and without context - E1 is updated, E3 is ignored (with error)
+# 04. Batch Update entity E2+E4 on T1 tenant and without context - E2 is updated, E4 is ignored (with error)
+# 05. Batch Update entity E1 on default tenant and with user context in Link header
+# 06. Batch Update entity E2 on T1 tenant and with user context in Link header
+#
+# 07. Batch Update entity E1+E3 on default tenant and with user contexts 1+2 in payload body
+# 08. Batch Update entity E2+E4 on T1 tenant and with user contexts 1+2 in payload body
+#
+# 09. See all entities in TRoE DB, default tenant
+# 10. See all attributes in TRoE DB, default tenant
+# 11. See all sub-attributes in TRoE DB, default tenant
+# 12. See all entities in TRoE DB, tenant T1
+# 13. See all attributes in TRoE DB, tenant T1
+# 14. See all sub-attributes in TRoE DB, tenant T1
+#
+
+echo "01. Batch Create entity E1 on default tenant and without context"
+echo "================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 1,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.001Z",
+      "modifiedAt": "2021-03-20T00:00:00.001Z",
+      "observedAt": "2021-03-20T00:00:00.001Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:1",
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt":  "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 100,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt":  "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt": "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:1",
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt": "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 1,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt": "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 1 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.001Z",
+        "createdAt":  "2021-03-20T00:00:00.001Z",
+        "modifiedAt": "2021-03-20T00:00:00.001Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Batch Create entity E2 on T1 tenant and without context"
+echo "==========================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 2,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.002Z",
+      "modifiedAt": "2021-03-20T00:00:00.002Z",
+      "observedAt": "2021-03-20T00:00:00.002Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:2",
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt":  "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 200,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt":  "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt": "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:2",
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt": "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 2,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt": "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 2 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.002Z",
+        "createdAt":  "2021-03-20T00:00:00.002Z",
+        "modifiedAt": "2021-03-20T00:00:00.002Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "03. Batch Update entity E1+E3 on default tenant and without context - E1 is updated, E3 is ignored (with error)"
+echo "==============================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 3,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.003Z",
+      "modifiedAt": "2021-03-20T00:00:00.003Z",
+      "observedAt": "2021-03-20T00:00:00.003Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:3",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 300,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:3",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 3,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 3 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 3,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.003Z",
+      "modifiedAt": "2021-03-20T00:00:00.003Z",
+      "observedAt": "2021-03-20T00:00:00.003Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:3",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 300,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:3",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 3,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt": "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 3 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.003Z",
+        "createdAt":  "2021-03-20T00:00:00.003Z",
+        "modifiedAt": "2021-03-20T00:00:00.003Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "04. Batch Update entity E2+E4 on T1 tenant and without context - E2 is updated, E4 is ignored (with error)"
+echo "=========================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 4,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.004Z",
+      "modifiedAt": "2021-03-20T00:00:00.004Z",
+      "observedAt": "2021-03-20T00:00:00.004Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:4",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 400,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:4",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 4,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 3 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 4,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.004Z",
+      "modifiedAt": "2021-03-20T00:00:00.004Z",
+      "observedAt": "2021-03-20T00:00:00.004Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:4",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 400,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:4",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 4,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt": "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 3 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.004Z",
+        "createdAt":  "2021-03-20T00:00:00.004Z",
+        "modifiedAt": "2021-03-20T00:00:00.004Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "05. Batch Update entity E1 on default tenant and with user context in Link header"
+echo "================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 5,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.005Z",
+      "modifiedAt": "2021-03-20T00:00:00.005Z",
+      "observedAt": "2021-03-20T00:00:00.005Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:5",
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt":  "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 500,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt":  "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt": "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:5",
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt": "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 5,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt": "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 5 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.005Z",
+        "createdAt":  "2021-03-20T00:00:00.005Z",
+        "modifiedAt": "2021-03-20T00:00:00.005Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "06. Batch Update entity E2 on T1 tenant and with user context in Link header"
+echo "============================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 6,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.006Z",
+      "modifiedAt": "2021-03-20T00:00:00.006Z",
+      "observedAt": "2021-03-20T00:00:00.006Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:6",
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt":  "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 600,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt":  "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt": "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:6",
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt": "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 6,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt": "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 6 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.006Z",
+        "createdAt":  "2021-03-20T00:00:00.006Z",
+        "modifiedAt": "2021-03-20T00:00:00.006Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload" --tenant t1 -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "07. Batch Update entity E1+E3 on default tenant and with user contexts 1+2 in payload body"
+echo "=========================================================================================="
+payload='[
+  {
+    "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 7,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.007Z",
+      "modifiedAt": "2021-03-20T00:00:00.007Z",
+      "observedAt": "2021-03-20T00:00:00.007Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:7",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 700,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:7",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 7,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 7 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      }
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "DeviceX",
+    "owner": {
+      "type": "Property",
+      "value": 7,
+      "unitCode": "kg",
+      "createdAt":  "2021-03-20T00:00:00.007Z",
+      "modifiedAt": "2021-03-20T00:00:00.007Z",
+      "observedAt": "2021-03-20T00:00:00.007Z",
+      "R1": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:R:7",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "weight": {
+        "type": "Property",
+        "value": 700,
+        "unitCode": "kg",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "status": {
+        "type": "Property",
+        "value": "OK",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "owner": {
+        "type":  "Relationship",
+        "object": "urn:ngsi-ld:owner:7",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "batteryLevel": {
+        "type": "Property",
+        "value": 7,
+        "unitCode": "%",
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt": "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      },
+      "location": {
+        "type": "GeoProperty",
+        "value": {
+          "type": "Point",
+          "coordinates": [ 1, 7 ]
+        },
+        "observedAt": "2021-03-20T00:00:00.007Z",
+        "createdAt":  "2021-03-20T00:00:00.007Z",
+        "modifiedAt": "2021-03-20T00:00:00.007Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "08. Batch Update entity E2+E4 on T1 tenant and with user contexts 1+2 in payload body"
+echo "======================================================================================"
+echo
+echo
+
+
+echo "09. See all entities in TRoE DB, default tenant"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "10. See all attributes in TRoE DB, default tenant"
+echo "================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
+echo
+echo
+
+
+echo "11. See all sub-attributes in TRoE DB, default tenant"
+echo "====================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,observedAt,attrInstanceId FROM subAttributes"
+echo
+echo
+
+
+echo "12. See all entities in TRoE DB, tenant T1"
+echo "=========================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" -t ftest_t1
+echo
+echo
+
+
+echo "13. See all attributes in TRoE DB, tenant T1"
+echo "============================================"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes" -t ftest_t1
+echo
+echo
+
+
+echo "14. See all sub-attributes in TRoE DB, tenant T1"
+echo "================================================"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,observedAt,attrInstanceId FROM subAttributes" -t ftest_t1
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Create entity E1 on default tenant and without context
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+02. Batch Create entity E2 on T1 tenant and without context
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+03. Batch Update entity E1+E3 on default tenant and without context - E1 is updated, E3 is ignored (with error)
+===============================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E3",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+04. Batch Update entity E2+E4 on T1 tenant and without context - E2 is updated, E4 is ignored (with error)
+==========================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E4",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+05. Batch Update entity E1 on default tenant and with user context in Link header
+=================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Batch Update entity E2 on T1 tenant and with user context in Link header
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. Batch Update entity E1+E3 on default tenant and with user contexts 1+2 in payload body
+==========================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E3",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+08. Batch Update entity E2+E4 on T1 tenant and with user contexts 1+2 in payload body
+======================================================================================
+
+
+09. See all entities in TRoE DB, default tenant
+===============================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/DeviceX,202REGEX(.*)
+
+
+10. See all attributes in TRoE DB, default tenant
+=================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,1,,2021-03-20 00:00:00.001,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,3,,2021-03-20 00:00:00.003,202REGEX(.*)
+Replace,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,5,,2021-03-20 00:00:00.005,202REGEX(.*)
+Replace,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,7,,2021-03-20 00:00:00.007,202REGEX(.*)
+
+
+11. See all sub-attributes in TRoE DB, default tenant
+=====================================================
+id,valuetype,entityid,unitcode,text,number,boolean,observedat,attrinstanceid
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:1,,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,kg,,100,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:1,,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,1,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-20 00:00:00.001,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:3,,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,kg,,300,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:3,,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,3,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-20 00:00:00.003,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:5,,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E1,kg,,500,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:5,,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,5,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-20 00:00:00.005,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:R:7,,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E1,kg,,700,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E1,,OK,,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E1,,urn:ngsi-ld:owner:7,,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E1,%,,7,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E1,,,,,2021-03-20 00:00:00.007,urn:ngsi-ld:attribute:instance:REGEX(.*)
+
+
+12. See all entities in TRoE DB, tenant T1
+==========================================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E2,https://uri.etsi.org/ngsi-ld/default-context/DeviceX,202REGEX(.*)
+
+
+13. See all attributes in TRoE DB, tenant T1
+============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,2,,2021-03-20 00:00:00.002,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,4,,2021-03-20 00:00:00.004,202REGEX(.*)
+Replace,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,6,,2021-03-20 00:00:00.006,202REGEX(.*)
+
+
+14. See all sub-attributes in TRoE DB, tenant T1
+================================================
+id,valuetype,entityid,unitcode,text,number,boolean,observedat,attrinstanceid
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:2,,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,kg,,200,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:2,,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,2,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-20 00:00:00.002,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:4,,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,kg,,400,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:4,,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,4,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-20 00:00:00.004,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:R:6,,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E2,kg,,600,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.etsi.org/ngsi-ld/status,String,urn:ngsi-ld:entity:E2,,OK,,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E2,,urn:ngsi-ld:owner:6,,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+https://uri.fiware.org/ns/data-models#batteryLevel,Number,urn:ngsi-ld:entity:E2,%,,6,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+location,GeoPoint,urn:ngsi-ld:entity:E2,,,,,2021-03-20 00:00:00.006,urn:ngsi-ld:attribute:instance:REGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_t1
