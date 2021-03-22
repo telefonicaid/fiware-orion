@@ -288,7 +288,8 @@ static void mongoDriverLogger
   void                *user_data
 )
 {
-  // FIXME P3: don't know what to do with user_data...
+  // FIXME P3: user_data is needed due to the handler signature, but don't know
+  // what do to with it
 
   // Match driver errors to our own log levels
   switch (log_level)

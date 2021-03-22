@@ -1681,6 +1681,10 @@ bool entitiesQuery
 
   orion::releaseMongoConnection(connection);
 
+  // Get check errType after the while on next(). When an error occurs, next()
+  // returns false, as there aren't more results to process, and the program
+  // flow directly ends here, to check errType
+
   if (errType == ON_NEXT_MANAGED_ERROR)
   {
     ContextElementResponse*  cer   = new ContextElementResponse();
