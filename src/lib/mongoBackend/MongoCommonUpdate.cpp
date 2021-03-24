@@ -2641,6 +2641,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
+  bool                             upsert,
   OrionError*                      oeP
 )
 {
@@ -2722,28 +2723,30 @@ static bool createEntity
     attrNamesToAdd.append(attrsV[ix]->name);
   }
 
-  orion::BSONObjBuilder bsonId;
+  orion::BSONObjBuilder bsonIdBuilder;
 
-  bsonId.append(ENT_ENTITY_ID, eP->id);
+  bsonIdBuilder.append(ENT_ENTITY_ID, eP->id);
 
   if (eP->type.empty())
   {
     if (apiVersion == V2)
     {
       // NGSIv2 uses default entity type
-      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
+      bsonIdBuilder.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
     }
   }
   else
   {
-    bsonId.append(ENT_ENTITY_TYPE, eP->type);
+    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
+  bsonIdBuilder.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
+
+  orion::BSONObj bsonId = bsonIdBuilder.obj();
 
   orion::BSONObjBuilder insertedDoc;
 
-  insertedDoc.append("_id", bsonId.obj());
+  insertedDoc.append("_id", bsonId);
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
   insertedDoc.append(ENT_CREATION_DATE, now);
@@ -2770,10 +2773,35 @@ static bool createEntity
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
-  if (!collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
+  // Why upsert here? See issue: https://github.com/telefonicaid/fiware-orion/issues/3821
+  if (upsert)
   {
-    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
-    return false;
+    orion::BSONObjBuilder q;
+    q.append("_id", bsonId);
+    if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, q.obj(), insertedDoc.obj(), true, errDetail))
+    {
+      oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      return false;
+    }
+  }
+  else
+  {
+    if (!orion::collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
+    {
+      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
+      // of "duplicate key" is used in the error message, then it will break. It would be better to use
+      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
+      // orion::collectionInsert() function.
+      if (errDetail->find("duplicate key") != std::string::npos)
+      {
+        oeP->fill(SccInvalidModification, "Already Exists", "Unprocessable");
+      }
+      else
+      {
+        oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      }
+      return false;
+    }
   }
 
   return true;
@@ -3696,7 +3724,18 @@ unsigned int processContextElement
       std::string  errDetail;
       double       now = getCurrentTime();
 
-      if (!createEntity(eP, eP->attributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
+      // upsert condition is based on ngsiv2Flavour. It happens that when upsert is on,
+      // ngsiv2Flavour is NGSIV2_NO_FLAVOUR (see postEntities.cpp code)
+      if (!createEntity(eP,
+                        eP->attributeVector,
+                        now,
+                        &errDetail,
+                        tenant,
+                        servicePathV,
+                        apiVersion,
+                        fiwareCorrelator,
+                        ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
+                        &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that
