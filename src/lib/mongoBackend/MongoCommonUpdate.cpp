@@ -103,24 +103,27 @@ using orion::CompoundValueNode;
 */
 static bool isNotCustomMetadata(const char* mdName)
 {
-  if (strcmp(mdName, "location") == 0)
+  if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    // "location" is not added to the DB for NGSIv2 (it's considered NOT custom) - for NGSI-LD it is
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if ((strcmp(mdName, NGSI_MD_ID)           != 0) &&    // "id"
+        (strcmp(mdName, NGSI_MD_DATECREATED)  != 0) &&    // "creDate"
+        (strcmp(mdName, NGSI_MD_DATEMODIFIED) != 0))      // "modDate"
+    {
       return false;
-
-    return true;
+    }
   }
-
-  // id, creDate, and modDate is not custom metadata - return true
-  if ((strcmp(mdName, "id")      == 0) ||
-      (strcmp(mdName, "creDate") == 0) ||
-      (strcmp(mdName, "modDate") == 0))
+  else
   {
-    return true;
+    if ((strcmp(mdName, NGSI_MD_ID)           != 0) &&
+        (strcmp(mdName, NGSI_MD_DATECREATED)  != 0) &&
+        (strcmp(mdName, NGSI_MD_DATEMODIFIED) != 0) &&
+        (strcmp(mdName, NGSI_MD_LOCATION)     != 0))
+    {
+      return false;
+    }
   }
 
-  return false;
+  return true;
 }
 
 
