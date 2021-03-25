@@ -231,19 +231,16 @@ echo
 --REGEXPECT--
 01. Create entities E1, E2 and E3 with attributes P1 and R1
 ===========================================================
-HTTP/1.1 200 OK
-Content-Length: 97
+HTTP/1.1 201 Created
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2",
-        "urn:ngsi-ld:entity:E3"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E2",
+    "urn:ngsi-ld:entity:E3"
+]
 
 
 02. GET the entities

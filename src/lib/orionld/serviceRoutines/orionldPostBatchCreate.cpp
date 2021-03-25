@@ -278,9 +278,9 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
                                                      ciP->apiVersion,
                                                      NGSIV2_NO_FLAVOUR);
 
-    if (orionldState.httpStatusCode == SccOk)
+    if (orionldState.httpStatusCode == 200)
     {
-      orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+      // orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
       for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
       {
@@ -315,7 +315,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
     mongoRequest.release();
     mongoResponse.release();
 
-    if (orionldState.httpStatusCode != SccOk)
+    if (orionldState.httpStatusCode != 200)
     {
       LM_E(("mongoUpdateContext flagged an error"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
@@ -328,13 +328,19 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   //
   // Add the success/error arrays to the response-tree
   //
-  if (orionldState.responseTree == NULL)
-    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+  if (errorsArrayP->value.firstChildP == NULL)  // No errors - 201 and String[] as payload body
+  {
+    orionldState.httpStatusCode = 201;
+    orionldState.responseTree   = successArrayP;
+  }
+  else
+  {
+    orionldState.httpStatusCode = 207;
+    orionldState.responseTree   = kjObject(orionldState.kjsonP, NULL);
 
-  kjChildAdd(orionldState.responseTree, successArrayP);
-  kjChildAdd(orionldState.responseTree, errorsArrayP);
-
-  orionldState.httpStatusCode = SccOk;
+    kjChildAdd(orionldState.responseTree, successArrayP);
+    kjChildAdd(orionldState.responseTree, errorsArrayP);
+  }
 
   if ((troe == true) && (cloneP != NULL))
   {

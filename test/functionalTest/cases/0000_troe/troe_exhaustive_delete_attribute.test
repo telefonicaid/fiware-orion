@@ -263,32 +263,26 @@ echo
 --REGEXPECT--
 01. Create E1 on default tenant
 ===============================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Create E2 on T1 tenant
 ==========================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 03. Delete E1/weight on default tenant with user context in Link header - not found

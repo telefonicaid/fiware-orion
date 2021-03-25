@@ -117,7 +117,7 @@ echo
 --REGEXPECT--
 01. Attempt to Batch Create entity E1 with user context in payload body but Content-Type as application/json
 ============================================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 249
 Content-Type: application/json
 Date: REGEX(.*)

@@ -533,32 +533,26 @@ echo
 --REGEXPECT--
 01. Create E1 on default tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
 ==============================================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Create E2 on T1 tenant, with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
 =========================================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
@@ -1227,7 +1221,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
-#dbDrop CB t1
+dbDrop CB
+dbDrop CB t1
 pgDrop $CB_DB_NAME
 pgDrop ${CB_DB_NAME}_t1

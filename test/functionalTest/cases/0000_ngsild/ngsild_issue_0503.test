@@ -123,19 +123,16 @@ echo
 --REGEXPECT--
 01. Create three entities
 =========================
-HTTP/1.1 200 OK
-Content-Length: 133
+HTTP/1.1 201 Created
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:TemperatureSensor:002",
-        "urn:ngsi-ld:TemperatureSensor:003",
-        "urn:ngsi-ld:TemperatureSensor:004"
-    ]
-}
+[
+    "urn:ngsi-ld:TemperatureSensor:002",
+    "urn:ngsi-ld:TemperatureSensor:003",
+    "urn:ngsi-ld:TemperatureSensor:004"
+]
 
 
 02. Update two of them using Batch Update, one with a correct entity type present and the other one without entity type

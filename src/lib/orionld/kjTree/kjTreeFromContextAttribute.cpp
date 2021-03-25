@@ -223,14 +223,13 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     if ((isGeoProperty == true) && (strcmp(mdName, "location") == 0))
     {
-      //
-      // FIXME
-      //   Skipping the metadata "location" for GeoProperty attributes - for now
-      //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
-      //   What was default unit in orion v1 is not default for orionld
-      //
-      LM_K(("FIXME: something needs to be implemented here!"));
-      continue;
+      nodeP = kjObject(orionldState.kjsonP, mdName);
+
+      KjNode* typeP  = kjString(orionldState.kjsonP, "type", "GeoProperty");
+      KjNode* valueP = kjObject(orionldState.kjsonP, "value");
+
+      kjChildAdd(nodeP, typeP);
+      kjChildAdd(nodeP, valueP);
     }
 
     //

@@ -146,7 +146,7 @@ echo
 --REGEXPECT--
 01. Issue a Batch Create with two correct entities and one erroneous (entity id missing)
 ========================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
@@ -191,7 +191,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 
 05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity
 ================================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 204
 Content-Type: application/json
 Date: REGEX(.*)

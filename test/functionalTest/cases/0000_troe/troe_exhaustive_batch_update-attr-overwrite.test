@@ -1107,36 +1107,30 @@ echo
 --REGEXPECT--
 01. Create E1,E3,E5 on default tenant
 =====================================
-HTTP/1.1 200 OK
-Content-Length: 97
+HTTP/1.1 201 Created
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E3",
-        "urn:ngsi-ld:entity:E5"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E3",
+    "urn:ngsi-ld:entity:E5"
+]
 
 
 02. Create E2,E4,E6 on T1 tenant
 ================================
-HTTP/1.1 200 OK
-Content-Length: 97
+HTTP/1.1 201 Created
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2",
-        "urn:ngsi-ld:entity:E4",
-        "urn:ngsi-ld:entity:E6"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E2",
+    "urn:ngsi-ld:entity:E4",
+    "urn:ngsi-ld:entity:E6"
+]
 
 
 03. Update E1,E3,E7 on default tenant and without context - E7 fails, E1+E3 are updated

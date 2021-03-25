@@ -1734,7 +1734,7 @@ Date: REGEX(*.)
 
 15. Attempt to create entities with entityOperations using @id invalid - see error
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 458
 Content-Type: application/json
 Date: REGEX(*.)
@@ -1767,7 +1767,7 @@ Date: REGEX(*.)
 
 16. Attempt to create entities with entityOperations using @type invalid - see error
 ====================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 540
 Content-Type: application/json
 Date: REGEX(*.)
@@ -1800,7 +1800,7 @@ Date: REGEX(*.)
 
 17. Attempt to create entities with entityOperations using @id and @type invalid - see error
 ============================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 458
 Content-Type: application/json
 Date: REGEX(*.)
@@ -1833,7 +1833,7 @@ Date: REGEX(*.)
 
 18. Attempt to create entities with entityOperations w/o @id - see error
 ========================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 279
 Content-Type: application/json
 Date: REGEX(*.)
@@ -1857,7 +1857,7 @@ Date: REGEX(*.)
 
 19. Attempt to create entities with entityOperations w/o @type - see error
 ==========================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 576
 Content-Type: application/json
 Date: REGEX(*.)
@@ -1890,7 +1890,7 @@ Date: REGEX(*.)
 
 20. Attempt to create entities with entityOperations w/o @id and @type - see error
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 279
 Content-Type: application/json
 Date: REGEX(*.)

@@ -21,7 +21,7 @@ The latest release of Orion-LD is ([Beta 2](https://github.com/FIWARE/context.Or
 * Query responses and notifications in GeoJSON format, if so requested (Accept: application/geo+json)
 * Performance improvements
 * Bug fixes
-* Experimental implementation of Temporal Representation of Entities (TRoE - feel free to use, but at your own risk ;-))
+* Experimental implementation of the optional interface for Temporal Representation of Entities (TRoE - feel free to use, but at your own risk ;-))
 
 Fully working and thoroughly tested TRoE will be available in Orion-LD as part of the next major FIWARE release (~June 2021).
 
