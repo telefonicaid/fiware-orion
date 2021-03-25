@@ -96,7 +96,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
     "ts                  TIMESTAMP NOT NULL,"
     "primary key (instanceId, ts),"
-    "index attr_instance_index (id))";
+    "index attr_id_index (id))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
     "instanceId          TEXT NOT NULL,"
