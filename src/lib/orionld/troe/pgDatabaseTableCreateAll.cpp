@@ -67,14 +67,15 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "'Delete')";
 
   const char* entitiesSql = "CREATE TABLE IF NOT EXISTS entities ("
-    "instanceId   TEXT PRIMARY KEY,"
+    "instanceId   TEXT NOT NULL,"
     "ts           TIMESTAMP NOT NULL,"
     "opMode       OperationMode,"
     "id           TEXT NOT NULL,"
-    "type         TEXT NOT NULL)";
+    "type         TEXT NOT NULL,"
+    "primary key (instanceId, ts))";
 
   const char* attributesSql = "CREATE TABLE IF NOT EXISTS attributes ("
-    "instanceId          TEXT PRIMARY KEY,"
+    "instanceId          TEXT NOT NULL,"
     "id                  TEXT NOT NULL,"
     "opMode              OperationMode,"
     "entityId            TEXT NOT NULL,"
@@ -93,10 +94,12 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4326),"
     "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
-    "ts                  TIMESTAMP NOT NULL)";
+    "ts                  TIMESTAMP NOT NULL,"
+    "primary key (instanceId, ts),"
+    "index attr_instance_index (id))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
-    "instanceId          TEXT PRIMARY KEY,"
+    "instanceId          TEXT NOT NULL,"
     "id                  TEXT NOT NULL,"
     "entityId            TEXT NOT NULL,"
     "attrInstanceId      TEXT NOT NULL,"
@@ -113,7 +116,9 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4326),"
     "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
-    "ts                  TIMESTAMP NOT NULL)";
+    "ts                  TIMESTAMP NOT NULL,"
+    "primary key (instanceId, ts),"
+    "index attr_instance_index (attrInstanceId))";
 
 #if 0
   const char* entitiesTimescale      = "SELECT create_hypertable('entities', 'ts')";
