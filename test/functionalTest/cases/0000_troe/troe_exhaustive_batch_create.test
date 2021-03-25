@@ -955,37 +955,31 @@ echo
 --REGEXPECT--
 01. Create E1 on default tenant
 ===============================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Create E2 on T1 tenant
 ==========================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 03. Attempt to create E1,E3,E5 on default tenant and without context - E1 must not be recreated
 ===============================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 224
 Content-Type: application/json
 Date: REGEX(.*)
@@ -1010,7 +1004,7 @@ Date: REGEX(.*)
 
 04. Attempt to create E2,E4,E6 on T1 tenant and without context - E2 must not be recreated
 ==========================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 224
 Content-Type: application/json
 Date: REGEX(.*)
@@ -1035,98 +1029,80 @@ Date: REGEX(.*)
 
 05. Create E7,E9 on default tenant, with user context in Link Header
 ====================================================================
-HTTP/1.1 200 OK
-Content-Length: 73
+HTTP/1.1 201 Created
+Content-Length: 49
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E7",
-        "urn:ngsi-ld:entity:E9"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E7",
+    "urn:ngsi-ld:entity:E9"
+]
 
 
 06. Create E8,E10 on T1 tenant, with user context in Link Header
 ================================================================
-HTTP/1.1 200 OK
-Content-Length: 74
+HTTP/1.1 201 Created
+Content-Length: 50
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E8",
-        "urn:ngsi-ld:entity:E10"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E8",
+    "urn:ngsi-ld:entity:E10"
+]
 
 
 07. Create E11,E13 on default tenant, with user context in payload body
 =======================================================================
-HTTP/1.1 200 OK
-Content-Length: 75
+HTTP/1.1 201 Created
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E11",
-        "urn:ngsi-ld:entity:E13"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E11",
+    "urn:ngsi-ld:entity:E13"
+]
 
 
 08. Create E12,E14 on T1 tenant, with user context in payload body
 ==================================================================
-HTTP/1.1 200 OK
-Content-Length: 75
+HTTP/1.1 201 Created
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E12",
-        "urn:ngsi-ld:entity:E14"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E12",
+    "urn:ngsi-ld:entity:E14"
+]
 
 
 09. Create E15 with user context #1 and E17 with user context #2, in payload body, on default tenant
 ====================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 75
+HTTP/1.1 201 Created
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E15",
-        "urn:ngsi-ld:entity:E17"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E15",
+    "urn:ngsi-ld:entity:E17"
+]
 
 
 10. Create E16 with user context #1 and E18 with user context #2, in payload body, on T1 tenant
 ===============================================================================================
-HTTP/1.1 200 OK
-Content-Length: 75
+HTTP/1.1 201 Created
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E16",
-        "urn:ngsi-ld:entity:E18"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E16",
+    "urn:ngsi-ld:entity:E18"
+]
 
 
 11. See all entities in TRoE DB, default tenant

@@ -97,21 +97,30 @@ using orion::CompoundValueNode;
 * isNotCustomMetadata -
 *
 * Check that the parameter is a not custom metadata, i.e. one metadata without
-* an special semantic to be interpreted by the context broker itself
+* any special semantic to be interpreted by the context broker itself
 *
 * FIXME P2: this function probably could be moved to another place "closer" to metadata
 */
-static bool isNotCustomMetadata(std::string md)
+static bool isNotCustomMetadata(const char* mdName)
 {
-  if (md != NGSI_MD_ID            &&
-      md != NGSI_MD_LOCATION      &&
-      md != NGSI_MD_DATECREATED   &&
-      md != NGSI_MD_DATEMODIFIED)
+  if (strcmp(mdName, "location") == 0)
   {
-    return false;
+    // "location" is not added to the DB for NGSIv2 (it's considered NOT custom) - for NGSI-LD it is
+    if (orionldState.apiVersion == NGSI_LD_V1)
+      return false;
+
+    return true;
   }
 
-  return true;
+  // id, creDate, and modDate is not custom metadata - return true
+  if ((strcmp(mdName, "id")      == 0) ||
+      (strcmp(mdName, "creDate") == 0) ||
+      (strcmp(mdName, "modDate") == 0))
+  {
+    return true;
+  }
+
+  return false;
 }
 
 
@@ -525,7 +534,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     Metadata* mdP = caP->metadataVector[ix];
 
     /* Skip not custom metadata */
-    if (isNotCustomMetadata(mdP->name))
+    if (isNotCustomMetadata(mdP->name.c_str()))
     {
       continue;
     }
@@ -652,7 +661,7 @@ static bool contextAttributeCustomMetadataToBson
   {
     const Metadata* md = ca->metadataVector[ix];
 
-    if (!isNotCustomMetadata(md->name))
+    if (!isNotCustomMetadata(md->name.c_str()))
     {
       appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
@@ -2282,7 +2291,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   {
     Metadata* mdReq = caReq->metadataVector[ix];
 
-    if (!isNotCustomMetadata(mdReq->name))
+    if (!isNotCustomMetadata(mdReq->name.c_str()))
     {
       md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);

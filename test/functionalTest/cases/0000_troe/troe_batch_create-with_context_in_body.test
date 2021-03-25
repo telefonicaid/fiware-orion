@@ -119,17 +119,14 @@ echo
 --REGEXPECT--
 01. Batch Create an entity with the context in the payload body
 ===============================================================
-HTTP/1.1 200 OK
-Content-Length: 51
+HTTP/1.1 201 Created
+Content-Length: 27
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. See the entity in the temporal database

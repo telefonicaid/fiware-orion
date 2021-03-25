@@ -85,18 +85,15 @@ echo
 --REGEXPECT--
 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/create
 ============================================================================
-HTTP/1.1 200 OK
-Content-Length: 96
+HTTP/1.1 201 Created
+Content-Length: 57
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-  "success": [
-    "urn:ngsi-ld:entity:E1",
-    "urn:ngsi-ld:entity:E2"
-  ],
-  "errors": []
-}
+[
+  "urn:ngsi-ld:entity:E1",
+  "urn:ngsi-ld:entity:E2"
+]
 
 
 

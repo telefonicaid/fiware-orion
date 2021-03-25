@@ -112,19 +112,16 @@ echo
 --REGEXPECT--
 01. Create three entities, E1, E2, and E3
 =========================================
-HTTP/1.1 200 OK
-Content-Length: 103
+HTTP/1.1 201 Created
+Content-Length: 79
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E1",
-        "urn:ngsi-ld:entities:E2",
-        "urn:ngsi-ld:entities:E3"
-    ]
-}
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2",
+    "urn:ngsi-ld:entities:E3"
+]
 
 
 02. Delete E1 and E3 using Batch Delete

@@ -291,17 +291,14 @@ echo
 --REGEXPECT--
 01.  Create E1 with attrs location, observationSpace, operationSpace, weight, owner (and createdAt+modifiedAt to be ignored)
 ===========================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 01b. See the entity E1 in mongo

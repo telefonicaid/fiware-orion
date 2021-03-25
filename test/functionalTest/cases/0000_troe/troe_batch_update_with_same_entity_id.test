@@ -276,19 +276,16 @@ echo
 --REGEXPECT--
 01. Create entities E1, E2, and E3 - all three with P1 and R1
 =============================================================
-HTTP/1.1 200 OK
-Content-Length: 103
+HTTP/1.1 201 Created
+Content-Length: 79
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E1",
-        "urn:ngsi-ld:entities:E2",
-        "urn:ngsi-ld:entities:E3"
-    ]
-}
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2",
+    "urn:ngsi-ld:entities:E3"
+]
 
 
 02. See TRoE content - 3 entities, 6 attributes

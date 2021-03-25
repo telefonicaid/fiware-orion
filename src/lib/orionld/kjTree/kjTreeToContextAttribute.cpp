@@ -558,6 +558,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   KjNode*  objectP                = NULL;  // For 'Relationship:  Mandatory
   KjNode*  unitCodeP              = NULL;  // For 'Property':     Optional
   KjNode*  observedAtP            = NULL;  // For ALL:            Optional
+  KjNode*  locationP              = NULL;  // For 'GeoProperty':  Optional
   KjNode*  observationSpaceP      = NULL;  // For 'GeoProperty':  Optional
   KjNode*  operationSpaceP        = NULL;  // For 'GeoProperty':  Optional
   KjNode*  creDateP               = NULL;
@@ -570,8 +571,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
   while (nodeP != NULL)
   {
-    LM_T(LmtPayloadCheck, ("Treating part '%s' of attribute '%s'", nodeP->name, kNodeP->name));
-
     if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
     {
       //
@@ -702,7 +701,18 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
         orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
-        *detailP = (char*) "Error adding metadata to 'observed at' attribute";
+        *detailP = (char*) "Error adding metadata 'observed at' to attribute";
+        return false;
+      }
+    }
+    else if (SCOMPARE9(nodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    {
+      DUPLICATE_CHECK(locationP, "location", nodeP);
+      if (metadataAdd(caP, nodeP, attributeName) == false)
+      {
+        LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
+        *detailP = (char*) "Error adding metadata 'location' to attribute";
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
         return false;
       }
     }
@@ -712,7 +722,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       if (metadataAdd(caP, nodeP, attributeName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        *detailP = (char*) "Error adding metadata to 'observation space' attribute";
+        *detailP = (char*) "Error adding metadata 'observation space' to attribute";
         orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
         return false;
       }
@@ -723,7 +733,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       if (metadataAdd(caP, nodeP, attributeName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        *detailP = (char*) "Error adding metadata to 'operation space' attribute";
+        *detailP = (char*) "Error adding metadata 'operation space' to attribute";
         orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
         return false;
       }

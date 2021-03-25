@@ -95,7 +95,7 @@ echo
 --REGEXPECT--
 01. Batch Create request with more than one entry for the same entity: E1,E1,E2 - SR supposed to clean up the array before calling TRoE
 =======================================================================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 229
 Content-Type: application/json
 Date: REGEX(.*)

@@ -758,32 +758,26 @@ echo
 --REGEXPECT--
 01. Batch Create entity E1 on default tenant and without context
 ================================================================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Batch Create entity E2 on T1 tenant and without context
 ===========================================================
-HTTP/1.1 200 OK
-Content-Length: 49
+HTTP/1.1 201 Created
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 03. Batch Update entity E1+E3 on default tenant and without context - E1 is updated, E3 is ignored (with error)
