@@ -1294,7 +1294,8 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
-    cat /tmp/httpHeaders.out  | sed 's///g' > /tmp/httpHeaders.noCtrlM
+    cat /tmp/httpHeaders.out  | sed 's/
+//g' > /tmp/httpHeaders.noCtrlM
     mv /tmp/httpHeaders.noCtrlM /tmp/httpHeaders.out
 
     _responseHeaders=$(cat /tmp/httpHeaders.out)
@@ -1451,9 +1452,9 @@ function pgCreate()
   postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
   valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'GeoMultiLineString', 'LanguageMap')"
   operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
-  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, ts TIMESTAMP NOT NULL, opMode OperationMode, id TEXT NOT NULL, type TEXT NOT NULL)"
-  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, subProperties BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4326), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326), geoLineString GEOGRAPHY(LINESTRING, 4326), geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326), ts TIMESTAMP NOT NULL)"
-  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityId TEXT NOT NULL, attrInstanceId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4326), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326), geoLineString GEOGRAPHY(LINESTRING, 4326), geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326), ts TIMESTAMP NOT NULL)"
+  entities="CREATE TABLE entities(instanceId TEXT NOT NULL, ts TIMESTAMP NOT NULL, opMode OperationMode, id TEXT NOT NULL, type TEXT NOT NULL, primary key (instanceId, ts))"
+  attributes="CREATE TABLE attributes(instanceId TEXT NOT NULL, id TEXT NOT NULL, opMode OperationMode, entityId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, subProperties BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4326), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326), geoLineString GEOGRAPHY(LINESTRING, 4326), geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326), ts TIMESTAMP NOT NULL, primary key (instanceId, ts), index attr_id_index (id))"
+  subAttributes="CREATE TABLE subAttributes(instanceId TEXT NOT NULL, id TEXT NOT NULL, entityId TEXT NOT NULL, attrInstanceId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4326), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326), geoLineString GEOGRAPHY(LINESTRING, 4326), geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326), ts TIMESTAMP NOT NULL, primary key (instanceId, ts), index attr_instance_index (attrInstanceId))"
 
   # timescaledb="CREATE EXTENSION IF NOT EXISTS timescaledb;"
   # entitiesTimescale="SELECT create_hypertable('entities', 'ts')"
