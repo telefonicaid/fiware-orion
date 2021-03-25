@@ -279,8 +279,9 @@ aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `
         . /opt/ft_env/bin/activate
         pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
-* テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
+* テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 
+        sed -i -e "s/Peer certificate cannot be authenticated[^\"]*/SSL peer certificate or SSH remote key was not OK/" /opt/fiware-orion/test/functionalTest/cases/0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test
         make functional_test INSTALL_DIR=~
 
 * すべての機能テストに合格したら、valgrind テストを実行できます (これは機能テストよりも時間がかかります) :

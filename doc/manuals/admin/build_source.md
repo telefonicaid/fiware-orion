@@ -266,8 +266,9 @@ In the case of the aarch64 architecture, additionally install `python2-dev` and 
         . /opt/ft_env/bin/activate
         pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
-* Run test harness (it takes some time, please be patient).
+* Run test harness (it takes some time, please be patient). Before starting test by make command, apply the following patch to avoid test failing.
 
+        sed -i -e "s/Peer certificate cannot be authenticated[^\"]*/SSL peer certificate or SSH remote key was not OK/" /opt/fiware-orion/test/functionalTest/cases/0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test
         make functional_test INSTALL_DIR=~
 
 * Once passed all the functional tests, you can run the valgrind tests (this will take longer than the functional tests, arm yourself with a lot of patience):
