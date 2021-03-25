@@ -497,9 +497,9 @@ std::string postQueryContext
                                                       countP,
                                                       ciP->apiVersion));
 
-  if (qcrsP->errorCode.code == SccBadRequest)
+  if ((qcrsP->errorCode.code == SccBadRequest) || (qcrsP->errorCode.code == SccReceiverInternalError))
   {
-    // Bad Input detected by Mongo Backend - request ends here !
+    // Bad Input or Internal Error detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
     TIMED_RENDER(answer = oe.toJsonV1());

@@ -21,6 +21,16 @@
 %define name contextBroker
 %define owner orion 
 
+%if 0%{?rhel} > 7
+# To avoid problems in CentOS 8 with empty files in debug package
+# see https://www.programmersought.com/article/24984333483/
+%define debug_package %{nil}
+# To avoid /usr/lib/.build-id files in the package. This seems to be a
+# new feature of CentOS 8 (see https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo)
+# but by the moment we are going to disable it to build as in CentOS 7
+%define _build_id_links none
+%endif
+
 # Don't byte compile python code
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
@@ -155,7 +165,8 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 #    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 #
 %package tests
-Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
+#FIXME: obsolete packages names. Probably it's better to remove the contextBroker-test packages at all that solve this...
+#Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
@@ -182,6 +193,18 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
+- Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
+- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
+- Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
+- Fix: avoid over-requesting to CPrs attributes that has been filtered out (#3745)
+- Fix: avoid spureous entities spurious entities (eg. '{"id": "E", "type": "T"}') in GET /v2/entities responses
+- Fix: create normal files as 644 permissions for assure backup tools take configuration files in RPM
+- Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
+- Disable logging to /tmp/contextBroker.log file in Dockerfile
+- Remove: NGSIv1 context availability subscriptions
+
 * Fri Oct 30 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.0-1
 - Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
 - ADD: re-worked INFO log level, simplifying traces and making them much more useful (#3694)

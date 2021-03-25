@@ -33,7 +33,6 @@
 #include "cache/subCache.h"
 
 
-
 /* ****************************************************************************
 *
 * startSenderThread -
@@ -94,7 +93,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
       else
@@ -103,7 +102,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
       }
     }
