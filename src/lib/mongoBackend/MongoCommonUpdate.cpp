@@ -1859,7 +1859,7 @@ static unsigned int processSubscriptions
       bobQuery.append(keySp, sp);
 
       unsigned long long n;
-      if (!collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
+      if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;

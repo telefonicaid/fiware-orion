@@ -80,6 +80,7 @@ bool orion::collectionQuery
 
   // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
+  bool r;
   if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
@@ -91,17 +92,19 @@ bool orion::collectionQuery
 
     mongoc_cursor_destroy(c);
 
-    return false;
+    r = false;
   }
-
-  LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", bsonStr));
-
-  cursor->set(c);
-  alarmMgr.dbErrorReset();
+  else
+  {
+    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", bsonStr));
+    cursor->set(c);
+    alarmMgr.dbErrorReset();
+    r = true;
+  }
 
   bson_free(bsonStr);
 
-  return true;
+  return r;
 }
 
 
@@ -179,6 +182,8 @@ bool orion::collectionRangedQuery
   BSON_APPEND_INT32(opt, "limit", limit);
   BSON_APPEND_INT32(opt, "skip", offset);
 
+  char* bsonOptStr = bson_as_relaxed_extended_json(opt, NULL);
+
   mongoc_cursor_t* c = mongoc_collection_find_with_opts(collection, q, opt, NULL);
 
   bson_destroy(opt);
@@ -186,6 +191,7 @@ bool orion::collectionRangedQuery
 
   // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
+  bool r;
   if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
@@ -197,17 +203,20 @@ bool orion::collectionRangedQuery
 
     mongoc_cursor_destroy(c);
 
-    return false;
+    r = false;
+  }
+  else
+  {
+    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s, opt: %s)", bsonStr, bsonOptStr));
+    cursor->set(c);
+    alarmMgr.dbErrorReset();
+    r = true;
   }
 
-  LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", bsonStr));
-
-  cursor->set(c);
-  alarmMgr.dbErrorReset();
-
   bson_free(bsonStr);
+  bson_free(bsonOptStr);
 
-  return true;
+  return r;
 }
 
 
@@ -632,6 +641,7 @@ bool orion::collectionAggregate
 
   // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
+  bool r;
   if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
@@ -643,16 +653,18 @@ bool orion::collectionAggregate
 
     mongoc_cursor_destroy(c);
 
-    return false;
+    r = false;
   }
-
-  cursor->set(c);
-
-  alarmMgr.dbErrorReset();
+  else
+  {
+    cursor->set(c);
+    alarmMgr.dbErrorReset();
+    r = true;
+  }
 
   bson_free(bsonStr);
 
-  return true;
+  return r;
 }
 
 
