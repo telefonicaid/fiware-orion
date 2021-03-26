@@ -38,6 +38,8 @@ brokerStart CB
 # 06. GET v2/entities with servicepath '/Level_1/, /Level_2/' to see all entities present at given SP
 # 07. Attempt to UPDATE entity E1 with A1=11, using PATCH v2/update operation, with servicepath '/#', see 400 error
 # 08. Attempt to UPDATE entity E2 with A2=22, using PATCH v2/update operation, with servicepath '/Level_1/, /Level_2/' see 400 error
+# 09. Attempt to UPDATE entity E1 with A1=12, using PATCH v2/update operation, without specifying servicepath, see 404 error
+# 10. Attempt to UPDATE entity E2 with A2=21, using PATCH v2/update operation, with servicepath '/Level_1/', see 404 error
 #
 
 
@@ -123,6 +125,30 @@ payload='{
     }
 }'
 orionCurl --url '/v2/entities/E2/attrs?type=T2' -X PATCH --payload "$payload" --header "Fiware-ServicePath:/Level_1/, /Level_2/"
+echo
+echo
+
+
+echo "09. Attempt to UPDATE entity E1 with A1=12, using PATCH v2/update operation, without specifying servicepath, see 404 error"
+echo "=========================================================================================================================="
+payload='{
+    "A1": {
+      "value": 12
+    }
+}'
+orionCurl --url '/v2/entities/E1/attrs?type=T1' -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "10. Attempt to UPDATE entity E2 with A2=21, using PATCH v2/update operation, with servicepath '/Level_1/', see 404 error"
+echo "========================================================================================================================"
+payload='{
+    "A2": {
+      "value": 21
+    }
+}'
+orionCurl --url '/v2/entities/E2/attrs?type=T2' -X PATCH --payload "$payload" --header "Fiware-ServicePath:/Level_1/"
 echo
 echo
 
@@ -271,6 +297,34 @@ Date: REGEX(.*)
 {
     "description": "more than one servicepath in patch update request is not allowed", 
     "error": "BadRequest"
+}
+
+
+09. Attempt to UPDATE entity E1 with A1=12, using PATCH v2/update operation, without specifying servicepath, see 404 error
+==========================================================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id", 
+    "error": "NotFound"
+}
+
+
+10. Attempt to UPDATE entity E2 with A2=21, using PATCH v2/update operation, with servicepath '/Level_1/', see 404 error
+========================================================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id", 
+    "error": "NotFound"
 }
 
 
