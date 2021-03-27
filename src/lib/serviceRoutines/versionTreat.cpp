@@ -150,6 +150,7 @@ std::string versionTreat
   out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
+  out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
   out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
   out += "  }\n";
   out += "}\n";
