@@ -1,0 +1,1 @@
+* * Issue  #280   Fixed the response (HTTP STatus and payload data) for Batch Create according to update in NGSi-LD API spec

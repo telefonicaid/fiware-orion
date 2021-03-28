@@ -1,0 +1,101 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Create with an array of three entities, see issue #776
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 
+
+--SHELL--
+
+#
+# 01. Batch create 3 entities (issue 776) and see the entity IDs in the response payload body
+#
+
+echo "01. Batch create 3 entities (issue 776) and see the entity IDs in the response payload body"
+echo "==========================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:002",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 20,
+      "unitCode": "CEL"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:003",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 2,
+      "unitCode": "CEL"
+    }
+  },
+   {
+    "id": "urn:ngsi-ld:TemperatureSensor:004",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 100,
+      "unitCode": "CEL"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --in application/json --out application/ld+json
+echo
+echo
+
+--REGEXPECT--
+01. Batch create 3 entities (issue 776) and see the entity IDs in the response payload body
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:TemperatureSensor:002",
+    "urn:ngsi-ld:TemperatureSensor:003",
+    "urn:ngsi-ld:TemperatureSensor:004"
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1004,9 +1004,10 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Should a @context be added to the response payload?
     //
-    bool addContext = ((orionldState.serviceP != NULL) && (orionldState.linkHeaderAdded == false) &&
+    bool addContext = ((orionldState.serviceP        != NULL) &&
+                       (orionldState.linkHeaderAdded == false) &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
-                       (orionldState.acceptJsonld == true));
+                       (orionldState.acceptJsonld    == true));
 
     if (addContext)
     {
@@ -1032,8 +1033,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
         LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
     }
-
-    kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
 
     if (orionldState.uriParams.prettyPrint == false)
       kjFastRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));

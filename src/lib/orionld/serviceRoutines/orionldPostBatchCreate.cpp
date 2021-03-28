@@ -79,7 +79,7 @@ extern "C"
 //
 static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 {
-  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
+  KjNode* eIdP = kjString(orionldState.kjsonP, NULL, entityId);
 
   kjChildAdd(successArrayP, eIdP);
 }
@@ -332,11 +332,13 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   {
     orionldState.httpStatusCode = 201;
     orionldState.responseTree   = successArrayP;
+    orionldState.acceptJsonld   = false;
   }
   else
   {
     orionldState.httpStatusCode = 207;
     orionldState.responseTree   = kjObject(orionldState.kjsonP, NULL);
+    orionldState.acceptJsonld   = false;
 
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);

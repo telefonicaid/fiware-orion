@@ -190,8 +190,9 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     kjChildAdd(orionldState.responseTree, success);
     kjChildAdd(orionldState.responseTree, errors);
 
-    orionldState.httpStatusCode = 207;
-    ciP->outMimeType = JSON;
+    orionldState.httpStatusCode = 207;  // Multi-Status
+    ciP->outMimeType            = JSON;
+    orionldState.acceptJsonld   = false;
   }
 
   return true;
