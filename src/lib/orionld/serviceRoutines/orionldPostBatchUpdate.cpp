@@ -336,10 +336,13 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     return false;
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
-    orionldState.httpStatusCode = SccMultiStatus;
+  {
+    orionldState.httpStatusCode = 207;  // Multi-Status
+    orionldState.acceptJsonld   = false;
+  }
   else
   {
-    orionldState.httpStatusCode = SccNoContent;
+    orionldState.httpStatusCode = 204;  // No Content
     orionldState.responseTree = NULL;
   }
 
