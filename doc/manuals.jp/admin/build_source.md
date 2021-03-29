@@ -84,12 +84,12 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        make
         sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
+aarch64 アーキテクチャの場合、yum を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
 * MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
 
@@ -102,7 +102,7 @@ aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と
         sudo yum install curl nc valgrind bc
         sudo pip2 install virtualenv
 
-aarch64 アーキテクチャの場合、さらに yum で、python-devel と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
+aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-build と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
 
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
