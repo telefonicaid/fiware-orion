@@ -78,7 +78,6 @@ bool orion::collectionQuery
   mongoc_cursor_t* c = mongoc_collection_find_with_opts(collection, q, NULL, NULL);
   mongoc_collection_destroy(collection);
 
-  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   bool r;
   if (mongoc_cursor_error(c, &error))
@@ -189,7 +188,6 @@ bool orion::collectionRangedQuery
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   bool r;
   if (mongoc_cursor_error(c, &error))
@@ -639,7 +637,6 @@ bool orion::collectionAggregate
   bson_destroy(opt);
   mongoc_collection_destroy(collection);
 
-  // FIXME: pending on PR https://github.com/mongodb/mongo-c-driver/pull/740 merging
   bson_error_t error;
   bool r;
   if (mongoc_cursor_error(c, &error))
