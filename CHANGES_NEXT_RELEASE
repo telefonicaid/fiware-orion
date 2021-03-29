@@ -1,2 +1,3 @@
 - Fix: response rightly 500 Internal Error when DB query fails (previously 200 OK with empty entities array was returned)
 - Fix: -logForHumans traces including full timestamp information
+- Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
