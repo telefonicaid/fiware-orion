@@ -27,6 +27,7 @@ fi
 git_hash=$(git log | grep commit | head -1 | awk '{ print $2 }')
 user=$(whoami)
 host=$(hostname)
+machine=$(uname -m)
 
 if [ -n "$git_hash" ]; then
     hash=$git_hash
@@ -68,6 +69,7 @@ echo '#define COMPILE_TIME     "'${date}'"'                                     
 echo '#define COMPILED_BY      "'${user}'"'                                         >> $TMP_FILE
 echo '#define COMPILED_IN      "'${host}'"'                                         >> $TMP_FILE
 echo '#define RELEASE_DATE     "'${date}'"'                                         >> $TMP_FILE
+echo '#define MACHINE_ARCH     "'${machine}'"'                                      >> $TMP_FILE
 echo                                                                                >> $TMP_FILE
 echo '#endif  // SRC_LIB_COMMON_COMPILEINFO_H_'                                     >> $TMP_FILE
 
