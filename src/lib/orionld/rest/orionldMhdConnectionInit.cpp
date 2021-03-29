@@ -650,7 +650,9 @@ MHD_Result orionldMhdConnectionInit
   // Check URL path is OK
 
   // Check Content-Type is accepted
-  if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
+  if ((orionldState.verb == PATCH) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/merge-patch+json") == 0))
+    ciP->httpHeaders.contentType = "application/json";
+  else if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
     //
     // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
