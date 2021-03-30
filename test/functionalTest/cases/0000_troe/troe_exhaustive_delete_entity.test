@@ -378,13 +378,13 @@ Date: REGEX(.*)
 05. Attempt to delete E1 on default tenant
 ==========================================
 HTTP/1.1 404 Not Found
-Content-Length: 160
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:entity:E1",
-    "title": "The requested entity has not been found. Check its id",
+    "title": "Entity not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -392,13 +392,13 @@ Date: REGEX(.*)
 06. Attempt to delete E2 on T1 tenant
 =====================================
 HTTP/1.1 404 Not Found
-Content-Length: 160
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:entity:E2",
-    "title": "The requested entity has not been found. Check its id",
+    "title": "Entity not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
