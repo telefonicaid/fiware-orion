@@ -53,16 +53,16 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
   if (dbRegistrationExists(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationExists says that the registration '%s' doesn't exist", orionldState.wildcard[0]));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
 
   if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationDelete failed - not found?"));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
 

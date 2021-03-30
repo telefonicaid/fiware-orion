@@ -185,14 +185,14 @@ Date: REGEX(.*)
 03. Attempt to patch a non-existing entity E2 - see 404
 =======================================================
 HTTP/1.1 404 Not Found
-Content-Length: 128
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:entities:E2",
     "title": "Entity does not exist",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

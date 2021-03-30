@@ -461,7 +461,7 @@ static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
       orionldState.httpStatusCode = 405;  // SccBadVerb
     else
     {
-      orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath);
       orionldState.httpStatusCode = 404;
     }
   }

@@ -563,8 +563,8 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   if (dbRegistrationP == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration not found", registrationId);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Registration not found", registrationId);
     return false;
   }
 

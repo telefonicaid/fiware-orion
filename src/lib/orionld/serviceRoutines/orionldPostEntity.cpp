@@ -208,8 +208,8 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
     return false;
   }
 

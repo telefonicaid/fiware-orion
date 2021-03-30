@@ -774,8 +774,8 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 
   if (currentEntityTree == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", orionldState.wildcard[0]);
     return false;
   }
 

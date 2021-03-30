@@ -51,8 +51,8 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
   if (contextP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0]);
-    orionldState.httpStatusCode = SccContextElementNotFound;
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;
     return false;
   }
 

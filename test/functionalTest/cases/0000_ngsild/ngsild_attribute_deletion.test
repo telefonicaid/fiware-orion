@@ -159,14 +159,14 @@ Date: REGEX(.*)
 05. Attempt to delete non-existing attribute P4
 ===============================================
 HTTP/1.1 404 Not Found
-Content-Length: 150
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/P4",
-    "title": "Attribute Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

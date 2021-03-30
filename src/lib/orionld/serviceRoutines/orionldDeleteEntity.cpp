@@ -57,8 +57,8 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
 
   if (dbEntityLookup(entityId) == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "The requested entity has not been found. Check its id", entityId);
-    orionldState.httpStatusCode = SccNotFound;  // 404
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity not found", entityId);
+    orionldState.httpStatusCode = 404;  // Not Found
     return false;
   }
 
