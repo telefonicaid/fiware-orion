@@ -415,16 +415,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         orionldState.payloadTypeNode = attrNodeP;
 
         STRING_CHECK(orionldState.payloadTypeNode, "entity type");
-
-        char* detail;
-        if (pcheckName(orionldState.payloadTypeNode->value.s, &detail) == false)
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", orionldState.payloadTypeNode->value.s);
-          orionldState.httpStatusCode = 400;
-          return false;
-        }
-        LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.payloadTypeNode));
-
         attrNodeP = orionldState.payloadTypeNode->next;
         kjNodeDecouple(orionldState.payloadTypeNode, prev, orionldState.requestTree);
       }
