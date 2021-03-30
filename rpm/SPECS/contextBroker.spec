@@ -193,6 +193,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Mar 30 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.1-1
+- Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
+
 * Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
 - Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
 - Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file

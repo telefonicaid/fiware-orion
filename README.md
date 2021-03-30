@@ -9,7 +9,7 @@
 [![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 [![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
 <br>
-[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion/2.6.0.svg)](https://fiware-orion.rtfd.io/en/2.6.0/)
+[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion/2.6.1.svg)](https://fiware-orion.rtfd.io/en/2.6.1/)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
 ![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
 ![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
