@@ -31,20 +31,27 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create an entity E1 with an attribute A1
+# 01. Create an entity E1 with attributes A1 and A2
 # 02. Try to delete the attribute A1 of entity E2 - entity not found
-# 03. Try to delete the	attribute A2 of	entity E1 - attribute not found
-# 04. Delete the attribute A1 of	entity E1 - 200 OK
+# 03. Try to delete the attribute A3 of entity E1 - attribute not found
+# 04. Delete the attribute A1 (with shortname) of entity E1 - ok
+# 05. Delete the attribute A2 (with longname) of entity E1 - ok
+# 06. Attempt to delete the attribute A1 (with shortname) of entity E1 - 404
+# 07. Attempt to delete the attribute A2 (with longname) of entity E1 - 404
 #
 
-echo "01. Create an entity E1 with an attribute A1"
-echo "============================================"
+echo "01. Create an entity E1 with attributes A1 and A2"
+echo "================================================="
 payload='{
   "id": "urn:ngsi-ld/entities/E1",
   "type": "T",
   "A1": {
     "type": "Property",
     "value": "A1"
+  },
+  "A2": {
+    "type": "Property",
+    "value": "A2"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
@@ -59,23 +66,45 @@ echo
 echo
 
 
-echo "03. Try to delete the	attribute A2 of	entity E1 - attribute not found"
+echo "03. Try to delete the attribute A3 of entity E1 - attribute not found"
 echo "====================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/https://uri=etsi=org/ngsi-ld/default/A2 -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/A3 -X DELETE
 echo
 echo
 
 
-echo "04. Delete the attribute A1 of	entity E1 - 200 OK"
-echo "=================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/https://uri=etsi=org/ngsi-ld/default/A1 -X DELETE
+echo "04. Delete the attribute A1 (with shortname) of entity E1 - ok"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/A1 -X DELETE
+echo
+echo
+
+
+
+echo "05. Delete the attribute A2 (with longname) of entity E1 - ok"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/https://uri.etsi.org/ngsi-ld/default-context/A2 -X DELETE
+echo
+echo
+
+
+echo "06. Attempt to delete the attribute A1 (with shortname) of entity E1 - 404"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/A1 -X DELETE
+echo
+echo
+
+
+echo "07. Attempt to delete the attribute A2 (with longname) of entity E1 - 404"
+echo "========================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1/attrs/https://uri.etsi.org/ngsi-ld/default-context/A2 -X DELETE
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity E1 with an attribute A1
-============================================
+01. Create an entity E1 with attributes A1 and A2
+=================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E1
@@ -86,42 +115,70 @@ Date: REGEX(.*)
 02. Try to delete the attribute A1 of entity E2 - entity not found
 ==================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 162
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld/entities/E2",
-    "title": "The requested entity has not been found. Check its id",
+    "title": "Entity not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
-03. Try to delete the	attribute A2 of	entity E1 - attribute not found
+03. Try to delete the attribute A3 of entity E1 - attribute not found
 =====================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 142
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri=etsi=org/ngsi-ld/default/A2",
-    "title": "Attribute Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/A3",
+    "title": "Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
-04. Delete the attribute A1 of	entity E1 - 200 OK
-==================================================
+04. Delete the attribute A1 (with shortname) of entity E1 - ok
+==============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Delete the attribute A2 (with longname) of entity E1 - ok
+=============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Attempt to delete the attribute A1 (with shortname) of entity E1 - 404
+==========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 142
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri=etsi=org/ngsi-ld/default/A1",
-    "title": "Attribute Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/A1",
+    "title": "Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. Attempt to delete the attribute A2 (with longname) of entity E1 - 404
+=========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/A2",
+    "title": "Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

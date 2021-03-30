@@ -32,9 +32,9 @@ brokerStart CB 0-255 --prettyPrint
 
 #
 # 01. Create an entity with three attrs P1-P3, Using an inline context, where P1, P2, and P3 is defined
-# 03. Attempt to delete P2, without context, using alias P2 => see error Not Found
-# 04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
-# 05. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
+# 02. Attempt to delete P2, without context, using alias P2 => see error Not Found
+# 03. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
+# 04. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
 #
 
 HOST=$(hostname)
@@ -67,21 +67,21 @@ echo
 echo
 
 
-echo "03. Attempt to delete P2, without context, using alias P2 => see error Not Found"
+echo "02. Attempt to delete P2, without context, using alias P2 => see error Not Found"
 echo "================================================================================"
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P2 -X DELETE --linkHeaderFix
 echo
 echo
 
 
-echo "04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK"
+echo "03. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK"
 echo "======================================================================================================================"
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P2.jsonld -X DELETE --linkHeaderFix
 echo
 echo
 
 
-echo "05. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context"
+echo "04. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context"
 echo "=========================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 echo
@@ -98,28 +98,28 @@ Date: REGEX(.*)
 
 
 
-03. Attempt to delete P2, without context, using alias P2 => see error Not Found
+02. Attempt to delete P2, without context, using alias P2 => see error Not Found
 ================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 150
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/P2",
-    "title": "Attribute Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
-04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
+03. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
 ======================================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-05. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
+04. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
 ==========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 218

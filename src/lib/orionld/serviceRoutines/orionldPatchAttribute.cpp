@@ -36,7 +36,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/HttpStatusCode.h"                                 // SccNotFound
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
@@ -166,11 +165,11 @@ static bool orionldForwardPatchAttribute
   if (reqOk == false)
   {
     LM_E(("PATCH: orionldRequestSend failed: %s", detail));
-    orionldState.httpStatusCode = SccReceiverInternalError;  // ???
+    orionldState.httpStatusCode = 500;  // ???
     return false;
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }
@@ -415,8 +414,8 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     char pair[1024];
 
     snprintf(pair, sizeof(pair), "Entity '%s', Attribute '%s'", entityId, attrName);
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity/Attribute not found", pair);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", pair);
     return false;
   }
 
@@ -485,8 +484,8 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
-  if (orionldState.httpStatusCode == SccOk)
-    orionldState.httpStatusCode = SccNoContent;
+  if (orionldState.httpStatusCode == 200)
+    orionldState.httpStatusCode = 204;
   else
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));

@@ -34,7 +34,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/HttpStatusCode.h"                                 // SccNotFound
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -165,7 +164,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   // 1. Is the Entity ID in the URL a valid URI?
   if (pcheckUri(entityId, &detail) == false)
   {
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
@@ -177,8 +176,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
     return false;
   }
 
@@ -187,7 +186,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   if (idNodeP == NULL)
   {
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = 500;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id' field of entity from DB not found");
     return false;
   }
@@ -197,7 +196,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   if (entityTypeNodeP == NULL)
   {
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = 500;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id::type' field of entity from DB not found");
     return false;
   }
@@ -206,7 +205,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
   if (inDbAttrNamesP == NULL)
   {
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = 500;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found");
     return false;
   }
@@ -215,7 +214,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* inDbAttrsP = kjLookup(dbEntityP, "attrs");
   if (inDbAttrsP == NULL)
   {
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = 500;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
@@ -337,7 +336,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   // 9. Postprocess output from mongoBackend
-  if (orionldState.httpStatusCode == SccOk)
+  if (orionldState.httpStatusCode == 200)
   {
     //
     // 204 or 207?
@@ -354,10 +353,10 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       kjChildAdd(orionldState.responseTree, updatedP);
       kjChildAdd(orionldState.responseTree, notUpdatedP);
 
-      orionldState.httpStatusCode = SccMultiStatus;
+      orionldState.httpStatusCode = 207;
     }
     else
-      orionldState.httpStatusCode = SccNoContent;
+      orionldState.httpStatusCode = 204;
   }
   else
   {

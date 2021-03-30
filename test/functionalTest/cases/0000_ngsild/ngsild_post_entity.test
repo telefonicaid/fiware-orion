@@ -409,14 +409,14 @@ Date: REGEX(.*)
 09. Entity not found - see error
 ================================
 HTTP/1.1 404 Not Found
-Content-Length: 128
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:entities:E2",
     "title": "Entity does not exist",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

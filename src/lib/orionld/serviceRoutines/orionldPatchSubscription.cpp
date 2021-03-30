@@ -486,7 +486,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 
   if (dbSubscriptionP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription not found", subscriptionId);
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", subscriptionId);
     orionldState.httpStatusCode = 404;
     return false;
   }

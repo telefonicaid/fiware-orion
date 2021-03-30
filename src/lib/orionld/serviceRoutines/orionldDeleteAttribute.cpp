@@ -75,9 +75,8 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   if (dbEntityLookup(entityId) == NULL)
   {
-    LM_T(LmtService, ("Entity Not Found: %s", entityId));
-    orionldErrorResponseCreate(OrionldResourceNotFound, "The requested entity has not been found. Check its id", entityId);
-    orionldState.httpStatusCode = SccNotFound;  // 404
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity not found", entityId);
+    orionldState.httpStatusCode = 404;  // Not Found
     return false;
   }
 
@@ -86,20 +85,19 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   // IMPORTANT: Must call dbEntityAttributeLookup before replacing dots for eqs
   if (dbEntityAttributeLookup(entityId, attrNameP) == NULL)
   {
-    LM_T(LmtService, ("Attribute Not Found: %s/%s", entityId, attrNameP));
-    orionldState.httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", attrNameP);
+    orionldState.httpStatusCode = 404;
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute not found", attrNameP);
     return false;
   }
 
   dotForEq(attrNameP);
 
-  char* attrNameV[1]  = { attrNameP };
+  char* attrNameV[1] = { attrNameP };
   if (dbEntityAttributesDelete(entityId, attrNameV, 1) == false)
   {
     LM_W(("dbEntityAttributesDelete failed"));
-    orionldState.httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", attrNameP);
+    orionldState.httpStatusCode = 404;
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute Not Found", attrNameP);
     return false;
   }
 
