@@ -1513,9 +1513,9 @@ function pgCreate()
   # This is pretty strange.
   # To fix the problem, the tables are emptied here:
   #
-  echo "DELETE FROM subattributes" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM attributes"    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM entities"      | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+#  echo "DELETE FROM subattributes" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+#  echo "DELETE FROM attributes"    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+#  echo "DELETE FROM entities"      | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
 }
 
 
