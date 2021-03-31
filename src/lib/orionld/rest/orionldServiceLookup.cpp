@@ -37,14 +37,14 @@
 //
 // The cSumV values are interesting only for URL paths without wildcard of just uptil the first wildcard
 // The longest URL path without/before first wildcard is "/ngsi-ld/v1/csourceRegistrations/".
-// The initial part ("/ngsi-ld/") doesn't count, so ... 24 chars is all we need for the cSumV.
+// The initial part ("/ngsi-ld/") doesn't count, so ... 34 chars is all we need for the cSumV.
 //
-// strlen("/ngsi-ld/v1/entityOperations/delete")   == 35
-// strlen("/ngsi-ld/")                           == 9   (ORION_LD_SERVICE_PREFIX_LEN)
+// strlen("/ngsi-ld/v1/temporal/entityOperations/query") == 43
+// strlen("/ngsi-ld/")                                   == 9   (ORION_LD_SERVICE_PREFIX_LEN)
 //
-//  35 - 9 == 26
+//   43 - 9 == 34
 //
-#define MAX_CHARS_BEFORE_WILDCARD 26
+#define MAX_CHARS_BEFORE_WILDCARD 34
 static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 {
   // First of all, skip the first 9 characters in the URL path ("/ngsi-ld/")

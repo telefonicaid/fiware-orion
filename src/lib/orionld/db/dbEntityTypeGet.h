@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
+#define SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
+
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -22,23 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/serviceRoutines/orionldNotImplemented.h"     // Own Interface
 
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldNotImplemented -
-//
-bool orionldNotImplemented(ConnectionInfo* ciP)
+extern "C"
 {
-  orionldState.httpStatusCode = 501;
-  orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
-
-  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url);
-  return false;
+#include "kjson/KjNode.h"                                        // KjNode
 }
+
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbEntityTypeGet -
+//
+extern KjNode* dbEntityTypeGet(OrionldProblemDetails* pdP, const char* type);
+
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
