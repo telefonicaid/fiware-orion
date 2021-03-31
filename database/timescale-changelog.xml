@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v1_step_0">
+        <comment>Create a combined primary key for the entities table.</comment>
+        <dropPrimaryKey constraintName="entities_pkey"
+                        dropIndex="true"
+                        schemaName="public"
+                        tableName="entities"/>
+        <addPrimaryKey
+                        columnNames="instanceid, ts"
+                        constraintName="entities_pkey"
+                        schemaName="public"
+                        tableName="entities"
+                        validate="true"/>
+        <rollback>
+            <dropPrimaryKey constraintName="entities_pkey"
+                             dropIndex="true"
+                             schemaName="public"
+                             tableName="entities"/>
+            <addPrimaryKey
+                    columnNames="instanceid"
+                    constraintName="entities_pkey"
+                    schemaName="public"
+                    tableName="entities"
+                    validate="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v1_step_1">
+        <comment>Create a combined primary key for the attributes table.</comment>
+        <dropPrimaryKey constraintName="attributes_pkey"
+                        dropIndex="true"
+                        schemaName="public"
+                        tableName="attributes"/>
+        <addPrimaryKey
+                columnNames="instanceid, ts"
+                constraintName="attributes_pkey"
+                schemaName="public"
+                tableName="attributes"
+                validate="true"/>
+        <rollback>
+            <dropPrimaryKey constraintName="attributes_pkey"
+                            dropIndex="true"
+                            schemaName="public"
+                            tableName="attributes"/>
+            <addPrimaryKey
+                    columnNames="instanceid"
+                    constraintName="attributes_pkey"
+                    schemaName="public"
+                    tableName="attributes"
+                    validate="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v1_step_2">
+        <comment>Create a combined primary key for the subattributes table.</comment>
+        <dropPrimaryKey constraintName="subattributes_pkey"
+                        dropIndex="true"
+                        schemaName="public"
+                        tableName="subattributes"/>
+        <addPrimaryKey
+                columnNames="instanceid, ts"
+                constraintName="subattributes_pkey"
+                schemaName="public"
+                tableName="subattributes"
+                validate="true"/>
+        <rollback>
+            <dropPrimaryKey constraintName="subattributes_pkey"
+                            dropIndex="true"
+                            schemaName="public"
+                            tableName="subattributes"/>
+            <addPrimaryKey
+                    columnNames="instanceid"
+                    constraintName="subattributes_pkey"
+                    schemaName="public"
+                    tableName="subattributes"
+                    validate="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v1_step_3">
+        <comment>Create attribute-id index for subattributes table.</comment>
+        <createIndex indexName="subattributes_attributeid_index" tableName="subattributes">
+            <column name="attrinstanceid"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="subattributes_attributeid_index"
+                       schemaName="public"
+                       tableName="subattributes"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
