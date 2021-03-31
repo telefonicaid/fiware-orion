@@ -72,7 +72,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "opMode       OperationMode,"
     "id           TEXT NOT NULL,"
     "type         TEXT NOT NULL,"
-    "primary key (instanceId, ts))";
+    "CONSTRAINT entities_pkey PRIMARY KEY (instanceId, ts))";
 
   const char* attributesSql = "CREATE TABLE IF NOT EXISTS attributes ("
     "instanceId          TEXT NOT NULL,"
@@ -95,8 +95,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
     "ts                  TIMESTAMP NOT NULL,"
-    "primary key (instanceId, ts),"
-    "index attr_id_index (id))";
+    "CONSTRAINT attributes_pkey PRIMARY KEY (instanceId, ts),"
+    "INDEX (id))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
     "instanceId          TEXT NOT NULL,"
@@ -117,8 +117,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoLineString       GEOGRAPHY(LINESTRING, 4326),"
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING, 4326),"
     "ts                  TIMESTAMP NOT NULL,"
-    "primary key (instanceId, ts),"
-    "index attr_instance_index (attrInstanceId))";
+    "CONSTRAINT subattributes_pkey PRIMARY KEY (instanceId, ts),"
+    "INDEX (attrInstanceId))";
 
 #if 0
   const char* entitiesTimescale      = "SELECT create_hypertable('entities', 'ts')";

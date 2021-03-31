@@ -48,3 +48,9 @@ docker run
 
 You need to run the script for every tenant. Every tenant gets its own database, with the naming schema 
 ```<DEFAULT_DATABASE_NAME>_<TENANT_ID>```, for example orion_mytenant. 
+
+### Version history
+
+| Version | Description |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| v1 | Change primary keys to include the timestamp in preparation of timescale-hypertable support, add index for (sub-)attributes. |
