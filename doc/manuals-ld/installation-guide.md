@@ -252,3 +252,7 @@ please follow the instructions in your respective Installation Guide for Functio
 
 
 And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
+
+## Kubernetes
+
+For running Orion-LD on [Kubernetes](https://kubernetes.io/) we provide a [Helm-Chart](https://github.com/FIWARE/helm-charts/tree/main/charts/orion). More detailed information for configuration and load-numbers, can be found at the [Loadtest-Repository](https://github.com/FIWARE/orion-loadtest). 
