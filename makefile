@@ -82,11 +82,14 @@ compile_info: branchFile
 compile_info_release: branchFile
 	./scripts/build/compileInfo.sh --release
 
-prepare_release: compile_info_release
+src/lib/orionld/troe/dbCreationCommand.cpp: database/sql/initial.sql
+	./scripts/build/troeDbCreationCommand.sh
+
+prepare_release: compile_info_release src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_RELEASE || true
 	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_debug: compile_info
+prepare_debug: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_DEBUG || true
 	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 

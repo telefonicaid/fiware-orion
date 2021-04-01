@@ -83,6 +83,7 @@ SET (SOURCES
     pgGeoSubLineStringPush.cpp
     pgGeoSubMultiPolygonPush.cpp
     pgGeoSubMultiLineStringPush.cpp
+    dbCreationCommand.cpp
 )
 
 SET (HEADERS
