@@ -50,5 +50,5 @@ cat > src/lib/orionld/troe/dbCreationCommand.cpp <<EOF
 EOF
 
 echo 'const char* dbCreationCommand = "\'     >> src/lib/orionld/troe/dbCreationCommand.cpp
-cat database/sql/initial.sql | sed 's/$/\\/'  >> src/lib/orionld/troe/dbCreationCommand.cpp
+cat database/sql/current.sql | sed 's/$/\\/'  >> src/lib/orionld/troe/dbCreationCommand.cpp
 echo '";'                                     >> src/lib/orionld/troe/dbCreationCommand.cpp
