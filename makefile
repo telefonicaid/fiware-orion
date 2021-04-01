@@ -82,7 +82,7 @@ compile_info: branchFile
 compile_info_release: branchFile
 	./scripts/build/compileInfo.sh --release
 
-src/lib/orionld/troe/dbCreationCommand.cpp: database/sql/initial.sql
+src/lib/orionld/troe/dbCreationCommand.cpp: database/sql/current.sql scripts/build/troeDbCreationCommand.sh
 	./scripts/build/troeDbCreationCommand.sh
 
 prepare_release: compile_info_release src/lib/orionld/troe/dbCreationCommand.cpp
