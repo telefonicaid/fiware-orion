@@ -9,7 +9,6 @@ While Orion-LD takes care of populating the TRoE databases, another component ha
 So, for queries of the temporal data, instead of sending the requests to Orion-LD, on (default) port 1026, the queries are sent to Mintaka, on (default) port 8080.
 
 ## Database setup
-
 To run Orion-LD with TroE enabled, a PostgreSQL with PostGIS and TimescaleDB is needed.
 For local installations, this [timescaledb-postgis image](https://hub.docker.com/layers/timescale/timescaledb-postgis/latest-pg12/images/sha256-40be823de6035faa44d3e811f04f3f064868ee779ebb49b287e1c809ec786994?context=explore) is recommended.
 
@@ -19,14 +18,14 @@ docker run -e POSTGRES_USER=orion -e POSTGRES_PASSWORD=orion -e POSTGRES_HOST_AU
 ```
 
 ## Database Migration
-A databese migration scripts is found in the [database-folder](../../database)
-The file [initial.sql](../../database/sql/initial.sql) contains the SQL script for the timescale database. It holds the schema at the state of orion-ld version 0.7.0.
+A database migration scripts is found in the [database-folder](../../database)
+The file [initial.sql](../../database/sql/initial.sql) contains the SQL script for the timescale database. It holds the schema at the state of Orion-LD version 0.7.0.
 
 ### Migration
 For database migration, a liquibase changelog is provided. This changelog can be used to migrate existing databases to the new schema.
 The  changesets use the following ID schema: ```v<MIGRATION_NR>_step_<STEP_NR>```
 The ```<MIGRATION_NR>``` is a continuously incrementing number.
-All steps of one migration to a certain orion version should use the same  ```<MIGRATION_NR>```.
+All steps of one migration to a certain Orion-LD version should use the same  ```<MIGRATION_NR>```.
 
 ### Running the Migration
 
