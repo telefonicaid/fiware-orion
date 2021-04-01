@@ -384,12 +384,7 @@ bool collectionInsert
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - insert(): " + doc.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
+    *err = "Bad Request";
 
     return false;
   }
