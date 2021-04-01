@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS attributes (
     geoLineString GEOGRAPHY(LINESTRING, 4326),
     geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326),
     ts TIMESTAMP NOT NULL,
-    CONSTRAINT entities_pkey PRIMARY KEY (instanceId,ts));
+    CONSTRAINT attributes_pkey PRIMARY KEY (instanceId,ts));
 
 CREATE TABLE IF NOT EXISTS subAttributes (
     instanceId TEXT NOT NULL,
@@ -69,6 +69,6 @@ CREATE TABLE IF NOT EXISTS subAttributes (
     geoLineString GEOGRAPHY(LINESTRING, 4326),
     geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326),
     ts TIMESTAMP NOT NULL,
-    CONSTRAINT entities_pkey PRIMARY KEY (instanceId,ts));
+    CONSTRAINT subattributes_pkey PRIMARY KEY (instanceId,ts));
 
 CREATE INDEX subattributes_attributeid_index ON subAttributes (attrInstanceId);
