@@ -188,6 +188,10 @@ def ignore(root, file):
     if 'cases' in root and file.endswith('.json'):
         return True
 
+    # Database migration files in /databases are ignored
+    if 'database' in root:
+        return True
+
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
