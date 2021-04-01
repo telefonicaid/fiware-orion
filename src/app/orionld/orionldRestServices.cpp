@@ -50,9 +50,13 @@
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"
+#include "orionld/serviceRoutines/orionldGetEntityType.h"
 #include "orionld/serviceRoutines/orionldGetTenants.h"
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"
 #include "orionld/serviceRoutines/orionldPostQuery.h"
+#include "orionld/serviceRoutines/orionldGetTemporalEntities.h"
+#include "orionld/serviceRoutines/orionldGetTemporalEntity.h"
+#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -65,20 +69,23 @@
 //
 static OrionLdRestServiceSimplified getServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*",              orionldGetEntity          },
-  { "/ngsi-ld/v1/entities",                orionldGetEntities        },
-  { "/ngsi-ld/v1/types",                   orionldGetEntityTypes     },
-  { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription    },
-  { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
-  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration    },
-  { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations   },
-  { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext         },
-  { "/ngsi-ld/ex/v1/contexts",             orionldGetContexts        },
-  { "/ngsi-ld/ex/v1/version",              orionldGetVersion         },
-  { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants         },
-  { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes       },
-  { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented     },
-  { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented     }
+  { "/ngsi-ld/v1/entities/*",              orionldGetEntity           },
+  { "/ngsi-ld/v1/entities",                orionldGetEntities         },
+  { "/ngsi-ld/v1/types/*",                 orionldGetEntityType       },
+  { "/ngsi-ld/v1/types",                   orionldGetEntityTypes      },
+  { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription     },
+  { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions    },
+  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration     },
+  { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations    },
+  { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext          },
+  { "/ngsi-ld/ex/v1/contexts",             orionldGetContexts         },
+  { "/ngsi-ld/ex/v1/version",              orionldGetVersion          },
+  { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants          },
+  { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes        },
+  { "/ngsi-ld/v1/temporal/entities/*",     orionldGetTemporalEntity   },
+  { "/ngsi-ld/v1/temporal/entities",       orionldGetTemporalEntities },
+  { "/ngsi-ld/v1/attributes/*",            orionldNotImplemented      },
+  { "/ngsi-ld/v1/attributes",              orionldNotImplemented      }
 };
 static const int getServices = (sizeof(getServiceV) / sizeof(getServiceV[0]));
 
@@ -90,17 +97,18 @@ static const int getServices = (sizeof(getServiceV) / sizeof(getServiceV[0]));
 //
 static OrionLdRestServiceSimplified postServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs",        orionldPostEntity                     },
-  { "/ngsi-ld/v1/entities",                orionldPostEntities                   },
-  { "/ngsi-ld/v1/entityOperations/create", orionldPostBatchCreate                },
-  { "/ngsi-ld/v1/entityOperations/upsert", orionldPostBatchUpsert                },
-  { "/ngsi-ld/v1/entityOperations/update", orionldPostBatchUpdate                },
-  { "/ngsi-ld/v1/entityOperations/delete", orionldPostBatchDelete                },
-  { "/ngsi-ld/v1/entityOperations/query",  orionldPostQuery                      },
-  { "/ngsi-ld/v1/subscriptions",           orionldPostSubscriptions              },
-  { "/ngsi-ld/v1/csourceRegistrations",    orionldPostRegistrations              },
-  { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented                 },
-  { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented                 }
+  { "/ngsi-ld/v1/entities/*/attrs",                orionldPostEntity         },
+  { "/ngsi-ld/v1/entities",                        orionldPostEntities       },
+  { "/ngsi-ld/v1/entityOperations/create",         orionldPostBatchCreate    },
+  { "/ngsi-ld/v1/entityOperations/upsert",         orionldPostBatchUpsert    },
+  { "/ngsi-ld/v1/entityOperations/update",         orionldPostBatchUpdate    },
+  { "/ngsi-ld/v1/entityOperations/delete",         orionldPostBatchDelete    },
+  { "/ngsi-ld/v1/entityOperations/query",          orionldPostQuery          },
+  { "/ngsi-ld/v1/subscriptions",                   orionldPostSubscriptions  },
+  { "/ngsi-ld/v1/csourceRegistrations",            orionldPostRegistrations  },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldNotImplemented     },
+  { "/ngsi-ld/v1/temporal/entities",               orionldNotImplemented     },
+  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery  }
 };
 static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]));
 
@@ -112,10 +120,11 @@ static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]))
 //
 static OrionLdRestServiceSimplified patchServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs/*",      orionldPatchAttribute     },
-  { "/ngsi-ld/v1/entities/*/attrs",        orionldPatchEntity        },
-  { "/ngsi-ld/v1/subscriptions/*",         orionldPatchSubscription  },
-  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldPatchRegistration  }
+  { "/ngsi-ld/v1/entities/*/attrs/*",            orionldPatchAttribute     },
+  { "/ngsi-ld/v1/entities/*/attrs",              orionldPatchEntity        },
+  { "/ngsi-ld/v1/subscriptions/*",               orionldPatchSubscription  },
+  { "/ngsi-ld/v1/csourceRegistrations/*",        orionldPatchRegistration  },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs/*/*", orionldNotImplemented     }
 };
 static const int patchServices = (sizeof(patchServiceV) / sizeof(patchServiceV[0]));
 
@@ -127,10 +136,13 @@ static const int patchServices = (sizeof(patchServiceV) / sizeof(patchServiceV[0
 //
 static OrionLdRestServiceSimplified deleteServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs/*",      orionldDeleteAttribute    },  // Very important that orionldDeleteAttribute comes before orionldDeleteEntity
-  { "/ngsi-ld/v1/entities/*",              orionldDeleteEntity       },
-  { "/ngsi-ld/v1/subscriptions/*",         orionldDeleteSubscription },
-  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldDeleteRegistration }
+  { "/ngsi-ld/v1/entities/*/attrs/*",            orionldDeleteAttribute    },  // Very important that orionldDeleteAttribute comes before orionldDeleteEntity
+  { "/ngsi-ld/v1/entities/*",                    orionldDeleteEntity       },
+  { "/ngsi-ld/v1/subscriptions/*",               orionldDeleteSubscription },
+  { "/ngsi-ld/v1/csourceRegistrations/*",        orionldDeleteRegistration },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs/*/*", orionldNotImplemented     },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs/*",   orionldNotImplemented     },
+  { "/ngsi-ld/v1/temporal/entities/*",           orionldNotImplemented     }
 };
 static const int deleteServices = (sizeof(deleteServiceV) / sizeof(deleteServiceV[0]));
 

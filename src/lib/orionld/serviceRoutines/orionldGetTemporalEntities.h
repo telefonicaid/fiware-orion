@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETTEMPORALENTITIES_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETTEMPORALENTITIES_H_
+
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,23 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/serviceRoutines/orionldNotImplemented.h"     // Own Interface
+#include "logMsg/logMsg.h"
+
+#include "rest/ConnectionInfo.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldNotImplemented -
+// orionldGetTemporalEntities -
 //
-bool orionldNotImplemented(ConnectionInfo* ciP)
-{
-  orionldState.httpStatusCode = 501;
-  orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
+extern bool orionldGetTemporalEntities(ConnectionInfo* ciP);
 
-  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url);
-  return false;
-}
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETTEMPORALENTITIES_H_

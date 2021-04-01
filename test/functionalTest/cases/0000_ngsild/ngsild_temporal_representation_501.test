@@ -32,9 +32,14 @@ brokerStart CB
 
 #
 # 01. Get 501 for POST /ngsi-ld/v1/temporal/entities
-# 02. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>
-# 03. Get 501 for GET /ngsi-ld/v1/temporal/entities
-# 04. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
+# 02. Get 501 for GET /ngsi-ld/v1/temporal/entities
+# 03. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
+# 04. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>
+# 05. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>/attrs
+# 06. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}
+# 07. Get 501 for PATCH /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
+# 08. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
+# 09. Get 501 for POST /ngsi-ld/v1/temporal/entityOperations/query
 #
 
 echo "01. Get 501 for POST /ngsi-ld/v1/temporal/entities"
@@ -43,34 +48,78 @@ payload='{
   "id": "urn:ngsi-ld:City:Madrid",
   "type": "T_City"
 }'
-orionCurl --url /ngsi-ld/v1/temporal/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+orionCurl --url /ngsi-ld/v1/temporal/entities -X POST --payload "$payload"
 echo
 echo
 
-
-echo "02. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>"
-echo "========================================================"
-payload='{
-  "attr1": {
-    "type": "Property",
-    "value": 1
-  }
-}'
-orionCurl --url /ngsi-ld/v1/temporal/entities/http://a.b.c/entities/E1 -X POST --payload "$payload" -H "Content-Type: application/json"
-echo
-echo
-
-
-echo "03. Get 501 for GET /ngsi-ld/v1/temporal/entities"
+echo "02. Get 501 for GET /ngsi-ld/v1/temporal/entities"
 echo "================================================="
 orionCurl --url /ngsi-ld/v1/temporal/entities
 echo
 echo
 
 
-echo "04. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>"
+echo "03. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>"
 echo "======================================================="
-orionCurl --url /ngsi-ld/v1/temporal/entities/http://a.b.c/entities/E1
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid
+echo
+echo
+
+
+echo "04. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid -X DELETE
+echo
+echo
+
+
+
+echo "05. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>/attrs"
+echo "=============================================================="
+payload='{
+  "attr1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid/attrs -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}"
+echo "========================================================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid/attrs/attr1 -X DELETE
+echo
+echo
+
+
+echo "07. Get 501 for PATCH /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}"
+echo "====================================================================================="
+payload='{
+  "attr1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid/attrs/attr1/urn:ngsi-ld:instance:1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:City:Madrid/attrs/attr1/urn:ngsi-ld:instance:1 -X DELETE
+echo
+echo
+
+
+echo "09. Get 501 for POST /ngsi-ld/v1/temporal/entityOperations/query"
+echo "================================================================"
+payload='{
+  "q": "A1>10"
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entityOperations/query --payload "$payload"
 echo
 echo
 
@@ -79,56 +128,126 @@ echo
 01. Get 501 for POST /ngsi-ld/v1/temporal/entities
 ==================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 128
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities",
     "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
-02. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>
-========================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 130
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "/ngsi-ld/v1/temporal/entities/*",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-03. Get 501 for GET /ngsi-ld/v1/temporal/entities
+02. Get 501 for GET /ngsi-ld/v1/temporal/entities
 =================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 128
+Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "Not Implemented in Orion-LD, please use Mintaka for this operation",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
-04. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
+03. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
 =======================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 130
+Content-Length: 188
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities/*",
+    "title": "Not Implemented in Orion-LD, please use Mintaka for this operation",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+04. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>
+==========================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 137
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities/*",
     "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+05. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>/attrs
+==============================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities/*/attrs",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+06. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}
+=========================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities/*/attrs/*/*",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+07. Get 501 for PATCH /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
+=====================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities/*/attrs/*/*",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+08. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
+======================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities/*/attrs/*/*",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+09. Get 501 for POST /ngsi-ld/v1/temporal/entityOperations/query
+================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entityOperations/query",
+    "title": "Not Implemented in Orion-LD, please use Mintaka for this operation",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 

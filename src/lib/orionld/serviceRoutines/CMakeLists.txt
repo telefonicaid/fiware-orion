@@ -51,8 +51,12 @@ SET (SOURCES
     orionldPostBatchUpdate.cpp
     orionldPostQuery.cpp
     orionldGetEntityTypes.cpp
+    orionldGetEntityType.cpp
     orionldGetTenants.cpp
     orionldGetDbIndexes.cpp
+    orionldGetTemporalEntities.cpp
+    orionldGetTemporalEntity.cpp
+    orionldPostTemporalQuery.cpp
 )
 
 # Include directories

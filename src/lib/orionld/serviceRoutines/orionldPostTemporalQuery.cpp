@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,23 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/serviceRoutines/orionldNotImplemented.h"     // Own Interface
+#include "logMsg/logMsg.h"
+
+#include "rest/ConnectionInfo.h"
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
+#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"    // Own Interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldNotImplemented -
+// orionldPostTemporalQuery -
 //
-bool orionldNotImplemented(ConnectionInfo* ciP)
+bool orionldPostTemporalQuery(ConnectionInfo* ciP)
 {
   orionldState.httpStatusCode = 501;
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
 
-  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url);
+  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented in Orion-LD, please use Mintaka for this operation", orionldState.serviceP->url);
   return false;
 }
