@@ -112,7 +112,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
       // The entity id must be a URI
       char* detail;
 
-      if (pcheckUri(idP, &detail) == false)
+      if (pcheckUri(idP, true, &detail) == false)
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include 'detail' and name (id)
         orionldState.httpStatusCode = SccBadRequest;

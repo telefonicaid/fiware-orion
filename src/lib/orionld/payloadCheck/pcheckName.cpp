@@ -54,11 +54,12 @@ bool pcheckName(char* name, char** detailsPP)
     //   ''',
     //   '\b',
     //   '\t',
-    //   '\n', and
-    //   '#'
+    //   '\n',
+    //   '#', and
+    //   ' '
     //
     if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
-        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#'))
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#') || (*name == ' '))
     {
       *detailsPP = (char*) "invalid character in name";
       return false;

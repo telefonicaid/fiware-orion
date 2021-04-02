@@ -413,7 +413,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
+  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)

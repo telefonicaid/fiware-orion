@@ -546,7 +546,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
   KjNode*  propertyTree;
   char*    detail;
 
-  if (pcheckUri(registrationId, &detail) == false)
+  if (pcheckUri(registrationId, true, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);  // FIXME: Include 'detail' and name (registrationId)

@@ -56,7 +56,7 @@ bool linkCheck(char* link, char** detailsP)
 
   *cP = 0;  // End of string for the URL
 
-  if (pcheckUri(link, detailsP) == false)
+  if (pcheckUri(link, true, detailsP) == false)
     return false;
 
   //

@@ -335,7 +335,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   for (int ix = 0; ix < idVecItems; ix++)
   {
-    if (pcheckUri(idVector[ix], &detail) == false)
+    if (pcheckUri(idVector[ix], true, &detail) == false)
     {
       LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (id array item)
@@ -367,7 +367,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
-      if (pcheckUri(typeVector[ix], &detail) == false)
+      if (pcheckUri(typeVector[ix], true, &detail) == false)
         typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // entity type
       else
         typeExpanded = typeVector[ix];

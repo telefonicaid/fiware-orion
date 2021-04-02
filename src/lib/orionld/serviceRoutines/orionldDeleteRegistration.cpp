@@ -42,7 +42,7 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
 {
   char* detail;
 
-  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
+  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
     LM_E(("uriCheck: %s", detail));
     orionldState.httpStatusCode = SccBadRequest;

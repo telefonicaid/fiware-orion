@@ -59,7 +59,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::id");
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::id");
-      URI_CHECK(entityItemP, "entities[X]::id");
+      URI_CHECK(entityItemP->value.s, "entities[X]::id", true);
     }
     else if (strcmp(entityItemP->name, "idPattern") == 0)
     {
@@ -73,6 +73,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::type");
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::type");
+      URI_CHECK(entityItemP->value.s, "entities[X]::type", false);
 
       //
       // Expand, unless already expanded

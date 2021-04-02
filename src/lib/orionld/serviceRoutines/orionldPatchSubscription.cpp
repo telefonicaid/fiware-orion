@@ -464,7 +464,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   char* subscriptionId = orionldState.wildcard[0];
   char* detail;
 
-  if (pcheckUri(subscriptionId, &detail) == false)
+  if (pcheckUri(subscriptionId, true, &detail) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);  // FIXME: Include 'detail' and name (subscriptionId)

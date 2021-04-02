@@ -1,0 +1,239 @@
+# Copyright 2018 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Spaces in Entity Type and attribute names should result in error
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Attempt to create an entity with a space as part of the entity id uri - see error
+# 02. Attempt to create an entity with a space as part of the unexpanded entity type - see error
+# 03. Attempt to create an entity with a space as part of the expanded entity type - see error
+# 04. Attempt to create an entity with a space as part of an unexpanded attribute name - see error
+# 05. Attempt to create an entity with a space as part of an expanded attribute name - see error
+#
+# LATER
+# 06. Attempt to create an entity with a space as part of an unexpanded sub-attribute name - see error
+# 07. Attempt to create an entity with a space as part of an expanded sub-attribute name - see error
+#
+
+echo "01. Attempt to create an entity with a space as part of the entity id uri - see error"
+echo "====================================================================================="
+payload='{
+  "id": "urn:ngsi-ld: entities:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create an entity with a space as part of the unexpanded entity type - see error"
+echo "=============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": " T",
+  "A1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create an entity with a space as part of the expanded entity type - see error"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "urn:ngsi-ld:types: T",
+  "A1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create an entity with a space as part of an unexpanded attribute name - see error"
+echo "================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A 1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create an entity with a space as part of an expanded attribute name - see error"
+echo "=============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "urn:ngsi-ld:attributes:A 1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create an entity with a space as part of an unexpanded sub-attribute name - see error"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E2",
+    "A 1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+}'
+#orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create an entity with a space as part of an expanded sub-attribute name - see error"
+echo "=================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E2",
+    "urn:ngsi-ld:attributes:A 1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+}'
+#orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an entity with a space as part of the entity id uri - see error
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an entity with a space as part of the unexpanded entity type - see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 97
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an entity with a space as part of the expanded entity type - see error
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 97
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create an entity with a space as part of an unexpanded attribute name - see error
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "A 1",
+    "title": "Invalid Property/Relationship name",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create an entity with a space as part of an expanded attribute name - see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:attributes:A 1",
+    "title": "Invalid Property/Relationship name",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create an entity with a space as part of an unexpanded sub-attribute name - see error
+====================================================================================================
+
+
+07. Attempt to create an entity with a space as part of an expanded sub-attribute name - see error
+==================================================================================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

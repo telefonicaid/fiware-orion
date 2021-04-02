@@ -30,8 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/urnCheck.h"                             // urnCheck
-#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 
 
 
@@ -335,11 +334,11 @@ do                                                                              
 //
 // URI_CHECK -
 //
-#define URI_CHECK(kNodeP, fieldName)                                                                         \
+#define URI_CHECK(uri, fieldName, strict)                                                                    \
 do                                                                                                           \
 {                                                                                                            \
   char* detail;                                                                                              \
-  if (!urlCheck(kNodeP->value.s, &detail) && !urnCheck(kNodeP->value.s, &detail))                            \
+  if (pcheckUri(uri, strict, &detail) == false)                                                              \
   {                                                                                                          \
     orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", fieldName);                               \
     orionldState.httpStatusCode = SccBadRequest;                                                             \

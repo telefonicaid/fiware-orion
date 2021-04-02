@@ -194,7 +194,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   char* detail;
 
   // 1. Is the Entity ID in the URL a valid URI?
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
@@ -360,7 +360,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         if (datasetIdP != NULL)  // datasetId present
         {
           STRING_CHECK(datasetIdP, "datasetId");
-          URI_CHECK(datasetIdP, "datasetId");
+          URI_CHECK(datasetIdP->value.s, "datasetId", true);
 
           if (datasetsP == NULL)
             datasetsP = kjObject(orionldState.kjsonP, "@datasets");

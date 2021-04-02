@@ -447,6 +447,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
 
 
+extern void pcheckUriInit(void);
 // -----------------------------------------------------------------------------
 //
 // orionldServiceInit -
@@ -529,4 +530,9 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   // Initialize Tenant list
   //
   orionldTenantInit();
+
+  //
+  // Initialize checks for incoming payloads
+  //
+  pcheckUriInit();
 }

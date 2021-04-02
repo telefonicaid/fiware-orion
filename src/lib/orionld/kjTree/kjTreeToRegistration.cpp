@@ -195,7 +195,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
 
   char* uri = (char*) regP->id.c_str();
   char* detail;
-  if (pcheckUri(uri, &detail) == false)
+  if (pcheckUri(uri, true, &detail) == false)
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str());  // FIXME: Include 'detail' and name (registration::id)

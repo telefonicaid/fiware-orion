@@ -109,7 +109,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   char* uri = (char*) subP->id.c_str();
   char* detail;
 
-  if (pcheckUri(uri, &detail) == false)
+  if (pcheckUri(uri, true, &detail) == false)
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", uri);  // FIXME: Include 'detail' and name (subscription::id)

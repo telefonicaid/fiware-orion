@@ -395,11 +395,11 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
 
-        orionldState.payloadIdNode = attrNodeP;
-        STRING_CHECK(orionldState.payloadIdNode, "entity id");
-        LM_T(LmtContext, ("Found Entity::id in the payload (%p)", orionldState.payloadIdNode));
+        STRING_CHECK(attrNodeP, "entity id");
+        URI_CHECK(attrNodeP->value.s, "id", true);
 
-        attrNodeP = orionldState.payloadIdNode->next;
+        orionldState.payloadIdNode = attrNodeP;
+        attrNodeP                  = attrNodeP->next;
         kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
       else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
@@ -412,10 +412,11 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
 
-        orionldState.payloadTypeNode = attrNodeP;
+        STRING_CHECK(attrNodeP, "entity type");
+        URI_CHECK(attrNodeP->value.s, "type", false);
 
-        STRING_CHECK(orionldState.payloadTypeNode, "entity type");
-        attrNodeP = orionldState.payloadTypeNode->next;
+        orionldState.payloadTypeNode = attrNodeP;
+        attrNodeP                    = attrNodeP->next;
         kjNodeDecouple(orionldState.payloadTypeNode, prev, orionldState.requestTree);
       }
       else
