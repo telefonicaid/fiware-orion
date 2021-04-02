@@ -955,7 +955,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
     if (objectP->type == KjString)
     {
-      if (pcheckUri(objectP->value.s, &details) == false)
+      if (pcheckUri(objectP->value.s, true, &details) == false)
         ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
 
       caP->valueType   = orion::ValueTypeString;
@@ -969,7 +969,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
           ATTRIBUTE_ERROR("relationship attribute with 'object' array item not being a JSON string", kjValueType(nodeP->type));
 
         char* uri = nodeP->value.s;
-        if (pcheckUri(uri, &details) == false)
+        if (pcheckUri(uri, true, &details) == false)
           ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", uri);
       }
       caP->valueType      = orion::ValueTypeVector;

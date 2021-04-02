@@ -116,14 +116,12 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
 
       DUPLICATE_CHECK(idP, "id", nodeP);
       STRING_CHECK(nodeP, "id");
-      EMPTY_STRING_CHECK(nodeP, "id");
-      URI_CHECK(nodeP, "id");
+      URI_CHECK(nodeP->value.s, "id", true);
     }
     else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
       STRING_CHECK(nodeP, "type");
-      EMPTY_STRING_CHECK(nodeP, "type");
 
       if (strcmp(nodeP->value.s, "ContextSourceRegistration") != 0)
       {
@@ -213,8 +211,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(endpointP, "endpoint", nodeP);
       STRING_CHECK(nodeP, "endpoint");
-      EMPTY_STRING_CHECK(nodeP, "endpoint");
-      URI_CHECK(nodeP, nodeP->name);
+      URI_CHECK(nodeP->value.s, nodeP->name, true);
     }
     else
     {

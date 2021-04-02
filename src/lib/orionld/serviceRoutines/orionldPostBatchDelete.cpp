@@ -85,7 +85,7 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
       return false;
     }
 
-    if (pcheckUri(idNodeP->value.s, &detail) == false)
+    if (pcheckUri(idNodeP->value.s, true, &detail) == false)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be valid URIs)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs");  // FIXME: Include 'detail' and name ("id") and its value (idNodeP->value.s)

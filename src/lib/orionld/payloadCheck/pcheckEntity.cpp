@@ -130,13 +130,14 @@ bool pcheckEntity
       {
         DUPLICATE_CHECK(batchIdP, "id", kNodeP);
         STRING_CHECK(batchIdP, "id");
-        URI_CHECK(batchIdP, "id");
+        URI_CHECK(batchIdP->value.s, "id", true);
         orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
       else if (strcmp(kNodeP->name, "type") == 0 || strcmp(kNodeP->name, "@type") == 0)
       {
         DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
         STRING_CHECK(batchTypeP, "type");
+        URI_CHECK(batchTypeP->value.s, "type", false);
         orionldState.payloadTypeNode = kNodeP;  // FIXME: Is this necessary?
       }
     }

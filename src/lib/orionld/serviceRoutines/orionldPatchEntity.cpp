@@ -162,7 +162,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char* detail;
 
   // 1. Is the Entity ID in the URL a valid URI?
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)

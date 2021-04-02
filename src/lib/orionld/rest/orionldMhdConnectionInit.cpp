@@ -347,7 +347,7 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
   {
     char* detail;
 
-    if (pcheckUri((char*) value, &detail) == false)
+    if (pcheckUri((char*) value, true, &detail) == false)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);  // FIXME: Include 'detail' and name (datasetId)
       orionldState.httpStatusCode = 400;

@@ -93,8 +93,7 @@ bool pcheckSubscription
 
       DUPLICATE_CHECK(idP, "id", nodeP);
       STRING_CHECK(nodeP, nodeP->name);
-      EMPTY_STRING_CHECK(nodeP, nodeP->name);
-      URI_CHECK(nodeP, nodeP->name);
+      URI_CHECK(nodeP->value.s, nodeP->name, true);
     }
     else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {

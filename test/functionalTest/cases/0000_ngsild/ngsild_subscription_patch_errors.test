@@ -2442,13 +2442,13 @@ Date: REGEX(.*)
 80. Attempt to PATCH the subscription with a 'notification:endpoint:uri' that is an empty string
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "endpoint::uri",
-    "title": "Empty String",
+    "title": "Not a URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -65,7 +65,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   char*    detail;
 
   // Make sure the Entity ID is a valid URI
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - not a URI)", entityId));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include name (entityId) and value ($entityId)

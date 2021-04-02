@@ -117,7 +117,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
         return NULL;
       }
 
-      if (pcheckUri(datasetIdP->value.s, &pdP->detail) == false)
+      if (pcheckUri(datasetIdP->value.s, true, &pdP->detail) == false)
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");  // FIXME: Include 'detail' and value (datasetIdP->value.s)
         orionldState.httpStatusCode = SccBadRequest;
@@ -227,14 +227,19 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
 
   //
-  // Entity ID
+  // Entity ID and TYPE
   //
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
+  if (pcheckUri(entityType, false, &detail) == false)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity Type", detail);  // FIXME: Include 'detail' and name (entityId)
+    return false;
+  }
 
   //
   // If the entity already exists, an error should be returned
@@ -343,7 +348,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     if (datasetIdP != NULL)
     {
       STRING_CHECK(datasetIdP, "datasetId");
-      URI_CHECK(datasetIdP, "datasetId");
+      URI_CHECK(datasetIdP->value.s, "datasetId", true);
 
       kjChildRemove(orionldState.requestTree, kNodeP);
       kjChildAdd(datasets, kNodeP);

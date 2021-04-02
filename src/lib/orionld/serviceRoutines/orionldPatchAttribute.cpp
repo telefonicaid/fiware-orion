@@ -366,7 +366,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URI");  // FIXME: Include 'detail' and name (entityId)

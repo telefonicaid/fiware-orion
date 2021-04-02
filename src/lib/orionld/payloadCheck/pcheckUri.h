@@ -32,6 +32,6 @@
 //
 // pcheckUri -
 //
-extern bool pcheckUri(char* uri, char** detailP);
+extern bool pcheckUri(char* uri, bool strict, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
