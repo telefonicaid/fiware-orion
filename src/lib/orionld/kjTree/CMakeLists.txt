@@ -39,7 +39,6 @@ SET (SOURCES
     kjStringValueLookupInArray.cpp
     kjEntityIdLookupInEntityArray.cpp
     kjTreeToUpdateContextRequest.cpp
-    kjTreeToEntity.cpp
     kjTreeToMetadata.cpp
     kjTreeToContextAttribute.cpp
     kjTreeRegistrationInfoExtract.cpp

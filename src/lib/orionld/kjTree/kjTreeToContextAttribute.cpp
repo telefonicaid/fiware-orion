@@ -68,7 +68,7 @@ do                                                                           \
 // Forward declaration - compoundCreate is used by compoundValueNodeValueSet
 //                       and compoundValueNodeValueSet uses compoundCreate
 //
-static orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level = 0);
+orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level = 0);
 
 
 
@@ -76,7 +76,7 @@ static orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP,
 //
 // compoundValueNodeValueSet - set the value of a CompoundeValueNode instance
 //
-static bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
+bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
 {
   if (kNodeP->type == KjString)
   {
@@ -142,7 +142,7 @@ static bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* 
 //
 // compoundCreate -
 //
-static orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level)
+orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level)
 {
   if (kNodeP->type != KjArray)
     LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' called '%s' on level %d", kjValueType(kNodeP->type), kNodeP->name, level));
@@ -755,6 +755,8 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     {
       for (KjNode* mdP = nodeP->value.firstChildP; mdP != NULL; mdP = mdP->next)
       {
+        LM_TMP(("PA: Calling kjTreeToMetadata for '%s'", mdP->name));
+
         if (kjTreeToMetadata(caP, mdP, attributeName, detailP) == false)
           return false;
       }

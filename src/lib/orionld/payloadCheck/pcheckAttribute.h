@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
 
 /*
 *
@@ -25,23 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/HttpInfo.h"                               // HttpInfo
-
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToEntity -
+// pcheckAttribute -
 //
-extern bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP);
+extern bool pcheckAttribute(KjNode* aP, char* type, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
