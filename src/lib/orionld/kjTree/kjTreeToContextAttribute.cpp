@@ -44,6 +44,7 @@ extern "C"
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
+#include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
 
 
@@ -60,108 +61,6 @@ do                                                                           \
   orionldState.httpStatusCode = SccBadRequest;                               \
   return false;                                                              \
 } while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Forward declaration - compoundCreate is used by compoundValueNodeValueSet
-//                       and compoundValueNodeValueSet uses compoundCreate
-//
-orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level = 0);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// compoundValueNodeValueSet - set the value of a CompoundeValueNode instance
-//
-bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
-{
-  if (kNodeP->type == KjString)
-  {
-    cNodeP->valueType   = orion::ValueTypeString;
-    cNodeP->stringValue = kNodeP->value.s;
-  }
-  else if (kNodeP->type == KjBoolean)
-  {
-    cNodeP->valueType   = orion::ValueTypeBoolean;
-    cNodeP->boolValue   = kNodeP->value.b;
-  }
-  else if (kNodeP->type == KjFloat)
-  {
-    cNodeP->valueType   = orion::ValueTypeNumber;
-    cNodeP->numberValue = kNodeP->value.f;
-  }
-  else if (kNodeP->type == KjInt)
-  {
-    cNodeP->valueType   = orion::ValueTypeNumber;
-    cNodeP->numberValue = kNodeP->value.i;
-  }
-  else if (kNodeP->type == KjNull)
-  {
-    cNodeP->valueType = orion::ValueTypeNull;
-  }
-  else if (kNodeP->type == KjObject)
-  {
-    *levelP += 1;
-    cNodeP->valueType = orion::ValueTypeObject;
-
-    for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
-    {
-      orion::CompoundValueNode* cChildP = compoundCreate(kChildP, kNodeP, *levelP);
-      cNodeP->childV.push_back(cChildP);
-    }
-  }
-  else if (kNodeP->type == KjArray)
-  {
-    *levelP += 1;
-    cNodeP->valueType = orion::ValueTypeVector;
-
-    for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
-    {
-      orion::CompoundValueNode* cChildP = compoundCreate(kChildP, kNodeP, *levelP);
-
-      cNodeP->childV.push_back(cChildP);
-    }
-  }
-  else
-  {
-    LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name.c_str()));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson");
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// compoundCreate -
-//
-orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level)
-{
-  if (kNodeP->type != KjArray)
-    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' called '%s' on level %d", kjValueType(kNodeP->type), kNodeP->name, level));
-  else
-    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' on level %d", kjValueType(kNodeP->type), level));
-
-  orion::CompoundValueNode* cNodeP = new orion::CompoundValueNode();
-
-  if ((parentP != NULL) && (parentP->type == KjObject))
-    cNodeP->name = kNodeP->name;
-
-  if (compoundValueNodeValueSet(cNodeP, kNodeP, &level) == false)
-  {
-    // compoundValueNodeValueSet calls orionldErrorResponseCreate
-    return NULL;
-  }
-
-  return cNodeP;
-}
 
 
 
@@ -255,8 +154,8 @@ static bool attributeValueSet(ContextAttribute* caP, KjNode* valueP)
   case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
   case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
   case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
-  case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(valueP, NULL); break;
-  case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(valueP, NULL); break;
+  case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0); break;
+  case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0); break;
   case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid type from kjson"));
@@ -288,8 +187,8 @@ static bool metadataValueSet(Metadata* mdP, KjNode* valueNodeP)
   case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
   case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
   case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
-  case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(valueNodeP, NULL); break;
-  case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(valueNodeP, NULL);  break;
+  case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = kjTreeToCompoundValue(valueNodeP, NULL, 0); break;
+  case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = kjTreeToCompoundValue(valueNodeP, NULL, 0);  break;
   case KjNull:       mdP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid json type (KjNone!) for value field of metadata '%s'", valueNodeP->name));
@@ -838,7 +737,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;
-      caP->compoundValueP  = compoundCreate(valueP, NULL, 0);
+      caP->compoundValueP  = kjTreeToCompoundValue(valueP, NULL, 0);
     }
     else if (isTemporalProperty == true)
     {
@@ -975,7 +874,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
           ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", uri);
       }
       caP->valueType      = orion::ValueTypeVector;
-      caP->compoundValueP = compoundCreate(objectP, NULL);
+      caP->compoundValueP = kjTreeToCompoundValue(objectP, NULL, 0);
     }
     else
       ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", attributeName);

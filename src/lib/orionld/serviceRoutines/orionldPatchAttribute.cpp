@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
+#include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
@@ -170,14 +171,6 @@ bool kjAttributeMerge(KjNode* inAttribute, KjNode* dbAttribute, KjNode* dbAttrib
 
 // -----------------------------------------------------------------------------
 //
-// Extern declaration - compoundCreate is used by kjTreeToAttributeValue
-//
-extern orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level = 0);
-
-
-
-// -----------------------------------------------------------------------------
-//
 // kjTreeToAttributeValue -
 //
 static bool kjTreeToAttributeValue(ContextAttribute* caP, KjNode* valueP, int* levelP)
@@ -207,12 +200,12 @@ static bool kjTreeToAttributeValue(ContextAttribute* caP, KjNode* valueP, int* l
   else if (valueP->type == KjObject)
   {
     caP->valueType      = orion::ValueTypeObject;
-    caP->compoundValueP = compoundCreate(valueP, NULL);
+    caP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0);
   }
   else if (valueP->type == KjArray)
   {
     caP->valueType      = orion::ValueTypeObject;  // Array???
-    caP->compoundValueP = compoundCreate(valueP, NULL);
+    caP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0);
   }
 
   return true;
@@ -251,12 +244,12 @@ static bool kjTreeToMetadataValue(Metadata* metadataP, KjNode* valueP)
   else if (valueP->type == KjObject)
   {
     metadataP->valueType      = orion::ValueTypeObject;
-    metadataP->compoundValueP = compoundCreate(valueP, NULL);
+    metadataP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0);
   }
   else if (valueP->type == KjArray)
   {
     metadataP->valueType      = orion::ValueTypeObject;
-    metadataP->compoundValueP = compoundCreate(valueP, NULL);
+    metadataP->compoundValueP = kjTreeToCompoundValue(valueP, NULL, 0);
   }
 
   return true;
