@@ -606,10 +606,18 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-    actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
-                    ((caP->type != "") &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
-                    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+
+    //
+    // For NGSI-LD, we want ALL updates to give notifications, even if nothing changed.
+    // At least for now ...
+    //
+    if (orionldState.apiVersion == NGSI_LD_V1)
+      actualUpdate = true;
+    else
+      actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
+                      ((caP->type != "") &&
+                       (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                      mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
   }
   else
   {

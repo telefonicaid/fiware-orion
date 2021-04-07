@@ -2,3 +2,4 @@
 * Issue  #280   PATCH ops now support the MIME type 'application/marge-patch+json'
 * Issue  #280   Removed check for forbidden characters of entity type when inside the payload body
 * Issue  #280   Better URI validity test
+* Issue  #280   NGSI-LD entity update requests now provoke notifications regardless on whether any actual change has been done on the entity
