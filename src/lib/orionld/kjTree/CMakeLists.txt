@@ -39,7 +39,6 @@ SET (SOURCES
     kjStringValueLookupInArray.cpp
     kjEntityIdLookupInEntityArray.cpp
     kjTreeToUpdateContextRequest.cpp
-    kjTreeToEntity.cpp
     kjTreeToMetadata.cpp
     kjTreeToContextAttribute.cpp
     kjTreeRegistrationInfoExtract.cpp
@@ -48,6 +47,7 @@ SET (SOURCES
     kjGeojsonEntityTransform.cpp
     kjGeojsonEntitiesTransform.cpp
     kjEntityArrayErrorPurge.cpp
+    kjTreeToCompoundValue.cpp
 )
 
 # Include directories

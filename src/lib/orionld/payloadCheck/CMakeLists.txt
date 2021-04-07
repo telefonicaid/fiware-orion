@@ -41,6 +41,7 @@ SET (SOURCES
      pcheckAttrs.cpp
      pcheckQ.cpp
      pcheckUri.cpp
+     pcheckAttribute.cpp
 )
 
 # Include directories

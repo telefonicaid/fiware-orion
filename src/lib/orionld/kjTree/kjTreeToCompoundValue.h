@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOCOMPOUNDVALUE_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREETOCOMPOUNDVALUE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,23 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/HttpInfo.h"                               // HttpInfo
+#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToEntity -
+// kjTreeToCompoundValue -
 //
-extern bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP);
+extern orion::CompoundValueNode* kjTreeToCompoundValue(KjNode* kNodeP, KjNode* parentP, int level);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENTITY_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOCOMPOUNDVALUE_H_
