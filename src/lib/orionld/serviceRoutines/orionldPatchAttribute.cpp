@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -78,10 +79,23 @@ do {                                                                  \
 
 // -----------------------------------------------------------------------------
 //
-// orionldPatchAttributeWithDatasetId - to be implemented
+// orionldPatchAttributeWithDatasetId -
 //
-bool orionldPatchAttributeWithDatasetId(char* entityId, char* attrName, KjNode* inAttribute)
+// 1. Clone inAttribute for TRoE (are sub-attrs already expanded?)
+// 2. GET the dataset for attrNameExpandedEq from the DB
+// 3. Merge - use kjAttributeMerge (will need some altering for datasetId)
+// 4. Replace db.entities.entityId.attrs.attrNameExpandedEq with the merged attribute
+//
+//    orionldMhdConnectionTreat takes care of TRoE
+//
+bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, KjNode* datasetIdP)
 {
+  // <DEBUG>
+  char buf[1024];
+  kjFastRender(orionldState.kjsonP, inAttribute, buf, sizeof(buf));
+  LM_TMP(("PADI: inAttribute: %s", buf));
+  // </DEBUG>
+
   return true;
 }
 
@@ -598,19 +612,20 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
 
+  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
+  dotForEq(attrNameExpandedEq);
+
   //
   // 3. Lookup 'datasetId' in inAttribute - if found, enter datasetId function
   //
-  if (kjLookup(inAttribute, "datasetId") != NULL)
-    return orionldPatchAttributeWithDatasetId(entityId, attrName, inAttribute);
+  KjNode* datasetIdP = kjLookup(inAttribute, "datasetId");
+  if (datasetIdP != NULL)
+    return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP);
 
   //
   // 4. GET the attribute from the DB (dbAttribute)
   // 5. 404 if not found in DB
   //
-  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
-  dotForEq(attrNameExpandedEq);
-
   KjNode* dbEntityP = dbEntityAttributeLookup(entityId, attrNameExpanded);
   if (dbEntityP == NULL)
   {
