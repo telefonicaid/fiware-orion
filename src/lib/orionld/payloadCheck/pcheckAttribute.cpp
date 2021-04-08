@@ -31,12 +31,14 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/CHECK.h"                                // X_CHECK
 #include "orionld/payloadCheck/pcheckAttribute.h"                // Own interface
 
 
 
-bool pcheckSubAttribute(KjNode* saP, char** detailP)
+bool pcheckSubAttribute(KjNode* saP, char** detailP)  // FIXME: Implement and move to its own module
 {
   return true;
 }
@@ -47,7 +49,7 @@ bool pcheckSubAttribute(KjNode* saP, char** detailP)
 //
 // pcheckAttribute -
 //
-bool pcheckAttribute(KjNode* aP, char* type, char** detailP)
+bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
 {
   KjNode* typeP = NULL;
 
@@ -63,14 +65,18 @@ bool pcheckAttribute(KjNode* aP, char* type, char** detailP)
       if (typeP->type != KjString)
       {
         *detailP = (char*) "Attribute type must be a string";
+        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a string", aP->name);
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
       type = typeP->value.s;
     }
-    else
+    else if (typeMandatory == true)
     {
       *detailP = (char*) "attribute type missing";
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type missing", aP->name);
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -83,24 +89,28 @@ bool pcheckAttribute(KjNode* aP, char* type, char** detailP)
   for (KjNode* memberP = aP->value.firstChildP; memberP != NULL; memberP = memberP->next)
   {
     if (memberP == typeP)
-      continue;  // 'type' alread dealt with
+      continue;  // 'type' already dealt with
     else if (strcmp(memberP->name, "value") == 0)
     {
       DUPLICATE_CHECK(valueP, "value", memberP);
 
       // Relationships cannot have a 'value' member
-      if (strcmp(type, "Relationship") == 0)
+      if ((type != NULL) && (strcmp(type, "Relationship") == 0))
       {
         *detailP = (char*) "Relationships cannot have a 'value' member";
+        orionldErrorResponseCreate(OrionldBadRequestData, "Relationships cannot have a 'value' member", aP->name);
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
     else if (strcmp(memberP->name, "object") == 0)
     {
       // Only Relationships can have an 'object' member
-      if (strcmp(type, "Relationship") != 0)
+      if ((type != NULL) && (strcmp(type, "Relationship") != 0))
       {
         *detailP = (char*) "Only Relationships can have an 'object' member";
+        orionldErrorResponseCreate(OrionldBadRequestData, "Only Relationships can have an 'object' member", aP->name);
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
@@ -123,10 +133,8 @@ bool pcheckAttribute(KjNode* aP, char* type, char** detailP)
     }
     else  // Seems to be a sub-attribute
     {
-      if (pcheckSubAttribute(memberP, detailP) == false)
-      {
+      if (pcheckSubAttribute(memberP, detailP) == false)  // pcheckSubAttribute calls orionldErrorResponseCreate
         return false;
-      }
     }
   }
 

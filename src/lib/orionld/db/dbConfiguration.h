@@ -90,6 +90,7 @@ typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
 typedef bool    (*DbIdIndexCreate)(const char* tenant);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
+typedef KjNode* (*DbDatasetGet)(const char* entityId, const char* attributeNameExpandedEq, const char* datasetId);
 
 
 
@@ -124,5 +125,6 @@ extern DbEntitiesGet                             dbEntitiesGet;
 extern DbGeoIndexCreate                          dbGeoIndexCreate;
 extern DbIdIndexCreate                           dbIdIndexCreate;
 extern DbEntitiesQuery                           dbEntitiesQuery;
+extern DbDatasetGet                              dbDatasetGet;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
 #include "kjson/kjClone.h"                                       // kjClone
-#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -81,20 +80,90 @@ do {                                                                  \
 //
 // orionldPatchAttributeWithDatasetId -
 //
-// 1. Clone inAttribute for TRoE (are sub-attrs already expanded?)
-// 2. GET the dataset for attrNameExpandedEq from the DB
-// 3. Merge - use kjAttributeMerge (will need some altering for datasetId)
-// 4. Replace db.entities.entityId.attrs.attrNameExpandedEq with the merged attribute
+// 0. entityId, attrName and datasetId have been checked already
+// 1. Check the validity of the incoming payload (except attr type - need DB lookup for that check)
+// 2. GET the "dataset" 'datasetIdP->value.s' for attrNameExpandedEq from the DB
+// 3. If "attr type" is present in 'inAttribute', make sure it is identical to what's in the "dataset"
+// 4. Clone inAttribute for TRoE (are sub-attrs already expanded?)
+// 5. Merge - use kjAttributeMerge (will need some altering for datasetId)
+// 6. Replace db.entities.entityId.attrs.attrNameExpandedEq with the merged attribute
 //
 //    orionldMhdConnectionTreat takes care of TRoE
 //
-bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, KjNode* datasetIdP)
+bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, const char* datasetId)
 {
-  // <DEBUG>
-  char buf[1024];
-  kjFastRender(orionldState.kjsonP, inAttribute, buf, sizeof(buf));
-  LM_TMP(("PADI: inAttribute: %s", buf));
-  // </DEBUG>
+  char* detail;
+  if (pcheckAttribute(inAttribute, NULL, false, &detail) == false)
+  {
+    LM_W(("Bad Input (invalid attribute - %s)", detail));
+    return false;
+  }
+
+  KjNode* datasetNodeP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
+  if (datasetNodeP == NULL)
+  {
+    LM_W(("Bad Input (dataset '%s' not found for attr '%s' in entity '%s')", datasetId, attrNameExpandedEq, entityId));
+    orionldState.httpStatusCode = 404;
+    orionldErrorResponseCreate(OrionldResourceNotFound, "attribute dataset not found", datasetId);
+    return false;
+  }
+
+  KjNode* dbInstanceP = datasetNodeP;
+  if (datasetNodeP->type == KjArray)
+  {
+    for (KjNode* nodeP = datasetNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      KjNode* datasetIdP = kjLookup(nodeP, "datasetId");
+
+      if ((datasetId != NULL) && (strcmp(datasetIdP->value.s, datasetId) == 0))
+        dbInstanceP = nodeP;
+    }
+  }
+
+  // Remove 'datasetId' from the PATCH object (inAttribute)
+  KjNode* nodeP = kjLookup(inAttribute, "datasetId");
+  if (nodeP != NULL)
+    kjChildRemove(inAttribute, nodeP);
+
+  // Modify 'modifiedAt' for dbInstanceP
+  nodeP = kjLookup(dbInstanceP, "modifiedAt");
+
+  if (nodeP != NULL)
+    nodeP->value.f = orionldState.requestTime;
+  else
+  {
+    // This should not happen
+    nodeP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
+    kjChildAdd(dbInstanceP, nodeP);
+  }
+
+  // For every item in inAttribute, look it up in dbInstanceP and replace if found, else, add (to dbInstanceP)
+  //
+  // Actually, it's faster to go over all of the nodes in inAttribute and remove those that are found in dbInstanceP.
+  // After dbInstanceP is "clean" - just add all the inAttribute children to dbInstanceP
+  //
+  for (nodeP = inAttribute->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    KjNode* toRemove = kjLookup(dbInstanceP, nodeP->name);
+
+    if (toRemove != NULL)
+      kjChildRemove(dbInstanceP, toRemove);
+  }
+
+  // Now, simply concatenate the two
+  dbInstanceP->lastChild->next = inAttribute->value.firstChildP;
+  dbInstanceP->lastChild       = inAttribute->lastChild;
+
+  //
+  // Create the path to the field we want to update
+  //
+  char attrDatasetFieldPath[512];
+  snprintf(attrDatasetFieldPath, sizeof(attrDatasetFieldPath), "@datasets.%s", attrNameExpandedEq);
+
+  // And finally, ask the mongo driver to do the update
+  dbEntityFieldReplace(entityId, attrDatasetFieldPath, datasetNodeP);
+
+  orionldState.httpStatusCode = 204;
 
   return true;
 }
@@ -587,7 +656,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
 
 
   //
-  // 2. Query registrations and forward message if found
+  // 2. Query registrations and forward message if found - let forward-receiver check the validity
   //
   if (forwarding)
   {
@@ -620,7 +689,12 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   KjNode* datasetIdP = kjLookup(inAttribute, "datasetId");
   if (datasetIdP != NULL)
-    return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP);
+  {
+    STRING_CHECK(datasetIdP, "datasetId");
+    URI_CHECK(datasetIdP->value.s, "datasetId", true);
+
+    return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP->value.s);
+  }
 
   //
   // 4. GET the attribute from the DB (dbAttribute)
@@ -691,7 +765,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     saP->name = orionldSubAttributeExpand(orionldState.contextP, saP->name, true, NULL);
   }
 
-  if (pcheckAttribute(inAttribute, dbAttributeType->value.s, &detail) == false)
+  if (pcheckAttribute(inAttribute, dbAttributeType->value.s, false, &detail) == false)
   {
     LM_W(("Bad Input (invalid attribute - %s)", detail));
     orionldState.httpStatusCode = 400;
