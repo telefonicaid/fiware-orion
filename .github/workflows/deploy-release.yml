@@ -2,8 +2,9 @@ name: Deploy Releases
 
 on:
   push:
-    branches:
-      -  'release/**'
+    branches: [ hardening/CD_global_instance ]
+
+#      -  'release/**'
 
 env:
   IMAGE_NAME: fiware/orion-ld
@@ -48,3 +49,10 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
           file: docker/Dockerfile
+
+      - name: Deploy Stage
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: ${{ secrets.URL }}
+          method: 'GET'
+          bearerToken: ${{ secrets.TOKEN }}
