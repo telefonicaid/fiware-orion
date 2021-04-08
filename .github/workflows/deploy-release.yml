@@ -32,6 +32,6 @@ jobs:
       - name: Deploy Stage
         uses: fjogeleit/http-request-action@master
         with:
-          url: ${{ secrets.URL }}
+          url: ${{ secrets.CD_URL_TRIGGER }}
           method: 'GET'
-          bearerToken: ${{ secrets.TOKEN }}
+          bearerToken: ${{ secrets.CD_TOKEN }}
