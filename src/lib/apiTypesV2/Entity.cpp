@@ -50,6 +50,8 @@
 */
 Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
+  creDate = 0;
+  modDate = 0;
 }
 
 
@@ -66,6 +68,8 @@ Entity::Entity(const std::string& _id, const std::string& _type, const std::stri
   type          = _type;
   isPattern     = _isPattern;
   isTypePattern = _isTypePattern;
+  creDate       = 0;
+  modDate       = 0;
 }
 
 
