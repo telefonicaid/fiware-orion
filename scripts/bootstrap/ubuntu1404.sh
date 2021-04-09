@@ -22,6 +22,9 @@
 # Author: José Jaime
 #
 
+# FIXME: this script is not going to work... we are no longer using legacy-1.0.2.tar.gz
+# This scripts needs a deep update or being removed if it is obsolete and no longer used
+
 # Setting up EPEL Repo
 #wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 #sudo rpm -ivh epel-release-6-8.noarch.rpm

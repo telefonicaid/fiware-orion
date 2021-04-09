@@ -26,26 +26,22 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/MongoCommonSubscription.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonSubscription.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/MongoGlobal.h"  // processConditionVector
+
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 /* ****************************************************************************
 *
 * USING - 
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
-using mongo::BSONObj;
-using mongo::BSONArray;
-using mongo::OID;
 using ngsiv2::Subscription;
 using ngsiv2::HttpInfo;
 using ngsiv2::EntID;
@@ -56,9 +52,9 @@ using ngsiv2::EntID;
 *
 * setNewSubscriptionId -
 */
-std::string setNewSubscriptionId(BSONObjBuilder* b)
+std::string setNewSubscriptionId(orion::BSONObjBuilder* b)
 {
-  OID  oid;
+  orion::OID  oid;
 
   oid.init();
   b->append("_id", oid);
@@ -73,7 +69,7 @@ std::string setNewSubscriptionId(BSONObjBuilder* b)
 *
 * setExpiration -
 */
-void setExpiration(const Subscription& sub, BSONObjBuilder* b)
+void setExpiration(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_EXPIRATION, sub.expires);
   LM_T(LmtMongo, ("Subscription expiration: %lu", sub.expires));
@@ -85,7 +81,7 @@ void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 *
 * setCustomHttpInfo -
 */
-static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
+static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b)
 {
   if (httpInfo.verb != NOVERB)
   {
@@ -97,13 +93,13 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 
   if (httpInfo.headers.size() > 0)
   {
-    BSONObjBuilder headersBuilder;
+    orion::BSONObjBuilder headersBuilder;
 
     for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
     {
       headersBuilder.append(it->first, it->second);
     }
-    BSONObj headersObj = headersBuilder.obj();
+    orion::BSONObj headersObj = headersBuilder.obj();
 
     b->append(CSUB_HEADERS, headersObj);
     LM_T(LmtMongo, ("Subscription headers: %s", headersObj.toString().c_str()));
@@ -111,14 +107,14 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 
   if (httpInfo.qs.size() > 0)
   {
-    BSONObjBuilder qsBuilder;
+    orion::BSONObjBuilder qsBuilder;
 
     for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
     {
       qsBuilder.append(it->first, it->second);
     }
 
-    BSONObj qsObj = qsBuilder.obj();
+    orion::BSONObj qsObj = qsBuilder.obj();
 
     b->append(CSUB_QS, qsObj);
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
@@ -137,7 +133,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 *
 * setHttpInfo -
 */
-void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
+void setHttpInfo(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
   b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
@@ -157,7 +153,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 *
 * setThrottling -
 */
-void setThrottling(const Subscription& sub, BSONObjBuilder* b)
+void setThrottling(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_THROTTLING, sub.throttling);
   LM_T(LmtMongo, ("Subscription throttling: %lu", sub.throttling));
@@ -169,7 +165,7 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 *
 * setServicePath -
 */
-void setServicePath(const std::string& servicePath, BSONObjBuilder* b)
+void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_SERVICE_PATH, servicePath);
   LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath.c_str()));
@@ -181,7 +177,7 @@ void setServicePath(const std::string& servicePath, BSONObjBuilder* b)
 *
 * setDescription -
 */
-void setDescription(const Subscription& sub, BSONObjBuilder* b)
+void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   if (!sub.description.empty())
   {
@@ -196,7 +192,7 @@ void setDescription(const Subscription& sub, BSONObjBuilder* b)
 *
 * setStatus -
 */
-void setStatus(const Subscription& sub, BSONObjBuilder* b)
+void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   std::string  status = (sub.status.empty())? STATUS_ACTIVE : sub.status;
 
@@ -210,9 +206,9 @@ void setStatus(const Subscription& sub, BSONObjBuilder* b)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, BSONObjBuilder* b)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  BSONArrayBuilder entities;
+  orion::BSONArrayBuilder entities;
 
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
@@ -248,18 +244,18 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
       isTypePattern = false;
     }
 
-    if (finalType.empty())  // no type provided
+    orion::BSONObjBuilder bob;
+    bob.append(CSUB_ENTITY_ID, finalId);
+    bob.append(CSUB_ENTITY_ISPATTERN, isIdPattern);
+    if (!finalType.empty())
     {
-      entities.append(BSON(CSUB_ENTITY_ID << finalId << CSUB_ENTITY_ISPATTERN << isIdPattern));
+      bob.append(CSUB_ENTITY_TYPE, finalType);
+      bob.append(CSUB_ENTITY_ISTYPEPATTERN, isTypePattern);
     }
-    else  // type provided
-    {
-      entities.append(BSON(CSUB_ENTITY_ID   << finalId   << CSUB_ENTITY_ISPATTERN     << isIdPattern
-                        << CSUB_ENTITY_TYPE << finalType << CSUB_ENTITY_ISTYPEPATTERN << isTypePattern));
-    }
+    entities.append(bob.obj());
   }
 
-  BSONArray entitiesArr = entities.arr();
+  orion::BSONArray entitiesArr = entities.arr();
 
   b->append(CSUB_ENTITIES, entitiesArr);
   LM_T(LmtMongo, ("Subscription entities: %s", entitiesArr.toString().c_str()));
@@ -271,16 +267,16 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
 *
 * setAttrs -
 */
-void setAttrs(const Subscription& sub, BSONObjBuilder* b)
+void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  BSONArrayBuilder attrs;
+  orion::BSONArrayBuilder attrs;
 
   for (unsigned int ix = 0; ix < sub.notification.attributes.size(); ++ix)
   {
     attrs.append(sub.notification.attributes[ix]);
   }
 
-  BSONArray attrsArr = attrs.arr();
+  orion::BSONArray attrsArr = attrs.arr();
   b->append(CSUB_ATTRS, attrsArr);
   LM_T(LmtMongo, ("Subscription attributes: %s", attrsArr.toString().c_str()));
 }
@@ -305,7 +301,7 @@ void setCondsAndInitialNotify
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  BSONObjBuilder*                  b,
+  orion::BSONObjBuilder*           b,
   bool*                            notificationDone,
   const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
@@ -320,7 +316,7 @@ void setCondsAndInitialNotify
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
 
-  BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
+  orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
                                             notifAttributesV,
                                             metadataV,
@@ -349,7 +345,7 @@ void setCondsAndInitialNotify
 *
 * setLastNotification -
 */
-void setLastNotification(long long lastNotification, BSONObjBuilder* b)
+void setLastNotification(long long lastNotification, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_LASTNOTIFICATION, lastNotification);
   LM_T(LmtMongo, ("Subscription lastNotification: %lu", lastNotification));
@@ -361,7 +357,7 @@ void setLastNotification(long long lastNotification, BSONObjBuilder* b)
 *
 * setCount -
 */
-void setCount(long long count, BSONObjBuilder* b)
+void setCount(long long count, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_COUNT, count);
   LM_T(LmtMongo, ("Subscription count: %lu", count));
@@ -373,7 +369,7 @@ void setCount(long long count, BSONObjBuilder* b)
 *
 * setLastFailure -
 */
-void setLastFailure(long long lastFailure, const std::string& lastFailureReason, BSONObjBuilder* b)
+void setLastFailure(long long lastFailure, const std::string& lastFailureReason, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_LASTFAILURE, lastFailure);
   LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
@@ -391,7 +387,7 @@ void setLastFailure(long long lastFailure, const std::string& lastFailureReason,
 *
 * setLastSuccess -
 */
-void setLastSuccess(long long lastSuccess, long long lastSuccessCode, BSONObjBuilder* b)
+void setLastSuccess(long long lastSuccess, long long lastSuccessCode, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_LASTSUCCESS, lastSuccess);
   LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));
@@ -409,13 +405,18 @@ void setLastSuccess(long long lastSuccess, long long lastSuccessCode, BSONObjBui
 *
 * setExpression -
 */
-void setExpression(const Subscription& sub, BSONObjBuilder* b)
+void setExpression(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  BSONObj expression = BSON(CSUB_EXPR_Q      << sub.subject.condition.expression.q        <<
-                            CSUB_EXPR_MQ     << sub.subject.condition.expression.mq       <<
-                            CSUB_EXPR_GEOM   << sub.subject.condition.expression.geometry <<
-                            CSUB_EXPR_COORDS << sub.subject.condition.expression.coords   <<
-                            CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel);
+  orion::BSONObjBuilder expressionB;
+
+  // FIXME #3774: previously this part was based in streamming instead of append()
+  expressionB.append(CSUB_EXPR_Q, sub.subject.condition.expression.q);
+  expressionB.append(CSUB_EXPR_MQ, sub.subject.condition.expression.mq);
+  expressionB.append(CSUB_EXPR_GEOM, sub.subject.condition.expression.geometry);
+  expressionB.append(CSUB_EXPR_COORDS, sub.subject.condition.expression.coords);
+  expressionB.append(CSUB_EXPR_GEOREL,  sub.subject.condition.expression.georel);
+
+  orion::BSONObj expression = expressionB.obj();
 
   b->append(CSUB_EXPR, expression);
   LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
@@ -427,7 +428,7 @@ void setExpression(const Subscription& sub, BSONObjBuilder* b)
 *
 * setFormat -
 */
-void setFormat(const Subscription& sub, BSONObjBuilder* b)
+void setFormat(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   std::string format = renderFormatToString(sub.attrsFormat);
 
@@ -441,7 +442,7 @@ void setFormat(const Subscription& sub, BSONObjBuilder* b)
 *
 * setBlacklist -
 */
-void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
+void setBlacklist(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   bool bl = sub.notification.blacklist;
 
@@ -455,7 +456,7 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 *
 * setOnlyChanged -
 */
-void setOnlyChanged(const Subscription& sub, BSONObjBuilder* b)
+void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   bool bl = sub.notification.onlyChanged;
 
@@ -469,16 +470,16 @@ void setOnlyChanged(const Subscription& sub, BSONObjBuilder* b)
 *
 * setMetadata -
 */
-void setMetadata(const Subscription& sub, BSONObjBuilder* b)
+void setMetadata(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  BSONArrayBuilder metadata;
+  orion::BSONArrayBuilder metadata;
 
   for (unsigned int ix = 0; ix < sub.notification.metadata.size(); ++ix)
   {
     metadata.append(sub.notification.metadata[ix]);
   }
 
-  BSONArray metadataArr = metadata.arr();
+  orion::BSONArray metadataArr = metadata.arr();
 
   b->append(CSUB_METADATA, metadataArr);
   LM_T(LmtMongo, ("Subscription metadata: %s", metadataArr.toString().c_str()));

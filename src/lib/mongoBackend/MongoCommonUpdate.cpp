@@ -50,9 +50,6 @@
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
 
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -62,21 +59,17 @@
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 /* ****************************************************************************
 *
 * USING
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
-using mongo::BSONObj;
-using mongo::BSONType;
-using mongo::BSONArray;
-using mongo::BSONElement;
-using mongo::OID;
-using mongo::DBClientCursor;
-using mongo::DBClientBase;
 using orion::CompoundValueNode;
 
 
@@ -166,7 +159,7 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 *
 * equalMetadataValues -
 */
-static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
+static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj& md2)
 {
   bool md1TypeExist = md1.hasField(ENT_ATTRS_MD_TYPE);
   bool md2TypeExist = md2.hasField(ENT_ATTRS_MD_TYPE);
@@ -197,28 +190,28 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
         break;
       */
 
-    case mongo::NumberDouble:
+    case orion::NumberDouble:
       if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
-    case mongo::Bool:
+    case orion::Bool:
       if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
-    case mongo::String:
+    case orion::String:
       if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
-    case mongo::jstNULL:
+    case orion::jstNULL:
       if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
       {
         return false;
@@ -241,25 +234,25 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
   switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
-    case mongo::Object:
+    case orion::Object:
       ...
       break;
 
-    case mongo::Array:
+    case orion::Array:
       ...
       break;
     */
 
-    case mongo::NumberDouble:
+    case orion::NumberDouble:
       return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
-    case mongo::Bool:
+    case orion::Bool:
       return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
-    case mongo::String:
+    case orion::String:
       return getStringFieldF(md1, ENT_ATTRS_MD_VALUE) == getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
 
-    case mongo::jstNULL:
+    case orion::jstNULL:
       return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
 
     default:
@@ -277,12 +270,12 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
 * Given two metadata object assuming they have the same size (i.e. number of elements). check that all the values
 * are equal, returning false otherwise.
 */
-static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
+static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
 {
   std::set<std::string>  md1Set;
 
   // Assuming that md1 and md2 are of equal size, we can equally use md1 or md2 for the set
-  md1.getFieldNames(md1Set);
+  md1.getFieldNames(&md1Set);
 
   for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
@@ -293,8 +286,8 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
       return false;
     }
 
-    BSONObj md1Item = getObjectFieldF(md1, currentMd);
-    BSONObj md2Item = getObjectFieldF(md2, currentMd);
+    orion::BSONObj md1Item = getObjectFieldF(md1, currentMd);
+    orion::BSONObj md2Item = getObjectFieldF(md2, currentMd);
 
     if (!equalMetadataValues(md1Item, md2Item))
     {
@@ -311,7 +304,7 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 *
 * changedAttr -
 */
-static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate, ApiVersion apiVersion)
+static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate, ApiVersion apiVersion)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -327,22 +320,22 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const b
 
   switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
   {
-  case mongo::Object:
-  case mongo::Array:
+  case orion::Object:
+  case orion::Array:
     /* As the compoundValueP has been checked is NULL before invoking this function, finding
      * a compound value in DB means that there is a change */
     return true;
 
-  case mongo::NumberDouble:
+  case orion::NumberDouble:
     return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
-  case mongo::Bool:
+  case orion::Bool:
     return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
-  case mongo::String:
+  case orion::String:
     return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
-  case mongo::jstNULL:
+  case orion::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
 
   default:
@@ -359,8 +352,8 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const b
 */
 static void appendMetadata
 (
-  BSONObjBuilder*    mdBuilder,
-  BSONArrayBuilder*  mdNamesBuilder,
+  orion::BSONObjBuilder*    mdBuilder,
+  orion::BSONArrayBuilder*  mdNamesBuilder,
   const Metadata*    mdP,
   bool               useDefaultType
 )
@@ -382,39 +375,47 @@ static void appendMetadata
   mdNamesBuilder->append(mdP->name);
   std::string effectiveName = dbDotEncode(mdP->name);
 
+  // FIXME P8: this code probably should be refactored to be clearer and cleaner
   if (!type.empty())
   {
+    orion::BSONObjBuilder bob;
+    bob.append(ENT_ATTRS_MD_TYPE, type);
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeNull:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
+      bob.appendNull(ENT_ATTRS_MD_VALUE);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeObject:
       if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
       {
-        BSONArrayBuilder ba;
+        orion::BSONArrayBuilder ba;
         compoundValueBson(mdP->compoundValueP->childV, ba);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << ba.arr()));
+        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
+        mdBuilder->append(effectiveName, bob.obj());
       }
       else
       {
-        BSONObjBuilder bo;
-
+        orion::BSONObjBuilder bo;
         compoundValueBson(mdP->compoundValueP->childV, bo);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << bo.obj()));
+        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
+        mdBuilder->append(effectiveName, bob.obj());
       }
       break;
 
@@ -424,38 +425,42 @@ static void appendMetadata
   }
   else
   {
+    orion::BSONObjBuilder bob;
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeNull:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
+      bob.appendNull(ENT_ATTRS_MD_VALUE);
+      mdBuilder->append(effectiveName, bob.obj());
       return;
 
     case orion::ValueTypeObject:
       if (mdP->compoundValueP->isVector())
       {
-        BSONArrayBuilder ba;
-
+        orion::BSONArrayBuilder ba;
         compoundValueBson(mdP->compoundValueP->childV, ba);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << ba.arr()));
+        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
+        mdBuilder->append(effectiveName, bob.obj());
       }
       else
       {
-        BSONObjBuilder bo;
-
-        compoundValueBson(mdP->compoundValueP->childV, bo);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << bo.obj()));
+        orion::BSONObjBuilder bo;
+        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
+        mdBuilder->append(effectiveName, bob.obj());
       }
       break;
 
@@ -475,9 +480,9 @@ static void appendMetadata
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const bool& forcedUpdate, ApiVersion apiVersion)
+static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, orion::BSONObj* mergedAttr, const bool& forcedUpdate, ApiVersion apiVersion)
 {
-  BSONObjBuilder ab;
+  orion::BSONObjBuilder ab;
 
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
@@ -494,27 +499,27 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     //
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
-    case mongo::Object:
+    case orion::Object:
       ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
-    case mongo::Array:
-      ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
+    case orion::Array:
+      ab.append(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
-    case mongo::NumberDouble:
+    case orion::NumberDouble:
       ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
-    case mongo::Bool:
+    case orion::Bool:
       ab.append(ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
-    case mongo::String:
+    case orion::String:
       ab.append(ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
-    case mongo::jstNULL:
+    case orion::jstNULL:
       ab.appendNull(ENT_ATTRS_VALUE);
       break;
 
@@ -537,8 +542,8 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   }
 
   /* 3. Add metadata */
-  BSONObjBuilder   mdBuilder;
-  BSONArrayBuilder mdNamesBuilder;
+  orion::BSONObjBuilder   mdBuilder;
+  orion::BSONArrayBuilder mdNamesBuilder;
 
   /* First add the metadata elements coming in the request */
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
@@ -558,19 +563,19 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
 
   int      mdSize = 0;
-  BSONObj  md;
+  orion::BSONObj  md;
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
     std::set<std::string>  mdsSet;
 
     md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
-    md.getFieldNames(mdsSet);
+    md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
       std::string  currentMd = *i;
-      BSONObj      mdItem    = getObjectFieldF(md, currentMd);
+      orion::BSONObj      mdItem    = getObjectFieldF(md, currentMd);
       Metadata     md(currentMd, mdItem);
 
       mdSize++;
@@ -588,7 +593,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   }
 
 
-  BSONObj mdNew = mdBuilder.obj();
+  orion::BSONObj mdNew = mdBuilder.obj();
 
   if (mdNew.nFields() > 0)
   {
@@ -660,14 +665,14 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
 */
 static bool contextAttributeCustomMetadataToBson
 (
-  BSONObj*                 md,
-  BSONArray*               mdNames,
+  orion::BSONObj*                 md,
+  orion::BSONArray*               mdNames,
   const ContextAttribute*  ca,
   bool                     useDefaultType
 )
 {
-  BSONObjBuilder    mdToAdd;
-  BSONArrayBuilder  mdNamesToAdd;
+  orion::BSONObjBuilder    mdToAdd;
+  orion::BSONArrayBuilder  mdNamesToAdd;
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
@@ -718,9 +723,9 @@ static bool contextAttributeCustomMetadataToBson
 */
 static bool updateAttribute
 (
-  BSONObj&            attrs,
-  BSONObjBuilder*     toSet,
-  BSONArrayBuilder*   toPush,
+  orion::BSONObj&            attrs,
+  orion::BSONObjBuilder*     toSet,
+  orion::BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool*               actualUpdate,
   bool                isReplace,
@@ -734,7 +739,7 @@ static bool updateAttribute
 
   if (isReplace)
   {
-    BSONObjBuilder newAttr;
+    orion::BSONObjBuilder newAttr;
     double         now = getCurrentTime();
 
     *actualUpdate = true;
@@ -763,8 +768,8 @@ static bool updateAttribute
     caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
-    BSONObj    md;
-    BSONArray  mdNames;
+    orion::BSONObj    md;
+    orion::BSONArray  mdNames;
 
     if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
     {
@@ -782,8 +787,8 @@ static bool updateAttribute
       return false;
     }
 
-    BSONObj newAttr;
-    BSONObj attr = getObjectFieldF(attrs, effectiveName);
+    orion::BSONObj newAttr;
+    orion::BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, forcedUpdate, apiVersion);
     if (*actualUpdate)
@@ -813,9 +818,9 @@ static bool updateAttribute
 */
 static bool appendAttribute
 (
-  BSONObj&            attrs,
-  BSONObjBuilder*     toSet,
-  BSONArrayBuilder*   toPush,
+  orion::BSONObj&            attrs,
+  orion::BSONObjBuilder*     toSet,
+  orion::BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool*               actualUpdate,
   const bool&         forcedUpdate,
@@ -832,7 +837,7 @@ static bool appendAttribute
   }
 
   /* Build the attribute to append */
-  BSONObjBuilder ab;
+  orion::BSONObjBuilder ab;
 
   /* 1. Value */
   caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
@@ -859,8 +864,8 @@ static bool appendAttribute
   }
 
   /* 3. Metadata */
-  BSONObj   md;
-  BSONArray mdNames;
+  orion::BSONObj   md;
+  orion::BSONArray mdNames;
 
   if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
   {
@@ -892,9 +897,9 @@ static bool appendAttribute
 */
 static bool deleteAttribute
 (
-  BSONObj&                              attrs,
-  BSONObjBuilder*                       toUnset,
-  BSONArrayBuilder*                     toPull,
+  orion::BSONObj&                              attrs,
+  orion::BSONObjBuilder*                       toUnset,
+  orion::BSONArrayBuilder*                     toPull,
   ContextAttribute*                     caP
 )
 {
@@ -926,7 +931,7 @@ static bool deleteAttribute
 *    - [ "/#", "/a1/#", "/a1/a2/#", "/a1/a2/a3/#", "/a1/a2/a3" ]
 *
 */
-static void servicePathSubscription(const std::string& servicePath, BSONArrayBuilder* bab)
+static void servicePathSubscription(const std::string& servicePath, orion::BSONArrayBuilder* bab)
 {
   std::vector<std::string>  spathV;
   int                       spathComponents = 0;
@@ -1135,21 +1140,21 @@ static bool addTriggeredSubscriptions_withCache
 */
 typedef struct CSubQueryGroup
 {
-  BSONObj         idNPtypeNP;              // First clause: idNPtypeNP
+  orion::BSONObj         idNPtypeNP;              // First clause: idNPtypeNP
 
-  BSONObj         idPtypeNP;               // Second clause: idPtypeNP
+  orion::BSONObj         idPtypeNP;               // Second clause: idPtypeNP
   std::string     functionIdPtypeNP;
-  BSONObjBuilder  boPNP;
+  orion::BSONObjBuilder  boPNP;
 
-  BSONObj         idNPtypeP;               // Third clause: idNPtypeP
+  orion::BSONObj         idNPtypeP;               // Third clause: idNPtypeP
   std::string     functionIdNPtypeP;
-  BSONObjBuilder  boNPP;
+  orion::BSONObjBuilder  boNPP;
 
   std::string     functionIdPtypeP;        // Fourth clause: idPtypeP
-  BSONObj         idPtypeP;
-  BSONObjBuilder  boPP;
+  orion::BSONObj         idPtypeP;
+  orion::BSONObjBuilder  boPP;
 
-  BSONObj         query;                   // Final query
+  orion::BSONObj         query;                   // Final query
 } CSubQueryGroup;
 
 
@@ -1169,13 +1174,47 @@ static void fill_idNPtypeNP
   const std::string&  typePatternQ
 )
 {
+  /* FIXME #3774: previously this part was based in streamming instead of append(). Draft:
+
   bgP->idNPtypeNP = BSON(entIdQ << entityId <<
                          "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
                                              BSON(entTypeQ << BSON("$exists" << false))) <<
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
                          CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE));
+                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE)); */
+
+  orion::BSONObjBuilder bob;
+
+  orion::BSONArrayBuilder baOr;
+  orion::BSONObjBuilder   bobEntityType;
+  orion::BSONObjBuilder   bobEntityTypeExistFalse;
+  orion::BSONObjBuilder   bobExistFalse;
+
+  orion::BSONObjBuilder bobNeTrue;
+  orion::BSONObjBuilder bobGtCurrentTime;
+  orion::BSONObjBuilder bobNeStatus;
+
+  bobExistFalse.append("$exists", false);
+
+  bobEntityType.append(entTypeQ, entityType);
+  bobEntityTypeExistFalse.append(entTypeQ, bobExistFalse.obj());
+
+  baOr.append(bobEntityType.obj());
+  baOr.append(bobEntityTypeExistFalse.obj());
+
+  bobNeTrue.append("$ne", true);
+  bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
+  bobNeStatus.append("$ne", STATUS_INACTIVE);
+
+  bob.append(entIdQ, entityId);
+  bob.append("$or", baOr.arr());
+  bob.append(entPatternQ, "false");
+  bob.append(typePatternQ, bobNeTrue.obj());
+  bob.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
+  bob.append(CSUB_STATUS, bobNeStatus.obj());
+
+  bgP->idNPtypeNP = bob.obj();
 }
 
 
@@ -1209,10 +1248,18 @@ static void fill_idPtypeNP
          "}";
   LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
 
+  orion::BSONObjBuilder bobNeTrue;
+  orion::BSONObjBuilder bobGtCurrentTime;
+  orion::BSONObjBuilder bobNeStatus;
+
+  bobNeTrue.append("$ne", true);
+  bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
+  bobNeStatus.append("$ne", STATUS_INACTIVE);
+
   bgP->boPNP.append(entPatternQ, "true");
-  bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
-  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  bgP->boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boPNP.append(typePatternQ, bobNeTrue.obj());
+  bgP->boPNP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
+  bgP->boPNP.append(CSUB_STATUS, bobNeStatus.obj());
   bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
 
   bgP->idPtypeNP = bgP->boPNP.obj();
@@ -1247,10 +1294,16 @@ static void fill_idNPtypeP
       "}";
   LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
 
+  orion::BSONObjBuilder bobGtCurrentTime;
+  orion::BSONObjBuilder bobNeStatus;
+
+  bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
+  bobNeStatus.append("$ne", STATUS_INACTIVE);
+
   bgP->boNPP.append(entPatternQ, "false");
   bgP->boNPP.append(typePatternQ, true);
-  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  bgP->boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boNPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
+  bgP->boNPP.append(CSUB_STATUS, bobNeStatus.obj());
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
 
   bgP->idNPtypeP = bgP->boNPP.obj();
@@ -1287,10 +1340,16 @@ static void fill_idPtypeP
       "}";
   LM_T(LmtMongo, ("idPtypeP function: %s", bgP->functionIdPtypeP.c_str()));
 
+  orion::BSONObjBuilder bobGtCurrentTime;
+  orion::BSONObjBuilder bobNeStatus;
+
+  bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
+  bobNeStatus.append("$ne", STATUS_INACTIVE);
+
   bgP->boPP.append(entPatternQ, "true");
   bgP->boPP.append(typePatternQ, true);
-  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  bgP->boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
+  bgP->boPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
+  bgP->boPP.append(CSUB_STATUS, bobNeStatus.obj());
   bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
 
   bgP->idPtypeP = bgP->boPP.obj();
@@ -1317,7 +1376,7 @@ static bool addTriggeredSubscriptions_noCache
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
 
-  BSONArrayBuilder bab;
+  orion::BSONArrayBuilder bab;
   servicePathSubscription(servicePath, &bab);
 
   /* Build query */
@@ -1328,7 +1387,8 @@ static bool addTriggeredSubscriptions_noCache
 
   // Note that, by construction, bab.arr() has always more than one element thus we
   // cannot avoid $in usage
-  BSONObj     spBson        = BSON("$in" << bab.arr());
+  orion::BSONObjBuilder bobSp;
+  bobSp.append("$in", bab.arr());
 
   /* Query is an $or of 4 sub-clauses:
    *
@@ -1370,24 +1430,33 @@ static bool addTriggeredSubscriptions_noCache
   fill_idNPtypeP(bgP,  entityId, entityType, entPatternQ, typePatternQ);
 
   /* Composing final query */
-  bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP) <<
-                    CSUB_SERVICE_PATH << spBson);
+  orion::BSONObjBuilder bobQuery;
+  orion::BSONArrayBuilder baFilters;
+  baFilters.append(bgP->idNPtypeNP);
+  baFilters.append(bgP->idPtypeNP);
+  baFilters.append(bgP->idNPtypeP);
+  baFilters.append(bgP->idPtypeP);
 
-  std::string                    collection  = getSubscribeContextCollectionName(tenant);
-  std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    errorString;
+  bobQuery.append("$or", baFilters.arr());
+  bobQuery.append(CSUB_SERVICE_PATH, bobSp.obj());
+
+  bgP->query = bobQuery.obj();
+
+  std::string      db  = composeDatabaseName(tenant);
+  orion::DBCursor  cursor;
+  std::string      errorString;
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextCollectionName(tenant).c_str(),
+                  (db + '.' + COL_CSUBS).c_str(),
                   bgP->query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
 
-  if (collectionQuery(connection, collection, bgP->query, &cursor, &errorString) != true)
+  if (orion::collectionQuery(connection, db, COL_CSUBS, bgP->query, &cursor, &errorString) != true)
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     delete bgP;
     return false;
   }
@@ -1395,17 +1464,10 @@ static bool addTriggeredSubscriptions_noCache
 
   /* For each one of the subscriptions found, add it to the map (if not already there),
    * after checking triggering attributes */
-  while (moreSafe(cursor))
+  orion::BSONObj sub;
+  while (cursor.next(&sub))
   {
-    BSONObj     sub;
-    std::string err;
-
-    if (!nextSafeOrErrorF(cursor, &sub, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), bgP->query.toString().c_str()));
-      continue;
-    }
-    BSONElement  idField  = getFieldF(sub, "_id");
+    orion::BSONElement  idField  = getFieldF(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -1421,7 +1483,7 @@ static bool addTriggeredSubscriptions_noCache
       continue;
     }
 
-    std::string subIdStr = idField.OID().toString();
+    std::string subIdStr = idField.OID();
 
     if (subs.count(subIdStr) == 0)
     {
@@ -1485,7 +1547,7 @@ static bool addTriggeredSubscriptions_noCache
 
       if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
+        orion::BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
 
         std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expr, CSUB_EXPR_Q)      : "";
         std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
@@ -1506,7 +1568,7 @@ static bool addTriggeredSubscriptions_noCache
             delete bgP;
 
             LM_E(("Runtime Error (%s)", err.c_str()));
-            releaseMongoConnection(connection);
+            orion::releaseMongoConnection(connection);
             return false;
           }
           else
@@ -1519,7 +1581,7 @@ static bool addTriggeredSubscriptions_noCache
               delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
-              releaseMongoConnection(connection);
+              orion::releaseMongoConnection(connection);
               return false;
             }
 
@@ -1538,7 +1600,7 @@ static bool addTriggeredSubscriptions_noCache
             delete bgP;
 
             LM_E(("Runtime Error (%s)", err.c_str()));
-            releaseMongoConnection(connection);
+            orion::releaseMongoConnection(connection);
             return false;
           }
           else
@@ -1551,7 +1613,7 @@ static bool addTriggeredSubscriptions_noCache
               delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
-              releaseMongoConnection(connection);
+              orion::releaseMongoConnection(connection);
               return false;
             }
 
@@ -1564,7 +1626,7 @@ static bool addTriggeredSubscriptions_noCache
     }
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   delete bgP;
 
   return true;
@@ -1775,8 +1837,8 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      BSONObj areaFilter;
-      if (!processAreaScopeV2(&geoScope, &areaFilter))
+      orion::BSONObjBuilder bobQuery;
+      if (!processAreaScopeV2(&geoScope, &bobQuery, true))
       {
         // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
         continue;
@@ -1787,14 +1849,17 @@ static unsigned int processSubscriptions
       std::string  keyId   = "_id." ENT_ENTITY_ID;
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
-      std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
+
       std::string  id      = notifyCerP->entity.id;
       std::string  type    = notifyCerP->entity.type;
       std::string  sp      = notifyCerP->entity.servicePath;
-      BSONObj      query   = BSON(keyId << id << keyType << type << keySp << sp << keyLoc << areaFilter);
+
+      bobQuery.append(keyId, id);
+      bobQuery.append(keyType, type);
+      bobQuery.append(keySp, sp);
 
       unsigned long long n;
-      if (!collectionCount(getEntitiesCollectionName(tenant), query, &n, &filterErr))
+      if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;
@@ -1829,19 +1894,23 @@ static unsigned int processSubscriptions
       notifSent++;
 
       long long  rightNow  = getCurrentTime();
-      BSONObj    query     = BSON("_id" << OID(mapSubId));
-      BSONObj    update;
+
+      orion::BSONObjBuilder bobQuery;
+      bobQuery.append("_id", orion::OID(mapSubId));
+
+      orion::BSONObj  query = bobQuery.obj();
+      orion::BSONObj  update;
 
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
-        BSONObj      subOrig;
-        std::string  newErr;
-        std::string  status;
+        orion::BSONObj  subOrig;
+        std::string     newErr;
+        std::string     status;
 
-        collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
+        collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, query, &subOrig, &newErr);
         if (!subOrig.isEmpty())
         {
           if (subOrig.hasField(CSUB_STATUS))
@@ -1850,18 +1919,24 @@ static unsigned int processSubscriptions
           }
         }
 
+        orion::BSONObjBuilder bobSet;
+        bobSet.append(CSUB_LASTNOTIFICATION, rightNow);
+
         // Update the value of status (in case of oneshot) in DB when broker is running without subscription cache
         if (status == STATUS_ONESHOT)
         {
-          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow << CSUB_STATUS << STATUS_INACTIVE) <<
-                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
+          bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
         }
-        else
-        {
-          update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                        "$inc" << BSON(CSUB_COUNT << (long long) 1));
-        }
-        collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+
+        // FIXME #3774: previously this part was based in streamming instead of append()
+        orion::BSONObjBuilder bobInc;
+        bobInc.append(CSUB_COUNT, (long long) 1);
+
+        orion::BSONObjBuilder bobUpdate;
+        bobUpdate.append("$set", bobSet.obj());
+        bobUpdate.append("$inc", bobInc.obj());
+
+        orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
       }
 
 
@@ -1878,9 +1953,14 @@ static unsigned int processSubscriptions
         {
           if (cSubP->status == STATUS_ONESHOT)
           {
-            update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
+            orion::BSONObjBuilder bobSet;
+            bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+
+            orion::BSONObjBuilder bobUpdate;
+            bobUpdate.append("$set", bobSet.obj());
+
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
-            collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+            orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
             cSubP->status = STATUS_INACTIVE;
 
             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
@@ -2154,17 +2234,17 @@ static bool updateContextAttributeItem
 (
   ContextElementResponse*   cerP,
   ContextAttribute*         ca,
-  BSONObj&                  attrs,
+  orion::BSONObj&           attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
-  BSONObjBuilder*           toSet,
-  BSONArrayBuilder*         toPush,
+  orion::BSONObjBuilder*    toSet,
+  orion::BSONArrayBuilder*  toPush,
   bool*                     actualUpdate,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
-  BSONObjBuilder*           geoJson,
-  mongo::Date_t*            dateExpiration,
+  orion::BSONObjBuilder*    geoJson,
+  orion::BSONDate*          dateExpiration,
   bool*                     dateExpirationInPayload,
   bool                      isReplace,
   const bool&               forcedUpdate,
@@ -2235,17 +2315,17 @@ static bool updateContextAttributeItem
 static bool appendContextAttributeItem
 (
   ContextElementResponse*   cerP,
-  BSONObj&                  attrs,
+  orion::BSONObj&           attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
-  BSONObjBuilder*           toSet,
-  BSONArrayBuilder*         toPush,
+  orion::BSONObjBuilder*    toSet,
+  orion::BSONArrayBuilder*  toPush,
   bool*                     actualUpdate,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
-  BSONObjBuilder*           geoJson,
-  mongo::Date_t*            dateExpiration,
+  orion::BSONObjBuilder*    geoJson,
+  orion::BSONDate*          dateExpiration,
   const bool&               forcedUpdate,
   ApiVersion                apiVersion,
   OrionError*               oe
@@ -2292,19 +2372,19 @@ static bool appendContextAttributeItem
 */
 static bool deleteContextAttributeItem
 (
-  ContextElementResponse*               cerP,
-  ContextAttribute*                     ca,
-  BSONObj&                              attrs,
-  ContextAttribute*                     targetAttr,
-  ContextElementResponse*               notifyCerP,
-  const std::string&                    entityDetail,
-  BSONObjBuilder*                       toUnset,
-  BSONArrayBuilder*                     toPull,
-  std::string*                          currentLocAttrName,
-  bool*                                 entityModified,
-  mongo::Date_t*                        dateExpiration,
-  ApiVersion                            apiVersion,
-  OrionError*                           oe
+  ContextElementResponse*   cerP,
+  ContextAttribute*         ca,
+  orion::BSONObj&           attrs,
+  ContextAttribute*         targetAttr,
+  ContextElementResponse*   notifyCerP,
+  const std::string&        entityDetail,
+  orion::BSONObjBuilder*    toUnset,
+  orion::BSONArrayBuilder*  toPull,
+  std::string*              currentLocAttrName,
+  bool*                     entityModified,
+  orion::BSONDate*          dateExpiration,
+  ApiVersion                apiVersion,
+  OrionError*               oe
 )
 {
   if (deleteAttribute(attrs, toUnset, toPull, targetAttr))
@@ -2339,7 +2419,7 @@ static bool deleteContextAttributeItem
      * of specifying that date expiration field is no longer used */
     if (targetAttr->name == DATE_EXPIRES)
     {
-      *dateExpiration = NO_EXPIRATION_DATE;
+      *dateExpiration = orion::BSONDate(NO_EXPIRATION_DATE);
     }
 
     ca->found = true;
@@ -2380,15 +2460,15 @@ static bool processContextAttributeVector
   ActionType                                      action,
   std::map<std::string, TriggeredSubscription*>&  subsToNotify,
   ContextElementResponse*                         notifyCerP,
-  BSONObj&                                        attrs,
-  BSONObjBuilder*                                 toSet,
-  BSONObjBuilder*                                 toUnset,
-  BSONArrayBuilder*                               toPush,
-  BSONArrayBuilder*                               toPull,
+  orion::BSONObj&                                 attrs,
+  orion::BSONObjBuilder*                          toSet,
+  orion::BSONObjBuilder*                          toUnset,
+  orion::BSONArrayBuilder*                        toPush,
+  orion::BSONArrayBuilder*                        toPull,
   ContextElementResponse*                         cerP,
   std::string*                                    currentLocAttrName,
-  BSONObjBuilder*                                 geoJson,
-  mongo::Date_t*                                  dateExpiration,
+  orion::BSONObjBuilder*                          geoJson,
+  orion::BSONDate*                                dateExpiration,
   bool*                                           dateExpirationInPayload,
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
@@ -2564,7 +2644,7 @@ static bool createEntity
   OrionError*                      oeP
 )
 {
-  LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
+  LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", (composeDatabaseName(tenant) + '.' + COL_ENTITIES).c_str()));
 
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
@@ -2573,8 +2653,8 @@ static bool createEntity
   ensureDateExpirationIndex(tenant);
 
   /* Search for a potential location attribute */
-  std::string     locAttr;
-  BSONObjBuilder  geoJson;
+  std::string            locAttr;
+  orion::BSONObjBuilder  geoJson;
 
   if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
   {
@@ -2583,7 +2663,7 @@ static bool createEntity
   }
 
   /* Search for a potential date expiration attribute */
-  mongo::Date_t dateExpiration = NO_EXPIRATION_DATE;
+  orion::BSONDate dateExpiration(NO_EXPIRATION_DATE);
 
   if (!processDateExpirationAtEntityCreation(attrsV, &dateExpiration, errDetail, oeP))
   {
@@ -2591,12 +2671,12 @@ static bool createEntity
     return false;
   }
 
-  BSONObjBuilder    attrsToAdd;
-  BSONArrayBuilder  attrNamesToAdd;
+  orion::BSONObjBuilder    attrsToAdd;
+  orion::BSONArrayBuilder  attrNamesToAdd;
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    BSONObjBuilder  bsonAttr;
+    orion::BSONObjBuilder  bsonAttr;
 
     std::string attrType;
 
@@ -2630,8 +2710,8 @@ static bool createEntity
                     attrsV[ix]->getValue().c_str()));
 
     /* Custom metadata */
-    BSONObj   md;
-    BSONArray mdNames;
+    orion::BSONObj   md;
+    orion::BSONArray mdNames;
     if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
     {
       bsonAttr.append(ENT_ATTRS_MD, md);
@@ -2642,7 +2722,7 @@ static bool createEntity
     attrNamesToAdd.append(attrsV[ix]->name);
   }
 
-  BSONObjBuilder bsonId;
+  orion::BSONObjBuilder bsonId;
 
   bsonId.append(ENT_ENTITY_ID, eP->id);
 
@@ -2661,7 +2741,7 @@ static bool createEntity
 
   bsonId.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
 
-  BSONObjBuilder insertedDoc;
+  orion::BSONObjBuilder insertedDoc;
 
   insertedDoc.append("_id", bsonId.obj());
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
@@ -2672,12 +2752,15 @@ static bool createEntity
   /* Add location information in the case it was found */
   if (!locAttr.empty())
   {
-    insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                          ENT_LOCATION_COORDS   << geoJson.obj()));
+    orion::BSONObjBuilder bobLocation;
+    bobLocation.append(ENT_LOCATION_ATTRNAME, locAttr);
+    bobLocation.append(ENT_LOCATION_COORDS, geoJson.obj());
+
+    insertedDoc.append(ENT_LOCATION, bobLocation.obj());
   }
 
   /* Add date expiration in the case it was found */
-  if (dateExpiration != NO_EXPIRATION_DATE)
+  if (!dateExpiration.equal(NO_EXPIRATION_DATE))
   {
     insertedDoc.appendDate(ENT_EXPIRATION, dateExpiration);
   }
@@ -2687,7 +2770,7 @@ static bool createEntity
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
-  if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
+  if (!collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
   {
     oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
@@ -2712,15 +2795,17 @@ static bool removeEntity
   OrionError*              oe
 )
 {
-  const std::string    idString          = "_id." ENT_ENTITY_ID;
-  const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
-  const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-  BSONObjBuilder       bob;
+  const std::string      idString          = "_id." ENT_ENTITY_ID;
+  const std::string      typeString        = "_id." ENT_ENTITY_TYPE;
+  const std::string      servicePathString = "_id." ENT_SERVICE_PATH;
+  orion::BSONObjBuilder  bob;
 
   bob.append(idString, entityId);
   if (entityType.empty())
   {
-    bob.append(typeString, BSON("$exists" << false));
+    orion::BSONObjBuilder bobExist;
+    bobExist.append("$exists", false);
+    bob.append(typeString, bobExist.obj());
   }
   else
   {
@@ -2729,7 +2814,9 @@ static bool removeEntity
 
   if (servicePath.empty())
   {
-    bob.append(servicePathString, BSON("$exists" << false));
+    orion::BSONObjBuilder bobExist;
+    bobExist.append("$exists", false);
+    bob.append(servicePathString, bobExist.obj());
   }
   else
   {
@@ -2737,7 +2824,7 @@ static bool removeEntity
   }
 
   std::string err;
-  if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
+  if (!collectionRemove(composeDatabaseName(tenant), COL_ENTITIES, bob.obj(), &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2856,7 +2943,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static unsigned int updateEntity
 (
-  const BSONObj&                  r,
+  const orion::BSONObj&           r,
   ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
@@ -2879,7 +2966,7 @@ static unsigned int updateEntity
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
-  BSONObj            idField           = getObjectFieldF(r, "_id");
+  orion::BSONObj            idField           = getObjectFieldF(r, "_id");
 
   std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
@@ -2907,11 +2994,11 @@ static unsigned int updateEntity
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
-  BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
-  BSONObjBuilder    toSet;
-  BSONObjBuilder    toUnset;
-  BSONArrayBuilder  toPush;
-  BSONArrayBuilder  toPull;
+  orion::BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
+  orion::BSONObjBuilder    toSet;
+  orion::BSONObjBuilder    toUnset;
+  orion::BSONArrayBuilder  toPush;
+  orion::BSONArrayBuilder  toPull;
 
   /* We accumulate the subscriptions in a map. The key of the map is the string representing
    * subscription id */
@@ -2920,15 +3007,15 @@ static unsigned int updateEntity
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
-  std::string     locAttr = "";
-  BSONObj         currentGeoJson;
-  BSONObj         newGeoJson;
-  BSONObj         finalGeoJson;
-  BSONObjBuilder  geoJson;
+  std::string            locAttr = "";
+  orion::BSONObj         currentGeoJson;
+  orion::BSONObj         newGeoJson;
+  orion::BSONObj         finalGeoJson;
+  orion::BSONObjBuilder  geoJson;
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
+    orion::BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
 
     locAttr        = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
     currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
@@ -2939,12 +3026,12 @@ static unsigned int updateEntity
    * The dateExpirationInPayload boolean is used in case of replace operation,
    * in order to know that the date is a new one, coming from the input request
    */
-  mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
+  orion::BSONDate currentDateExpiration(NO_EXPIRATION_DATE);
   bool dateExpirationInPayload          = false;
 
   if (r.hasField(ENT_EXPIRATION))
   {
-    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+    currentDateExpiration = orion::getField(r, ENT_EXPIRATION).date();
   }
 
   //
@@ -3065,8 +3152,10 @@ static unsigned int updateEntity
 
     if (action != ActionTypeReplace)
     {
-      toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                    ENT_LOCATION_COORDS   << finalGeoJson));
+      orion::BSONObjBuilder bobLoc;
+      bobLoc.append(ENT_LOCATION_ATTRNAME, locAttr);
+      bobLoc.append(ENT_LOCATION_COORDS, finalGeoJson);
+      toSet.append(ENT_LOCATION, bobLoc.obj());
     }
     else if (newGeoJson.nFields() == 0)
     {
@@ -3080,7 +3169,7 @@ static unsigned int updateEntity
 
   // We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if ((currentDateExpiration != NO_EXPIRATION_DATE) && (action != ActionTypeReplace))
+  if ((!currentDateExpiration.equal(NO_EXPIRATION_DATE)) && (action != ActionTypeReplace))
   {
     toSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
   }
@@ -3098,45 +3187,41 @@ static unsigned int updateEntity
     toSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
   }
 
-  /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
-   * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
-  BSONObjBuilder  updatedEntity;
-  BSONObj         toSetObj    = toSet.obj();
-  BSONObj         toUnsetObj  = toUnset.obj();
-  BSONArray       toPushArr   = toPush.arr();
-  BSONArray       toPullArr   = toPull.arr();
+  orion::BSONObjBuilder  updatedEntity;
 
   if (action == ActionTypeReplace)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    BSONObjBuilder replaceSet;
+    orion::BSONObjBuilder replaceSet;
     double         now = getCurrentTime();
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
     // Note entity replacement could be caused by a notification request
     // (with cbnotif= in the correlator) so we need to use correlatorRoot()
-    replaceSet.append(ENT_ATTRS, toSetObj);
-    replaceSet.append(ENT_ATTRNAMES, toPushArr);
+    replaceSet.append(ENT_ATTRS, toSet.obj());
+    replaceSet.append(ENT_ATTRNAMES, toPush.arr());
     replaceSet.append(ENT_MODIFICATION_DATE, now);
     replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
     if (dateExpirationInPayload)
     {
-      replaceSet.append(ENT_EXPIRATION, currentDateExpiration);
+      replaceSet.appendDate(ENT_EXPIRATION, currentDateExpiration);
     }
 
     if (newGeoJson.nFields() > 0)
     {
-      replaceSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                    ENT_LOCATION_COORDS   << finalGeoJson));
+      orion::BSONObjBuilder bobLoc;
+      bobLoc.append(ENT_LOCATION_ATTRNAME, locAttr);
+      bobLoc.append(ENT_LOCATION_COORDS, finalGeoJson);
+      replaceSet.append(ENT_LOCATION, bobLoc.obj());
     }
 
     updatedEntity.append("$set", replaceSet.obj());
 
     if (!dateExpirationInPayload || newGeoJson.nFields() == 0)
     {
-      updatedEntity.append("$unset", toUnsetObj);
+      updatedEntity.append("$unset", toUnset.obj());
     }
 
     notifyCerP->entity.modDate = now;
@@ -3144,40 +3229,49 @@ static unsigned int updateEntity
   else
   {
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
-    if (toSetObj.nFields() > 0)
+    if (toSet.nFields() > 0)
     {
-      updatedEntity.append("$set", toSetObj);
+      updatedEntity.append("$set", toSet.obj());
     }
 
-    if (toUnsetObj.nFields() > 0)
+    if (toUnset.nFields() > 0)
     {
-      updatedEntity.append("$unset", toUnsetObj);
+      updatedEntity.append("$unset", toUnset.obj());
     }
 
-    if (toPushArr.nFields() > 0)
+    if (toPush.arrSize() > 0)
     {
-      updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
+      orion::BSONObjBuilder bobEach;
+      orion::BSONObjBuilder bobAttrs;
+      bobEach.append("$each", toPush.arr());
+      bobAttrs.append(ENT_ATTRNAMES, bobEach.obj());
+
+      updatedEntity.append("$addToSet", bobAttrs.obj());
     }
 
-    if (toPullArr.nFields() > 0)
+    if (toPull.arrSize() > 0)
     {
-      updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
+      orion::BSONObjBuilder bobAttrs;
+      bobAttrs.append(ENT_ATTRNAMES, toPull.arr());
+      updatedEntity.append("$pullAll", bobAttrs.obj());
     }
   }
 
-  BSONObj updatedEntityObj = updatedEntity.obj();
+  orion::BSONObj updatedEntityObj = updatedEntity.obj();
 
   /* Note that the query that we build for updating is slighty different than the query used
    * for selecting the entities to process. In particular, the "no type" branch in the if
    * sentence selects precisely the entity with no type, using the {$exists: false} clause */
-  BSONObjBuilder query;
+  orion::BSONObjBuilder query;
 
   // idString, typeString from earlier in this function
   query.append(idString, entityId);
 
   if (entityType.empty())
   {
-    query.append(typeString, BSON("$exists" << false));
+    orion::BSONObjBuilder bob;
+    bob.append("$exists", false);
+    query.append(typeString, bob.obj());
   }
   else
   {
@@ -3191,7 +3285,7 @@ static unsigned int updateEntity
   }
 
   std::string err;
-  if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
+  if (!collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3379,7 +3473,7 @@ unsigned int processContextElement
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
   EntityId           en(eP->id, eP->type);
-  BSONObjBuilder     bob;
+  orion::BSONObjBuilder     bob;
 
   bob.append(idString, eP->id);
 
@@ -3402,13 +3496,18 @@ unsigned int processContextElement
   if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
     std::string  entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-    BSONObj      b                = BSON(entityTypeString << BSON("$exists" << false));
 
-    bob.appendElements(b);
+    orion::BSONObjBuilder bobExist;
+    bobExist.append("$exists", false);
+
+    orion::BSONObjBuilder b;
+    b.append(entityTypeString, bobExist.obj());
+
+    bob.appendElements(b.obj());
   }
 
-  BSONObj                        query = bob.obj();
-  std::auto_ptr<DBClientCursor>  cursor;
+  orion::BSONObj   query = bob.obj();
+  orion::DBCursor  cursor;
 
   // Several checks related to NGSIv2
   if (apiVersion == V2)
@@ -3416,7 +3515,7 @@ unsigned int processContextElement
     unsigned long long entitiesNumber;
     std::string        err;
 
-    if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
+    if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
       responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3453,11 +3552,11 @@ unsigned int processContextElement
   std::string err;
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3474,23 +3573,16 @@ unsigned int processContextElement
   // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
   //
 
-  std::vector<BSONObj> results;
-  unsigned int         docs = 0;
+  std::vector<orion::BSONObj>  results;
+  unsigned int                 docs = 0;
 
-  while (moreSafe(cursor))
+  orion::BSONObj r;
+  while (cursor.next(&r))
   {
-    BSONObj r;
-
-    if (!nextSafeOrErrorF(cursor, &r, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
-      continue;
-    }
-
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    BSONElement idField = getFieldF(r, "_id");
+    orion::BSONElement idField = getFieldF(r, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -3505,14 +3597,10 @@ unsigned int processContextElement
       continue;
     }
 
-    //
-    // We need to use getOwned() here, otherwise we have empirically found that bad things may happen with long BSONObjs
-    // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
-    //
-    results.push_back(r.getOwned());
+    results.push_back(r);
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
 

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
-#define SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
+#ifndef SRC_LIB_MONGODRIVER_MONGOCONNECTIONPOOL_H_
+#define SRC_LIB_MONGODRIVER_MONGOCONNECTIONPOOL_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,17 +23,18 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
-#include <semaphore.h>
+// #include <semaphore.h>
 
-#include "mongo/client/dbclient.h"
+#include "mongoDriver/DBConnection.h"
 
 
-
+namespace orion
+{
 /* ****************************************************************************
 *
-* mongoVersionGet - 
+* mongoVersionGet -
 */
 extern void mongoVersionGet(int* mayor, int* minor);
 
@@ -41,7 +42,7 @@ extern void mongoVersionGet(int* mayor, int* minor);
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolInit - 
+* mongoConnectionPoolInit -
 */
 extern int mongoConnectionPoolInit
 (
@@ -53,8 +54,9 @@ extern int mongoConnectionPoolInit
   const char* mechanism,
   const char* authDb,
   bool        dbSSL,
-  bool        multitenant,
-  double      timeout,
+  bool        dbDisableRetryWrites,
+  bool        mtenant,
+  int64_t     timeout,
   int         writeConcern = 1,
   int         poolSize = 10,
   bool        semTimeStat = false
@@ -64,7 +66,7 @@ extern int mongoConnectionPoolInit
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeGet - 
+* mongoPoolConnectionSemWaitingTimeGet -
 */
 extern float mongoPoolConnectionSemWaitingTimeGet(void);
 
@@ -72,7 +74,7 @@ extern float mongoPoolConnectionSemWaitingTimeGet(void);
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeReset - 
+* mongoPoolConnectionSemWaitingTimeReset -
 */
 extern void mongoPoolConnectionSemWaitingTimeReset(void);
 
@@ -80,7 +82,7 @@ extern void mongoPoolConnectionSemWaitingTimeReset(void);
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolSemGet - 
+* mongoConnectionPoolSemGet -
 */
 extern const char* mongoConnectionPoolSemGet(void);
 
@@ -88,7 +90,7 @@ extern const char* mongoConnectionPoolSemGet(void);
 
 /* ****************************************************************************
 *
-* mongoConnectionSemGet - 
+* mongoConnectionSemGet -
 */
 extern const char* mongoConnectionSemGet(void);
 
@@ -97,8 +99,9 @@ extern const char* mongoConnectionSemGet(void);
 // Higher level functions (previously in MongoGlobal)
 
 #ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBConnection _connection);
 #endif
+
 
 
 /* ****************************************************************************
@@ -108,7 +111,7 @@ extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API seems not to work that way
 */
-extern mongo::DBClientBase* getMongoConnection(void);
+extern DBConnection getMongoConnection(void);
 
 
 
@@ -116,7 +119,7 @@ extern mongo::DBClientBase* getMongoConnection(void);
 *
 * releaseMongoConnection -
 */
-extern void releaseMongoConnection(mongo::DBClientBase* connection);
+extern void releaseMongoConnection(const DBConnection& connection);
+}
 
-
-#endif  // SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
+#endif  // SRC_LIB_MONGODRIVER_MONGOCONNECTIONPOOL_H_

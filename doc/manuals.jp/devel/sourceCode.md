@@ -16,7 +16,8 @@
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (NGSIv1 のサービス・ルーチン)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (NGSIv2 のサービス・ルーチン)
 * [src/lib/convenience/](#srclibconvenience) (NGSIv1 のコンビニエンス・オペレーション)
-* [src/lib/mongoBackend/](#srclibmongobackend) (外部ライブラリ libmongoclient を使用した mongodb へのデータベース・インタフェース)
+* [src/lib/mongoBackend/](#srclibmongobackend) (データベース操作の実装)
+* [src/lib/mongoDriver/](#srclibmongodriver) (MongoDB へのデータベース・インターフェース)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSIv1 通知)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (アラーム管理の実装)
 * [src/lib/cache/](#srclibcache) (サブスクリプション・キャッシュの実装)
@@ -363,7 +364,67 @@ typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vecto
 
 <a name="srclibmongobackend"></a>
 ## src/lib/mongoBackend/
-Broker のすべてのライブラリの中で最も重要なのは、**mongoBackend** ライブラリです。データベースのやりとりがすべて行われます。このライブラリは、[別のドキュメント](mongoBackend.md)で詳しく説明されています。
+Broker のすべてのライブラリの中で最も重要なのは、**mongoBackend** ライブラリです。("ラッピング" ライブラリ **mongoDriver** を介して) データベースのやりとりがすべて行われます。このライブラリは、[別のドキュメント](mongoBackend.md)で詳しく説明されています。
+
+[トップ](#top)
+
+
+## src/lib/mongoDriver/
+
+このライブラリは MongoDB とインターフェイスし、データベース操作をドライバ・レベルと BSON データ構造でラップします。これは
+[Mongo C ドライバ](https://mongoc.org) に基づいていますが、このライブラリが提供する API に依存しているため、ドライバの内部をi
+無視できるのは良いことです (新しい操作または BSON 情報構造でこのライブラリを拡張する必要がある場合を除きます)。
+
+この API は、次のクラスによって提供されます:
+
+* `orion::DBConnection`: データベースへの接続の実装
+* `orion::DBCursor`: クエリおよび集計操作によって提供される DB カーソルの実装
+* 異なる BSON データ構造を実装するいくつかのクラス:
+    * `orion::BSONObjBuilder` (`orion::BSONObj` のビルダー・クラス)
+    * `orion::BSONArayBuilder` (`orion::BSONArray` のビルダー・クラス)
+    * `orion::BSONElement`
+    * `orion::BSONDate`
+    * `orion::OID`
+
+および以下の追加モジュール:
+
+* `mongoConnectionPool`: Orion の起動時に MongoDB 接続プールを初期化し、接続を取得/解放するための関数を提供します。
+   詳細については、[以下のセクション](#connection-pool-management) をご覧ください
+* `connectionOperations`: データベース操作 (挿入、検索、更新など) のラッパー、Orion 固有の側面の追加 (データベース接続プールでの
+   同時実行管理、エラー処理、ロギングなど)
+* `safeMongo`: BSON オブジェクトからフィールドを取得するための安全なメソッド
+
+### 接続プール管理
+
+モジュール `mongoConnectionPool` は、データベース接続プールを管理します。プールがどのように機能するかは重要であり、説明に値します。
+基本的に、Orion Context Broker は、データベースへの接続のリストを保持します (`mongoConnectionPool.cpp` で定義された `connectionPool`)。
+リストのサイズは `-dbPoolSize` [CLI パラメータ](../admin/cli.md) (デフォルトでは10) です。リスト内の各要素は、このタイプのオブジェクトです:
+
+```
+typedef struct MongoConnection
+{
+  orion::DBConnection  connection;
+  bool                 free;
+} MongoConnection;
+```
+
+ここで、`connection` は実際の接続 (`orion::DBConnection`オブジェクト) であり、`free` は、接続が現在使用されているかどうかを知るための
+フラグです。`orion::DBConnection` オブジェクトはスレッド・セーフではないため、これは重要です。そのため、Context Broker ロジックは、
+同じ接続が2つのスレッドによって同時に使用されないようにする必要があります。
+
+これを考慮に入れると、`mongoConnectionPool` モジュール内の主な機能は次のとおりです (これ以上ありますが、残りはメトリック・ロジックに
+関連するセカンダリ・モジュールです):
+
+* `mongoConnectionPoolInit()`: ContextBroker ブートストラップ・ロジックから呼び出されるプールを初期化します
+* `mongoPoolConnectionGet()`: プールからフリーの接続を取得します
+* `mongoPoolConnectionRelease()`: 接続を解放するため、プールに戻り、次に `mongoConnectionGet()` を呼び出すことで再び選択できるようになります
+
+セマフォ・システムは、接続の使用を保護するために使用されます。詳細については、[この別のドキュメント](semaphores.md＃mongo-connection-pool-semaphores)
+を参照してください。
+
+**注:** 接続を管理するこの方法は、ネイティブ・プール管理をサポートしていない古いバージョンのドライバからのレガシーです。現在のドライバでは、
+ネイティブ・プール管理が可能であるため、将来的には、ドライバのネイティブ機能を使用してコード・ベースを簡素化するように実装を変更する可能性があります。
+[Issue 3789](https://github.com/telefonicaid/fiware-orion/issues/3789) はこれについてです。
 
 [トップ](#top)
 

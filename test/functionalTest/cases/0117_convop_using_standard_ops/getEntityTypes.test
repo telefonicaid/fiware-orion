@@ -349,8 +349,8 @@ Date: REGEX(.*)
         {
             "attributes": [
 #SORT_START
-                "A2",
-                "A1"
+                "A2"REGEX(,?)
+                "A1"REGEX(,?)
 #SORT_END
             ],
             "name": "T1"

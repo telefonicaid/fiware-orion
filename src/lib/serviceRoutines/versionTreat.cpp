@@ -41,9 +41,10 @@
 #include "rest/ConnectionInfo.h"
 #include "rapidjson/rapidjson.h"
 #include "serviceRoutines/versionTreat.h"
-#include "mongo/version.h"
 
-
+#include <boost/version.hpp>
+#include <mongoc/mongoc.h>
+#include <bson/bson.h>
 
 /* ****************************************************************************
 *
@@ -67,7 +68,8 @@ std::string libVersions(void)
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
-  std::string  mongo  = "     \"mongodriver\": ";
+  std::string  mongo  = "     \"mongoc\": ";
+  std::string  bson   = "     \"bson\": ";
 
   char*        curlVersion = curl_version();
 
@@ -76,7 +78,8 @@ std::string libVersions(void)
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
-  total += mongo   + "\"legacy-" + mongo::client::kVersionString + "\"" + "\n";
+  total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
+  total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";
 
   return total;
 }
@@ -147,6 +150,7 @@ std::string versionTreat
   out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
+  out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
   out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
   out += "  }\n";
   out += "}\n";

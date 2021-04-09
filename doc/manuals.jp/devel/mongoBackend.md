@@ -16,7 +16,6 @@
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 	* [`mongoRegistrationDelete` (SR2)](#mongoregistrationdelete-sr2) 
-* [コネクション・プール管理](#connection-pool-management)
 * [DB インタラクションに関連するロー・レベルのモジュール](#low-level-modules-related-to-db-interaction)
 * [特定目的のモジュール](#specific-purpose-modules)
 * [`MongoGlobal` モジュール](#the-mongoglobal-module)
@@ -35,7 +34,7 @@
 * [serviceRoutines](sourceCode.md#srclibserviceroutines) と [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2)。これらは最も重要なエントリ・ポイントです
 * 初期化ルーチンやヘルパーメソッドなど他の場所からの他のエントリ・ポイント
 
-このライブラリは、[MongoDB C++ driver](http://mongodb.github.io/mongo-cxx-driver/) を大量に使用し、データベースに操作を送信し、BSONデータ (これらの操作で使用される基本的な構造体のデータ・タイプ) を処理します。ライブラリの仕組みを理解するには、このドライバに精通している必要があります。
+このライブラリは、**mongoDriver** ライブラリ を大量に使用し、データベースに操作を送信し、BSONデータ (これらの操作で使用される基本的な構造体のデータ・タイプ) を処理します。
 
 このライブラリは、[キャッシュ](sourceCode.md#srclibcache)・ライブラリ (サブスクリプション・キャッシュが有効な場合、つまり、グローバルの bool 変数 `noCache` に `false` が設定されている場合)にも2つの異なる方法で関連しています :
 
@@ -615,36 +614,9 @@ _MB-27: mongoRegistrationDelete_
 
 [Top](#top)
 
-<a name="connection-pool-management"></a>
-### コネクション・プール管理
-
-モジュール `mongoConnectionPool`は、データベース・コネクション・プールを管理します。プールの仕組みは重要であり、説明に値します。 基本的に、Orion Context Broker はデータベースへの接続のリスト (`mongoConnectionPool.cpp` で定義された `connectionPool`) を保持します。リストのサイズは、`-dbPoolSize` [CLIパラメータ](../admin/cli.md) (デフォルトでは10)で指定します。リストの各要素は、このタイプのオブジェクトです :
-
-```
-typedef struct MongoConnection
-{
-  DBClientBase*  connection;
-  bool           free;
-} MongoConnection;
-```
-
-ここで、`connection` (`DBClientBase` は MongoDB ドライバのクラスです) は実際の接続であり、`free` は接続が現在使用中かどうかを知るフラグです。`DBClientBase` オブジェクトはスレッド・セーフではないので、これは重要です。そのため、Context Broker のロジックは、同じ接続が同時に2つのスレッドによって使用されていないことを保証する必要があります。詳しくは、[StackOverflowのこの記事](http://stackoverflow.com/questions/33945987/thread-safeness-at-mongodb-c-driver-regarding-indirect-connection-usage-throug)を参照してくだい。ので、Context Brokerロジックは、同じ接続が2つのスレッドによって同時に使用されていないことを保証する必要があります。
-
-これを考慮すると、 `mongoConnectionPool` モジュールの主な機能は次の通りです (これ以上はありますが、残りはメトリック・ロジックに関連する2次モジュールです) :
-
-* `mongoConnectionPoolInit()`: Context Broker のブートストラップ・ロジックから呼び出されたプールを初期化します
-* `mongoPoolConnectionGet()`: プールからフリーのコネクションを取得します
-* `mongoPoolConnectionRelease()`: 接続を解放します。このため、プールに戻り、`mongoConnectionGet()` の次の呼び出しで再び選択できる状態になります
-
-セマフォ・システムは、コネクションの使用を保護するために使用されます。詳細については、[この別のドキュメント](semaphores.md#mongo-connection-pool-semaphores)をご覧ください。
-
-[Top](#top)
-
 <a name="low-level-modules-related-to-db-interaction"></a>
 ### DB インタラクションに関連するロー・レベルのモジュール
 
-* `connectionOperations`：データベース・オペレーションのラッパー (挿入、検索、更新など)、Orion 固有の側面の追加 (データベース接続プールの並行性管理、エラー処理、ロギングなど)、 データベースと対話する MongoDB ドライバ・メソッドは、直接使用するのではなく、このモジュールを使用する (または、カバーされていないオペレーションが必要な場合は展開する) べきです
-* `safeMongo`：BSON オブジェクトからフィールドを取得する安全なメソッドです。MongoDB ドライバ・メソッドを使用した BSON オブジェクトへの直接アクセスは避けるべきです。代わりに `safeMongo` モジュールを使用してください。または、カバーされていない BSON 情報にアクセスする別の方法が必要な場合は展開してください
 * `dbConstants` (`.h` のみ)：データベース・レベルで使用されるフィールド名です。[データベース・モデルのドキュメント](../admin/database_model.md)で説明されている同じものがここで定義されています
 * `dbFieldsEncoding` (`.h` のみ)：データベース・レベルでのエンコーディングとメタデータ文字列の分割を行うインライン・ヘルパー関数です
 

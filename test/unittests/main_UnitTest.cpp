@@ -109,7 +109,7 @@ PaArgument paArgs[] =
   { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
-  { "-dbAuthMech",     authMech,      "DB_AUTH_MECH",   PaString, PaOpt, (int64_t) "SCRAM-SHA-1", PaNL, PaNL,  "" },
+  { "-dbAuthMech",     authMech,      "DB_AUTH_MECH",   PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbAuthDb",       authDb,        "DB_AUTH_DB",     PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  ""  },
   { "-dbSSL",          &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,                  false, true,  "" },
   { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL, PaNL,  "" },
@@ -155,11 +155,11 @@ int main(int argC, char** argV)
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
-  // Note that multitenancy and mutex time stats are disabled for unit test mongo init
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, dbTimeout, writeConcern, dbPoolSize, false);
+  // Note that disableRetryTries, multitenancy and mutex time stats are disabled for unit test mongo init
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
-  setupDatabase();
+  // setupDatabase(); FIXME #3775: pending on mongo unit test re-enabling
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

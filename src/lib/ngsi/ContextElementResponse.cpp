@@ -35,12 +35,12 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"       // includedAttribute
 
-using namespace mongo;
+#include "mongoDriver/safeMongo.h"
+
 
 
 /* ****************************************************************************
@@ -97,7 +97,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 */
 ContextElementResponse::ContextElementResponse
 (
-  const mongo::BSONObj&  entityDoc,
+  const orion::BSONObj&  entityDoc,
   const StringList&      attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
@@ -106,7 +106,7 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
+  orion::BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
 
   std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
   std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
@@ -116,7 +116,7 @@ ContextElementResponse::ContextElementResponse
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
-  if (entityDoc.hasElement(ENT_LOCATION))
+  if (entityDoc.hasField(ENT_LOCATION))
   {
     locAttr = getStringFieldF(getObjectFieldF(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
   }
@@ -124,16 +124,16 @@ ContextElementResponse::ContextElementResponse
 
   //
   // Attribute vector
-  // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
+  // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
-  attrs.getFieldNames(attrNames);
+  attrs.getFieldNames(&attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName                = *i;
-    BSONObj            attr                    = getObjectFieldF(attrs, attrName);
+    orion::BSONObj     attr                    = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP                     = NULL;
     ContextAttribute   ca;
     bool               noLocationMetadata      = true;
@@ -158,7 +158,7 @@ ContextElementResponse::ContextElementResponse
     {
       switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
       {
-      case String:
+      case orion::String:
         ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
         if (!includeEmpty && ca.stringValue.empty())
         {
@@ -167,34 +167,34 @@ ContextElementResponse::ContextElementResponse
         caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
         break;
 
-      case NumberDouble:
+      case orion::NumberDouble:
         ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
-      case NumberInt:
+      case orion::NumberInt:
         ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
-      case Bool:
+      case orion::Bool:
         ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
-      case jstNULL:
+      case orion::jstNULL:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->valueType = orion::ValueTypeNull;
         break;
 
-      case Object:
+      case orion::Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
         caP->valueType = orion::ValueTypeObject;
         compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
-      case Array:
+      case orion::Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
         caP->valueType = orion::ValueTypeVector;
@@ -215,10 +215,10 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
+      orion::BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
-      mds.getFieldNames(mdsSet);
+      mds.getFieldNames(&mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;

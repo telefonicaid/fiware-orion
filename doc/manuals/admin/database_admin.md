@@ -240,7 +240,7 @@ then the DB has raised an error related to sorting operation failure due to lack
 check that the Orion log file contains an ERROR trace similar to this one:
 
 ```
-Raising alarm DatabaseError: nextSafe(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
+Raising alarm DatabaseError: next(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
 ```
 
 The typical solution to this is to create an index in the field used for sorting. In particular,

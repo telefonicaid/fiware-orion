@@ -34,26 +34,17 @@
 
 /* ****************************************************************************
 *
-* USING
-*/
-using mongo::BSONElement;
-using mongo::BSONObj;
-
-
-
-/* ****************************************************************************
-*
 * addCompoundNode -
 *
 */
-static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
+static void addCompoundNode(orion::CompoundValueNode* cvP, const orion::BSONElement& e)
 {
-  if ((e.type() != mongo::String)       &&
-      (e.type() != mongo::Bool)         &&
-      (e.type() != mongo::NumberDouble) &&
-      (e.type() != mongo::jstNULL)      &&
-      (e.type() != mongo::Object)       &&
-      (e.type() != mongo::Array))
+  if ((e.type() != orion::String)       &&
+      (e.type() != orion::Bool)         &&
+      (e.type() != orion::NumberDouble) &&
+      (e.type() != orion::jstNULL)      &&
+      (e.type() != orion::Object)       &&
+      (e.type() != orion::Array))
   {
     LM_E(("Runtime Error (unknown BSON type: %d)", e.type()));
     return;
@@ -64,30 +55,30 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 
   switch (e.type())
   {
-  case mongo::String:
+  case orion::String:
     child->valueType  = orion::ValueTypeString;
     child->stringValue = e.String();
     break;
 
-  case mongo::Bool:
+  case orion::Bool:
     child->valueType  = orion::ValueTypeBoolean;
     child->boolValue = e.Bool();
     break;
 
-  case mongo::NumberDouble:
+  case orion::NumberDouble:
     child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
     break;
 
-  case mongo::jstNULL:
+  case orion::jstNULL:
     child->valueType  = orion::ValueTypeNull;
     break;
 
-  case mongo::Object:
+  case orion::Object:
     compoundObjectResponse(child, e);
     break;
 
-  case mongo::Array:
+  case orion::Array:
     compoundVectorResponse(child, e);
     break;
 
@@ -107,15 +98,16 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 *
 * compoundObjectResponse -
 */
-void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
+void compoundObjectResponse(orion::CompoundValueNode* cvP, const orion::BSONElement& be)
 {
-  BSONObj obj = be.embeddedObject();
+  orion::BSONObj obj = be.embeddedObject();
 
   cvP->valueType = orion::ValueTypeObject;
-  for (BSONObj::iterator i = obj.begin(); i.more();)
+  std::vector<orion::BSONElement> vBe;
+  obj.toElementsVector(&vBe);
+  for (unsigned int ix = 0; ix < vBe.size(); ix++)
   {
-    BSONElement e = i.next();
-    addCompoundNode(cvP, e);
+    addCompoundNode(cvP, vBe[ix]);
   }
 }
 
@@ -124,14 +116,14 @@ void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be
 *
 * compoundVectorResponse -
 */
-void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
+void compoundVectorResponse(orion::CompoundValueNode* cvP, const orion::BSONElement& be)
 {
-  std::vector<BSONElement> vec = be.Array();
+  std::vector<orion::BSONElement> vec = be.Array();
 
   cvP->valueType = orion::ValueTypeVector;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    BSONElement e = vec[ix];
+    orion::BSONElement e = vec[ix];
     addCompoundNode(cvP, e);
   }
 }

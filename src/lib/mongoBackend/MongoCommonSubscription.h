@@ -28,8 +28,9 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
 #include "apiTypesV2/Subscription.h"
+
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -37,7 +38,7 @@
 *
 * setNewSubscriptionId -
 */
-extern std::string setNewSubscriptionId(mongo::BSONObjBuilder* b);
+extern std::string setNewSubscriptionId(orion::BSONObjBuilder* b);
 
 
 
@@ -45,7 +46,7 @@ extern std::string setNewSubscriptionId(mongo::BSONObjBuilder* b);
 *
 * setExpiration -
 */
-extern void setExpiration(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setExpiration(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -53,7 +54,7 @@ extern void setExpiration(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 *
 * setHttpInfo -
 */
-extern void setHttpInfo(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setHttpInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -61,7 +62,7 @@ extern void setHttpInfo(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* 
 *
 * setThrottling -
 */
-extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setThrottling(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -69,7 +70,7 @@ extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 *
 * setServicePath -
 */
-extern void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder* b);
+extern void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b);
 
 
 
@@ -77,7 +78,7 @@ extern void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder
 *
 * setDescription -
 */
-extern void setDescription(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setDescription(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -85,7 +86,7 @@ extern void setDescription(const ngsiv2::Subscription& sub, mongo::BSONObjBuilde
 *
 * setStatus -
 */
-extern void setStatus(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setStatus(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -93,7 +94,7 @@ extern void setStatus(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 *
 * setEntities -
 */
-extern void setEntities(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -101,7 +102,7 @@ extern void setEntities(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* 
 *
 * setAttrs -
 */
-extern void setAttrs(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setAttrs(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -123,7 +124,7 @@ extern void setCondsAndInitialNotify
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
-  mongo::BSONObjBuilder*           b,
+  orion::BSONObjBuilder*           b,
   bool*                            notificationDone,
   const bool&                      skipInitialNotification,
   ApiVersion                       apiVersion
@@ -135,7 +136,7 @@ extern void setCondsAndInitialNotify
 *
 * setLastNotification -
 */
-extern void setLastNotification(long long lastNotification, mongo::BSONObjBuilder* b);
+extern void setLastNotification(long long lastNotification, orion::BSONObjBuilder* b);
 
 
 
@@ -143,7 +144,7 @@ extern void setLastNotification(long long lastNotification, mongo::BSONObjBuilde
 *
 * setCount -
 */
-extern void setCount(long long count, mongo::BSONObjBuilder* b);
+extern void setCount(long long count, orion::BSONObjBuilder* b);
 
 
 
@@ -151,7 +152,7 @@ extern void setCount(long long count, mongo::BSONObjBuilder* b);
 *
 * setLastFailure -
 */
-extern void setLastFailure(long long lastFailure, const std::string& lastFailureReason, mongo::BSONObjBuilder* b);
+extern void setLastFailure(long long lastFailure, const std::string& lastFailureReason, orion::BSONObjBuilder* b);
 
 
 
@@ -159,7 +160,7 @@ extern void setLastFailure(long long lastFailure, const std::string& lastFailure
 *
 * setLastSuccess -
 */
-extern void setLastSuccess(long long lastSuccess, long long lastSuccessCode, mongo::BSONObjBuilder* b);
+extern void setLastSuccess(long long lastSuccess, long long lastSuccessCode, orion::BSONObjBuilder* b);
 
 
 
@@ -167,7 +168,7 @@ extern void setLastSuccess(long long lastSuccess, long long lastSuccessCode, mon
 *
 * setExpression -
 */
-extern void setExpression(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setExpression(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -175,7 +176,7 @@ extern void setExpression(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 *
 * setFormat -
 */
-extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setFormat(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -183,7 +184,7 @@ extern void setFormat(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b)
 *
 * setBlacklist -
 */
-extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setBlacklist(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -191,7 +192,7 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder*
 *
 * setOnlyChanged -
 */
-extern void setOnlyChanged(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -199,6 +200,6 @@ extern void setOnlyChanged(const ngsiv2::Subscription& sub, mongo::BSONObjBuilde
 *
 * setMetadata -
 */
-extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* b);
+extern void setMetadata(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

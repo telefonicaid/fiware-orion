@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "gmock/gmock.h"
-#include "mongo/client/dbclient.h"
 
 #include "common/globals.h"
 #include "common/RenderFormat.h"
@@ -37,6 +36,9 @@
 #include "apiTypesV2/HttpInfo.h"
 
 
+
+#if 0
+// FIXME #3775: pending on mongo unit test re-enabling
 
 /* ****************************************************************************
 *
@@ -201,6 +203,7 @@ class DBClientCursorMock: public mongo::DBClientCursor
       return mongo::DBClientCursor::next();
     }
 };
+#endif
 
 
 

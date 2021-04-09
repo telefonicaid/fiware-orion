@@ -132,7 +132,7 @@ void utInit(bool notifierMocked, bool timerMocked)
   startTime       = getCurrentTime();
   statisticsTime  = getCurrentTime();
 
-  setupDatabase();
+  // setupDatabase(); // FIXME #3775: pending on mongo unit test re-enabling
 
 #ifdef UT_DEBUG
   printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);

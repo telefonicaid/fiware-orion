@@ -41,25 +41,14 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoCommonRegister.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
-using mongo::BSONObj;
-using mongo::BSONElement;
-using mongo::DBClientBase;
-using mongo::DBClientCursor;
-using mongo::OID;
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -80,7 +69,7 @@ HttpStatusCode processRegisterContext
 (
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
-  OID*                      id,
+  orion::OID*               id,
   const std::string&        tenant,
   const std::string&        servicePath,
   const std::string&        format,
@@ -101,8 +90,8 @@ HttpStatusCode processRegisterContext
   LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 
   /* Create the mongoDB registration document */
-  BSONObjBuilder reg;
-  OID oid;
+  orion::BSONObjBuilder reg;
+  orion::OID oid;
 
   if (id == NULL)
   {
@@ -123,47 +112,56 @@ HttpStatusCode processRegisterContext
   // In NGISv1 forwarding mode is always "all"
   reg.append(REG_FORWARDING_MODE, "all");
 
-  BSONArrayBuilder  contextRegistration;
+  orion::BSONArrayBuilder  contextRegistration;
 
   for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
   {
-    ContextRegistration*  cr = requestP->contextRegistrationVector[ix];
-    BSONArrayBuilder      entities;
+    ContextRegistration*     cr = requestP->contextRegistrationVector[ix];
+    orion::BSONArrayBuilder  entities;
 
     for (unsigned int jx = 0; jx < cr->entityIdVector.size(); ++jx)
     {
       EntityId* en = cr->entityIdVector[jx];
 
 
+      orion::BSONObjBuilder bob;
+      bob.append(REG_ENTITY_ID, en->id);
+
       if (en->type.empty())
       {
-        entities.append(BSON(REG_ENTITY_ID << en->id));
         LM_T(LmtMongo, ("Entity registration: {id: %s}", en->id.c_str()));
       }
       else
       {
-        entities.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
+        bob.append(REG_ENTITY_TYPE, en->type);
         LM_T(LmtMongo, ("Entity registration: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
       }
+      entities.append(bob.obj());
     }
 
-    BSONArrayBuilder attrs;
+    orion::BSONArrayBuilder attrs;
 
     for (unsigned int jx = 0; jx < cr->contextRegistrationAttributeVector.size(); ++jx)
     {
       ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector[jx];
 
-      attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type));
+      orion::BSONObjBuilder bob;
+      bob.append(REG_ATTRS_NAME, cra->name);
+      bob.append(REG_ATTRS_TYPE, cra->type);
+
+      attrs.append(bob.obj());
       LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s}",
                       cra->name.c_str(),
                       cra->type.c_str()));
     }
 
-    contextRegistration.append(
-      BSON(
-        REG_ENTITIES << entities.arr() <<
-        REG_ATTRS << attrs.arr() <<
-        REG_PROVIDING_APPLICATION << requestP->contextRegistrationVector[ix]->providingApplication.get()));
+    // FIXME #3774: previously this part was based in streamming instead of append()
+    orion::BSONObjBuilder bob;
+    bob.append(REG_ENTITIES, entities.arr());
+    bob.append(REG_ATTRS, attrs.arr());
+    bob.append(REG_PROVIDING_APPLICATION, requestP->contextRegistrationVector[ix]->providingApplication.get());
+
+    contextRegistration.append(bob.obj());
 
     LM_T(LmtMongo, ("providingApplication registration: %s",
                     requestP->contextRegistrationVector[ix]->providingApplication.c_str()));
@@ -174,7 +172,9 @@ HttpStatusCode processRegisterContext
    * exist in the collection, it is created. Thus, this way both uses of registerContext are OK
    * (either new registration or updating an existing one)
    */
-  if (!collectionUpdate(getRegistrationsCollectionName(tenant), BSON("_id" << oid), reg.obj(), true, &err))
+  orion::BSONObjBuilder bobId;
+  bobId.append("_id", oid);
+  if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_REGISTRATIONS, bobId.obj(), reg.obj(), true, &err))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
     return SccOk;

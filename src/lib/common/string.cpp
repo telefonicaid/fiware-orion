@@ -1088,3 +1088,19 @@ void toLowercase(char* s)
 }
 
 
+
+/* ****************************************************************************
+*
+* offuscatePassword -
+*/
+std::string offuscatePassword(const std::string& uri, const std::string& pwd)
+{
+  if ((pwd.empty()) || (uri.find(pwd) ==  std::string::npos))
+  {
+    return uri;
+  }
+
+  std::string s(uri);  // replace cannot be called in const std::string&
+  s.replace(uri.find(pwd), pwd.length(), "******");
+  return s;
+}

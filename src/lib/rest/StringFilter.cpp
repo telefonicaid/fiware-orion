@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/wsStrip.h"
@@ -41,8 +39,8 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
-using namespace mongo;
-
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 /* ****************************************************************************
@@ -1743,11 +1741,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
   {
     StringFilterItem*  itemP = filters[ix];
     std::string        k;
-    BSONArrayBuilder   ba;
-    BSONObjBuilder     bob;
-    BSONObjBuilder     bb;
-    BSONObjBuilder     bb2;
-    BSONObj            f;
+    orion::BSONArrayBuilder   ba;
+    orion::BSONObjBuilder     bob;
+    orion::BSONObjBuilder     bb;
+    orion::BSONObjBuilder     bb2;
+    orion::BSONObj            f;
     std::string        left = std::string(itemP->left.c_str());
 
     //
@@ -1848,7 +1846,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else
       {
-        bob.append(ENT_ATTRNAMES, BSON("$ne" << dbDotDecode(itemP->attributeName)));
+        orion::BSONObjBuilder bobNe;
+        bobNe.append("$ne", dbDotDecode(itemP->attributeName));
+        bob.append(ENT_ATTRNAMES, bobNe.obj());
       }
       f = bob.obj();
       break;
@@ -1858,11 +1858,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       {
       case SfvtNumberRange:
       case SfvtDateRange:
-        bb.append("$gte", itemP->numberRangeFrom).append("$lte", itemP->numberRangeTo);
+        bb.append("$gte", itemP->numberRangeFrom);
+        bb.append("$lte", itemP->numberRangeTo);
         break;
 
       case SfvtStringRange:
-        bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
+        bb.append("$gte", itemP->stringRangeFrom);
+        bb.append("$lte", itemP->stringRangeTo);
         break;
 
       case SfvtNumberList:
@@ -1916,11 +1918,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     case SfopDiffers:
       if ((itemP->valueType == SfvtNumberRange) || (itemP->valueType == SfvtDateRange))
       {
-        bb.append("$gte", itemP->numberRangeFrom).append("$lte", itemP->numberRangeTo);
+        bb.append("$gte", itemP->numberRangeFrom);
+        bb.append("$lte", itemP->numberRangeTo);
 
         // In this case we cannot avoid to use $exists. Otherwise, $not will match entities
         // not having the k field at all
-        bb2.append("$exists", true).append("$not", bb.obj());
+        bb2.append("$exists", true);
+        bb2.append("$not", bb.obj());
         bob.append(k, bb2.obj());
         f = bob.obj();
       }
@@ -1933,17 +1937,20 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 
         // In this case we cannot avoid to use $exists. Otherwise, $nin will match entities
         // not having the k field at all
-        bb.append("$exists", true).append("$nin", ba.arr());
+        bb.append("$exists", true);
+        bb.append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
       else if (itemP->valueType == SfvtStringRange)
       {
-        bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
+        bb.append("$gte", itemP->stringRangeFrom);
+        bb.append("$lte", itemP->stringRangeTo);
 
         // In this case we cannot avoid to use $exists. Otherwise, $not will match entities
         // not having the k field at all
-        bb2.append("$exists", true).append("$not", bb.obj());
+        bb2.append("$exists", true);
+        bb2.append("$not", bb.obj());
         bob.append(k, bb2.obj());
         f = bob.obj();
       }
@@ -1956,7 +1963,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 
         // In this case we cannot avoid to use $exists. Otherwise, $nin will match entities
         // not having the k field at all
-        bb.append("$exists", true).append("$nin", ba.arr());
+        bb.append("$exists", true);
+        bb.append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1964,7 +1972,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       {
         // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
         // not having the k field at all
-        bb.append("$exists", true).append("$ne", itemP->boolValue);
+        bb.append("$exists", true);
+        bb.append("$ne", itemP->boolValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1976,8 +1985,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         // NOTE: $type 10 corresponds to NULL value
         // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
         //
-        bb.append("$exists", true).append("$not", BSON("$type" << 10));
-        bb.append("$not", BSON("$type" << 10));
+        orion::BSONObjBuilder bb2;
+        bb2.append("$type", 10);
+
+        bb.append("$exists", true);
+        bb.append("$not", bb2.obj());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1985,7 +1997,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       {
         // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
         // not having the k field at all
-        bb.append("$exists", true).append("$ne", itemP->numberValue);
+        bb.append("$exists", true);
+        bb.append("$ne", itemP->numberValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1993,7 +2006,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       {
         // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
         // not having the k field at all
-        bb.append("$exists", true).append("$ne", itemP->stringValue);
+        bb.append("$exists", true);
+        bb.append("$ne", itemP->stringValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }

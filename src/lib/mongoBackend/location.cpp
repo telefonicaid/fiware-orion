@@ -35,7 +35,8 @@
 
 // FIXME P5: the following could be not necessary if we optimize the valueBson() thing. See
 // the next FIXME P5 comment in this file
-#include "mongoBackend/safeMongo.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/location.h"
 
@@ -45,8 +46,6 @@
 *
 * USING
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
 using orion::CompoundValueNode;
 
 
@@ -109,14 +108,14 @@ static bool stringArray2coords
 static bool getGeoJson
 (
   const ContextAttribute*  caP,
-  BSONObjBuilder*          geoJson,
+  orion::BSONObjBuilder*   geoJson,
   std::string*             errDetail,
   ApiVersion               apiVersion
 )
 {
-  std::vector<double>  coordLat;
-  std::vector<double>  coordLong;
-  BSONArrayBuilder     ba;
+  std::vector<double>      coordLat;
+  std::vector<double>      coordLong;
+  orion::BSONArrayBuilder  ba;
 
   if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
       (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
@@ -134,7 +133,11 @@ static bool getGeoJson
     }
 
     geoJson->append("type", "Point");
-    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+
+    orion::BSONArrayBuilder ba;
+    ba.append(aLong);
+    ba.append(aLat);
+    geoJson->append("coordinates", ba.arr());
 
     return true;
   }
@@ -151,7 +154,11 @@ static bool getGeoJson
     }
 
     geoJson->append("type", "Point");
-    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+
+    orion::BSONArrayBuilder ba;
+    ba.append(aLong);
+    ba.append(aLat);
+    geoJson->append("coordinates", ba.arr());
 
     return true;
   }
@@ -175,7 +182,7 @@ static bool getGeoJson
      * Note that valueBson() puts the BSON object in the "value" field of the builder passed
      * as argument.
      */
-    BSONObjBuilder bo;
+    orion::BSONObjBuilder bo;
 
     // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
     caP->valueBson(bo, "", true, apiVersion == V1);
@@ -211,14 +218,37 @@ static bool getGeoJson
       return false;
     }
 
-    ba.append(BSON_ARRAY(minLon << minLat));
-    ba.append(BSON_ARRAY(minLon << maxLat));
-    ba.append(BSON_ARRAY(maxLon << maxLat));
-    ba.append(BSON_ARRAY(maxLon << minLat));
-    ba.append(BSON_ARRAY(minLon << minLat));
+    orion::BSONArrayBuilder ba1;
+    orion::BSONArrayBuilder ba2;
+    orion::BSONArrayBuilder ba3;
+    orion::BSONArrayBuilder ba4;
+    orion::BSONArrayBuilder ba5;
+
+    ba1.append(minLon);
+    ba1.append(minLat);
+
+    ba2.append(minLon);
+    ba2.append(maxLat);
+
+    ba3.append(maxLon);
+    ba3.append(maxLat);
+
+    ba4.append(maxLon);
+    ba4.append(minLat);
+
+    ba5.append(minLon);
+    ba5.append(minLat);
+
+    ba.append(ba1.arr());
+    ba.append(ba2.arr());
+    ba.append(ba3.arr());
+    ba.append(ba4.arr());
+    ba.append(ba5.arr());
 
     geoJson->append("type", "Polygon");
-    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
+    orion::BSONArrayBuilder baContainer;
+    baContainer.append(ba.arr());
+    geoJson->append("coordinates", baContainer.arr());
 
     return true;
   }
@@ -226,7 +256,11 @@ static bool getGeoJson
   // geo:line and geo:polygon (different from geo:box) both build the coords array in the same way
   for (unsigned int ix = 0; ix < coordLat.size(); ix++)
   {
-    ba.append(BSON_ARRAY(coordLong[ix] << coordLat[ix]));
+    orion::BSONArrayBuilder ba1;
+    ba1.append(coordLong[ix]);
+    ba1.append(coordLat[ix]);
+
+    ba.append(ba1.arr());
   }
 
   if (caP->type == GEO_LINE)
@@ -263,7 +297,9 @@ static bool getGeoJson
     }
 
     geoJson->append("type", "Polygon");
-    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
+    orion::BSONArrayBuilder baContainer;
+    baContainer.append(ba.arr());
+    geoJson->append("coordinates", baContainer.arr());
 
     return true;
   }
@@ -291,7 +327,7 @@ bool processLocationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
   std::string*                   locAttr,
-  BSONObjBuilder*                geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe
@@ -347,7 +383,7 @@ bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
-  mongo::BSONObjBuilder*         geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe
@@ -474,7 +510,7 @@ bool processLocationAtAppendAttribute
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
-  mongo::BSONObjBuilder*         geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe

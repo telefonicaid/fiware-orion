@@ -57,6 +57,7 @@ Date: REGEX(.*)
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
+  "machine" : "REGEX(.*)",
   "doc" : "REGEX(.*)",
   "libversions": {
      "boost": "REGEX(.*)",
@@ -64,7 +65,8 @@ Date: REGEX(.*)
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
-     "mongodriver": "REGEX(.*)"
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
   }
 }
 }

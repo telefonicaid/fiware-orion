@@ -14,7 +14,7 @@ Previous knowledge of the external libraries that Orion depends on also helps th
 * Microhttpd
 * Libcurl
 * Rapidjson (NGSIv2 JSON parsing)
-* MongoMB C++ driver
+* MongoDB C driver
 * Boost property tree (NGSIv1 JSON parsing)
 
 In the case of MongoDB, not only knowledge of the driver is recommended, but also MongoDB technology in general.

@@ -1,17 +1,17 @@
 # ソースからのビルド
 
-Orion Context Broker のリファレンス配布は CentOS 7.x です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。CentOS を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は CentOS 7.x 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
+Orion Context Broker のリファレンス配布は CentOS 8.x です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。CentOS を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は CentOS 8.x 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
 
-## CentOS 7.x (正式サポート)
+## CentOS 8.x (正式サポート)
 
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
-* boost: 1.53
+* boost: 1.66
 * libmicrohttpd: 0.9.70 (ソースから)
-* libcurl: 7.29.0
-* openssl: 1.0.2k
-* libuuid: 2.23.2
-* Mongo Driver: legacy-1.1.2 (ソースから)
+* libcurl: 7.61.1
+* openssl: 1.1.1g
+* libuuid: 2.32.1
+* Mongo C driver: 1.17.4 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
 * gmock (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
@@ -20,7 +20,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * 必要なビルドツール (コンパイラなど) をインストールします
 
-        sudo yum install make cmake gcc-c++ scons
+        sudo yum install make cmake gcc-c++
 
 * 必要なライブラリをインストールします (次の手順で説明する、ソースから取得する必要があるものを除きます)
 
@@ -28,11 +28,14 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから Mongo Driver をインストールします
 
-        wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
-        tar xfvz legacy-1.1.2.tar.gz
-        cd mongo-cxx-driver-legacy-1.1.2
-        scons  --use-sasl-client --ssl                                        # The build/linux2/normal/libmongoclient.a library is generated as outcome
-        sudo scons install --prefix=/usr/local --use-sasl-client --ssl        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz
+        tar xfvz mongo-c-driver-1.17.4.tar.gz
+        cd mongo-c-driver-1.17.4
+        mkdir cmake-build
+        cd cmake-build
+        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        make
+        sudo make install
 
 * ソースから rapidjson をインストールする :
 
@@ -50,19 +53,6 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* ソースから Google Test/Mock をインストールします (このための RPM パッケージがありますが、現在の CMakeLists.txt の設定では動作しません)。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
-
-        yum install perl-Digest-MD5 libxslt
-        wget ftp://repositories.lab.fiware.org/gmock-1.5.0.tar.bz2
-        tar xfvj gmock-1.5.0.tar.bz2
-        cd gmock-1.5.0
-        ./configure
-        make
-        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
-        sudo ldconfig      # just in case... it doesn't hurt :)
-
-aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と libxslt をインストールし、`.-configure` を `--build=arm-linux` オプションとともに実行します。
-
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、`git clone git@github.com:telefonicaid/fiware-orion.git`) :
 
         sudo yum install git
@@ -73,16 +63,7 @@ aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と
         cd fiware-orion
         make
 
-* (オプションですが強く推奨されます) ユニット・テストの実行です。まず、MongoDB をユニットとしてインストールする必要があり、機能テストは localhost で動作する mongod に依存しています。詳細については、[公式 MongoDB のドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 3.6 です。ただし、3.2 および 3.4 も正常に動作するはずです
-
-* yum を使用して、mongodb-org-shell をインストールするために、 /etc/yum.repos.d/mongodb.repo ファイルを作成します。
-
-        [mongodb-org-3.6]
-        name=MongoDB Repository
-        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
-        gpgcheck=1
-        enabled=1
-        gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+* (オプションですが強く推奨されます) 単体テストと機能テストを実行します。 これについては、[以下の特定のセクション](#testing-coverage-and-rpm)で詳しく説明します。
 
 * バイナリをインストールします。INSTALL_DIR を使用して、インストール・プレフィックス・パス (デフォルトは /usr) を設定することができます。したがって、broker は `$INSTALL_DIR/bin` ディレクトリにインストールされます
 
@@ -92,40 +73,62 @@ aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と
 
         contextBroker --version
 
-Orion Context Broker には、次の手順 (オプション) に従って実行することができる、valgrind およびエンド・ツー・エンドのテストの機能的なスイートが付属しています :
+### テスト, カバレッジと RPM
 
-* 必要なツールをインストールします :
+Orion Context Broker には、次の手順に従って実行できる一連のユニット・テスト, valgrind, およびエンドツーエンドのテストが付属しています (オプションですが、強くお勧めします):
 
-        sudo yum install python python-pip curl nc mongodb-org-shell valgrind bc
-        sudo pip install --upgrade pip 
+* ソースから GoogleTest/Mock をインストールします (これには RPM パッケージがありますが、現在の CMakeLists.txt 構成では機能しません)。以前の URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google は2016年8月下旬にそのパッケージを削除し、機能しなくなりました。
 
-aarch64 アーキテクチャの場合、さらに yum で、python-devel と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
+        sudo yum install python2
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
+        tar xfvj gmock-1.5.0.tar.bz2
+        cd gmock-1.5.0
+        ./configure
+        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # just in case... it doesn't hurt :)
+
+aarch64 アーキテクチャの場合、yum を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
+
+* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
+
+* ユニット・テストを実行します
+
+        make unit_test
+
+* 機能テストと valgrind テストに必要な追加のツールをインストールします:
+
+        sudo yum install curl nc valgrind bc
+        sudo pip2 install virtualenv
+
+aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-build と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
 
 
-* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、CentOS7 のデフォルトの Flask の代わりに Flask version 1.0.2 を使用するために、virtualenv 環境を作成する必要があります。この環境でテスト・ハーネスを実行します。
+* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        pip install virtualenv
-        virtualenv /opt/ft_env
+        virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
         pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
-* テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
+* この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
         make functional_test INSTALL_DIR=~
 
 * すべての機能テストに合格したら、valgrind テストを実行できます (これは機能テストよりも時間がかかります) :
 
-        make valgrind
+        make valgrind INSTALL_DIR=~
 
 次の手順を使用して、Orion Context Broker のカバレッジレポートを生成できます (オプション) :
 
 * lcov ツールをインストールします
 
-        sudo yum install lcov
+        # Download .rpm file from http://downloads.sourceforge.net/ltp/lcov-1.14-1.noarch.rpm
+        sudo yum install lcov-1.14-1.noarch.rpm
 
 * まず、unit_test と functional_test の成功パスを実行して、すべてが正常であることを確認します (上記参照)
 
@@ -145,48 +148,45 @@ aarch64 アーキテクチャの場合、さらに yum で、python-devel と li
 
 * 生成された RPM は `~/rpmbuild/RPMS/x86_64` ディレクトリに置かれます
 
-<a name="ubuntu-1804-lts"></a>
-## Ubuntu 18.04 LTS
+## Ubuntu 20.04 LTS
 
-この手順は、Ubuntu 18.04 LTS 上で x86_64 および aarch64 アーキテクチャ用の Orion Context Broker をすることです。
-また、Orion が依存する MongoDB 3.6 をビルドするための手順が含まれています。Orion Context Brokerは、ビルドの依存関係と
+この手順は、Ubuntu 20.04 LTS 上で x86_64 および aarch64 アーキテクチャ用の Orion Context Broker をすることです。
+また、Orion が依存する MongoDB 4.4 をビルドするための手順が含まれています。Orion Context Brokerは、ビルドの依存関係と
 して次のライブラリを使用します :
 
-* boost: 1.65.1
+* boost: 1.71.0
 * libmicrohttpd: 0.9.70 (from source)
-* libcurl: 7.58.0
-* openssl: 1.0.2n
-* libuuid: 2.31.1
-* Mongo Driver: legacy-1.1.2 (from source)
+* libcurl: 7.68.0
+* openssl: 1.1.1f
+* libuuid: 2.34-0.1
+* Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
-* MongoDB: 3.6.17 (from source)
 
 基本的な手順は次のとおりです (root 権限でコマンドを実行しないと仮定し、root 権限が必要なコマンドに sudo を使用します) :
 
 * 必要なビルドツール (コンパイラなど) をインストールします
 
-        sudo apt install build-essential cmake scons
+        sudo apt install build-essential cmake
 
 * 必要なライブラリをインストールします (次の手順で説明する、ソースから取得する必要があるものを除きます)
 
         sudo apt install libboost-dev libboost-regex-dev libboost-thread-dev libboost-filesystem-dev \
-                         libcurl4-gnutls-dev gnutls-dev libgcrypt-dev libssl1.0-dev uuid-dev libsasl2-dev
+                         libcurl4-gnutls-dev gnutls-dev libgcrypt-dev libssl-dev uuid-dev libsasl2-dev
 
-* ソースから Mongo Driver をインストールします。Mongo Driver 1.1.2 は gcc 4.x でコンパイルすることを想定した、レガシーな
-コードです。そのため、新しい gcc でビルドする場合、一部のウォーニングはエラーとして扱われます。このエラーを避けるために、
-`-Wno-{option name}` オプションを CCFLAGS に追加する必要があります。
+* ソースから Mongo Driver をインストールします
 
-        wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
-        tar xfvz legacy-1.1.2.tar.gz
-        cd mongo-cxx-driver-legacy-1.1.2
-        # The build/linux2/normal/libmongoclient.a library is generated as outcome
-        scons  --use-sasl-client --ssl "CCFLAGS=-Wno-nonnull-compare -Wno-noexcept-type -Wno-format-truncation"
-        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
-        sudo scons install --prefix=/usr/local --use-sasl-client --ssl "CCFLAGS=-Wno-nonnull-compare -Wno-noexcept-type -Wno-format-truncation"
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz
+        tar xfvz mongo-c-driver-1.17.4.tar.gz
+        cd mongo-c-driver-1.17.4
+        mkdir cmake-build
+        cd cmake-build
+        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        make
+        sudo make install
 
-* ソースから rapidjson をインストールする :
+* ソースから rapidjson をインストールします :
 
         wget https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
         tar xfvz v1.1.0.tar.gz
@@ -203,22 +203,6 @@ aarch64 アーキテクチャの場合、さらに yum で、python-devel と li
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* ソースから Google Test/Mock をインストールします (このための RPM パッケージがありますが、現在の CMakeLists.txt
-の設定では動作しません)。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、
-Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
-
-        apt install xsltproc
-        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
-        tar xfvj gmock-1.5.0.tar.bz2
-        cd gmock-1.5.0
-        ./configure
-        make
-        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
-        sudo ldconfig      # just in case... it doesn't hurt :)
-
-aarch64 アーキテクチャの場合、apt を使用して xsltproc をインストールし、`.-configure` を `--build=arm-linux`
-オプションとともに実行します。
-
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、
 `git clone git@github.com:telefonicaid/fiware-orion.git`) :
 
@@ -230,33 +214,8 @@ aarch64 アーキテクチャの場合、apt を使用して xsltproc をイン�
         cd fiware-orion
         make
 
-* ソースコードから MongoDB 3.6.17 をビルドしてインストールします。ユニット・テストを実行するには、ユニットとして MongoDB を
-ビルドする必要があり、機能テストは localhost で実行されている mongod に依存します (Ubuntu 18.04 用の MongoDB 3.6 バイナリは
-提供されていません)。ソースコードから MongoDB をビルドする手順は次のとおりです。aarch64 アーキテクチャの場合、追加で
-`-march=armv8-a+crc` オプションを CCFLAGS に追加します。`mongo` コマンドを実行して、MongoDB が正常にインストールされたことを
-確認します。
-
-        # Build MongoDB
-        sudo apt install build-essential cmake scons  # Not required if you installed in previous step
-        sudo apt install python python-pip            # Not required if you installed in previous step
-        pip install --upgrade pip                     # Not required if you installed in previous step
-        cd /opt
-        git clone -b r3.6.17 --depth=1 https://github.com/mongodb/mongo.git
-        cd mongo
-        pip install --user -r buildscripts/requirements.txt
-        python buildscripts/scons.py mongo mongod mongos \
-          "CCFLAGS=-Wno-nonnull-compare -Wno-format-truncation -Wno-noexcept-type" \
-          --wiredtiger=on \
-          --mmapv1=on
-        # Install MongoDB
-        strip -s mongo*
-        sudo cp -a mongo mongod mongos /usr/bin/ 
-        sudo useradd -M -s /bin/false mongodb
-        sudo mkdir /var/lib/mongodb /var/log/mongodb /var/run/mongodb
-        sudo chown mongodb:mongodb /var/lib/mongodb /var/log/mongodb /var/run/mongodb
-        sudo cp -a ./debian/mongod.conf /etc/
-        sudo cp -a ./debian/mongod.service /etc/systemd/system/
-        sudo systemctl start mongod
+* (オプションですが、強くお勧めします) 単体テスト (unit test) と機能テスト (functional tests) を実行します。
+詳細については、[以下のセクション](#testing-and-coverage)をご覧ください。
 
 * バイナリをインストールします。INSTALL_DIR を使用して、インストール・プレフィックス・パス (デフォルトは /usr) を設定する
 ことができます。したがって、broker は `$INSTALL_DIR/bin` ディレクトリにインストールされます
@@ -267,15 +226,44 @@ aarch64 アーキテクチャの場合、apt を使用して xsltproc をイン�
 
         contextBroker --version
 
+<a name="testing-and-coverage"></a>
+### テストとカバレッジ
+
 Orion Context Broker には、次の手順 (オプション) に従って実行することができる、valgrind およびエンド・ツー・エンドのテストの
 機能的なスイートが付属しています :
 
-* 必要なツールをインストールします :
+* ソースから Google Test/Mock をインストールします (このための RPM パッケージがありますが、現在の CMakeLists.txt
+の設定では動作しません)。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、
+Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
 
-        sudo apt install python python-pip curl netcat valgrind bc
-        sudo pip install --upgrade pip
+        sudo apt install python-is-python2 xsltproc
+        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
+        tar xfvj gmock-1.5.0.tar.bz2
+        cd gmock-1.5.0
+        ./configure
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # just in case... it doesn't hurt :)
 
-aarch64 アーキテクチャの場合、さらに apt で、python-devel と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
+aarch64 アーキテクチャの場合、`.-configure` を `--build=arm-linux` オプションとともに実行します。
+
+* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、
+  [MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)を確認してください。
+  推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
+
+* 単体テストを実行します :
+
+        make unit_test
+
+* 機能テストと valgrind テストに必要な追加のツールをインストールします :
+
+        curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py 
+        sudo python get-pip.py 
+        sudo apt install netcat valgrind bc 
+        sudo pip install --upgrade pip 
+        pip install virtualenv
+
+aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `libffi-dev` をインストールします。これは、pyOpenSSL をビルドするときに必要です。
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスに
 インストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることも
@@ -287,13 +275,13 @@ aarch64 アーキテクチャの場合、さらに apt で、python-devel と li
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        pip install virtualenv
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
         pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
-* テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
+* テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 
+        sed -i -e "s/Peer certificate cannot be authenticated[^\"]*/SSL peer certificate or SSH remote key was not OK/" /opt/fiware-orion/test/functionalTest/cases/0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test
         make functional_test INSTALL_DIR=~
 
 * すべての機能テストに合格したら、valgrind テストを実行できます (これは機能テストよりも時間がかかります) :
