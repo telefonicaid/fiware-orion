@@ -35,13 +35,29 @@
 //
 // pgAttributeDelete - mark an attribute as deleted in the database
 //
-bool pgAttributeDelete(PGconn* connectionP, char* entityId, char* instanceId, char* attributeName, char* deletedAt)
+bool pgAttributeDelete
+(
+  PGconn*     connectionP,
+  const char* entityId,
+  const char* instanceId,
+  const char* attributeName,
+  const char* datasetId,
+  const char* deletedAt
+)
 {
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s')",
-           instanceId, attributeName, entityId, deletedAt);
+  if (datasetId == NULL)
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s')",
+             instanceId, attributeName, entityId, deletedAt);
+  }
+  else
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, datasetId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s', '%s')",
+             instanceId, attributeName, entityId, datasetId, deletedAt);
+  }
 
   // LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);

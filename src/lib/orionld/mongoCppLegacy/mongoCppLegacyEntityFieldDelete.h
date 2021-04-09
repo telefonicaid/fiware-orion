@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TROE_PGATTRIBUTEDELETE_H_
-#define SRC_LIB_ORIONLD_TROE_PGATTRIBUTEDELETE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDDELETE_H_
 
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,22 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgAttributeDelete - mark an attribute as deleted in the database
+// mongoCppLegacyEntityFieldDelete -
 //
-extern bool pgAttributeDelete
-(
-  PGconn*     connectionP,
-  const char* entityId,
-  const char* instanceId,
-  const char* attributeName,
-  const char* datasetId,
-  const char* deletedAt
-);
+extern bool mongoCppLegacyEntityFieldDelete(const char* entityId, const char* fieldPath);
 
-#endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTEDELETE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDDELETE_H_

@@ -63,15 +63,45 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
   attributeName = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
-  if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.requestTimeString) == false)
+
+  if (orionldState.uriParams.datasetId != NULL)
   {
-    LM_E(("Database Error (delete attribute troe layer failed)"));
+    if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.uriParams.datasetId, orionldState.requestTimeString) == false)
+    {
+      LM_E(("Database Error (delete attribute with datasetId troe layer failed)"));
 
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("pgTransactionRollback failed"));
 
-    pgConnectionRelease(connectionP);
-    return false;
+      pgConnectionRelease(connectionP);
+      return false;
+    }
+  }
+  else if (orionldState.uriParams.deleteAll == true)
+  {
+    if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, "urn:ALL", orionldState.requestTimeString) == false)
+    {
+      LM_E(("Database Error (delete attribute all datasetIds troe layer failed)"));
+
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("pgTransactionRollback failed"));
+
+      pgConnectionRelease(connectionP);
+      return false;
+    }
+  }
+  else
+  {
+    if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, NULL, orionldState.requestTimeString) == false)
+    {
+      LM_E(("Database Error (delete attribute troe layer failed)"));
+
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("pgTransactionRollback failed"));
+
+      pgConnectionRelease(connectionP);
+      return false;
+    }
   }
 
   if (pgTransactionCommit(connectionP) != true)

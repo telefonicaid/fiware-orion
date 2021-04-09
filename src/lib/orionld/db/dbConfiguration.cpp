@@ -44,6 +44,7 @@ DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
 DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityFieldReplaceFunction              dbEntityFieldReplace;
+DbEntityFieldDeleteFunction               dbEntityFieldDelete;
 DbEntityDeleteFunction                    dbEntityDelete;
 DbEntitiesDeleteFunction                  dbEntitiesDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;

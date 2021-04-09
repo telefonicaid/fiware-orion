@@ -425,13 +425,13 @@ Date: REGEX(.*)
 16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 ===========================================
 HTTP/1.1 404 Not Found
-Content-Length: 138
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "http://a.b.c/list/of/entities/E1.xxx",
-    "title": "Entity not found",
+    "detail": "http://a.b.c/list/of/attributes/A1.xxx",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 

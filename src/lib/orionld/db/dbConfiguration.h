@@ -71,6 +71,7 @@ typedef KjNode* (*DbEntitiesAttributeLookupFunction)(char** entityArray, int ent
 typedef bool    (*DbEntityAttributesDeleteFunction)(const char* entityId, char** attrNameV, int vecSize);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityFieldReplaceFunction)(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP);
+typedef bool    (*DbEntityFieldDeleteFunction)(const char* entityId, const char* fieldPath);
 typedef bool    (*DbEntityDeleteFunction)(const char* entityId);
 typedef bool    (*DbEntitiesDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, bool isArray, char** titleP, char** detailsP);
@@ -106,6 +107,7 @@ extern DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
 extern DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 extern DbEntityUpdateFunction                    dbEntityUpdate;
 extern DbEntityFieldReplaceFunction              dbEntityFieldReplace;
+extern DbEntityFieldDeleteFunction               dbEntityFieldDelete;
 extern DbEntityDeleteFunction                    dbEntityDelete;
 extern DbEntitiesDeleteFunction                  dbEntitiesDelete;
 extern DbDataToKjTreeFunction                    dbDataToKjTree;
