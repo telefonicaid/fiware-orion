@@ -64,3 +64,4 @@ DbEntitiesGet                             dbEntitiesGet;
 DbGeoIndexCreate                          dbGeoIndexCreate;
 DbIdIndexCreate                           dbIdIndexCreate;
 DbEntitiesQuery                           dbEntitiesQuery;
+DbDatasetGet                              dbDatasetGet;

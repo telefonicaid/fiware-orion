@@ -54,6 +54,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyIdIndexCreate.h"            // mongoCppLegacyIdIndexCreate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"           // mongoCppLegacyEntityRetrieve
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"            // mongoCppLegacyEntitiesQuery
+#include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"               // mongoCppLegacyDatasetGet
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -103,6 +104,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbGeoIndexCreate                         = mongoCppLegacyGeoIndexCreate;
   dbIdIndexCreate                          = mongoCppLegacyIdIndexCreate;
   dbEntitiesQuery                          = mongoCppLegacyEntitiesQuery;
+  dbDatasetGet                             = mongoCppLegacyDatasetGet;
 
   mongoCppLegacyInit(dbHost, dbName);
 

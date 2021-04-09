@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDATASETGET_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDATASETGET_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +25,18 @@
 *
 * Author: Ken Zangelin
 */
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// pcheckAttribute -
+// mongoCppLegacyDatasetGet -
 //
-extern bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailsP);
+extern KjNode* mongoCppLegacyDatasetGet(const char* entityId, const char* attributeNameExpandedEq, const char* datasetId);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDATASETGET_H_

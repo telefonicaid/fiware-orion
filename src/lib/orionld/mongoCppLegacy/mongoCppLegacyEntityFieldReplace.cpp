@@ -46,12 +46,8 @@ extern "C"
 //
 bool mongoCppLegacyEntityFieldReplace(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP)
 {
-  char                   collectionPath[256];
-  mongo::BSONObj         payloadAsBsonObj;
-
+  char  collectionPath[256];
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-  dbDataFromKjTree(fieldValeNodeP, &payloadAsBsonObj);
-
 
   //
   // Populate filter
@@ -60,19 +56,36 @@ bool mongoCppLegacyEntityFieldReplace(const char* entityId, const char* fieldNam
   filter.append("_id.id", entityId);
 
 
+  mongo::BSONObj update;
+
   //
   // Populate update
   //
-  mongo::BSONObj update = BSON("$set" << BSON(fieldName << payloadAsBsonObj << "modDate" << orionldState.requestTime));
+  if (fieldValeNodeP->type == KjObject)
+  {
+    mongo::BSONObj payloadAsBsonObj;
 
-  // semTake()
+    dbDataFromKjTree(fieldValeNodeP, &payloadAsBsonObj);
+    update = BSON("$set" << BSON(fieldName << payloadAsBsonObj << "modDate" << orionldState.requestTime));
+  }
+  else
+  {
+    mongo::BSONArray payloadAsBsonArray;
+
+    dbDataFromKjTree(fieldValeNodeP, &payloadAsBsonArray);
+    update = BSON("$set" << BSON(fieldName << payloadAsBsonArray << "modDate" << orionldState.requestTime));
+  }
+
+
+  //
+  // Connecting to mongo and sending the update
+  //
   mongo::DBClientBase*  connectionP = getMongoConnection();
   bool                  upsert      = false;
   mongo::Query          query(filter.obj());
 
   connectionP->update(collectionPath, query, update, upsert, false);
   releaseMongoConnection(connectionP);
-  // semGive()
 
   return true;
 }
