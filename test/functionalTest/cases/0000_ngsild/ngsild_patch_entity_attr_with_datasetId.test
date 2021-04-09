@@ -1,0 +1,904 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity attribute using PATCH, with datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+#
+# 01. Create an entity E1 with all different kinds of properties with datasetIds
+# 02. See E1 in mongo
+# 03. PATCH E1/P1 with datasetId D1
+# 04. See E1 in mongo
+# 05. PATCH E1/P2 with datasetId D1
+# 06. See E1 in mongo
+# 07. Attempt to PATCH E1/P3 with datasetId D1
+# 08. See E1 in mongo
+# 09. PATCH E1/P4 with datasetId D1
+# 10. See E1 in mongo
+# 11. PATCH E1/P5 with datasetId D1
+# 12. See E1 in mongo
+# 13. GET E1 and see all the changes made
+#
+
+
+echo "01. Create an entity E1 with all different kinds of properties with datasetIds"
+echo "=============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "P1": [
+    {
+      "type": "Property",
+      "value": "P1:D1 from step 01",
+      "datasetId": "urn:ngsi-ld:dataset:D1"
+    },
+    {
+      "type": "Property",
+      "value": "P1:D2 from step 01",
+      "datasetId": "urn:ngsi-ld:dataset:D2"
+    }
+  ],
+  "P2": {
+    "type": "Property",
+    "value": "P2:D1 from step 01",
+    "datasetId": "urn:ngsi-ld:dataset:D1"
+  },
+  "P3": {
+    "type": "Property",
+    "value": "P3:Normal-instance from step 01"
+  },
+  "P4": [
+    {
+      "type": "Property",
+      "value": "P4:Normal-instance from from step 01"
+    },
+    {
+      "type": "Property",
+      "value": "P4:D1 from step 01",
+      "datasetId": "urn:ngsi-ld:dataset:D1"
+    }
+  ],
+  "P5": [
+    {
+      "type": "Property",
+      "value": "P5:Normal-instance from from step 01"
+    },
+    {
+      "type": "Property",
+      "value": "P5:D1 from step 01",
+      "datasetId": "urn:ngsi-ld:dataset:D1"
+    },
+    {
+      "type": "Property",
+      "value": "P5:D2 from step 01",
+      "datasetId": "urn:ngsi-ld:dataset:D2"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. PATCH E1/P1 with datasetId D1"
+echo "================================="
+payload='{
+  "value": "P1:D1 from step 03",
+  "datasetId": "urn:ngsi-ld:dataset:D1"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. PATCH E1/P2 with datasetId D1"
+echo "================================="
+payload='{
+  "value": "P2:D1 from step 05",
+  "datasetId": "urn:ngsi-ld:dataset:D1"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P2 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "07. Attempt to PATCH E1/P3 with datasetId D1"
+echo "============================================"
+payload='{
+  "value": "P3:D1 from step 07",
+  "datasetId": "urn:ngsi-ld:dataset:D1"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P3 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "09. PATCH E1/P4 with datasetId D1"
+echo "================================="
+payload='{
+  "value": "P4:D1 from step 09",
+  "datasetId": "urn:ngsi-ld:dataset:D1"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P4 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "10. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "11. PATCH E1/P5 with datasetId D1"
+echo "================================="
+payload='{
+  "value": "P5:D1 from step 11",
+  "datasetId": "urn:ngsi-ld:dataset:D1"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P5 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "12. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "13. GET E1 and see all the changes made"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with all different kinds of properties with datasetIds
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"value" : "P1:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : "P2:D1 from step 01",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*)
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"value" : "P4:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"value" : "P5:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+03. PATCH E1/P1 with datasetId D1
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P1:D1 from step 03"
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : "P2:D1 from step 01",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*)
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"value" : "P4:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"value" : "P5:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+05. PATCH E1/P2 with datasetId D1
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P1:D1 from step 03"
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*),
+			"value" : "P2:D1 from step 05"
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"value" : "P4:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"value" : "P5:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+07. Attempt to PATCH E1/P3 with datasetId D1
+============================================
+HTTP/1.1 404 Not Found
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:dataset:D1",
+    "title": "attribute dataset not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+08. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P1:D1 from step 03"
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*),
+			"value" : "P2:D1 from step 05"
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"value" : "P4:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"value" : "P5:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+09. PATCH E1/P4 with datasetId D1
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P1:D1 from step 03"
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*),
+			"value" : "P2:D1 from step 05"
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+				"value" : "P4:D1 from step 09"
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"value" : "P5:D1 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+11. PATCH E1/P5 with datasetId D1
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P3:Normal-instance from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P4:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "P5:Normal-instance from from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P1:D1 from step 03"
+			},
+			{
+				"type" : "Property",
+				"value" : "P1:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"datasetId" : "urn:ngsi-ld:dataset:D1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*),
+			"value" : "P2:D1 from step 05"
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P4:D1 from step 09"
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
+			{
+				"type" : "Property",
+				"datasetId" : "urn:ngsi-ld:dataset:D1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*),
+				"value" : "P5:D1 from step 11"
+			},
+			{
+				"type" : "Property",
+				"value" : "P5:D2 from step 01",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+13. GET E1 and see all the changes made
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 784
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": [
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D1",
+            "type": "Property",
+            "value": "P1:D1 from step 03"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D2",
+            "type": "Property",
+            "value": "P1:D2 from step 01"
+        }
+    ],
+    "P2": {
+        "datasetId": "urn:ngsi-ld:dataset:D1",
+        "type": "Property",
+        "value": "P2:D1 from step 05"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "P3:Normal-instance from step 01"
+    },
+    "P4": [
+        {
+            "type": "Property",
+            "value": "P4:Normal-instance from from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D1",
+            "type": "Property",
+            "value": "P4:D1 from step 09"
+        }
+    ],
+    "P5": [
+        {
+            "type": "Property",
+            "value": "P5:Normal-instance from from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D1",
+            "type": "Property",
+            "value": "P5:D1 from step 11"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D2",
+            "type": "Property",
+            "value": "P5:D2 from step 01"
+        }
+    ],
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

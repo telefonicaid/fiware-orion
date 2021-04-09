@@ -59,14 +59,12 @@ bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
   mongo::BSONObjBuilder  filter;
   filter.append("_id.id", entityId);
 
-
-  // semTake()
   bool                  upsert      = false;
   mongo::DBClientBase*  connectionP = getMongoConnection();
   mongo::Query          query(filter.obj());
+
   connectionP->update(collectionPath, query, payloadAsBsonObj, upsert, false);
   releaseMongoConnection(connectionP);
-  // semGive()
 
   return true;
 }

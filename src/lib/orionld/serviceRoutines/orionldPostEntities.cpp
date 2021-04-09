@@ -58,24 +58,12 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pcheckAttribute -
-//
-// FIXME: Use instead the one from src/lib/payloadCheck/pcheckAttribute.cpp
-//
-static bool pcheckAttribute(KjNode* attributeP, OrionldProblemDetails* pdP)
-{
-  return true;
-}
 
 
 
@@ -100,8 +88,11 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
   int instanceIx = 0;
   while (instanceP != NULL)
   {
-    if (pcheckAttribute(instanceP, pdP) != true)
-      return NULL;  // pdP->status has been set by pcheckAttribute. Also, orionldErrorResponseCreate has been called
+    if (pcheckAttribute(instanceP, NULL, true, &pdP->detail) != true)
+    {
+      pdP->status = 400;
+      return NULL;
+    }
 
     next = instanceP->next;
 
