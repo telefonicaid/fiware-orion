@@ -33,6 +33,14 @@
 //
 // pgAttributeDelete - mark an attribute as deleted in the database
 //
-extern bool pgAttributeDelete(PGconn* connectionP, char* entityId, char* instanceId, char* attributeName, char* deletedAt);
+extern bool pgAttributeDelete
+(
+  PGconn*     connectionP,
+  const char* entityId,
+  const char* instanceId,
+  const char* attributeName,
+  const char* datasetId,
+  const char* deletedAt
+);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTEDELETE_H_

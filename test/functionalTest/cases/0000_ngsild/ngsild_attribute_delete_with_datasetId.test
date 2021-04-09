@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2021 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute Delete
+Attribute Delete with datasetId
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -182,7 +182,7 @@ bye
 04. GET E1 via REST - make sure A1:D1 is no longer present
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 237
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

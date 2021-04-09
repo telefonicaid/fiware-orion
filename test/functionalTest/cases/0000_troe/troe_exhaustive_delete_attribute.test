@@ -288,13 +288,13 @@ Date: REGEX(.*)
 03. Delete E1/weight on default tenant with user context in Link header - not found
 ===================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 134
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://w3id.org/saref#weight",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -323,13 +323,13 @@ Date: REGEX(.*)
 07. Delete E1/weight on default tenant without context - does not exist
 =======================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 156
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/weight",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -337,13 +337,13 @@ Date: REGEX(.*)
 08. Delete E2/weight on T1 tenant with user context in Link header - not found
 ==============================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 134
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://w3id.org/saref#weight",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -372,13 +372,13 @@ Date: REGEX(.*)
 12. Delete E2/weight on T1 tenant without context - does not exist
 ==================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 156
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/weight",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 

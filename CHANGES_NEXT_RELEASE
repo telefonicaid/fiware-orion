@@ -3,4 +3,5 @@
 * Issue  #280   Removed check for forbidden characters of entity type when inside the payload body
 * Issue  #280   Better URI validity test
 * Issue  #280   NGSI-LD entity update requests now provoke notifications regardless on whether any actual change has been done on the entity
-* Issue  #280   Implemented datasetId for PATCH /entities/*/attrs/*
+* Issue  #280   Implemented datasetId for PATCH /entities/{EID}/attrs/{attrName}
+* Issue  #280   Implemented datasetId for DELETE /entities/{EID}/attrs/{attrName} (supporting URI params 'datasetId' and 'deleteAll')

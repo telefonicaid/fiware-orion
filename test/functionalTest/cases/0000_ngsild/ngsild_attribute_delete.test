@@ -115,13 +115,13 @@ Date: REGEX(.*)
 02. Try to delete the attribute A1 of entity E2 - entity not found
 ==================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 125
+Content-Length: 151
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "urn:ngsi-ld/entities/E2",
-    "title": "Entity not found",
+    "detail": "https://uri=etsi=org/ngsi-ld/default/A1",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -129,13 +129,13 @@ Date: REGEX(.*)
 03. Try to delete the attribute A3 of entity E1 - attribute not found
 =====================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 152
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/A3",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -157,13 +157,13 @@ Date: REGEX(.*)
 06. Attempt to delete the attribute A1 (with shortname) of entity E1 - 404
 ==========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 152
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/A1",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -171,13 +171,13 @@ Date: REGEX(.*)
 07. Attempt to delete the attribute A2 (with longname) of entity E1 - 404
 =========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 152
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/A2",
-    "title": "Attribute not found",
+    "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
