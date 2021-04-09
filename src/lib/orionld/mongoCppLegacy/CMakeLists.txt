@@ -54,6 +54,7 @@ SET (SOURCES
     mongoCppLegacyEntityRetrieve.cpp
     mongoCppLegacyEntitiesQuery.cpp
     mongoCppLegacyEntityFieldReplace.cpp
+    mongoCppLegacyEntityFieldDelete.cpp
     mongoCppLegacyEntitiesAttributeLookup.cpp
 )
 
