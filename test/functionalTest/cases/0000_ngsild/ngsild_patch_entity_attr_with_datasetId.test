@@ -221,9 +221,9 @@ Date: REGEX(.*)
 
 02. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
@@ -324,9 +324,9 @@ Date: REGEX(.*)
 
 04. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
@@ -427,9 +427,9 @@ Date: REGEX(.*)
 
 06. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
@@ -537,9 +537,9 @@ Date: REGEX(.*)
 
 08. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
@@ -640,9 +640,9 @@ Date: REGEX(.*)
 
 10. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
@@ -743,9 +743,9 @@ Date: REGEX(.*)
 
 12. See E1 in mongo
 ===================
-MongoDB shell version v3.6.22
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
