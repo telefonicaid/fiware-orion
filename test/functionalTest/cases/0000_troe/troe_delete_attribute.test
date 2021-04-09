@@ -94,7 +94,7 @@ echo
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,observedAt FROM subAttributes"
 echo
 echo
 
@@ -119,22 +119,22 @@ Date: REGEX(.*)
 03. See E1 in the temporal database
 ===================================
 opmode,id,type,ts
-Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
 
 
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,REGEX(202.*)
-Delete,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:entities:E1,,,,,,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,202REGEX(.*)
+Delete,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:entities:E1,,,,,,,,202REGEX(.*)
 
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-i,,33,,2020-12-10 07:12:00.128
+id,valuetype,entityid,unitcode,text,number,boolean,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,,urn:ngsi-ld:rel:R,,,202REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,pi-i,,33,,202REGEX(.*)
 
 
 --TEARDOWN--

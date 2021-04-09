@@ -48,8 +48,16 @@ bool pgAttributeDelete
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, datasetId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s', '%s')",
-           instanceId, attributeName, entityId, datasetId, deletedAt);
+  if (datasetId == NULL)
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s')",
+             instanceId, attributeName, entityId, deletedAt);
+  }
+  else
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, datasetId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s', '%s')",
+             instanceId, attributeName, entityId, datasetId, deletedAt);
+  }
 
   // LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
