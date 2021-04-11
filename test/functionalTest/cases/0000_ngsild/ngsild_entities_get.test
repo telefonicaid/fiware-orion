@@ -41,6 +41,7 @@ brokerStart CB 212-249
 # 08. GET all entities with id E.*, see all four entities
 # 09. GET all entities with id E5, see empty array
 # 10. GET all entities with id E.* with count and limit==0 - see empty array and count==4
+# 11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present
 #
 
 echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T"
@@ -164,6 +165,12 @@ orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPr
 echo
 echo
 
+
+echo "11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present"
+echo "=========================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=sysAttrs&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T
 ====================================================================================
@@ -387,6 +394,56 @@ NGSILD-Results-Count: 4
 Date: REGEX(.*)
 
 []
+
+
+
+11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1179
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)",
+    "P1": {
+      "type": "Property",
+      "value": "E1",
+      "createdAt": "REGEX(.*)",
+      "modifiedAt": "REGEX(.*)"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E1",
+      "createdAt": "REGEX(.*)",
+      "modifiedAt": "REGEX(.*)"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)",
+    "P1": {
+      "type": "Property",
+      "value": "E3",
+      "createdAt": "REGEX(.*)",
+      "modifiedAt": "REGEX(.*)"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E3",
+      "createdAt": "REGEX(.*)",
+      "modifiedAt": "REGEX(.*)"
+    }
+  }
+]
 
 
 
