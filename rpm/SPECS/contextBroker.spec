@@ -205,7 +205,7 @@ fi
 - Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
 - Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
 - Hardening: MongoDB connection logic largely rewritten
-- Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797 and probably #3717, #3778, #3326)
+- Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797, #3695 and probably #3717, #3778, #3326)
 - Remove: MONGODB-CR as -dbAuthMech
 
 * Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
