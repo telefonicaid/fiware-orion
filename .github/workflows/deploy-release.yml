@@ -48,3 +48,10 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
           file: docker/Dockerfile
+
+      - name: Deploy new global instance based on the new release
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: ${{ secrets.CD_URL_TRIGGER }}
+          method: 'GET'
+          bearerToken: ${{ secrets.CD_TOKEN }}
