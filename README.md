@@ -30,6 +30,10 @@ _[ The plan is to merge Orion-LD back into the main branch of Orion at some poin
 This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for
 [Core Context](https://github.com/Fiware/catalogue/tree/master/core).
 
+Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues), while
+questions are preferred on Stackoverflow, using the tag "fiware-orion".
+
+
 | :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 
