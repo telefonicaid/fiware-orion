@@ -193,6 +193,21 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Apr 12 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.0.0-1
+- Reference distribution changed from RHEL/CentOS 7 to RHEL/CentOS 8 (#3764)
+- Reference MongoDB version changed from 3.6 to 4.4
+- Add: SCRAM-SHA-256 as allowed mechanism in -dbAuthMech (#3782)
+- Add: tlsAllowInvalidCertificates=true to mongo connection URI along with tls=true when -dbSSL switch is used
+- Add: new CLI parameter -dbDisableRetryWrites to set retryWrite parameter to false in DB connections (#3797)
+- Add: machine information in GET /version
+- Fix: response rightly 500 Internal Error when DB query fails (previously 200 OK with empty entities array was returned)
+- Fix: -logForHumans traces including full timestamp information
+- Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
+- Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
+- Hardening: MongoDB connection logic largely rewritten
+- Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797 and probably #3717, #3778, #3326)
+- Remove: MONGODB-CR as -dbAuthMech
+
 * Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
 - Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
 - Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
