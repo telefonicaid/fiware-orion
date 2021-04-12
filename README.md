@@ -10,6 +10,7 @@
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion-ld.readthedocs.io/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/incubating.svg)
 [![Coverage Status](https://coveralls.io/repos/github/FIWARE/context.Orion-LD/badge.svg?branch=develop)](https://coveralls.io/github/FIWARE/context.Orion-LD?branch=develop)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4800/badge)](https://bestpractices.coreinfrastructure.org/projects/4800)
 
 Orion-LD is a Context Broker which supports both the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.04.01_60/gs_cim009v010401p.pdf) and the
 [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) APIs.
@@ -29,6 +30,10 @@ _[ The plan is to merge Orion-LD back into the main branch of Orion at some poin
 
 This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for
 [Core Context](https://github.com/Fiware/catalogue/tree/master/core).
+
+Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues), while
+questions are preferred on Stackoverflow, using the tag "fiware-orion".
+
 
 | :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
