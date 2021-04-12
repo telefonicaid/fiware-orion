@@ -10,3 +10,4 @@
 - Hardening: Add machine information in GET /version
 - Fix: -logForHumans traces including full timestamp information
 - Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
+- Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
