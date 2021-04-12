@@ -7,4 +7,7 @@
 - Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797 and possibly #3717, #3778, #3326)
 - Remove: MONGODB-CR as -dbAuthMech
 - Fix: response rightly 500 Internal Error when DB query fails (previously 200 OK with empty entities array was returned)
+- Hardening: Add machine information in GET /version
+- Fix: -logForHumans traces including full timestamp information
+- Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
 - Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)

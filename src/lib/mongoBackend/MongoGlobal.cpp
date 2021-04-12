@@ -1085,7 +1085,20 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
         andArray.append(andToken.obj());
       }
 
-      if (scoP->georel.minDistance >= 0)
+      if (scoP->georel.minDistance == 0)
+      {
+        // This is somehow a degenerate case, as any point in the space is
+        // more than 0 distance than any other point :). In this case we only
+        // check for existance of the location
+        orion::BSONObjBuilder existTrue;
+        existTrue.append("$exists", true);
+
+        orion::BSONObjBuilder andToken;
+        andToken.append(keyLoc, existTrue.obj());
+
+        andArray.append(andToken.obj());
+      }
+      else if (scoP->georel.minDistance > 0)
       {
         orion::BSONObjBuilder andToken;
 

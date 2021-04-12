@@ -22,13 +22,14 @@ curl --header 'Accept: application/json' localhost:1026/version
 ```
 {
   "orion" : {
-    "version" : "2.4.0-next",
+    "version" : "2.6.0-next",
     "uptime" : "0 d, 0 h, 2 m, 30 s",
     "git_hash" : "f2a3d436b2b507c5fd1611492ad7fad386901952",
     "compile_time" : "Thu Oct 29 16:56:16 CEST 2020",
     "compiled_by" : "fermin",
     "compiled_in" : "debvm",
     "release_date" : "Thu Oct 29 16:56:16 CEST 2020",
+    "machine" : "x86_64",
     "doc" : "https://fiware-orion.rtfd.io/",
     "libversions": ...
   }

@@ -17,7 +17,7 @@ The target devices are Raspberry Pi 3 and 4 which support the 64 bit ARM archite
 ### Linux OS
 
 As of now, there are not many options to use the 64 bit Linux on Raspberry Pi. 
-To use Ubuntu 18.04 LTS or 19.10 is better. You can get the OS image and find the install instruction 
+To use Ubuntu 20.04 LTS is better. You can get the OS image and find the install instruction
 [here](https://ubuntu.com/download/raspberry-pi).
 
 ### Docker
@@ -41,25 +41,19 @@ sudo add-apt-repository \
 sudo apt-get install -y docker-ce
 ```
 
-As the docker binary for Ubuntu 19.10 (Eoan) is not provided, it is necessary to install the docker binary
-for Ubuntu 18.04 LTS (Bionic). You should replace `$(lsb_release -cs)` with `bionic` in `add-apt-repository` command.
-
 The details to install Docker are [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
 ### Docker compose
 
 The Docker Compose binary for aarch64 is not provided. It is necessary to build it from its source code.
-You can install the docker compose version 1.25.1 by running the commands as shown:
+You can install the docker compose version 1.27.4 by running the commands as shown:
 
 ```
-git clone -b 1.25.1 https://github.com/docker/compose.git
+git clone -b 1.27.4 https://github.com/docker/compose.git
 cd compose/
-sed -i -e "43i'setuptools<45.0.0'," setup.py
 sudo ./script/build/linux
 sudo cp dist/docker-compose-Linux-aarch64 /usr/local/bin/docker-compose
 ```
-
-Note: A patch to avoid a build error is added by using the sed command.
 
 ## How to build Orion
 
@@ -68,7 +62,7 @@ To build the docker images of Orion, Clone the Orion repository and run the `doc
 ```
 git clone https://github.com/telefonicaid/fiware-orion.git
 cd fiware-orion/docker
-docker build --build-arg=centos7 -t orion .
+docker build -t orion .
 ```
 
 ## How to run Orion

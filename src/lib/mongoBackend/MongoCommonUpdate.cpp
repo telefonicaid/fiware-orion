@@ -1182,7 +1182,7 @@ static void fill_idNPtypeNP
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
                          CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                         CSUB_EXPIRATION << BSON("$ne" << STATUS_INACTIVE)); */
+                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE)); */
 
   orion::BSONObjBuilder bob;
 
@@ -1212,7 +1212,7 @@ static void fill_idNPtypeNP
   bob.append(entPatternQ, "false");
   bob.append(typePatternQ, bobNeTrue.obj());
   bob.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
-  bob.append(CSUB_EXPIRATION, bobNeStatus.obj());
+  bob.append(CSUB_STATUS, bobNeStatus.obj());
 
   bgP->idNPtypeNP = bob.obj();
 }
@@ -1859,7 +1859,7 @@ static unsigned int processSubscriptions
       bobQuery.append(keySp, sp);
 
       unsigned long long n;
-      if (!collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
+      if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;

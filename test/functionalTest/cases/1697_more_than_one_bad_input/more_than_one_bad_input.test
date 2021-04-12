@@ -62,7 +62,9 @@ echo
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+# Sometimes (see https://github.com/telefonicaid/fiware-orion/issues/3828) we can get an initial
+# summary at the start of the test. Thus, we take only the last four lines for the test
+tail -n 4 /tmp/contextBroker.log | grep 'SUMMARY' | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 

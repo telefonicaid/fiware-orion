@@ -968,7 +968,7 @@ int main(int argC, char* argV[])
     paConfig("log to screen",                 (void*) true);  
     if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
     {
-      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+      paConfig("screen line format", (void*) "TYPE@DATE  FILE[LINE]: TEXT");
     }
     else
     {
