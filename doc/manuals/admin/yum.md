@@ -1,5 +1,8 @@
 ## Using Yum repositories
 
+**FIXME:** reference distribution changed from CentOS/RHEL 7 to 8 in Orion 3.0.0. This document needs to be
+reviewed and updated.
+
 This document describes the guidelines of using FIWARE Yum repository to install Orion Context Broker. Provided configuration corresponds to x86_64 architecture and CentOS/RHEL 7 OS.
 
 There are two available repositories:

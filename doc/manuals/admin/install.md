@@ -59,6 +59,9 @@ Sometimes the above commands fails due to yum cache. In that case, run
 
 ### Using RPM file
 
+**FIXME:** reference distribution changed from CentOS/RHEL 7 to 8 in Orion 3.0.0. This section needs to be
+reviewed and updated.
+
 Download the package directly from the [FIWARE Yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) (both types of packages are provided).
 
 Next, install the package using the rpm command (as root):
@@ -97,6 +100,9 @@ please [ask using StackOverflow](http://stackoverflow.com/questions/ask)
 (remember to include the "fiware-orion" tag in your questions).
 
 ### Standard upgrade
+
+**FIXME:** reference distribution changed from CentOS/RHEL 7 to 8 in Orion 3.0.0. This section needs to be
+reviewed and updated.
 
 If you are using yum, then you can upgrade doing (as root):
 
