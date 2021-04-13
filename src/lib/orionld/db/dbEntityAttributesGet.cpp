@@ -76,7 +76,7 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 
 // ----------------------------------------------------------------------------
 //
-// attrNamesExtract -
+// localAttrNamesExtract -
 //
 // PARAMETERS
 // - outArray: The result of the operation
@@ -91,7 +91,7 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 // - lookup the alias
 // - sorted insert into a new array - the output array (first lookup to we have no duplicates)
 //
-static void attrNamesExtract(KjNode* outArray, KjNode* local)
+static void localAttrNamesExtract(KjNode* outArray, KjNode* local)
 {
   for (KjNode* objP = local->value.firstChildP; objP != NULL; objP = objP->next)
   {
@@ -138,27 +138,88 @@ static void attrNamesExtract(KjNode* outArray, KjNode* local)
 
 
 
+// ----------------------------------------------------------------------------
+//
+// remoteAttrNamesExtract -
+//
+// PARAMETERS
+// - outArray: The result of the operation
+// - remote:   The output from dbEntityTypesFromRegistrationsGet(details=true), which is an array of
+//             [
+//               {
+//                "id": "urn:ngsi-ld:entity:E1",
+//                "type": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+//                "attrs": ["https://uri.etsi.org/ngsi-ld/default-context/brandName", "https://uri.etsi.org/ngsi-ld/default-context/speed"]
+//               },
+//               {
+//                 "id": "urn:ngsi-ld:entity:E2",
+//                 "type": "https://uri.etsi.org/ngsi-ld/default-context/T2",
+//                 "attrs": ["https://uri.etsi.org/ngsi-ld/default-context/isParked"]
+//               }
+//             ]
+//
+// What we need to do now is to extract all strings in the "attrs" arrays of all the objects in the toplevel array
+// - loop over the attribute names
+// - lookup the alias
+// - sorted insert into a new array - the output array (first lookup to we have no duplicates)
+//
+static void remoteAttrNamesExtract(KjNode* outArray, KjNode* remote)
+{
+  for (KjNode* objP = remote->value.firstChildP; objP != NULL; objP = objP->next)
+  {
+    KjNode* attrsArray = kjLookup(objP, "attrs");
+
+    if (attrsArray != NULL)
+    {
+      KjNode* attrNameNode = attrsArray->value.firstChildP;
+      KjNode* next;
+
+      while (attrNameNode != NULL)
+      {
+        next = attrNameNode->next;
+
+        attrNameNode->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrNameNode->value.s, NULL, NULL);
+
+        if (kjArrayStringLookup(outArray, attrNameNode->value.s) == NULL)
+        {
+          kjChildRemove(objP, attrNameNode);
+          kjStringArraySortedInsert(outArray, attrNameNode);
+        }
+
+        attrNameNode = next;
+      }
+    }
+  }
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // dbEntityAttributesGetWithoutDetails -
 //
 static KjNode* dbEntityAttributesGetWithoutDetails(OrionldProblemDetails* pdP)
 {
-  KjNode* localEntityArray;
-  char*   fields[1] = { (char*) "attrNames" };
-
   //
   // GET local attributes - i.e. from the "entities" collection
   //
+  KjNode* localEntityArray;
+  char*   fields[1] = { (char*) "attrNames" };
+
   localEntityArray = dbEntitiesGet(fields, 1);
 
   KjNode* outArray = kjArray(orionldState.kjsonP, "attributeList");
 
   if (localEntityArray != NULL)
-    attrNamesExtract(outArray, localEntityArray);
-  else
-  {
-  }
+    localAttrNamesExtract(outArray, localEntityArray);
+
+  //
+  // GET external attributes - i.e. from the "registrations" collection
+  //
+  KjNode* remote = dbEntityTypesFromRegistrationsGet(true);
+
+  if (remote)
+    remoteAttrNamesExtract(outArray, remote);
 
   return getEntityAttributesResponse(outArray);
 }

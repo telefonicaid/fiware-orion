@@ -39,6 +39,6 @@ extern "C"
 //
 // mongoCppLegacyEntityTypesFromRegistrationsGet -
 //
-extern KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void);
+extern KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_

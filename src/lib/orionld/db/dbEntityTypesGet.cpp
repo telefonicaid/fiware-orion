@@ -396,7 +396,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   //
   // GET remote types - i.e. from the "registrations" collection
   //
-  remote = dbEntityTypesFromRegistrationsGet();
+  remote = dbEntityTypesFromRegistrationsGet(orionldState.uriParams.details);
 
   if ((remote != NULL) && (orionldState.uriParams.details == true))
     remote = typesAndAttributesExtractFromRegistrations(remote);

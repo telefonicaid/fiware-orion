@@ -87,7 +87,7 @@ typedef bool    (*DbSubscriptionDelete)(const char* subscriptionId);
 typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
 typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
-typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
+typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(bool details);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
 typedef bool    (*DbIdIndexCreate)(const char* tenant);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
