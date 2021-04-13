@@ -29,11 +29,11 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: Login to DockerHub
+#         uses: docker/login-action@v1
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Get Latest Release
         id: latest_version
@@ -53,7 +53,7 @@ jobs:
         run: |
           version=$LATEST_RELEASE
           a=( ${version//./ } )
-          ((a[1]++))
+          ((++a[1]))
           a[2]=0
           echo "${a[0]}.${a[1]}.${a[2]}"
           version=$(echo "${a[0]}.${a[1]}.${a[2]}")
