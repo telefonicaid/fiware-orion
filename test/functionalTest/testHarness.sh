@@ -1131,7 +1131,7 @@ do
     continue;
   fi
 
-  if [ $toLx == "end" ] || [ $toIx != 0 ] && [ $testNo -gt $toIx ]
+  if [ $toLx = "end" ] || [[ $toIx != 0  &&  $testNo -gt $toIx ]]
   then
     continue;
   fi
