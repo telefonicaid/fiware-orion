@@ -194,4 +194,4 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1106_1400 -dqt
+          docker run --rm --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1106_end -dqt
