@@ -79,6 +79,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"        // orionldPatchSubscription
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"       // orionldDeleteSubscription
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"           // orionldGetEntityTypes
+#include "orionld/serviceRoutines/orionldGetEntityAttributes.h"      // orionldGetEntityAttributes
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
 #include "orionld/troe/troeDeleteAttribute.h"                        // troeDeleteAttribute
@@ -391,6 +392,12 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
   }
   else if (serviceP->serviceRoutine == orionldGetEntityTypes)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
+
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+  }
+  else if (serviceP->serviceRoutine == orionldGetEntityAttributes)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
 

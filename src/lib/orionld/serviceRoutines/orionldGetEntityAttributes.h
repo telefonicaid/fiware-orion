@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_
+
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,29 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/types/OrionldResponseErrorType.h"               // OrionldResponseErrorType
-#include "orionld/types/OrionldProblemDetails.h"                  // Own interface
+#include "logMsg/logMsg.h"
+
+#include "rest/ConnectionInfo.h"
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldProblemDetailsFill -
+// orionldGetEntityAttributes -
 //
-void orionldProblemDetailsFill
-(
-  OrionldProblemDetails*   pdP,
-  OrionldResponseErrorType type,
-  const char*              title,
-  const char*              detail,
-  int                      status
-)
-{
-  pdP->type   = type;
-  pdP->title  = (char*) title;
-  pdP->detail = (char*) detail;
-  pdP->status = status;
+extern bool orionldGetEntityAttributes(ConnectionInfo* ciP);
 
-  orionldState.httpStatusCode = status;
-}
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_

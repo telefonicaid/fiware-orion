@@ -1,0 +1,184 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Attributes - simple test without collisions
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET Entity Attributes - see empty array
+# 02. Create an Entity E0 with three attributes: P1, P2, and R1
+# 03. GET Entity Types - see three attributes
+# 04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)
+# 05. GET Entity Types - see four attributes (P1, P2, P3, and R1)
+#
+
+echo "01. GET Entity Attributes - see empty array"
+echo "==========================================="
+orionCurl --url "/ngsi-ld/v1/attributes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "02. Create an Entity E0 with three attributes: P1, P2, and R1"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E0",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P2": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsu-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET Entity Types - see three attributes"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P3": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsu-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET Entity Types - see four attributes (P1, P2, P3, and R1)"
+echo "==============================================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+--REGEXPECT--
+01. GET Entity Attributes - see empty array
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+  "type": "EntityAttributeList",
+  "attributeList": []
+}
+
+
+
+02. Create an Entity E0 with three attributes: P1, P2, and R1
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
+Date: REGEX(.*)
+
+
+
+03. GET Entity Types - see three attributes
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "R1"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+05. GET Entity Types - see four attributes (P1, P2, P3, and R1)
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 144
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "P3",
+        "R1"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

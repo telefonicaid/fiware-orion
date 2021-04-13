@@ -26,6 +26,7 @@ SET (SOURCES
     dbCollectionPathGet.cpp
     dbConfiguration.cpp
     dbEntityTypesGet.cpp
+    dbEntityAttributesGet.cpp
     dbGeoIndexAdd.cpp
     dbGeoIndexLookup.cpp
 )

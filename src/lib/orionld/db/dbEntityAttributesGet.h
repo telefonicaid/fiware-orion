@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_
+#define SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_
+
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -22,29 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/types/OrionldResponseErrorType.h"               // OrionldResponseErrorType
-#include "orionld/types/OrionldProblemDetails.h"                  // Own interface
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldProblemDetailsFill -
+// dbEntityAttributesGet -
 //
-void orionldProblemDetailsFill
-(
-  OrionldProblemDetails*   pdP,
-  OrionldResponseErrorType type,
-  const char*              title,
-  const char*              detail,
-  int                      status
-)
-{
-  pdP->type   = type;
-  pdP->title  = (char*) title;
-  pdP->detail = (char*) detail;
-  pdP->status = status;
+extern KjNode* dbEntityAttributesGet(OrionldProblemDetails* pdP);
 
-  orionldState.httpStatusCode = status;
-}
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_

@@ -57,6 +57,7 @@ SET (SOURCES
     orionldGetTemporalEntities.cpp
     orionldGetTemporalEntity.cpp
     orionldPostTemporalQuery.cpp
+    orionldGetEntityAttributes.cpp
 )
 
 # Include directories

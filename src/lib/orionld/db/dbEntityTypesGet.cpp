@@ -65,7 +65,7 @@ KjNode* kjArrayStringLookup(KjNode* stringArray, const char* str)
 //
 // kjStringArraySortedInsert -
 //
-static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
+void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
 {
   KjNode* prev  = NULL;
   KjNode* itemP = array->value.firstChildP;
