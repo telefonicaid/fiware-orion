@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,20 +25,16 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                         // KjNode
-}
-
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // Own interface
+#include "rest/ConnectionInfo.h"
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityTypesFromRegistrationsGet -
+// orionldGetEntityAttributes -
 //
-extern KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details);
+extern bool orionldGetEntityAttributes(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_

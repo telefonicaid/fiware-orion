@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_
+#define SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_
 
 /*
 *
@@ -28,17 +28,17 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                         // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // Own interface
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityTypesFromRegistrationsGet -
+// dbEntityAttributesGet -
 //
-extern KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details);
+extern KjNode* dbEntityAttributesGet(OrionldProblemDetails* pdP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPESFROMREGISTRATIONSGET_H_
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYATTRIBUTESGET_H_

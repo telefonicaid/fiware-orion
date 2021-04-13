@@ -180,7 +180,7 @@ void entitiesAndProprertiesExtract(KjNode* regArray, KjNode* typeArray)
 //  ...
 //
 //
-KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
+KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details)
 {
   char collectionPath[256];
 
@@ -192,7 +192,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
 
   fields.append("contextRegistration.entities",  1);  // Entity Type is inside the 'contextRegistration.entities' field ...
 
-  if (orionldState.uriParams.details == true)
+  if (details == true)
     fields.append("contextRegistration.attrs",   1);
 
   fields.append("_id",     0);
@@ -227,7 +227,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   if (regArray != NULL)
   {
     typeArray = kjArray(orionldState.kjsonP, NULL);
-    if (orionldState.uriParams.details == false)
+    if (details == false)
       typeExtract(regArray, typeArray);
     else
       entitiesAndProprertiesExtract(regArray, typeArray);

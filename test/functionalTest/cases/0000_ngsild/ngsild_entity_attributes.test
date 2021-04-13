@@ -1,0 +1,433 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Attributes - simple test without collisions
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET Entity Attributes - see empty array
+# 02. Create an Entity E0 with three attributes: P1, P2, and R1
+# 03. GET Entity Attributes - see three attributes
+# 04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)
+# 05. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
+# 06. Create a registration R1 without any attributes
+# 07. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
+# 08. Create a registration R2 with attributes P4 and R2
+# 09. GET Entity Attributes - see six attributes (P1-P4, and R1-R2)
+# 10. Create a registration R3 with attributes P1-P5 and R1-R5
+# 11. GET Entity Attributes - see ten attributes (P1-P5, and R1-R5)
+# 12. Remove R3, R1, E0 and E1
+# 13. GET Entity Attributes - see only P4 and R2 from R2
+#
+
+echo "01. GET Entity Attributes - see empty array"
+echo "==========================================="
+orionCurl --url "/ngsi-ld/v1/attributes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "02. Create an Entity E0 with three attributes: P1, P2, and R1"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E0",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P2": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsu-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET Entity Attributes - see three attributes"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P3": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsu-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "06. Create a registration R1 without any attributes"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:reg:1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T1"
+        },
+        {
+          "id": "urn:ngsi-ld:entity:E2",
+          "type": "T2"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "08. Create a registration R2 with attributes P4 and R2"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:reg:2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T1"
+        }
+      ],
+      "properties": [ "P4" ],
+      "relationships": [ "R2" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. GET Entity Attributes - see six attributes (P1-P4, and R1-R2)"
+echo "================================================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "10. Create a registration R3 with attributes P1-P5 and R1-R5"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:reg:3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T1"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3", "P4", "P5" ],
+      "relationships": [ "R1", "R2", "R3", "R4", "R5" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "11. GET Entity Attributes - see ten attributes (P1-P5, and R1-R5)"
+echo "================================================================="
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "12. Remove R3, R1, E0 and E1"
+echo "============================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0 -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1 -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1 -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:3 -X DELETE
+echo
+echo
+
+
+echo "13. GET Entity Attributes - see only P4 and R2 from R2"
+echo "======================================================"
+orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+--REGEXPECT--
+01. GET Entity Attributes - see empty array
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+  "type": "EntityAttributeList",
+  "attributeList": []
+}
+
+
+
+02. Create an Entity E0 with three attributes: P1, P2, and R1
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
+Date: REGEX(.*)
+
+
+
+03. GET Entity Attributes - see three attributes
+================================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "R1"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+04. Create an Entity E1 with three attributes: P1, P3, and R1 (P1 and R1 already exist in E0)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+05. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 144
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "P3",
+        "R1"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+06. Create a registration R1 without any attributes
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1
+Date: REGEX(.*)
+
+
+
+07. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 144
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "P3",
+        "R1"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+08. Create a registration R2 with attributes P4 and R2
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:2
+Date: REGEX(.*)
+
+
+
+09. GET Entity Attributes - see six attributes (P1-P4, and R1-R2)
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 154
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "R1",
+        "R2"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+10. Create a registration R3 with attributes P1-P5 and R1-R5
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:3
+Date: REGEX(.*)
+
+
+
+11. GET Entity Attributes - see ten attributes (P1-P5, and R1-R5)
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 174
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+12. Remove R3, R1, E0 and E1
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+13. GET Entity Attributes - see only P4 and R2 from R2
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeList": [
+        "P4",
+        "R2"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

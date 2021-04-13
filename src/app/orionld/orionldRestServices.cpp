@@ -51,6 +51,7 @@
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"
 #include "orionld/serviceRoutines/orionldGetEntityType.h"
+#include "orionld/serviceRoutines/orionldGetEntityAttributes.h"
 #include "orionld/serviceRoutines/orionldGetTenants.h"
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"
 #include "orionld/serviceRoutines/orionldPostQuery.h"
@@ -73,6 +74,7 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/v1/entities",                orionldGetEntities         },
   { "/ngsi-ld/v1/types/*",                 orionldGetEntityType       },
   { "/ngsi-ld/v1/types",                   orionldGetEntityTypes      },
+  { "/ngsi-ld/v1/attributes",              orionldGetEntityAttributes },
   { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription     },
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions    },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration     },
