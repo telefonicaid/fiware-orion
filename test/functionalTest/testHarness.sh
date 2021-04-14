@@ -427,7 +427,15 @@ do
   elif [ "$1" == "--match" ];        then match="$2"; shift;
   elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
   elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
-  elif [ "$1" == "--toIx" ];         then toIx=$2; shift;
+  # in case of end, set to 0 to assure it will run until the last available test.
+  elif [ "$1" == "--toIx" ]
+  then
+    if [ "$2" == "end" ]
+    then
+      toIx=0
+    else
+      toIx=$2
+    fi
   elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
   elif [ "$1" == "--skipList" ];     then skipList=$2; shift;
   elif [ "$1" == "--no-duration" ];  then showDuration=off;
@@ -1131,7 +1139,7 @@ do
     continue;
   fi
 
-  if [ $toIx == "end" ] || [[ $toIx != 0  &&  $testNo -gt $toIx ]]
+  if [ $toIx != 0 ] &&  [ $testNo -gt $toIx ]
   then
     continue;
   fi
