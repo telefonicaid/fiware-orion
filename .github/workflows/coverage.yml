@@ -54,7 +54,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm  -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -qtC
+          docker run --rm  -v $(pwd):/opt/orion --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -qtC
 
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2
@@ -107,7 +107,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -qtC
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -qtC
 
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2
@@ -160,7 +160,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -qtC
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -qtC
 
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2
@@ -213,7 +213,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1001_end -qtC
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_MAX_TRIES=3 -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1001_end -qtC
 
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2
