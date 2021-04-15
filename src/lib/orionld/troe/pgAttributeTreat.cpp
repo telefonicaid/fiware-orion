@@ -71,7 +71,7 @@ bool pgAttributeTreat
   char     instanceId[80];
   char*    id         = attrP->name;
   char*    unitCode   = NULL;
-  char*    datasetId  = NULL;
+  char*    datasetId  = (char*) "None";
   char*    observedAt = NULL;
   KjNode*  valueNodeP = NULL;
   bool     subAttrs   = false;
@@ -132,15 +132,15 @@ bool pgAttributeTreat
     // Skip createdAt and modifiedAt, if present
     //
     // FIXME: Already expanded ... not so good - depends on the context
-    //        However, this solution works for all uses, if I also compare and removes non-expanded.
-    //        Let's do it this way for now, but fix it some day ...
+    //        However, this solution works for all uses, if I also compare and remove non-expanded.
+    //        Let's do it this way for now, but fix it some day!
     //        The fix would be that the service routines removes createdAt and modifiedAt before expanding and before calling the TRoE functions
     //
     if ((strcmp(subAttrP->name, "https://uri.etsi.org/ngsi-ld/createdAt") == 0) || (strcmp(subAttrP->name, "https://uri.etsi.org/ngsi-ld/modifiedAt") == 0))
     {}
     else if ((strcmp(subAttrP->name, "createdAt") == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
     {}
-    else if (pgSubAttributeTreat(connectionP, subAttrP, entityId, instanceId) == false)
+    else if (pgSubAttributeTreat(connectionP, subAttrP, entityId, instanceId, datasetId) == false)
     {
       LM_E(("Internal Error (pgSubAttributeTreat failed)"));
       return false;

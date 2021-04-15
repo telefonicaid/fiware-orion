@@ -126,8 +126,8 @@ Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123
-Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,None,SP of E1,,,2020-12-10 07:11:00.123
+Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,None,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129
 
 
 05. See the sub-attributes in the temporal database

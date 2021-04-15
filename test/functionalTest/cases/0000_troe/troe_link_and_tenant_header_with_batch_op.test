@@ -90,7 +90,7 @@ Create,urn:ngsi-ld:entities:E1,http://example.org/T,REGEX(202.*)
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,http://example.org/P1,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
+Create,http://example.org/P1,Number,urn:ngsi-ld:entities:E1,t,,None,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean

@@ -54,36 +54,19 @@ bool pgStringPropertyPush
   PGresult*    res;
   const char*  subPropertiesString = (subProperties == false)? "false" : "true";
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, text) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, value);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, valueType, subProperties, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, value);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, text) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, value);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, value);
   }
 
 

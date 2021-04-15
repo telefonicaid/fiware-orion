@@ -46,6 +46,7 @@ extern bool pgCompoundSubPropertyPush
   KjNode*      compoundValueNodeP,
   const char*  entityId,
   const char*  attrInstanceId,
+  const char*  attrDatasetId,
   const char*  observedAt
 );
 

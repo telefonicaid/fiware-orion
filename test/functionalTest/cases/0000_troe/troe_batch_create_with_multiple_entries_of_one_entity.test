@@ -128,8 +128,8 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,f,,,P of E1,,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E2,f,,,P of E2,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,f,,None,P of E1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E2,f,,None,P of E2,,,
 
 
 04. See the sub-attributes in the temporal database

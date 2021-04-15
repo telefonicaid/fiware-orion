@@ -43,7 +43,8 @@ extern bool pgSubAttributeTreat
   PGconn*      connectionP,
   KjNode*      subAttrP,
   const char*  entityId,
-  const char*  attrInstanceId
+  const char*  attrInstanceId,
+  const char*  attrDatasetId
 );
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGSUBATTRIBUTETREAT_H_
