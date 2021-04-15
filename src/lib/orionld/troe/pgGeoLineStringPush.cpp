@@ -73,36 +73,19 @@ bool pgGeoLineStringPush
   if (sql == NULL)
     LM_RE(false, ("Internal Error (out of memory)"));
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoLineString) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, lineStringCoordsString);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, lineStringCoordsString);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoLineString) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, '%s', ST_GeomFromText('LINESTRING(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, lineStringCoordsString);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', %s, ST_GeomFromText('LINESTRING(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, lineStringCoordsString);
   }
 
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));

@@ -137,9 +137,9 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,t,,,P of E1,,,2020-12-10 07:11:00.123,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,REGEX(202.*)
-Update,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,44,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,t,,None,P of E1,,,2020-12-10 07:11:00.123,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,None,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,REGEX(202.*)
+Update,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,None,,44,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database

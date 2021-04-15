@@ -39,7 +39,8 @@ extern bool pgSubRelationshipPush
   const char*  instanceId,
   const char*  object,
   const char*  entityId,
-  const char*  attrbiteId,
+  const char*  attrInstanceId,
+  const char*  attrDatasetId,
   const char*  subAttributeName,
   const char*  observedAt
 );

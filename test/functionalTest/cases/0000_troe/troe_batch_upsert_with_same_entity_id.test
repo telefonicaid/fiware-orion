@@ -234,10 +234,10 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
@@ -317,13 +317,13 @@ Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,R
 09. See the attributes in the temporal database - note the new ones, replacing the older ones
 =============================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 1: E1/P1",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 2: E1/P2",,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 3: E1/P3",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,None,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,None,"Step 06, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,None,"Step 06, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,None,"Step 06, Instance 3: E1/P3",,,REGEX(202.*)
 
 
 10. See the sub-attributes in the temporal database

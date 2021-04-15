@@ -133,7 +133,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,None,,1,
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
@@ -152,7 +152,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,None,,1,
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean

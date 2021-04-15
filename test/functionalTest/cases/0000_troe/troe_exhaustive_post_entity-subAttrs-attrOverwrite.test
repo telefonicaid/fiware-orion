@@ -977,13 +977,13 @@ Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/Device
 16. See all attributes in TRoE DB, default tenant
 =================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,1,,2021-03-17 00:00:00.001,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E1,t,mg,,,3,,2021-03-17 00:00:00.003,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E1,t,mg,,,4,,2021-03-17 00:00:00.004,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E1,t,mg,,,7,,2021-03-17 00:00:00.007,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E1,t,mg,,,8,,2021-03-17 00:00:00.008,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E1,t,mg,,,11,,2021-03-17 00:00:00.011,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E1,t,mg,,,12,,2021-03-17 00:00:00.012,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,None,,1,,2021-03-17 00:00:00.001,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E1,t,mg,None,,3,,2021-03-17 00:00:00.003,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E1,t,mg,None,,4,,2021-03-17 00:00:00.004,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E1,t,mg,None,,7,,2021-03-17 00:00:00.007,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E1,t,mg,None,,8,,2021-03-17 00:00:00.008,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E1,t,mg,None,,11,,2021-03-17 00:00:00.011,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E1,t,mg,None,,12,,2021-03-17 00:00:00.012,202REGEX(.*)
 
 
 17. See all sub-attributes in TRoE DB, default tenant
@@ -1033,13 +1033,13 @@ Create,urn:ngsi-ld:entity:E2,https://uri.etsi.org/ngsi-ld/default-context/Device
 19. See all attributes in TRoE DB, tenant T1
 ============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,2,,2021-03-17 00:00:00.002,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E2,t,mg,,,5,,2021-03-17 00:00:00.005,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E2,t,mg,,,6,,2021-03-17 00:00:00.006,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E2,t,mg,,,9,,2021-03-17 00:00:00.009,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E2,t,mg,,,10,,2021-03-17 00:00:00.01,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E2,t,mg,,,13,,2021-03-17 00:00:00.013,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E2,t,mg,,,14,,2021-03-17 00:00:00.014,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,None,,2,,2021-03-17 00:00:00.002,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E2,t,mg,None,,5,,2021-03-17 00:00:00.005,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,Number,urn:ngsi-ld:entity:E2,t,mg,None,,6,,2021-03-17 00:00:00.006,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E2,t,mg,None,,9,,2021-03-17 00:00:00.009,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,Number,urn:ngsi-ld:entity:E2,t,mg,None,,10,,2021-03-17 00:00:00.01,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E2,t,mg,None,,13,,2021-03-17 00:00:00.013,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,Number,urn:ngsi-ld:entity:E2,t,mg,None,,14,,2021-03-17 00:00:00.014,202REGEX(.*)
 
 
 20. See all sub-attributes in TRoE DB, tenant T1

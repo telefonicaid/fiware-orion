@@ -823,12 +823,12 @@ Create,urn:ngsi-ld:entity:E9,https://uri.etsi.org/ngsi-ld/default-context/Device
 10. See all attributes in TRoE DB, default tenant
 =================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,1,,2021-03-20 00:00:00.001,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,,,3,,2021-03-20 00:00:00.003,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E3,t,kg,,,3,,2021-03-20 00:00:00.003,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E5,t,kg,,,5,,2021-03-20 00:00:00.005,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E7,t,kg,,,7,,2021-03-20 00:00:00.007,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E9,t,kg,,,7,,2021-03-20 00:00:00.007,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,None,,1,,2021-03-20 00:00:00.001,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E1,t,kg,None,,3,,2021-03-20 00:00:00.003,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E3,t,kg,None,,3,,2021-03-20 00:00:00.003,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E5,t,kg,None,,5,,2021-03-20 00:00:00.005,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E7,t,kg,None,,7,,2021-03-20 00:00:00.007,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E9,t,kg,None,,7,,2021-03-20 00:00:00.007,202REGEX(.*)
 
 
 11. See all sub-attributes in TRoE DB, default tenant
@@ -884,10 +884,10 @@ Create,urn:ngsi-ld:entity:E6,https://uri.fiware.org/ns/data-models#Device,202REG
 13. See all attributes in TRoE DB, tenant T1
 ============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,2,,2021-03-20 00:00:00.002,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,,,4,,2021-03-20 00:00:00.004,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E4,t,kg,,,4,,2021-03-20 00:00:00.004,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E6,t,kg,,,6,,2021-03-20 00:00:00.006,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,None,,2,,2021-03-20 00:00:00.002,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E2,t,kg,None,,4,,2021-03-20 00:00:00.004,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Number,urn:ngsi-ld:entity:E4,t,kg,None,,4,,2021-03-20 00:00:00.004,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Number,urn:ngsi-ld:entity:E6,t,kg,None,,6,,2021-03-20 00:00:00.006,202REGEX(.*)
 
 
 14. See all sub-attributes in TRoE DB, tenant T1

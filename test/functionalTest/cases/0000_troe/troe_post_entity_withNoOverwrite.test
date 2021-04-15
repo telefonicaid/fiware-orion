@@ -189,10 +189,10 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,None,P2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
@@ -234,11 +234,11 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 08. See the attributes in the temporal database - especially the new overwritten P1
 ===================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R3,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,None,P2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R3,,,REGEX(202.*)
 
 
 09. See the sub-attributes in the temporal database
