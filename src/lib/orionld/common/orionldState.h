@@ -288,6 +288,7 @@ typedef struct OrionldConnectionState
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
   KjNode*                 batchEntities;
+  KjNode*                 dbAttrWithDatasetsP;  // Used in TRoE for DELETE Attribute with ?deleteAll=true
 
   //
   // GeoJSON - help vars for the case:

@@ -39,7 +39,7 @@ bool pgTransactionCommit(PGconn* connectionP)
 {
   PGresult* res;
 
-  // LM_TMP(("SQL[%p]: COMMIT", connectionP));
+  LM_TMP(("SQL[%p]: COMMIT", connectionP));
   res = PQexec(connectionP, "COMMIT");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
@@ -52,7 +52,10 @@ bool pgTransactionCommit(PGconn* connectionP)
   if ((st = PQtransactionStatus(connectionP)) != PQTRANS_IDLE)
     LM_E(("SQL[%p]: transaction error: %d", connectionP, st));  // FIXME: string! (last error?)
 
-  // LM_TMP(("SQL: PQerrorMessage: %s", PQerrorMessage(connectionP)));
+  char* errorMsg = PQerrorMessage(connectionP);
+
+  if ((errorMsg != NULL) && (errorMsg[0] != 0))
+    LM_TMP(("SQL[%p] Error: %s", connectionP, errorMsg));
 
   return true;
 }

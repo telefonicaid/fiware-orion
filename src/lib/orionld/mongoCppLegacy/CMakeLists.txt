@@ -24,6 +24,8 @@ SET (SOURCES
     mongoCppLegacyInit.cpp
     mongoCppLegacyEntityLookup.cpp
     mongoCppLegacyEntityAttributeLookup.cpp
+    mongoCppLegacyEntityAttributeInstanceLookup.cpp
+    mongoCppLegacyEntityAttributeWithDatasetsLookup.cpp
     mongoCppLegacyEntityUpdate.cpp
     mongoCppLegacyEntityDelete.cpp
     mongoCppLegacyEntitiesDelete.cpp

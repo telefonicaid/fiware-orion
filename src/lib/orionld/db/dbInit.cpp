@@ -30,7 +30,9 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"             // mongoCppLegacyEntityUpdate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"             // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"    // mongoCppLegacyEntityAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeInstanceLookup.h"    // mongoCppLegacyEntityAttributeInstanceLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesAttributeLookup.h"  // mongoCppLegacyEntitiesAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeWithDatasetsLookup.h"  // mongoCppLegacyEntityAttributeWithDatasetsLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"   // mongoCppLegacyEntityAttributesDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"       // mongoCppLegacyEntityFieldReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldDelete.h"        // mongoCppLegacyEntityFieldDelete
@@ -80,6 +82,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityLookup                           = mongoCppLegacyEntityLookup;
   dbEntityRetrieve                         = mongoCppLegacyEntityRetrieve;
   dbEntityAttributeLookup                  = mongoCppLegacyEntityAttributeLookup;
+  dbEntityAttributeInstanceLookup          = mongoCppLegacyEntityAttributeInstanceLookup;
+  dbEntityAttributeWithDatasetsLookup      = mongoCppLegacyEntityAttributeWithDatasetsLookup;
   dbEntitiesAttributeLookup                = mongoCppLegacyEntitiesAttributeLookup;
   dbEntityAttributesDelete                 = mongoCppLegacyEntityAttributesDelete;
   dbEntityUpdate                           = mongoCppLegacyEntityUpdate;

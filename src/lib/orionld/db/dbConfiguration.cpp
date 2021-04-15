@@ -41,6 +41,8 @@ DbEntityRetrieveFunction                  dbEntityRetrieve;
 DbEntityLookupManyFunction                dbEntityLookupMany;
 DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
 DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
+DbEntityAttributeInstanceLookupFunction   dbEntityAttributeInstanceLookup;
+DbEntityAttributeWithDatasetsLookup       dbEntityAttributeWithDatasetsLookup;
 DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityFieldReplaceFunction              dbEntityFieldReplace;
