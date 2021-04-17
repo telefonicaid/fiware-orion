@@ -141,10 +141,14 @@ MongoDB server version: REGEX(.*)
 					"value" : 1543924800
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T2:6789"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 0.79
 				}

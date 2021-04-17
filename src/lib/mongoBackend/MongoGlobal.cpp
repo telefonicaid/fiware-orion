@@ -1235,6 +1235,8 @@ static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, 
   {
     ContextAttribute* caP = cerP->contextElement.contextAttributeVector[ix];
 
+    LM_TMP(("SA: attribute: '%s'", caP->name.c_str()));
+
     if (includeCreDate && caP->creDate != 0)
     {
       // Lookup Metadata NGSI_MD_DATECREATED
@@ -1242,6 +1244,8 @@ static void addDatesForAttrs(ContextElementResponse* cerP, bool includeCreDate, 
       for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); mIx++)
       {
         Metadata* mdP = caP->metadataVector[mIx];
+
+        LM_TMP(("SA: metadata '%s'", mdP->name.c_str()));
 
         if (mdP->name == NGSI_MD_DATECREATED)
         {
@@ -1344,6 +1348,7 @@ bool entitiesQuery
   ApiVersion                       apiVersion
 )
 {
+  LM_TMP(("SA: In entitiesQuery"));
   /* Query structure is as follows
    *
    * {
@@ -1650,6 +1655,7 @@ bool entitiesQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
+    LM_TMP(("SA: Adding dates for attributes"));
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
@@ -1721,10 +1727,10 @@ bool entitiesQuery
 
       if (needToAdd)
       {
-        ContextElementResponse* cerP = new ContextElementResponse();
+        ContextElementResponse* cerP            = new ContextElementResponse();
 
-        cerP->contextElement.entityId.id = enV[ix]->id;
-        cerP->contextElement.entityId.type = enV[ix]->type;
+        cerP->contextElement.entityId.id        = enV[ix]->id;
+        cerP->contextElement.entityId.type      = enV[ix]->type;
         cerP->contextElement.entityId.isPattern = "false";
 
         //

@@ -103,6 +103,11 @@ static bool timestampToString(KjNode* nodeP)
 //
 static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool sysAttrs, bool keyValues)
 {
+  LM_TMP(("MS: sysAttrs: %d", sysAttrs));
+  char buf[1924];
+  kjFastRender(orionldState.kjsonP, attrP, buf, sizeof(buf));
+  LM_TMP(("MS: attrP: %s", buf));
+
   if (keyValues == true)
   {
     KjNode*  typeP    = kjLookup(attrP, "type");
@@ -145,9 +150,25 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 
     if (createdAtP != NULL)
       kjChildRemove(attrP, createdAtP);
+    else
+      LM_TMP(("MS: createdAt not found"));
 
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
+
+    LM_TMP(("MS: Looping over the attributes metadata to remove all createdAt/modifiedAt"));
+    for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    {
+      LM_TMP(("MS: metadata named '%s'", mdP->name));
+
+      createdAtP  = kjLookup(mdP, "createdAt");
+      modifiedAtP = kjLookup(mdP, "modifiedAt");
+
+      if (createdAtP != NULL)
+        kjChildRemove(mdP, createdAtP);
+      if (modifiedAtP != NULL)
+        kjChildRemove(mdP, modifiedAtP);
+    }
   }
   else
   {
@@ -159,6 +180,22 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 
     if (modifiedAtP != NULL)
       timestampToString(modifiedAtP);
+
+    LM_TMP(("MS: Looping over the attributes metadata to FIX all createdAt/modifiedAt"));
+    for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    {
+      LM_TMP(("MS: metadata named '%s'", mdP->name));
+
+      createdAtP  = kjLookup(mdP, "createdAt");
+      modifiedAtP = kjLookup(mdP, "modifiedAt");
+
+    if (createdAtP != NULL)
+      timestampToString(createdAtP);
+
+    if (modifiedAtP != NULL)
+      timestampToString(modifiedAtP);
+    }
+
   }
 
   return true;
@@ -628,6 +665,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 
     if (attrP->type == KjObject)
     {
+      LM_TMP(("MS: Calling presentationAttributeFix"));
       if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues) == false)
       {
         LM_E(("Internal Error (presentationAttributeFix failed)"));
