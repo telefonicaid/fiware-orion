@@ -195,7 +195,6 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (modifiedAtP != NULL)
       timestampToString(modifiedAtP);
     }
-
   }
 
   return true;
