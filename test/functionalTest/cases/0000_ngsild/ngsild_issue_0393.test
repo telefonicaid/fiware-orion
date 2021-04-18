@@ -127,9 +127,14 @@ echo
 --REGEXPECT--
 01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert
 ==================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 28
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:testunit:125"
+]
 
 
 02. See the entity in the database

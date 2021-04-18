@@ -99,9 +99,15 @@ echo
 --REGEXPECT--
 01. Batch Creation via UPSERT of two entities, urn:E1 and urn:E2
 ================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 19
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:E1",
+    "urn:E2"
+]
 
 
 02. Attempt to change entity type of entity urn:E1 in a batch update operation

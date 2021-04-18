@@ -993,44 +993,80 @@ Date: REGEX(.*)
 
 05. Upsert E7,E9 on default tenant, with user context in Link Header
 ====================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E7",
+    "urn:ngsi-ld:entity:E9"
+]
 
 
 06. Upsert E8,E10 on T1 tenant, with user context in Link Header
 ================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 50
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E8",
+    "urn:ngsi-ld:entity:E10"
+]
 
 
 07. Upsert E11,E13 on default tenant, with user context in payload body
 =======================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E11",
+    "urn:ngsi-ld:entity:E13"
+]
 
 
 08. Upsert E12,E14 on T1 tenant, with user context in payload body
 ==================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E12",
+    "urn:ngsi-ld:entity:E14"
+]
 
 
 09. Upsert E15 with user context #1 and E17 with user context #2, in payload body, on default tenant
 ====================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E15",
+    "urn:ngsi-ld:entity:E17"
+]
 
 
 10. Upsert E16 with user context #1 and E18 with user context #2, in payload body, on T1 tenant
 ===============================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E16",
+    "urn:ngsi-ld:entity:E18"
+]
 
 
 11. See all entities in TRoE DB, default tenant
