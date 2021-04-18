@@ -509,9 +509,18 @@ echo
 --REGEXPECT--
 01. Upsert 5 entities with context arrays in payload
 ====================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 233
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+  "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+  "urn:ngsi-ld:WeatherObserved:BMP180:15333",
+  "urn:ngsi-ld:WeatherObserved:BMP180:25514",
+  "urn:ngsi-ld:WeatherObserved:BMP180:18219",
+  "urn:ngsi-ld:WeatherObserved:BMP180:16956"
+]
 
 
 

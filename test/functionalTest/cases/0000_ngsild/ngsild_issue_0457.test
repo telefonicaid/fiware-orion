@@ -136,9 +136,15 @@ echo
 --REGEXPECT--
 01. Create 2 entities
 =====================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 95
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+  "urn:ngsi-ld:WeatherObserved:BMP180:21336",
+  "urn:ngsi-ld:WeatherObserved:BMP180:30765"
+]
 
 
 

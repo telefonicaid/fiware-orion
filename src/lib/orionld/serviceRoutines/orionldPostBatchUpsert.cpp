@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -138,6 +139,7 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 //
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
+  LM_TMP(("BUPS: In orionldPostBatchUpsert"));
   // Error or not, the Link header should never be present in the reponse
   orionldState.noLinkHeader = true;
 
@@ -416,8 +418,20 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   }
   else
   {
-    orionldState.httpStatusCode = 204;  // No Content
-    orionldState.responseTree   = NULL;
+    //
+    // FIXME: "idTypeAndCreDateFromDb == NULL" is not enough to decide whether all the entities were created or just updated
+    //        Need a better check (look inside idTypeAndCreDateFromDb and compare with the EIDs in the payload body)
+    //
+    if (idTypeAndCreDateFromDb == NULL)  // None of the entities were found in DB - 201 Created
+    {
+      orionldState.httpStatusCode = 201;
+      orionldState.responseTree   = successArrayP;
+    }
+    else  // All entities were found in DB - 204 No Content
+    {
+      orionldState.httpStatusCode = 204;  // No Content
+      orionldState.responseTree   = NULL;
+    }
   }
 
   if (troe == true)

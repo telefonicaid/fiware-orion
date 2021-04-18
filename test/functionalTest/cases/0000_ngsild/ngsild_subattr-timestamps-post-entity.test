@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Sub-Attribute system attributes
+Sub-Attribute system attributes for POST /entities/*/attrs
 
 --SHELL-INIT--
 export BROKER=orionld

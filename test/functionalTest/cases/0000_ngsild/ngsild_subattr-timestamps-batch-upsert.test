@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Sub-Attribute system attributes for POST /entities
+Sub-Attribute system attributes for Batch Upsert
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,76 +31,78 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create an entity E1 with attributes A1 having a sub-property MD1
+# 01. Batch Upsert two entities E1 and E2 with attributes A1 having a sub-property MD1
 # 02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1
-# 03. Retrieve E1 without sysAttrs
-# 04. Retrieve E1 with sysAttrs on
-# 05. Query all entities without sysAttrs
-# 06. Query all entities with sysAttrs on
+# 03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1
+# 04. Query entities with sysAttrs
 #
 
-echo "01. Create an entity E1 with attributes A1 having a sub-property MD1"
-echo "===================================================================="
-payload='{
-  "id": "urn:ngsi-ld:entities:E1",
-  "type": "T",
-  "A1": {
-    "type": "Property",
-    "value": "A1",
-    "MD1": {
+echo "01. Batch Upsert two entities E1 and E2 with attributes A1 having a sub-property MD1"
+echo "===================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "A1": {
       "type": "Property",
-      "value": 1
+      "value": "E1:A1",
+      "MD1": {
+        "type": "Property",
+        "value": "E1:A1:MD1"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1",
+      "MD1": {
+        "type": "Property",
+        "value": "E2:A1:MD1"
+      }
     }
   }
-}'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
 echo
 echo
 
 
 echo "02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1"
 echo "==========================================================================="
-mongoCmd2 ftest "db.entities.findOne()"
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entities:E1"})'
 echo
 echo
 
 
-echo "03. Retrieve E1 without sysAttrs"
+echo "03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1"
+echo "==========================================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entities:E2"})'
+echo
+echo
+
+
+echo "04. Query entities with sysAttrs"
 echo "================================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
-echo
-echo
-
-
-echo "04. Retrieve E1 with sysAttrs on"
-echo "================================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=sysAttrs
-echo
-echo
-
-
-echo "05. Query all entities without sysAttrs"
-echo "======================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T'
-echo
-echo
-
-
-echo "06. Query all entities with sysAttrs on"
-echo "======================================="
-orionCurl --url '/ngsi-ld/v1/entities?options=sysAttrs&type=T'
+orionCurl --url "/ngsi-ld/v1/entities?type=T&options=sysAttrs"
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity E1 with attributes A1 having a sub-property MD1
-====================================================================
+01. Batch Upsert two entities E1 and E2 with attributes A1 having a sub-property MD1
+====================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Content-Length: 53
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2"
+]
 
 
 02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1
@@ -122,13 +124,13 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "A1",
+			"value" : "E1:A1",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/MD1" : {
 					"createdAt" : REGEX(.*),
 					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
-					"value" : 1
+					"value" : "E1:A1:MD1"
 				}
 			},
 			"mdNames" : [
@@ -143,84 +145,50 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Retrieve E1 without sysAttrs
+03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1
+===========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "E2:A1",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/MD1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : "E2:A1:MD1"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/MD1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. Query entities with sysAttrs
 ================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "A1": {
-        "MD1": {
-            "type": "Property",
-            "value": 1
-        },
-        "type": "Property",
-        "value": "A1"
-    },
-    "id": "urn:ngsi-ld:entities:E1",
-    "type": "T"
-}
-
-
-04. Retrieve E1 with sysAttrs on
-================================
-HTTP/1.1 200 OK
-Content-Length: 354
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "A1": {
-        "MD1": {
-            "createdAt": "REGEX(.*)",
-            "modifiedAt": "REGEX(.*)",
-            "type": "Property",
-            "value": 1
-        },
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "type": "Property",
-        "value": "A1"
-    },
-    "createdAt": "REGEX(.*)",
-    "id": "urn:ngsi-ld:entities:E1",
-    "modifiedAt": "REGEX(.*)",
-    "type": "T"
-}
-
-
-05. Query all entities without sysAttrs
-=======================================
-HTTP/1.1 200 OK
-Content-Length: 119
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-[
-    {
-        "A1": {
-            "MD1": {
-                "type": "Property",
-                "value": 1
-            },
-            "type": "Property",
-            "value": "A1"
-        },
-        "id": "urn:ngsi-ld:entities:E1",
-        "type": "T"
-    }
-]
-
-
-06. Query all entities with sysAttrs on
-=======================================
-HTTP/1.1 200 OK
-Content-Length: 356
+Content-Length: 737
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -232,15 +200,33 @@ Date: REGEX(.*)
                 "createdAt": "REGEX(.*)",
                 "modifiedAt": "REGEX(.*)",
                 "type": "Property",
-                "value": 1
+                "value": "E1:A1:MD1"
             },
             "createdAt": "REGEX(.*)",
             "modifiedAt": "REGEX(.*)",
             "type": "Property",
-            "value": "A1"
+            "value": "E1:A1"
         },
         "createdAt": "REGEX(.*)",
         "id": "urn:ngsi-ld:entities:E1",
+        "modifiedAt": "REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "MD1": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "type": "Property",
+                "value": "E2:A1:MD1"
+            },
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": "E2:A1"
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:entities:E2",
         "modifiedAt": "REGEX(.*)",
         "type": "T"
     }
