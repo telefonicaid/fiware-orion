@@ -758,16 +758,26 @@ echo
 --REGEXPECT--
 01. Batch Upsert entity E1 on default tenant and without context
 ================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Batch Upsert entity E2 on T1 tenant and without context
 ===========================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 03. Batch Upsert entity E1+E3 on default tenant and without context - E1 updated, E3 created
@@ -786,23 +796,39 @@ Date: REGEX(.*)
 
 05. Batch Upsert entity E5 on default tenant and with user context in Link header
 =================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E5"
+]
 
 
 06. Batch Upsert entity E6 on T1 tenant and with user context in Link header
 ============================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E6"
+]
 
 
 07. Batch Upsert entity E7+E9 on default tenant and with user contexts 1+2 in payload body
 ==========================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E7",
+    "urn:ngsi-ld:entity:E9"
+]
 
 
 08. Batch Upsert entity E8+E10 on T1 tenant and with user contexts 1+2 in payload body

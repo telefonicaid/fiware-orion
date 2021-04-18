@@ -109,9 +109,14 @@ echo
 --REGEXPECT--
 01. Upsert/Create the entity E1, with a user context
 ====================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 27
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. GET the entity without context (core) and see the longnames of entity-type and attributes
