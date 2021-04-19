@@ -201,9 +201,15 @@ echo
 --REGEXPECT--
 01. Batch Creation via UPSERT of two entities with a single GeoProperty each
 ============================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 85
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:GtfsStation:900000245025:MS",
+    "urn:ngsi-ld:GtfsStation:900000550090:MS"
+]
 
 
 02. GET the entities

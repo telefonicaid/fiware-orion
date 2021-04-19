@@ -77,7 +77,7 @@ bool isSpecialSubAttribute(const char* attrName, AttributeType* aTypeP, KjNode* 
     *aTypeP = ATTRIBUTE_INSTANCEID;
     return true;
   }
-  else if ((*aTypeP == ATTRIBUTE_PROPERTY) && (strcmp(attrName, "unitCode") == 0))
+  else if (strcmp(attrName, "unitCode") == 0)
   {
     *aTypeP = ATTRIBUTE_UNITCODE;
     return true;

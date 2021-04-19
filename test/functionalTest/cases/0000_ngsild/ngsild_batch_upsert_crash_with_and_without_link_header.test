@@ -145,9 +145,14 @@ echo
 --REGEXPECT--
 01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header
 =====================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+  "urn:ngsi-ld:WeatherObserved:BMP180:22828"
+]
 
 
 
