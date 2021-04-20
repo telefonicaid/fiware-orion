@@ -1,0 +1,260 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of a Temporal Entity, using POST /temporal/entities, with all types of Attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Push an entity directly to the TRoE DB, using POST /temporal/entities - see 201 Created
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+# 05. Create an entity urn:ngsi-ld:entities:E1 in mongo
+# 06. Use POST /temporal/entities to push urn:ngsi-ld:entities:E1 to TRoE - see 204 No Content
+#
+
+echo "01. Push an entity directly to the TRoE DB, using POST /temporal/entities - see 201 Created"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "SP": [
+    {
+      "type": "Property",
+      "value": "SP of E1",
+      "observedAt": "2021-04-20T07:11:00.123Z",
+      "Sub-R": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:rel:R1",
+        "observedAt": "2021-04-20T07:12:00.123Z"
+      },
+      "Sub-String": {
+        "type": "Property",
+        "value": "string sub-property",
+        "observedAt": "2021-04-20T07:12:00.124Z"
+      },
+      "Sub-Bool": {
+        "type": "Property",
+        "value": true,
+        "observedAt": "2021-04-20T07:12:00.125Z"
+      },
+      "Sub-Array": {
+        "type": "Property",
+        "value": [ 1, 2, 3 ],
+        "observedAt": "2021-04-20T07:12:00.126Z"
+      },
+      "Sub-Object": {
+        "type": "Property",
+        "value": { "pi": 3.14, "bTrue": true, "c3": "3" },
+        "observedAt": "2021-04-20T07:12:00.127Z"
+      },
+      "Sub-Int": {
+        "type": "Property",
+        "value": 33,
+        "observedAt": "2021-04-20T07:12:00.128Z",
+        "unitCode": "pi-i"
+      },
+      "Sub-Float": {
+        "type": "Property",
+        "value": 3.1415927,
+        "observedAt": "2021-04-20T07:12:00.129Z",
+        "unitCode": "pi-f"
+      }
+    }
+  ],
+  "I": [
+    {
+      "type": "Property",
+      "value": 1,
+      "observedAt": "2021-04-20T07:11:00.001Z",
+      "unitCode": "cm"
+    },
+    {
+      "type": "Property",
+      "value": 2,
+      "observedAt": "2021-04-20T07:11:00.002Z",
+      "unitCode": "cm"
+    }
+  ],
+  "F": [
+    {
+      "type": "Property",
+      "value": 3.14,
+      "observedAt": "2021-04-20T07:11:00.125Z"
+    }
+  ],
+  "Object": [
+    {
+      "type": "Property",
+      "value": {
+        "A": 1,
+        "vec": [ 1, 2, 3 ]
+      },
+      "observedAt": "2021-04-20T07:11:00.126Z"
+    }
+  ],
+  "Array": [
+    {
+      "type": "Property",
+      "value": [ "S1", "S2", "S3" ],
+      "observedAt": "2021-04-20T07:11:00.127Z"
+    }
+  ],
+  "B": [
+    {
+      "type": "Property",
+      "value": true,
+      "observedAt": "2021-04-20T07:11:00.128Z"
+    }
+  ],
+  "R1": [
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:R1",
+      "observedAt": "2021-04-20T07:11:00.129Z"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
+echo
+echo
+
+
+echo "05. Create an entity urn:ngsi-ld:entities:E1 in mongo"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Use POST /temporal/entities to push urn:ngsi-ld:entities:E1 to TRoE - see 204 No Content"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": 6
+  }
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Push an entity directly to the TRoE DB, using POST /temporal/entities - see 201 Created
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/temporal/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Replace,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,,2021-04-20 07:11:00.123
+Replace,https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,1,,,2021-04-20 07:11:00.001
+Replace,https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,2,,,2021-04-20 07:11:00.002
+Replace,https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,,,2021-04-20 07:11:00.125
+Replace,https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"{""A"": 1, ""vec"": [1, 2, 3]}",2021-04-20 07:11:00.126
+Replace,https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"[""S1"", ""S2"", ""S3""]",2021-04-20 07:11:00.127
+Replace,https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t,,2021-04-20 07:11:00.128
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,,,2021-04-20 07:11:00.129
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,compound,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:rel:R1,,,,2021-04-20 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,string sub-property,,,,2021-04-20 07:12:00.124
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,t,,2021-04-20 07:12:00.125
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,"[1, 2, 3]",2021-04-20 07:12:00.126
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,"{""c3"": ""3"", ""pi"": 3.14, ""bTrue"": true}",2021-04-20 07:12:00.127
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-i,,33,,,2021-04-20 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-f,,3.141593,,,2021-04-20 07:12:00.129
+
+
+05. Create an entity urn:ngsi-ld:entities:E1 in mongo
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+06. Use POST /temporal/entities to push urn:ngsi-ld:entities:E1 to TRoE - see 204 No Content
+============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
