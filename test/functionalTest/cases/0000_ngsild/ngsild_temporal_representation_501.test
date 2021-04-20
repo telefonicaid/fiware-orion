@@ -30,8 +30,10 @@ brokerStart CB
 
 --SHELL--
 
+# Requests that have been implemented:
+# 01. POST /ngsi-ld/v1/temporal/entities
 #
-# 01. Get 501 for POST /ngsi-ld/v1/temporal/entities
+# Requests that still give 501:
 # 02. Get 501 for GET /ngsi-ld/v1/temporal/entities
 # 03. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
 # 04. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>
@@ -41,16 +43,6 @@ brokerStart CB
 # 08. Get 501 for DELETE /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
 # 09. Get 501 for POST /ngsi-ld/v1/temporal/entityOperations/query
 #
-
-echo "01. Get 501 for POST /ngsi-ld/v1/temporal/entities"
-echo "=================================================="
-payload='{
-  "id": "urn:ngsi-ld:City:Madrid",
-  "type": "T_City"
-}'
-orionCurl --url /ngsi-ld/v1/temporal/entities -X POST --payload "$payload"
-echo
-echo
 
 echo "02. Get 501 for GET /ngsi-ld/v1/temporal/entities"
 echo "================================================="
@@ -125,20 +117,6 @@ echo
 
 
 --REGEXPECT--
-01. Get 501 for POST /ngsi-ld/v1/temporal/entities
-==================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 135
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "/ngsi-ld/v1/temporal/entities",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
-}
-
-
 02. Get 501 for GET /ngsi-ld/v1/temporal/entities
 =================================================
 HTTP/1.1 501 Not Implemented

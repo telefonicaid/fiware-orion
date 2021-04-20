@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // Own interface
@@ -145,6 +146,9 @@ void orionldStateInit(void)
   orionldState.uriParams.limit         = 20;
 
   // orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
+
+  // TRoE
+  orionldState.troeOpMode = TROE_ENTITY_CREATE;
 }
 
 
