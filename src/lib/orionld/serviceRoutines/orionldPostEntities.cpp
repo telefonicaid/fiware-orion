@@ -419,8 +419,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  orionldState.httpStatusCode = SccCreated;
-  orionldState.entityCreated  = true;
+  orionldState.httpStatusCode = 201;
 
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", entityId);
 

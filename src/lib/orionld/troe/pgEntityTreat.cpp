@@ -111,7 +111,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, T
           (strcmp(attrP->name, "createdAt")  == 0) ||
           (strcmp(attrP->name, "modifiedAt") == 0))
       {
-        // If present, all these "attributes" are ignmoredd
+        // If present, all these "attributes" are ignored
       }
       else
         LM_E(("Internal Error (The attribute '%s' is neither an Object nor an Array)", attrP->name));
