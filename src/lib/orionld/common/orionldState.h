@@ -288,7 +288,9 @@ typedef struct OrionldConnectionState
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
   KjNode*                 batchEntities;
-  TroeMode                troeOpMode;
+  KjNode*                 dbAttrWithDatasetsP;  // Used in TRoE for DELETE Attribute with ?deleteAll=true
+  TroeMode                troeOpMode;           // Used in troePostEntities as both POST /entities and POST /temporal/entities use troePostEntities
+
 
   //
   // GeoJSON - help vars for the case:
