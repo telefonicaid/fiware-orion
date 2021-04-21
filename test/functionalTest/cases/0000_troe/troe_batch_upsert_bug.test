@@ -142,9 +142,14 @@ echo
 --REGEXPECT--
 01. Use Batch Upsert to create an entity on tenant openiot, with a user context that is an array
 ================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 33
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:Device:filling001"
+]
 
 
 02. See the entity in mongo

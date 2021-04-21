@@ -45,6 +45,7 @@ bool pgNumberSubPropertyPush
   double       numberValue,
   const char*  entityId,
   const char*  attrInstanceId,
+  const char*  attrDatasetId,
   const char*  observedAt,
   const char*  unitCode
 )
@@ -67,16 +68,16 @@ bool pgNumberSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attrInstanceId, ts, observedAt, valueType, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
-             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, observedAt, numberValue, unitCodeString);
+             "instanceId, id, entityId, attrInstanceId, attrDatasetId, ts, observedAt, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
+             instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, orionldState.requestTimeString, observedAt, numberValue, unitCodeString);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attrInstanceId, ts, valueType, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
-             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, numberValue, unitCodeString);
+             "instanceId, id, entityId, attrInstanceId, attrDatasetId, attrDatasetId, ts, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
+             instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, orionldState.requestTimeString, numberValue, unitCodeString);
   }
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 

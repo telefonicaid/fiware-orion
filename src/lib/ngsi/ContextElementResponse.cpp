@@ -39,6 +39,8 @@
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 
+#include "orionld/common/orionldState.h"                // orionldState
+
 using namespace mongo;
 
 
@@ -138,6 +140,8 @@ ContextElementResponse::ContextElementResponse
 )
 {
   prune = false;
+
+  LM_TMP(("SA: In ContextElementResponse constructor"));
 
   // Entity
   BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
@@ -268,12 +272,16 @@ ContextElementResponse::ContextElementResponse
       BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
+      LM_TMP(("SA: mds: %s", mds.toString().c_str()));
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
         Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
         caP->metadataVector.push_back(md);
+        LM_TMP(("SA: pushed the metadata '%s' - system attrs set by Metadata constructor", md->name.c_str()));
+        LM_TMP(("SA: createdAt  for '%s': %f", md->name.c_str(), md->createdAt));
+        LM_TMP(("SA: modifiedAt for '%s': %f", md->name.c_str(), md->modifiedAt));
       }
     }
 

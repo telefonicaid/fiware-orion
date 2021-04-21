@@ -728,6 +728,8 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E16"
 				},
@@ -805,6 +807,8 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -882,10 +886,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -968,10 +976,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -1026,10 +1038,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -1084,10 +1100,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -1145,10 +1165,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},
@@ -1208,10 +1232,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 22
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:entities:E19"
 				},

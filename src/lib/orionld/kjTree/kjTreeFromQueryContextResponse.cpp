@@ -155,8 +155,6 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   char     date[128];
   KjNode*  nodeP;
 
-  // FIXME: Always "keyValues" for 'createdAt' and 'modifiedAt' ?
-
   // createdAt
   if (numberToDate(creDate, date, sizeof(date)) == false)
   {
@@ -204,7 +202,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
 
-
+  LM_TMP(("SA: In kjTreeFromQueryContextResponse"));
   //
   // No hits when "oneHit == false" is not an error.
   // We just return an empty array
@@ -509,14 +507,21 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
 
           if ((strcmp(mdName, "observedAt") != 0) &&
               (strcmp(mdName, "createdAt")  != 0) &&
-              (strcmp(mdName, "modifiedAt") != 0))
+              (strcmp(mdName, "modifiedAt") != 0) &&
+              (strcmp(mdName, "unitCode")   != 0))
           {
             //
             // Looking up short name for the sub-attribute
             //
             mdName = orionldContextItemAliasLookup(orionldState.contextP, mdName, &valueMayBeCompacted, NULL);
+
+            if (sysAttrs)
+            {
+              LM_TMP(("SA: Add system attributes for '%s': %f, %f", mdName, mdP->createdAt, mdP->modifiedAt));
+            }
           }
 
+          LM_TMP(("SA: metadata '%s'", mdName));
           if (mdP->type != "")
           {
             const char*  valueFieldName = (mdP->type == "Relationship")? "object" : "value";
@@ -527,6 +532,16 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
 
             typeP = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
             kjChildAdd(nodeP, typeP);
+
+            // System Attributes?
+            if (sysAttrs == true)
+            {
+              if (orionldSysAttrs(mdP->createdAt, mdP->modifiedAt, nodeP) == false)
+              {
+                LM_E(("sysAttrs error"));
+                return NULL;
+              }
+            }
 
             details = NULL;
             switch (mdP->valueType)

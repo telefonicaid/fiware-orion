@@ -133,7 +133,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,20
 03. See TRoE attributes
 =======================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,,A1:Default,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,None,A1:Default,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D1,A1:D1,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D2,A1:D2,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D3,A1:D3,,,,202REGEX(.*)
@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. See TRoE attributes
 =======================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,,A1:Default,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,None,A1:Default,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D1,A1:D1,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D2,A1:D2,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D3,A1:D3,,,,202REGEX(.*)
@@ -166,15 +166,17 @@ Date: REGEX(.*)
 07. See TRoE attributes
 =======================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,,A1:Default,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,None,A1:Default,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D1,A1:D1,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D2,A1:D2,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,String,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:D3,A1:D3,,,,202REGEX(.*)
 Delete,https://uri.etsi.org/ngsi-ld/default-context/A1,,urn:ngsi-ld:entities:E1,,,urn:ngsi-ld:dataset:D1,,,,,202REGEX(.*)
-Delete,https://uri.etsi.org/ngsi-ld/default-context/A1,,urn:ngsi-ld:entities:E1,,,urn:ALL,,,,,202REGEX(.*)
+Delete,https://uri.etsi.org/ngsi-ld/default-context/A1,,urn:ngsi-ld:entities:E1,,,None,,,,,202REGEX(.*)
+Delete,https://uri.etsi.org/ngsi-ld/default-context/A1,,urn:ngsi-ld:entities:E1,,,urn:ngsi-ld:dataset:D2,,,,,202REGEX(.*)
+Delete,https://uri.etsi.org/ngsi-ld/default-context/A1,,urn:ngsi-ld:entities:E1,,,urn:ngsi-ld:dataset:D3,,,,,202REGEX(.*)
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-pgDrop $CB_DB_NAME
+#pgDrop $CB_DB_NAME

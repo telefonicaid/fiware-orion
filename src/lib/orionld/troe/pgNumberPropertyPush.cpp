@@ -65,36 +65,19 @@ bool pgNumberPropertyPush
     unitCodeString = unitCodeStringV;
   }
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, number, unitCode) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, valueType, subProperties, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, numberValue, unitCodeString);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, number, unitCode) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, numberValue, unitCodeString);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, numberValue, unitCodeString);
   }
 
 

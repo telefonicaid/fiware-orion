@@ -307,9 +307,15 @@ echo
 --REGEXPECT--
 01. Create entities E1 and E2 with attributes P1 and R1, using batch upsert
 ===========================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 02. GET entities, see E1 and E2 with attributes P1 and R1

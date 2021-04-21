@@ -993,44 +993,80 @@ Date: REGEX(.*)
 
 05. Upsert E7,E9 on default tenant, with user context in Link Header
 ====================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E7",
+    "urn:ngsi-ld:entity:E9"
+]
 
 
 06. Upsert E8,E10 on T1 tenant, with user context in Link Header
 ================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 50
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E8",
+    "urn:ngsi-ld:entity:E10"
+]
 
 
 07. Upsert E11,E13 on default tenant, with user context in payload body
 =======================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E11",
+    "urn:ngsi-ld:entity:E13"
+]
 
 
 08. Upsert E12,E14 on T1 tenant, with user context in payload body
 ==================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E12",
+    "urn:ngsi-ld:entity:E14"
+]
 
 
 09. Upsert E15 with user context #1 and E17 with user context #2, in payload body, on default tenant
 ====================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E15",
+    "urn:ngsi-ld:entity:E17"
+]
 
 
 10. Upsert E16 with user context #1 and E18 with user context #2, in payload body, on T1 tenant
 ===============================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E16",
+    "urn:ngsi-ld:entity:E18"
+]
 
 
 11. See all entities in TRoE DB, default tenant
@@ -1050,56 +1086,56 @@ Create,urn:ngsi-ld:entity:E17,https://uri.etsi.org/ngsi-ld/default-context/Devic
 12. See all attributes in TRoE DB, default tenant
 =================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Replace,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,,,,,,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E3,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E3,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E5,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E5,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E7,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E7,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E7,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E7,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E7,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E9,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E9,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E9,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E9,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E9,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E11,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E11,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E11,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E11,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E11,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E13,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E13,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E13,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E13,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E13,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E15,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E15,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E15,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E15,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E15,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E17,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E17,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E17,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E17,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E17,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E1,f,,None,,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E1,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E1,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E3,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E3,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E3,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E3,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E5,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E5,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E5,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E5,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E7,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E7,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E7,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E7,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E7,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E9,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E9,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E9,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E9,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E9,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E11,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E11,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E11,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E11,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E11,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E13,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E13,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E13,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E13,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E13,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E15,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E15,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E15,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E15,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E15,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E17,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E17,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E17,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E17,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E17,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
 
 
 13. See all sub-attributes in TRoE DB, default tenant - there aren't any
@@ -1124,56 +1160,56 @@ Create,urn:ngsi-ld:entity:E18,https://uri.etsi.org/ngsi-ld/default-context/Devic
 15. See all attributes in TRoE DB, tenant T1
 ============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Replace,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,,,,,,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E4,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E4,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E6,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E6,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E8,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E8,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E8,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E8,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E8,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E10,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E10,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E10,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E10,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E10,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E12,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E12,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E12,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E12,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E12,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E14,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E14,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E14,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E14,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E14,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E16,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E16,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E16,f,,,,,,,202REGEX(.*)
-Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E16,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E16,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
-Create,location,GeoPoint,urn:ngsi-ld:entity:E18,f,,,,,,,202REGEX(.*)
-Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E18,f,,,,,,,202REGEX(.*)
-Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E18,f,,,,,,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E18,f,kg,,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E18,f,,,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Replace,location,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Replace,observationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Replace,operationSpace,GeoPoint,urn:ngsi-ld:entity:E2,f,,None,,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E2,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E2,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E4,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E4,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E4,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E4,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E6,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E6,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E6,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E6,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E8,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E8,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E8,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E8,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E8,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E10,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E10,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E10,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E10,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E10,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E12,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E12,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E12,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E12,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E12,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E14,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E14,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E14,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E14,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E14,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E16,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E16,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E16,f,,None,,,,,202REGEX(.*)
+Create,https://w3id.org/saref#weight,Number,urn:ngsi-ld:entity:E16,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,Relationship,urn:ngsi-ld:entity:E16,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
+Create,location,GeoPoint,urn:ngsi-ld:entity:E18,f,,None,,,,,202REGEX(.*)
+Create,observationSpace,GeoPoint,urn:ngsi-ld:entity:E18,f,,None,,,,,202REGEX(.*)
+Create,operationSpace,GeoPoint,urn:ngsi-ld:entity:E18,f,,None,,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/weight,Number,urn:ngsi-ld:entity:E18,f,kg,None,,250,,2021-03-07 08:31:00.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,Relationship,urn:ngsi-ld:entity:E18,f,,None,urn:ngsi-ld:owner:1,,,2021-03-07 08:32:00.123,202REGEX(.*)
 
 
 16. See all sub-attributes in TRoE DB, tenant T1 - there aren't any

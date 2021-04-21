@@ -109,9 +109,14 @@ echo
 --REGEXPECT--
 01. Upsert/Create the entity E1, with a user context
 ====================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 27
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. GET the entity without context (core) and see the longnames of entity-type and attributes
@@ -163,11 +168,11 @@ Create,urn:ngsi-ld:entities:E1,https://ngsi-ld-tutorials.readthedocs.io/en/lates
 04. See the attributes in the temporal database - make sure the attribute names are correctly expanded
 ======================================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://w3id.org/saref#humidity,Number,urn:ngsi-ld:entities:E1,f,P1,,,32,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/description,String,urn:ngsi-ld:entities:E1,f,,,Soil Humdity Sensor,,,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#category,String,urn:ngsi-ld:entities:E1,f,,,sensor,,,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#controlledProperty,String,urn:ngsi-ld:entities:E1,f,,,humidity,,,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#supportedProtocol,String,urn:ngsi-ld:entities:E1,f,,,ul20,,,202REGEX(.*)
+Create,https://w3id.org/saref#humidity,Number,urn:ngsi-ld:entities:E1,f,P1,None,,32,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/description,String,urn:ngsi-ld:entities:E1,f,,None,Soil Humdity Sensor,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#category,String,urn:ngsi-ld:entities:E1,f,,None,sensor,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#controlledProperty,String,urn:ngsi-ld:entities:E1,f,,None,humidity,,,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#supportedProtocol,String,urn:ngsi-ld:entities:E1,f,,None,ul20,,,202REGEX(.*)
 
 
 05. See the sub-attributes in the temporal database (spoiler - there aren't any)

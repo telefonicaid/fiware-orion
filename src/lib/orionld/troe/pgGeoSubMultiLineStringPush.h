@@ -45,6 +45,7 @@ extern bool pgGeoSubMultiLineStringPush
   const char*  instanceId,
   const char*  entityId,
   const char*  attrInstanceId,
+  const char*  attrDatasetId,
   const char*  subAttributeName,
   const char*  observedAt
 );

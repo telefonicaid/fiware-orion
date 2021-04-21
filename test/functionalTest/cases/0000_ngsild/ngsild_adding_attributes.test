@@ -229,10 +229,14 @@ MongoDB server version: REGEX(.*)
 			"type" : "Relationship",
 			"md" : {
 				"https://fiware=github=io/tutorials=Step-by-Step/schema/installedBy" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:Person:employee001"
 				},
 				"https://fiware=github=io/tutorials=Step-by-Step/schema/statusOfWork" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "completed"
 				}

@@ -157,6 +157,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 }
 
 
+
 // ----------------------------------------------------------------------------
 //
 // orionldDeleteAttribute -
@@ -166,6 +167,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   char*    entityId = orionldState.wildcard[0];
   char*    attrName = orionldState.wildcard[1];
   char*    attrNameExpanded;
+  char*    attrNameExpandedEq;
   char*    detail;
 
   //
@@ -200,17 +202,10 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     return false;
   }
 
-  attrNameExpanded = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
-
-  if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
-  {
-    orionldState.httpStatusCode = 404;
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded);
-    return false;
-  }
-
-  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
+  attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
+  attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
   dotForEq(attrNameExpandedEq);
+
 
   //
   // Three possibilities here (well, four, if we count the error of "both SET"):
@@ -223,7 +218,39 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   //      NOT SET                NOT SET        Delete only the default attribute
   //
   if (orionldState.uriParams.datasetId != NULL)
+  {
+    if (dbEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
+    {
+      orionldState.httpStatusCode = 404;
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded);
+      return false;
+    }
+  }
+  else if (orionldState.uriParams.deleteAll == true)
+  {
+    // GET attribute AND its dataset
+    orionldState.dbAttrWithDatasetsP = dbEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
+    if (orionldState.dbAttrWithDatasetsP == NULL)
+    {
+      orionldState.httpStatusCode = 404;
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded);
+      return false;
+    }
+  }
+  else
+  {
+    if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
+    {
+      orionldState.httpStatusCode = 404;
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded);
+      return false;
+    }
+  }
+
+  if (orionldState.uriParams.datasetId != NULL)
+  {
     return orionldDeleteAttributeDatasetId(entityId, attrNameExpanded, attrNameExpandedEq, orionldState.uriParams.datasetId);
+  }
   else if (orionldState.uriParams.deleteAll == true)
   {
     if (orionldDeleteAttributeDatasetId(entityId, attrName, attrNameExpandedEq, NULL) == false)

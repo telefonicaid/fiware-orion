@@ -30,6 +30,12 @@
 #include <set>
 #include <algorithm>
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                          // KjNode, kjValueType
+#include "kjson/kjLookup.h"                                        // kjLookup
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -50,17 +56,11 @@
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
 
-#ifdef ORIONLD
-extern "C"
-{
-#include "kjson/KjNode.h"                                          // KjNode, kjValueType
-#include "kjson/kjLookup.h"                                        // kjLookup
-}
-
+#include "orionld/types/AttributeType.h"                           // AttributeType
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
+#include "orionld/common/isSpecialSubAttribute.h"                  // isSpecialSubAttribute
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
-#endif
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -352,11 +352,17 @@ static void appendMetadata
 (
   BSONObjBuilder*    mdBuilder,
   BSONArrayBuilder*  mdNamesBuilder,
-  const Metadata*    mdP,
+  Metadata*          mdP,
   bool               useDefaultType
 )
 {
-  std::string type = mdP->type;
+  BSONObjBuilder bsonmd;
+  std::string    type    = mdP->type;
+  const char*    mdName  = mdP->name.c_str();
+  AttributeType  mdType;
+  bool           special = isSpecialSubAttribute(mdName, &mdType, NULL);
+
+  LM_TMP(("MS: appending metadata", mdName));
 
   if (!mdP->typeGiven && useDefaultType)
   {
@@ -373,87 +379,83 @@ static void appendMetadata
   mdNamesBuilder->append(mdP->name);
   std::string effectiveName = dbDotEncode(mdP->name);
 
+  //
+  // Filling in the RHS of the metadata ("mdName": RHS)
+  //
+  if (special == false)
+  {
+    //
+    // Setting sysAttrs
+    //
+    if (orionldState.apiVersion == NGSI_LD_V1)
+    {
+      LM_TMP(("MS: Setting MD SysAttrs"));
+      if (mdP->createdAt == 0)
+      {
+        LM_TMP(("MS: Setting createdAt in BSON"));
+        mdP->createdAt = orionldState.requestTime;
+        bsonmd.append("createdAt", mdP->createdAt);
+      }
+
+      LM_TMP(("MS: Setting modifiedAt in BSON"));
+      mdP->modifiedAt  = orionldState.requestTime;
+      bsonmd.append("modifiedAt", mdP->modifiedAt);
+    }
+  }
+
+  LM_TMP(("MS: Setting MD Type"));
   if (type != "")
+    bsonmd.append("type", type);
+
+  LM_TMP(("MS: Setting MD Value"));
+  switch (mdP->valueType)
   {
-    switch (mdP->valueType)
+  case orion::ValueTypeString:
+    LM_TMP(("MS: Setting MD String Value"));
+    bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
+    break;
+
+  case orion::ValueTypeNumber:
+    LM_TMP(("MS: Setting MD Number Value (%f)", mdP->numberValue));
+    bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
+    LM_TMP(("MS: Set MD Number Value (%f)", mdP->numberValue));
+    break;
+
+  case orion::ValueTypeBoolean:
+    LM_TMP(("MS: Setting MD Boolean Value"));
+    bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
+    break;
+
+  case orion::ValueTypeNull:
+    LM_TMP(("MS: Setting MD Null Value"));
+    bsonmd.appendNull(ENT_ATTRS_MD_VALUE);
+    break;
+
+  case orion::ValueTypeObject:
+    LM_TMP(("MS: Setting MD Compound Value"));
+    if (mdP->compoundValueP->isVector())
     {
-    case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
-      return;
+      BSONArrayBuilder ba;
 
-    case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
-      return;
-
-    case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
-      return;
-
-    case orion::ValueTypeNull:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
-      {
-        BSONArrayBuilder ba;
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << ba.arr()));
-      }
-      else
-      {
-        BSONObjBuilder bo;
-
-        compoundValueBson(mdP->compoundValueP->childV, bo);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << bo.obj()));
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
+      compoundValueBson(mdP->compoundValueP->childV, ba);
+      bsonmd.append(ENT_ATTRS_MD_VALUE, ba.arr());
     }
-  }
-  else
-  {
-    switch (mdP->valueType)
+    else
     {
-    case orion::ValueTypeString:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->stringValue));
-      return;
+      BSONObjBuilder bo;
 
-    case orion::ValueTypeNumber:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->numberValue));
-      return;
-
-    case orion::ValueTypeBoolean:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mdP->boolValue));
-      return;
-
-    case orion::ValueTypeNull:
-      mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << mongo::BSONNULL));
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->isVector())
-      {
-        BSONArrayBuilder ba;
-
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << ba.arr()));
-      }
-      else
-      {
-        BSONObjBuilder bo;
-
-        compoundValueBson(mdP->compoundValueP->childV, bo);
-        mdBuilder->append(effectiveName, BSON(ENT_ATTRS_MD_VALUE << bo.obj()));
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type)"));
+      compoundValueBson(mdP->compoundValueP->childV, bo);
+      bsonmd.append(ENT_ATTRS_MD_VALUE, bo.obj());
     }
+    break;
+
+  default:
+    LM_E(("Runtime Error (unknown metadata type)"));
   }
+
+  LM_TMP(("MS: Appending MD to mdBuilder"));
+  mdBuilder->append(effectiveName, bsonmd.obj());
+  LM_TMP(("MS: Appended MD '%s' to mdBuilder", effectiveName.c_str()));
 }
 
 
@@ -670,14 +672,18 @@ static bool contextAttributeCustomMetadataToBson
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
-    const Metadata* md = ca->metadataVector[ix];
+    Metadata* md = ca->metadataVector[ix];
 
+    LM_TMP(("MS: Calling isNotCustomMetadata for '%s'", md->name.c_str()));
     if (!isNotCustomMetadata(md->name.c_str()))
     {
+      LM_TMP(("MS: '%s' is a custom metadata", md->name.c_str()));
       appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
+    else
+      LM_TMP(("MS: '%s' is NOT a custom metadata", md->name.c_str()));
   }
 
   *md      = mdToAdd.obj();
@@ -840,9 +846,11 @@ static bool appendAttribute
       return false;
     }
 
+    LM_TMP(("MS: APPEND with existing attribute"));
     //
     // If updateAttribute fails, the name of the attribute caP is added to the list of erroneous attributes
     //
+    LM_TMP(("MS: Calling updateAttribute"));
     if (updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion) == false)
       orionldStateErrorAttributeAdd(caP->name.c_str());
 
@@ -851,6 +859,8 @@ static bool appendAttribute
 
   /* Build the attribute to append */
   BSONObjBuilder ab;
+
+  LM_TMP(("MS: ADDING a new attribute - all MD created/modifiedAt to be added"));
 
   /* 1. Value */
   caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
@@ -880,6 +890,7 @@ static bool appendAttribute
   BSONObj   md;
   BSONArray mdNames;
 
+  LM_TMP(("MS: Calling contextAttributeCustomMetadataToBson (created/modifiedAt to be added)"));
   if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
   {
     ab.append(ENT_ATTRS_MD, md);
@@ -2814,6 +2825,7 @@ static bool processContextAttributeVector
     bool actualUpdate = true;
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
+      LM_TMP(("MS: Calling updateContextAttributeItem"));
       if (!updateContextAttributeItem(cerP,
                                       ca,
                                       attrs,
@@ -2837,6 +2849,7 @@ static bool processContextAttributeVector
     }
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
+      LM_TMP(("MS: Calling appendContextAttributeItem"));
       if (!appendContextAttributeItem(cerP,
                                       attrs,
                                       targetAttr,

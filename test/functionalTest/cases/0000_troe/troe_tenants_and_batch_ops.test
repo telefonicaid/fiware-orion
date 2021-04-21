@@ -81,9 +81,14 @@ echo
 --REGEXPECT--
 01. Create an entity E1 on tenant t1 - making the broker create the postgres db
 ===============================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 27
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
@@ -94,7 +99,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,None,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean

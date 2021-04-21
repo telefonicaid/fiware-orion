@@ -77,9 +77,14 @@ echo
 --REGEXPECT--
 01. Create an entity E1 on tenant t1, with the context in the Link header using batch upsert
 ============================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 27
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. Make sure the postgres db ftest_t1 exists and that the entity and its attrs and all sub-attrs are present
@@ -90,7 +95,7 @@ Create,urn:ngsi-ld:entities:E1,http://example.org/T,REGEX(202.*)
 
 ATTRIBUTES:
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,http://example.org/P1,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
+Create,http://example.org/P1,Number,urn:ngsi-ld:entities:E1,t,,None,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                           // orionldState
+
 #include "common/globals.h"
 #include "common/limits.h"
 #include "common/tag.h"
@@ -70,6 +72,8 @@ Metadata::Metadata()
   valueType       = orion::ValueTypeNotGiven;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -80,7 +84,7 @@ Metadata::Metadata()
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
-  LM_T(LmtClone, ("'cloning' Metadata '%s'", mP->name.c_str()));
+  LM_TMP(("SA: 'cloning' Metadata '%s'", mP->name.c_str()));
 
   name            = mP->name;
   type            = mP->type;
@@ -89,6 +93,8 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
+  createdAt       = mP->createdAt;
+  modifiedAt      = mP->modifiedAt;
 
   LM_T(LmtClone, ("mP->compoundValueP at %p", mP->compoundValueP));
   compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
@@ -120,6 +126,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   stringValue     = std::string(_value);
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -136,6 +144,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   stringValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -152,6 +162,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   numberValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -168,6 +180,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   boolValue       = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -182,6 +196,8 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
   type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type == "")? false : true;
   compoundValueP  = NULL;
+  createdAt       = mdB.hasField("createdAt") ? getNumberFieldF(mdB, "createdAt") : 0;
+  modifiedAt      = mdB.hasField("modifiedAt") ? getNumberFieldF(mdB, "modifiedAt") : 0;
 
   BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
@@ -302,6 +318,18 @@ std::string Metadata::render(bool comma)
     //   a method that it SHOULD NOT USE !
     //
     out += "\n";
+  }
+
+  // Adding sysAttrs, if NGSI-LD and if explicitly requested
+  LM_TMP(("MS: orionldState.apiVersion               == %d", orionldState.apiVersion));
+  LM_TMP(("MS: orionldState.uriParamOptions.sysAttrs == %d", orionldState.uriParamOptions.sysAttrs));
+  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  {
+    std::string dateTime = isodate2str(createdAt);
+    out += JSON_STR("createdAt") + ":" + dateTime;
+
+    dateTime = isodate2str(modifiedAt);
+    out += JSON_STR("modifiedAt") + ":" + dateTime;
   }
 
   out += endTag(comma);
@@ -533,6 +561,18 @@ std::string Metadata::toJson(bool isLastElement)
   {
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
     out += JSON_VALUE("value", stringValue);
+  }
+
+  // Adding sysAttrs, if NGSI-LD and if explicitly requested
+  LM_TMP(("MS: orionldState.apiVersion               == %d", orionldState.apiVersion));
+  LM_TMP(("MS: orionldState.uriParamOptions.sysAttrs == %d", orionldState.uriParamOptions.sysAttrs));
+  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  {
+    std::string dateTime = isodate2str(createdAt);
+    out += JSON_STR("createdAt") + ":" + dateTime;
+
+    dateTime = isodate2str(modifiedAt);
+    out += JSON_STR("modifiedAt") + ":" + dateTime;
   }
 
   out += "}";

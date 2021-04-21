@@ -72,37 +72,21 @@ bool pgGeoMultiPolygonPush
   if (sql == NULL)
     LM_RE(false, ("Internal Error (out of memory)"));
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoMultiPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, coordsString);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, coordsString);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoMultiPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, coordsString);
   }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, coordsString);
-  }
+
 
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);

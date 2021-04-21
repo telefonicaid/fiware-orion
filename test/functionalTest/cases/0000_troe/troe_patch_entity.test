@@ -152,9 +152,9 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,New P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,New P1,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
@@ -168,3 +168,4 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-P12,String,urn:ngsi-ld:entities
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+pgDrop $CB_DB_NAME
