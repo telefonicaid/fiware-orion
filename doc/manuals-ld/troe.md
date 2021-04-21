@@ -37,7 +37,7 @@ docker run
            liquibase/liquibase 
            --driver=org.postgresql.Driver 
            --url="jdbc:postgresql://<TIMESCALE_HOST>:<TIMESCALE_PORT>/<DATABSE_NAME>"
-           --changeLogFile=timescale-changelog.xml 
+           --changeLogFile=timescale-changelog_master.xml 
            --username=<TIMESCALE_USERNAME>
            --password=<TIMESCALE_PASSWORD>
            update
@@ -48,7 +48,12 @@ The script needs to be executed for every tenant, as each tenant in held in a da
 The naming schema of the "tenant databases" is:
 ```<DEFAULT_DATABASE_NAME>_<TENANT_ID>```, e.g., "orion_mytenant".
 
+Every migration has its own changelog file, they are postfixed with the given version. When running on top of a database initialized with the 
+[initial.sql](../../database/sql/initial.sql), the [timescale-changelog_master.xml](../../database/timescale-changelog_master.xml) can be used to apply 
+all changesets at once. If the db is already updated to a certain version, only the changelogs after that version should be used.
+
 ### Version history
 | Version | Description |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | v1 | Changed primary keys to include the timestamp in preparation of timescale-hypertable support, added index for (sub-)attributes. |
+| v2 | Added the datasetId to the combined primary key and optimizes its datatype. |

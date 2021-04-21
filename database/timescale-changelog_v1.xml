@@ -12,16 +12,16 @@
                         schemaName="public"
                         tableName="entities"/>
         <addPrimaryKey
-                        columnNames="instanceid, ts"
-                        constraintName="entities_pkey"
-                        schemaName="public"
-                        tableName="entities"
-                        validate="true"/>
+                columnNames="instanceid, ts"
+                constraintName="entities_pkey"
+                schemaName="public"
+                tableName="entities"
+                validate="true"/>
         <rollback>
             <dropPrimaryKey constraintName="entities_pkey"
-                             dropIndex="true"
-                             schemaName="public"
-                             tableName="entities"/>
+                            dropIndex="true"
+                            schemaName="public"
+                            tableName="entities"/>
             <addPrimaryKey
                     columnNames="instanceid"
                     constraintName="entities_pkey"
@@ -94,4 +94,5 @@
                        tableName="subattributes"/>
         </rollback>
     </changeSet>
+
 </databaseChangeLog>
