@@ -9,7 +9,7 @@ env:
   IMAGE_NAME: fiware/orion-ld
   IMAGE_TAG_LATEST:  latest
   IMAGE_TAG_DEBUG: debug
-  IMAGE_TAG_PRE: 0.7-PRE-${{ github.run_number }}
+  IMAGE_TAG_PRE: 0.8-PRE-${{ github.run_number }}
 
 jobs:
   deploy-release:
