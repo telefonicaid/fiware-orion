@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS attributes (
     observedAt TIMESTAMP,
     subProperties BOOL,
     unitCode TEXT,
-    datasetId TEXT,
+    datasetId VARCHAR NOT NULL,
     valueType ValueType,
     text TEXT,
     boolean BOOL,
@@ -48,13 +48,14 @@ CREATE TABLE IF NOT EXISTS attributes (
     geoLineString GEOGRAPHY(LINESTRING, 4326),
     geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326),
     ts TIMESTAMP NOT NULL,
-    CONSTRAINT attributes_pkey PRIMARY KEY (instanceId,ts));
+    CONSTRAINT attributes_pkey PRIMARY KEY (instanceId,datasetId,ts));
 
 CREATE TABLE IF NOT EXISTS subAttributes (
     instanceId TEXT NOT NULL,
     id TEXT NOT NULL,
     entityId TEXT NOT NULL,
     attrInstanceId TEXT NOT NULL,
+    attrDatasetId VARCHAR NOT NULL,
     observedAt TIMESTAMP,
     unitCode TEXT,
     valueType ValueType,
@@ -71,4 +72,4 @@ CREATE TABLE IF NOT EXISTS subAttributes (
     ts TIMESTAMP NOT NULL,
     CONSTRAINT subattributes_pkey PRIMARY KEY (instanceId,ts));
 
-CREATE INDEX subattributes_attributeid_index ON subAttributes (attrInstanceId);
+CREATE INDEX subattributes_attributeid_index ON subAttributes (attrInstanceId,attrDatasetId);

@@ -50,6 +50,7 @@ bool pgCompoundSubPropertyPush
   KjNode*      compoundValueNodeP,
   const char*  entityId,
   const char*  attrInstanceId,
+  const char*  attrDatasetId,
   const char*  observedAt
 )
 {
@@ -70,16 +71,16 @@ bool pgCompoundSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attrInstanceId, ts, observedAt, valueType, compound) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
-             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, observedAt, renderedValue);
+             "instanceId, id, entityId, attrInstanceId, attrDatasetId, ts, observedAt, valueType, compound) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, orionldState.requestTimeString, observedAt, renderedValue);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attrInstanceId, ts, valueType, compound) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
-             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, renderedValue);
+             "instanceId, id, entityId, attrInstanceId, attrDatasetId, ts, valueType, compound) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, orionldState.requestTimeString, renderedValue);
   }
 
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));

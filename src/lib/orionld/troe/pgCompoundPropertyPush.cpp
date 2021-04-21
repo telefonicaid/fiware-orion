@@ -69,36 +69,19 @@ bool pgCompoundPropertyPush
 
   kjFastRender(orionldState.kjsonP, compoundValueNodeP, renderedValue, renderedValueSize);
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, compound) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, renderedValue);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, valueType, subProperties, compound) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, renderedValue);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, compound) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, renderedValue);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, compound) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, renderedValue);
   }
 
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));

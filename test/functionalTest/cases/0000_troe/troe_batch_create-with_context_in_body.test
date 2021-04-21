@@ -138,7 +138,7 @@ Create,urn:ngsi-ld:entities:E1,http://example.org/T
 03. See the attribute in the temporal database
 ==============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
-Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1,,,,2021-03-03 18:14:42.123
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,None,P1 of E1,,,,2021-03-03 18:14:42.123
 
 
 04. Batch Upsert E1 and E2, with the context in the payload body
@@ -159,9 +159,9 @@ Create,urn:ngsi-ld:entities:E2,http://example.org/T
 06. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
-Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1,,,,2021-03-03 18:14:42.123
-Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,,P1 of E1 - again,,,,2021-03-03 18:15:42.123
-Create,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,,P1 of E2,,,,2021-03-03 18:15:42.123
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,None,P1 of E1,,,,2021-03-03 18:14:42.123
+Replace,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,None,P1 of E1 - again,,,,2021-03-03 18:15:42.123
+Create,http://example.org/P1,String,urn:ngsi-ld:entities:E2,f,,None,P1 of E2,,,,2021-03-03 18:15:42.123
 
 
 --TEARDOWN--

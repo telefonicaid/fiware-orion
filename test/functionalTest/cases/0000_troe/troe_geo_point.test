@@ -128,7 +128,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geopoint,observedat
-Create,location,GeoPoint,urn:ngsi-ld:entities:E1,f,,,01010000A0E6100000000000000000F03F00000000000000400000000000000840,
+Create,location,GeoPoint,urn:ngsi-ld:entities:E1,f,,None,01010000A0E6100000000000000000F03F00000000000000400000000000000840,
 
 
 04. See the sub-attributes in the temporal database

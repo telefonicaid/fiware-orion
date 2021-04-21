@@ -72,37 +72,21 @@ bool pgGeoPolygonPush
   if (sql == NULL)
     LM_RE(false, ("Internal Error (out of memory)"));
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, polygonCoordsString);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, polygonCoordsString);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, '%s', ST_GeomFromText('POLYGON(%s)', 4326))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, polygonCoordsString);
   }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', %s, ST_GeomFromText('POLYGON(%s)', 4326))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, polygonCoordsString);
-  }
+
 
   // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);

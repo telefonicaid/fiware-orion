@@ -55,36 +55,19 @@ bool pgBoolPropertyPush
   const char*  subPropertiesString = (subProperties == false)? "false" : "true";
   const char*  boolValueAsString   = (value == true)? "true" : "false";
 
-  //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
-  //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, boolean) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, boolValueAsString);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, valueType, subProperties, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, boolValueAsString);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
+  else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, boolean) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
              opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, boolValueAsString);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, boolValueAsString);
   }
 
 
