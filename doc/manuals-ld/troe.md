@@ -56,6 +56,7 @@ all changesets at once. If the db is already updated to a certain version, only 
 > backup should be assured!
 
 ### Version history
+
 | Version | Description |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | v1 | Changed primary keys to include the timestamp in preparation of timescale-hypertable support, added index for (sub-)attributes. |
