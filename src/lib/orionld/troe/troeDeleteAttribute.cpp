@@ -89,7 +89,6 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   }
   else if (orionldState.uriParams.deleteAll == true)
   {
-    LM_TMP(("DA: orionldState.uriParams.deleteAll == true"));
     if (orionldState.dbAttrWithDatasetsP == NULL)
       LM_W(("DA: orionldState.dbAttrWithDatasetsP == NULL ... how?"));
     else
@@ -101,7 +100,6 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
         KjNode* defaultInstanceP = kjLookup(attrsP, attributeNameEq);
         if (defaultInstanceP != NULL)
         {
-          LM_TMP(("DA: Calling pgAttributeDelete without datasetId"));
           if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, NULL, orionldState.requestTimeString) == false)
           {
             LM_E(("Database Error (delete attribute default instance troe layer failed)"));
@@ -129,7 +127,6 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
 
             if (datasetIdNodeP != NULL)
             {
-              LM_TMP(("DA: Calling pgAttributeDelete for datasetId '%s'", datasetIdNodeP->value.s));
               if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, datasetIdNodeP->value.s, orionldState.requestTimeString) == false)
               {
                 LM_E(("Database Error (delete attribute datasetId troe layer failed)"));

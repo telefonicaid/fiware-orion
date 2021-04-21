@@ -54,7 +54,7 @@ bool pgAttributeDelete
   snprintf(sql, sizeof(sql), "INSERT INTO attributes(opMode, instanceId, id, entityId, datasetId, ts) VALUES ('Delete', '%s', '%s', '%s', '%s', '%s')",
            instanceId, attributeName, entityId, datasetId, deletedAt);
 
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
+  // LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

@@ -28,7 +28,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -61,18 +60,16 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
   char                   datasets[512];
   mongo::BSONObjBuilder  filter;
   mongo::BSONObjBuilder  fields;
-  
+
   snprintf(datasetInstance, sizeof(datasetInstance), "@datasets.%s.datasetId", attributeName);
   snprintf(datasets,        sizeof(datasets),        "@datasets.%s",           attributeName);
-
-  LM_TMP(("DA: datasetInstance: %s", datasetInstance));
 
   filter.append("_id.id", entityId);
   filter.append(datasetInstance, datasetId);
 
   fields.append("_id", 0);
   fields.append(datasets, 1);
-  
+
   // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
@@ -95,14 +92,7 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
   releaseMongoConnection(connectionP);
 
   if (kjTree == NULL)
-  {
-    LM_TMP(("DA: got NOTHING from DB"));
     return NULL;
-  }
-
-  char buf[2048];
-  kjFastRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
-  LM_TMP(("DA: got from DB: %s", buf));
 
   // This is what we have now:
   // {
@@ -128,7 +118,6 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
   KjNode* instanceArray = NULL;
   for (KjNode* aP = kjTree->value.firstChildP->value.firstChildP; aP != NULL; aP = aP->next)
   {
-    LM_TMP(("DA: Comparing '%s' and '%s'", aP->name, attributeName));
     if (strcmp(aP->name, attributeName) == 0)
     {
       instanceArray = aP;
@@ -137,10 +126,7 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
   }
 
   if (instanceArray == NULL)
-  {
-    LM_TMP(("DA: Couldn't find the right instance ... ???"));
     return NULL;
-  }
 
   //
   // Lookup the object with the matching datasetId and return it
@@ -150,13 +136,13 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
     KjNode* datasetIdNodeP = kjLookup(aInstanceP, "datasetId");
 
     if ((datasetIdNodeP != NULL) && (datasetIdNodeP->type == KjString) && (strcmp(datasetIdNodeP->value.s, datasetId) == 0))
-    {
-      LM_TMP(("DA: found it!"));
       return aInstanceP;
-    }
   }
 
-#if 0
+
+  //
+  // Change "value" in Relationship to "object"
+  //
   if (kjTree != NULL)
   {
     KjNode* attrArrayP = kjLookup(kjTree, "attrs");
@@ -189,7 +175,6 @@ KjNode* mongoCppLegacyEntityAttributeInstanceLookup(const char* entityId, const 
       }
     }
   }
-#endif
 
   return  kjTree;
 }

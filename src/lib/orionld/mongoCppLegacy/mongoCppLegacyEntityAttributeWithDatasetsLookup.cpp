@@ -28,7 +28,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -51,7 +50,6 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
   char    collectionPath[256];
   KjNode* kjTree = NULL;
 
-  LM_TMP(("DA: In"));
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
 
 
@@ -74,8 +72,6 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
   fields.append("attrs",     1);
   fields.append("@datasets", 1);
 
-  // LM_TMP(("DA: filter: %s", filter.obj().toString().c_str()));
-
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
@@ -97,14 +93,7 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
   releaseMongoConnection(connectionP);
 
   if (kjTree == NULL)
-  {
-    LM_TMP(("DA: Nothing matches"));
     return NULL;
-  }
-
-  char buf[2048];
-  kjFastRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
-  LM_TMP(("DA: got from DB: %s", buf));
 
   //
   // Now we have this in kjTree (for example):
@@ -135,7 +124,10 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
   //
   // Let's just return the whole kjTree (for now) and let the caller deal with extracting stuff
   //
-#if 0
+
+  //
+  // Change "value" in Relationship to "object"
+  //
   if (kjTree != NULL)
   {
     KjNode* attrArrayP = kjLookup(kjTree, "attrs");
@@ -168,7 +160,6 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
       }
     }
   }
-#endif
 
   return  kjTree;
 }
