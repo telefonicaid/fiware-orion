@@ -52,6 +52,9 @@ Every migration has its own changelog file, they are postfixed with the given ve
 [initial.sql](../../database/sql/initial.sql), the [timescale-changelog_master.xml](../../database/timescale-changelog_master.xml) can be used to apply 
 all changesets at once. If the db is already updated to a certain version, only the changelogs after that version should be used.
 
+> :warning: Be aware that the runtime of an update can be substantial(minutes to hours) when executing at a huge database. The existence of a an up-to-date 
+> backup should be assured!
+
 ### Version history
 | Version | Description |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
