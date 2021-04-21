@@ -105,6 +105,8 @@ MongoDB server version: REGEX(.*)
 					"value" : 1543924800
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : 0.8REGEX(.*)
 				}

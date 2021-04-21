@@ -58,6 +58,7 @@
 #include "orionld/serviceRoutines/orionldGetTemporalEntities.h"
 #include "orionld/serviceRoutines/orionldGetTemporalEntity.h"
 #include "orionld/serviceRoutines/orionldPostTemporalQuery.h"
+#include "orionld/serviceRoutines/orionldPostTemporalEntities.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -99,18 +100,18 @@ static const int getServices = (sizeof(getServiceV) / sizeof(getServiceV[0]));
 //
 static OrionLdRestServiceSimplified postServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs",                orionldPostEntity         },
-  { "/ngsi-ld/v1/entities",                        orionldPostEntities       },
-  { "/ngsi-ld/v1/entityOperations/create",         orionldPostBatchCreate    },
-  { "/ngsi-ld/v1/entityOperations/upsert",         orionldPostBatchUpsert    },
-  { "/ngsi-ld/v1/entityOperations/update",         orionldPostBatchUpdate    },
-  { "/ngsi-ld/v1/entityOperations/delete",         orionldPostBatchDelete    },
-  { "/ngsi-ld/v1/entityOperations/query",          orionldPostQuery          },
-  { "/ngsi-ld/v1/subscriptions",                   orionldPostSubscriptions  },
-  { "/ngsi-ld/v1/csourceRegistrations",            orionldPostRegistrations  },
-  { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldNotImplemented     },
-  { "/ngsi-ld/v1/temporal/entities",               orionldNotImplemented     },
-  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery  }
+  { "/ngsi-ld/v1/entities/*/attrs",                orionldPostEntity           },
+  { "/ngsi-ld/v1/entities",                        orionldPostEntities         },
+  { "/ngsi-ld/v1/entityOperations/create",         orionldPostBatchCreate      },
+  { "/ngsi-ld/v1/entityOperations/upsert",         orionldPostBatchUpsert      },
+  { "/ngsi-ld/v1/entityOperations/update",         orionldPostBatchUpdate      },
+  { "/ngsi-ld/v1/entityOperations/delete",         orionldPostBatchDelete      },
+  { "/ngsi-ld/v1/entityOperations/query",          orionldPostQuery            },
+  { "/ngsi-ld/v1/subscriptions",                   orionldPostSubscriptions    },
+  { "/ngsi-ld/v1/csourceRegistrations",            orionldPostRegistrations    },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldNotImplemented       },
+  { "/ngsi-ld/v1/temporal/entities",               orionldPostTemporalEntities },
+  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery    }
 };
 static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]));
 

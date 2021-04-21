@@ -6,3 +6,6 @@
 * Issue  #280   Implemented datasetId for PATCH /entities/{EID}/attrs/{attrName}
 * Issue  #280   Implemented datasetId for DELETE /entities/{EID}/attrs/{attrName} (supporting URI params 'datasetId' and 'deleteAll')
 * Issue  #280   Implemented GET /attributes, but only without details=true
+* Issue  #280   Slightly increased response from Batch Upsert
+* Issue  #280   Implemented system attributes (createdAt, modifiedAt) for sub-attributes
+* Issue  #280   Implemented POST /temporal/entities - to add entities to TRoE without actually creating any entity (for the current state)

@@ -183,9 +183,15 @@ echo
 --REGEXPECT--
 01. Create entities E1 and E2
 =============================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 53
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2"
+]
 
 
 02. Batch Upsert entities E1-E4

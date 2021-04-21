@@ -430,16 +430,28 @@ Date: REGEX(.*)
 
 08. Upsert of entities - options=update - with entityOperations using @id and @type
 ===================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 57
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:Vehicle:00001",
+    "urn:ngsi-ld:Vehicle:00002"
+]
 
 
 09. Upsert of entities - options=replace - with entityOperations using @id and @type
 ====================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 57
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:Vehicle:00004",
+    "urn:ngsi-ld:Vehicle:00005"
+]
 
 
 --TEARDOWN--

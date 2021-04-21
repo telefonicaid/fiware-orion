@@ -115,6 +115,8 @@ MongoDB server version: REGEX(.*)
 					"value" : "123"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/R_R" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "http://a.b.c/R_R"
 				}
