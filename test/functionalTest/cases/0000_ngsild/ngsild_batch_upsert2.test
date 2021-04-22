@@ -372,9 +372,19 @@ Date: REGEX(.*)
 
 03. Upsert entities E1, E2 and E3 with attributes P2 and R2 (Entity content is replaced - default mode)
 =======================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 97
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 04. GET entities, see E1, E2 and E3, all with attributes P2 and R2 - entities have been replaced in step 3
@@ -451,9 +461,20 @@ Date: REGEX(.*)
 
 05. Upsert entities E1, E2, E3 and E4 with attributes P2, P3 and R3, using options=update - append attrs P3 and R3, replace P2
 ==============================================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 121
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3",
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
 
 
 06. GET entities, see the new E4 and E1+E2+E3 with P3 and R3 new step 05, while P2 has been replaced with what's in step 05

@@ -167,9 +167,18 @@ Date: REGEX(.*)
 
 02. Modify E1 with Batch Upsert (replacing with attrs P2 and R2) and add E3, also with attrs P2 and R2
 ======================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 03. GET all three entities, see E1 and E3 with attrs P2 and R2, while E2 has P1 and R1
@@ -222,9 +231,18 @@ Date: REGEX(.*)
 
 04. Modify E2 with Batch Upsert (updating with attrs P2 and R2) and add E4, also with attrs P2 and R2
 =====================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
 
 
 05. GET all four entities, see E1 and E3 with attrs P2 and R2, E2 with P1,P2 and R1,R2, and E4 with attrs P2 and R2

@@ -104,7 +104,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   //
   // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
   //
-  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, errorsArrayP);
 
   //
   // 02. Check whether some ID from idArray does not exist - that would be an error for Batch Update

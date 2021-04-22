@@ -272,9 +272,18 @@ Slept 3 seconds
 
 05. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
 =======================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 06. T6: Extract creDate and modDate of E1, E2 and E3 from mongo

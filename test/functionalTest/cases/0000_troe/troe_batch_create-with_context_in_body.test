@@ -143,9 +143,18 @@ Create,http://example.org/P1,String,urn:ngsi-ld:entities:E1,f,,None,P1 of E1,,,,
 
 04. Batch Upsert E1 and E2, with the context in the payload body
 ================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 77
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2"
+    ]
+}
 
 
 05. See the entities in the temporal database
