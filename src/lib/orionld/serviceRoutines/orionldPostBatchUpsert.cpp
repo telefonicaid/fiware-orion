@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjClone.h"                                     // kjClone
-#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -120,6 +119,43 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 }
 
 
+// ----------------------------------------------------------------------------
+//
+// entityLookupInDb - lookup an entioty id in an array of entities
+//
+// idTypeAndCreDateFromDb looks like this:
+// [
+//   {
+//     "id":"urn:ngsi-ld:entity:E1",
+//     "type":"https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+//     "creDate":1619077285.144012
+//   },
+//   {
+//     "id":"urn:ngsi-ld:entity:E2",
+//     "type":"https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+//     "creDate":1619077285.144012
+//   }
+// ]
+static KjNode* entityLookupInDb(KjNode* idTypeAndCreDateFromDb, const char* entityId)
+{
+  if (idTypeAndCreDateFromDb == NULL)
+    return NULL;
+
+  for (KjNode* entityP = idTypeAndCreDateFromDb->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode* idNodeP = kjLookup(entityP, "id");
+
+    if ((idNodeP != NULL) && (idNodeP->type == KjString))
+    {
+      if (strcmp(idNodeP->value.s, entityId) == 0)
+        return entityP;
+    }
+  }
+
+  return NULL;
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -139,7 +175,6 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 //
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
-  LM_TMP(("BUPS: In orionldPostBatchUpsert"));
   // Error or not, the Link header should never be present in the reponse
   orionldState.noLinkHeader = true;
 
@@ -166,7 +201,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
 
   KjNode* incomingTree   = orionldState.requestTree;
-  KjNode* successArrayP  = kjArray(orionldState.kjsonP, "success");
+  KjNode* createdArrayP  = kjArray(orionldState.kjsonP, "created");
+  KjNode* updatedArrayP  = kjArray(orionldState.kjsonP, "updated");
   KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
 
   //
@@ -176,7 +212,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
   //
-  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, errorsArrayP);
 
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
@@ -363,17 +399,22 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // bool partialUpdate = (orionldState.errorAttributeArrayP[0] == 0)? false : true;
   // bool retValue      = true;
   //
-
   if (orionldState.httpStatusCode == SccOk)
   {
-    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {
       const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
       if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
-        entitySuccessPush(successArrayP, entityId);
+      {
+        // Creation or Update?
+        KjNode* dbEntityP = entityLookupInDb(idTypeAndCreDateFromDb, entityId);
+
+        if (dbEntityP == NULL)
+          entitySuccessPush(createdArrayP, entityId);
+        else
+          entitySuccessPush(updatedArrayP, entityId);
+      }
       else
         entityErrorPush(errorsArrayP,
                         entityId,
@@ -388,51 +429,103 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     {
       const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
 
-      if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
-        entitySuccessPush(successArrayP, entityId);
+      // Creation or Update?
+      KjNode* dbEntityP = entityLookupInDb(idTypeAndCreDateFromDb, entityId);
+
+      if (dbEntityP == NULL)
+      {
+        if (kjStringValueLookupInArray(createdArrayP, entityId) == NULL)
+          entitySuccessPush(createdArrayP, entityId);
+      }
+      else
+      {
+        if (kjStringValueLookupInArray(updatedArrayP, entityId) == NULL)
+          entitySuccessPush(updatedArrayP, entityId);
+      }
     }
+  }
+
+  //
+  // We have entity ids in three arrays:
+  //   errorsArrayP
+  //   updatedArrayP
+  //   createdArrayP
+  //
+  // 1. The broker returns 201 if all entities have been created:
+  //    - errorsArrayP  EMPTY
+  //    - updatedArrayP EMPTY
+  //    - createdArrayP NOT EMPTY
+  //
+  // 2. The broker returns 204 if all entities have been updated:
+  //    - errorsArrayP  EMPTY
+  //    - createdArrayP EMPTY
+  //    - updatedArrayP NOT EMPTY
+  //
+  // 3. Else, 207 is returned
+  //
+  KjNode* successArrayP  = NULL;
+
+  if ((errorsArrayP->value.firstChildP == NULL) && (updatedArrayP->value.firstChildP == NULL))
+  {
+    orionldState.httpStatusCode = 201;
+    orionldState.responseTree   = createdArrayP;
+    successArrayP               = createdArrayP;  // for kjEntityArrayErrorPurge
+    successArrayP->name         = (char*) "success";
+  }
+  else if ((errorsArrayP->value.firstChildP == NULL) && (createdArrayP->value.firstChildP == NULL))
+  {
+    orionldState.httpStatusCode = 204;
+    orionldState.responseTree   = NULL;
+    successArrayP               = updatedArrayP;  // for kjEntityArrayErrorPurge
+    successArrayP->name         = (char*) "success";
+  }
+  else
+  {
+    orionldState.httpStatusCode = 207;
+
+    //
+    // For v1.3.1, merge updatedArrayP and createdArrayP into successArrayP
+    // FIXME:  This will be amended in the spec and this code will need to change
+    //
+    if (updatedArrayP->value.firstChildP != NULL)
+    {
+      successArrayP = updatedArrayP;
+
+      if (createdArrayP->value.firstChildP != NULL)
+      {
+        // Concatenate arrays
+        successArrayP->lastChild->next = createdArrayP->value.firstChildP;
+        successArrayP->lastChild       = createdArrayP->lastChild;
+      }
+    }
+    else if (createdArrayP->value.firstChildP != NULL)
+    {
+      successArrayP = createdArrayP;
+
+      if (updatedArrayP->value.firstChildP != NULL)
+      {
+        // Concatenate arrays
+        successArrayP->lastChild->next = updatedArrayP->value.firstChildP;
+        successArrayP->lastChild       = updatedArrayP->lastChild;
+      }
+    }
+    else
+      successArrayP = updatedArrayP;  // Empty array
+
+    successArrayP->name = (char*) "success";
 
     //
     // Add the success/error arrays to the response-tree
     //
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
-
-    orionldState.httpStatusCode = SccOk;
   }
+
 
   mongoRequest.release();
   mongoResponse.release();
-
-  if (orionldState.httpStatusCode != SccOk)
-  {
-    LM_E(("mongoUpdateContext flagged an error"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-    orionldState.httpStatusCode = SccReceiverInternalError;
-    return false;
-  }
-  else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
-  {
-    orionldState.httpStatusCode = 207;  // Multi-Status
-    orionldState.acceptJsonld   = false;
-  }
-  else
-  {
-    //
-    // FIXME: "idTypeAndCreDateFromDb == NULL" is not enough to decide whether all the entities were created or just updated
-    //        Need a better check (look inside idTypeAndCreDateFromDb and compare with the EIDs in the payload body)
-    //
-    if (idTypeAndCreDateFromDb == NULL)  // None of the entities were found in DB - 201 Created
-    {
-      orionldState.httpStatusCode = 201;
-      orionldState.responseTree   = successArrayP;
-    }
-    else  // All entities were found in DB - 204 No Content
-    {
-      orionldState.httpStatusCode = 204;  // No Content
-      orionldState.responseTree   = NULL;
-    }
-  }
 
   if (troe == true)
     kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);

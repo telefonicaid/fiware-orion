@@ -260,9 +260,18 @@ Date: REGEX(.*)
 
 03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)
 =============================================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 109
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:GtfsStation:900000245025:MS",
+        "urn:ngsi-ld:GtfsStation:900000550091:MS"
+    ]
+}
 
 
 04. GET the entities

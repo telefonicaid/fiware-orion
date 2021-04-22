@@ -188,11 +188,11 @@ bool pcheckEntity
   //
   // Prepare output
   //
-  *locationNodePP         = locationNodeP;
-  *observationSpaceNodePP = observationSpaceNodeP;
-  *operationSpaceNodePP   = operationSpaceNodeP;
-  *createdAtPP            = createdAtP;
-  *modifiedAtPP           = modifiedAtP;
+  if (locationNodePP         != NULL)  *locationNodePP         = locationNodeP;
+  if (observationSpaceNodePP != NULL)  *observationSpaceNodePP = observationSpaceNodeP;
+  if (operationSpaceNodePP   != NULL)  *operationSpaceNodePP   = operationSpaceNodeP;
+  if (createdAtPP            != NULL)  *createdAtPP            = createdAtP;
+  if (modifiedAtPP           != NULL)  *modifiedAtPP           = modifiedAtP;
 
   return true;
 }

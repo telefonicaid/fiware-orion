@@ -782,16 +782,34 @@ Date: REGEX(.*)
 
 03. Batch Upsert entity E1+E3 on default tenant and without context - E1 updated, E3 created
 ============================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 04. Batch Upsert entity E2+E4 on T1 tenant and without context - E2 updated, E4 created
 =======================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
 
 
 05. Batch Upsert entity E5 on default tenant and with user context in Link header

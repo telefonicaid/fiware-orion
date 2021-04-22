@@ -979,16 +979,36 @@ Date: REGEX(.*)
 
 03. Upsert E1,E3,E5 on default tenant and without context - E1 is replaced
 ==========================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 97
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E3",
+        "urn:ngsi-ld:entity:E5"
+    ]
+}
 
 
 04. Upsert E2,E4,E6 on T1 tenant and without context - E2 is replaced
 =====================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 97
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E4",
+        "urn:ngsi-ld:entity:E6"
+    ]
+}
 
 
 05. Upsert E7,E9 on default tenant, with user context in Link Header

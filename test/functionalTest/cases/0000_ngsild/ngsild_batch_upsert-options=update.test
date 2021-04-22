@@ -141,9 +141,18 @@ Date: REGEX(.*)
 
 03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
 ======================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3
