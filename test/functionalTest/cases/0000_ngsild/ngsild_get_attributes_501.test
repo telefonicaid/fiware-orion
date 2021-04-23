@@ -31,48 +31,48 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Get 501 for GET /ngsi-ld/v1/attributes?details=true
-# 02. Get 501 for GET /ngsi-ld/v1/attributes/A1
+# 01. Get 501 for GET /ngsi-ld/v1/attributes/A1
+# 02. Get 501 for GET /ngsi-ld/v1/attributes/A1?details=true
 #
 
-echo "01. Get 501 for GET /ngsi-ld/v1/attributes"
-echo "=========================================="
-orionCurl --url /ngsi-ld/v1/attributes?details=true
-echo
-echo
-
-
-echo "02. Get 501 for GET /ngsi-ld/v1/attributes/A1"
+echo "01. Get 501 for GET /ngsi-ld/v1/attributes/A1"
 echo "============================================="
 orionCurl --url /ngsi-ld/v1/attributes/A1
 echo
 echo
 
 
+echo "02. Get 501 for GET /ngsi-ld/v1/attributes/A1?details=true"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/attributes/A1?details=true
+echo
+echo
+
+
 --REGEXPECT--
-01. Get 501 for GET /ngsi-ld/v1/attributes
-==========================================
+01. Get 501 for GET /ngsi-ld/v1/attributes/A1
+=============================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 145
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "GET /ngsi-ld/v1/attributes?details=true",
+    "detail": "GET /ngsi-ld/v1/attributes/{attrName}",
     "title": "Not Implemented",
     "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
-02. Get 501 for GET /ngsi-ld/v1/attributes/A1
-=============================================
+02. Get 501 for GET /ngsi-ld/v1/attributes/A1?details=true
+==========================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 130
+Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "/ngsi-ld/v1/attributes/*",
+    "detail": "GET /ngsi-ld/v1/attributes/{attrName}?details=true",
     "title": "Not Implemented",
     "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }

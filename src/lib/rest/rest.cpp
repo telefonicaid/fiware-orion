@@ -440,15 +440,15 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   //
   // So, if the media-range is anything else, it is rejected immediately and not put in the list
   //
-  if ((strcmp(cP, "*/*")              != 0) &&
-      (strcmp(cP, "application/*")    != 0) &&
+  if ((strcmp(cP, "*/*")                  != 0) &&
+      (strcmp(cP, "application/*")        != 0) &&
 #ifdef ORIONLD
       (strcmp(cP, "application/ld+json")  != 0) &&
       (strcmp(cP, "application/geo+json") != 0) &&
 #endif
-      (strcmp(cP, "application/json") != 0) &&
-      (strcmp(cP, "text/*")           != 0) &&
-      (strcmp(cP, "text/plain")       != 0))
+      (strcmp(cP, "application/json")     != 0) &&
+      (strcmp(cP, "text/*")               != 0) &&
+      (strcmp(cP, "text/plain")           != 0))
   {
     return true;  // No error, just a media type that the broker doesn't recognize
   }
@@ -535,6 +535,7 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
   // push the accept header and return true
   headerP->acceptHeaderV.push_back(acceptHeaderP);
+
   return true;
 }
 

@@ -48,6 +48,7 @@ SET (SOURCES
     kjGeojsonEntitiesTransform.cpp
     kjEntityArrayErrorPurge.cpp
     kjTreeToCompoundValue.cpp
+    kjStringArraySortedInsert.cpp
 )
 
 # Include directories
