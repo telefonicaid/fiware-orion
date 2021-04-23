@@ -22,12 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                               // strcmp
 #include <unistd.h>                                               // NULL
 
 extern "C"
 {
 #include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjBuilder.h"                                      // kjArray, kjObject
+#include "kjson/kjBuilder.h"                                      // kjArray, kjObject, kjChildRemove
 #include "kjson/kjLookup.h"                                       // kjLookup
 #include "kjson/kjClone.h"                                        // kjClone
 }
@@ -39,72 +40,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                          // orionldState
 #include "orionld/common/uuidGenerate.h"                          // uuidGenerate
 #include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjStringValueLookupInArray.h"            // kjStringValueLookupInArray
+#include "orionld/kjTree/kjStringArraySortedInsert.h"             // kjStringArraySortedInsert
 #include "orionld/db/dbConfiguration.h"                           // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
 #include "orionld/db/dbEntityTypesGet.h"                          // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjArrayStringLookup -
-//
-KjNode* kjArrayStringLookup(KjNode* stringArray, const char* str)
-{
-  for (KjNode* sNodeP = stringArray->value.firstChildP; sNodeP != NULL; sNodeP = sNodeP->next)
-  {
-    if (strcmp(sNodeP->value.s, str) == 0)
-      return sNodeP;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjStringArraySortedInsert -
-//
-void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
-{
-  KjNode* prev  = NULL;
-  KjNode* itemP = array->value.firstChildP;
-
-  while (itemP != NULL)
-  {
-    int cmp = strcmp(itemP->value.s, newItemP->value.s);  // <0 if itemP < newItemP,  ==0 id equal
-
-    if (cmp < 0)
-      prev = itemP;
-    else if (cmp == 0)
-      return;  // Already present values are skipped
-
-    itemP = itemP->next;
-  }
-
-  if (prev != NULL)
-  {
-    if (prev->next == NULL)  // Insert as last item
-    {
-      prev->next       = newItemP;
-      newItemP->next   = NULL;
-      array->lastChild = newItemP;
-    }
-    else  // Insert the middle
-    {
-      newItemP->next = prev->next;
-      prev->next     = newItemP;
-    }
-  }
-  else  // Insert as first item
-  {
-    newItemP->next = array->value.firstChildP;
-    array->value.firstChildP = newItemP;
-
-    if (array->lastChild == NULL)
-      array->lastChild = newItemP;
-  }
-}
 
 
 
@@ -281,6 +220,12 @@ static KjNode* getAvailableEntityTypesDetails(KjNode* sortedArrayP)
     KjNode* attrsNameP         = kjLookup(typeValueNodeP, "attributeNames");
     KjNode* typeNodeResponseP  = kjObject(orionldState.kjsonP, NULL);
 
+    if (orionldState.acceptJsonld == true)
+    {
+      KjNode* contextNode = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
+      kjChildAdd(typeNodeResponseP, contextNode);
+    }
+
     if ((idP != NULL) && (typeNameP != NULL))
     {
       KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", idP->value.s);
@@ -321,7 +266,7 @@ bool detailTypeMerge(KjNode* fromP, KjNode* toP)
   {
     next = fromAttrP->next;
 
-    if (kjArrayStringLookup(toAttributes, fromAttrP->value.s) == NULL)
+    if (kjStringValueLookupInArray(toAttributes, fromAttrP->value.s) == NULL)
     {
       // Not there - let's add it!
       kjChildRemove(fromAttributes, fromAttrP);

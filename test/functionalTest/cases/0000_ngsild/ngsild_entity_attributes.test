@@ -44,6 +44,7 @@ brokerStart CB
 # 11. GET Entity Attributes - see ten attributes (P1-P5, and R1-R5)
 # 12. Remove R3, R1, E0 and E1
 # 13. GET Entity Attributes - see only P4 and R2 from R2
+# 14. Same same, but Accept: application/ld+json
 #
 
 echo "01. GET Entity Attributes - see empty array"
@@ -221,6 +222,13 @@ echo
 echo "13. GET Entity Attributes - see only P4 and R2 from R2"
 echo "======================================================"
 orionCurl --url /ngsi-ld/v1/attributes
+echo
+echo
+
+
+echo "14. Same same, but Accept: application/ld+json"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/attributes -H "Accept: application/ld+json"
 echo
 echo
 
@@ -419,6 +427,24 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Date: REGEX(.*)
 
 {
+    "attributeList": [
+        "P4",
+        "R2"
+    ],
+    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
+    "type": "EntityAttributeList"
+}
+
+
+14. Same same, but Accept: application/ld+json
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "attributeList": [
         "P4",
         "R2"
