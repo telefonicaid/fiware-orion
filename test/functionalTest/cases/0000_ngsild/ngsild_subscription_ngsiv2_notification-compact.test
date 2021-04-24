@@ -396,7 +396,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 265
+Content-Length: 146
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
@@ -416,10 +416,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T1"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub01", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub01"
 }
 =======================================
 
@@ -453,7 +450,7 @@ Date: REGEX(.*)
 ===================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 266
+Content-Length: 147
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
@@ -473,10 +470,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T2"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub02", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub02"
 }
 =======================================
 
@@ -510,7 +504,7 @@ Date: REGEX(.*)
 ================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 267
+Content-Length: 148
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
@@ -530,10 +524,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T3"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub03", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub03"
 }
 =======================================
 
@@ -567,7 +558,7 @@ Date: REGEX(.*)
 ===============================================================================================
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
-Content-Length: 312
+Content-Length: 193
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: localhost:9997
@@ -594,10 +585,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T4"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub04", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================
 
@@ -650,7 +638,7 @@ Date: REGEX(.*)
 =======================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 462
+Content-Length: 343
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
@@ -694,10 +682,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T4"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub04", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================
 
@@ -713,7 +698,7 @@ Date: REGEX(.*)
 =====================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 610
+Content-Length: 491
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
@@ -774,10 +759,7 @@ Content-Type: application/json; charset=utf-8
             "type": "T4"
         }
     ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub04", 
-    "type": "Notification"
+    "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================
 

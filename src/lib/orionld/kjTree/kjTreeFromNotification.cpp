@@ -55,12 +55,13 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 {
   KjNode*          nodeP;
   char             buf[32];
-  KjNode*          rootP      = kjObject(orionldState.kjsonP, NULL);
-  char*            id         = mongoIdentifier(buf);
-  char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
-  OrionldContext*  contextP   = orionldContextCacheLookup(context);
+  KjNode*          rootP             = kjObject(orionldState.kjsonP, NULL);
+  char*            id                = mongoIdentifier(buf);
+  char             idBuffer[]        = "urn:ngsi-ld:Notification:012345678901234567890123";  // '012345678901234567890123' will be overwritten
+  OrionldContext*  contextP          = orionldContextCacheLookup(context);
+  bool             crossNotification = (renderFormat >= NGSI_LD_V1_V2_NORMALIZED);           // NGSI_LD_V1_V2_[NORMALIZED|KEYVALUES|NORMALIZED_COMPACT|KEYVALUES_COMPACT]
 
-  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  if (crossNotification == false)  // Meaning: NGSI-LD format
   {
     // id
     strcpy(&idBuffer[25], id);
@@ -92,7 +93,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   }
 
   // notifiedAt
-  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  if (crossNotification == false)  // Meaning: NGSI-LD format
   {
     char date[128];
 
