@@ -11,3 +11,4 @@
 * Issue  #280   Implemented POST /temporal/entities - to add entities to TRoE without actually creating any entity (for the current state)
 * Issue  #803   Correct HTTP Status Codes for Batch Upsert (201/204/207) according to NGSI-LD v1.3
 * Issue  #806   Implemented GET /attributes?details=true
+* Issue  #280   Implemented GET /attributes/{attrName}

@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                      // kaStrdup
 #include "kjson/KjNode.h"                                         // KjNode
 #include "kjson/kjBuilder.h"                                      // kjArray, kjObject
 #include "kjson/kjLookup.h"                                       // kjLookup
@@ -41,6 +42,7 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                          // uuidGenerate
 #include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
 #include "orionld/common/eqForDot.h"                              // eqForDot
+#include "orionld/common/dotForEq.h"                              // dotForEq
 #include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjStringValueLookupInArray.h"            // kjStringValueLookupInArray
 #include "orionld/kjTree/kjStringArraySortedInsert.h"             // kjStringArraySortedInsert
@@ -432,7 +434,17 @@ static KjNode* attributeLookup(KjNode* attrV, char* attrLongName)
 //   This first implementation will perform a single query to get ALL the info in one go -
 //   in the future, we will need pagination for this operation and a cursor iterate out more info from the db ...
 //
-static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP)
+//
+// The function is used for two operations:
+//
+//   1. GET /attributes?details=true
+//   2. GET /attributes/{attrName}
+//
+// Case 2 has a non-NULL 'attributeName' parameter AND:
+// - In case of nothing found. NULL shall be returneed (not an empty array)
+// - If found, instead of an array, a single Attribute is returned
+//
+static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char* attributeName)
 {
   //
   // GET local attributes - i.e. from the "entities" collection
@@ -442,16 +454,35 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP)
 
   localEntityArray = dbEntitiesGet(fields, 2);
 
-  // KjNode* outArray = kjArray(orionldState.kjsonP, NULL);
-
-  KjNode* top = kjArray(orionldState.kjsonP, NULL);
-
   if (localEntityArray == NULL)
-    return top;
+  {
+    if (attributeName == NULL)  // GET /attributes?details=true
+    {
+      KjNode* empty = kjArray(orionldState.kjsonP, NULL);
+      return empty;
+    }
+    else
+    {
+      orionldProblemDetailsFill(pdP, OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
+      orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+      return orionldState.responseTree;
+    }
+  }
+
+
+  //
+  // The attributes are stored in mongo with all dots replaced for '=', so ...
+  //
+  char* attributeNameEq = NULL;
+
+  if (attributeName != NULL)
+  {
+    attributeNameEq = kaStrdup(&orionldState.kalloc, attributeName);
+    dotForEq(attributeNameEq);
+  }
 
   // Looping over output from dbEntitiesGet
   KjNode* attrV = kjArray(orionldState.kjsonP, NULL);
-
   for (KjNode* entityP = localEntityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode* _idNode   = kjLookup(entityP, "_id");
@@ -472,6 +503,12 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP)
     for (KjNode* aP = attrsNode->value.firstChildP; aP != NULL; aP = aP->next)
     {
       //
+      // For GET /attributes/{attributeName}, one single attribute is considered
+      //
+      if ((attributeNameEq != NULL) && (strcmp(aP->name, attributeNameEq) != 0))
+        continue;
+
+      //
       // Lookup the attribute in the current output
       // Not there?  Create it
       //
@@ -484,6 +521,18 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP)
     }
   }
 
+  if (attributeNameEq != NULL)
+  {
+    if (attrV->value.firstChildP == NULL)
+    {
+      orionldProblemDetailsFill(pdP, OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
+      orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+      return orionldState.responseTree;
+    }
+
+    return attrV->value.firstChildP;
+  }
+
   return attrV;
 }
 
@@ -493,12 +542,12 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP)
 //
 // dbEntityAttributesGet -
 //
-KjNode* dbEntityAttributesGet(OrionldProblemDetails* pdP)
+KjNode* dbEntityAttributesGet(OrionldProblemDetails* pdP, char* attribute, bool details)
 {
   bzero(pdP, sizeof(OrionldProblemDetails));
 
-  if (orionldState.uriParams.details == false)
+  if (details == false)
     return dbEntityAttributesGetWithoutDetails(pdP);
   else
-    return dbEntityAttributesGetWithDetails(pdP);
+    return dbEntityAttributesGetWithDetails(pdP, attribute);
 }
