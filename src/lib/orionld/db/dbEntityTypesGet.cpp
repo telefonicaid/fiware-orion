@@ -310,7 +310,7 @@ KjNode* typeObjectLookup(KjNode* arrayP, const char* type)
 //
 // dbEntityTypesGet -
 //
-KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
+KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
 {
   KjNode*  local;
   KjNode*  remote;
@@ -322,7 +322,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   //
   // GET local types - i.e. from the "entities" collection
   //
-  if (orionldState.uriParams.details == false)
+  if (details == false)
     local  = dbEntitiesGet(fields, 1);
   else
   {
@@ -332,7 +332,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
   if (local != NULL)
   {
-    if (orionldState.uriParams.details == false)
+    if (details == false)
       local = typesExtract(local);
     else
       local = typesAndAttributesExtractFromEntities(local);
@@ -341,9 +341,9 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   //
   // GET remote types - i.e. from the "registrations" collection
   //
-  remote = dbEntityTypesFromRegistrationsGet(orionldState.uriParams.details);
+  remote = dbEntityTypesFromRegistrationsGet(details);
 
-  if ((remote != NULL) && (orionldState.uriParams.details == true))
+  if ((remote != NULL) && (details == true))
     remote = typesAndAttributesExtractFromRegistrations(remote);
 
 
@@ -365,7 +365,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
       //
       // Search for the same name AFTER 'typeP' in the string array - if found, remove 'typeP' from the array + merge if details are on
       //
-      if (orionldState.uriParams.details == false)
+      if (details == false)
       {
         char* typeName = typeP->value.s;
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
@@ -422,7 +422,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
       //
       // Search for the same name AFTER 'typeP' in the string array - if found, remove 'typeP' from the array + merge if details are on
       //
-      if (orionldState.uriParams.details == false)
+      if (details == false)
       {
         char* typeName = typeP->value.s;
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
@@ -486,7 +486,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     arrayP = remote;
   else
   {
-    if (orionldState.uriParams.details == false)
+    if (details == false)
     {
       arrayP = remote;
 
@@ -503,7 +503,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   //
   // Sort the typeList array, if options=details is not set
   //
-  if (orionldState.uriParams.details == false)
+  if (details == false)
   {
     KjNode* sortedArrayP = kjArray(orionldState.kjsonP, "typeList");
 

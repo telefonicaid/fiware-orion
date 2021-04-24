@@ -1,0 +1,269 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET Entity Attribute P1 - see 404
+# 02. Create an Entity E0/T with three attributes: P1, P2, and R1
+# 03. GET Entity Attribute P1 - see P1 as Property and entity Type T
+# 04. Create an Entity E1/T2 with one attribute: P1
+# 05. GET Entity Attribute P1 - see P1 as Property+Relationship and entity Type T+T2
+# 06. Create an Entity E2/T with two attributes: P1 and R1
+# 07. GET Entity Attribute R1 - see R1 as Relationship and entity Type T 
+#
+
+echo "01. GET Entity Attribute P1 - see 404"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/attributes/P1
+echo
+echo
+
+
+echo "02. Create an Entity E0/T with three attributes: P1, P2, and R1"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E0",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P2": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET Entity Attribute P1 - see P1 as Property and entity Type T"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/v1/attributes/P1
+echo
+echo
+
+
+echo "04. Create an Entity E1/T2 with one attribute: P1"
+echo "================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T2",
+  "P1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E0"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET Entity Attribute P1 - see P1 as Property+Relationship and entity Type T+T2"
+echo "=================================================================================="
+orionCurl --url /ngsi-ld/v1/attributes/P1
+echo
+echo
+
+
+echo "06. Create an Entity E2/T with two attributes: P1 and R1"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E0"
+  },
+  "P1": {
+    "type": "Property",
+    "value": 6
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. GET Entity Attribute R1 - see R1 as Relationship and entity Type T"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/attributes/R1
+echo
+echo
+
+
+echo "08. Same same, but Accept: application/ld+json"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/attributes/R1 -H "Accept: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. GET Entity Attribute P1 - see 404
+=====================================
+HTTP/1.1 404 Not Found
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Attribute Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+02. Create an Entity E0/T with three attributes: P1, P2, and R1
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
+Date: REGEX(.*)
+
+
+
+03. GET Entity Attribute P1 - see P1 as Property and entity Type T
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 163
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeCount": 1,
+    "attributeName": "P1",
+    "attributeTypes": [
+        "Property"
+    ],
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "type": "Attribute",
+    "typeNames": [
+        "T"
+    ]
+}
+
+
+04. Create an Entity E1/T2 with one attribute: P1
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+05. GET Entity Attribute P1 - see P1 as Property+Relationship and entity Type T+T2
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 183
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeCount": 2,
+    "attributeName": "P1",
+    "attributeTypes": [
+        "Property",
+        "Relationship"
+    ],
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "type": "Attribute",
+    "typeNames": [
+        "T",
+        "T2"
+    ]
+}
+
+
+06. Create an Entity E2/T with two attributes: P1 and R1
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+07. GET Entity Attribute R1 - see R1 as Relationship and entity Type T
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeCount": 2,
+    "attributeName": "R1",
+    "attributeTypes": [
+        "Relationship"
+    ],
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "type": "Attribute",
+    "typeNames": [
+        "T"
+    ]
+}
+
+
+08. Same same, but Accept: application/ld+json
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 313
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "attributeCount": 2,
+    "attributeName": "R1",
+    "attributeTypes": [
+        "Relationship"
+    ],
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "type": "Attribute",
+    "typeNames": [
+        "T"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
