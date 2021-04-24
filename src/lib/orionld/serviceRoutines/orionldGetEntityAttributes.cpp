@@ -48,7 +48,7 @@ bool orionldGetEntityAttributes(ConnectionInfo* ciP)
 {
   OrionldProblemDetails  pd;
 
-  orionldState.responseTree = dbEntityAttributesGet(&pd);
+  orionldState.responseTree = dbEntityAttributesGet(&pd, NULL, orionldState.uriParams.details);
   if (orionldState.responseTree == NULL)
   {
     // dbEntityAttributesGet calls orionldErrorResponseCreate

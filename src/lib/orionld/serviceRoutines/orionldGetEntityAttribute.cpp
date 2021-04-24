@@ -33,8 +33,8 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/db/dbEntityAttributesGet.h"                    // dbEntityAttributesGet
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldGetEntityAttribute.h"   // Own Interface
 
 
@@ -43,19 +43,19 @@ extern "C"
 //
 // orionldGetEntityAttribute -
 //
-// The payload body of the response looks like this:
-// {
-//   "id": ""
-// }
-//
 bool orionldGetEntityAttribute(ConnectionInfo* ciP)
 {
-  if (orionldState.uriParams.details == false)
-    orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", "GET /ngsi-ld/v1/attributes/{attrName}");
-  else
-    orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", "GET /ngsi-ld/v1/attributes/{attrName}?details=true");
+  OrionldProblemDetails  pd;
 
-  orionldState.httpStatusCode = 501;
+  char* attrLongName        = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[0], true, NULL);
+  orionldState.responseTree = dbEntityAttributesGet(&pd, attrLongName, true);
 
-  return false;
+  if (orionldState.responseTree == NULL)
+  {
+    // dbEntityAttributesGet calls orionldErrorResponseCreate
+    LM_E(("dbEntityAttributesGet: %s: %s", pd.title, pd.detail));
+    return false;
+  }
+
+  return true;
 }
