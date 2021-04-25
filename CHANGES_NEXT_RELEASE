@@ -12,3 +12,4 @@
 * Issue  #803   Correct HTTP Status Codes for Batch Upsert (201/204/207) according to NGSI-LD v1.3
 * Issue  #806   Implemented GET /attributes?details=true
 * Issue  #280   Implemented GET /attributes/{attrName}
+* Issue  #280   Implemented GET /types/{typeName}

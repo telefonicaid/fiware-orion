@@ -48,7 +48,7 @@ bool orionldGetEntityTypes(ConnectionInfo* ciP)
 {
   OrionldProblemDetails  pd;
 
-  orionldState.responseTree = dbEntityTypesGet(&pd);
+  orionldState.responseTree = dbEntityTypesGet(&pd, orionldState.uriParams.details);
   if (orionldState.responseTree == NULL)
   {
     LM_E(("dbEntityTypesGet: %s: %s", pd.title, pd.detail));

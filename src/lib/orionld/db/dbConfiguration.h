@@ -71,6 +71,7 @@ typedef KjNode* (*DbEntityAttributeInstanceLookupFunction)(const char* entityId,
 typedef KjNode* (*DbEntityAttributeWithDatasetsLookup)(const char* entityId, const char* attributeName);
 typedef KjNode* (*DbEntitiesAttributeLookupFunction)(char** entityArray, int entitiesInArray, const char* attributeName);
 typedef bool    (*DbEntityAttributesDeleteFunction)(const char* entityId, char** attrNameV, int vecSize);
+typedef KjNode* (*DbEntityTypeGet)(OrionldProblemDetails* pdP, const char* typeLongName, int* noOfEntitiesP);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityFieldReplaceFunction)(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP);
 typedef bool    (*DbEntityFieldDeleteFunction)(const char* entityId, const char* fieldPath);
@@ -109,6 +110,7 @@ extern DbEntityAttributeWithDatasetsLookup       dbEntityAttributeWithDatasetsLo
 extern DbEntityAttributeInstanceLookupFunction   dbEntityAttributeInstanceLookup;
 extern DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
 extern DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
+extern DbEntityTypeGet                           dbEntityTypeGet;
 extern DbEntityUpdateFunction                    dbEntityUpdate;
 extern DbEntityFieldReplaceFunction              dbEntityFieldReplace;
 extern DbEntityFieldDeleteFunction               dbEntityFieldDelete;
