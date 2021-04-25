@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
-#define SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPEGET_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPEGET_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -37,8 +37,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbEntityTypeGet -
+// mongoCppLegacyEntityLookup -
 //
-extern KjNode* dbEntityTypeGet(OrionldProblemDetails* pdP, const char* type);
+extern KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* typeLongName, int* noOfEntitiesP);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBENTITYTYPEGET_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYTYPEGET_H_

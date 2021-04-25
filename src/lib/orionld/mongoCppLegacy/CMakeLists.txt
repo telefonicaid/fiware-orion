@@ -59,6 +59,7 @@ SET (SOURCES
     mongoCppLegacyEntityFieldDelete.cpp
     mongoCppLegacyEntitiesAttributeLookup.cpp
     mongoCppLegacyDatasetGet.cpp
+    mongoCppLegacyEntityTypeGet.cpp
 )
 
 # Include directories
