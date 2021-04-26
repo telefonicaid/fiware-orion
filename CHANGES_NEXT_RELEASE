@@ -1,4 +1,4 @@
-* Issue  #280   Fixed the response (HTTP STatus and payload data) for Batch Create according to update in NGSi-LD API spec
+* Issue  #280   Fixed the response (HTTP Status and payload data) for Batch Create according to update in NGSi-LD API spec
 * Issue  #280   PATCH ops now support the MIME type 'application/marge-patch+json'
 * Issue  #280   Removed check for forbidden characters of entity type when inside the payload body
 * Issue  #280   Better URI validity test
