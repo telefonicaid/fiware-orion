@@ -32,6 +32,7 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
+- Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842))
 - Migration from legacy to new MongoDB driver ([#3132](https://github.com/telefonicaid/fiware-orion/issues/3132))
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Attribute update operators (inc, push, etc.) ([#3814](https://github.com/telefonicaid/fiware-orion/issues/3814))
@@ -43,6 +44,7 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
+- Service provisioning API (pools, etc.) ([#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
 - Advanced query language
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
