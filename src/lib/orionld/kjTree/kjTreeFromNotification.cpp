@@ -35,11 +35,10 @@ extern "C"
 #include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
 
 #include "common/RenderFormat.h"                                 // RenderFormat
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"           // kjTreeFromContextAttribute
@@ -81,7 +80,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   if ((mimeType == JSONLD) && (renderFormat != NGSI_LD_V1_V2_NORMALIZED))
   {
     if (context == NULL)
-      nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+      nodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
     else
       nodeP = kjString(orionldState.kjsonP, "@context", context);
 

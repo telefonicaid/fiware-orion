@@ -33,10 +33,11 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // coreContextUrl
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP, orionldDefaultUrl
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextCacheInit.h"             // orionldContextCacheInit
 #include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
@@ -183,7 +184,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
 
   OrionldContext* contextP = orionldContextFromBuffer(url, json, &pd);
 
-  if (strcmp(url, ORIONLD_CORE_CONTEXT_URL) == 0)
+  if (strcmp(url, coreContextUrl) == 0)
   {
     if (contextP == NULL)
       LM_X(1, ("error creating the core context from file system file '%s'", path));
@@ -267,7 +268,7 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
 
   if (gotCoreContext == false)
   {
-    orionldCoreContextP = orionldContextFromUrl(ORIONLD_CORE_CONTEXT_URL, pdP);
+    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, pdP);
 
     if (orionldCoreContextP == NULL)
       return false;

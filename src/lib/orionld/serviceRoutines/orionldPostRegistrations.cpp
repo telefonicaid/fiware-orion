@@ -34,10 +34,9 @@
 #include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
 #include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
 
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
 
@@ -77,7 +76,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     reg.ldContext = orionldState.contextP->url;
   else
-    reg.ldContext = ORIONLD_CORE_CONTEXT_URL;
+    reg.ldContext = coreContextUrl;
 
   //
   // Translate the incoming KjNode tree into a ngsiv2::Registration

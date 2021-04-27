@@ -42,9 +42,9 @@ extern "C"
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
-#include "orionld/common/orionldState.h"                       // orionldState
+
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
@@ -86,7 +86,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
   else
-    sub.ldContext = ORIONLD_CORE_CONTEXT_URL;
+    sub.ldContext = coreContextUrl;
 
   //
   // FIXME: attrsFormat etc. should be set to default by constructor
