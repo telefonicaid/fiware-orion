@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/common/orionldState.h"                         // coreContextUrl
 #include "orionld/context/orionldContextSimplify.h"              // Own interface
 
 
@@ -58,7 +58,7 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
   {
     KjNode* next = nodeP->next;
 
-    if ((nodeP->type == KjString) && (strcmp(nodeP->value.s, ORIONLD_CORE_CONTEXT_URL) == 0))
+    if ((nodeP->type == KjString) && (strcmp(nodeP->value.s, coreContextUrl) == 0))
       kjChildRemove(contextTreeP, nodeP);
     else
       ++itemsInArray;

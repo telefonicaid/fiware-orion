@@ -32,10 +32,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, kalloc
+#include "orionld/common/orionldState.h"                         // orionldState, kalloc, coreContextUrl
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextSimplify.h"              // orionldContextSimplify
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromObject.h"            // orionldContextFromObject
@@ -59,7 +59,7 @@ bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
   for (KjNode* itemP = contextTreeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     ++itemsInArray;
-    if ((itemP->type == KjString) && (strcmp(itemP->value.s, ORIONLD_CORE_CONTEXT_URL) == 0))
+    if ((itemP->type == KjString) && (strcmp(itemP->value.s, coreContextUrl) == 0))
       ++itemsToRemove;
   }
 

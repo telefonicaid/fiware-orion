@@ -38,7 +38,7 @@ extern "C"
 
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
@@ -89,6 +89,7 @@ Kjson             kjson;
 Kjson*            kjsonP;
 uint16_t          portNo                   = 0;
 int               dbNameLen;
+char*             coreContextUrl           = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
 char              orionldHostName[128];
 int               orionldHostNameLen       = -1;
 char*             tenantV[100];

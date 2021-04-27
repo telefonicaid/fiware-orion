@@ -361,6 +361,7 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
+extern char*             coreContextUrl;
 extern char              orionldHostName[128];
 extern int               orionldHostNameLen;
 extern char              kallocBuffer[32 * 1024];

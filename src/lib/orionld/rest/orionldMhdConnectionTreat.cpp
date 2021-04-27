@@ -50,7 +50,7 @@ extern "C"
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
-#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
+#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
@@ -66,7 +66,7 @@ extern "C"
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"           // kjGeojsonEntitiesTransform
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
@@ -544,7 +544,7 @@ static void contextToPayload(void)
   if (orionldState.payloadContextNode == NULL)
   {
     if (orionldState.link == NULL)
-      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", coreContextUrl);
     else
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
   }
@@ -576,7 +576,7 @@ static void contextToPayload(void)
       if (orionldState.payloadContextNode == NULL)
       {
         if (orionldState.link == NULL)
-          contextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+          contextNode = kjString(orionldState.kjsonP, "@context", coreContextUrl);
         else
           contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
       }

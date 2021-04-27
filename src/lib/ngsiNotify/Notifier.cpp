@@ -49,8 +49,7 @@ extern "C" {
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "cache/subCache.h"                                    // CachedSubscription
@@ -660,7 +659,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         if (httpInfo.mimeType == JSON)
         {
           if (subP->ldContext == "")
-            params->extraHeaders["Link"] = std::string("<") + ORIONLD_CORE_CONTEXT_URL + ">; " + LINK_REL_AND_TYPE;
+            params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
           else
             params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
         }

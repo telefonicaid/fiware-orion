@@ -33,8 +33,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // Own interface
 
 
@@ -110,7 +109,7 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoProper
     KjNode* contextP;
 
     if (orionldState.link == NULL)
-      contextP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+      contextP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
     else
       contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
 

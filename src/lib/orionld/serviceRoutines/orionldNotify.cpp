@@ -36,11 +36,11 @@ extern "C"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/serviceRoutines/orionldNotify.h"               // Own interface
 
 
@@ -206,7 +206,7 @@ void orionldNotify(void)
       if ((orionldState.contextP == NULL) || (orionldState.contextP == orionldCoreContextP))
       {
         orionldState.contextP = orionldCoreContextP;
-        KjNode* contextStringNodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+        KjNode* contextStringNodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
         kjChildAdd(notificationTree, contextStringNodeP);
       }
       else if (orionldState.contextP->tree != NULL)
