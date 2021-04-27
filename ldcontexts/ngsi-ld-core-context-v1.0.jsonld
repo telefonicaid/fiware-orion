@@ -102,7 +102,7 @@ https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
         "@type": "DateTime"
       },
       "lastFailure":{
-        "@id": "https://uri.etsi.org/ngsi-ld/lastFailure ",
+        "@id": "https://uri.etsi.org/ngsi-ld/lastFailure",
         "@type": "DateTime"
       },
       "lastSuccess":{
@@ -150,9 +150,9 @@ https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
           "@container": "@list"
       },
       "objects":{
-        "@id": "https://uri.etsi.org/ngsi-ld/hasObjects",
-        "@type": "@id",
-        "@container": "@list"
+          "@id": "https://uri.etsi.org/ngsi-ld/hasObjects",
+	      "@type": "@id",
+	      "@container": "@list"
       },
       "@vocab": "https://uri.etsi.org/ngsi-ld/default-context/"
     }
