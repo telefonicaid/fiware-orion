@@ -84,6 +84,11 @@ SET (SOURCES
     pgGeoSubMultiPolygonPush.cpp
     pgGeoSubMultiLineStringPush.cpp
     dbCreationCommand.cpp
+    pgAppendInit.cpp
+    pgAppend.cpp
+    pgAppendChar.cpp
+    pgAttributeBuild.cpp
+    pgSubAttributeBuild.cpp
 )
 
 SET (HEADERS
@@ -146,6 +151,12 @@ SET (HEADERS
     pgGeoSubLineStringPush.h
     pgGeoSubMultiPolygonPush.h
     pgGeoSubMultiLineStringPush.h
+    pgAppendInit.h
+    pgAppend.h
+    pgAttributeBuild.h
+    pgSubAttributeBuild.h
+    pgQuotedString.cpp
+    pgCommands.cpp
 )
 
 

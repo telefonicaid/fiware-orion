@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -38,12 +36,13 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgAttributeTreat.h"                     // pgAttyributeTreat
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
+#include "orionld/troe/pgAttributeTreat.h"                     // pgAttributeTreat
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePatchAttribute.h"                   // Own interface
 
@@ -63,16 +62,6 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
   troeSubAttrsExpand(orionldState.requestTree);
 
-  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
-
   char* entityId       = orionldState.wildcard[0];
   char* attributeName  = orionldState.wildcard[1];
 
@@ -82,23 +71,28 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   //
   orionldState.requestTree->name = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
 
-  if (pgAttributeTreat(connectionP, orionldState.requestTree, entityId, TROE_ATTRIBUTE_UPDATE) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  PgAppendBuffer attributes;
+  PgAppendBuffer subAttributes;
 
-    pgConnectionRelease(connectionP);
-    return false;
-  }
+  pgAppendInit(&attributes, 1024);  // Just a single attribute - 1024 should be enough
+  pgAppendInit(&subAttributes, 4 * 1024);
 
-  if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);  // pgAppend does strlen of PG_ATTRIBUTE_INSERT_START - for now!
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);  // pgAppend does strlen of PG_SUB_ATTRIBUTE_INSERT_START - for now!
+  pgAttributeBuild(&attributes, "Update", entityId, orionldState.requestTree, &subAttributes);
 
-  pgConnectionRelease(connectionP);
+  // <DEBUG>
+  attributes.buf[attributes.currentIx] = 0;
+  LM_TMP(("attributes.buf: %s", attributes.buf));
+  subAttributes.buf[subAttributes.currentIx] = 0;
+  LM_TMP(("subAttributes.buf: %s", subAttributes.buf));
+  // </DEBUG>
+
+  const char* sqlV[2]  = { attributes.buf, subAttributes.buf };
+  int         commands = (subAttributes.values > 0)? 2 : 1;
+
+  pgCommands(sqlV, commands);
 
   return true;
 }
+
