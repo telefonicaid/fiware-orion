@@ -41,7 +41,7 @@ void pgAppendInit(PgAppendBuffer* pgBufP, int initSize)
 {
   pgBufP->buf        = (char*) kaAlloc(&orionldState.kalloc, initSize);
   pgBufP->bufSize    = initSize;
-  pgBufP->toFree     = NULL;
+  pgBufP->allocated  = false;
   pgBufP->currentIx  = 0;
   pgBufP->values     = 0;
 }

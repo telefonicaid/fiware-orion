@@ -79,6 +79,10 @@ bool troePatchAttribute(ConnectionInfo* ciP)
 
   pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);  // pgAppend does strlen of PG_ATTRIBUTE_INSERT_START - for now!
   pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);  // pgAppend does strlen of PG_SUB_ATTRIBUTE_INSERT_START - for now!
+
+  LM_TMP(("TROE: attributes:    '%s'", attributes.buf));
+  LM_TMP(("TROE: subAttributes: '%s'", subAttributes.buf));
+
   pgAttributeBuild(&attributes, "Update", entityId, orionldState.requestTree, &subAttributes);
 
   // <DEBUG>

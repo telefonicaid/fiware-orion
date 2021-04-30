@@ -86,7 +86,6 @@ SET (SOURCES
     dbCreationCommand.cpp
     pgAppendInit.cpp
     pgAppend.cpp
-    pgAppendChar.cpp
     pgAttributeBuild.cpp
     pgSubAttributeBuild.cpp
 )

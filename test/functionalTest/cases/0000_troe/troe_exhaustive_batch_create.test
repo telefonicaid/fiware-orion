@@ -1249,5 +1249,3 @@ dbDrop CB
 dbDrop CB t1
 pgDrop $CB_DB_NAME
 pgDrop ${CB_DB_NAME}_t1
-
-

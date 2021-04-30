@@ -42,8 +42,8 @@ extern bool pgSubAttributeBuild
 (
   PgAppendBuffer*  subAttributesBuffer,
   const char*      entityId,
-  const char*      attrInstanceId,
-  const char*      attrDatasetId,
+  char*            attrInstanceId,
+  char*            attrDatasetId,
   KjNode*          subAttributeNodeP
 );
 

@@ -25,6 +25,9 @@
 #include <string.h>                                            // strlen, strncpy
 #include <stdlib.h>                                            // malloc
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // Own interface
@@ -55,19 +58,17 @@ void pgAppend(PgAppendBuffer* pgBufP, const char* tail, int tailLen)
         pgBufP->bufSize += 12 * 1024;  // Add an additional 12k if buffer > 32k (16k in total: 4+12)
 
       pgBufP->buf = (char*) malloc(pgBufP->bufSize);
+      if (pgBufP->allocated == true)
+        free(old);
+
+      pgBufP->allocated = true;
     }
 
     strncpy(pgBufP->buf, old, pgBufP->currentIx);
-
-    if (pgBufP->toFree != NULL)
-    {
-      free(pgBufP->toFree);
-      pgBufP->toFree = pgBufP->buf;
-    }
   }
 
   strncpy(&pgBufP->buf[pgBufP->currentIx], tail, tailLen);
   pgBufP->currentIx += tailLen;
 
-  pgBufP->buf[pgBufP->currentIx + 1] = 0;
+  pgBufP->buf[pgBufP->currentIx] = 0;
 }

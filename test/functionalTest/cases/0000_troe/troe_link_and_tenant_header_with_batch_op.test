@@ -104,5 +104,7 @@ http://example.org/P1_R1,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attrib
 
 --TEARDOWN--
 brokerStop CB
-pgDrop ftest_t1
+dbDrop CB
 dbDrop CB t1
+pgDrop ftest_t1
+pgDrop ftest

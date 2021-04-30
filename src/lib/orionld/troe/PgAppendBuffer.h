@@ -36,7 +36,7 @@ typedef struct PgAppendBuffer
 {
   char*  buf;        // The SQL buffer
   int    bufSize;    // The total size of the SQL buffer
-  char*  toFree;     // non-NULL if PgAppendBuffer::buf needs to be freed before reallocation
+  bool   allocated;  // if true: PgAppendBuffer::buf needs to be freed when reallocating
   int    currentIx;  // Current index in the buffer
   int    values;
 } PgAppendBuffer;
