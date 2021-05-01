@@ -58,11 +58,23 @@ void pgCommands(const char* sql[], int commands)
     LM_TMP(("TROE: SQL[%d]: %s", ix, sql[ix]));
     PGresult* res = PQexec(connectionP, sql[ix]);
     if (res == NULL)
-      LM_RVE(("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+    {
+      LM_E(("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("Database Error (pgTransactionRollback failed too)"));
+      pgConnectionRelease(connectionP);
+      return;
+    }
     PQclear(res);
 
     if (PQstatus(connectionP) != CONNECTION_OK)
+    {
       LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("Database Error (pgTransactionRollback failed too)"));
+      pgConnectionRelease(connectionP);
+      return;
+    }
   }
 
   if (pgTransactionCommit(connectionP) != true)

@@ -33,7 +33,6 @@ SET (SOURCES
     troePostBatchUpsert.cpp
     troePostEntities.cpp
     troePostEntity.cpp
-    troePostEntityNoOverwrite.cpp
     troePatchAttribute.cpp
     pgInit.cpp
     pgConnectionGet.cpp
@@ -88,6 +87,7 @@ SET (SOURCES
     pgAppend.cpp
     pgEntityBuild.cpp
     pgAttributeBuild.cpp
+    pgAttributesBuild.cpp
     pgSubAttributeBuild.cpp
     pgQuotedString.cpp
     pgCommands.cpp
@@ -106,7 +106,6 @@ SET (HEADERS
     troePostBatchUpsert.h
     troePostEntities.h
     troePostEntity.h
-    troePostEntityNoOverwrite.h
     troePatchAttribute.h
     pgInit.h
     pgConnectionGet.h

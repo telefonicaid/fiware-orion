@@ -44,12 +44,6 @@ extern "C"
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
 
@@ -147,9 +141,9 @@ bool troePostEntities(ConnectionInfo* ciP)
   PgAppendBuffer attributes;
   PgAppendBuffer subAttributes;
 
-  pgAppendInit(&entities, 100);       // Just a single entity - 1024 should be more than enough
-  pgAppendInit(&attributes, 100);     // 2k - enough only for smaller entities - will be reallocated if necessary
-  pgAppendInit(&subAttributes, 100);  // ditto
+  pgAppendInit(&entities, 1024);       // Just a single entity - 1024 should be more than enough
+  pgAppendInit(&attributes, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 2*1024);  // ditto
 
   pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
   pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);

@@ -91,6 +91,8 @@ static void subAttributeAppend
   const char*      object
 )
 {
+  LM_TMP(("TROE2: Treating sub-attr '%s' (valueNodeP at %p)", subAttributeName, valueNodeP));
+
   int         bufSize = 20480;
   char*       buf     = kaAlloc(&orionldState.kalloc, bufSize);
   const char* comma   = (subAttributesBufferP->values != 0)? "," : "";
@@ -236,6 +238,12 @@ bool pgSubAttributeBuild
   KjNode* valueNodeP    = NULL;
 
   LM_TMP(("TROE: Building sub-attribute '%s'", subAttributeNodeP->name));
+
+  if (subAttributeNodeP->type != KjObject)
+  {
+    LM_TMP(("TROE2: sub-attribute '%s' is not an object (%s) - skipped", subAttributeNodeP->name, kjValueType(subAttributeNodeP->type)));
+    return true;
+  }
 
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
