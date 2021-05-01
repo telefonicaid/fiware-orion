@@ -86,8 +86,11 @@ SET (SOURCES
     dbCreationCommand.cpp
     pgAppendInit.cpp
     pgAppend.cpp
+    pgEntityBuild.cpp
     pgAttributeBuild.cpp
     pgSubAttributeBuild.cpp
+    pgQuotedString.cpp
+    pgCommands.cpp
 )
 
 SET (HEADERS
@@ -152,10 +155,11 @@ SET (HEADERS
     pgGeoSubMultiLineStringPush.h
     pgAppendInit.h
     pgAppend.h
+    pgEntityBuild.h
     pgAttributeBuild.h
     pgSubAttributeBuild.h
-    pgQuotedString.cpp
-    pgCommands.cpp
+    pgQuotedString.h
+    pgCommands.h
 )
 
 

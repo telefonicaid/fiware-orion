@@ -119,9 +119,9 @@ static void attributeAppend
   }
   else if (strcmp(type, "GeoProperty") == 0)
   {
-    KjNode*     geoTypeNodeP     = kjLookup(valueNodeP, "type");
-    KjNode*     coordinatesNodeP = kjLookup(valueNodeP, "coordinates");
-    const char* geoType          = geoTypeNodeP->value.s;
+    KjNode*      geoTypeNodeP     = kjLookup(valueNodeP, "type");
+    KjNode*      coordinatesNodeP = kjLookup(valueNodeP, "coordinates");
+    const char*  geoType          = geoTypeNodeP->value.s;
 
     LM_TMP(("TROE: Appending '%s' GeoProperty '%s'", geoType, attributeName));
     if (strcmp(geoType, "Point") == 0)
@@ -132,7 +132,7 @@ static void attributeAppend
 
       kjGeoPointExtract(coordinatesNodeP, &longitude, &latitude, &altitude);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPoint', null, null, null, null, null, null, ST_GeomFromText('POINT Z(%f %f %f)'), null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPoint', null, null, null, null, null, ST_GeomFromText('POINT Z(%f %f %f)'), null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, longitude, latitude, altitude, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiPoint") == 0)
@@ -145,7 +145,7 @@ static void attributeAppend
 
       kjGeoLineStringExtract(coordinatesNodeP, coordsString, 10240);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoLineString', null, null, null, null, null, null, null, null, null, ST_GeomFromText('LINESTRING(%s)', 4326), null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoLineString', null, null, null, null, null, null, null, null, ST_GeomFromText('LINESTRING(%s)', 4326), null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiLineString") == 0)
@@ -154,7 +154,7 @@ static void attributeAppend
 
       kjGeoMultiLineStringExtract(coordinatesNodeP, coordsString, 10240);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiLineString', null, null, null, null, null, null, null, null, null, null, ST_GeomFromText('MULTILINESTRING(%s)', 4326), '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiLineString', null, null, null, null, null, null, null, null, null, ST_GeomFromText('MULTILINESTRING(%s)', 4326), '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "Polygon") == 0)
@@ -162,7 +162,7 @@ static void attributeAppend
       char* coordsString = kaAlloc(&orionldState.kalloc, 2048);
 
       kjGeoPolygonExtract(coordinatesNodeP, coordsString, 2048);
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPolygon', null, null, null, null, null, null, null, ST_GeomFromText('POLYGON(%s)'), null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPolygon', null, null, null, null, null, null, ST_GeomFromText('POLYGON(%s)'), null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiPolygon") == 0)
@@ -170,7 +170,7 @@ static void attributeAppend
       char* coordsString = kaAlloc(&orionldState.kalloc, 4096);
 
       kjGeoMultiPolygonExtract(coordinatesNodeP, coordsString, 4096);
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPolygon', null, null, null, null, null, null, null, null, ST_GeomFromText('MULTIPOLYGON(%s)', 4326), null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPolygon', null, null, null, null, null, null, null, ST_GeomFromText('MULTIPOLYGON(%s)', 4326), null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
   }
@@ -187,7 +187,7 @@ static void attributeAppend
       LM_TMP(("TROE: Appending 'Boolean' attribute '%s'", attributeName));
       const char* value = (valueNodeP->value.b == true)? "true" : "false";
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Bool', null, %s, null, null, null, null, null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Boolean', null, %s, null, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, value, orionldState.requestTimeString);
     }
     else if (valueNodeP->type == KjInt)
@@ -211,7 +211,7 @@ static void attributeAppend
 
       kjFastRender(orionldState.kjsonP, valueNodeP, renderedValue, renderedValueSize);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Number', null, null, null, null, '%s', null, null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Compound', null, null, null, null, '%s', null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, renderedValue, orionldState.requestTimeString);
     }
   }
@@ -261,10 +261,13 @@ bool pgAttributeBuild
   KjNode* nodeP = attributeNodeP->value.firstChildP;
   KjNode* next;
 
+  LM_TMP(("TROE: Building attribute '%s'", attributeNodeP->name));
+
   while (nodeP != NULL)
   {
     next = nodeP->next;
 
+    LM_TMP(("Treating sub-attr '%s'", nodeP->name));
     if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = nodeP->value.s;  // Might need pgObservedAtExtract()
     else if (strcmp(nodeP->name, "unitCode")   == 0)  unitCode   = nodeP->value.s;
     else if (strcmp(nodeP->name, "type")       == 0)  type       = nodeP->value.s;

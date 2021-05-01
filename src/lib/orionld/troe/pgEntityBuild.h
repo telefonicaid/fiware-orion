@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TROE_PGENTITYBUILD_H_
+#define SRC_LIB_ORIONLD_TROE_PGENTITYBUILD_H_
+
 /*
 *
 * Copyright 2021 FIWARE Foundation e.V.
@@ -24,25 +27,26 @@
 */
 extern "C"
 {
-#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kjson/KjNode.h"                                           // KjNode
 }
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
-#include "orionld/troe/pgAppendInit.h"                         // Own interface
+#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pgAppendInit -
+// pgEntityBuild -
 //
-void pgAppendInit(PgAppendBuffer* pgBufP, int initSize)
-{
-  pgBufP->buf        = (char*) kaAlloc(&orionldState.kalloc, initSize);
-  pgBufP->buf[0]     = 0;
-  pgBufP->bufSize    = initSize;
-  pgBufP->allocated  = false;
-  pgBufP->currentIx  = 0;
-  pgBufP->values     = 0;
-}
+extern bool pgEntityBuild
+(
+  PgAppendBuffer*  entitiesBufferP,
+  const char*      opMode,
+  KjNode*          entityNodeP,
+  char*            entityId,
+  char*            entityType,
+  PgAppendBuffer*  attributesBufferP,
+  PgAppendBuffer*  subAttributesBufferP
+);
+
+#endif  // SRC_LIB_ORIONLD_TROE_PGENTITYBUILD_H_

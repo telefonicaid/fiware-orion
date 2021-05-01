@@ -177,7 +177,7 @@ static void subAttributeAppend
       LM_TMP(("TROE: Appending 'Boolean' sub-attribute '%s'", subAttributeName));
       const char* value = (valueNodeP->value.b == true)? "true" : "false";
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Bool', null, %s, null, null, null, null, null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Boolean', null, %s, null, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, value, orionldState.requestTimeString);
     }
     else if (valueNodeP->type == KjInt)
@@ -202,7 +202,7 @@ static void subAttributeAppend
 
       kjFastRender(orionldState.kjsonP, valueNodeP, renderedValue, renderedValueSize);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Compound', null, null, null, '%s', null, null, null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Compound', null, null, null, null, '%s', null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, renderedValue, orionldState.requestTimeString);
     }
   }
