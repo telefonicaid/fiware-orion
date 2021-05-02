@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -93,13 +94,23 @@ bool pgEntityBuild
   if (entityId == NULL)
   {
     KjNode* entityIdNodeP = kjLookup(entityNodeP, "id");
+
+    if (entityIdNodeP == NULL)
+      LM_RE(false, ("entity without id"));
+
     entityId = entityIdNodeP->value.s;
+    kjChildRemove(entityNodeP, entityIdNodeP);
   }
 
   if (entityType == NULL)
   {
     KjNode* entityTypeNodeP = kjLookup(entityNodeP, "type");
+
+    if (entityTypeNodeP == NULL)
+      LM_RE(false, ("entity without type"));
+
     entityType = entityTypeNodeP->value.s;
+    kjChildRemove(entityNodeP, entityTypeNodeP);
   }
 
   if ((entityId == NULL) || (entityType == NULL))

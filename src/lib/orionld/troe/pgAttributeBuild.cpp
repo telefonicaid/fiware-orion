@@ -243,6 +243,12 @@ bool pgAttributeBuild
   PgAppendBuffer*  subAttributesBuffer
 )
 {
+  if (attributeNodeP->type != KjObject)
+  {
+    LM_TMP(("TROE: Skipping attribute '%s' (not an object)", attributeNodeP->name));
+    return false;
+  }
+
   char    instanceId[80];
   char*   type          = NULL;
   char*   observedAt    = NULL;
@@ -253,7 +259,7 @@ bool pgAttributeBuild
   KjNode* valueNodeP    = NULL;
   KjNode* subAttrV      = kjArray(orionldState.kjsonP, NULL);
 
-  LM_TMP(("TROE: Building attribute '%s'", attributeNodeP->name));
+  LM_TMP(("TROE: Building attribute '%s' (type: %s)", attributeNodeP->name, kjValueType(attributeNodeP->type)));
 
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
@@ -261,7 +267,7 @@ bool pgAttributeBuild
   KjNode* nodeP = attributeNodeP->value.firstChildP;
   KjNode* next;
 
-  LM_TMP(("TROE: Building attribute '%s'", attributeNodeP->name));
+  LM_TMP(("TROE: Building attribute '%s' (type: %s)", attributeNodeP->name, kjValueType(attributeNodeP->type)));
 
   while (nodeP != NULL)
   {
@@ -276,6 +282,8 @@ bool pgAttributeBuild
     else if (strcmp(nodeP->name, "object")     == 0)  object     = nodeP->value.s;
     else if (strcmp(nodeP->name, "createdAt")  == 0)  {}  // Skipping
     else if (strcmp(nodeP->name, "modifiedAt") == 0)  {}  // Skipping
+    else if (strcmp(nodeP->name, "https://uri.etsi.org/ngsi-ld/createdAt")  == 0)  {}  // Skipping
+    else if (strcmp(nodeP->name, "https://uri.etsi.org/ngsi-ld/modifiedAt") == 0)  {}  // Skipping
     else
     {
       subProperties = true;
