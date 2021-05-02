@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -38,13 +36,15 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+
 #include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostBatchUpsert.h"                  // Own interface
 
 
@@ -74,96 +74,74 @@ static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
 //
 bool troePostBatchUpsert(ConnectionInfo* ciP)
 {
-  PGconn* connectionP;
+  PgAppendBuffer  entities;
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
+  char*           troeEntityMode     = (char*) "Replace";
 
-  connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("unable to connect to postgres DB '%s'", orionldState.tenant));
+  pgAppendInit(&entities, 4*1024);       // 4k - will be reallocated if necessary
+  pgAppendInit(&attributes, 8*1024);     // 8k - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 8*1024);  // ditto
 
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  bool     ok                 = true;
-  TroeMode troeEntityMode     = TROE_ENTITY_REPLACE;
-  TroeMode troeAttributeMode  = TROE_ATTRIBUTE_REPLACE;
+  troeEntityArrayExpand(orionldState.requestTree);
 
   if (orionldState.duplicateArray != NULL)
   {
-    troeEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
+    troeEntityArrayExpand(orionldState.duplicateArray);
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeEntityMode, troeAttributeMode) == false)
-      {
-        LM_E(("Database Error (pgEntityTreat failed)"));
-        ok = false;
-        break;
-      }
+      pgEntityBuild(&entities, "Replace", entityP, NULL, NULL, &attributes, &subAttributes);
     }
   }
 
-  if (ok == true)
+  troeEntityArrayExpand(orionldState.requestTree);
+  for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
-    troeEntityArrayExpand(orionldState.requestTree);
+    if (troeIgnored(entityP) == true)
+      continue;
 
-    for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    KjNode* entityIdP    = kjLookup(entityP, "id");
+    bool    entityUpdate = false;  // Updated of entities aren't recorded in the "entities" table
+
+    if (entityIdP != NULL)  // Can't be NULL, really ...
     {
-      if (troeIgnored(entityP) == true)
-        continue;
-
-      KjNode* entityIdP = kjLookup(entityP, "id");
-      if (entityIdP != NULL)  // Can't be NULL, really ...
+      if (orionldState.batchEntities != NULL)
       {
-        if (orionldState.batchEntities != NULL)
-        {
-          // If the entity already existed, the entity op mode must be "REPLACE"
-          if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
-          {
-            troeEntityMode    = TROE_ENTITY_CREATE;
-            troeAttributeMode = TROE_ENTITY_CREATE;
-          }
-          else
-          {
-            troeEntityMode    = (orionldState.uriParamOptions.update == true)? TROE_ENTITY_UPDATE : TROE_ENTITY_REPLACE;
-            troeAttributeMode = TROE_ATTRIBUTE_REPLACE;
-          }
-        }
+        // If the entity already existed, the entity op mode must be "REPLACE"
+        if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
+          troeEntityMode    = (char*) "Create";
         else
         {
-          troeEntityMode    = TROE_ENTITY_CREATE;
-          troeAttributeMode = TROE_ENTITY_CREATE;
+          if (orionldState.uriParamOptions.update == true)
+            entityUpdate = true;
+          else
+            troeEntityMode = (char*) "Replace";
         }
       }
-
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeEntityMode, troeAttributeMode) == false)
-      {
-        LM_E(("Database Error (pgEntityTreat failed)"));
-        ok = false;
-        break;
-      }
+      else
+        troeEntityMode = (char*) "Create";
     }
+
+    if (entityUpdate == true)
+      pgAttributesBuild(&attributes, entityP, NULL, "Replace", &subAttributes);
+    else
+      pgEntityBuild(&entities, troeEntityMode, entityP, NULL, NULL, &attributes, &subAttributes);
   }
 
-  if (ok == false)
-  {
-    LM_E(("Database Error (batch create TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  const char* sqlV[3]  = { entities.buf, attributes.buf, subAttributes.buf };
+  int         commands = 1;
 
-    pgConnectionRelease(connectionP);
-    return false;
-  }
+  if (attributes.values > 0)
+    ++commands;
 
-  if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  if (subAttributes.values > 0)
+    ++commands;
 
-  pgConnectionRelease(connectionP);
+  pgCommands(sqlV, commands);
 
   return true;
 }

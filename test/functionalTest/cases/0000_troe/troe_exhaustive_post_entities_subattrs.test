@@ -56,7 +56,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg1",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -93,7 +93,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg2",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -130,7 +130,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg3",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -167,7 +167,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg4",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -205,7 +205,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg5",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -243,7 +243,7 @@ payload='{
   "owner": {
     "type": "Property",
     "value": "Peter Farmer",
-    "unitCode": "kg",
+    "unitCode": "kg6",
     "createdAt":  "2021-03-07T08:30:01.123Z",
     "modifiedAt": "2021-03-07T08:30:02.123Z",
     "observedAt": "2021-03-07T08:30:03.123Z",
@@ -380,9 +380,9 @@ Create,urn:ngsi-ld:entity:E5,https://uri.fiware.org/ns/data-models#Device,202REG
 08. See all attributes in TRoE DB, default tenant
 =================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,String,urn:ngsi-ld:entity:E1,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E3,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E5,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,String,urn:ngsi-ld:entity:E1,t,kg1,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E3,t,kg3,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E5,t,kg5,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
 
 
 09. See all sub-attributes in TRoE DB, default tenant
@@ -410,9 +410,9 @@ Create,urn:ngsi-ld:entity:E6,https://uri.fiware.org/ns/data-models#Device,202REG
 11. See all attributes in TRoE DB, tenant T1
 ============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/owner,String,urn:ngsi-ld:entity:E2,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E4,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
-Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E6,t,,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/owner,String,urn:ngsi-ld:entity:E2,t,kg2,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E4,t,kg4,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
+Create,https://uri.fiware.org/ns/data-models#owner,String,urn:ngsi-ld:entity:E6,t,kg6,None,Peter Farmer,,,2021-03-07 08:30:03.123,202REGEX(.*)
 
 
 12. See all sub-attributes in TRoE DB, tenant T1

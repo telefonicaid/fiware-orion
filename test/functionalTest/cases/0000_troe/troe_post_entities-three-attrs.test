@@ -1,0 +1,119 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity with three attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with three attributes
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity E1 with three attributes"
+echo "============================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "Rela": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:rel:R1",
+    "observedAt": "2020-12-10T07:12:00.124Z"
+  },
+  "String": {
+    "type": "Property",
+    "value": "string property",
+    "observedAt": "2020-12-10T07:12:00.125Z"
+  },
+  "Integer": {
+    "type": "Property",
+    "value": 1,
+    "observedAt": "2020-12-10T07:12:00.126Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with three attributes
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/Rela,Relationship,urn:ngsi-ld:entities:E1,f,,None,urn:ngsi-ld:rel:R1,,,,2020-12-10 07:12:00.124
+Create,https://uri.etsi.org/ngsi-ld/default-context/String,String,urn:ngsi-ld:entities:E1,f,,None,string property,,,,2020-12-10 07:12:00.125
+Create,https://uri.etsi.org/ngsi-ld/default-context/Integer,Number,urn:ngsi-ld:entities:E1,f,,None,,1,,,2020-12-10 07:12:00.126
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,compound,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TROE_TROEPOSTENTITYNOOVERWRITE_H_
-#define SRC_LIB_ORIONLD_TROE_TROEPOSTENTITYNOOVERWRITE_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGATTRIBUTEBUILD_H_
+#define SRC_LIB_ORIONLD_TROE_PGATTRIBUTEBUILD_H_
 
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+extern "C"
+{
+#include "kjson/KjNode.h"                                           // KjNode
+}
+
+#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
 
 
 
 // ----------------------------------------------------------------------------
 //
-// troePostEntityNoOverwrite -
+// pgAttributeBuild -
 //
-extern bool troePostEntityNoOverwrite(ConnectionInfo* ciP);
+extern bool pgAttributeBuild(PgAppendBuffer* attributesBuffer, const char* opMode, const char* entityId, KjNode* attributeNodeP, PgAppendBuffer* subAttributesBuffer);
 
-#endif  // SRC_LIB_ORIONLD_TROE_TROEPOSTENTITYNOOVERWRITE_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTEBUILD_H_

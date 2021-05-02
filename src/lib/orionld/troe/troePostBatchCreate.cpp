@@ -35,13 +35,13 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
 #include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
 
@@ -52,53 +52,35 @@ extern "C"
 //
 bool troePostBatchCreate(ConnectionInfo* ciP)
 {
-  PGconn* connectionP;
+  PgAppendBuffer  entities;
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
 
-  //
-  // FIXME: the tree should be served expanded + with erroneous entities removed
-  //
+  pgAppendInit(&entities, 4*1024);       // 4k - will be reallocated if necessary
+  pgAppendInit(&attributes, 8*1024);     // 8k - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 8*1024);  // ditto
 
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchCreate.cpp has been fixed to do that
   troeEntityArrayExpand(orionldState.requestTree);
 
-  connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
-
-  bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_CREATE, TROE_ENTITY_CREATE) == false)
-    {
-      ok = false;
-      break;
-    }
+    pgEntityBuild(&entities, "Create", entityP, NULL, NULL, &attributes, &subAttributes);
   }
 
-  if (ok == false)
-  {
-    LM_E(("Database Error (batch create TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  const char* sqlV[3]  = { entities.buf, attributes.buf, subAttributes.buf };
+  int         commands = 1;
 
-    pgConnectionRelease(connectionP);
-    return false;
-  }
+  if (attributes.values > 0)
+    ++commands;
 
-  if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  if (subAttributes.values > 0)
+    ++commands;
 
-  pgConnectionRelease(connectionP);
+  pgCommands(sqlV, commands);
 
   return true;
 }

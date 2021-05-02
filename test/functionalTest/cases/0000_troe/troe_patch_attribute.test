@@ -33,7 +33,7 @@ brokerStart CB 100 IPv4 -troe
 
 #
 # 01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
-# 02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44
+# 02. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
 # 03. See E1 in the temporal database
 # 04. See the attributes in the temporal database
 # 05. See the sub-attributes in the temporal database
@@ -71,8 +71,8 @@ echo
 echo
 
 
-echo "02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44"
-echo "=============================================================================="
+echo "02. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44"
+echo "======================================================================================================"
 payload='{
   "value": 44,
   "Sub-R": {
@@ -83,6 +83,41 @@ payload='{
   "Sub-P": {
     "type": "Property",
     "value": "Sub-P"
+  },
+  "geo-point": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1,2,3 ]
+    }
+  },
+  "geo-line-string": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates":  [ [ 1,2 ], [3,4], [5,6] ]
+    }
+  },
+  "geo-multi-line-string": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "MultiLineString",
+      "coordinates":  [ [ [ 1,2 ], [3,4], [5,6] ], [ [ 1,2 ], [3,4], [5,6] ] ]
+    }
+  },
+  "geo-polygon": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]]
+    }
+  },
+  "geo-multi-polygon": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "MultiPolygon",
+      "coordinates": [ [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]], [[ [10,0], [14,0], [14,-2], [10,-2], [10,0] ]] ]
+    }
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P -X PATCH --payload "$payload"
@@ -121,8 +156,8 @@ Date: REGEX(.*)
 
 
 
-02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44
-==============================================================================
+02. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
+======================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -149,6 +184,11 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:enti
 https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-i,,33,,2020-12-10 07:12:00.128
 https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:rel:R2,,,2020-12-10 07:12:00.124
 https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P,,,
+https://uri.etsi.org/ngsi-ld/default-context/geo-point,GeoPoint,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,
+https://uri.etsi.org/ngsi-ld/default-context/geo-line-string,GeoLineString,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,
+https://uri.etsi.org/ngsi-ld/default-context/geo-multi-line-string,GeoMultiLineString,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,
+https://uri.etsi.org/ngsi-ld/default-context/geo-polygon,GeoPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,
+https://uri.etsi.org/ngsi-ld/default-context/geo-multi-polygon,GeoMultiPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,
 
 
 --TEARDOWN--

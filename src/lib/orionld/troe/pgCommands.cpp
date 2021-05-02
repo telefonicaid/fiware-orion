@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -24,63 +24,61 @@
 */
 #include <postgresql/libpq-fe.h>                               // PGconn
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjRender.h"                                    // kjRender
-}
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
-#include "orionld/troe/troePostEntityNoOverwrite.h"            // Own interface
+#include "orionld/troe/pgCommands.h"                           // Own interface
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// troePostEntityNoOverwrite -
+// pgCommands -
 //
-bool troePostEntityNoOverwrite(ConnectionInfo* ciP)
+void pgCommands(const char* sql[], int commands)
 {
   PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+    LM_RVE(("no connection to postgres"));
 
   if (pgTransactionBegin(connectionP) != true)
   {
     pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
+    LM_RVE(("pgTransactionBegin failed"));
   }
 
-  char* entityId   = orionldState.wildcard[0];
-  char* entityType = (char*) "APPEND";
-
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ENTITY_UPDATE, TROE_ATTRIBUTE_APPEND) == false)
+  for (int ix = 0; ix < commands; ix++)
   {
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("Database Error (pgTransactionRollback failed too)"));
+    LM_TMP(("TROE: SQL[%d]: %s", ix, sql[ix]));
+    PGresult* res = PQexec(connectionP, sql[ix]);
+    if (res == NULL)
+    {
+      LM_E(("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("Database Error (pgTransactionRollback failed too)"));
+      pgConnectionRelease(connectionP);
+      return;
+    }
+    PQclear(res);
 
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("Database Error (post entities TRoE layer failed)"));
+    if (PQstatus(connectionP) != CONNECTION_OK)
+    {
+      LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
+      if (pgTransactionRollback(connectionP) == false)
+        LM_E(("Database Error (pgTransactionRollback failed too)"));
+      pgConnectionRelease(connectionP);
+      return;
+    }
   }
 
   if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+    LM_E(("pgTransactionCommit failed"));
 
   pgConnectionRelease(connectionP);
-
-  return true;
 }

@@ -126,7 +126,7 @@ void orionldStateInit(void)
   //
   // Creating kjson environment for KJson parse and render
   //
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
+  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 64 * 1024, NULL, "Thread KAlloc buffer");
 
   kTimeGet(&orionldState.timestamp);
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;

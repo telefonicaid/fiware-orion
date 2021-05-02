@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjChildRemove
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -37,12 +38,12 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
 
@@ -126,49 +127,42 @@ void troeEntityExpand(KjNode* entityP)
 //
 bool troePostEntities(ConnectionInfo* ciP)
 {
-  PGconn* connectionP;
-  KjNode* entityP = orionldState.requestTree;
+  char*    entityId    = (orionldState.payloadIdNode   != NULL)? orionldState.payloadIdNode->value.s   : NULL;
+  char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+  KjNode*  entityP     = orionldState.requestTree;
 
   // Expand entity type and attribute names - FIXME: Remove once orionldPostEntities() has been fixed to do that
   troeEntityExpand(entityP);
 
-  connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-  {
-    orionldProblemDetailsFill(&orionldState.pd, OrionldInternalError, "Database Error", "No connection to TRoE database", 500);
-    LM_RE(false, ("no connection to postgres"));
-  }
+  if (entityType != NULL)
+    entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
 
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    orionldProblemDetailsFill(&orionldState.pd, OrionldInternalError, "Database Error", "Transaction begin for TRoE database", 500);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
+  PgAppendBuffer entities;
+  PgAppendBuffer attributes;
+  PgAppendBuffer subAttributes;
 
-  char* entityId   = orionldState.payloadIdNode->value.s;
-  char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // entity type
-  if (pgEntityTreat(connectionP, entityP, entityId, entityType, orionldState.troeOpMode, orionldState.troeOpMode) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  pgAppendInit(&entities, 1024);         // Just a single entity - 1024 should be more than enough
+  pgAppendInit(&attributes, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 2*1024);  // ditto
 
-    orionldProblemDetailsFill(&orionldState.pd, OrionldInternalError, "Database Error", "unable to push the entity information to the TRoE database", 500);
-    pgConnectionRelease(connectionP);
-    return false;
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-    {
-      LM_E(("pgTransactionCommit failed"));
-      orionldProblemDetailsFill(&orionldState.pd, OrionldInternalError, "Database Error", "Unable to commit transaction", 500);
-      pgConnectionRelease(connectionP);
-      return false;
-    }
-  }
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  pgConnectionRelease(connectionP);
+  const char* opModeString = (orionldState.troeOpMode == TROE_ENTITY_CREATE)? "Create" : "Replace";
+
+  pgEntityBuild(&entities, opModeString, entityP, entityId, entityType, &attributes, &subAttributes);
+
+  const char* sqlV[3]  = { entities.buf, attributes.buf, subAttributes.buf };
+  int         commands = 1;
+
+  if (attributes.values > 0)
+    ++commands;
+
+  if (subAttributes.values > 0)
+    ++commands;
+
+  pgCommands(sqlV, commands);
 
   return true;
 }
