@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgSubAttributeBuild.h"                  // pgSubAttributeBuild
 #include "orionld/troe/pgQuotedString.h"                       // pgQuotedString
+#include "orionld/troe/pgObservedAtExtract.h"                  // pgObservedAtExtract
 #include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
 #include "orionld/troe/kjGeoLineStringExtract.h"               // kjGeoLineStringExtract
 #include "orionld/troe/kjGeoMultiLineStringExtract.h"          // kjGeoMultiLineStringExtract
@@ -274,7 +275,7 @@ bool pgAttributeBuild
     next = nodeP->next;
 
     LM_TMP(("Treating sub-attr '%s'", nodeP->name));
-    if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = nodeP->value.s;  // Might need pgObservedAtExtract()
+    if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(nodeP);
     else if (strcmp(nodeP->name, "unitCode")   == 0)  unitCode   = nodeP->value.s;
     else if (strcmp(nodeP->name, "type")       == 0)  type       = nodeP->value.s;
     else if (strcmp(nodeP->name, "datasetId")  == 0)  datasetId  = nodeP->value.s;

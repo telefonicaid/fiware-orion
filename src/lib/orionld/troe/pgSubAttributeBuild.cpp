@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgQuotedString.h"                       // pgQuotedString
+#include "orionld/troe/pgObservedAtExtract.h"                  // pgObservedAtExtract
 #include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
 #include "orionld/troe/kjGeoLineStringExtract.h"               // kjGeoLineStringExtract
 #include "orionld/troe/kjGeoMultiLineStringExtract.h"          // kjGeoMultiLineStringExtract
@@ -250,7 +251,7 @@ bool pgSubAttributeBuild
   // Extract sub-attribute info
   for (KjNode* nodeP = subAttributeNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = nodeP->value.s;  // Might need pgObservedAtExtract()
+    if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(nodeP);
     else if (strcmp(nodeP->name, "unitCode")   == 0)  unitCode   = nodeP->value.s;
     else if (strcmp(nodeP->name, "type")       == 0)  type       = nodeP->value.s;
     else if (strcmp(nodeP->name, "value")      == 0)  valueNodeP = nodeP;

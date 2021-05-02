@@ -37,12 +37,13 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePatchEntity.h"                      // Own interface
 
 
@@ -53,36 +54,26 @@ extern "C"
 //
 bool troePatchEntity(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
-
   char* entityId   = orionldState.wildcard[0];
-  char* entityType = (char*) "REPLACE";
 
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ENTITY_UPDATE, TROE_ATTRIBUTE_REPLACE) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  PgAppendBuffer attributesBuffer;
+  PgAppendBuffer subAttributesBuffer;
 
-    pgConnectionRelease(connectionP);
-    return false;
-  }
+  pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributesBuffer, 2*1024);  // ditto
 
-  if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  pgAppend(&attributesBuffer,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributesBuffer, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  pgConnectionRelease(connectionP);
+  pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, "Replace", &subAttributesBuffer);
+
+  const char* sqlV[2]  = { attributesBuffer.buf, subAttributesBuffer.buf };
+  int         commands = 1;
+
+  if (subAttributesBuffer.values > 0)
+    ++commands;
+
+  pgCommands(sqlV, commands);
 
   return true;
 }
