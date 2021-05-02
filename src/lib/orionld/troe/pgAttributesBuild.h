@@ -38,6 +38,6 @@ extern "C"
 //
 // pgAttributesBuild -
 //
-extern void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, const char* entityId, const char* opMode, PgAppendBuffer* subAttributesBufferP);
+extern void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, char* entityId, const char* opMode, PgAppendBuffer* subAttributesBufferP);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTESBUILD_H_

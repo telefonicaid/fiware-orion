@@ -22,15 +22,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                                 // NULL
+#include <unistd.h>                                            // NULL
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                           // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
-#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
-#include "orionld/troe/pgAttributeBuild.h"                          // pgAttributeBuild
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
 
 
 
@@ -38,8 +42,24 @@ extern "C"
 //
 // pgAttributesBuild -
 //
-void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, const char* entityId, const char* opMode, PgAppendBuffer* subAttributesBufferP)
+// The entity id can be passed either as a separate parameter (char* entityId),
+// or as part of the attribute list (KjNode* attrList).
+// In the latter case, the entityIs nmust be extracted from 'attrList' before the list is treated.
+//
+void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, char* entityId, const char* opMode, PgAppendBuffer* subAttributesBufferP)
 {
+  if (entityId == NULL)
+  {
+    KjNode* entityIdNodeP = kjLookup(attrList, "id");
+
+    if (entityIdNodeP == NULL)
+      LM_RVE(("Internal Error (entity without id)"));
+    else if (entityIdNodeP->type != KjString)
+      LM_RVE(("Internal Error (entity id field not a string (%s))", kjValueType(entityIdNodeP->type)));
+
+    entityId = entityIdNodeP->value.s;
+  }
+
   for (KjNode* attrP = attrList->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (attrP->type == KjArray)
@@ -50,7 +70,9 @@ void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, cons
         pgAttributeBuild(attributesBufferP, opMode, entityId, aiP, subAttributesBufferP);
       }
     }
-    else
+    else if (attrP->type == KjObject)
       pgAttributeBuild(attributesBufferP, opMode, entityId, attrP, subAttributesBufferP);
+    else
+      LM_TMP(("TROE: Not treating entity-path '%s'", attrP->name));
   }
 }

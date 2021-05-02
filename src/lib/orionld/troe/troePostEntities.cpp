@@ -141,7 +141,7 @@ bool troePostEntities(ConnectionInfo* ciP)
   PgAppendBuffer attributes;
   PgAppendBuffer subAttributes;
 
-  pgAppendInit(&entities, 1024);       // Just a single entity - 1024 should be more than enough
+  pgAppendInit(&entities, 1024);         // Just a single entity - 1024 should be more than enough
   pgAppendInit(&attributes, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
   pgAppendInit(&subAttributes, 2*1024);  // ditto
 
