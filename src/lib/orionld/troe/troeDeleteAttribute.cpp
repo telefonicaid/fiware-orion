@@ -38,14 +38,16 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgAttributeDelete.h"                    // pgAttributeDelete
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributeAppend.h"                    // pgAttributeAppend
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troeDeleteAttribute.h"                  // Own interface
 
+
+// FIXME: Move to pgAttributeAppend.h/cpp
 
 
 // ----------------------------------------------------------------------------
@@ -54,41 +56,33 @@ extern "C"
 //
 bool troeDeleteAttribute(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres at %s", orionldState.tenant));
-
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
-
+  LM_TMP(("In troeDeleteAttribute"));
   char* entityId      = orionldState.wildcard[0];
   char* attributeName = orionldState.wildcard[1];
   char* attributeNameEq;
   char  instanceId[80];
+
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
   attributeName   = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
   attributeNameEq = kaStrdup(&orionldState.kalloc, attributeName);
   dotForEq(attributeNameEq);
 
+  //
+  // Prepare attributesBuffer
+  //
+  PgAppendBuffer  attributesBuffer;
+  pgAppendInit(&attributesBuffer, 1024);       // Will grow if needed
+  pgAppend(&attributesBuffer, PG_ATTRIBUTE_INSERT_START, 0);
+
   if (orionldState.uriParams.datasetId != NULL)
   {
-    if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.uriParams.datasetId, orionldState.requestTimeString) == false)
-    {
-      LM_E(("Database Error (delete attribute with datasetId troe layer failed)"));
-
-      if (pgTransactionRollback(connectionP) == false)
-        LM_E(("pgTransactionRollback failed"));
-
-      pgConnectionRelease(connectionP);
-      return false;
-    }
+    LM_TMP(("orionldState.uriParams.datasetId != NULL"));
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
   }
   else if (orionldState.uriParams.deleteAll == true)
   {
+    LM_TMP(("orionldState.uriParams.deleteAll == true"));
     if (orionldState.dbAttrWithDatasetsP == NULL)
       LM_W(("DA: orionldState.dbAttrWithDatasetsP == NULL ... how?"));
     else
@@ -99,18 +93,7 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
       {
         KjNode* defaultInstanceP = kjLookup(attrsP, attributeNameEq);
         if (defaultInstanceP != NULL)
-        {
-          if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, NULL, orionldState.requestTimeString) == false)
-          {
-            LM_E(("Database Error (delete attribute default instance troe layer failed)"));
-
-            if (pgTransactionRollback(connectionP) == false)
-              LM_E(("pgTransactionRollback failed"));
-
-            pgConnectionRelease(connectionP);
-            return false;
-          }
-        }
+          pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
       }
 
       KjNode* datasetsP = kjLookup(orionldState.dbAttrWithDatasetsP, "@datasets");
@@ -126,18 +109,7 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
             KjNode* datasetIdNodeP = kjLookup(aP, "datasetId");
 
             if (datasetIdNodeP != NULL)
-            {
-              if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, datasetIdNodeP->value.s, orionldState.requestTimeString) == false)
-              {
-                LM_E(("Database Error (delete attribute datasetId troe layer failed)"));
-
-                if (pgTransactionRollback(connectionP) == false)
-                  LM_E(("pgTransactionRollback failed"));
-
-                pgConnectionRelease(connectionP);
-                return false;
-              }
-            }
+              pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, datasetIdNodeP->value.s, NULL, NULL);
           }
         }
       }
@@ -145,25 +117,15 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   }
   else
   {
-    if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, NULL, orionldState.requestTimeString) == false)
-    {
-      LM_E(("Database Error (delete attribute troe layer failed)"));
-
-      if (pgTransactionRollback(connectionP) == false)
-        LM_E(("pgTransactionRollback failed"));
-
-      pgConnectionRelease(connectionP);
-      return false;
-    }
+    LM_TMP(("Calling pgAttributeAppend"));
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, NULL, NULL, NULL);
+    LM_TMP(("After pgAttributeAppend. attributesBuffer.buf: '%s'", attributesBuffer.buf));
   }
 
-  if (pgTransactionCommit(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  const char* sqlV[1]  = { attributesBuffer.buf };
+  int         commands = 1;
 
-  pgConnectionRelease(connectionP);
+  pgCommands(sqlV, commands);
 
   return true;
 }

@@ -22,15 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
 #include "orionld/troe/pgAppend.h"                             // pgAppend
@@ -48,7 +46,7 @@ bool troePostBatchDelete(ConnectionInfo* ciP)
 {
   PgAppendBuffer  entitiesBuffer;
 
-  pgAppendInit(&entitiesBuffer, 2*1024);       // 4k - will be reallocated if necessary
+  pgAppendInit(&entitiesBuffer, 2*1024);       // 2k - will be reallocated if necessary
   pgAppend(&entitiesBuffer, PG_ENTITY_INSERT_START, 0);
 
   for (KjNode* entityIdP = orionldState.requestTree->value.firstChildP; entityIdP != NULL; entityIdP = entityIdP->next)
