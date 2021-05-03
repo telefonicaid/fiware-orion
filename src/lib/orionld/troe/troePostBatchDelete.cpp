@@ -29,14 +29,13 @@
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityDelete.h"                       // pgEntityDelete
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgEntityAppend.h"                       // pgEntityAppend
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostBatchDelete.h"                  // Own interface
 
 
@@ -47,48 +46,25 @@
 //
 bool troePostBatchDelete(ConnectionInfo* ciP)
 {
-  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+  PgAppendBuffer  entitiesBuffer;
 
-  if (pgTransactionBegin(connectionP) != true)
-  {
-    pgConnectionRelease(connectionP);
-    LM_RE(false, ("pgTransactionBegin failed"));
-  }
+  pgAppendInit(&entitiesBuffer, 2*1024);       // 4k - will be reallocated if necessary
+  pgAppend(&entitiesBuffer, PG_ENTITY_INSERT_START, 0);
 
-  bool allGood = true;
   for (KjNode* entityIdP = orionldState.requestTree->value.firstChildP; entityIdP != NULL; entityIdP = entityIdP->next)
   {
+    char* entityId = entityIdP->value.s;
     char  instanceId[80];
+
     uuidGenerate(instanceId, sizeof(instanceId), true);
 
-    if (pgEntityDelete(connectionP, instanceId, entityIdP->value.s) == false)
-    {
-      LM_E(("Database Error (batch delete entities TRoE layer failed)"));
-      allGood = false;
-      break;
-    }
+    pgEntityAppend(&entitiesBuffer, "Delete", entityId, "NULL", instanceId);
   }
 
-  if (allGood == true)
-  {
-    if (pgTransactionCommit(connectionP) != true)
-    {
-      pgConnectionRelease(connectionP);
-      LM_RE(false, ("pgTransactionCommit failed"));
-    }
-  }
-  else
-  {
-    if (pgTransactionRollback(connectionP) == false)
-      LM_E(("pgTransactionRollback failed"));
+  const char* sqlV[1]  = { entitiesBuffer.buf };
+  int         commands = 1;
 
-    pgConnectionRelease(connectionP);
-    return false;
-  }
-
-  pgConnectionRelease(connectionP);
+  pgCommands(sqlV, commands);
 
   return true;
 }

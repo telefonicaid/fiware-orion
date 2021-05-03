@@ -35,37 +35,11 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/troe/troe.h"                                 // TroeMode, troeMode
-#include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
 #include "orionld/troe/pgSubAttributeBuild.h"                  // pgSubAttributeBuild
+#include "orionld/troe/pgEntityAppend.h"                       // pgEntityAppend
 #include "orionld/troe/pgEntityBuild.h"                        // Own interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityAppend -
-//
-// INSERT INTO entities(instanceId,
-//                      ts,
-//                      opMode,
-//                      id,
-//                      type) VALUES (), (), ...
-//
-static void entityAppend(PgAppendBuffer* entitiesBufferP, const char* opMode, const char* entityId, const char* entityType, const char* instanceId)
-{
-  char         buf[1024];
-  const char*  comma = (entitiesBufferP->values != 0)? "," : "";
-
-  snprintf(buf, sizeof(buf), "%s('%s', '%s', '%s', '%s', '%s')", comma, instanceId, orionldState.requestTimeString, opMode, entityId, entityType);
-
-  LM_TMP(("Calling pgAppend"));
-  pgAppend(entitiesBufferP, buf, 0);
-  LM_TMP(("Back from pgAppend"));
-  entitiesBufferP->values += 1;
-  LM_TMP(("Here"));
-}
 
 
 
@@ -117,9 +91,7 @@ bool pgEntityBuild
     LM_RE(false, ("Missing Entity id/type"));
 
   // We have all the entity info - time to add the entity
-  LM_TMP(("Entity SQL buffer BEFORE: '%s'", entitiesBufferP->buf));
-  entityAppend(entitiesBufferP, opMode, entityId, entityType, instanceId);
-  LM_TMP(("Entity SQL buffer AFTER: '%s'", entitiesBufferP->buf));
+  pgEntityAppend(entitiesBufferP, opMode, entityId, entityType, instanceId);
 
   // All that remains in 'entityNodeP' are attributes!
   for (KjNode* attrP = entityNodeP->value.firstChildP; attrP != NULL; attrP = attrP->next)
