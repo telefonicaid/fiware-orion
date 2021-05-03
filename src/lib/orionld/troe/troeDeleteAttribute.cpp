@@ -122,10 +122,12 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
     LM_TMP(("After pgAttributeAppend. attributesBuffer.buf: '%s'", attributesBuffer.buf));
   }
 
-  const char* sqlV[1]  = { attributesBuffer.buf };
-  int         commands = 1;
+  if (attributesBuffer.values > 0)
+  {
+    char* sqlV[1] = { attributesBuffer.buf };
 
-  pgCommands(sqlV, commands);
+    pgCommands(sqlV, 1);
+  }
 
   return true;
 }

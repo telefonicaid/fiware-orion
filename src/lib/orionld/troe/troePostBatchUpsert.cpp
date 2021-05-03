@@ -132,16 +132,16 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
       pgEntityBuild(&entities, troeEntityMode, entityP, NULL, NULL, &attributes, &subAttributes);
   }
 
-  const char* sqlV[3]  = { entities.buf, attributes.buf, subAttributes.buf };
-  int         commands = 1;
 
-  if (attributes.values > 0)
-    ++commands;
+  char* sqlV[3];
+  int   sqlIx = 0;
 
-  if (subAttributes.values > 0)
-    ++commands;
+  if (entities.values      > 0) sqlV[sqlIx++] = entities.buf;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  pgCommands(sqlV, commands);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

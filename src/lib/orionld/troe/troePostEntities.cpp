@@ -153,16 +153,15 @@ bool troePostEntities(ConnectionInfo* ciP)
 
   pgEntityBuild(&entities, opModeString, entityP, entityId, entityType, &attributes, &subAttributes);
 
-  const char* sqlV[3]  = { entities.buf, attributes.buf, subAttributes.buf };
-  int         commands = 1;
+  char* sqlV[3];
+  int   sqlIx = 0;
 
-  if (attributes.values > 0)
-    ++commands;
+  if (entities.values      > 0) sqlV[sqlIx++] = entities.buf;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  if (subAttributes.values > 0)
-    ++commands;
-
-  pgCommands(sqlV, commands);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

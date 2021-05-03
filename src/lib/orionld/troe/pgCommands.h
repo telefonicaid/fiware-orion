@@ -32,6 +32,6 @@
 //
 // pgCommands -
 //
-extern void pgCommands(const char* sql[], int commands);
+extern void pgCommands(char* sql[], int commands);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGCOMMANDS_H_

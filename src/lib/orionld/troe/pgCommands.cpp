@@ -41,7 +41,7 @@
 //
 // pgCommands -
 //
-void pgCommands(const char* sql[], int commands)
+void pgCommands(char* sql[], int commands)
 {
   PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
   if (connectionP == NULL)

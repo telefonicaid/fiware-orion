@@ -82,13 +82,14 @@ bool troePostBatchUpdate(ConnectionInfo* ciP)
     pgAttributesBuild(&attributes, entityP, NULL, attributeTroeMode, &subAttributes);
   }
 
-  const char* sqlV[2]  = { attributes.buf, subAttributes.buf };
-  int         commands = 1;
+  char* sqlV[2];
+  int   sqlIx = 0;
 
-  if (subAttributes.values > 0)
-    ++commands;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  pgCommands(sqlV, commands);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

@@ -59,10 +59,11 @@ bool troePostBatchDelete(ConnectionInfo* ciP)
     pgEntityAppend(&entitiesBuffer, "Delete", entityId, "NULL", instanceId);
   }
 
-  const char* sqlV[1]  = { entitiesBuffer.buf };
-  int         commands = 1;
-
-  pgCommands(sqlV, commands);
+  if (entitiesBuffer.values > 0)
+  {
+    char* sqlV[1]  = { entitiesBuffer.buf };
+    pgCommands(sqlV, 1);
+  }
 
   return true;
 }
