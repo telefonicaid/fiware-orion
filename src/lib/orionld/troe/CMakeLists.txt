@@ -92,6 +92,7 @@ SET (SOURCES
     pgQuotedString.cpp
     pgCommands.cpp
     pgEntityAppend.cpp
+    pgAttributeAppend.cpp
 )
 
 SET (HEADERS
@@ -161,6 +162,7 @@ SET (HEADERS
     pgQuotedString.h
     pgCommands.h
     pgEntityAppend.h
+    pgAttributeAppend.h
 )
 
 
