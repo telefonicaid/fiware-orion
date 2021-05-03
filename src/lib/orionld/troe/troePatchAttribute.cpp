@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
-#include "orionld/troe/pgAttributeTreat.h"                     // pgAttributeTreat
 #include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePatchAttribute.h"                   // Own interface
@@ -66,7 +65,7 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   char* attributeName  = orionldState.wildcard[1];
 
   //
-  // pgAttributeTreat assumes the name of the attribute comes as part of the tree.
+  // pgAttributeBuild assumes the name of the attribute comes as part of the tree.
   // So, let's name the tree then! :)
   //
   orionldState.requestTree->name = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);

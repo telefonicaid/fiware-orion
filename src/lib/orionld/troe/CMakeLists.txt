@@ -44,30 +44,6 @@ SET (SOURCES
     pgTransactionBegin.cpp
     pgTransactionCommit.cpp
     pgTransactionRollback.cpp
-    pgEntityTreat.cpp
-    pgEntityPush.cpp
-    pgAttributeTreat.cpp
-    pgAttributePush.cpp
-    pgSubAttributePush.cpp
-    pgRelationshipPush.cpp
-    pgStringPropertyPush.cpp
-    pgNumberPropertyPush.cpp
-    pgCompoundPropertyPush.cpp
-    pgBoolPropertyPush.cpp
-    pgSubAttributeTreat.cpp
-    pgSubRelationshipPush.cpp
-    pgStringSubPropertyPush.cpp
-    pgBoolSubPropertyPush.cpp
-    pgCompoundSubPropertyPush.cpp
-    pgNumberSubPropertyPush.cpp
-    pgEntityDelete.cpp
-    pgAttributeDelete.cpp
-    pgGeoPropertyPush.cpp
-    pgGeoPointPush.cpp
-    pgGeoPolygonPush.cpp
-    pgGeoMultiPolygonPush.cpp
-    pgGeoLineStringPush.cpp
-    pgGeoMultiLineStringPush.cpp
     kjGeoPointExtract.cpp
     kjGeoPolygonExtract.cpp
     kjGeoMultiPolygonExtract.cpp
@@ -119,27 +95,6 @@ SET (HEADERS
     pgTransactionBegin.h
     pgTransactionCommit.h
     pgTransactionRollback.h
-    pgEntityTreat.h
-    pgEntityPush.h
-    pgAttributeTreat.h
-    pgAttributePush.h
-    pgSubAttributePush.h
-    pgRelationshipPush.h
-    pgNumberPropertyPush.h
-    pgCompoundPropertyPush.h
-    pgBoolPropertyPush.h
-    pgStringSubPropertyPush.h
-    pgBoolSubPropertyPush.h
-    pgCompoundSubPropertyPush.h
-    pgNumberSubPropertyPush.h
-    pgEntityDelete.h
-    pgAttributeDelete.h
-    pgGeoPropertyPush.h
-    pgGeoPointPush.h
-    pgGeoPolygonPush.h
-    pgGeoMultiPolygonPush.h
-    pgGeoLineStringPush.h
-    pgGeoMultiLineStringPush.h
     kjGeoPointExtract.h
     kjGeoPolygonExtract.h
     kjGeoMultiPolygonExtract.h

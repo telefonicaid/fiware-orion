@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/pgEntityPush.h"                         // Own interface
+#include "orionld/troe/pgTransactionBegin.h"                   // Own interface
 
 
 
