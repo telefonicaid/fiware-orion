@@ -92,7 +92,7 @@ bool collectionQuery
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
+    // LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -179,7 +179,7 @@ bool collectionRangedQuery
       }
     }
 
-    LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
+    // LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -241,7 +241,7 @@ bool collectionCount
     *c = connection->count(col.c_str(), q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_I(("Database Operation Successful (count: %s)", q.toString().c_str()));
+    // LM_I(("Database Operation Successful (count: %s)", q.toString().c_str()));
   }
   catch (const std::exception& e)
   {
@@ -309,7 +309,7 @@ bool collectionFindOne
     *doc = connection->findOne(col.c_str(), q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_I(("Database Operation Successful (findOne: %s)", q.toString().c_str()));
+    // LM_I(("Database Operation Successful (findOne: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -378,7 +378,7 @@ bool collectionInsert
     connection->insert(col.c_str(), doc);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (insert: %s)", doc.toString().c_str()));
+    // LM_I(("Database Operation Successful (insert: %s)", doc.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -452,7 +452,7 @@ bool collectionUpdate
     connection->update(col.c_str(), q, doc, upsert);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
+    // LM_I(("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
   }
   catch (const std::exception& e)
   {
@@ -521,7 +521,7 @@ bool collectionRemove
     connection->remove(col.c_str(), q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (remove: %s)", q.toString().c_str()));
+    // LM_I(("Database Operation Successful (remove: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -601,7 +601,7 @@ bool collectionCreateIndex
 
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
+    // LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -705,7 +705,7 @@ bool runCollectionCommand
       releaseMongoConnection(connection);
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
-    LM_I(("Database Operation Successful (command: %s)", command.toString().c_str()));
+    // LM_I(("Database Operation Successful (command: %s)", command.toString().c_str()));
   }
   catch (const std::exception &e)
   {
