@@ -84,17 +84,14 @@ bool troePatchAttribute(ConnectionInfo* ciP)
 
   pgAttributeBuild(&attributes, "Update", entityId, orionldState.requestTree, &subAttributes);
 
-  // <DEBUG>
-  attributes.buf[attributes.currentIx] = 0;
-  LM_TMP(("attributes.buf: %s", attributes.buf));
-  subAttributes.buf[subAttributes.currentIx] = 0;
-  LM_TMP(("subAttributes.buf: %s", subAttributes.buf));
-  // </DEBUG>
+  char* sqlV[2];
+  int   sqlIx = 0;
 
-  const char* sqlV[2]  = { attributes.buf, subAttributes.buf };
-  int         commands = (subAttributes.values > 0)? 2 : 1;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  pgCommands(sqlV, commands);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

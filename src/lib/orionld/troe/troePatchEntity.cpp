@@ -67,13 +67,14 @@ bool troePatchEntity(ConnectionInfo* ciP)
 
   pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, "Replace", &subAttributesBuffer);
 
-  const char* sqlV[2]  = { attributesBuffer.buf, subAttributesBuffer.buf };
-  int         commands = 1;
+  char* sqlV[2];
+  int   sqlIx = 0;
 
-  if (subAttributesBuffer.values > 0)
-    ++commands;
+  if (attributesBuffer.values    > 0) sqlV[sqlIx++] = attributesBuffer.buf;
+  if (subAttributesBuffer.values > 0) sqlV[sqlIx++] = subAttributesBuffer.buf;
 
-  pgCommands(sqlV, commands);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }
