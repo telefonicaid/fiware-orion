@@ -715,7 +715,7 @@ ContextAttribute* Entity::getAttribute(const std::string& attrName)
   {
     ContextAttribute* caP = attributeVector[ix];
 
-    if (dbDotEncode(caP->name) == attrName)
+    if (dbEncode(caP->name) == attrName)
     {
       return caP;
     }

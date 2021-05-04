@@ -1831,7 +1831,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else
       {
-        bob.append(ENT_ATTRNAMES, dbDotDecode(itemP->attributeName));
+        bob.append(ENT_ATTRNAMES, dbDecode(itemP->attributeName));
       }
       f = bob.obj();
       break;
@@ -1847,7 +1847,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else
       {
         orion::BSONObjBuilder bobNe;
-        bobNe.append("$ne", dbDotDecode(itemP->attributeName));
+        bobNe.append("$ne", dbDecode(itemP->attributeName));
         bob.append(ENT_ATTRNAMES, bobNe.obj());
       }
       f = bob.obj();
