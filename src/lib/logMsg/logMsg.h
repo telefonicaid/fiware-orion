@@ -1841,7 +1841,7 @@ inline void lmTransactionStart(const char* keyword, const char* schema, const ch
   snprintf(service,    sizeof(service),    "pending");
   snprintf(subService, sizeof(subService), "pending");
   snprintf(fromIp,     sizeof(fromIp),     "pending");
-  LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
+  // LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
 
 
@@ -1913,7 +1913,7 @@ inline void lmTransactionSetFrom(const char* _fromIp)
 inline void lmTransactionStart_URL(const char* url)
 {
   transactionIdSet();
-  LM_I(("Starting transaction from %s", url));
+  // LM_I(("Starting transaction from %s", url));
 }
 #endif
 
@@ -1925,7 +1925,7 @@ inline void lmTransactionStart_URL(const char* url)
 */
 inline void lmTransactionEnd()
 {
-  LM_I(("Transaction ended"));
+  // LM_I(("Transaction ended"));
   lmTransactionReset();
 }
 
