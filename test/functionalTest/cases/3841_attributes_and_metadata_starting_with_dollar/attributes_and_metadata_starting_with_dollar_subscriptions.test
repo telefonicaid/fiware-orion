@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attributes and metadata with dollar sign in the name in subscriptions
+Attributes and metadata starting with dollar sign in the name in subscriptions
 
 --SHELL-INIT--
 dbInit CB
