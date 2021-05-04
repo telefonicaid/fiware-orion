@@ -85,7 +85,6 @@ void troeEntityExpand(KjNode* entityP)
   KjNode* attrP = entityP->value.firstChildP;
   KjNode* nextAttr;
 
-  LM_TMP(("PTE: Expanding attribute names, and their sub-attribute names as well"));
   while (attrP != NULL)
   {
     nextAttr = attrP->next;

@@ -106,8 +106,6 @@ void pgAttributeAppend
 
   const char* hasSubProperties = (subProperties == true)? "true" : "false";
 
-  LM_TMP(("TROE: Appending '%s' attribute '%s'", type, attributeName));
-
   if (strcmp(opMode, "Delete") == 0)
   {
     snprintf(buf, bufSize, "%s('%s', '%s', 'Delete', '%s', null, null, null, '%s', null, null, null, null, null, null, null, null, null, null, null, '%s')",
@@ -124,7 +122,6 @@ void pgAttributeAppend
     KjNode*      coordinatesNodeP = kjLookup(valueNodeP, "coordinates");
     const char*  geoType          = geoTypeNodeP->value.s;
 
-    LM_TMP(("TROE: Appending '%s' GeoProperty '%s'", geoType, attributeName));
     if (strcmp(geoType, "Point") == 0)
     {
       double longitude;
@@ -179,13 +176,11 @@ void pgAttributeAppend
   {
     if (valueNodeP->type == KjString)
     {
-      LM_TMP(("TROE: Appending 'String' attribute '%s'", attributeName));
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'String', '%s', null, null, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, valueNodeP->value.s, orionldState.requestTimeString);
     }
     else if (valueNodeP->type == KjBoolean)
     {
-      LM_TMP(("TROE: Appending 'Boolean' attribute '%s'", attributeName));
       const char* value = (valueNodeP->value.b == true)? "true" : "false";
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Boolean', null, %s, null, null, null, null, null, null, null, null, '%s')",
@@ -193,20 +188,16 @@ void pgAttributeAppend
     }
     else if (valueNodeP->type == KjInt)
     {
-      LM_TMP(("TROE: Appending 'Integer' attribute '%s'", attributeName));
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Number', null, null, %lld, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, valueNodeP->value.i, orionldState.requestTimeString);
-      LM_TMP(("TROE: Appended 'Integer' attribute '%s'", attributeName));
     }
     else if (valueNodeP->type == KjFloat)
     {
-      LM_TMP(("TROE: Appending 'Float' attribute '%s'", attributeName));
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Number', null, null, %f, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, valueNodeP->value.f, orionldState.requestTimeString);
     }
     else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
     {
-      LM_TMP(("TROE: Appending 'Compound' attribute '%s'", attributeName));
       int          renderedValueSize   = 4 * 1024;
       char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
 

@@ -62,8 +62,6 @@ void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, char
 
   for (KjNode* attrP = attrList->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    LM_TMP(("TROE: Treating attribute '%s' (%s)", attrP->name, kjValueType(attrP->type)));
-
     if (attrP->type == KjArray)
     {
       for (KjNode* aiP = attrP->value.firstChildP; aiP != NULL; aiP = aiP->next)
@@ -74,7 +72,5 @@ void pgAttributesBuild(PgAppendBuffer* attributesBufferP, KjNode* attrList, char
     }
     else if (attrP->type == KjObject)
       pgAttributeBuild(attributesBufferP, opMode, entityId, attrP, subAttributesBufferP);
-    else
-      LM_TMP(("TROE: Not treating entity-path '%s'", attrP->name));
   }
 }

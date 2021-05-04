@@ -362,8 +362,6 @@ static void appendMetadata
   AttributeType  mdType;
   bool           special = isSpecialSubAttribute(mdName, &mdType, NULL);
 
-  LM_TMP(("MS: appending metadata", mdName));
-
   if (!mdP->typeGiven && useDefaultType)
   {
     if ((mdP->compoundValueP == NULL) || (mdP->compoundValueP->valueType != orion::ValueTypeVector))
@@ -389,50 +387,39 @@ static void appendMetadata
     //
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      LM_TMP(("MS: Setting MD SysAttrs"));
       if (mdP->createdAt == 0)
       {
-        LM_TMP(("MS: Setting createdAt in BSON"));
         mdP->createdAt = orionldState.requestTime;
         bsonmd.append("createdAt", mdP->createdAt);
       }
 
-      LM_TMP(("MS: Setting modifiedAt in BSON"));
       mdP->modifiedAt  = orionldState.requestTime;
       bsonmd.append("modifiedAt", mdP->modifiedAt);
     }
   }
 
-  LM_TMP(("MS: Setting MD Type"));
   if (type != "")
     bsonmd.append("type", type);
 
-  LM_TMP(("MS: Setting MD Value"));
   switch (mdP->valueType)
   {
   case orion::ValueTypeString:
-    LM_TMP(("MS: Setting MD String Value"));
     bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
     break;
 
   case orion::ValueTypeNumber:
-    LM_TMP(("MS: Setting MD Number Value (%f)", mdP->numberValue));
     bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
-    LM_TMP(("MS: Set MD Number Value (%f)", mdP->numberValue));
     break;
 
   case orion::ValueTypeBoolean:
-    LM_TMP(("MS: Setting MD Boolean Value"));
     bsonmd.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
     break;
 
   case orion::ValueTypeNull:
-    LM_TMP(("MS: Setting MD Null Value"));
     bsonmd.appendNull(ENT_ATTRS_MD_VALUE);
     break;
 
   case orion::ValueTypeObject:
-    LM_TMP(("MS: Setting MD Compound Value"));
     if (mdP->compoundValueP->isVector())
     {
       BSONArrayBuilder ba;
@@ -453,9 +440,7 @@ static void appendMetadata
     LM_E(("Runtime Error (unknown metadata type)"));
   }
 
-  LM_TMP(("MS: Appending MD to mdBuilder"));
   mdBuilder->append(effectiveName, bsonmd.obj());
-  LM_TMP(("MS: Appended MD '%s' to mdBuilder", effectiveName.c_str()));
 }
 
 
@@ -674,16 +659,8 @@ static bool contextAttributeCustomMetadataToBson
   {
     Metadata* md = ca->metadataVector[ix];
 
-    LM_TMP(("MS: Calling isNotCustomMetadata for '%s'", md->name.c_str()));
     if (!isNotCustomMetadata(md->name.c_str()))
-    {
-      LM_TMP(("MS: '%s' is a custom metadata", md->name.c_str()));
       appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
-      LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
-    }
-    else
-      LM_TMP(("MS: '%s' is NOT a custom metadata", md->name.c_str()));
   }
 
   *md      = mdToAdd.obj();
@@ -842,15 +819,11 @@ static bool appendAttribute
   if (attrs.hasField(effectiveName.c_str()))
   {
     if (orionldState.uriParamOptions.noOverwrite == true)
-    {
       return false;
-    }
 
-    LM_TMP(("MS: APPEND with existing attribute"));
     //
     // If updateAttribute fails, the name of the attribute caP is added to the list of erroneous attributes
     //
-    LM_TMP(("MS: Calling updateAttribute"));
     if (updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion) == false)
       orionldStateErrorAttributeAdd(caP->name.c_str());
 
@@ -860,7 +833,6 @@ static bool appendAttribute
   /* Build the attribute to append */
   BSONObjBuilder ab;
 
-  LM_TMP(("MS: ADDING a new attribute - all MD created/modifiedAt to be added"));
 
   /* 1. Value */
   caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
@@ -890,7 +862,6 @@ static bool appendAttribute
   BSONObj   md;
   BSONArray mdNames;
 
-  LM_TMP(("MS: Calling contextAttributeCustomMetadataToBson (created/modifiedAt to be added)"));
   if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
   {
     ab.append(ENT_ATTRS_MD, md);
@@ -2825,7 +2796,6 @@ static bool processContextAttributeVector
     bool actualUpdate = true;
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
-      LM_TMP(("MS: Calling updateContextAttributeItem"));
       if (!updateContextAttributeItem(cerP,
                                       ca,
                                       attrs,
@@ -2849,7 +2819,6 @@ static bool processContextAttributeVector
     }
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
-      LM_TMP(("MS: Calling appendContextAttributeItem"));
       if (!appendContextAttributeItem(cerP,
                                       attrs,
                                       targetAttr,

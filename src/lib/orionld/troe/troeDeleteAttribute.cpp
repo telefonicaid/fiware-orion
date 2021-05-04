@@ -56,7 +56,6 @@ extern "C"
 //
 bool troeDeleteAttribute(ConnectionInfo* ciP)
 {
-  LM_TMP(("In troeDeleteAttribute"));
   char* entityId      = orionldState.wildcard[0];
   char* attributeName = orionldState.wildcard[1];
   char* attributeNameEq;
@@ -76,13 +75,9 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   pgAppend(&attributesBuffer, PG_ATTRIBUTE_INSERT_START, 0);
 
   if (orionldState.uriParams.datasetId != NULL)
-  {
-    LM_TMP(("orionldState.uriParams.datasetId != NULL"));
     pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
-  }
   else if (orionldState.uriParams.deleteAll == true)
   {
-    LM_TMP(("orionldState.uriParams.deleteAll == true"));
     if (orionldState.dbAttrWithDatasetsP == NULL)
       LM_W(("DA: orionldState.dbAttrWithDatasetsP == NULL ... how?"));
     else
@@ -116,11 +111,7 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
     }
   }
   else
-  {
-    LM_TMP(("Calling pgAttributeAppend"));
     pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, NULL, NULL, NULL);
-    LM_TMP(("After pgAttributeAppend. attributesBuffer.buf: '%s'", attributesBuffer.buf));
-  }
 
   if (attributesBuffer.values > 0)
   {

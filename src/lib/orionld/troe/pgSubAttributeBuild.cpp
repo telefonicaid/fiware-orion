@@ -92,8 +92,6 @@ static void subAttributeAppend
   const char*      object
 )
 {
-  LM_TMP(("TROE2: Treating sub-attr '%s' (valueNodeP at %p)", subAttributeName, valueNodeP));
-
   int         bufSize = 20480;
   char*       buf     = kaAlloc(&orionldState.kalloc, bufSize);
   const char* comma   = (subAttributesBufferP->values != 0)? "," : "";
@@ -104,7 +102,6 @@ static void subAttributeAppend
 
   if (strcmp(type, "Relationship") == 0)
   {
-    LM_TMP(("TROE: Appending 'Relationship' sub-attribute '%s'", subAttributeName));
     snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Relationship', '%s', null, null, null, null, null, null, null, null, null, '%s')",
              comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, object, orionldState.requestTimeString);
   }
@@ -121,26 +118,21 @@ static void subAttributeAppend
       double altitude;
 
       kjGeoPointExtract(coordinatesNodeP, &longitude, &latitude, &altitude);
-      LM_TMP(("TROE: Appending 'Geo::Point' sub-attribute '%s'", subAttributeName));
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'GeoPoint', null, null, null, null, null, ST_GeomFromText('POINT Z(%f %f %f)'), null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, longitude, latitude, altitude, orionldState.requestTimeString);
-      LM_TMP(("TROE: point buffer: '%s'", buf));
     }
     else if (strcmp(geoType, "MultiPoint") == 0)
     {
     }
     else if (strcmp(geoType, "LineString") == 0)
     {
-      LM_TMP(("TROE: got a line-string"));
       char*  coordsString = kaAlloc(&orionldState.kalloc, 10240);
 
       kjGeoLineStringExtract(coordinatesNodeP, coordsString, 10240);
-      LM_TMP(("TROE: Appending 'Geo::LineString' sub-attribute '%s'", subAttributeName));
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'GeoLineString', null, null, null, null, null, null, null, null, ST_GeomFromText('LINESTRING(%s)', 4326), null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, coordsString, orionldState.requestTimeString);
-      LM_TMP(("TROE: line-string buffer: '%s'", buf));
     }
     else if (strcmp(geoType, "MultiLineString") == 0)
     {
@@ -171,13 +163,11 @@ static void subAttributeAppend
   {
     if (valueNodeP->type == KjString)
     {
-      LM_TMP(("TROE: Appending 'String' sub-attribute '%s'", subAttributeName));
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'String', '%s', null, null, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, valueNodeP->value.s, orionldState.requestTimeString);
     }
     else if (valueNodeP->type == KjBoolean)
     {
-      LM_TMP(("TROE: Appending 'Boolean' sub-attribute '%s'", subAttributeName));
       const char* value = (valueNodeP->value.b == true)? "true" : "false";
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Boolean', null, %s, null, null, null, null, null, null, null, null, '%s')",
@@ -185,21 +175,16 @@ static void subAttributeAppend
     }
     else if (valueNodeP->type == KjInt)
     {
-      LM_TMP(("TROE: Appending 'Integer' sub-attribute '%s'", subAttributeName));
-
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Number', null, null, %lld, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, valueNodeP->value.i, orionldState.requestTimeString);
     }
     else if (valueNodeP->type == KjFloat)
     {
-      LM_TMP(("TROE: Appending 'Float' sub-attribute '%s'", subAttributeName));
-
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Number', null, null, %f, null, null, null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, valueNodeP->value.f, orionldState.requestTimeString);
     }
     else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
     {
-      LM_TMP(("TROE: Appending 'Compound' sub-attribute '%s'", subAttributeName));
       int          renderedValueSize   = 4 * 1024;
       char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
 
@@ -211,9 +196,7 @@ static void subAttributeAppend
   }
 
   pgAppend(subAttributesBufferP, buf, 0);
-  LM_TMP(("TROE: sub-attribute buffer: '%s'", subAttributesBufferP->buf));
   subAttributesBufferP->values += 1;
-  LM_TMP(("TROE: values in sub-attribute buffer: %d", subAttributesBufferP->values));
 }
 
 
@@ -238,13 +221,8 @@ bool pgSubAttributeBuild
   char*   object        = NULL;  // Only for relationships
   KjNode* valueNodeP    = NULL;
 
-  LM_TMP(("TROE: Building sub-attribute '%s'", subAttributeNodeP->name));
-
   if (subAttributeNodeP->type != KjObject)
-  {
-    LM_TMP(("TROE2: sub-attribute '%s' is not an object (%s) - skipped", subAttributeNodeP->name, kjValueType(subAttributeNodeP->type)));
     return true;
-  }
 
   uuidGenerate(instanceId, sizeof(instanceId), true);
 

@@ -84,8 +84,6 @@ Metadata::Metadata()
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
-  LM_TMP(("SA: 'cloning' Metadata '%s'", mP->name.c_str()));
-
   name            = mP->name;
   type            = mP->type;
   valueType       = mP->valueType;
@@ -321,8 +319,6 @@ std::string Metadata::render(bool comma)
   }
 
   // Adding sysAttrs, if NGSI-LD and if explicitly requested
-  LM_TMP(("MS: orionldState.apiVersion               == %d", orionldState.apiVersion));
-  LM_TMP(("MS: orionldState.uriParamOptions.sysAttrs == %d", orionldState.uriParamOptions.sysAttrs));
   if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
   {
     std::string dateTime = isodate2str(createdAt);
@@ -564,8 +560,6 @@ std::string Metadata::toJson(bool isLastElement)
   }
 
   // Adding sysAttrs, if NGSI-LD and if explicitly requested
-  LM_TMP(("MS: orionldState.apiVersion               == %d", orionldState.apiVersion));
-  LM_TMP(("MS: orionldState.uriParamOptions.sysAttrs == %d", orionldState.uriParamOptions.sysAttrs));
   if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
   {
     std::string dateTime = isodate2str(createdAt);

@@ -43,15 +43,9 @@ void pgAppend(PgAppendBuffer* pgBufP, const char* tail, int tailLen)
   if (tailLen <= 0)
     tailLen = strlen(tail);
 
-  LM_TMP(("TROE2: Appending %d chars to buffer", tailLen));
-
   // realloc necessary?
   if (pgBufP->currentIx + tailLen >= pgBufP->bufSize)
   {
-    LM_TMP(("TROE2: ****************************** REALLOCATION"));
-    LM_TMP(("TROE2: length of initial buffer: %d (currentIx: %d)", strlen(pgBufP->buf), pgBufP->currentIx));
-    LM_TMP(("TROE2: old buffer content: '%s'", pgBufP->buf));
-
     char* oldBuffer = pgBufP->buf;
 
     pgBufP->bufSize += 4 * 1024;  // Add 4k every time
@@ -83,8 +77,4 @@ void pgAppend(PgAppendBuffer* pgBufP, const char* tail, int tailLen)
   strncpy(&pgBufP->buf[pgBufP->currentIx], tail, tailLen);
   pgBufP->currentIx += tailLen;
   pgBufP->buf[pgBufP->currentIx] = 0;
-
-  LM_TMP(("TROE2: new buffer content: '%s'", pgBufP->buf));
-  LM_TMP(("TROE2: length of new buffer: %d (currentIx: %d)", strlen(pgBufP->buf), pgBufP->currentIx));
-  LM_TMP(("TROE2: --------------------------------------------------------------------------------------------------------------------"));
 }
