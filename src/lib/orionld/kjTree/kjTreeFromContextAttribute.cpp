@@ -118,7 +118,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
-      nodeP->name = (char*) caP->name.c_str();  // FIXME: WORKAROUND - kjTreeFromCompoundValue should be fixed instead!
+      nodeP->name = attrName;
       break;
 
     case orion::ValueTypeNotGiven:
