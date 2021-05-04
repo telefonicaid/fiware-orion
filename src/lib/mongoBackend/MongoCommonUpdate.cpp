@@ -373,7 +373,7 @@ static void appendMetadata
   }
 
   mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbDotEncode(mdP->name);
+  std::string effectiveName = dbEncode(mdP->name);
 
   // FIXME P8: this code probably should be refactored to be clearer and cleaner
   if (!type.empty())
@@ -582,7 +582,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
 
       if (apiVersion != V2 || caP->onlyValue)
       {
-        if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
+        if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
           appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
         }
@@ -735,7 +735,7 @@ static bool updateAttribute
 {
   *actualUpdate = false;
 
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   if (isReplace)
   {
@@ -827,7 +827,7 @@ static bool appendAttribute
   ApiVersion          apiVersion
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
@@ -903,7 +903,7 @@ static bool deleteAttribute
   ContextAttribute*                     caP
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   if (!attrs.hasField(effectiveName.c_str()))
   {
@@ -2703,7 +2703,7 @@ static bool createEntity
 
     attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
-    std::string effectiveName = dbDotEncode(attrsV[ix]->name);
+    std::string effectiveName = dbEncode(attrsV[ix]->name);
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),

@@ -51,7 +51,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const orion::BSONElem
   }
 
   orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = dbDotDecode(e.fieldName());
+  child->name = dbDecode(e.fieldName());
 
   switch (e.type())
   {

@@ -1,0 +1,1 @@
+- Fix: support attributes and metadata starting with dollar sign ($) (#3841)
