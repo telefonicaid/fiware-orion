@@ -46,16 +46,15 @@ bool pgTransactionCommit(PGconn* connectionP)
   PQclear(res);
 
   if (PQstatus(connectionP) != CONNECTION_OK)
-    LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
+    LM_E(("Database Error (SQL: bad connection: %d)", PQstatus(connectionP)));  // FIXME: string! (last error?)
 
   PGTransactionStatusType st;
   if ((st = PQtransactionStatus(connectionP)) != PQTRANS_IDLE)
-    LM_E(("SQL[%p]: transaction error: %d", connectionP, st));  // FIXME: string! (last error?)
+    LM_E(("Database Error (SQL transaction error: %d)", st));  // FIXME: string! (last error?)
 
   char* errorMsg = PQerrorMessage(connectionP);
-
   if ((errorMsg != NULL) && (errorMsg[0] != 0))
-    LM_TMP(("SQL[%p] Error: %s", connectionP, errorMsg));
+    LM_E(("Database Error (SQL Commit Error: %s)", errorMsg));
 
   return true;
 }
