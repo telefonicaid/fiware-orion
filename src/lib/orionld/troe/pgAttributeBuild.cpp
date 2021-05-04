@@ -55,10 +55,7 @@ bool pgAttributeBuild
 )
 {
   if (attributeNodeP->type != KjObject)
-  {
-    LM_TMP(("TROE: Skipping attribute '%s' (not an object)", attributeNodeP->name));
     return false;
-  }
 
   char    instanceId[80];
   char*   type          = NULL;
@@ -70,21 +67,16 @@ bool pgAttributeBuild
   KjNode* valueNodeP    = NULL;
   KjNode* subAttrV      = kjArray(orionldState.kjsonP, NULL);
 
-  LM_TMP(("TROE: Building attribute '%s' (type: %s)", attributeNodeP->name, kjValueType(attributeNodeP->type)));
-
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
   // Extract attribute info, call subAttributeBuild when necessary
   KjNode* nodeP = attributeNodeP->value.firstChildP;
   KjNode* next;
 
-  LM_TMP(("TROE: Building attribute '%s' (type: %s)", attributeNodeP->name, kjValueType(attributeNodeP->type)));
-
   while (nodeP != NULL)
   {
     next = nodeP->next;
 
-    LM_TMP(("Treating sub-attr '%s'", nodeP->name));
     if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(nodeP);
     else if (strcmp(nodeP->name, "unitCode")   == 0)  unitCode   = nodeP->value.s;
     else if (strcmp(nodeP->name, "type")       == 0)  type       = nodeP->value.s;
@@ -110,7 +102,6 @@ bool pgAttributeBuild
   // Now that all the attribute data is gathered, we can serve the sub-attrs
   for (nodeP = subAttrV->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    LM_TMP(("TROE: Calling pgSubAttributeBuild on '%s'", nodeP->name));
     pgSubAttributeBuild(subAttributesBuffer,
                         entityId,
                         instanceId,

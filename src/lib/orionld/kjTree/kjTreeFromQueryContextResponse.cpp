@@ -202,7 +202,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
 
-  LM_TMP(("SA: In kjTreeFromQueryContextResponse"));
   //
   // No hits when "oneHit == false" is not an error.
   // We just return an empty array
@@ -514,14 +513,8 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
             // Looking up short name for the sub-attribute
             //
             mdName = orionldContextItemAliasLookup(orionldState.contextP, mdName, &valueMayBeCompacted, NULL);
-
-            if (sysAttrs)
-            {
-              LM_TMP(("SA: Add system attributes for '%s': %f, %f", mdName, mdP->createdAt, mdP->modifiedAt));
-            }
           }
 
-          LM_TMP(("SA: metadata '%s'", mdName));
           if (mdP->type != "")
           {
             const char*  valueFieldName = (mdP->type == "Relationship")? "object" : "value";

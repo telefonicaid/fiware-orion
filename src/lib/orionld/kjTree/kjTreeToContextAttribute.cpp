@@ -654,8 +654,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     {
       for (KjNode* mdP = nodeP->value.firstChildP; mdP != NULL; mdP = mdP->next)
       {
-        LM_TMP(("PA: Calling kjTreeToMetadata for '%s'", mdP->name));
-
         if (kjTreeToMetadata(caP, mdP, attributeName, detailP) == false)
           return false;
       }

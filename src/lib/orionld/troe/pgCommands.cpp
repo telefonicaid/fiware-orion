@@ -55,7 +55,6 @@ void pgCommands(char* sql[], int commands)
 
   for (int ix = 0; ix < commands; ix++)
   {
-    LM_TMP(("TROE: SQL[%d]: %s", ix, sql[ix]));
     PGresult* res = PQexec(connectionP, sql[ix]);
     if (res == NULL)
     {

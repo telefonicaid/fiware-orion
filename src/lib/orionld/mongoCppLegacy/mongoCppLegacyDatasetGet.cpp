@@ -70,8 +70,6 @@ KjNode* mongoCppLegacyDatasetGet(const char* entityId, const char* attributeName
   fields.append(attrDataset, 1);  // Include @dataset for the attribute - ONLY
   fields.append("_id",       0);  // Exclude _id for the Entity (it's included by default)
 
-  LM_TMP(("PADI: attrDataset (the field I want): %s", attrDataset));
-
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(match.obj());
