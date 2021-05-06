@@ -80,9 +80,9 @@ Date: REGEX(.*)
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX((Core|None))",
     "type": "hash-table",
-    "origin": "FileCached",
+    "origin": "REGEX((FileCached|Downloaded))",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
