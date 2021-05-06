@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
+#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
@@ -379,13 +380,18 @@ static bool orionldForwardPatchAttribute
     regContextNodeP = kjLookup(registrationP, "@context");
 
     //
-    // For now - if a @context present in the registration, usae it
+    // For now - if a @context present in the registration, use it
     //           else, use the one of the current request
     //
     if (regContextNodeP != NULL)
     {
       OrionldProblemDetails pd;
-      regContextP = orionldContextFromTree(NULL, false, regContextNodeP, &pd);
+
+      if (regContextNodeP->type == KjString)
+        regContextP = orionldContextCacheLookup(regContextNodeP->value.s);
+
+      if (regContextP == NULL)
+        regContextP = orionldContextFromTree(NULL, OrionldContextFromInline, false, regContextNodeP, &pd);
     }
 
     if (regContextP == NULL)

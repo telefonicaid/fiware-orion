@@ -39,7 +39,7 @@ extern "C"
 #include "orionld/context/orionldContextCacheGet.h"              // Own interface
 
 
-
+extern const char* originName(OrionldContextOrigin origin);  // FIXME: move to own module
 // -----------------------------------------------------------------------------
 //
 // orionldContextCacheGet -
@@ -49,14 +49,20 @@ KjNode* orionldContextCacheGet(KjNode* arrayP)
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     OrionldContext*  contextP         = orionldContextCacheArray[ix];
+
+    if (contextP == NULL)
+      continue;
+
     KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
     KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",  contextP->url);
     KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",  (contextP->id == NULL)? "None" : contextP->id);
     KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type", contextP->keyValues? "hash-table" : "array");
+    KjNode*          originP          = kjString(orionldState.kjsonP, "origin", originName(contextP->origin));
 
     kjChildAdd(contextObjP, urlStringP);
     kjChildAdd(contextObjP, idStringP);
     kjChildAdd(contextObjP, typeStringP);
+    kjChildAdd(contextObjP, originP);
 
     if (contextP->keyValues)
     {

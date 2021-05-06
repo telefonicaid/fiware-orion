@@ -30,8 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextOrigin
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 
@@ -39,6 +39,6 @@ extern "C"
 //
 // orionldContextFromTree -
 //
-extern OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_

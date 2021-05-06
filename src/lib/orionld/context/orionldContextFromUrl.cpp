@@ -281,7 +281,10 @@ OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP)
     return NULL;
   }
 
-  contextP = orionldContextFromBuffer(url, buffer, pdP);
+  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, buffer, pdP);
+
+  if (contextP != NULL)
+    contextP->origin = OrionldContextDownloaded;
 
   // Remove the 'url' from the contextDownloadList
 

@@ -100,7 +100,7 @@ static int valueCompareFunction(const char* longname, void* itemP)
 // Served contexts need to be cloned so that they can be copied back to the caller (GET /ngsi-ld/ex/contexts/xxx).
 // For example, the URL "http:/x.y.z/contexts/context1.jsonld" was downloaded and its content is a key-value object.
 //
-OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromObject(char* url, OrionldContextOrigin origin, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP)
 {
   OrionldContext*  contextP;
   char*            id = NULL;
@@ -109,7 +109,7 @@ OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* con
   if (url == NULL)
     url  = orionldContextUrlGenerate(&id);
 
-  contextP = orionldContextCreate(url, id, contextObjectP, true, toBeCloned);
+  contextP = orionldContextCreate(url, origin, id, contextObjectP, true, toBeCloned);
   if (contextP == NULL)
   {
     LM_E(("orionldContextCreate failed"));

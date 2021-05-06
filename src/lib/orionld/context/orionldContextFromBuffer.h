@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextOrigin
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 
 
@@ -34,6 +34,6 @@
 //
 // orionldContextFromBuffer -
 //
-extern OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* buffer, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMBUFFER_H_

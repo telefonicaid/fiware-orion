@@ -183,9 +183,13 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
         OrionldContext* contextP;
 
-        if      (contextNodeP          != NULL)  contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
-        else if (orionldState.contextP != NULL)  contextP = orionldState.contextP;
-        else                                     contextP = orionldCoreContextP;
+        if (contextNodeP != NULL)
+          contextP = orionldContextFromTree(NULL, OrionldContextFromInline, false, contextNodeP, &pd);
+        else if (orionldState.contextP != NULL)
+          contextP = orionldState.contextP;
+
+        if (contextP == NULL)
+          contextP = orionldCoreContextP;
 
         char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);  // entity type
         if (strcmp(expandedType, dbTypeP->value.s) != 0)
