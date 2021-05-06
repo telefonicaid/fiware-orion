@@ -13,3 +13,4 @@
 * Issue  #806   Implemented GET /attributes?details=true
 * Issue  #280   Implemented GET /attributes/{attrName}
 * Issue  #280   Implemented GET /types/{typeName}
+* Issue  #807   Important change in context cache - inline contexts are no longer stored in cache

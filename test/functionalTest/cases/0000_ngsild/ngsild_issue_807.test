@@ -1,0 +1,175 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 807 - too many contexts in cache
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity, according to issue #807
+# 02. Patch it - 200 times
+# 03. GET all contexts from the brokers context cache - see only 2
+#
+
+echo "01. Create an entity, according to issue #807"
+echo "============================================="
+payload='{
+  "id": "urn:ngsi-ld:ambient_temperature:335547901",
+  "type": "ambient_temperature",
+  "device_ID": {
+    "type": "Property",
+    "value": "335547901"
+  }, 
+  "timestamp": {
+    "type": "Property",
+    "value": "2021-04-27T11:28:02.000Z",
+    "observedAt": "2021-04-27T11:28:02.000Z"
+  }, 
+  "Value": {
+    "type": "Property",
+    "value": "17.206493377685547",
+    "observedAt": "2021-04-27T11:28:02.000Z"
+  },
+  "@context": [
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    {
+      "ambient_temperature": "http://example.org/sensors/ambient/temperature", 
+      "device_ID": "http://example.org/sensors/device/ID", 
+      "timestamp": "http://example.org/sensors/timestamp", 
+      "Value": "http://example.org/sensors/Value"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --in application/ld+json --out application/ld+json
+echo
+echo
+
+
+echo "02. Patch it - 200 times"
+echo "========================"
+payload='{
+  "device_ID": {
+    "type": "Property",
+    "value": "335547901"
+  }, 
+  "timestamp": {
+    "type": "Property",
+    "value": "2021-04-27T11:28:02.000Z",
+    "observedAt": "2021-04-27T11:28:02.000Z"
+  },
+  "Value": {
+    "type": "Property",
+    "value": "17.206493377685547",
+    "observedAt": "2021-04-27T11:28:02.000Z"
+  },
+  "@context": [
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    {
+      "ambient_temperature": "http://example.org/sensors/ambient/temperature", 
+      "device_ID": "http://example.org/sensors/device/ID", 
+      "timestamp": "http://example.org/sensors/timestamp", 
+      "Value": "http://example.org/sensors/Value"
+    }
+  ]
+}'
+
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 200 ]
+do
+  orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:ambient_temperature:335547901/attrs -X PATCH --payload "$payload" --in application/ld+json --out application/ld+json
+  eNo=$eNo+1
+done | grep "HTTP/1.1 204 No Content" | wc -l
+echo
+echo
+
+
+echo "03. GET all contexts from the brokers context cache - see only 2"
+echo "================================================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity, according to issue #807
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ambient_temperature:335547901
+Date: REGEX(.*)
+
+
+
+02. Patch it - 200 times
+========================
+200
+
+
+03. GET all contexts from the brokers context cache - see only 2
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 824
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "origin": "Inline",
+        "type": "hash-table",
+        "url": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

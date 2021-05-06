@@ -90,8 +90,9 @@ Date: REGEX(.*)
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "None",
+    "id": "REGEX((Core|None))",
     "type": "hash-table",
+    "origin": "REGEX((FileCached|Downloaded))",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -104,6 +105,7 @@ Date: REGEX(.*)
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "None",
     "type": "hash-table",
+    "origin": "Inline",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",
@@ -116,6 +118,7 @@ Date: REGEX(.*)
     "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
     "id": "None",
     "type": "hash-table",
+    "origin": "Inline",
     "hash-table": {
       "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
       "commercial": "https://uri.fiware.org/ns/data-models#commercial",
@@ -123,15 +126,6 @@ Date: REGEX(.*)
       "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount",
       "industrial": "https://uri.fiware.org/ns/data-models#industrial"
     }
-  },
-  {
-    "url": "REGEX(.*)",
-    "id": "REGEX(.*)",
-    "type": "array",
-    "URLs": [
-      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-      "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
-    ]
   }
 ]
 

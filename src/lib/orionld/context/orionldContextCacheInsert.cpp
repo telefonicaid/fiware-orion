@@ -30,9 +30,33 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // kalloc, orionldState
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"    // orionldPostSubscriptions
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
 #include "orionld/context/orionldContextCacheInsert.h"           // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// originName -
+//
+const char* originName(OrionldContextOrigin origin)
+{
+  switch (origin)
+  {
+  case OrionldContextUnknownOrigin:        return "Unknown";
+  case OrionldContextFromInline:           return "Inline";
+  case OrionldContextDownloaded:           return "Downloaded";
+  case OrionldContextFileCached:           return "FileCached";
+  case OrionldContextForNotifications:     return "Notifications";
+  case OrionldContextForForwarding:        return "Forwarding";
+  case OrionldContextUserCreated:          return "UserCreated";
+  }
+
+  return "InvalidOrigin";
+}
 
 
 
@@ -42,6 +66,16 @@
 //
 void orionldContextCacheInsert(OrionldContext* contextP)
 {
+  if (contextP->origin == OrionldContextFromInline)
+  {
+    //
+    // If the request is a subscription creation, the the context must be saved
+    // FIXME: For now it must be saved. In the end, it should be saved just as it came in
+    //
+    if (orionldState.serviceP->serviceRoutine != orionldPostSubscriptions)
+      return;
+  }
+
   if (contextP == NULL)
   {
     LM_W(("contextP == NULL !!!     FIX IT !!!"));
@@ -56,6 +90,10 @@ void orionldContextCacheInsert(OrionldContext* contextP)
 
   if (orionldContextCacheSlotIx >= orionldContextCacheSlots)
   {
+    //
+    // FIXME:  the code has pointers to contexts, so, THE CONTEXTS THEMSELVES CANNOT MOVE
+    // FIX:    array of OrionldContext* instead of array of OrionldContext - no longer move contexts, just the placeholder of the OrionldContext*
+    //
     int   slotsToAdd   = 50;
     int   addedSize    = slotsToAdd * sizeof(OrionldContext*);
     int   newNoOfSlots = orionldContextCacheSlots + slotsToAdd;
@@ -70,6 +108,5 @@ void orionldContextCacheInsert(OrionldContext* contextP)
 
   orionldContextCache[orionldContextCacheSlotIx] = contextP;
   ++orionldContextCacheSlotIx;
-
   sem_post(&orionldContextCacheSem);
 }

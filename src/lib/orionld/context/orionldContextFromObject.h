@@ -44,6 +44,6 @@ extern "C"
 // Served contexts need to be cloned so that they can be copied back to the caller (GET /ngsi-ld/ex/contexts/xxx).
 // For example, the URL "http:/x.y.z/contexts/context1.jsonld" was downloaded and its content is a key-value object.
 //
-extern OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromObject(char* url, OrionldContextOrigin origin, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMOBJECT_H_

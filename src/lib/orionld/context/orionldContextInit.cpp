@@ -145,7 +145,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   OrionldProblemDetails  pd;
 
   snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
-  LM_T(LmtPreloadedContexts, ("Treating 'preloaded' context file '%s'", path));
 
   if (stat(path, &statBuf) != 0)
     LM_X(1, ("stat(%s): %s", path, strerror(errno)));
@@ -182,20 +181,26 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
   //
 
-  OrionldContext* contextP = orionldContextFromBuffer(url, json, &pd);
+  OrionldContext* contextP = orionldContextFromBuffer(url, OrionldContextFileCached, json, &pd);
 
   if (strcmp(url, coreContextUrl) == 0)
   {
     if (contextP == NULL)
       LM_X(1, ("error creating the core context from file system file '%s'", path));
-    orionldCoreContextP = contextP;
+
+    orionldCoreContextP         = contextP;
+    orionldCoreContextP->id     = (char*) "Core";
+    orionldCoreContextP->origin = OrionldContextFileCached;
   }
   else
   {
     if (contextP == NULL)
       LM_E(("error creating context from file system file '%s'", path));
     else
+    {
+      contextP->origin = OrionldContextFileCached;
       orionldContextCacheInsert(contextP);
+    }
   }
 }
 

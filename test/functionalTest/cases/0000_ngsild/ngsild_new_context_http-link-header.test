@@ -72,7 +72,7 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 817
+Content-Length: 873
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -80,8 +80,9 @@ Date: REGEX(.*)
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "None",
+    "id": "REGEX((Core|None))",
     "type": "hash-table",
+    "origin": "REGEX((FileCached|Downloaded))",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -94,6 +95,7 @@ Date: REGEX(.*)
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "None",
     "type": "hash-table",
+    "origin": "Downloaded",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",

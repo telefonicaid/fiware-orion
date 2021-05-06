@@ -48,7 +48,7 @@ extern "C"
 //
 // orionldContextFromArray -
 //
-OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInArray, KjNode* contextArrayP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromArray(char* url, OrionldContextOrigin origin, bool toBeCloned, int itemsInArray, KjNode* contextArrayP, OrionldProblemDetails* pdP)
 {
   char*           id = NULL;
   OrionldContext* contextP;
@@ -56,7 +56,7 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
   if (url == NULL)
     url = orionldContextUrlGenerate(&id);
 
-  contextP = orionldContextCreate(url, id, contextArrayP, false, toBeCloned);
+  contextP = orionldContextCreate(url, origin, id, contextArrayP, false, toBeCloned);
   orionldContextCacheInsert(contextP);
 
   contextP->context.array.items    = itemsInArray;
@@ -90,7 +90,7 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
     }
     else if (arrayItemP->type == KjObject)
     {
-      childContextP = orionldContextFromObject(NULL, false, arrayItemP, pdP);
+      childContextP = orionldContextFromObject(NULL, origin, false, arrayItemP, pdP);
 
       if (childContextP == NULL)
       {

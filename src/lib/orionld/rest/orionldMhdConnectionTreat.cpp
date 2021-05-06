@@ -816,7 +816,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
         url = orionldContextUrlGenerate(&id);
 
-      orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
+      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, true, orionldState.payloadContextNode, &pd);
       if (orionldState.contextP == NULL)
       {
         LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));

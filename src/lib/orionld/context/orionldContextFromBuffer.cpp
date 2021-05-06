@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // kjsonP
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextOrigin
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextFromBuffer.h"            // Own interface
 
@@ -45,7 +45,7 @@ extern "C"
 //
 // orionldContextFromBuffer -
 //
-OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* buffer, OrionldProblemDetails* pdP)
 {
   if ((buffer == NULL) || (*buffer == 0))
   {
@@ -85,5 +85,5 @@ OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblem
     return NULL;
   }
 
-  return orionldContextFromTree(url, false, contextNodeP, pdP);
+  return orionldContextFromTree(url, origin, false, contextNodeP, pdP);
 }

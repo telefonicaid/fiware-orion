@@ -39,6 +39,6 @@ extern "C"
 //
 // orionldContextFromArray -
 //
-extern OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInArray, KjNode* contextArrayP, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromArray(char* url, OrionldContextOrigin origin, bool toBeCloned, int itemsInArray, KjNode* contextArrayP, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMARRAY_H_

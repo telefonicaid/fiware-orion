@@ -65,6 +65,23 @@ typedef union OrionldContextInfo
 
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldContextOrigin -
+//
+typedef enum OrionldContextOrigin
+{
+  OrionldContextUnknownOrigin,
+  OrionldContextFromInline,
+  OrionldContextDownloaded,
+  OrionldContextFileCached,
+  OrionldContextForNotifications,
+  OrionldContextForForwarding,
+  OrionldContextUserCreated
+} OrionldContextOrigin;
+
+
+
 // ----------------------------------------------------------------------------
 //
 // OrionldContext -
@@ -74,11 +91,12 @@ typedef union OrionldContextInfo
 //
 typedef struct OrionldContext
 {
-  char*               url;
-  char*               id;         // For contexts that were created by the broker itself
-  KjNode*             tree;
-  bool                keyValues;
-  OrionldContextInfo  context;
+  char*                 url;
+  char*                 id;         // For contexts that were created by the broker itself
+  KjNode*               tree;
+  bool                  keyValues;
+  OrionldContextInfo    context;
+  OrionldContextOrigin  origin;
 } OrionldContext;
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXT_H_
