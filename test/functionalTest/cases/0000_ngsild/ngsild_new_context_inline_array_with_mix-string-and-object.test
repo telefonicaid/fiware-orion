@@ -67,7 +67,7 @@ echo
 
 echo "02. Ask for the entire list of contexts in the context cache"
 echo "============================================================"
-orionCurl --url "/ngsi-ld/ex/v1/contexts?prettyPrint=yes&spaces=2" --noPayloadCheck --linkHeaderFix
+orionCurl --url "/ngsi-ld/v1/contexts?prettyPrint=yes&spaces=2&details=true" --noPayloadCheck --linkHeaderFix
 echo
 echo
 
@@ -87,7 +87,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

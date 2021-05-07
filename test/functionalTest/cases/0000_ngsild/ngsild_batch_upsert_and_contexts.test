@@ -275,7 +275,7 @@ echo
 
 echo "04. Get all contexts from the context cache"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/ex/v1/contexts?prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true' --noPayloadCheck
 echo
 echo
 
@@ -501,7 +501,7 @@ echo
 
 echo "07. Get all contexts from the context cache"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/ex/v1/contexts?prettyPrint=yes' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true' --noPayloadCheck
 echo
 echo
 
@@ -727,7 +727,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1062
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -967,7 +966,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1062
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

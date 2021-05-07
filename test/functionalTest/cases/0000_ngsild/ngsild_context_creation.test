@@ -1,0 +1,359 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create a context, get it, and use it
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create a new context to be served by the broker
+# 02. GET all contexts, with details
+# 03. GET the context, make sure it is OK
+# 04. Create an entity, using the context created in step 01
+# 05. GET the entity, with just the Core context, and make sure the terms are expanded according to the context created in step 01
+# 06. GET the entity, with the creation context, and make sure the terms are compacted accordingly
+#
+# 07. Create another context, this one an array of two already existing contexts
+# 08. GET the new context, make sure it is OK
+# 09. GET all contexts, with details
+#
+
+echo "01. Create a new context to be served by the broker"
+echo "==================================================="
+payload='{
+  "A1": "urn:ngsi-ld:attributes:A1",
+  "A2": "urn:ngsi-ld:attributes:A2",
+  "A3": "urn:ngsi-ld:attributes:A3"
+}'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of newly created context: $contextURL
+echo
+echo
+
+
+echo "02. GET all contexts, with details"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+echo "03. GET the context, make sure it is OK"
+echo "======================================="
+orionCurl --url $contextURL
+echo
+echo
+
+
+echo "04. Create an entity, using the context created in step 01"
+echo "=========================================================="
+payload='{
+  "@context": "'http://localhost:9999$contextURL'",
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "A3",
+  "A1": {
+    "type": "Property",
+    "value": 1
+  },
+  "A2": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "05. GET the entity, with just the Core context, and make sure the terms are expanded according to the context created in step 01"
+echo "================================================================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "06. GET the entity, with the creation context, and make sure the terms are compacted accordingly"
+echo "================================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1 -H 'Link: <'http://localhost:9999$contextURL'>'
+echo
+echo
+
+
+echo "07. Create another context, this one an array of two already existing contexts"
+echo "=============================================================================="
+payload='[
+  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+  "https://fiware.github.io/data-models/context.jsonld"
+]'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of newly created context: $contextURL
+echo
+echo
+
+
+echo "08. GET the new context, make sure it is OK"
+echo "==========================================="
+orionCurl --url $contextURL
+echo
+echo
+
+
+echo "09. GET all contexts, with details"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a new context to be served by the broker
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of newly created context: REGEX(.*)
+
+
+02. GET all contexts, with details
+==================================
+HTTP/1.1 200 OK
+Content-Length: 699
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    }
+]
+
+
+03. GET the context, make sure it is OK
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": {
+        "A1": "urn:ngsi-ld:attributes:A1",
+        "A2": "urn:ngsi-ld:attributes:A2",
+        "A3": "urn:ngsi-ld:attributes:A3"
+    }
+}
+
+
+04. Create an entity, using the context created in step 01
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+05. GET the entity, with just the Core context, and make sure the terms are expanded according to the context created in step 01
+================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 183
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "urn:ngsi-ld:attributes:A3",
+    "urn:ngsi-ld:attributes:A1": {
+        "type": "Property",
+        "value": 1
+    },
+    "urn:ngsi-ld:attributes:A2": {
+        "type": "Property",
+        "value": 1
+    }
+}
+
+
+06. GET the entity, with the creation context, and make sure the terms are compacted accordingly
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/json
+Link: <http://REGEX(.*)
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "type": "Property",
+        "value": 1
+    },
+    "A2": {
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "A3"
+}
+
+
+07. Create another context, this one an array of two already existing contexts
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: REGEX(.*)
+Date: REGEX(.*)
+
+URL of newly created context: /ngsi-ld/v1/contexts/REGEX(.*)
+
+
+08. GET the new context, make sure it is OK
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": [
+        "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+        "https://fiware.github.io/data-models/context.jsonld"
+    ]
+}
+
+
+09. GET all contexts, with details
+==================================
+HTTP/1.1 200 OK
+Content-Length: 2232
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "Core",
+        "origin": "FileCached",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "REGEX(.*)"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "None",
+        "origin": "Inline",
+        "type": "hash-table",
+        "url": "REGEX(.*)"
+    },
+    {
+        "hash-table": {
+            "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
+            "commercial": "https://uri.fiware.org/ns/data-models#commercial",
+            "inProgress": "https://fiware.github.io/tutorials.Step-by-Step/schema/inProgress",
+            "industrial": "https://uri.fiware.org/ns/data-models#industrial",
+            "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount"
+        },
+        "id": "None",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle",
+            "areaServed": "https://schema.org/areaServed",
+            "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+            "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+            "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+        },
+        "id": "None",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "https://fiware.github.io/data-models/context.jsonld"
+    },
+    {
+        "URLs": [
+            "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+            "https://fiware.github.io/data-models/context.jsonld"
+        ],
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "array",
+        "url": "REGEX(.*)"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

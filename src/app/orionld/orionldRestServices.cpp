@@ -60,6 +60,7 @@
 #include "orionld/serviceRoutines/orionldGetTemporalEntity.h"
 #include "orionld/serviceRoutines/orionldPostTemporalQuery.h"
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"
+#include "orionld/serviceRoutines/orionldPostContexts.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -82,8 +83,8 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions    },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration     },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations    },
-  { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext          },
-  { "/ngsi-ld/ex/v1/contexts",             orionldGetContexts         },
+  { "/ngsi-ld/v1/contexts/*",              orionldGetContext          },
+  { "/ngsi-ld/v1/contexts",                orionldGetContexts         },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion          },
   { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants          },
   { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes        },
@@ -113,7 +114,8 @@ static OrionLdRestServiceSimplified postServiceV[] =
   { "/ngsi-ld/v1/csourceRegistrations",            orionldPostRegistrations    },
   { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldNotImplemented       },
   { "/ngsi-ld/v1/temporal/entities",               orionldPostTemporalEntities },
-  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery    }
+  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery    },
+  { "/ngsi-ld/v1/contexts",                        orionldPostContexts         }
 };
 static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]));
 

@@ -80,7 +80,7 @@ echo
 
 echo "02. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -103,7 +103,7 @@ echo
 
 echo "04. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -126,7 +126,7 @@ echo
 
 echo "06. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -149,7 +149,7 @@ echo
 
 echo "08. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -172,7 +172,7 @@ echo
 
 echo "10. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -195,7 +195,7 @@ echo
 
 echo "12. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -218,7 +218,7 @@ echo
 
 echo "14. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -241,7 +241,7 @@ echo
 
 echo "16. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -264,7 +264,7 @@ echo
 
 echo "18. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -290,7 +290,7 @@ echo
 
 echo "20. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -315,7 +315,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -354,7 +353,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -393,7 +391,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -433,7 +430,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -472,7 +468,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -511,7 +506,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -550,7 +544,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -589,7 +582,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -628,7 +620,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -667,7 +658,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 498
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

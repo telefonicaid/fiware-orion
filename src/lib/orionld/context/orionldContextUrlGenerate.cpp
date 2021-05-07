@@ -39,21 +39,21 @@ extern "C"
 //
 // The size used in the call to kaAlloc:
 //   - strlen("http://HOSTNAME:PORT"):       12
-//   - strlen("/ngsi-ld/ex/v1/contexts/"):   24
+//   - strlen("/ngsi-ld/v1/contexts/"):      21
 //   - uuidGenerate:                         37
 //   - zero termination:                     1
 //   - orionldHostNameLen
 //
-//  => 74 + orionldHostNameLen
+//  => 71 + orionldHostNameLen
 //
 char* orionldContextUrlGenerate(char** contextIdP)
 {
-  char* url = (char*) kaAlloc(&kalloc, 74 + orionldHostNameLen);
+  char* url = (char*) kaAlloc(&kalloc, 71 + orionldHostNameLen);
 
-  snprintf(url, 74 + orionldHostNameLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/", orionldHostName, portNo);
-  uuidGenerate(&url[36 + orionldHostNameLen], 100, false);
+  snprintf(url, 71 + orionldHostNameLen, "http://%s:%d/ngsi-ld/v1/contexts/", orionldHostName, portNo);
+  uuidGenerate(&url[33 + orionldHostNameLen], 100, false);
 
-  *contextIdP = &url[36 + orionldHostNameLen];
+  *contextIdP = &url[33 + orionldHostNameLen];
 
   return url;
 }

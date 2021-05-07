@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,49 +25,49 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
-#include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
+#include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
+
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetContext -
+// orionldPostContexts -
 //
-bool orionldGetContext(ConnectionInfo* ciP)
+bool orionldPostContexts(ConnectionInfo* ciP)
 {
-  OrionldContext* contextP    = orionldContextCacheLookup(orionldState.wildcard[0]);
+  char* id;
+  char* url;
 
-  orionldState.noLinkHeader = true;  // We don't want the Link header for context requests
+  url = orionldContextUrlGenerate(&id);
+
+  LM_TMP(("orionldState.requestTree at %p", orionldState.requestTree));
+  OrionldProblemDetails  pd;
+  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, true, orionldState.requestTree, &pd);
 
   if (contextP == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0]);
-    orionldState.httpStatusCode = 404;
+    LM_W(("Unable to create context (%s: %s)", pd.title, pd.detail));
+    orionldErrorResponseCreate(&pd);
     return false;
   }
+  contextP->id = kaStrdup(&kalloc, id);
 
-  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-  if (orionldState.responseTree == NULL)
-  {
-    LM_E(("Internal Error (out of memory)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "kjObject failed", "out of memory?");
-    orionldState.httpStatusCode = SccReceiverInternalError;
-    return false;
-  }
-
-  contextP->tree->name = (char*) "@context";
-
-  kjChildAdd(orionldState.responseTree, contextP->tree);
+  LM_TMP(("Context Created: '%s'", contextP->url));
+  httpHeaderLocationAdd(ciP, contextP->url, NULL);
+  orionldState.httpStatusCode = 201;
 
   return true;
 }
