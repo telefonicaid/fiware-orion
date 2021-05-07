@@ -55,7 +55,10 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 {
   char location[512];
 
-  snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
+  if (entityId != NULL)
+    snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
+  else
+    snprintf(location, sizeof(location), "%s", uriPathWithSlash);
 
   ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
   ciP->httpHeaderValue.push_back(location);

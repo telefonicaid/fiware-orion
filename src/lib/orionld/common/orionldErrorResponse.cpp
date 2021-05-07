@@ -116,3 +116,16 @@ void orionldErrorResponseCreate
   kjChildAdd(orionldState.responseTree, titleP);
   kjChildAdd(orionldState.responseTree, detailP);
 }
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorResponseCreate -
+//
+void orionldErrorResponseCreate(OrionldProblemDetails* pdP)
+{
+  orionldState.httpStatusCode = pdP->status;
+  orionldState.pd             = *pdP;
+  orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+}

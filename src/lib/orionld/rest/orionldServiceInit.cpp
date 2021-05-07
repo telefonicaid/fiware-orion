@@ -82,6 +82,9 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntityAttributes.h"      // orionldGetEntityAttributes
 #include "orionld/serviceRoutines/orionldGetEntityAttribute.h"       // orionldGetEntityAttribute
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"     // orionldPostTemporalEntities
+#include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
+#include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
+
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
 #include "orionld/troe/troeDeleteAttribute.h"                        // troeDeleteAttribute
@@ -439,6 +442,22 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+  }
+  else if (serviceP->serviceRoutine == orionldGetContexts)
+  {
+    serviceP->options  = 0;  // Tenant is Ignored
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
+
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+  }
+  else if (serviceP->serviceRoutine == orionldGetContext)
+  {
+    serviceP->options  = 0;  // Tenant is Ignored
+
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
   }
 
   if (troe)  // CLI Option to turn on Temporal Representation of Entities

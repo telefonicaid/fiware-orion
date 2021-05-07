@@ -14,3 +14,6 @@
 * Issue  #280   Implemented GET /attributes/{attrName}
 * Issue  #280   Implemented GET /types/{typeName}
 * Issue  #807   Important change in context cache - inline contexts are no longer stored in cache
+* Issue  #280   Experimental implementation of GET /ngsi-ld/v1/contexts (with and without details) - yet to be defined in the NGSI-LD API
+* Issue  #280   Experimental implementation of GET /ngsi-ld/v1/contexts/{contextId} - yet to be defined in the NGSI-LD API
+* Issue  #280   Experimental implementation of POST /ngsi-ld/v1/contexts - yet to be defined in the NGSI-LD API

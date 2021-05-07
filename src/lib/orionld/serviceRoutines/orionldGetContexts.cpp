@@ -48,7 +48,9 @@ bool orionldGetContexts(ConnectionInfo* ciP)
 {
   KjNode* contextTree = kjArray(orionldState.kjsonP, "contexts");
 
-  orionldState.responseTree = orionldContextCacheGet(contextTree);
+  orionldState.noLinkHeader = true;  // We don't want the Link header for context requests
+
+  orionldState.responseTree = orionldContextCacheGet(contextTree, orionldState.uriParams.details);
 
   return true;
 }

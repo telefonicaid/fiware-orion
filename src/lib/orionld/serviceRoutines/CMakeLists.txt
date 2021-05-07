@@ -60,6 +60,7 @@ SET (SOURCES
     orionldGetEntityAttributes.cpp
     orionldGetEntityAttribute.cpp
     orionldPostTemporalEntities.cpp
+    orionldPostContexts.cpp
 )
 
 # Include directories

@@ -44,7 +44,7 @@ extern const char* originName(OrionldContextOrigin origin);  // FIXME: move to o
 //
 // orionldContextCacheGet -
 //
-KjNode* orionldContextCacheGet(KjNode* arrayP)
+KjNode* orionldContextCacheGet(KjNode* arrayP, bool details)
 {
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
@@ -53,65 +53,73 @@ KjNode* orionldContextCacheGet(KjNode* arrayP)
     if (contextP == NULL)
       continue;
 
-    KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
-    KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",  contextP->url);
-    KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",  (contextP->id == NULL)? "None" : contextP->id);
-    KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type", contextP->keyValues? "hash-table" : "array");
-    KjNode*          originP          = kjString(orionldState.kjsonP, "origin", originName(contextP->origin));
-
-    kjChildAdd(contextObjP, urlStringP);
-    kjChildAdd(contextObjP, idStringP);
-    kjChildAdd(contextObjP, typeStringP);
-    kjChildAdd(contextObjP, originP);
-
-    if (contextP->keyValues)
+    if (details == true)
     {
-      // Show a maximum of 5 items from the hash-table
-      KjNode*      hashTableObjectP = kjObject(orionldState.kjsonP, "hash-table");
-      KHashTable*  htP              = contextP->context.hash.nameHashTable;
-      int          noOfItems        = 0;
+      KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
+      KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",  contextP->url);
+      KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",  (contextP->id == NULL)? "None" : contextP->id);
+      KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type", contextP->keyValues? "hash-table" : "array");
+      KjNode*          originP          = kjString(orionldState.kjsonP, "origin", originName(contextP->origin));
 
-      for (int slot = 0; slot < ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE; ++slot)
+      kjChildAdd(contextObjP, urlStringP);
+      kjChildAdd(contextObjP, idStringP);
+      kjChildAdd(contextObjP, typeStringP);
+      kjChildAdd(contextObjP, originP);
+
+      if (contextP->keyValues)
       {
-        KHashListItem* itemP = htP->array[slot];
+        // Show a maximum of 5 items from the hash-table
+        KjNode*      hashTableObjectP = kjObject(orionldState.kjsonP, "hash-table");
+        KHashTable*  htP              = contextP->context.hash.nameHashTable;
+        int          noOfItems        = 0;
 
-        while (itemP != 0)
+        for (int slot = 0; slot < ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE; ++slot)
         {
-          OrionldContextItem* hashItemP       = (OrionldContextItem*) itemP->data;
-          KjNode*             hashItemStringP = kjString(orionldState.kjsonP, hashItemP->name, hashItemP->id);
+          KHashListItem* itemP = htP->array[slot];
 
-          kjChildAdd(hashTableObjectP, hashItemStringP);
+          while (itemP != 0)
+          {
+            OrionldContextItem* hashItemP       = (OrionldContextItem*) itemP->data;
+            KjNode*             hashItemStringP = kjString(orionldState.kjsonP, hashItemP->name, hashItemP->id);
 
-          ++noOfItems;
+            kjChildAdd(hashTableObjectP, hashItemStringP);
+
+            ++noOfItems;
+            if (noOfItems >= 5)
+              break;
+
+            itemP = itemP->next;
+          }
+
           if (noOfItems >= 5)
             break;
-
-          itemP = itemP->next;
         }
 
-        if (noOfItems >= 5)
-          break;
+        kjChildAdd(contextObjP, hashTableObjectP);
+      }
+      else
+      {
+        //
+        // If ARRAY - show all the URLs in the array
+        //
+        KjNode* urlArrayP = kjArray(orionldState.kjsonP, "URLs");
+
+        for (int aIx = 0; aIx < contextP->context.array.items; ++aIx)
+        {
+          KjNode* urlStringP = kjString(orionldState.kjsonP, NULL, contextP->context.array.vector[aIx]->url);
+
+          kjChildAdd(urlArrayP, urlStringP);
+        }
+        kjChildAdd(contextObjP, urlArrayP);
       }
 
-      kjChildAdd(contextObjP, hashTableObjectP);
+      kjChildAdd(arrayP, contextObjP);
     }
     else
     {
-      //
-      // If ARRAY - show all the URLs in the array
-      //
-      KjNode* urlArrayP = kjArray(orionldState.kjsonP, "URLs");
-
-      for (int aIx = 0; aIx < contextP->context.array.items; ++aIx)
-      {
-        KjNode* urlStringP = kjString(orionldState.kjsonP, NULL, contextP->context.array.vector[aIx]->url);
-
-        kjChildAdd(urlArrayP, urlStringP);
-      }
-      kjChildAdd(contextObjP, urlArrayP);
+      KjNode* urlNodeP = kjString(orionldState.kjsonP, NULL, contextP->url);
+      kjChildAdd(arrayP, urlNodeP);
     }
-
-    kjChildAdd(arrayP, contextObjP);
   }
 
   return arrayP;

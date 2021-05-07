@@ -52,7 +52,7 @@ brokerStart CB 0-255
 #
 #  "@context": [
 #    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
-#    "https://xps:9999/ngsi-ld/ex/v1/contexts/XXXXXX"
+#    "https://xps:9999/ngsi-ld/v1/contexts/XXXXXX"
 #  ]
 #
 # This is how "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld" looks:
@@ -78,8 +78,8 @@ brokerStart CB 0-255
 # So, the entire context cache should look like this:
 #
 #   1. Object:  The Core Context
-#   2. Array:   The Array with two items, containing "testFullContext.jsonld" and "https://xps:9999/ngsi-ld/ex/v1/contexts/XXXXXX"
-#   3. Object:  The new object with { "A", "name, and "name2" } - https://xps:9999/ngsi-ld/ex/v1/contexts/XXXXXX
+#   2. Array:   The Array with two items, containing "testFullContext.jsonld" and "https://xps:9999/ngsi-ld/v1/contexts/XXXXXX"
+#   3. Object:  The new object with { "A", "name, and "name2" } - https://xps:9999/ngsi-ld/v1/contexts/XXXXXX
 #   4. String:  https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld - a string (coming from a vector of testContext.jsonld + Core Context)
 #   5. Object:  https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld
 #
@@ -103,6 +103,20 @@ echo
 echo
 
 
+echo "02. Get all contexts"
+echo "===================="
+orionCurl --url /ngsi-ld/v1/contexts
+echo
+echo
+
+
+echo "03. Get all contexts, with details"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E1 with a context that is an array of a string and an inline context
 ======================================================================================
@@ -111,6 +125,66 @@ Content-Length: 0
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
+
+
+02. Get all contexts
+====================
+HTTP/1.1 200 OK
+Content-Length: 215
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+]
+
+
+03. Get all contexts, with details
+==================================
+HTTP/1.1 200 OK
+Content-Length: 923
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "P1": "http://example.org/P1",
+            "P2": "http://example.org/P2",
+            "P3": "http://example.org/P3",
+            "R1": "http://example.org/R1",
+            "T": "http://example.org/T"
+        },
+        "id": "None",
+        "origin": "Downloaded",
+        "type": "hash-table",
+        "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    },
+    {
+        "URLs": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+        ],
+        "id": "None",
+        "origin": "Inline",
+        "type": "array",
+        "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+    }
+]
 
 
 --TEARDOWN--
