@@ -146,7 +146,7 @@ URL of newly created context: REGEX(.*)
 02. GET all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 699
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -275,7 +275,7 @@ Date: REGEX(.*)
 09. GET all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 2232
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -288,8 +288,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "Core",
-        "origin": "FileCached",
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     },
