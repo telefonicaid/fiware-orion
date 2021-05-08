@@ -66,6 +66,14 @@ const char* originName(OrionldContextOrigin origin)
 //
 void orionldContextCacheInsert(OrionldContext* contextP)
 {
+  int slotNo = orionldContextCacheSlotIx;
+
+  if (contextP == NULL)
+  {
+    LM_W(("contextP == NULL"));
+    return;
+  }
+
   if (contextP->origin == OrionldContextFromInline)
   {
     //
@@ -76,19 +84,27 @@ void orionldContextCacheInsert(OrionldContext* contextP)
       return;
   }
 
-  if (contextP == NULL)
-  {
-    LM_W(("contextP == NULL !!!     FIX IT !!!"));
-    return;
-  }
-
   sem_wait(&orionldContextCacheSem);
+
+  if (slotNo >= orionldContextCacheSlots)
+  {
+    // Look for holes - a context may have been deleted !!!
+    for (int ix = 0; ix < orionldContextCacheSlots; ix++)
+    {
+      if (orionldContextCache[ix] == NULL)
+      {
+        slotNo = ix;
+        break;
+      }
+    }
+  }
+  else
+    ++orionldContextCacheSlotIx;
 
   //
   // Reallocation necessary?
   //
-
-  if (orionldContextCacheSlotIx >= orionldContextCacheSlots)
+  if (slotNo >= orionldContextCacheSlots)
   {
     //
     // FIXME:  the code has pointers to contexts, so, THE CONTEXTS THEMSELVES CANNOT MOVE
@@ -104,9 +120,10 @@ void orionldContextCacheInsert(OrionldContext* contextP)
 
     orionldContextCacheSlots += 50;
     orionldContextCache = (OrionldContext**) newArray;
+
+    slotNo = orionldContextCacheSlotIx;
   }
 
-  orionldContextCache[orionldContextCacheSlotIx] = contextP;
-  ++orionldContextCacheSlotIx;
+  orionldContextCache[slotNo] = contextP;
   sem_post(&orionldContextCacheSem);
 }

@@ -61,6 +61,7 @@
 #include "orionld/serviceRoutines/orionldPostTemporalQuery.h"
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"
 #include "orionld/serviceRoutines/orionldPostContexts.h"
+#include "orionld/serviceRoutines/orionldDeleteContext.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -147,6 +148,7 @@ static OrionLdRestServiceSimplified deleteServiceV[] =
   { "/ngsi-ld/v1/entities/*",                    orionldDeleteEntity       },
   { "/ngsi-ld/v1/subscriptions/*",               orionldDeleteSubscription },
   { "/ngsi-ld/v1/csourceRegistrations/*",        orionldDeleteRegistration },
+  { "/ngsi-ld/v1/contexts/*",                    orionldDeleteContext      },
   { "/ngsi-ld/v1/temporal/entities/*/attrs/*/*", orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*/attrs/*",   orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",           orionldNotImplemented     }

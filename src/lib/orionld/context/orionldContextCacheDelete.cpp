@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -29,27 +29,33 @@
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheLookup.h"           // Own interface
+#include "orionld/context/orionldContextCacheDelete.h"           // Own interface
+
+
+static void orionldContextCacheRelease(OrionldContext* contextP)
+{
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheLookup -
+// orionldContextCacheDelete -
 //
-OrionldContext* orionldContextCacheLookup(const char* url)
+bool orionldContextCacheDelete(const char* id)
 {
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     if (orionldContextCache[ix] == NULL)
       continue;
 
-    if (strcmp(url, orionldContextCache[ix]->url) == 0)
-      return orionldContextCache[ix];
-
-    if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
-      return orionldContextCache[ix];
+    if ((orionldContextCache[ix]->id != NULL) && (strcmp(id, orionldContextCache[ix]->id) == 0))
+    {
+      orionldContextCacheRelease(orionldContextCache[ix]);
+      orionldContextCache[ix] = NULL;
+      return true;
+    }
   }
 
-  return NULL;
+  return false;
 }
