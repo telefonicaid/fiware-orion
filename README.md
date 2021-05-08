@@ -68,5 +68,6 @@ Documentation:
 * [Quick Start Guide](doc/manuals-ld/quick-start-guide.md)
 * [External Libraries](doc/manuals-ld/external-libraries.md)
 * [Temporal Representation](doc/manuals-ld/troe.md)
+* [The Broker as Context Server](doc/manuals-ld/contextServer.md)
 
 A Test Suite for NGSI-LD can be found [here](https://github.com/fiware/NGSI-LD_Tests). 
