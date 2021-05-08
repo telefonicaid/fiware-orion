@@ -50,6 +50,7 @@ SET (SOURCES
     orionldContextItemAlreadyExpanded.cpp
     orionldAttributeExpand.cpp
     orionldSubAttributeExpand.cpp
+    orionldContextCacheDelete.cpp
 )
 
 # Include directories

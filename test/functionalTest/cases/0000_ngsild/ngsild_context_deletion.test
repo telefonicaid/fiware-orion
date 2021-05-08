@@ -1,0 +1,251 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create and DELETE contexts
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create context A in the broker
+# 02. Create context B in the broker
+# 03. Create context C in the broker
+# 04. GET all contexts, with details, see A-B-C
+# 05. Delete context B
+# 06. GET all contexts, with details, see A-C
+# 07. Create context D in the broker
+# 08. GET all contexts, with details, see A-D-C
+#
+
+echo "01. Create context A in the broker"
+echo "=================================="
+payload='{
+  "A1": "urn:ngsi-ld:attributes:A1",
+  "A2": "urn:ngsi-ld:attributes:A2",
+  "A3": "urn:ngsi-ld:attributes:A3"
+}'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+urlA=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of context A: $urlA
+echo
+echo
+
+
+echo "02. Create context B in the broker"
+echo "=================================="
+payload='{
+  "B1": "urn:ngsi-ld:attributes:B1",
+  "B2": "urn:ngsi-ld:attributes:B2",
+  "B3": "urn:ngsi-ld:attributes:B3"
+}'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+urlB=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of context B: $urlB
+echo
+echo
+
+
+echo "03. Create context C in the broker"
+echo "=================================="
+payload='{
+  "C1": "urn:ngsi-ld:attributes:C1",
+  "C2": "urn:ngsi-ld:attributes:C2",
+  "C3": "urn:ngsi-ld:attributes:C3"
+}'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+urlC=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of context C: $urlC
+echo
+echo
+
+
+echo "04. GET all contexts, with details, see A-B-C"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+echo "05. Delete context B"
+echo "===================="
+idB=$(echo $urlB | awk -F/ '{print $5}')
+orionCurl --url /ngsi-ld/v1/contexts/$idB -X DELETE
+echo
+echo
+
+
+echo "06. GET all contexts, with details, see A-C"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create context A in the broker
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of context A: REGEX(.*)
+
+
+02. Create context B in the broker
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of context B: REGEX(.*)
+
+
+03. Create context C in the broker
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of context C: REGEX(.*)
+
+
+04. GET all contexts, with details, see A-B-C
+=============================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    },
+    {
+        "hash-table": {
+            "B1": "urn:ngsi-ld:attributes:B1",
+            "B2": "urn:ngsi-ld:attributes:B2",
+            "B3": "urn:ngsi-ld:attributes:B3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    },
+    {
+        "hash-table": {
+            "C1": "urn:ngsi-ld:attributes:C1",
+            "C2": "urn:ngsi-ld:attributes:C2",
+            "C3": "urn:ngsi-ld:attributes:C3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    }
+]
+
+
+05. Delete context B
+====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. GET all contexts, with details, see A-C
+===========================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "REGEX((Core|None))",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    },
+    {
+        "hash-table": {
+            "C1": "urn:ngsi-ld:attributes:C1",
+            "C2": "urn:ngsi-ld:attributes:C2",
+            "C3": "urn:ngsi-ld:attributes:C3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
