@@ -42,6 +42,11 @@ brokerStart CB 212-249
 # 08. GET the new context, make sure it is OK
 # 09. GET all contexts, with details
 #
+# 10. Create a context, as an object with a @context member with key-values
+# 11. GET the context, make sure it is OK
+# 12. Create a context, as an object with a @context member with an array
+# 13. GET the context, make sure it is OK
+#
 
 echo "01. Create a new context to be served by the broker"
 echo "==================================================="
@@ -128,6 +133,49 @@ echo
 echo "09. GET all contexts, with details"
 echo "=================================="
 orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+echo "10. Create a context, as an object with a @context member with key-values"
+echo "========================================================================="
+payload='{
+  "@context": {
+    "A4": "urn:ngsi-ld:attributes:A4",
+    "A5": "urn:ngsi-ld:attributes:A5",
+    "A6": "urn:ngsi-ld:attributes:A6"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of newly created context: $contextURL
+echo
+echo
+
+
+echo "11. GET the context, make sure it is OK"
+echo "======================================="
+orionCurl --url $contextURL
+echo
+echo
+
+
+echo "12. Create a context, as an object with a @context member with an array"
+echo "======================================================================="
+payload='[
+  "https://fiware.github.io/data-models/context.jsonld",
+  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+]'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo URL of newly created context: $contextURL
+echo
+echo
+
+
+echo "13. GET the context, make sure it is OK"
+echo "======================================="
+orionCurl --url $contextURL
 echo
 echo
 
@@ -352,6 +400,57 @@ Date: REGEX(.*)
         "url": "REGEX(.*)"
     }
 ]
+
+
+10. Create a context, as an object with a @context member with key-values
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of newly created context: REGEX(.*)
+
+
+11. GET the context, make sure it is OK
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": {
+        "A4": "urn:ngsi-ld:attributes:A4",
+        "A5": "urn:ngsi-ld:attributes:A5",
+        "A6": "urn:ngsi-ld:attributes:A6"
+    }
+}
+
+
+12. Create a context, as an object with a @context member with an array
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+URL of newly created context: REGEX(.*)
+
+
+13. GET the context, make sure it is OK
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": [
+        "https://fiware.github.io/data-models/context.jsonld",
+        "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+    ]
+}
 
 
 --TEARDOWN--

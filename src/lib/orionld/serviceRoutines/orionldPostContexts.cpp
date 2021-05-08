@@ -24,8 +24,10 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjRender.h"                                      // kjFasrRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -46,10 +48,25 @@ extern "C"
 //
 // orionldPostContexts -
 //
+// The @context can come in in various formats.
+// 1. { "key1": "value1", "key2": "value2", ... }
+// 2. [ "url1", "url2", ... ]
+// 3. { "@context": { "key1": "value1", "key2": "value2", ... } }
+// 4. { "@context": [ "url1", "url2", ... ] }
+// 5. Etc
+//
+// orionldContextFromTree() needs the value of the @context as the input tree, so, in case the "@context" member is
+// present, like in cases 3 and 4, then it will have to be extracted and its value used for orionldContextFromTree().
+//
+// orionldMhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
+//
 bool orionldPostContexts(ConnectionInfo* ciP)
 {
   char* id;
   char* url;
+
+  if (orionldState.payloadContextNode != NULL)
+    orionldState.requestTree = orionldState.payloadContextNode;
 
   url = orionldContextUrlGenerate(&id);
 
