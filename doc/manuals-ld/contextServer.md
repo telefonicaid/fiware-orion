@@ -172,3 +172,5 @@ Lastly, if a user needs modifications for its "hosted" context, the broker also 
 ```
 DELETE /ngsi-ld/v1/contexts/{contextId}
 ```
+So, DELETE and then POST, to update a hosted context.
+Or, just DELETE if you no longer need the context to be hosted.
