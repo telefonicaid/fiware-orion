@@ -93,7 +93,7 @@ Date: REGEX(.*)
     "http://BROKER_IP:BROKER_PORT/ngsi-ld/v1/contexts/xxx-yyy-zzz..."
 ]
 ```
-In this example, the first item in the context URL array is the URK of the core context.
+In this example, the first item in the context URL array is the URL of the core context.
 As the core context is downloaded when the broker first starts up, it will always be the first in the list.
 The second and the third URLs are contexts that the broker downloaded on demand, as the contexts were used as part of a request,
 while the fourth URL is a user created context - you can see that as the IP and port are the brokers IP and port,
@@ -149,9 +149,23 @@ As mentioned above, when a context is created (using POST /ngsi-ld/v1/contexts),
 Actually, the entire URL to the context is returned in the Location header.
 This value can then be used for the Link header of subsequent requests, or be part of an array with URLs for a composite context or ...
 It can also be used to retrieve the context, which is what the broker will have to do whenever this context is used.
-Well, the broker notices that the broker itself is the server of the context and instead of issuing a GET request, the context is just looked up in the brpkers context cache).
-
+Well, the broker notices that the broker itself is the server of the context and instead of issuing a GET request,
+the context is just looked up in the brokers context cache).
+```
 GET /ngsi-ld/v1/contexts/{contextId}
+```
+This request retrieves the entire context (with id {contextId}), with the "@context" key and the context itself as its value, e.g.:
+```
+GET /ngsi-ld/v1/contexts/{contextId}
+
+{
+  "@context": {
+    "A1": "urn:ngsi-ld:attributes:A1",
+    "A2": "urn:ngsi-ld:attributes:A2",
+    "A3": "urn:ngsi-ld:attributes:A3"
+  }
+}
+```
 
 ## DELETE a user created context
 Lastly, if a user needs modifications for its "hosted" context, the broker also supports for deletion of user created contexts:
