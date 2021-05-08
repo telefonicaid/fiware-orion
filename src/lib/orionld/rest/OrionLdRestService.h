@@ -104,6 +104,7 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD                         (1 << 4)
 #define ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS                      (1 << 5)
 #define ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED                     (1 << 6)
+#define ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK                 (1 << 7)
 
 
 

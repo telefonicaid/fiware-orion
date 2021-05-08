@@ -779,9 +779,11 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 05. Check the Content-Type
   //
-  if (contentTypeCheck(ciP) == false)
-    goto respond;
-
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK) == 0)
+  {
+    if (contentTypeCheck(ciP) == false)
+      goto respond;
+  }
 
   //
   // 06. Check the Accept header and ...
