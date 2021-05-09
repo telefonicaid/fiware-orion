@@ -202,7 +202,7 @@ static OrionldContext* contextCacheWait(char* url, OrionldProblemDetails* pdP)
 //
 // orionldContextFromUrl -
 //
-OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails* pdP)
 {
   OrionldContext* contextP = orionldContextCacheLookup(url);
 
@@ -281,7 +281,7 @@ OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP)
     return NULL;
   }
 
-  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, buffer, pdP);
+  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer, pdP);
 
   if (contextP != NULL)
     contextP->origin = OrionldContextDownloaded;

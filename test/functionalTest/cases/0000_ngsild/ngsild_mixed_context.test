@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 923
+Content-Length: 975
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -157,7 +157,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -180,7 +180,8 @@ Date: REGEX(.*)
             "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
         ],
         "id": "None",
-        "origin": "Inline",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
         "type": "array",
         "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
     }

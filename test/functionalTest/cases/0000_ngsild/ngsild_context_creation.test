@@ -207,7 +207,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -336,7 +336,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -359,7 +359,7 @@ Date: REGEX(.*)
             "A3": "urn:ngsi-ld:attributes:A3"
         },
         "id": "None",
-        "origin": "Inline",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "REGEX(.*)"
     },
@@ -372,7 +372,8 @@ Date: REGEX(.*)
             "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount"
         },
         "id": "None",
-        "origin": "UserCreated",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
         "type": "hash-table",
         "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
     },
@@ -385,7 +386,8 @@ Date: REGEX(.*)
             "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
         },
         "id": "None",
-        "origin": "UserCreated",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
         "type": "hash-table",
         "url": "https://fiware.github.io/data-models/context.jsonld"
     },

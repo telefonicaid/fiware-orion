@@ -135,7 +135,7 @@ Date: REGEX(.*)
 03. GET all contexts from the brokers context cache - see only 2
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 824
+Content-Length: 876
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -148,7 +148,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -162,7 +162,8 @@ Date: REGEX(.*)
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
         "id": "None",
-        "origin": "Inline",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
         "type": "hash-table",
         "url": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }

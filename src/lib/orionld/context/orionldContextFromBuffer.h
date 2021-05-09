@@ -34,6 +34,6 @@
 //
 // orionldContextFromBuffer -
 //
-extern OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* buffer, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* id, char* buffer, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMBUFFER_H_

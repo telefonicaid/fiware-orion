@@ -1,0 +1,192 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create a context, get it, and use it
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create a new context to be served by the broker, one that is an array of a URL and a key-value list: 3 contexts in total
+# 02. GET all contexts - see 4 contexts: array, downloaded and inline (the core context is the "fourth")
+# 03. GET all contexts without details
+# 04. Delete the new context
+# 05. GET all contexts - see 2 contexts - the core and the downloaded context - the other two have disappeared
+#
+
+echo "01. Create a new context to be served by the broker, one that is an array of a URL and a key-value list: 3 contexts in total"
+echo "============================================================================================================================"
+payload='[
+  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+  {
+    "A1": "urn:ngsi-ld:attributes:A1",
+    "A2": "urn:ngsi-ld:attributes:A2",
+    "A3": "urn:ngsi-ld:attributes:A3"    
+  }
+]'
+orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '02. GET all contexts - see 4 contexts: array, downloaded and inline (the core context is the "fourth")'
+echo '======================================================================================================'
+orionCurl --url /ngsi-ld/v1/contexts?details=true
+echo
+echo
+
+
+echo "03. GET all contexts without details"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/contexts
+echo
+echo
+
+
+echo "04. Delete the new context"
+echo "=========================="
+orionCurl --url $contextURL -X DELETE
+echo
+echo
+
+
+echo "05. GET all contexts - see 2 contexts - the core and the downloaded context - the other two have disappeared"
+echo "============================================================================================================"
+orionCurl --url /ngsi-ld/v1/contexts
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a new context to be served by the broker, one that is an array of a URL and a key-value list: 3 contexts in total
+============================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: http://REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. GET all contexts - see 4 contexts: array, downloaded and inline (the core context is the "fourth")
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "Core",
+        "origin": "REGEX((FileCached|Downloaded))",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
+            "commercial": "https://uri.fiware.org/ns/data-models#commercial",
+            "inProgress": "https://fiware.github.io/tutorials.Step-by-Step/schema/inProgress",
+            "industrial": "https://uri.fiware.org/ns/data-models#industrial",
+            "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount"
+        },
+        "id": "None",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
+        "type": "hash-table",
+        "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+    },
+    {
+        "hash-table": {
+            "A1": "urn:ngsi-ld:attributes:A1",
+            "A2": "urn:ngsi-ld:attributes:A2",
+            "A3": "urn:ngsi-ld:attributes:A3"
+        },
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "parent": "REGEX(.*)",
+        "type": "hash-table",
+        "url": "http://REGEX(.*)"
+    },
+    {
+        "URLs": [
+            "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+            "http://REGEX(.*)
+        ],
+        "id": "REGEX(.*)",
+        "origin": "UserCreated",
+        "type": "array",
+        "url": "http://REGEX(.*)"
+    }
+]
+
+
+03. GET all contexts without details
+====================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "http://REGEX(.*)",
+    "http://REGEX(.*)"
+]
+
+
+04. Delete the new context
+==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET all contexts - see 2 contexts - the core and the downloaded context - the other two have disappeared
+============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

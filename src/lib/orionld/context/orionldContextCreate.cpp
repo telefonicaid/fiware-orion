@@ -39,6 +39,28 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextOriginName - FIXME: move to its own module
+//
+const char* orionldContextOriginName(OrionldContextOrigin origin)
+{
+  switch (origin)
+  {
+  case OrionldContextUnknownOrigin:     return "UnknownOrigin";
+  case OrionldContextFromInline:        return "Inline";
+  case OrionldContextDownloaded:        return "Downloaded";
+  case OrionldContextFileCached:        return "FileCached";
+  case OrionldContextForNotifications:  return "ForNotifications";
+  case OrionldContextForForwarding:     return "ForForwarding";
+  case OrionldContextUserCreated:       return "UserCreated";
+  }
+
+  return "Unknown Origin II";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextCreate -
 //
 OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
@@ -50,6 +72,7 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
 
   contextP->url       = (url == NULL)? (char*) "no URL" : kaStrdup(&kalloc, url);
   contextP->origin    = origin;
+  contextP->parent    = NULL;
   contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
   contextP->tree      = (toBeCloned == true)? kjClone(NULL, tree) : NULL;
   contextP->keyValues = keyValues;

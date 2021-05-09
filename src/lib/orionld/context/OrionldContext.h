@@ -81,6 +81,7 @@ typedef enum OrionldContextOrigin
 } OrionldContextOrigin;
 
 
+extern const char* orionldContextOriginName(OrionldContextOrigin origin);
 
 // ----------------------------------------------------------------------------
 //
@@ -93,6 +94,7 @@ typedef struct OrionldContext
 {
   char*                 url;
   char*                 id;         // For contexts that were created by the broker itself
+  char*                 parent;
   KjNode*               tree;
   bool                  keyValues;
   OrionldContextInfo    context;

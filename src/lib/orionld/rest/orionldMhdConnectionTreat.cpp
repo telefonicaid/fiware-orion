@@ -518,7 +518,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   char*                  url = kaStrdup(&kalloc, orionldState.link);
   OrionldProblemDetails  pd;
 
-  orionldState.contextP = orionldContextFromUrl(url, &pd);
+  orionldState.contextP = orionldContextFromUrl(url, NULL, &pd);
   if (orionldState.contextP == NULL)
   {
     LM_W(("Bad Input? (%s: %s)", pd.title, pd.detail));
@@ -818,7 +818,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
         url = orionldContextUrlGenerate(&id);
 
-      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, true, orionldState.payloadContextNode, &pd);
+      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, true, orionldState.payloadContextNode, &pd);
       if (orionldState.contextP == NULL)
       {
         LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));
@@ -827,9 +827,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
         goto respond;
       }
-
-      if (id != NULL)
-        orionldState.contextP->id = id;
 
       if (pd.status == 200)  // got an array with only Core Context
         orionldState.contextP = orionldCoreContextP;

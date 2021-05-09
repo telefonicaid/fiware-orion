@@ -181,7 +181,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
   //
 
-  OrionldContext* contextP = orionldContextFromBuffer(url, OrionldContextFileCached, json, &pd);
+  OrionldContext* contextP = orionldContextFromBuffer(url, OrionldContextFileCached, NULL, json, &pd);
 
   if (strcmp(url, coreContextUrl) == 0)
   {
@@ -273,10 +273,12 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
 
   if (gotCoreContext == false)
   {
-    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, pdP);
+    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL, pdP);
 
     if (orionldCoreContextP == NULL)
       return false;
+
+    orionldCoreContextP->id = (char*) "Core";
   }
 
   OrionldContextItem* vocabP = orionldContextItemLookup(orionldCoreContextP, "@vocab", NULL);

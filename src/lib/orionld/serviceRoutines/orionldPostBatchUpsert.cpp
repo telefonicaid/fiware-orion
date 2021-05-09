@@ -259,7 +259,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       typeInPayload = entityTypeGet(entityP, &contextNodeP);
 
       if (contextNodeP != NULL)
-        contextP = orionldContextFromTree(NULL, OrionldContextFromInline, true, contextNodeP, &pd);
+        contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, true, contextNodeP, &pd);
 
       if (contextP == NULL)
         contextP = orionldState.contextP;
