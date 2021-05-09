@@ -326,7 +326,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -364,7 +364,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -402,7 +402,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -441,7 +441,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -479,7 +479,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -517,7 +517,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -555,7 +555,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -593,7 +593,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -631,7 +631,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
@@ -669,7 +669,7 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "REGEX((Core|None))",
+        "id": "Core",
         "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"

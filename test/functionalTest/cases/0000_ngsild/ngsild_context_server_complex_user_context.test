@@ -109,7 +109,7 @@ Date: REGEX(.*)
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
         "id": "Core",
-        "origin": "FileCached",
+        "origin": "REGEX((FileCached|Downloaded))",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     },

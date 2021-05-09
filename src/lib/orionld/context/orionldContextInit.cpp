@@ -277,6 +277,8 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
 
     if (orionldCoreContextP == NULL)
       return false;
+
+    orionldCoreContextP->id = (char*) "Core";
   }
 
   OrionldContextItem* vocabP = orionldContextItemLookup(orionldCoreContextP, "@vocab", NULL);
