@@ -56,15 +56,22 @@ KjNode* orionldContextCacheGet(KjNode* arrayP, bool details)
     if (details == true)
     {
       KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
-      KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",  contextP->url);
-      KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",  (contextP->id == NULL)? "None" : contextP->id);
-      KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type", contextP->keyValues? "hash-table" : "array");
+      KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",    contextP->url);
+      KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",     (contextP->id == NULL)? "None" : contextP->id);
+      KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type",   contextP->keyValues? "hash-table" : "array");
       KjNode*          originP          = kjString(orionldState.kjsonP, "origin", originName(contextP->origin));
 
       kjChildAdd(contextObjP, urlStringP);
       kjChildAdd(contextObjP, idStringP);
       kjChildAdd(contextObjP, typeStringP);
       kjChildAdd(contextObjP, originP);
+
+      if (contextP->parent != NULL)
+      {
+        KjNode* parentP = kjString(orionldState.kjsonP, "parent", contextP->parent);
+
+        kjChildAdd(contextObjP, parentP);
+      }
 
       if (contextP->keyValues)
       {

@@ -107,7 +107,8 @@ Date: REGEX(.*)
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "None",
     "type": "hash-table",
-    "origin": "Inline",
+    "origin": "Downloaded",
+    "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",

@@ -391,7 +391,7 @@ static bool orionldForwardPatchAttribute
         regContextP = orionldContextCacheLookup(regContextNodeP->value.s);
 
       if (regContextP == NULL)
-        regContextP = orionldContextFromTree(NULL, OrionldContextFromInline, false, regContextNodeP, &pd);
+        regContextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, false, regContextNodeP, &pd);
     }
 
     if (regContextP == NULL)

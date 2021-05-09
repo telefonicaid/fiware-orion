@@ -76,7 +76,7 @@ bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
 //
 // orionldContextFromTree -
 //
-OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP)
 {
   int itemsInArray;
 
@@ -99,7 +99,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, b
     }
 
     // Need to clone the array and add it to the cache before it is destroyed
-    OrionldContext* contextP = orionldContextCreate(url, origin, NULL, contextTreeP, false, insert);
+    OrionldContext* contextP = orionldContextCreate(url, origin, id, contextTreeP, false, insert);
 
     if (contextP == NULL)
     {
@@ -107,7 +107,6 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, b
       return NULL;
     }
 
-    contextP->origin                  = origin;
     contextP->context.array.items     = itemsInArray;
     contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, itemsInArray * sizeof(OrionldContext*));
 
@@ -132,7 +131,11 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, b
       }
 
       if (cachedContextP == NULL)
-        contextP->context.array.vector[ix] = orionldContextFromTree(NULL, origin, true, ctxItemP, pdP);
+      {
+        contextP->context.array.vector[ix] = orionldContextFromTree(NULL, origin, NULL, true, ctxItemP, pdP);
+        if (contextP->context.array.vector[ix] != NULL)
+          contextP->context.array.vector[ix]->parent = contextP->id;
+      }
       else
         contextP->context.array.vector[ix] = cachedContextP;
       ++ix;
@@ -151,33 +154,39 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, b
 
       if (contextP == NULL)
       {
-        contextP = orionldContextCreate(url, origin, NULL, contextTreeP, false, true);
+        contextP = orionldContextCreate(url, origin, id, contextTreeP, false, true);
 
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
-        contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, pdP);
+        contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, NULL, pdP);
       }
 
       if (contextP != NULL)
         contextP->origin = origin;
+
       return contextP;
     }
     else
     {
       OrionldContext* contextP;
-      contextP = orionldContextFromUrl(contextTreeP->value.s, pdP);
+      contextP = orionldContextFromUrl(contextTreeP->value.s, NULL, pdP);
 
       if (contextP)
-        contextP->origin = origin;
+      {
+        if (contextP->origin != OrionldContextDownloaded)
+          contextP->origin = origin;
+      }
+
       return contextP;
     }
   }
   else if (contextTreeP->type == KjObject)
   {
     OrionldContext* contextP;
-    contextP = orionldContextFromObject(url, origin, toBeCloned, contextTreeP, pdP);
+    contextP = orionldContextFromObject(url, origin, id, toBeCloned, contextTreeP, pdP);
     if (contextP)
       contextP->origin = origin;
+
     return contextP;
   }
 

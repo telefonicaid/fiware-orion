@@ -70,9 +70,8 @@ bool orionldPostContexts(ConnectionInfo* ciP)
 
   url = orionldContextUrlGenerate(&id);
 
-  LM_TMP(("orionldState.requestTree at %p", orionldState.requestTree));
   OrionldProblemDetails  pd;
-  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, true, orionldState.requestTree, &pd);
+  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, true, orionldState.requestTree, &pd);
 
   if (contextP == NULL)
   {
@@ -80,9 +79,7 @@ bool orionldPostContexts(ConnectionInfo* ciP)
     orionldErrorResponseCreate(&pd);
     return false;
   }
-  contextP->id = kaStrdup(&kalloc, id);
 
-  LM_TMP(("Context Created: '%s'", contextP->url));
   httpHeaderLocationAdd(ciP, contextP->url, NULL);
   orionldState.httpStatusCode = 201;
 

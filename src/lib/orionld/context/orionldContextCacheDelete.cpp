@@ -49,13 +49,21 @@ bool orionldContextCacheDelete(const char* id)
     if (orionldContextCache[ix] == NULL)
       continue;
 
+    //
+    // If same id, then delete
+    // Also delete any context that has the context to be deleted as parent, unless Downloaded.
+    //
     if ((orionldContextCache[ix]->id != NULL) && (strcmp(id, orionldContextCache[ix]->id) == 0))
     {
       orionldContextCacheRelease(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
-      return true;
+    }
+    else if ((orionldContextCache[ix]->origin != OrionldContextDownloaded) && (orionldContextCache[ix]->parent != NULL) && (strcmp(id, orionldContextCache[ix]->parent) == 0))
+    {
+      orionldContextCacheRelease(orionldContextCache[ix]);
+      orionldContextCache[ix] = NULL;
     }
   }
 
-  return false;
+  return true;
 }

@@ -45,7 +45,7 @@ extern "C"
 //
 // orionldContextFromBuffer -
 //
-OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* buffer, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin, char* id, char* buffer, OrionldProblemDetails* pdP)
 {
   if ((buffer == NULL) || (*buffer == 0))
   {
@@ -85,5 +85,5 @@ OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin,
     return NULL;
   }
 
-  return orionldContextFromTree(url, origin, false, contextNodeP, pdP);
+  return orionldContextFromTree(url, origin, id, false, contextNodeP, pdP);
 }

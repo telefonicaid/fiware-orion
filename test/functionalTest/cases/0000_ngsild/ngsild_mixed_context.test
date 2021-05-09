@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 923
+Content-Length: 975
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -180,7 +180,8 @@ Date: REGEX(.*)
             "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
         ],
         "id": "None",
-        "origin": "Inline",
+        "origin": "Downloaded",
+        "parent": "REGEX(.*)",
         "type": "array",
         "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
     }

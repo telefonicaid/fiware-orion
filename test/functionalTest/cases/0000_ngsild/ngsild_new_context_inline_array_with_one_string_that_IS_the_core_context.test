@@ -75,7 +75,7 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 530
+Content-Length: 498
 Content-Type: application/json
 Date: REGEX(.*)
 

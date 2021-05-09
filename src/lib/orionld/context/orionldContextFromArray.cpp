@@ -80,7 +80,7 @@ OrionldContext* orionldContextFromArray(char* url, OrionldContextOrigin origin, 
     {
       childContextP = orionldContextCacheLookup(arrayItemP->value.s);
       if (childContextP == NULL)
-        childContextP = orionldContextFromUrl(arrayItemP->value.s, pdP);
+        childContextP = orionldContextFromUrl(arrayItemP->value.s, NULL, pdP);
       if (childContextP == NULL)
       {
         // orionldContextFromUrl fills in pdP
@@ -90,7 +90,7 @@ OrionldContext* orionldContextFromArray(char* url, OrionldContextOrigin origin, 
     }
     else if (arrayItemP->type == KjObject)
     {
-      childContextP = orionldContextFromObject(NULL, origin, false, arrayItemP, pdP);
+      childContextP = orionldContextFromObject(NULL, origin, NULL, false, arrayItemP, pdP);
 
       if (childContextP == NULL)
       {
