@@ -119,9 +119,9 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
     }
   }
 
-  // Is it a date?
-  if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
-  {
+  // Is it a (not null) date?
+  if (((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT)) && (mdP->valueType != orion::ValueTypeNull))
+  {   
     mdP->numberValue =  parse8601Time(mdP->stringValue);
 
     if (mdP->numberValue == -1)
