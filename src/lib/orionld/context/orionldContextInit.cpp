@@ -137,7 +137,7 @@ int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, Or
 //
 // contextFileTreat -
 //
-static void contextFileTreat(char* dir, struct dirent* dirItemP)
+static bool contextFileTreat(char* dir, struct dirent* dirItemP)
 {
   char*                  fileBuffer;
   struct stat            statBuf;
@@ -147,20 +147,20 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
 
   if (stat(path, &statBuf) != 0)
-    LM_X(1, ("stat(%s): %s", path, strerror(errno)));
+    LM_RE(false, ("stat(%s): %s", path, strerror(errno)));
 
   fileBuffer = (char*) malloc(statBuf.st_size + 1);
   if (fileBuffer == NULL)
-    LM_X(1, ("Out of memory"));
+    LM_RE(false, ("Out of memory"));
 
   int fd = open(path, O_RDONLY);
   if (fd == -1)
-    LM_X(1, ("open(%s): %s", path, strerror(errno)));
+    LM_RE(false, ("open(%s): %s", path, strerror(errno)));
 
   int nb;
   nb = read(fd, fileBuffer, statBuf.st_size);
   if (nb != statBuf.st_size)
-    LM_X(1, ("read(%s): %s", path, strerror(errno)));
+    LM_RE(false, ("read(%s): %s", path, strerror(errno)));
   fileBuffer[statBuf.st_size] = 0;
   close(fd);
 
@@ -174,34 +174,33 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   char* json;
 
   if (contextFileParse(fileBuffer, statBuf.st_size, &url, &json, &pd) != 0)
-    LM_X(1, ("error parsing the context file '%s': %s", path, pd.detail));
+    LM_RE(false, ("error parsing the context file '%s': %s", path, pd.detail));
+
+
+  //
+  // The file-cached contexts destroys the functional tests - can't have it like it was.
+  // From now on, only the core context (whichever reason was selected for the broker at startup) is
+  // taken from the file-cached contexts.
+  //
+  bool isCoreContext = (strcmp(url, coreContextUrl) == 0);
+
+  if (isCoreContext == false)
+    LM_RE(true, ("Not the core context - skipping it", url));
 
   //
   // We have both the URL and the 'JSON Context'.
   // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
   //
-
   OrionldContext* contextP = orionldContextFromBuffer(url, OrionldContextFileCached, NULL, json, &pd);
 
-  if (strcmp(url, coreContextUrl) == 0)
-  {
-    if (contextP == NULL)
-      LM_X(1, ("error creating the core context from file system file '%s'", path));
+  if (contextP == NULL)
+    LM_RE(false, ("error creating the core context from file system file '%s'", path));
 
-    orionldCoreContextP         = contextP;
-    orionldCoreContextP->id     = (char*) "Core";
-    orionldCoreContextP->origin = OrionldContextFileCached;
-  }
-  else
-  {
-    if (contextP == NULL)
-      LM_E(("error creating context from file system file '%s'", path));
-    else
-    {
-      contextP->origin = OrionldContextFileCached;
-      orionldContextCacheInsert(contextP);
-    }
-  }
+  orionldCoreContextP         = contextP;
+  orionldCoreContextP->id     = (char*) "Core";
+  orionldCoreContextP->origin = OrionldContextFileCached;
+
+  return true;
 }
 
 
@@ -210,11 +209,11 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
 //
 // fileSystemContexts -
 //
-static bool fileSystemContexts(char* cacheContextDir)
+static bool fileSystemContexts(char* cacheContextDir, bool* gotCoreContextP)
 {
-  DIR*            dirP;
-  struct  dirent  dirItem;
-  struct  dirent* result;
+  DIR*             dirP;
+  struct  dirent   dirItem;
+  struct  dirent*  result;
 
   dirP = opendir(cacheContextDir);
   if (dirP == NULL)
@@ -224,10 +223,20 @@ static bool fileSystemContexts(char* cacheContextDir)
     //           or should the broker continue (downloading the core context) ???
     //           Continue, by returning false.
     //
-    LM_X(1, ("opendir(%s): %s", cacheContextDir, strerror(errno)));
+    LM_RE(false, ("opendir(%s): %s", cacheContextDir, strerror(errno)));
   }
 
-  int files = 0;
+  //
+  // Before any context can be parsed, the broker needs the CORE CONTEXT
+  // So, this loop needs a double pass:
+  //   1. Loop and find the core context + install the core context
+  //   2. Loop and insert all non-core contexts
+  //
+
+  //
+  // 1. Loop and find the core context + install the core context
+  //
+  int contextsAdded = 0;
   while (readdir_r(dirP, &dirItem, &result) == 0)
   {
     if (result == NULL)
@@ -236,13 +245,20 @@ static bool fileSystemContexts(char* cacheContextDir)
     if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
       continue;
 
-    contextFileTreat(cacheContextDir, &dirItem);
-    ++files;
+    if (contextFileTreat(cacheContextDir, &dirItem) == true)
+    {
+      ++contextsAdded;
+      *gotCoreContextP = true;
+    }
   }
+
+  if (*gotCoreContextP == false)
+    LM_RE(false, ("The core context '%s' was not found - can't continue with the file cached contexts", coreContextUrl));
+
   closedir(dirP);
 
-  if (files == 0)
-    LM_X(1, ("Cache Context Directory in use but no context was extracted from it"));
+  if (contextsAdded == 0)
+    LM_W(("Cache Context Directory in use but no core context was extracted from it - that's OK ... sort of ... :)"));
 
   return true;
 }
@@ -264,11 +280,9 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
   char* cacheContextDir = getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY");
   if (cacheContextDir != NULL)
   {
-    gotCoreContext = fileSystemContexts(cacheContextDir);
-    if (gotCoreContext == false)
-      LM_E(("Unable to cache pre-loaded contexts from '%s'", cacheContextDir));
+    if (fileSystemContexts(cacheContextDir, &gotCoreContext) == false)
+      LM_E(("Unable to insert file-cached contexts from '%s'into the context cache", cacheContextDir));
   }
-  LM_K(("ORIONLD_CACHED_CONTEXT_DIRECTORY == '%s'", cacheContextDir));  // #if DEBUG
 #endif
 
   if (gotCoreContext == false)
