@@ -185,7 +185,10 @@ static bool contextFileTreat(char* dir, struct dirent* dirItemP)
   bool isCoreContext = (strcmp(url, coreContextUrl) == 0);
 
   if (isCoreContext == false)
-    LM_RE(true, ("Not the core context - skipping it", url));
+  {
+    LM_W(("Not the core context - skipping it"));
+    return true;
+  }
 
   //
   // We have both the URL and the 'JSON Context'.
