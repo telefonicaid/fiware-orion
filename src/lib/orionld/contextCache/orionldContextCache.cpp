@@ -22,27 +22,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include <unistd.h>                                              // NULL
+#include <semaphore.h>                                           // sem_t
 
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
-#include "orionld/context/orionldContextCachePresent.h"          // Own interface
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/contextCache/orionldContextCache.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCachePresent -
+// Context Cache Internals
 //
-void orionldContextCachePresent(const char* prefix, const char* info)
-{
-  LM_K(("%s: *************** %s: %d Contexts *************************", prefix, info, orionldContextCacheSlotIx));
-  LM_K(("%s: ========================================================================", prefix));
-  for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
-  {
-    orionldContextPresent(prefix, orionldContextCache[ix]);
-    LM_K(("%s:", prefix));
-  }
-  LM_K(("%s: ========================================================================", prefix));
-}
+sem_t             orionldContextCacheSem;
+OrionldContext*   orionldContextCacheArray[100];  // When 100 is not enough, a realloc is done (automatically)
+OrionldContext**  orionldContextCache         = orionldContextCacheArray;
+int               orionldContextCacheSlots    = 100;
+int               orionldContextCacheSlotIx   = 0;

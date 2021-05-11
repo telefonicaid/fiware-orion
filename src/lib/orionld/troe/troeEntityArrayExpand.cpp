@@ -34,7 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
-#include "orionld/context/orionldContextCacheLookup.h"         // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"    // orionldContextCacheLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand

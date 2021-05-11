@@ -32,14 +32,14 @@ extern "C"
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                         // orionldState, kalloc
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCachePresent.h"     // orionldContextCachePresent
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromObject.h"            // orionldContextFromObject
-#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
-#include "orionld/context/orionldContextCachePresent.h"          // orionldContextCachePresent
 #include "orionld/context/orionldContextFromArray.h"             // Own interface
 
 

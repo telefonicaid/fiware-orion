@@ -108,20 +108,20 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
-#include "orionld/common/branchName.h"                      // ORIONLD_BRANCH
-#include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
-#include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
-#include "orionld/db/dbInit.h"                              // dbInit
-#include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
-#include "orionld/troe/troeInit.h"                          // troeInit
+#include "orionld/common/orionldState.h"                      // orionldStateRelease, kalloc, ...
+#include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
+#include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
+#include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/db/dbInit.h"                                // dbInit
+#include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
+#include "orionld/troe/troeInit.h"                            // troeInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
 
-#include "orionld/socketService/socketServiceInit.h"        // socketServiceInit
-#include "orionld/socketService/socketServiceRun.h"         // socketServiceRun
+#include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
+#include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 
 using namespace orion;
 

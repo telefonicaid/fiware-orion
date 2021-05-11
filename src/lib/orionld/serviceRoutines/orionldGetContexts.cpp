@@ -35,7 +35,7 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/context/orionldContextCacheGet.h"              // orionldContextCacheGet
+#include "orionld/contextCache/orionldContextCacheGet.h"         // orionldContextCacheGet
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 

@@ -38,8 +38,8 @@
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP, orionldDefaultUrl
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
-#include "orionld/context/orionldContextCacheInit.h"             // orionldContextCacheInit
-#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCacheInit.h"        // orionldContextCacheInit
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextItemLookup.h"            // orionldContextItemLookup

@@ -35,8 +35,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheGet.h"              // Own interface
+#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
+#include "orionld/contextCache/orionldContextCacheGet.h"         // Own interface
+
 
 
 extern const char* originName(OrionldContextOrigin origin);  // FIXME: move to own module

@@ -33,7 +33,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextCacheDelete.h"           // orionldContextCacheDelete
+#include "orionld/contextCache/orionldContextCacheDelete.h"      // orionldContextCacheDelete
 #include "orionld/serviceRoutines/orionldDeleteContext.h"        // Own Interface
 
 

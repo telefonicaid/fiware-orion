@@ -29,8 +29,8 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 }
 
-#include "orionld/context/orionldContextCache.h"                 // orionldContextCache, orionldContextCacheSlotIx
-#include "orionld/context/orionldContextCacheRelease.h"          // Own interface
+#include "orionld/contextCache/orionldContextCache.h"            // orionldContextCache, orionldContextCacheSlotIx
+#include "orionld/contextCache/orionldContextCacheRelease.h"     // Own interface
 
 
 

@@ -22,24 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                             // bzero
-
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheInit.h"             // Own interface
+#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
+#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
+#include "orionld/contextCache/orionldContextCachePresent.h"     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheInit -
+// orionldContextCachePresent -
 //
-void orionldContextCacheInit(void)
+void orionldContextCachePresent(const char* prefix, const char* info)
 {
-  bzero(&orionldContextCacheArray, sizeof(orionldContextCacheArray));
-
-  if (sem_init(&orionldContextCacheSem, 0, 1) == -1)
-    LM_X(1, ("Runtime Error (error initializing semaphore for orionld context list; %s)", strerror(errno)));
+  LM_K(("%s: *************** %s: %d Contexts *************************", prefix, info, orionldContextCacheSlotIx));
+  LM_K(("%s: ========================================================================", prefix));
+  for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
+  {
+    orionldContextPresent(prefix, orionldContextCache[ix]);
+    LM_K(("%s:", prefix));
+  }
+  LM_K(("%s: ========================================================================", prefix));
 }

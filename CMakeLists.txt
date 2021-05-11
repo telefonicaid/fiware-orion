@@ -181,6 +181,7 @@ SET (ORION_LIBS
     orionld_context
     orionld_common
     orionld_context
+    orionld_contextCache
     orionld_db
 #    orionld_mongoc
     orionld_mongoCppLegacy
@@ -338,6 +339,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/common)
   ADD_SUBDIRECTORY(src/lib/orionld/types)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
+  ADD_SUBDIRECTORY(src/lib/orionld/contextCache)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
