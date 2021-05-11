@@ -46,8 +46,8 @@
 * RECONNECT_RETRIES - number of retries after connect
 * RECONNECT_DELAY   - number of millisecs to sleep between retries
 */
-#define RECONNECT_RETRIES 100
-#define RECONNECT_DELAY   1000  // One second
+#define RECONNECT_RETRIES 20
+#define RECONNECT_DELAY   500  // milliseconds
 
 
 
@@ -147,7 +147,7 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -156,7 +156,7 @@ static DBClientBase* mongoConnect
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
       }
 
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
+      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis
     }
   }
   else
@@ -190,7 +190,7 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -199,7 +199,7 @@ static DBClientBase* mongoConnect
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
       }
 
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
+      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis
     }
   }
 
@@ -329,6 +329,9 @@ int mongoConnectionPoolInit
     connectionPool[ix].free       = true;
     connectionPool[ix].connection =
         mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+
+    if ((connectionPool[ix].connection == NULL) && (ix == 0))
+      LM_X(1, ("Database Error (unable connect to mongo after a number of retries)"));
   }
 
   //
