@@ -112,7 +112,7 @@ echo
 
 echo "03. GET all contexts from the brokers context cache - see only 2"
 echo "================================================================"
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 

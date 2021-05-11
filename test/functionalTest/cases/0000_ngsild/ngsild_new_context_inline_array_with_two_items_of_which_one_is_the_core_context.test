@@ -58,7 +58,7 @@ echo
 
 echo "02. Ask for the entire list of contexts in the context cache"
 echo "============================================================"
-orionCurl --url "/ngsi-ld/v1/contexts?prettyPrint=yes&spaces=2&details=true" --noPayloadCheck --linkHeaderFix
+orionCurl --url "/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&spaces=2&details=true" --noPayloadCheck --linkHeaderFix
 echo
 echo
 

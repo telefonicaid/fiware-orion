@@ -55,7 +55,7 @@ payload='{
   "A2": "urn:ngsi-ld:attributes:A2",
   "A3": "urn:ngsi-ld:attributes:A3"
 }'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
@@ -64,7 +64,7 @@ echo
 
 echo "02. GET all contexts, with details"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 
@@ -116,7 +116,7 @@ payload='[
   "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
   "https://fiware.github.io/data-models/context.jsonld"
 ]'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
@@ -132,7 +132,7 @@ echo
 
 echo "09. GET all contexts, with details"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 
@@ -146,7 +146,7 @@ payload='{
     "A6": "urn:ngsi-ld:attributes:A6"
   }
 }'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
@@ -166,7 +166,7 @@ payload='[
   "https://fiware.github.io/data-models/context.jsonld",
   "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
 ]'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
@@ -302,7 +302,7 @@ Content-Length: 0
 Location: REGEX(.*)
 Date: REGEX(.*)
 
-URL of newly created context: /ngsi-ld/v1/contexts/REGEX(.*)
+URL of newly created context: /ngsi-ld/v1/jsonldContexts/REGEX(.*)
 
 
 08. GET the new context, make sure it is OK
