@@ -37,7 +37,7 @@ brokerStart CB 212-249
 # 04. GET /ngsi-ld/v1/subscriptions/S1
 # 05. GET /ngsi-ld/v1/csourceRegistrations
 # 06. GET /ngsi-ld/v1/csourceRegistrations/R1
-# 07. GET /ngsi-ld/v1/contexts/C1
+# 07. GET /ngsi-ld/v1/jsonldContexts/C1
 #
 # 08. POST /ngsi-ld/v1/entities
 # 09. POST /ngsi-ld/v1/entities/E9/attrs
@@ -98,9 +98,9 @@ echo
 echo
 
 
-echo "07. GET /ngsi-ld/v1/contexts/C1"
-echo "==============================="
-orionCurl --url /ngsi-ld/v1/contexts/C1
+echo "07. GET /ngsi-ld/v1/jsonldContexts/C1"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts/C1
 echo
 echo
 
@@ -311,8 +311,8 @@ Date: REGEX(.*)
 }
 
 
-07. GET /ngsi-ld/v1/contexts/C1
-===============================
+07. GET /ngsi-ld/v1/jsonldContexts/C1
+=====================================
 HTTP/1.1 404 Not Found
 Content-Length: 105
 Content-Type: application/json

@@ -48,7 +48,7 @@ payload='[
     "A3": "urn:ngsi-ld:attributes:A3"    
   }
 ]'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo
 echo
@@ -56,14 +56,14 @@ echo
 
 echo '02. GET all contexts - see 4 contexts: array, downloaded and inline (the core context is the "fourth")'
 echo '======================================================================================================'
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 
 
 echo "03. GET all contexts without details"
 echo "===================================="
-orionCurl --url /ngsi-ld/v1/contexts
+orionCurl --url /ngsi-ld/v1/jsonldContexts
 echo
 echo
 
@@ -77,7 +77,7 @@ echo
 
 echo "05. GET all contexts - see 2 contexts - the core and the downloaded context - the other two have disappeared"
 echo "============================================================================================================"
-orionCurl --url /ngsi-ld/v1/contexts
+orionCurl --url /ngsi-ld/v1/jsonldContexts
 echo
 echo
 

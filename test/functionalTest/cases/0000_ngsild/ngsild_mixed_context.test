@@ -52,7 +52,7 @@ brokerStart CB 0-255
 #
 #  "@context": [
 #    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
-#    "https://xps:9999/ngsi-ld/v1/contexts/XXXXXX"
+#    "https://xps:9999/ngsi-ld/v1/jsonldContexts/XXXXXX"
 #  ]
 #
 # This is how "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld" looks:
@@ -78,8 +78,8 @@ brokerStart CB 0-255
 # So, the entire context cache should look like this:
 #
 #   1. Object:  The Core Context
-#   2. Array:   The Array with two items, containing "testFullContext.jsonld" and "https://xps:9999/ngsi-ld/v1/contexts/XXXXXX"
-#   3. Object:  The new object with { "A", "name, and "name2" } - https://xps:9999/ngsi-ld/v1/contexts/XXXXXX
+#   2. Array:   The Array with two items, containing "testFullContext.jsonld" and "https://xps:9999/ngsi-ld/v1/jsonldContexts/XXXXXX"
+#   3. Object:  The new object with { "A", "name, and "name2" } - https://xps:9999/ngsi-ld/v1/jsonldContexts/XXXXXX
 #   4. String:  https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld - a string (coming from a vector of testContext.jsonld + Core Context)
 #   5. Object:  https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld
 #
@@ -105,14 +105,14 @@ echo
 
 echo "02. Get all contexts"
 echo "===================="
-orionCurl --url /ngsi-ld/v1/contexts
+orionCurl --url /ngsi-ld/v1/jsonldContexts
 echo
 echo
 
 
 echo "03. Get all contexts, with details"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 

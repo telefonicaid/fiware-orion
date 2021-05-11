@@ -275,7 +275,7 @@ echo
 
 echo "04. Get all contexts from the context cache"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true' --noPayloadCheck
 echo
 echo
 
@@ -501,7 +501,7 @@ echo
 
 echo "07. Get all contexts from the context cache"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/v1/contexts?prettyPrint=yes&details=true' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true' --noPayloadCheck
 echo
 echo
 

@@ -84,8 +84,8 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions    },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration     },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations    },
-  { "/ngsi-ld/v1/contexts/*",              orionldGetContext          },
-  { "/ngsi-ld/v1/contexts",                orionldGetContexts         },
+  { "/ngsi-ld/v1/jsonldContexts/*",        orionldGetContext          },
+  { "/ngsi-ld/v1/jsonldContexts",          orionldGetContexts         },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion          },
   { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants          },
   { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes        },
@@ -116,7 +116,7 @@ static OrionLdRestServiceSimplified postServiceV[] =
   { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldNotImplemented       },
   { "/ngsi-ld/v1/temporal/entities",               orionldPostTemporalEntities },
   { "/ngsi-ld/v1/temporal/entityOperations/query", orionldPostTemporalQuery    },
-  { "/ngsi-ld/v1/contexts",                        orionldPostContexts         }
+  { "/ngsi-ld/v1/jsonldContexts",                  orionldPostContexts         }
 };
 static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]));
 
@@ -148,7 +148,7 @@ static OrionLdRestServiceSimplified deleteServiceV[] =
   { "/ngsi-ld/v1/entities/*",                    orionldDeleteEntity       },
   { "/ngsi-ld/v1/subscriptions/*",               orionldDeleteSubscription },
   { "/ngsi-ld/v1/csourceRegistrations/*",        orionldDeleteRegistration },
-  { "/ngsi-ld/v1/contexts/*",                    orionldDeleteContext      },
+  { "/ngsi-ld/v1/jsonldContexts/*",              orionldDeleteContext      },
   { "/ngsi-ld/v1/temporal/entities/*/attrs/*/*", orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*/attrs/*",   orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",           orionldNotImplemented     }

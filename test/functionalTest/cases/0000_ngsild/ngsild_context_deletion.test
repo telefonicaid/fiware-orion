@@ -48,7 +48,7 @@ payload='{
   "A2": "urn:ngsi-ld:attributes:A2",
   "A3": "urn:ngsi-ld:attributes:A3"
 }'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 urlA=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of context A: $urlA
 echo
@@ -62,7 +62,7 @@ payload='{
   "B2": "urn:ngsi-ld:attributes:B2",
   "B3": "urn:ngsi-ld:attributes:B3"
 }'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 urlB=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of context B: $urlB
 echo
@@ -76,7 +76,7 @@ payload='{
   "C2": "urn:ngsi-ld:attributes:C2",
   "C3": "urn:ngsi-ld:attributes:C3"
 }'
-orionCurl --url /ngsi-ld/v1/contexts --payload "$payload"
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 urlC=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
 echo URL of context C: $urlC
 echo
@@ -85,7 +85,7 @@ echo
 
 echo "04. GET all contexts, with details, see A-B-C"
 echo "============================================="
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 
@@ -93,14 +93,14 @@ echo
 echo "05. Delete context B"
 echo "===================="
 idB=$(echo $urlB | awk -F/ '{print $5}')
-orionCurl --url /ngsi-ld/v1/contexts/$idB -X DELETE
+orionCurl --url /ngsi-ld/v1/jsonldContexts/$idB -X DELETE
 echo
 echo
 
 
 echo "06. GET all contexts, with details, see A-C"
 echo "==========================================="
-orionCurl --url /ngsi-ld/v1/contexts?details=true
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
 echo
 echo
 
