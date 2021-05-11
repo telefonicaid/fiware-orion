@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINIT_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINIT_H_
+
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -22,34 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strcmp
-
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheLookup.h"           // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheLookup -
+// orionldContextCacheInit -
 //
-OrionldContext* orionldContextCacheLookup(const char* url)
-{
-  for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
-  {
-    if (orionldContextCache[ix] == NULL)
-      continue;
+extern void orionldContextCacheInit(void);
 
-    if (strcmp(url, orionldContextCache[ix]->url) == 0)
-      return orionldContextCache[ix];
-
-    if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
-      return orionldContextCache[ix];
-  }
-
-  return NULL;
-}
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINIT_H_

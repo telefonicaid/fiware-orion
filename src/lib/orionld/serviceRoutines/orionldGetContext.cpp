@@ -34,7 +34,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 

@@ -40,9 +40,9 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromObject.h"            // orionldContextFromObject
 #include "orionld/context/orionldContextFromArray.h"             // orionldContextFromArray
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
-#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
 #include "orionld/context/orionldContextFromTree.h"              // Own interface
 
 

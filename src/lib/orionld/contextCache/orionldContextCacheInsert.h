@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHERELEASE_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHERELEASE_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINSERT_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINSERT_H_
 
 /*
 *
@@ -25,13 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheRelease -
+// orionldContextCacheInsert -
 //
-extern void orionldContextCacheRelease(void);
+extern void orionldContextCacheInsert(OrionldContext* contextP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHERELEASE_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEINSERT_H_

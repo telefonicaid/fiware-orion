@@ -33,8 +33,8 @@
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"    // orionldPostSubscriptions
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheInsert.h"           // Own interface
+#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // Own interface
 
 
 

@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2021 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -28,42 +28,28 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheDelete.h"           // Own interface
-
-
-static void orionldContextCacheRelease(OrionldContext* contextP)
-{
-}
+#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheDelete -
+// orionldContextCacheLookup -
 //
-bool orionldContextCacheDelete(const char* id)
+OrionldContext* orionldContextCacheLookup(const char* url)
 {
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     if (orionldContextCache[ix] == NULL)
       continue;
 
-    //
-    // If same id, then delete
-    // Also delete any context that has the context to be deleted as parent, unless Downloaded.
-    //
-    if ((orionldContextCache[ix]->id != NULL) && (strcmp(id, orionldContextCache[ix]->id) == 0))
-    {
-      orionldContextCacheRelease(orionldContextCache[ix]);
-      orionldContextCache[ix] = NULL;
-    }
-    else if ((orionldContextCache[ix]->origin != OrionldContextDownloaded) && (orionldContextCache[ix]->parent != NULL) && (strcmp(id, orionldContextCache[ix]->parent) == 0))
-    {
-      orionldContextCacheRelease(orionldContextCache[ix]);
-      orionldContextCache[ix] = NULL;
-    }
+    if (strcmp(url, orionldContextCache[ix]->url) == 0)
+      return orionldContextCache[ix];
+
+    if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
+      return orionldContextCache[ix];
   }
 
-  return true;
+  return NULL;
 }

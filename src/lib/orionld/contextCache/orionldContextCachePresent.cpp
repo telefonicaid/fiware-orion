@@ -22,30 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-extern "C"
-{
-#include "kjson/kjFree.h"                                        // kjFree
-}
-
-#include "orionld/context/orionldContextCache.h"                 // orionldContextCache, orionldContextCacheSlotIx
-#include "orionld/context/orionldContextCacheRelease.h"          // Own interface
+#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
+#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
+#include "orionld/contextCache/orionldContextCachePresent.h"     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheRelease -
+// orionldContextCachePresent -
 //
-void orionldContextCacheRelease(void)
+void orionldContextCachePresent(const char* prefix, const char* info)
 {
+  LM_K(("%s: *************** %s: %d Contexts *************************", prefix, info, orionldContextCacheSlotIx));
+  LM_K(("%s: ========================================================================", prefix));
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
-    if (orionldContextCache[ix]->tree != NULL)
-    {
-      kjFree(orionldContextCache[ix]->tree);
-      orionldContextCache[ix]->tree = NULL;
-    }
+    orionldContextPresent(prefix, orionldContextCache[ix]);
+    LM_K(("%s:", prefix));
   }
+  LM_K(("%s: ========================================================================", prefix));
 }

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEPRESENT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEPRESENT_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_
 
 /*
 *
@@ -25,13 +25,28 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>                                           // sem_t, sem_init, sem_wait, sem_post
+
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCachePresent -
+// ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE -
 //
-extern void orionldContextCachePresent(const char* prefix, const char* info);
+#define ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE   1024
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEPRESENT_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextCache
+//
+extern sem_t             orionldContextCacheSem;
+extern OrionldContext*   orionldContextCacheArray[100];  // When 100 is not enough, a realloc is done (automatically)
+extern OrionldContext**  orionldContextCache;
+extern int               orionldContextCacheSlots;
+extern int               orionldContextCacheSlotIx;
+
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_

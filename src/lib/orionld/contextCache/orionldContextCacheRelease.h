@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEGET_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEGET_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHERELEASE_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHERELEASE_H_
 
 /*
 *
@@ -25,17 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheGet -
+// orionldContextCacheRelease -
 //
-extern KjNode* orionldContextCacheGet(KjNode* arrayP, bool details);
+extern void orionldContextCacheRelease(void);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEGET_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHERELEASE_H_

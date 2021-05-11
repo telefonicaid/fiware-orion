@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeFromRegistration.h"               // Own interface
 
 

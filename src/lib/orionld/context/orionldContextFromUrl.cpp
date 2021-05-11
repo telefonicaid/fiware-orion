@@ -32,9 +32,9 @@
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/context/orionldContextDownload.h"              // orionldContextDownload
-#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
 #include "orionld/context/orionldContextFromUrl.h"               // Own interface
 
 

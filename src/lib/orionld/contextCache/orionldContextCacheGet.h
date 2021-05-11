@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEGET_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEGET_H_
+
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -22,24 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                             // bzero
-
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "orionld/context/orionldContextCache.h"                 // Context Cache Internals
-#include "orionld/context/orionldContextCacheInit.h"             // Own interface
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheInit -
+// orionldContextCacheGet -
 //
-void orionldContextCacheInit(void)
-{
-  bzero(&orionldContextCacheArray, sizeof(orionldContextCacheArray));
+extern KjNode* orionldContextCacheGet(KjNode* arrayP, bool details);
 
-  if (sem_init(&orionldContextCacheSem, 0, 1) == -1)
-    LM_X(1, ("Runtime Error (error initializing semaphore for orionld context list; %s)", strerror(errno)));
-}
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEGET_H_

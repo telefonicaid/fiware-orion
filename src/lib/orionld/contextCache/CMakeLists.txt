@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2021 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,28 +21,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldCoreContext.cpp
-    orionldContextCreate.cpp
-    orionldContextInit.cpp
-    orionldContextPresent.cpp
-    orionldContextTreePresent.cpp
-    orionldContextHashTablesFill.cpp
-    orionldContextDownload.cpp
-    orionldContextItemAliasLookup.cpp
-    orionldContextItemValueLookup.cpp
-    orionldContextPrefixExpand.cpp
-    orionldContextItemLookup.cpp
-    orionldContextItemExpand.cpp
-    orionldContextFromBuffer.cpp
-    orionldContextFromUrl.cpp
-    orionldContextSimplify.cpp
-    orionldContextFromTree.cpp
-    orionldContextFromObject.cpp
-    orionldContextUrlGenerate.cpp
-    orionldContextFromArray.cpp
-    orionldContextItemAlreadyExpanded.cpp
-    orionldAttributeExpand.cpp
-    orionldSubAttributeExpand.cpp
+    orionldContextCache.cpp
+    orionldContextCacheInsert.cpp
+    orionldContextCacheInit.cpp
+    orionldContextCacheLookup.cpp
+    orionldContextCachePresent.cpp
+    orionldContextCacheGet.cpp
+    orionldContextCacheRelease.cpp
+    orionldContextCacheDelete.cpp
 )
 
 # Include directories
@@ -52,4 +38,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_context STATIC ${SOURCES})
+ADD_LIBRARY(orionld_contextCache STATIC ${SOURCES})

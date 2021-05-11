@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINSERT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINSERT_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,14 +22,30 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include <unistd.h>                                              // NULL
+
+extern "C"
+{
+#include "kjson/kjFree.h"                                        // kjFree
+}
+
+#include "orionld/contextCache/orionldContextCache.h"            // orionldContextCache, orionldContextCacheSlotIx
+#include "orionld/contextCache/orionldContextCacheRelease.h"     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheInsert -
+// orionldContextCacheRelease -
 //
-extern void orionldContextCacheInsert(OrionldContext* contextP);
-
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINSERT_H_
+void orionldContextCacheRelease(void)
+{
+  for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
+  {
+    if (orionldContextCache[ix]->tree != NULL)
+    {
+      kjFree(orionldContextCache[ix]->tree);
+      orionldContextCache[ix]->tree = NULL;
+    }
+  }
+}

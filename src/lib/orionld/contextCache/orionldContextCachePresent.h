@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINIT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINIT_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEPRESENT_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEPRESENT_H_
 
 /*
 *
@@ -30,8 +30,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheInit -
+// orionldContextCachePresent -
 //
-extern void orionldContextCacheInit(void);
+extern void orionldContextCachePresent(const char* prefix, const char* info);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHEINIT_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEPRESENT_H_
