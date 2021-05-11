@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHE_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHE_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_
+#define SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_
 
 /*
 *
@@ -49,4 +49,4 @@ extern OrionldContext**  orionldContextCache;
 extern int               orionldContextCacheSlots;
 extern int               orionldContextCacheSlotIx;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCACHE_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHE_H_
