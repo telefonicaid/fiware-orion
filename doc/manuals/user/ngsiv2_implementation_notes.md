@@ -21,6 +21,7 @@
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
+* [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
@@ -420,6 +421,30 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
+
+[Top](#top)
+
+## `null` support in DateTime and geolocation types
+
+According to NGSIv2 specification:
+
+* `DateTime` attributes and metadata: has to be strings in in ISO8601 format
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`: attributes has to follow specific formatting rules
+  (defined in the "Geospatial properties of entities section)
+
+It is not clear in the NGSIv2 specification if the `null` value is supported in these cases or not.
+Just to be clear, Orion supports that possibility.
+
+With regards to `DateTime` attributes and metadata:
+
+* A `DateTime` attribute or metadata with `null` value will not be taken into account in filters, i.e.
+  `GET /v2/entities?q=T>2021-04-21`
+
+With regards to `geo:` attributes:
+
+* A `geo:` attribute with `null` value will not be taken into account in geo-queries, i.e. the entity will
+  not be returned as a result of geo-query
+* `geo:` attributes with `null` value doesn't count towards [the limit of one](#limit-to-attributes-for-entity-location)
 
 [Top](#top)
 
