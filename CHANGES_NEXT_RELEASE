@@ -1,1 +1,2 @@
+- Fix: potential crash (although under very rare situations) in log trace code 
 - Fix: support attributes and metadata starting with dollar sign ($) (#3841)
