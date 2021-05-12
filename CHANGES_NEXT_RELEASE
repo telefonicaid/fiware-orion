@@ -1,3 +1,4 @@
+- Fix: potential crash (although under very rare situations) in log trace code 
 - Fix: support attributes and metadata starting with dollar sign ($) (#3841)
 - Add: support to null in DateTime attributes and metadata (#3533)
 - Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
