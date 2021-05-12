@@ -561,7 +561,8 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
   }
   else // v2
   {
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
+    // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
+    if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
       return LOCATION_WGS84;
     }
