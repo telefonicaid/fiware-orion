@@ -17,7 +17,7 @@ any time.
 
 Disclaimer:
 
-* This section has been last updated in March 2021. Please take into account its 
+* This section has been last updated in May 2021. Please take into account its 
   content could be obsolete.
 * Note we develop this software in Agile way, so development plan is continuously 
   under review. Thus, this roadmap has to be understood as rough plan of features 
@@ -49,6 +49,7 @@ after next planned release:
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
+- Signed entities
 
 ## Long term
 
