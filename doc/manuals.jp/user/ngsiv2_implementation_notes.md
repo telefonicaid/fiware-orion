@@ -21,6 +21,7 @@
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
+* [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
 
@@ -394,6 +395,31 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
+
+[Top](#top)
+
+<a name="null-support-in-datetime-and-geolocation-types"></a>
+## DateTime および geolocation タイプでの `null` サポート
+
+NGSIv2仕様によると:
+
+* `DateTime` 属性およびメタデータ: ISO8601 形式の文字列である必要があります
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`: 属性は特定のフォーマット・ルールに
+  従う必要があります ("エンティティの地理空間プロパティ" セクションで定義されています)
+
+これらの場合に `null` 値がサポートされているかどうかは、NGSIv2 仕様では明確ではありません。
+明確にするために、Orion はその可能性をサポートします。
+
+`DateTime` 属性およびメタデータに関して:
+
+* `DateTime` 属性または `null` 値を持つメタデータはフィルターで考慮されません。つまり
+  `GET /v2/entities?q=T>2021-04-21` 
+
+`geo:` 属性に関して:
+
+* `null` 値を持つ `geo:` 属性は、ジオ・クエリでは考慮されません。つまり、ジオ・クエリの結果として
+  エンティティは返されません
+* `null` 値を持つ `geo:` 属性は[属性の制限](#limit-to-attributes-for-entity-location)にはカウントされません
 
 [Top](#top)
 
