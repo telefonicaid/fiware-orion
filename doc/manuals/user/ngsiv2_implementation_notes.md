@@ -24,6 +24,7 @@
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
+* [Additional fields in `httpInfo` for custom notifications](#additional-fields-in-httpInfo-for-custom-notifications)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -475,5 +476,12 @@ you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 * `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
 which attributes to include in the response to the query) and unary attribute filter in `q` within
 `expression` (to return only entities which have these attributes). Use them instead.
+
+[Top](#top)
+
+## Additional fields in `httpInfo` for custom notifications
+
+Orion supports a boolean field `includePayload` in `httpCustom` for custom notifications that can be used to avoid payload in the outgoing notification. If `includePayload` is set to `false` then no payload is included in the notification (and `payload` field, if used, is ignored).
+Default value if `includePayload` if omitted is `true` (that is, payload is included by default).
 
 [Top](#top)

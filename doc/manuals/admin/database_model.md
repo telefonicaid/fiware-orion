@@ -321,6 +321,8 @@ Fields:
 -   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
     time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
+-   **includePayload**: a boolean field that can be used to avoid payload in the outgoing notification. 
+    If `includePayload` is set to `false` then no payload is included in the notification (and `payload` field, if used, is ignored).
 
 Example document:
 

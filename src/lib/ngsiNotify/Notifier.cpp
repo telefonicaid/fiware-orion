@@ -1,4 +1,4 @@
-﻿/*
+/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -204,7 +204,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
       curl_free(pload);
     }
-
 
     //
     // 4. URI Params (Query Strings)

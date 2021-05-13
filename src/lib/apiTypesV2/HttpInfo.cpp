@@ -75,6 +75,14 @@ std::string HttpInfo::toJson()
     {
       jh.addString("payload", this->payload);
     }
+    else if (this->includePayload)
+    {
+      jh.addBool("includePayload", false);
+    }
+    else
+    {
+      jh.addBool("includePayload", true);
+    }
 
     if (this->verb != NOVERB)
     {
@@ -109,6 +117,7 @@ void HttpInfo::fill(const orion::BSONObj& bo)
   if (this->custom)
   {
     this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+    this->includePayload = bo.hasField(CSUB_INCLUDEPAYLOAD)? getBoolFieldF(bo, CSUB_INCLUDEPAYLOAD) : true;
 
     if (bo.hasField(CSUB_METHOD))
     {
