@@ -18,3 +18,4 @@
 * Issue  #280   Experimental implementation of GET /ngsi-ld/v1/contexts/{contextId} - yet to be defined in the NGSI-LD API
 * Issue  #280   Experimental implementation of POST /ngsi-ld/v1/contexts - yet to be defined in the NGSI-LD API
 * Issue  #280   Experimental implementation of DELETE /ngsi-ld/v1/contexts/{contextId} - yet to be defined in the NGSI-LD API
+* Issue  #280   Persisting contexts from the cache in mongo

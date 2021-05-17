@@ -234,21 +234,21 @@ MongoDB server version: REGEX(.*)
 }
 {
 	"_id" : "REGEX(.*)",
-	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
 	"createdAt" : REGEX(.*)
 }
 {
 	"_id" : "REGEX(.*)",
-	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
 	"createdAt" : REGEX(.*)
 }
 {
 	"_id" : "REGEX(.*)",
-	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
 	"createdAt" : REGEX(.*)
@@ -330,14 +330,14 @@ MongoDB server version: REGEX(.*)
 }
 {
 	"_id" : "REGEX(.*)",
-	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
 	"createdAt" : REGEX(.*)
 }
 {
 	"_id" : "REGEX(.*)",
-	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
 	"createdAt" : REGEX(.*)
