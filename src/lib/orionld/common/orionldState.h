@@ -227,7 +227,6 @@ typedef struct OrionldConnectionState
   char                    contextId[256];
   QNode                   qNodeV[QNODE_SIZE];
   int                     qNodeIx;
-  char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;           // Used by kjTreeFromBsonObj
 
@@ -258,14 +257,12 @@ typedef struct OrionldConnectionState
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
 
-// #ifdef DB_DRIVER_MONGOC
   //
   // MongoDB stuff - Context Cache uses mongoc regardless of which mongo client lib is in use
   //
   mongoc_uri_t*           mongoUri;
   mongoc_client_t*        mongoClient;
   mongoc_database_t*      mongoDatabase;
-// #endif
 
   //
   // Instructions for mongoBackend
@@ -402,13 +399,9 @@ extern sem_t             tenantSem;
 //
 // Global variables for Mongo C Driver
 //
-//#ifdef DB_DRIVER_MONGOC
 extern mongoc_collection_t*  mongoEntitiesCollectionP;
 extern mongoc_collection_t*  mongoRegistrationsCollectionP;
-//#endif
-
-// The Context Cache module uses mongoc regardless
-extern mongoc_collection_t*  mongoContextsCollectionP;
+extern mongoc_collection_t*  mongoContextsCollectionP;       // The Context Cache module uses mongoc regardless
 extern sem_t                 mongoContextsSem;
 
 

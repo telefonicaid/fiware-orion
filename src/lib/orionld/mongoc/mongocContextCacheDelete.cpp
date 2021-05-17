@@ -47,7 +47,7 @@ void mongocContextCacheDelete(const char* id)
 
   bson_init(&selector);
   bson_append_symbol(&selector, "_id", 3, id, -1);
-  
+
   sem_wait(&mongoContextsSem);
 
   bson_error_t  mcError;

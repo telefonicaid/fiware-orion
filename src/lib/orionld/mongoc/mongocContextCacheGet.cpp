@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/contextCache/orionldContextCache.h"            // Own interface
 
- 
+
 
 // -----------------------------------------------------------------------------
 //

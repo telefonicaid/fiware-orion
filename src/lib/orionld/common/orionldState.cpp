@@ -103,14 +103,10 @@ sem_t             tenantSem;
 //
 // Variables for Mongo C Driver
 //
-//#ifdef DB_DRIVER_MONGOC
 mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;
 mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
 mongoc_collection_t*  mongoSubscriptionsCollectionP = NULL;
-//#endif
-
-// The Context Cache module uses mongoc
-mongoc_collection_t*  mongoContextsCollectionP      = NULL;
+mongoc_collection_t*  mongoContextsCollectionP      = NULL;  // The Context Cache module uses mongoc regardless
 sem_t                 mongoContextsSem;
 
 
