@@ -13,6 +13,7 @@ COPY ./docker/build/ /tmp/build/
 RUN /tmp/build/install-build-dependencies.sh
 RUN /tmp/build/install-postgres-client.sh
 RUN /tmp/build/install-mongo-driver.sh
+RUN /tmp/build/install-mongoc-driver.sh
 RUN /tmp/build/install-rapid-json.sh
 RUN /tmp/build/install-lib-microhttp.sh
 RUN /tmp/build/install-k-libs.sh
