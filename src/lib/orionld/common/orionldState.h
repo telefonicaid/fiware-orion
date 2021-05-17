@@ -27,6 +27,7 @@
 */
 #include <time.h>                                                // struct timespec
 #include <semaphore.h>                                           // sem_t
+#include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -226,7 +227,6 @@ typedef struct OrionldConnectionState
   char                    contextId[256];
   QNode                   qNodeV[QNODE_SIZE];
   int                     qNodeIx;
-  char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;           // Used by kjTreeFromBsonObj
 
@@ -257,14 +257,12 @@ typedef struct OrionldConnectionState
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
 
-#ifdef DB_DRIVER_MONGOC
   //
-  // MongoDB stuff
+  // MongoDB stuff - Context Cache uses mongoc regardless of which mongo client lib is in use
   //
   mongoc_uri_t*           mongoUri;
   mongoc_client_t*        mongoClient;
   mongoc_database_t*      mongoDatabase;
-#endif
 
   //
   // Instructions for mongoBackend
@@ -370,6 +368,7 @@ extern KAlloc            kalloc;
 extern Kjson             kjson;
 extern Kjson*            kjsonP;
 extern uint16_t          portNo;
+extern char              dbHost[];                 // From orionld.cpp
 extern char              dbName[];                 // From orionld.cpp
 extern int               dbNameLen;
 extern char              dbUser[];                 // From orionld.cpp
@@ -400,10 +399,10 @@ extern sem_t             tenantSem;
 //
 // Global variables for Mongo C Driver
 //
-#ifdef DB_DRIVER_MONGOC
 extern mongoc_collection_t*  mongoEntitiesCollectionP;
 extern mongoc_collection_t*  mongoRegistrationsCollectionP;
-#endif
+extern mongoc_collection_t*  mongoContextsCollectionP;       // The Context Cache module uses mongoc regardless
+extern sem_t                 mongoContextsSem;
 
 
 

@@ -33,14 +33,15 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
-
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
+#include "orionld/serviceRoutines/orionldPostContexts.h"         // Own interface
 
 
 
@@ -80,7 +81,12 @@ bool orionldPostContexts(ConnectionInfo* ciP)
     return false;
   }
 
+  contextP->createdAt = orionldState.requestTime;
+  contextP->usedAt    = orionldState.requestTime;
+
   httpHeaderLocationAdd(ciP, contextP->url, NULL);
+
+  orionldContextCachePersist(contextP);
   orionldState.httpStatusCode = 201;
 
   return true;

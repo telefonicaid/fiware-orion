@@ -222,6 +222,9 @@ SET (STATIC_LIBS
 
 # Include directories
 # ------------------------------------------------------------
+include_directories("/usr/include")
+include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")

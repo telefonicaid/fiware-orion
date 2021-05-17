@@ -183,7 +183,7 @@ SET (ORION_LIBS
     orionld_context
     orionld_contextCache
     orionld_db
-#    orionld_mongoc
+    orionld_mongoc
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend
@@ -238,8 +238,6 @@ SET (BOOST_MT
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
-#    mongoc-static-1.0.a
-#    bson-static-1.0.a
     kjson.a
     khash.a
     kalloc.a
@@ -262,6 +260,8 @@ SET (DYNAMIC_LIBS
     resolv
     paho-mqtt3c
     pq             # for TRoE & Postgres
+    libmongoc-1.0.so
+    libbson-1.0.so
 )
 
 #
@@ -281,7 +281,7 @@ endif (UNIT_TEST)
 #
 include_directories("/usr/include")
 include_directories("/usr/local/include/libbson-1.0")
-#include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 
 #
@@ -344,9 +344,9 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
+  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
   ADD_SUBDIRECTORY(src/lib/orionld/mqtt)
-#  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)

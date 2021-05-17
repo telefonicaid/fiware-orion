@@ -22,14 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#ifdef DEBUG
-#include <sys/types.h>                                           // DIR, dirent
-#include <fcntl.h>                                               // O_RDONLY
-#include <dirent.h>                                              // opendir(), readdir(), closedir()
-#include <sys/stat.h>                                            // statbuf
-#include <unistd.h>                                              // stat()
-#endif  // DEBUG
-
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -39,233 +31,11 @@
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP, orionldDefaultUrl
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/contextCache/orionldContextCacheInit.h"        // orionldContextCacheInit
-#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextItemLookup.h"            // orionldContextItemLookup
 #include "orionld/context/orionldContextInit.h"                  // Own interface
-
-
-
-#ifdef DEBUG
-// -----------------------------------------------------------------------------
-//
-// contextFileParse -
-//
-int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, OrionldProblemDetails* pdP)
-{
-  //
-  // 1. Skip initial whitespace
-  // Note: 0xD (13) is the Windows 'carriage ret' character
-  //
-  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
-  {
-    pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid @context";
-    pdP->detail = (char*) "empty context file (or, only whitespace)";
-    pdP->status = 400;
-
-    return -1;
-  }
-
-
-  //
-  // 2. The URL is on the first line of the buffer
-  //
-  *urlP = fileBuffer;
-  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. URL is %s", *urlP));
-
-
-  //
-  // 3. Find the '\n' that ends the URL
-  //
-  while ((*fileBuffer != 0) && (*fileBuffer != '\n'))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
-  {
-    pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid @context";
-    pdP->detail = (char*) "can't find the end of the URL line";
-    pdP->status = 400;
-
-    return -1;
-  }
-
-
-  //
-  // 4. Zero-terminate URL
-  //
-  *fileBuffer = 0;
-
-
-  //
-  // 5. Jump over the \n and onto the first char of the next line
-  //
-  ++fileBuffer;
-
-
-  //
-  // 1. Skip initial whitespace
-  // Note: 0xD (13) is the Windows 'carriage ret' character
-  //
-  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
-  {
-    pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid @context";
-    pdP->detail = (char*) "no JSON Context found";
-    pdP->status = 400;
-
-    return -1;
-  }
-
-  *jsonP = fileBuffer;
-  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. JSON is %s", *jsonP));
-
-  return 0;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// contextFileTreat -
-//
-static bool contextFileTreat(char* dir, struct dirent* dirItemP)
-{
-  char*                  fileBuffer;
-  struct stat            statBuf;
-  char                   path[512];
-  OrionldProblemDetails  pd;
-
-  snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
-
-  if (stat(path, &statBuf) != 0)
-    LM_RE(false, ("stat(%s): %s", path, strerror(errno)));
-
-  fileBuffer = (char*) malloc(statBuf.st_size + 1);
-  if (fileBuffer == NULL)
-    LM_RE(false, ("Out of memory"));
-
-  int fd = open(path, O_RDONLY);
-  if (fd == -1)
-    LM_RE(false, ("open(%s): %s", path, strerror(errno)));
-
-  int nb;
-  nb = read(fd, fileBuffer, statBuf.st_size);
-  if (nb != statBuf.st_size)
-    LM_RE(false, ("read(%s): %s", path, strerror(errno)));
-  fileBuffer[statBuf.st_size] = 0;
-  close(fd);
-
-
-  //
-  // OK, the entire buffer is in 'fileBuffer'
-  // Now let's parse the buffer to extract URL (first line)
-  // and the "payload" that is the JSON of the context
-  //
-  char* url;
-  char* json;
-
-  if (contextFileParse(fileBuffer, statBuf.st_size, &url, &json, &pd) != 0)
-    LM_RE(false, ("error parsing the context file '%s': %s", path, pd.detail));
-
-
-  //
-  // The file-cached contexts destroys the functional tests - can't have it like it was.
-  // From now on, only the core context (whichever reason was selected for the broker at startup) is
-  // taken from the file-cached contexts.
-  //
-  bool isCoreContext = (strcmp(url, coreContextUrl) == 0);
-
-  if (isCoreContext == false)
-  {
-    LM_W(("Not the core context - skipping it"));
-    return true;
-  }
-
-  //
-  // We have both the URL and the 'JSON Context'.
-  // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
-  //
-  OrionldContext* contextP = orionldContextFromBuffer(url, OrionldContextFileCached, NULL, json, &pd);
-
-  if (contextP == NULL)
-    LM_RE(false, ("error creating the core context from file system file '%s'", path));
-
-  orionldCoreContextP         = contextP;
-  orionldCoreContextP->id     = (char*) "Core";
-  orionldCoreContextP->origin = OrionldContextFileCached;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fileSystemContexts -
-//
-static bool fileSystemContexts(char* cacheContextDir, bool* gotCoreContextP)
-{
-  DIR*             dirP;
-  struct  dirent   dirItem;
-  struct  dirent*  result;
-
-  dirP = opendir(cacheContextDir);
-  if (dirP == NULL)
-  {
-    //
-    // FIXME PR: Should the broker die here (Cache Context Directory given but it doesn't exist)
-    //           or should the broker continue (downloading the core context) ???
-    //           Continue, by returning false.
-    //
-    LM_RE(false, ("opendir(%s): %s", cacheContextDir, strerror(errno)));
-  }
-
-  //
-  // Before any context can be parsed, the broker needs the CORE CONTEXT
-  // So, this loop needs a double pass:
-  //   1. Loop and find the core context + install the core context
-  //   2. Loop and insert all non-core contexts
-  //
-
-  //
-  // 1. Loop and find the core context + install the core context
-  //
-  int contextsAdded = 0;
-  while (readdir_r(dirP, &dirItem, &result) == 0)
-  {
-    if (result == NULL)
-      break;
-
-    if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
-      continue;
-
-    if (contextFileTreat(cacheContextDir, &dirItem) == true)
-    {
-      ++contextsAdded;
-      *gotCoreContextP = true;
-    }
-  }
-
-  if (*gotCoreContextP == false)
-    LM_RE(false, ("The core context '%s' was not found - can't continue with the file cached contexts", coreContextUrl));
-
-  closedir(dirP);
-
-  if (contextsAdded == 0)
-    LM_W(("Cache Context Directory in use but no core context was extracted from it - that's OK ... sort of ... :)"));
-
-  return true;
-}
-#endif  // DEBUG
 
 
 
@@ -275,39 +45,13 @@ static bool fileSystemContexts(char* cacheContextDir, bool* gotCoreContextP)
 //
 bool orionldContextInit(OrionldProblemDetails* pdP)
 {
-  orionldContextCacheInit();
-
-  bool  gotCoreContext  = false;
-
-#if DEBUG
-  char* cacheContextDir = getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY");
-  if (cacheContextDir != NULL)
-  {
-    if (fileSystemContexts(cacheContextDir, &gotCoreContext) == false)
-      LM_E(("Unable to insert file-cached contexts from '%s'into the context cache", cacheContextDir));
-  }
-#endif
-
-  if (gotCoreContext == false)
-  {
-    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL, pdP);
-
-    if (orionldCoreContextP == NULL)
-      return false;
-
-    orionldCoreContextP->id = (char*) "Core";
-  }
+  orionldContextCacheInit();  // Get all contexts from the 'orionld' DB, 'contexts' collection
 
   OrionldContextItem* vocabP = orionldContextItemLookup(orionldCoreContextP, "@vocab", NULL);
-
   if (vocabP == NULL)
-  {
-    LM_E(("Context Error (no @vocab item found in Core Context)"));
-    orionldDefaultUrl = (char*) "https://example.org/ngsi-ld/default/";
-  }
-  else
-    orionldDefaultUrl = vocabP->id;
+    LM_X(1, ("Invalid Core Context - the term '@vocab' is missing"));
 
+  orionldDefaultUrl    = vocabP->id;
   orionldDefaultUrlLen = strlen(orionldDefaultUrl);
 
   return true;

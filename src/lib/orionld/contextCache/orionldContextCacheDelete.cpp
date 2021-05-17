@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/mongoc/mongocContextCacheDelete.h"             // mongocContextCacheDelete
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheDelete.h"      // Own interface
@@ -55,11 +56,13 @@ bool orionldContextCacheDelete(const char* id)
     //
     if ((orionldContextCache[ix]->id != NULL) && (strcmp(id, orionldContextCache[ix]->id) == 0))
     {
+      mongocContextCacheDelete(orionldContextCache[ix]->id);
       orionldContextCacheRelease(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
     }
     else if ((orionldContextCache[ix]->origin != OrionldContextDownloaded) && (orionldContextCache[ix]->parent != NULL) && (strcmp(id, orionldContextCache[ix]->parent) == 0))
     {
+      mongocContextCacheDelete(orionldContextCache[ix]->id);
       orionldContextCacheRelease(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
     }

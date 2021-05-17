@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>                                           // sem_init
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -76,11 +77,29 @@ void mongocInit(const char* dbHost, const char* dbName)
   //
   // Get a handle on the collections
   //
+#ifdef DB_DRIVER_MONGOC
   mongoEntitiesCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "entities");
   if (mongoEntitiesCollectionP == NULL)
     LM_X(1, ("mongoc_client_get_collection(%s, 'entities') failed", dbName));
 
+  mongoSubscriptionsCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "subscriptions");
+  if (mongoSubscriptionsCollectionP == NULL)
+    LM_X(1, ("mongoc_client_get_collection(%s, 'regiatrations') failed", dbName));
+
   mongoRegistrationsCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "registrations");
   if (mongoRegistrationsCollectionP == NULL)
     LM_X(1, ("mongoc_client_get_collection(%s, 'regiatrations') failed", dbName));
+#endif
+
+  // The Context Cache module uses mongoc regardless
+  mongoContextsCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "contexts");
+  if (mongoContextsCollectionP == NULL)
+    LM_X(1, ("mongoc_client_get_collection(%s, 'contexts') failed", dbName));
+
+
+  //
+  // For now, there will be a single connection to the 'contexts' collection on DB 'orionld'.
+  // A semaphore is needed
+  //
+  sem_init(&mongoContextsSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
 }

@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCCONTEXTCACHEPERSIST_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCCONTEXTCACHEPERSIST_H_
+
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,27 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/troe/pgTransactionRollback.h"                // Own interface
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionRollback - rollback a transaction
+// mongocContextCachePersist -
 //
-bool pgTransactionRollback(PGconn* connectionP)
-{
-  PGresult* res;
+extern void mongocContextCachePersist(KjNode* contextObject);
 
-  res = PQexec(connectionP, "ROLLBACK");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(ROLLBACK): %s)", PQresStatus(PQresultStatus(res))));
-  PQclear(res);
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCCONTEXTCACHEPERSIST_H_

@@ -61,6 +61,25 @@ const char* orionldContextOriginName(OrionldContextOrigin origin)
 
 // -----------------------------------------------------------------------------
 //
+// orionldOriginFromString - FIXME: move to its own module
+//
+OrionldContextOrigin orionldOriginFromString(const char* s)
+{
+  if      (strcmp(s, "UnknownOrigin")    == 0) return OrionldContextUnknownOrigin;
+  else if (strcmp(s, "Inline")           == 0) return OrionldContextFromInline;
+  else if (strcmp(s, "Downloaded")       == 0) return OrionldContextDownloaded;
+  else if (strcmp(s, "FileCached")       == 0) return OrionldContextFileCached;
+  else if (strcmp(s, "ForNotifications") == 0) return OrionldContextForNotifications;
+  else if (strcmp(s, "ForForwarding")    == 0) return OrionldContextForForwarding;
+  else if (strcmp(s, "UserCreated")      == 0) return OrionldContextUserCreated;
+
+  return OrionldContextUnknownOrigin;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextCreate -
 //
 OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
@@ -74,8 +93,9 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
   contextP->origin    = origin;
   contextP->parent    = NULL;
   contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
-  contextP->tree      = (toBeCloned == true)? kjClone(NULL, tree) : NULL;
+  contextP->tree      = kjClone(NULL, tree);
   contextP->keyValues = keyValues;
+  contextP->lookups   = 0;
 
   return contextP;
 }

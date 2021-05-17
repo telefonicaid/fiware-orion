@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,44 +22,41 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strcmp
+#include <bson/bson.h>                                           // bson_t, ...
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
-#include "orionld/contextCache/orionldContextCacheLookup.h"      // Own interface
+#include "orionld/common/orionldState.h"                         // mongoContextsSem, mongoContextsCollectionP
+#include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
+#include "orionld/mongoc/mongocContextCachePersist.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextCacheLookup -
+// mongocContextCachePersist -
 //
-OrionldContext* orionldContextCacheLookup(const char* url)
+void mongocContextCachePersist(KjNode* contextObject)
 {
-  OrionldContext* contextP = NULL;
+  bson_t bson;
 
-  for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
-  {
-    if (orionldContextCache[ix] == NULL)
-      continue;
+  mongocKjTreeToBson(contextObject, &bson);
 
-    if (strcmp(url, orionldContextCache[ix]->url) == 0)
-      contextP = orionldContextCache[ix];
+  sem_wait(&mongoContextsSem);
 
-    if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
-      contextP = orionldContextCache[ix];
+  bson_error_t  mcError;
+  bool          r = mongoc_collection_insert_one(mongoContextsCollectionP, &bson, NULL, NULL, &mcError);
 
-    if (contextP != NULL)
-    {
-      contextP->usedAt   = orionldState.requestTime;
-      contextP->lookups += 1;
-      return contextP;
-    }
-  }
+  sem_post(&mongoContextsSem);
 
-  return NULL;
+  if (r == false)
+    LM_E(("Database Error (persisting context: %s)", mcError.message));
+
+  bson_destroy(&bson);
 }

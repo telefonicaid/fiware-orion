@@ -78,7 +78,7 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   {
     //
     // If the request is a subscription creation, the the context must be saved
-    // FIXME: For now it must be saved. In the end, it should be saved just as it came in
+    // FIXME: For now it must be saved. In the end, it should be saved just as it came in, in the subscription
     //
     if (orionldState.serviceP->serviceRoutine != orionldPostSubscriptions)
       return;
@@ -107,8 +107,10 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   if (slotNo >= orionldContextCacheSlots)
   {
     //
-    // FIXME:  the code has pointers to contexts, so, THE CONTEXTS THEMSELVES CANNOT MOVE
-    // FIX:    array of OrionldContext* instead of array of OrionldContext - no longer move contexts, just the placeholder of the OrionldContext*
+    // NOTE
+    //   the code is full of pointers to contexts, so, the contexts themselves CANNOT MOVE.
+    //   They don't, as 'orionldContextCache' is an array of OrionldContext*.
+    //   The cache itself may be reallocated and move, but what it points to - the contextx - they stay where thry were.
     //
     int   slotsToAdd   = 50;
     int   addedSize    = slotsToAdd * sizeof(OrionldContext*);

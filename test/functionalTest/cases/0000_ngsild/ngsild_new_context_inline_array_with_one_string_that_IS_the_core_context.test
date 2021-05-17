@@ -26,6 +26,7 @@ Alternative Context implementation - inline context that is an array with one si
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -75,7 +76,7 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 498
+Content-Length: 575
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -84,7 +85,8 @@ Date: REGEX(.*)
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",

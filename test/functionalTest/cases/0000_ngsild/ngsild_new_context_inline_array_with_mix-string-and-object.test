@@ -26,6 +26,7 @@ Alternative Context implementation - inline context that is an array with two it
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -38,12 +39,19 @@ brokerStart CB 0-255
 #
 # 01. Create entity E1 with a context that is an array with two items of which one is a string and the other is an object
 # 02. Ask for the entire list of contexts in the context cache
+# 03. GET the entity E1, make sure its type has been expanded to 'http:/a.b.c/types/T1'
 #
 # Step two should show 4 contexts:
 # 1. The Core Context
 # 2. The array of two contexts
 # 3. https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld
 # 4. local object with T1-T3
+#
+# Actually ... better implementation. The context used in step 1 is temporary and lives ONLY while the request is active.
+# However, as one context was downloaded, that one will survive (wouldn't want to download it again).
+# So, only TWO contexts, not four:
+# 1. The Core Context
+# 2. https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld
 #
 
 echo "01. Create entity E1 with a context that is an array with two items of which one is a string and the other is an object"
@@ -72,6 +80,13 @@ echo
 echo
 
 
+echo "03. GET the entity E1, make sure its type has been expanded to 'http:/a.b.c/types/T1'"
+echo "====================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E1 with a context that is an array with two items of which one is a string and the other is an object
 =======================================================================================================================
@@ -85,16 +100,17 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 1142
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -105,9 +121,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
     "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 0,
     "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",
@@ -119,6 +138,20 @@ Date: REGEX(.*)
   }
 ]
 
+
+
+03. GET the entity E1, make sure its type has been expanded to 'http:/a.b.c/types/T1'
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 61
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "http://a.b.c/entity/E1",
+    "type": "http:/a.b.c/types/T1"
+}
 
 
 --TEARDOWN--

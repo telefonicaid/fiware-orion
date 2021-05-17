@@ -33,7 +33,9 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheGet.h"         // Own interface
@@ -56,16 +58,33 @@ KjNode* orionldContextCacheGet(KjNode* arrayP, bool details)
 
     if (details == true)
     {
+      char createdAtString[64];
+      char lastUseString[64];
+
+      numberToDate(contextP->createdAt, createdAtString, sizeof(createdAtString));
+      numberToDate(contextP->usedAt,    lastUseString,   sizeof(lastUseString));
+
       KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
-      KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",    contextP->url);
-      KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",     (contextP->id == NULL)? "None" : contextP->id);
-      KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type",   contextP->keyValues? "hash-table" : "array");
-      KjNode*          originP          = kjString(orionldState.kjsonP, "origin", originName(contextP->origin));
+      KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",       contextP->url);
+      KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",        (contextP->id == NULL)? "None" : contextP->id);
+      KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type",      contextP->keyValues? "hash-table" : "array");
+      KjNode*          originP          = kjString(orionldState.kjsonP, "origin",    originName(contextP->origin));
+      KjNode*          createdAtP       = kjString(orionldState.kjsonP, "createdAt", createdAtString);
 
       kjChildAdd(contextObjP, urlStringP);
       kjChildAdd(contextObjP, idStringP);
       kjChildAdd(contextObjP, typeStringP);
       kjChildAdd(contextObjP, originP);
+      kjChildAdd(contextObjP, createdAtP);
+
+      if (contextP != orionldCoreContextP)
+      {
+        KjNode*          usedAtP          = kjString(orionldState.kjsonP,  "lastUse",  lastUseString);
+        KjNode*          lookupsP         = kjInteger(orionldState.kjsonP, "lookups",  contextP->lookups);
+
+        kjChildAdd(contextObjP, usedAtP);
+        kjChildAdd(contextObjP, lookupsP);
+      }
 
       if (contextP->parent != NULL)
       {

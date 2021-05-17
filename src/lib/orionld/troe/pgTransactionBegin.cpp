@@ -41,7 +41,6 @@ bool pgTransactionBegin(PGconn* connectionP)
 {
   PGresult* res;
 
-  // LM_TMP(("SQL[%p]: BEGIN", connectionP));
   res = PQexec(connectionP, "BEGIN");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
