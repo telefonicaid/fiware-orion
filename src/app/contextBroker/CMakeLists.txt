@@ -82,7 +82,7 @@ ELSEIF(${DISTRO} STREQUAL "Fedora_20")
 # specify switch
 
 ELSE()  
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 ENDIF()
 
 IF (${DISTRO} MATCHES "Ubuntu.*")

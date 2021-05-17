@@ -31,8 +31,6 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/RenderFormat.h"
@@ -42,6 +40,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
+#include "ngsi/ContextRegistrationResponseVector.h"
 #include "ngsi/ConditionValueList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -52,8 +51,10 @@
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Registration.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
+#include "mongoDriver/BSONArray.h"
 
 
 /* ****************************************************************************
@@ -75,38 +76,16 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
+  bool         dbDisableRetryWrites,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
 );
-
-
-
-/* ****************************************************************************
-*
-* mongoStart - 
-*/
-extern bool mongoStart
-(
-  const char* host,
-  const char* db,
-  const char* rplSet,
-  const char* username,
-  const char* passwd,
-  bool        _multitenant,
-  double      timeout,
-  int         writeConcern = 1,
-  int         poolSize     = 10,
-  bool        semTimeStat  = false
-);
-
-
-
-#ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
-#endif
 
 
 
@@ -123,25 +102,6 @@ extern Notifier* getNotifier(void);
 * setNotifier -
 */
 extern void setNotifier(Notifier* n);
-
-
-
-/* ****************************************************************************
-*
-* getMongoConnection -
-*
-* I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API seems not to work that way
-*/
-extern mongo::DBClientBase* getMongoConnection(void);
-
-
-
-/* ****************************************************************************
-*
-* releaseMongoConnection - 
-*/
-extern void releaseMongoConnection(mongo::DBClientBase* connection);
 
 
 
@@ -186,74 +146,10 @@ extern std::string tenantFromDb(const std::string& database);
 
 /* ****************************************************************************
 *
-* setEntitiesCollectionName -
-*/
-extern void setEntitiesCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-extern void setRegistrationsCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-extern void setSubscribeContextCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextAvailabilityCollectionName -
-*/
-extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
 * composeDatabaseName -
 *
 */
 extern std::string composeDatabaseName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-extern std::string getEntitiesCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-extern std::string getRegistrationsCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-extern std::string getSubscribeContextCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
 
 
@@ -267,9 +163,25 @@ extern bool mongoLocationCapable(void);
 
 /* ****************************************************************************
 *
+* mongoExpirationCapable -
+*/
+extern bool mongoExpirationCapable(void);
+
+
+
+/* ****************************************************************************
+*
 * ensureLocationIndex -
 */
 extern void ensureLocationIndex(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
+* ensureDateExpirationIndex -
+*/
+extern void ensureDateExpirationIndex(const std::string& tenant);
 
 
 
@@ -293,7 +205,7 @@ extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 *
 * includedAttribute -
 */
-extern bool includedAttribute(const ContextRegistrationAttribute& attr, const StringList& attrsV);
+extern bool includedAttribute(const std::string& attrName, const StringList& attrsV);
 
 
 
@@ -302,7 +214,7 @@ extern bool includedAttribute(const ContextRegistrationAttribute& attr, const St
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
 
 
 
@@ -314,7 +226,6 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const StringList&                metadataList,
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
@@ -335,7 +246,13 @@ extern bool entitiesQuery
 *
 * pruneContextElements -
 */
-extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+);
 
 
 
@@ -347,6 +264,7 @@ extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -363,7 +281,7 @@ extern bool registrationsQuery
 *
 * condValueAttrMatch -
 */
-extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+extern bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
 
 
 
@@ -374,7 +292,24 @@ extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std:
 * Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
 */
-extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
+extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
+
+
+
+/* ****************************************************************************
+*
+* subToNotifyList -
+*/
+void subToNotifyList
+(
+  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  conditionVector,
+  const std::vector<std::string>&  notificationVector,
+  const std::vector<std::string>&  entityAttrsVector,
+  StringList&                      attrL,
+  const bool&                      blacklist,
+  bool&                            op
+);
 
 
 
@@ -384,7 +319,25 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern StringList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList
+(
+  const orion::BSONObj&           attrL,
+  const bool&                     onlyChanged,
+  const bool&                     blacklist,
+  const std::vector<std::string>  modifiedAttrs,
+  const std::vector<std::string>  attributes,
+  bool&                           op
+);
+
+
+
+/* ****************************************************************************
+*
+* subToAttributeList -
+*
+* Extract the attribute list from a BSON document (in the format of the csubs collection)
+*/
+extern StringList subToAttributeList(const orion::BSONObj& attrL);
 
 
 
@@ -394,7 +347,7 @@ extern StringList subToAttributeList(const mongo::BSONObj& attrL);
 *
 * NGSIv2 wrapper
 */
-extern mongo::BSONArray processConditionVector
+extern orion::BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,
@@ -411,23 +364,9 @@ extern mongo::BSONArray processConditionVector
   const std::string&                 status,
   const std::string&                 fiwareCorrelator,
   const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist
-);
-
-
-
-/* ****************************************************************************
-*
-* processAvailabilitySubscriptions -
-*/
-extern bool processAvailabilitySubscription(
-    const EntityIdVector& enV,
-    const StringList&     attrL,
-    const std::string&    subId,
-    const std::string&    notifyUrl,
-    RenderFormat          renderFormat,
-    const std::string&    tenant,
-    const std::string&    fiwareCorrelator
+  bool                               blacklist,
+  const bool&                        skipInitialNotification,
+  ApiVersion                         apiVersion
 );
 
 
@@ -454,9 +393,18 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 
 /* ****************************************************************************
 *
+* servicePathFilterNeeded -
+*
+*/
+bool servicePathFilterNeeded(const std::vector<std::string>& servicePath);
+
+
+
+/* ****************************************************************************
+*
 * fillQueryServicePath -
 */
-extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+extern orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
 
 
 
@@ -482,13 +430,23 @@ extern bool someContextElementNotFound(const ContextElementResponse& cer);
 */
 extern void cprLookupByAttribute
 (
-  EntityId&                                en,
+  const Entity&                            en,
   const std::string&                       attrName,
   const ContextRegistrationResponseVector& crrV,
   std::string*                             perEntPa,
   MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,
-  MimeType*                                perAttrPaMimeType
+  MimeType*                                perAttrPaMimeType,
+  ProviderFormat*                          providerFormatP,
+  std::string*                             regId
 );
+
+
+/* ****************************************************************************
+*
+* addBuiltins -
+*
+*/
+extern void addBuiltins(ContextElementResponse* cerP);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

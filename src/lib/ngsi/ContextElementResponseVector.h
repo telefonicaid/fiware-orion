@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponse.h"
+#include "apiTypesV2/EntityVector.h"
 #include "common/RenderFormat.h"
 
 
@@ -41,22 +42,24 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(ApiVersion   apiVersion,
-                                  bool         asJsonObject,
-                                  RequestType  requestType,
-                                  bool         comma               = false,
-                                  bool         omitAttributeValues = false);
+  std::string              toJsonV1(bool                             asJsonObject,
+                                    RequestType                      requestType,
+                                    const std::vector<std::string>&  attrsFilter,
+                                    bool                             blacklist,
+                                    const std::vector<std::string>&  metadataFilter,
+                                    bool                             comma               = false,
+                                    bool                             omitAttributeValues = false);
 
   std::string              toJson(RenderFormat                     renderFormat,
                                   const std::vector<std::string>&  attrsFilter,
-                                  const std::vector<std::string>&  metadataFilter,
-                                  bool                             blacklist = false);
-  void                     present(const std::string& indent);
+                                  bool                             blacklist,
+                                  const std::vector<std::string>&  metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
-  ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
-  void                     release();
+  ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
+  void                     release(void);
   void                     fill(ContextElementResponseVector& cerV);
+  void                     fill(EntityVector& erV, HttpStatusCode sc);    // Needed by NGSIv2 forwarding logic
   ContextElementResponse*  operator[] (unsigned int ix) const;
   
 

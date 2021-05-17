@@ -1,0 +1,260 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Null support in geo:json attributes in subscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}
+# 02. Create entity E2 with geo:json attribute loc with value null
+# 03. Create subscription covering all planet (triggers initial notif, see E1)
+# 04. Update E1-loc: null (doesn't trigger notification)
+# 05. Update E2-loc: {type: Point, coordinates: [ -4, 36 ]} (triggers notif)
+# 06. Dump accumulator, see 2 notifications (one for E1 and one for E2)
+#
+# (Actually, query at 03 doesn't cover all the planet, but a single hemisphere.
+# See https://stackoverflow.com/questions/67493504/earth-wide-polygon-query-in-mongodb-doesnt-return-geo-located-document/67501039#67501039)
+#
+
+echo "01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}"
+echo "======================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "loc": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 with geo:json attribute loc with value null"
+echo "================================================================"
+payload='{
+  "id": "E2",
+  "type": "T",
+  "loc": {
+    "value": null,
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create subscription covering all planet (triggers initial notif, see E1)"
+echo "============================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ],
+    "condition": {
+        "expression": {
+           "geometry": "box",
+           "coords": "-90,-90;90,90",
+           "georel": "coveredBy"
+        }
+     }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Update E1-loc: null (doesn't trigger notif)"
+echo "==============================================="
+payload='{
+  "loc": {
+    "value": null,
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "05. Update E2-loc: {type: Point, coordinates: [ -4, 36 ]} (triggers notif)"
+echo "=========================================================================="
+payload='{
+  "loc": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator, see 2 notifications (one for E1 and one for E2)"
+echo "====================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with geo:json attribute loc with value null
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create subscription covering all planet (triggers initial notif, see E1)
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Update E1-loc: null (doesn't trigger notif)
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update E2-loc: {type: Point, coordinates: [ -4, 36 ]} (triggers notif)
+==========================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump accumulator, see 2 notifications (one for E1 and one for E2)
+=====================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 164
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "E1",
+            "loc": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        -4,
+                        36
+                    ],
+                    "type": "Point"
+                }
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 164
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "E2",
+            "loc": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        -4,
+                        36
+                    ],
+                    "type": "Point"
+                }
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

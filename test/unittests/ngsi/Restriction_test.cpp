@@ -65,19 +65,6 @@ TEST(Restriction, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Restriction, present)
-{
-  Restriction   restriction;
-
-  restriction.present("");
-}
-
-
-
-/* ****************************************************************************
-*
 * render - 
 */
 TEST(Restriction, render)
@@ -86,6 +73,6 @@ TEST(Restriction, render)
   std::string  rendered;
   std::string  expected = "";
 
-  rendered = restriction.render(0, false);
+  rendered = restriction.toJsonV1(0, false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 }

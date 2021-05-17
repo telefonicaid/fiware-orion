@@ -46,9 +46,9 @@ extern bool harakiri;
 */
 static RestService getV[] =
 {
-  { ExitRequest,    2, { "exit", "*" }, "", exitTreat },
-  { ExitRequest,    1, { "exit"      }, "", exitTreat },
-  { InvalidRequest, 0, {             }, "", NULL      }
+  { ExitRequest,    2, { "exit", "*" }, exitTreat },
+  { ExitRequest,    1, { "exit"      }, exitTreat },
+  { InvalidRequest, 0, {             }, NULL      }
 };
 
 
@@ -61,11 +61,13 @@ TEST(exitTreat, error)
 {
   ConnectionInfo ci("/exit/harakiri",  "GET", "1.1");
   std::string    out;
+  RestService    restService = { ExitRequest, 2, { "exit", "harakiri" }, NULL };
 
   utInit();
 
   harakiri = true;
-  ci.apiVersion = V1;
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
   out = orion::requestServe(&ci);

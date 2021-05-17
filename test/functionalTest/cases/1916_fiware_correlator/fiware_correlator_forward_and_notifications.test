@@ -106,8 +106,7 @@ payload='{
       ],
       "attributes": [
         {
-          "name": "A2",
-          "isDomain": "false"
+          "name": "A2"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -274,7 +273,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: CORRELATOR1
+Fiware-Correlator: CORRELATOR1; cbnotif=1
 
 {
     "data": [
@@ -324,7 +323,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: CORRELATOR3
+Fiware-Correlator: CORRELATOR3; cbfwd=1; cbnotif=1
 
 {
     "data": [

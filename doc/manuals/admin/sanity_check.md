@@ -24,14 +24,16 @@ curl --header 'Accept: application/json' localhost:1026/version
 ```
 {
   "orion" : {
-    "version" : "1.8.0-next",
+    "version" : "2.6.0-next",
     "uptime" : "0 d, 0 h, 2 m, 30 s",
-    "git_hash" : "c49692a996fb8d23cb2e78992094e26b1ca45dac",
-    "compile_time" : "Wed Sep 27 16:56:16 CEST 2017",
+    "git_hash" : "f2a3d436b2b507c5fd1611492ad7fad386901952",
+    "compile_time" : "Thu Oct 29 16:56:16 CEST 2020",
     "compiled_by" : "fermin",
     "compiled_in" : "debvm",
-    "release_date" : "Wed Sep 27 16:56:16 CEST 2017",
-    "doc" : "https://fiware-orion.readthedocs.org/en/master/"
+    "release_date" : "Thu Oct 29 16:56:16 CEST 2020",
+    "machine" : "x86_64",
+    "doc" : "https://fiware-orion.rtfd.io/",
+    "libversions": ...
   }
 }
 ```
@@ -59,9 +61,22 @@ changed using the -port command line option.
 ## Databases
 
 The Orion Context Broker uses a MongoDB database, whose parameters are
-provided using the command line options `dbhost`, `-dbuser`, `-dbpwd`
-and `-db`. Note that `-dbuser` and `-dbpwd` are only used if MongoDB
-runs using authentication, i.e. with `--auth`.
+provided using the command line options:
+
+* `-dbhost`
+* `-db`
+* `-dbuser`
+* `-dbpwd`
+* `-dbAuthMech`
+* `-dbAuthDb`
+* `-dbSSL`
+* `-dbDisableRetryWrites`
+* `-dbTimeout`
+* `-dbPoolSize`
+* `-writeConcern`
+
+Note that `-dbuser`, `-dbpwd`, `-dbAuthMech` and `-dbAuthDb`.
+are only used if MongoDB runs using authentication, i.e. with `--auth`.
 
 You can check that the database is working using the mongo console:
 
@@ -81,7 +96,6 @@ given moment.
 > db.registrations.count()
 > db.entities.count()
 > db.csubs.count()
-> db.casubs.count()
 ```
 
 [Top](#top)

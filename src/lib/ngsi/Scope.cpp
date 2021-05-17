@@ -128,7 +128,7 @@ int Scope::fill
   //
   // Parse georel?
   //
-  if (georelString != "")
+  if (!georelString.empty())
   {
     if (georel.parse(georelString.c_str(), errorStringP) != 0)
     {
@@ -176,7 +176,7 @@ int Scope::fill
   //
   // Split coordsString into a vector of points, or pairs of coordinates
   //
-  if (coordsString == "")
+  if (coordsString.empty())
   {
     *errorStringP = "no coordinates for geometry";
     return -1;
@@ -384,9 +384,9 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::render -
+* Scope::toJsonV1 -
 */
-std::string Scope::render(bool notLastInVector)
+std::string Scope::toJsonV1(bool notLastInVector)
 {
   std::string out      = "";
   const char* tTag     = "type";
@@ -435,12 +435,12 @@ std::string Scope::check(void)
         alarmMgr.badInput(clientIp, "radius zero for a circle area");
         return "Radius zero for a circle area";
       }
-      else if (circle.radiusString() == "")
+      else if (circle.radiusString().empty())
       {
         alarmMgr.badInput(clientIp, "missing radius for circle area");
         return "Missing radius for circle area";
       }
-      else if (circle.invertedString() != "")
+      else if (!circle.invertedString().empty())
       {
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
@@ -449,12 +449,12 @@ std::string Scope::check(void)
           return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
       }
-      else if (circle.center.latitudeString() == "")
+      else if (circle.center.latitudeString().empty())
       {
         alarmMgr.badInput(clientIp, "missing latitude for circle center");
         return "Missing latitude for circle center";
       }
-      else if (circle.center.longitudeString() == "")
+      else if (circle.center.longitudeString().empty())
       {
         alarmMgr.badInput(clientIp, "missing longitude for circle center");
         return "Missing longitude for circle center";
@@ -492,7 +492,7 @@ std::string Scope::check(void)
 
         return "too few vertices for a polygon";
       }
-      else if (polygon.invertedString() != "")
+      else if (!polygon.invertedString().empty())
       {
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
         {
@@ -504,13 +504,13 @@ std::string Scope::check(void)
 
       for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
       {
-        if (polygon.vertexList[ix]->latitudeString() == "")
+        if (polygon.vertexList[ix]->latitudeString().empty())
         {
           alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
           return std::string("missing latitude value for polygon vertex");
         }
 
-        if (polygon.vertexList[ix]->longitudeString() == "")
+        if (polygon.vertexList[ix]->longitudeString().empty())
         {
           alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
           return std::string("missing longitude value for polygon vertex");
@@ -542,13 +542,13 @@ std::string Scope::check(void)
 
   if ((type != FIWARE_LOCATION) && (type != FIWARE_LOCATION_DEPRECATED))
   {
-    if (type == "")
+    if (type.empty())
     {
       alarmMgr.badInput(clientIp, "empty type in restriction scope");
       return "Empty type in restriction scope";
     }
 
-    if (value == "")
+    if (value.empty())
     {
       alarmMgr.badInput(clientIp, "empty value in restriction scope");
       return "Empty value in restriction scope";
@@ -580,95 +580,6 @@ std::string Scope::check(void)
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* Scope::present -
-*/
-void Scope::present(const std::string& indent, int ix)
-{
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sScope:",       indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sScope %d:",    indent.c_str(), ix));
-  }
-
-  LM_T(LmtPresent, ("%s  Type:     '%s'", indent.c_str(), type.c_str()));
-  
-  if (oper != "")
-    LM_T(LmtPresent, ("%s  Operator: '%s'", indent.c_str(), oper.c_str()));
-
-  if (areaType == orion::NoArea)
-  {
-    LM_T(LmtPresent, ("%s  Value:    %s", indent.c_str(), value.c_str()));
-  }
-  else if (areaType == orion::CircleType)
-  {
-    LM_T(LmtPresent, ("%s  FI-WARE Circle Area:", indent.c_str()));
-    LM_T(LmtPresent, ("%s    Radius:     %s",     indent.c_str(), circle.radiusString().c_str()));
-    LM_T(LmtPresent, ("%s    Longitude:  %s",     indent.c_str(), circle.center.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Latitude:   %s", 	  indent.c_str(), circle.center.latitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Inverted:   %s", 	  indent.c_str(), circle.invertedString().c_str()));
-  }
-  else if (areaType == orion::PolygonType)
-  {
-    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", indent.c_str(), polygon.vertexList.size()));
-
-    LM_T(LmtPresent, ("%s    Inverted:   %s", indent.c_str(), polygon.invertedString().c_str()));
-    for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
-    {
-      LM_T(LmtPresent, ("%s    Vertex %d",        indent.c_str(), ix));
-      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str()));
-      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), 
-			polygon.vertexList[ix]->latitudeString().c_str()));
-    }
-  }
-  else if (areaType == orion::PointType)
-  {
-    LM_T(LmtPresent, ("%s  FI-WARE Point:", indent.c_str()));
-    LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), point.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), point.latitudeString().c_str()));
-  }
-  else if (areaType == orion::BoxType)
-  {
-    LM_T(LmtPresent, ("%s  FI-WARE Box:", indent.c_str()));
-    LM_T(LmtPresent, ("%s      lowerLeft.longitude:   %s", indent.c_str(), box.lowerLeft.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      lowerLeft.latitude:    %s", indent.c_str(), box.lowerLeft.latitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      upperRight.longitude:  %s", indent.c_str(), box.upperRight.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      upperRight.latitude:   %s", indent.c_str(), box.upperRight.latitudeString().c_str()));
-  }
-  else if (areaType == orion::LineType)
-  {
-    LM_T(LmtPresent, ("%s  FI-WARE Line:", indent.c_str()));
-    for (unsigned int ix = 0; ix < line.pointList.size(); ++ix)
-    {
-      LM_T(LmtPresent, ("%s    Point %d",        indent.c_str(), ix));
-      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), line.pointList[ix]->longitudeString().c_str()));
-      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(),
-      line.pointList[ix]->latitudeString().c_str()));
-    }
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%s  Unknown areaType '%d'", indent.c_str(), areaType));
-  }
-
-  if (georel.type == "near")
-  {
-    LM_T(LmtPresent, ("%s  Georel: 'near'", indent.c_str()));
-    LM_T(LmtPresent, ("%s    maxDistance:  %f", georel.maxDistance));
-    LM_T(LmtPresent, ("%s    minDistance:  %f", georel.minDistance));
-  }
-  else if ((georel.type == "coveredBy") || (georel.type == "intersects") || (georel.type == "equals") || (georel.type == "disjoint"))
-  {
-    LM_T(LmtPresent, ("%s  Georel: '%s'", indent.c_str(), georel.type.c_str()));
-  }
 }
 
 

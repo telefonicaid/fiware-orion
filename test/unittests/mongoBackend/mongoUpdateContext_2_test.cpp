@@ -34,6 +34,7 @@
 #include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
@@ -66,7 +67,7 @@ using ::testing::_;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 
@@ -75,17 +76,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * Tests
 *
 * (Continues from mongoUpdateContext_test.cpp)
-*
-* With isPattern=false, related with attribute IDs
-*
-* - updateAttrWithId
-* - updateAttrWithAndWithoutId
-* - appendAttrWithId
-* - appendAttrWithAndWithoutId
-* - appendAttrWithIdFails
-* - appendAttrWithoutIdFails
-* - deleteAttrWithId
-* - deleteAttrWithAndWithoutId
 *
 * With isPattern=true and custom metadata
 *
@@ -254,34 +244,6 @@ static void prepareDatabaseMd(void)
 }
 
 
-
-/* ****************************************************************************
-*
-* prepareDatabaseWithAttributeIds -
-*
-* This function is called before every test, to populate some information in the
-* entities collection.
-*/
-static void prepareDatabaseWithAttributeIds(void)
-{
-  /* Start with the base entities */
-  prepareDatabase();
-
-  /* Add some entities with metadata ID */
-
-  DBClientBase* connection = getMongoConnection();
-  BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
-                    "attrNames" << BSON_ARRAY("A1" << "A2") <<
-                    "attrs" << BSON(
-                      "A1()ID1" << BSON("type" << "TA1" << "value" << "val11") <<
-                      "A1()ID2" << BSON("type" << "TA1" << "value" << "val12") <<
-                      "A2" << BSON("type" << "TA2" << "value" << "val2")));
-
-  connection->insert(ENTITIES_COLL, en);
-}
-
-
-
 /* ****************************************************************************
 *
 * prepareDatabaseWithServicePaths -
@@ -406,1459 +368,7 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
   return false;
 }
 
-/* ****************************************************************************
-*
-* updateAttrWithId -
-*/
-TEST(mongoUpdateContextRequest, updateAttrWithId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
 
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID1");
-    caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(3, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
-    EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* updateAttrWithAndWithoutId -
-*/
-TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID1");
-    ca1P->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(ca1P);
-    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
-    ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(3, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
-    EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
-    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* appendAttrWithId -
-*/
-TEST(mongoUpdateContextRequest, appendAttrWithId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID3");
-    caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID3", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(4, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    BSONObj a1id3 = attrs.getField("A1()ID3").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_FALSE(a1id1.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id3, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
-    EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* appendAttrWithAndWithoutId -
-*/
-TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID3");
-    ca1P->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(ca1P);
-    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val3");
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID3", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ("A3", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA3", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
-    ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(5, attrs.nFields());
-    ASSERT_EQ(3, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    BSONObj a1id3 = attrs.getField("A1()ID3").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    a3 = attrs.getField("A3").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_FALSE(a1id1.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id3, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
-    EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
-    EXPECT_EQ(1360232700, a3.getIntField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* appendAttrWithIdFails -
-*/
-TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
-    Metadata md("ID", "string", "IDX");
-    caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("IDX", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E10, T10] - offending attribute: A2 - attribute cannot be appended",
-              RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(3, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_FALSE(a1id1.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* appendAttrWithoutIdFails -
-*/
-TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E10, T10] - offending attribute: A1 - attribute cannot be appended",
-              RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(3, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id1 = attrs.getField("A1()ID1").embeddedObject();
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id1, "type"));
-    EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_FALSE(a1id1.hasField("modDate"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* deleteAttrWithId -
-*/
-TEST(mongoUpdateContextRequest, deleteAttrWithId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
-    Metadata md("ID", "string", "ID1");
-    caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* deleteAttrWithAndWithoutId -
-*/
-TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabaseWithAttributeIds();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E10", "T10", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
-    Metadata md("ID", "string", "ID1");
-    ca1P->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(ca1P);
-    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E10", RES_CER(0).entityId.id);
-    EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
-    ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
-    EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    BSONObj a1id2 = attrs.getField("A1()ID2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
@@ -1876,16 +386,16 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     setupDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD1", "TMD1", "MD1val");
     Metadata md2("MD2", "TMD2", "MD2val");
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1899,10 +409,10 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1977,14 +487,14 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "new_val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1998,10 +508,10 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2072,14 +582,14 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "new_val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2093,10 +603,10 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2167,14 +677,14 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD3", "TMD3", "new_val3");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2188,10 +698,10 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2266,14 +776,14 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD3", "TMD3", "new_val3");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2287,10 +797,10 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2365,16 +875,16 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD2", "TMD2", "new_val2");
     Metadata md2("MD3", "TMD3", "new_val3");
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2388,10 +898,10 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2469,16 +979,16 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md1("MD2", "TMD2", "new_val2");
     Metadata md2("MD3", "TMD3", "new_val3");
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2492,10 +1002,10 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2573,14 +1083,14 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "attr_new_val");
     Metadata md("MD1", "TMD1", "new_val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2594,10 +1104,10 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2668,14 +1178,14 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "attr_new_val");
     Metadata md("MD1", "TMD1", "new_val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2689,10 +1199,10 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2764,14 +1274,14 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "MD1val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2785,10 +1295,10 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2859,14 +1369,14 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     prepareDatabaseMd();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "val1");
     Metadata md("MD1", "TMD1", "MD1val");
     caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2880,10 +1390,10 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2954,18 +1464,18 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
-    ce2P->entityId.fill("E[2-3]", "T", "true");
+    e2P->fill("E[2-3]", "T", "true");
     ContextAttribute* ca2P = new ContextAttribute("AX", "TAX", "X");
 
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce2P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("UPDATE");
+    e1P->attributeVector.push_back(ca1P);
+    e2P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2979,10 +1489,10 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2992,10 +1502,10 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E[2-3]", RES_CER(1).entityId.id);
-    EXPECT_EQ("T", RES_CER(1).entityId.type);
-    EXPECT_EQ("true", RES_CER(1).entityId.isPattern);
-    EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E[2-3]", RES_CER(1).id);
+    EXPECT_EQ("T", RES_CER(1).type);
+    EXPECT_EQ("true", RES_CER(1).isPattern);
+    EXPECT_EQ(0, RES_CER(1).attributeVector.size());
     EXPECT_EQ(SccNotImplemented, RES_CER_STATUS(1).code);
     EXPECT_EQ("Not Implemented", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3122,13 +1632,13 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Set filter */
     uriParams[URI_PARAM_NOT_EXIST] = "entity::type";
@@ -3145,10 +1655,10 @@ TEST(mongoUpdateContextRequest, notExistFilter)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3279,19 +1789,19 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
+    Entity* eP = new Entity();
+    eP->fill("E4", "T4", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "T", "myVal");
     ContextAttribute* ca2P = new ContextAttribute("A2", "T", 42.5);
     ContextAttribute* ca3P = new ContextAttribute("A3", "T", false);
     ContextAttribute* ca4P = new ContextAttribute("A4", "T", "");
     ca4P->valueType = orion::ValueTypeNull;
-    ceP->contextAttributeVector.push_back(ca1P);
-    ceP->contextAttributeVector.push_back(ca2P);
-    ceP->contextAttributeVector.push_back(ca3P);
-    ceP->contextAttributeVector.push_back(ca4P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    eP->attributeVector.push_back(ca3P);
+    eP->attributeVector.push_back(ca4P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3305,10 +1815,10 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(4, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(4, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3485,25 +1995,25 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "T", 42.5);
     ContextAttribute* ca2P = new ContextAttribute("A2", "T", false);
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce1P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
+    e1P->attributeVector.push_back(ca1P);
+    e1P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
 
-    ContextElement* ce2P = new ContextElement();
-    ce2P->entityId.fill("E2", "T2", "false");
+    Entity* e2P = new Entity();
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "T", "");
     ca3P->valueType = orion::ValueTypeNull;
-    ce2P->contextAttributeVector.push_back(ca3P);
-    req.contextElementVector.push_back(ce2P);
+    e2P->attributeVector.push_back(ca3P);
+    req.entityVector.push_back(e2P);
 
-    req.updateActionType.set("UPDATE");
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3514,10 +2024,10 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3531,10 +2041,10 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -3668,12 +2178,12 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     prepareDatabaseDifferentNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3687,10 +2197,10 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3769,8 +2279,8 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
+    Entity* eP = new Entity();
+    eP->fill("E4", "T4", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_val");
     Metadata md1("MD1", "T", "s");
     Metadata md2("MD2", "T", 55.5);
@@ -3781,9 +2291,9 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     caP->metadataVector.push_back(&md2);
     caP->metadataVector.push_back(&md3);
     caP->metadataVector.push_back(&md4);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3797,10 +2307,10 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3982,8 +2492,8 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     prepareDatabaseDifferentMdNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_val");
     Metadata md1("MD1", "T", "ss");
     Metadata md2("MD2", "T", 44.4);
@@ -3991,9 +2501,9 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
     caP->metadataVector.push_back(&md3);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4007,10 +2517,10 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4098,12 +2608,12 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     prepareDatabaseDifferentMdNativeTypes();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "T", "new_s");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4117,10 +2627,10 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4194,19 +2704,19 @@ TEST(mongoUpdateContextRequest, replace)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
-    ce2P->entityId.fill("E2", "T2", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca1P = new ContextAttribute("B1", "T", "1");
     ContextAttribute* ca2P = new ContextAttribute("B2", "T", "2");
     ContextAttribute* ca3P = new ContextAttribute("B3", "T", "3");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce1P->contextAttributeVector.push_back(ca2P);
-    ce2P->contextAttributeVector.push_back(ca3P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("REPLACE");
+    e1P->attributeVector.push_back(ca1P);
+    e1P->attributeVector.push_back(ca2P);
+    e2P->attributeVector.push_back(ca3P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4220,10 +2730,10 @@ TEST(mongoUpdateContextRequest, replace)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("B1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4237,10 +2747,10 @@ TEST(mongoUpdateContextRequest, replace)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("B3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -4365,15 +2875,16 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
+  bool forcedUpdate = false;
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4384,10 +2895,10 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(0, RES_CER(0).attributeVector.size());
   EXPECT_EQ(SccConflict, RES_CER_STATUS(0).code);
   EXPECT_EQ("Too Many Results", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(ERROR_DESC_TOO_MANY_ENTITIES, RES_CER_STATUS(0).details);
@@ -4515,15 +3026,15 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val1");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4534,10 +3045,10 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4721,12 +3232,12 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4740,10 +3251,10 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4752,10 +3263,9 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", "
-              "_id.servicePath: { $in: [ /^/.*/, null ] } },"
+              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\" },"
               "{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], "
-              "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1 } }> "
+              "modDate: 1360232700.0 }, modDate: 1360232700.0, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
@@ -4791,12 +3301,12 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4810,14 +3320,14 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    EXPECT_EQ(0, RES_CER(0).attributeVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } } "
+              "- query(): { _id.id: \"E1\", _id.type: \"T1\" } "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
@@ -4847,12 +3357,12 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   prepareDatabaseWithServicePaths();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01-modified");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
@@ -4868,10 +3378,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4945,12 +3455,12 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   prepareDatabaseWithServicePaths();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new");
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("APPEND");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeAppend;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
@@ -4966,10 +3476,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5049,12 +3559,12 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg");
 
@@ -5070,10 +3580,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5166,12 +3676,12 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "fg");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
     servicePathVector.clear();
     servicePathVector.push_back("/home/fg/01");
 
@@ -5187,10 +3697,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5283,10 +3793,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     prepareDatabaseWithServicePaths();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
     servicePathVector.clear();
     servicePathVector.push_back("/home/kz/01");
 
@@ -5302,10 +3812,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(0, RES_CER(0).attributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -5358,12 +3868,12 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "kz01");
-  ceP->contextAttributeVector.push_back(caP);
-  ucReq.contextElementVector.push_back(ceP);
-  ucReq.updateActionType.set("APPEND");
+  eP->attributeVector.push_back(caP);
+  ucReq.entityVector.push_back(eP);
+  ucReq.updateActionType = ActionTypeAppend;
   servicePathVector.clear();
   servicePathVector.push_back("/home/kz");
   servicePathVector.push_back("/home/fg");

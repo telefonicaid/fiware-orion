@@ -53,14 +53,14 @@ echo
 01. Try to create an entity with more than one service path - see error
 =======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400",
-    "details": "more than one service path in context update request"
+    "description": "more than one service path in context update request",
+    "error": "BadRequest"
 }
 
 

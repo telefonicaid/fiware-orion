@@ -51,14 +51,14 @@ TEST(ContextAttributeResponseVector, render_json)
 
   // 1. empty vector
   car.statusCode.fill(SccBadRequest, "Empty Vector");
-  out = carV.render(V1, false, ContextEntityAttributes);
+  out = carV.toJsonV1(false, ContextEntityAttributes);
   EXPECT_STREQ("", out.c_str());
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(V1, false, ContextEntityAttributes);
+  out = carV.toJsonV1(false, ContextEntityAttributes);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -96,24 +96,6 @@ TEST(ContextAttributeResponseVector, check_json)
   out = carV.check(V1, false, UpdateContextAttribute, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-}
-
-
-
-/* ****************************************************************************
-*
-* present - just exercise the code
-*/
-TEST(ContextAttributeResponseVector, present)
-{
-  ContextAttributeResponseVector  carV;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;
-
-  car.contextAttributeVector.push_back(&ca);
-  carV.push_back(&car);
-
-  carV.present("");
 }
 
 

@@ -1,0 +1,479 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Filtering in and out dateExpires builtin attribute in notifications
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create sub1 on E1 without attrs
+# 02. Create sub2 on E2 with attrs: [ dateExpires ]
+# 03. Create sub3 on E3 with attrs [ dateExpires, A ]
+# 04. Create sub4 on E4 with attrs: [ dateExpires, * ]
+# 05. Create E1 with attrs A, B and dateExpires
+# 06. Dump & reset accumulator: see E1 with A and B
+# 07. Create E2 with attrs A, B and dateExpires
+# 08. Dump & reset accumulator: see E2 with dateExpires
+# 09. Create E3 with attrs A, B and dateExpires
+# 10. Dump & reset accumulator: see E3 with dateExpires and A
+# 11. Create E4 with attrs A, B and dateExpires
+# 12. Dump & reset accumulator: see E4 with dateExpires and B
+#
+
+echo "01. Create sub1 on E1 without attrs"
+echo "==================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create sub2 on E2 with attrs: [ dateExpires ]"
+echo "================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E2"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ "dateExpires" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create sub3 on E3 with attrs [ dateExpires, A ]"
+echo "==================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E3"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ "dateExpires", "A" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create sub4 on E4 with attrs: [ dateExpires, * ]"
+echo "===================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E4"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ "dateExpires", "*" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create E1 with attrs A, B and dateExpires"
+echo "============================================="
+payload='{
+    "id": "E1",
+    "type": "T",
+    "dateExpires":{
+      "type": "DateTime",
+      "value": "2050-01-01T00:00:00Z"
+    },
+    "A": {
+      "type": "Text",
+      "value": "foo"
+    },
+    "B": {
+      "type": "Text",
+      "value": "bar"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump & reset accumulator: see E1 with A and B"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Create E2 with attrs A, B and dateExpires"
+echo "============================================="
+payload='{
+    "id": "E2",
+    "type": "T",
+    "dateExpires":{
+      "type": "DateTime",
+      "value": "2050-01-01T00:00:00Z"
+    },
+    "A": {
+      "type": "Text",
+      "value": "foo"
+    },
+    "B": {
+      "type": "Text",
+      "value": "bar"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump & reset accumulator: see E2 with dateExpires"
+echo "====================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "09. Create E3 with attrs A, B and dateExpires"
+echo "=============================================="
+payload='{
+    "id": "E3",
+    "type": "T",
+    "dateExpires":{
+      "type": "DateTime",
+      "value": "2050-01-01T00:00:00Z"
+    },
+    "A": {
+      "type": "Text",
+      "value": "foo"
+    },
+    "B": {
+      "type": "Text",
+      "value": "bar"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "10. Dump & reset accumulator: see E3 with dateExpires and A"
+echo "==========================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "11. Create E4 with attrs A, B and dateExpires"
+echo "============================================="
+payload='{
+    "id": "E4",
+    "type": "T",
+    "dateExpires":{
+      "type": "DateTime",
+      "value": "2050-01-01T00:00:00Z"
+    },
+    "A": {
+      "type": "Text",
+      "value": "foo"
+    },
+    "B": {
+      "type": "Text",
+      "value": "bar"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Dump & reset accumulator: see E4 with dateExpires and B"
+echo "==========================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub1 on E1 without attrs
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create sub2 on E2 with attrs: [ dateExpires ]
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create sub3 on E3 with attrs [ dateExpires, A ]
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create sub4 on E4 with attrs: [ dateExpires, * ]
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E1 with attrs A, B and dateExpires
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump & reset accumulator: see E1 with A and B
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 173
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "foo"
+            },
+            "B": {
+                "metadata": {},
+                "type": "Text",
+                "value": "bar"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+07. Create E2 with attrs A, B and dateExpires
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Dump & reset accumulator: see E2 with dateExpires
+=====================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 160
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "dateExpires": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2050-01-01T00:00:00.000Z"
+            },
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+09. Create E3 with attrs A, B and dateExpires
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Dump & reset accumulator: see E3 with dateExpires and A
+===========================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 208
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "foo"
+            },
+            "dateExpires": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2050-01-01T00:00:00.000Z"
+            },
+            "id": "E3",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+11. Create E4 with attrs A, B and dateExpires
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Dump & reset accumulator: see E4 with dateExpires and B
+===========================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 256
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "foo"
+            },
+            "B": {
+                "metadata": {},
+                "type": "Text",
+                "value": "bar"
+            },
+            "dateExpires": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2050-01-01T00:00:00.000Z"
+            },
+            "id": "E4",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

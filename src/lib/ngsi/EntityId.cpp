@@ -29,8 +29,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "ngsi/EntityId.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 
 
 
@@ -78,10 +80,38 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* EntityId::render -
+* EntityId::toJson -
 *
 */
-std::string EntityId::render(bool comma, bool isInVector)
+std::string EntityId::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  if (isTrue(isPattern))
+  {
+    jh.addString("idPattern", id);
+  }
+  else
+  {
+    jh.addString("id", id);
+  }
+
+  if (!type.empty())
+  {
+    jh.addString("type", type);
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityId::toJsonV1 -
+*
+*/
+std::string EntityId::toJsonV1(bool comma, bool isInVector)
 {
   std::string  out              = "";
   char*        isPatternEscaped = htmlEscape(isPattern.c_str());
@@ -118,18 +148,18 @@ std::string EntityId::render(bool comma, bool isInVector)
 */
 std::string EntityId::toJson(void) const
 {
-  std::string  out;
-  char*        typeEscaped  = htmlEscape(type.c_str());
-  char*        idEscaped    = htmlEscape(id.c_str());
+  JsonObjectHelper jh;
 
-  out += JSON_VALUE("id", idEscaped);
-  out += ",";
-  out += JSON_VALUE("type", typeEscaped);
+  char*  typeEscaped  = htmlEscape(type.c_str());
+  char*  idEscaped    = htmlEscape(id.c_str());
+
+  jh.addString("id", idEscaped);
+  jh.addString("type", typeEscaped);
 
   free(typeEscaped);
   free(idEscaped);
 
-  return out;
+  return jh.str();
 }
 
 
@@ -140,12 +170,12 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check(RequestType requestType)
 {
-  if (id == "")
+  if (id.empty())
   {
     return "empty entityId:id";
   }
 
-  if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
+  if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
   {
     return std::string("invalid isPattern value for entity: /") + isPattern + "/";
   }
@@ -197,43 +227,10 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
   creDate       = eidP->creDate;
   modDate       = eidP->modDate;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && (type.empty()))
   {
     type = DEFAULT_ENTITY_TYPE;
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityId::present - 
-*/
-void EntityId::present(const std::string& indent, int ix)
-{
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sEntity Id:",       indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sEntity Id %d:",       
-		      indent.c_str(), 
-		      ix));
-  }
-
-  LM_T(LmtPresent, ("%s  Id:         '%s'", 
-		    indent.c_str(), 
-		    id.c_str()));
-  LM_T(LmtPresent, ("%s  Type:       '%s'", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%s  isPattern:  '%s'", 
-		    indent.c_str(), 
-		    isPattern.c_str()));
-  LM_T(LmtPresent, ("%s  isTypePttern:  '%s'",
-            indent.c_str(),
-            isTypePattern? "true" : "false"));
 }
 
 

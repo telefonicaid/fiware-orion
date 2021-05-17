@@ -61,27 +61,10 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render();
+    return response.toJsonV1();
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscribeContextRequest::present -
-*/
-void SubscribeContextRequest::present(const std::string& indent)
-{
-  entityIdVector.present(indent + "  ");
-  attributeList.present(indent + "  ");
-  reference.present(indent + "  ");
-  duration.present(indent + "  ");
-  restriction.present(indent + "  ");
-  notifyConditionVector.present(indent + "  ");
-  throttling.present(indent + "  ");
 }
 
 

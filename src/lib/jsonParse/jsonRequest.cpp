@@ -39,10 +39,6 @@
 
 #include "jsonParse/jsonRegisterContextRequest.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
-#include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
-#include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonQueryContextResponse.h"
@@ -63,8 +59,7 @@
 
 
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
-                      json##prefix##Check,       json##prefix##Present, \
-                      json##prefix##Release
+                      json##prefix##Check,       json##prefix##Release
 
 
 
@@ -77,10 +72,6 @@ static JsonRequest jsonRequest[] =
   // NGSI9
   { RegisterContext,                       "POST", "registerContextRequest",                        FUNCS(Rcr)   },
   { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            FUNCS(Dcar)  },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           FUNCS(Scar)  },
-  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         FUNCS(Ucar)  },
-  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              FUNCS(Ncar)  },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           FUNCS(Qcr)   },
@@ -108,7 +99,7 @@ static JsonRequest jsonRequest[] =
 
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
+
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
@@ -173,7 +164,6 @@ std::string jsonTreat
   ConnectionInfo*     ciP,
   ParseData*          parseDataP,
   RequestType         request,
-  const std::string&  payloadWord,
   JsonRequest**       reqPP
 )
 {
@@ -200,19 +190,14 @@ std::string jsonTreat
 
   if (reqP == NULL)
   {
-    std::string errorReply =
-      restErrorReplyGet(ciP,
-                        "",
-                        requestType(request),
-                        SccBadRequest,
-                        std::string("Sorry, no request treating object found for RequestType /") +
-                        requestType(request) + "/");
+    std::string  details = std::string("Sorry, no request treating object found for RequestType /") + requestType(request) + "/";
+    std::string  errorReply;
+    char         reqTypeV[STRING_SIZE_FOR_INT];
 
-
-    char reqTypeV[STRING_SIZE_FOR_INT];
-
+    restErrorReplyGet(ciP, SccBadRequest, details, &errorReply);
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
-    std::string details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
+
+    details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
     alarmMgr.badInput(clientIp, details);
 
     return errorReply;
@@ -233,24 +218,18 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
-    std::string errorReply  = restErrorReplyGet(ciP,
-                                                "",
-                                                reqP->keyword,
-                                                SccBadRequest,
-                                                std::string("JSON Parse Error"));
-
     std::string details = std::string("JSON Parse Error: ") + e.what();
+    std::string errorReply;
+
+    restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
     alarmMgr.badInput(clientIp, details);
     return errorReply;
   }
   catch (...)
   {
-    std::string errorReply  = restErrorReplyGet(ciP,
-                                                "",
-                                                reqP->keyword,
-                                                SccBadRequest,
-                                                std::string("JSON Generic Error"));
+    std::string errorReply;
 
+    restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
     alarmMgr.badInput(clientIp, "JSON parse generic error");
     return errorReply;
   }
@@ -258,11 +237,11 @@ std::string jsonTreat
   if (res != "OK")
   {
     std::string details = std::string("JSON parse error: ") + res;
+    std::string answer;
+    
     alarmMgr.badInput(clientIp, details);
-
     ciP->httpStatusCode = SccBadRequest;
-
-    std::string answer = restErrorReplyGet(ciP, "", payloadWord, ciP->httpStatusCode, res);
+    restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
     return answer;
   }
 
@@ -275,7 +254,6 @@ std::string jsonTreat
     ciP->compoundValueP->shortShow("after parse: ");
   }
 
-  LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
   {

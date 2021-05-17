@@ -51,12 +51,11 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion)
+std::string UpdateContextAttributeRequest::toJsonV1(void)
 {
   std::string out = "";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
 
   out += startTag();
   out += valueTag("type", type, true);
@@ -67,19 +66,10 @@ std::string UpdateContextAttributeRequest::render(ApiVersion apiVersion)
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag("value", isCompoundVector);
-    out += compoundValueP->render(apiVersion);
-    out += endTag(commaAfterContextValue, isCompoundVector);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
-  out += metadataVector.render(false);
+  out += metadataVector.toJsonV1(metadataVector.vec, false);
   out += endTag();
 
   return out;
@@ -100,7 +90,7 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.fill(SccBadRequest, predetectedError);
   }
@@ -113,28 +103,11 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(false);
+  std::string out = response.toJsonV1(false);
 
   out = "{" + out + "}";
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextAttributeRequest::present(const std::string&  indent)
-{
-  LM_T(LmtPresent, ("%stype:         %s", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%scontextValue: %s", 
-		    indent.c_str(), 
-		    contextValue.c_str()));
-  metadataVector.present("ContextMetadata", indent);
 }
 
 

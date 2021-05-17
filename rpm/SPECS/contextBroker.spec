@@ -21,6 +21,16 @@
 %define name contextBroker
 %define owner orion 
 
+%if 0%{?rhel} > 7
+# To avoid problems in CentOS 8 with empty files in debug package
+# see https://www.programmersought.com/article/24984333483/
+%define debug_package %{nil}
+# To avoid /usr/lib/.build-id files in the package. This seems to be a
+# new feature of CentOS 8 (see https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo)
+# but by the moment we are going to disable it to build as in CentOS 7
+%define _build_id_links none
+%endif
+
 # Don't byte compile python code
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
@@ -40,15 +50,18 @@ Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel
 Requires(pre): shadow-utils
 
 %description
-The Orion Context Broker is an implementation of NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
+The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE,
+providing an NGSI interface. Using this interface, clients can do several operations:
+
+* Query context information. The Orion Context Broker stores context information updated
+  from applications, so queries are resolved based on that information. Context 
+  information consists on *entities* (e.g. a car) and their *attributes* (e.g. the speed
+  or location of the car).
+* Update context information, e.g. send updates of temperature
+* Get notified when changes on context information take place (e.g. the temperature
+  has changed)
+* Register context provider applications, e.g. the provider for the temperature sensor
+  within a room
 
 %prep
 if [ -d $RPM_BUILD_ROOT/usr ]; then
@@ -89,6 +102,12 @@ has been renamed to /etc/sysconfig/%{name}.orig-$DATE.
 After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
+chmod 644 /etc/cron.d/cron-logrotate-contextBroker-size || true
+chmod 644 /etc/logrotate.d/logrotate-contextBroker-daily || true
+chmod 644 /etc/prelink.conf.d/contextBroker.conf || true
+chmod 644 /etc/sysconfig/contextBroker || true
+chmod 644 /etc/sysconfig/logrotate-contextBroker-size || true
+chmod 644 /etc/tmpfiles.d/contextBroker.conf || true
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -146,7 +165,8 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 #    to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 #
 %package tests
-Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
+#FIXME: obsolete packages names. Probably it's better to remove the contextBroker-test packages at all that solve this...
+#Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
@@ -173,6 +193,146 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Apr 12 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.0.0-1
+- Reference distribution changed from RHEL/CentOS 7 to RHEL/CentOS 8 (#3764)
+- Reference MongoDB version changed from 3.6 to 4.4
+- Add: SCRAM-SHA-256 as allowed mechanism in -dbAuthMech (#3782)
+- Add: tlsAllowInvalidCertificates=true to mongo connection URI along with tls=true when -dbSSL switch is used
+- Add: new CLI parameter -dbDisableRetryWrites to set retryWrite parameter to false in DB connections (#3797)
+- Add: machine information in GET /version
+- Fix: response rightly 500 Internal Error when DB query fails (previously 200 OK with empty entities array was returned)
+- Fix: -logForHumans traces including full timestamp information
+- Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
+- Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
+- Hardening: MongoDB connection logic largely rewritten
+- Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797, #3695 and probably #3717, #3778, #3326)
+- Remove: MONGODB-CR as -dbAuthMech
+
+* Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
+- Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
+- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
+- Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
+- Fix: avoid over-requesting to CPrs attributes that has been filtered out (#3745)
+- Fix: avoid spureous entities spurious entities (eg. '{"id": "E", "type": "T"}') in GET /v2/entities responses
+- Fix: create normal files as 644 permissions for assure backup tools take configuration files in RPM
+- Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
+- Disable logging to /tmp/contextBroker.log file in Dockerfile
+- Remove: NGSIv1 context availability subscriptions
+
+* Fri Oct 30 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.0-1
+- Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
+- ADD: re-worked INFO log level, simplifying traces and making them much more useful (#3694)
+- Add: library version information in GET /version (#3681)
+- Add: CLI option -logLineMaxSize (#3694)
+- Add: CLI option -logInfoPayloadMaxSize (#3694)
+- Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
+- Fix: screen log output using the same format for time= than the one used in log files (ISO8601)
+- Fix: improve error response when incorrect URL used (#2231)
+- Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
+- Fix: log WARN about insecureNotifications mode (#3013)
+- Fix: avoid creating orion database in -multiservice mode (#3179)
+- Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
+- Fix: wrong 413 error when passing from 0 locations to 1 in entity update (#3706)
+- Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
+- Hardening: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
+- Hardening: upgrade microhttpd dependency from 0.9.48 to 0.9.70
+
+* Tue Mar 31 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.0-1
+- Add: TextUnrestricted attribute type to avoid forbidden chars checking (#3550)
+- Add: notification flow control on update (#3568)
+- Fix: crash when using null character in some NGSIv1 operations
+- Fix: crash when using attributes with invalid JSON having more than one "value" keys (#3603)
+- Hardening: add deepness control to compound attribute and metadata value (max 50 levels) (related with #3605, #3606 and #3608)
+- Hardening: NULL control in some strdup and calloc cases (very unlikely, but theoretically possible) (#3578)
+- Hardening: avoid crash in the unlikely case MongoDB get databases operations fails in csubs cache refresh logic (#3456, partly)
+- Hardening: refactor mongo connection logic at startup to make it simpler
+- Change centos7.6.1810 to centos7.7.1908 in Dockerfile
+
+* Tue Nov 05 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.3.0-1
+- Add: basic NGSIv2 queries and updates forwarding (#3068)
+- Add: idPattern '.*' support in in NGSIv2 registrations (#3458)
+- Add: Notify only attributes that change (#3190)
+- Add: CLI option -inReqPayloadMaxSize to let users decide the maximum allowed size of incoming request payloads (#3492)
+- Add: CLI option -outReqMsgMaxSize to let users decide the maximum allowed total size of any outgoing request message (for forwards and notifications) (#3492)
+- Add: -dbAuthMech CLI parameter to set MongoDB authentication mechanism (#2987)
+- Add: -dbAuthDb CLI parameter to set MongoDB authentication database
+- Add: -dbSSL to enable SSL in the connection to DB (#3524)
+- Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"
+- Fix: incorrectly loging update subscription traces in ERROR log level (#3531)
+- Fix: set default MongoDB authentication mechanism to SCRAM-SHA-1 (old MONGODB-CR was deprecated time ago)
+- Fix: abort on startup when MongoDB authentication fails to avoid starting a useless Context Broker
+- Fix: change max -dbhost length from 64 to 256 (to cope with long replica set strings using full domain names)
+- Hardening: avoid regex when possible in servicePath token in DB queries (#3505)
+- Hardening: avoid $in vectors with only one element in servicePath token in DB queries (#3505)
+- Hardening: avoid mono-item $or array in entity query (#3505)
+- Hardening: avoid unneeded _id.type: {$exists: true} in entity queries that already include _id.type (#3505)
+- Hardening: avoid _id.id: /.*/ and _id.type: /.*/ in entity queries, as removing the token has the same effect (#3505)
+- Hardening: avoid unneeded {$exists: true} and mono-item arrays (as much as posible) in attribute queries (#3505)
+- Remove: support to entities without service path in DB (no one of so ancient data model should remain today)
+- Remove: deprecated Rush support
+
+* Thu Feb 21 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.2.0-1
+- Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
+- Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
+- Add: log notification HTTP response (as INFO for 2xx or WARN for other codes)
+- Add: notification.lastFailureReason field in subscriptions to get the reason of the last notification failure
+- Add: notification.lastSuccessCode field in subscriptions to get the HTTP responde code of the last successful notification
+- Fix: NGSIv1 updates with geo:line|box|polygon|json removes location DB field of NGSIv2-located entities (#3442)
+- Fix: specify notification/forwarding error cause in log messages (#3077)
+- Fix: from=, corr=, srv=, subsrv= correctly propagated to logs in notifications (#3073)
+- Fix: avoid "pending" fields in logs
+- Fix: use "<none>" for srv= and subsrv= in logs when service/subservice header is not provided
+- Fix: bug in notification alarm raising in -notificationMode transient and persistent
+- Remove: deprecated feature ID metadata (and associated NGSIv1 operations)
+
+* Wed Dec 19 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.1.0-1
+- Add: Oneshot Subscription (#3189)
+- Add: support to MongoDB 3.6 (#3070)
+- Fix: problems rendering structured attribute values when forwarded queries are involved (#3162, #3363, #3282)
+- Fix: NGSIv2-NGSIv1 location metadata issues (#3122)
+- Fix: wrong inclusion of "location" metadata in geo:json notifications (#3045)
+- Fix: metadata filter was lost during csub cache refresh (#3290)
+- Fix: NGSIv1-like error responses were used in some NGSIv2 operations
+- Fix: cache sem is not taken before subCacheItemLookup() call (#2882)
+- Fix: wrong Runtime Error logs on GET /v2/registrations and GET /v2/registrations/{id} calls (#3375)
+- Deprecate: Rush support (along with -rush CLI parameter)
+- Remove: isDomain field in NGSIv1 registrations (it was never used)
+
+* Fri Sep 28 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.0.0-1
+- Fix: GET /v2/subscriptions and GET /v2/subscriptions/{id} crashes for permanent subscriptions created before version 1.13.0 (#3256)
+- Fix: correct processing of JSON special characters  (such as \n) in NGSIv2 rendering (#3280, #2938)
+- Fix: correct error payload using errorCode (previously orionError was used) in POST /v1/queryContext and POST /v1/updateContext in some cases
+- Fix: bug in metadata compound value rendering in NGSIv2 (sometimes "toplevel" key was wrongly inserted in the resulting JSON object)
+- Fix: missing or empty metadata values were not allowed in NGSIv2 create/update operations (#3121)
+- Fix: default types for entities and attributes in NGSIv2 was wrongly using "none" in some cases
+- Fix: with NGSIv2 replace operations the geolocalization field is inconsistent in DB (#1142, #3167)
+- Fix: duplicated attribute/metadata keys in JSON response in some cases for dateCreated/dateModified/actionType
+- Fix: proper management of user attributes/metadata which name matches the one of a builtin (the user defined shadows the builtin for rendering but not for filtering)
+- Fix: pre-update metadata content included in notifications (and it shouldn't) (#3310)
+- Fix: duplicated items in ?attrs and ?metadata URI params (and "attrs" and "metadata" in POST /v2/op/query and subscriptions) cause duplicated keys in responses/notifications (#3311)
+- Fix: dateCreated and dateModified included in initial notification (#3182)
+- Hardening: modification of the URL parsing mechanism, making it more efficient, and the source code easier to follow (#3109, step 1)
+- Hardening: refactor NGSIv2 rendering code (throughput increase up to 33%/365% in entities/subscriptions rendering intensive scenarios) (#1298)
+- Hardening: Mongo driver now compiled using --use-sasl-client --ssl to enable proper DB authentication mechanisms
+- Deprecated: NGSIv1 API (along with related CLI parameters: -strictNgsiv1Ids and -ngsiv1Autocast)
+
+* Mon Jul 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.15.0-1
+- Add: upsert option for the POST /v2/entities operation (#3215)
+- Add: transient entities functionality (new NGSIv2 builtin attribute: dateExpires) (#3000)
+- Add: "attrs" field in POST /v2/op/query (making "attributes" obsolete) (#2604)
+- Add: "expression" field in POST /v2/op/query (#2706)
+- Fix: large integer wrong rendering in responses (#2603, #2425, #2506)
+- Remove: "scopes" field in POST /v2/op/query (#2706)
+
+* Fri Jun 15 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.14.0-1
+- Add: support for APIv2 notifications (POST /v2/op/notify), which opens up for true APIv2 federation (#2986)
+- Add: camelCase actionTypes in POST /v2/op/update (append, appendStrict, update, delete and replace) (#2721)
+- Fix: bug having entities without attibutes AND matching registrations made the attr-less entity not be returned by GET /v2/entities (#3176)
+- Fix: bug when using "legacy" format for custom v2 notifications (#3154)
+- Fix: check for providers is done only in UPDATE or REPLACE actionType case in update entity logic (#2874)
+- Fix: wrong 404 Not Found responses when updating attribute using NGSIv2 and CB forwards it correctly (#2871)
+
 * Mon Apr 16 2018 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.13.0-1
 - Add: support for GET /v2/registrations (#3005)
 - Add: support for GET /v2/registrations/<registration-id> (#3008)

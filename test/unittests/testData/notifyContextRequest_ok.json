@@ -7,7 +7,6 @@
 				"type": "Room",
 				"isPattern": "false",
 				"id": "ConferenceRoom",
-        "attributeDomainName" : "ADN",
 				"attributes": [
 					{
 						"name": "temperature",
@@ -42,18 +41,6 @@
 								"value": "55"
 							}
 						]
-					}
-				],
-				"metadatas": [
-					{
-						"name": "m1",
-						"type": "t1",
-						"value": "v1"
-					},
-					{
-						"name": "m2",
-						"type": "t2",
-						"value": "v2"
 					}
 				]
 			},

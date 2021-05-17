@@ -55,6 +55,9 @@ bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
+unsigned long long     inReqPayloadMaxSize  = DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE;
+unsigned long long     outReqMsgMaxSize     = DEFAULT_OUT_REQ_MSG_MAX_SIZE;
+
 
 
 /* ****************************************************************************
@@ -77,6 +80,20 @@ int transactionIdGet(bool readonly)
     }
   }
 
+  return transactionId;
+}
+
+
+
+/* ****************************************************************************
+*
+* transactionIdGetAsString -
+*
+* Different from transactionIdGet(), this function returns the full transID,
+* not only the integer counter
+*/
+char* transactionIdGetAsString(void)
+{
   return transactionId;
 }
 
@@ -122,6 +139,33 @@ void transactionIdSet(void)
   transSemGive("transactionIdSet", "changing the transaction id");
 
   firstTime = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - set the transaction ID string
+*
+* Different from the argument-less version of this function, this one
+* just sets the thread variable for transaction ID. It's pretty
+* similar to correlatorIdSet()
+*/
+void transactionIdSet(const char* transId)
+{
+  strncpy(transactionId, transId, sizeof(transactionId));
+}
+
+
+
+/* ****************************************************************************
+*
+* correlationIdGet -
+*
+*/
+char* correlationIdGet(void)
+{
+  return correlatorId;
 }
 
 
@@ -246,7 +290,7 @@ void setTimer(Timer* t)
 *
 * getCurrentTime - 
 */ 
-int getCurrentTime(void)
+double getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
@@ -255,7 +299,9 @@ int getCurrentTime(void)
     return -1;
   }
 
-  return getTimer()->getCurrentTime();
+  double t = getTimer()->getCurrentTime();
+
+  return t;
 }
 
 
@@ -322,7 +368,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 */
 int64_t parse8601(const std::string& s)
 {
-  if (s == "")
+  if (s.empty())
   {
     return -1;
   }
@@ -497,7 +543,7 @@ static int timezoneOffset(const char* tz)
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
-int64_t parse8601Time(const std::string& ss)
+double parse8601Time(const std::string& ss)
 {
   int    y = 0;
   int    M = 0;
@@ -558,9 +604,15 @@ int64_t parse8601Time(const std::string& ss)
   time.tm_mday = d;        // 1-31
   time.tm_hour = h;        // 0-23
   time.tm_min  = m;        // 0-59
-  time.tm_sec  = (int)s;   // 0-61 (0-60 in C++11)
+  time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
 
-  return (int64_t) (timegm(&time) - offset);
+  int64_t  totalSecs  = timegm(&time) - offset;
+  float    millis     = s - (int) s;
+  double   timestamp  = totalSecs;
+
+  timestamp += millis;  // Must be done in two lines:  timestamp = totalSecs + millis fails ...
+
+  return timestamp;
 }
 
 

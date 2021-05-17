@@ -117,13 +117,11 @@ payload='{
       "attributes": [
         {
           "name": "A1",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "A2",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -151,18 +149,15 @@ payload='{
       "attributes": [
         {
           "name": "A3",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "A4",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         },
         {
           "name": "A5",
-          "type": "string",
-          "isDomain": "false"
+          "type": "string"
         }
       ],
       "providingApplication": "http://localhost:'${CP2_PORT}'/v1"

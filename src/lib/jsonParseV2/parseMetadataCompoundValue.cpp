@@ -59,17 +59,27 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 *
 * parseMetadataCompoundValue -
 */
-std::string parseMetadataCompoundValue
+static std::string parseMetadataCompoundValue
 (
   const rapidjson::Value::ConstValueIterator&   node,
   Metadata*                                     mdP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit ce3cf0766
+
+    return "max deep reached";
+  }
+
   if (node->IsObject())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
@@ -78,11 +88,6 @@ std::string parseMetadataCompoundValue
       cvnP->valueType  = stringToCompoundType(nodeType);
 
       cvnP->name       = iter->name.GetString();
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -102,12 +107,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -118,30 +121,22 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
   else if (node->IsArray())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_INT];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
 
       if (nodeType == "String")
       {
@@ -161,12 +156,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -177,10 +170,12 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
 
@@ -197,21 +192,28 @@ std::string parseMetadataCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   Metadata*                                     mdP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit ce3cf0766
+
+    return "max deep reached";
+  }
+
   std::string type   = jsonParseTypeNames[node->value.GetType()];
 
   if (mdP->compoundValueP == NULL)
   {
     mdP->compoundValueP            = new orion::CompoundValueNode();
-    mdP->compoundValueP->name      = "TOP";
-    mdP->compoundValueP->container = mdP->compoundValueP;
+    mdP->compoundValueP->name      = "";
     mdP->compoundValueP->valueType = stringToCompoundType(type);
-    mdP->compoundValueP->path      = "/";
-    mdP->compoundValueP->rootP     = mdP->compoundValueP;
-    mdP->compoundValueP->level     = 0;
-    mdP->compoundValueP->siblingNo = 0;
 
     parent = mdP->compoundValueP;
   }
@@ -222,22 +224,12 @@ std::string parseMetadataCompoundValue
   //
   if (type == "Array")
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_INT];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
 
       if (nodeType == "String")
       {
@@ -253,12 +245,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -269,15 +259,16 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
   else if (type == "Object")
   {
-    int                                    counter  = 0;
     rapidjson::Value::ConstMemberIterator  iter;
 
     for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
@@ -287,11 +278,6 @@ std::string parseMetadataCompoundValue
 
       cvnP->name       = iter->name.GetString();
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -307,12 +293,10 @@ std::string parseMetadataCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -323,10 +307,12 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
 

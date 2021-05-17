@@ -25,11 +25,12 @@
 
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/globals.h"
+#include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
-
 
 
 /* ****************************************************************************
@@ -61,12 +62,15 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
+    long long    statusCode = -1;
+    std::string  out;
+
     if (!simulatedNotification)
     {
-      std::string  out;
       int          r;
 
-      r = httpRequestSend(params->ip,
+      r = httpRequestSend(params->from,
+                          params->ip,
                           params->port,
                           params->protocol,
                           params->verb,
@@ -78,9 +82,8 @@ void* startSenderThread(void* p)
                           params->content,
                           params->fiwareCorrelator,
                           params->renderFormat,
-                          true,
-                          NOTIFICATION_WAIT_MODE,
                           &out,
+                          &statusCode,
                           params->extraHeaders);
 
       if (r == 0)
@@ -90,14 +93,16 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
       else
       {
+        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+
         if (params->registration == false)
         {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
       }
     }
@@ -105,8 +110,20 @@ void* startSenderThread(void* p)
     {
       LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-      alarmMgr.notificationError(url, "notification failure for sender-thread");
     }
+
+    // Add notificacion result summary in log INFO level
+    if (statusCode != -1)
+    {
+      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
+    }
+    else
+    {
+      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
+    }
+
+    // End transaction
+    lmTransactionEnd();
 
     /* Delete the parameters after using them */
     delete params;

@@ -59,7 +59,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
   std::string                       res;
   UpdateContextSubscriptionResponse response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);
@@ -76,22 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
   else
     return "OK";
 
-  return response.render();
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionRequest::present - 
-*/
-void UpdateContextSubscriptionRequest::present(const std::string& indent)
-{
-  duration.present(indent);
-  restriction.present(indent);
-  subscriptionId.present(indent);
-  notifyConditionVector.present(indent);
-  throttling.present(indent);
+  return response.toJsonV1();
 }
 
 

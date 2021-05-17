@@ -161,7 +161,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -202,7 +202,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 386
+Content-Length: 436
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,7 +210,7 @@ Date: REGEX(.*)
 [
     {
         "description": "x_yz4hahh",
-        "expires": "2040-01-01T14:00:00.00Z",
+        "expires": "2040-01-01T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [],
@@ -220,6 +220,8 @@ Date: REGEX(.*)
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "active",

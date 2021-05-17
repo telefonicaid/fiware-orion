@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
 #include "alarmMgr/alarmMgr.h"
@@ -49,18 +50,6 @@ BatchUpdate::BatchUpdate()
 */
 BatchUpdate::~BatchUpdate()
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* BatchUpdate::present - 
-*/
-void BatchUpdate::present(const std::string& indent)
-{
-  updateActionType.present(indent);
-  entities.present(indent);
 }
 
 

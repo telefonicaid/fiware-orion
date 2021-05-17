@@ -27,6 +27,7 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
 /* ****************************************************************************
@@ -64,29 +65,28 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 */
 std::string SubscribeContextResponse::toJson(void)
 {
-  std::string out = "";
-
-  out += "{";
-
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(false);
+    std::string out;
+    // FIXME P5: it is a bit weird to call a toJsonV1() method from a toJson() method. However,
+    // SubscribeResponse doesn't have another option. This should be looked into detail.
+    out += "{";
+    out += subscribeResponse.toJsonV1(false);
+    out += "}";
+    return out;
   }
   else
   {
-    out += subscribeError.toJson(SubscribeContext, false);
+    return subscribeError.toJson();
   }
 
-  out +=  "}";
-
-  return out;
 }
 
 /* ****************************************************************************
 *
-* SubscribeContextResponse::render - 
+* SubscribeContextResponse::toJsonV1 -
 */
-std::string SubscribeContextResponse::render(void)
+std::string SubscribeContextResponse::toJsonV1(void)
 {
   std::string out     = "";
 
@@ -94,11 +94,11 @@ std::string SubscribeContextResponse::render(void)
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(false);
+    out += subscribeResponse.toJsonV1(false);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, false);
+    out += subscribeError.toJsonV1(SubscribeContext, false);
   }
 
   out += endTag(false);

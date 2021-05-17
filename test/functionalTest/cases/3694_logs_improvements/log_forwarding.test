@@ -1,0 +1,585 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Basic test for notification forwarding
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+dbInit CP5
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+brokerStart CP3
+brokerStart CP4
+brokerStart CP5
+
+--SHELL--
+
+#
+# 01. Create E1/T1/A1 in CP1
+# 02. Create E1/T1/A2 in CP2
+# 03. Create E1/T1/A3 in CP3
+# 04. Create E1/T1/A4 in CP4
+# 05. Create E1/T1/A5 in CP5
+# 06. Register E1/T1/A1 in CB, provApp: CP1
+# 07. Register E1/T1/A2 in CB, provApp: CP2
+# 08. Register E1/T1/A3 in CB, provApp: CP3
+# 09. Register E1/T1/A4 in CB, provApp: CP4
+# 10. Register E1/T1/A5 in CB, provApp: CP5
+# 11. Query E1/T1 in CB
+# 12. Update/UPDATE E1/T1/A1+A2+A3+A4+A5 in CB
+# 13. Query E1/T1 in CB
+# 14. Check request forwarded logs
+# 15. Check notification correlators (three series of 5 elements)
+# 16. Check three messages about starting forwarding
+#
+
+echo "01. Create E1/T1/A1 in CP1"
+echo "=========================="
+payload='
+{
+  "type": "T1",
+  "id": "E1",
+  "A1": {
+    "type": "Text",
+    "value": "A1 in CP1"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. Create E1/T1/A2 in CP2"
+echo "=========================="
+payload='
+{
+  "type": "T1",
+  "id": "E1",
+  "A2": {
+    "type": "Text",
+    "value": "A2 in CP2"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "03. Create E1/T1/A3 in CP3"
+echo "=========================="
+payload='
+{
+  "type": "T1",
+  "id": "E1",
+  "A3": {
+    "type": "Text",
+    "value": "A3 in CP3"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "04. Create E1/T1/A4 in CP4"
+echo "=========================="
+payload='
+{
+  "type": "T1",
+  "id": "E1",
+  "A4": {
+    "type": "Text",
+    "value": "A4 in CP4"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "05. Create E1/T1/A5 in CP5"
+echo "=========================="
+payload='
+{
+  "type": "T1",
+  "id": "E1",
+  "A5": {
+    "type": "Text",
+    "value": "A5 in CP5"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP5_PORT
+echo
+echo
+
+
+echo "06. Register E1/T1/A1 in CB, provApp: CP1"
+echo "========================================="
+payload='
+{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [
+      "A1"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Register E1/T1/A2 in CB, provApp: CP2"
+echo "========================================="
+payload='
+{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [
+      "A2"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Register E1/T1/A3 in CB, provApp: CP3"
+echo "========================================="
+payload='
+{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [
+      "A3"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP3_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Register E1/T1/A4 in CB, provApp: CP4"
+echo "========================================="
+payload='
+{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [
+      "A4"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP4_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Register E1/T1/A5 in CB, provApp: CP5"
+echo "========================================="
+payload='
+{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "attrs": [
+      "A5"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP5_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "11. Query E1/T1 in CB"
+echo "====================="
+orionCurl --url '/v2/entities/E1?type=T1'
+echo
+echo
+
+
+echo "12. Update E1/T1/A1+A2+A3+A4+A5 in CB"
+echo "====================================="
+payload='
+{
+  "A1": {
+    "type": "Text",
+    "value": "A1 via CB"
+  },
+  "A2": {
+    "type": "Text",
+    "value": "A2 via CB"
+  },
+  "A3": {
+    "type": "Text",
+    "value": "A3 via CB"
+  },
+  "A4": {
+    "type": "Text",
+    "value": "A4 via CB"
+  },
+  "A5": {
+    "type": "Text",
+    "value": "A5 via CB"
+  }
+}'
+orionCurl --url '/v2/entities/E1/attrs?type=T1' -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "13. Query E1/T1 in CB"
+echo "====================="
+orionCurl --url '/v2/entities/E1?type=T1'
+echo
+echo
+
+
+# Example log trace for forwarded request (to help understanding the awk/cut stuff :)
+#
+# msg=Request forwarded (regId: 5f912aae20882d0211ca4ac2): POST http://localhost:9801/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A1"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 in CP1","metadata":{}}}], response code: 200
+
+
+echo "14. Check request forwarded logs"
+echo "================================"
+cat /tmp/contextBroker.log | grep INFO | grep 'Request forwarded' | awk -F '|' '{print $10}' | cut -c 59-
+echo
+echo
+
+
+echo "15. Check notification correlators (three series of 5 elements)"
+echo "==============================================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Request forwarded' | awk -F '|' '{print $3}'
+echo
+echo
+
+
+echo "16. Check three messages about starting forwarding"
+echo "=================================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Starting' | awk -F '|' '{print $10}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/T1/A1 in CP1
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1/T1/A2 in CP2
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1/T1/A3 in CP3
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E1/T1/A4 in CP4
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E1/T1/A5 in CP5
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Register E1/T1/A1 in CB, provApp: CP1
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Register E1/T1/A2 in CB, provApp: CP2
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Register E1/T1/A3 in CB, provApp: CP3
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Register E1/T1/A4 in CB, provApp: CP4
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Register E1/T1/A5 in CB, provApp: CP5
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Query E1/T1 in CB
+=====================
+HTTP/1.1 200 OK
+Content-Length: 298
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A1 in CP1"
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A2 in CP2"
+    },
+    "A3": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A3 in CP3"
+    },
+    "A4": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A4 in CP4"
+    },
+    "A5": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A5 in CP5"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+12. Update E1/T1/A1+A2+A3+A4+A5 in CB
+=====================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+13. Query E1/T1 in CB
+=====================
+HTTP/1.1 200 OK
+Content-Length: 298
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A1 via CB"
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A2 via CB"
+    },
+    "A3": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A3 via CB"
+    },
+    "A4": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A4 via CB"
+    },
+    "A5": {
+        "metadata": {},
+        "type": "Text",
+        "value": "A5 via CB"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+14. Check request forwarded logs
+================================
+POST http://localhost:9801/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A1"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 in CP1","metadata":{}}}], response code: 200
+POST http://localhost:9802/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A2"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A2":{"type":"Text","value":"A2 in CP2","metadata":{}}}], response code: 200
+POST http://localhost:9803/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A3"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A3":{"type":"Text","value":"A3 in CP3","metadata":{}}}], response code: 200
+POST http://localhost:9804/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A4"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A4":{"type":"Text","value":"A4 in CP4","metadata":{}}}], response code: 200
+POST http://localhost:9805/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A5"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A5":{"type":"Text","value":"A5 in CP5","metadata":{}}}], response code: 200
+POST http://localhost:9801/v2/op/update, request payload (115 bytes): {"entities":[{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 via CB","metadata":{}}}],"actionType":"update"}, response payload (0 bytes): , response code: 204
+POST http://localhost:9802/v2/op/update, request payload (115 bytes): {"entities":[{"id":"E1","type":"T1","A2":{"type":"Text","value":"A2 via CB","metadata":{}}}],"actionType":"update"}, response payload (0 bytes): , response code: 204
+POST http://localhost:9803/v2/op/update, request payload (115 bytes): {"entities":[{"id":"E1","type":"T1","A3":{"type":"Text","value":"A3 via CB","metadata":{}}}],"actionType":"update"}, response payload (0 bytes): , response code: 204
+POST http://localhost:9804/v2/op/update, request payload (115 bytes): {"entities":[{"id":"E1","type":"T1","A4":{"type":"Text","value":"A4 via CB","metadata":{}}}],"actionType":"update"}, response payload (0 bytes): , response code: 204
+POST http://localhost:9805/v2/op/update, request payload (115 bytes): {"entities":[{"id":"E1","type":"T1","A5":{"type":"Text","value":"A5 via CB","metadata":{}}}],"actionType":"update"}, response payload (0 bytes): , response code: 204
+POST http://localhost:9801/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A1"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 via CB","metadata":{}}}], response code: 200
+POST http://localhost:9802/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A2"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A2":{"type":"Text","value":"A2 via CB","metadata":{}}}], response code: 200
+POST http://localhost:9803/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A3"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A3":{"type":"Text","value":"A3 via CB","metadata":{}}}], response code: 200
+POST http://localhost:9804/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A4"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A4":{"type":"Text","value":"A4 via CB","metadata":{}}}], response code: 200
+POST http://localhost:9805/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A5"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A5":{"type":"Text","value":"A5 via CB","metadata":{}}}], response code: 200
+
+
+15. Check notification correlators (three series of 5 elements)
+===============================================================
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=1
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=2
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=3
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=4
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=5
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=1
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=2
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=3
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=4
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=5
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=1
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=2
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=3
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=4
+ corr=REGEX([0-9a-f\-]{36}); cbfwd=5
+
+
+16. Check three messages about starting forwarding
+==================================================
+ msg=Starting forwarding for GET /v2/entities/E1?type=T1
+ msg=Starting forwarding for PATCH /v2/entities/E1/attrs?type=T1
+ msg=Starting forwarding for GET /v2/entities/E1?type=T1
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+brokerStop CP5
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4
+dbDrop CP5

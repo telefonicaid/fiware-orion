@@ -58,8 +58,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "http://mysensors.com/Rooms"
@@ -103,8 +102,7 @@ payload='{
     "attributes": [
       {
         "name": "temperature",
-        "type": "centigrade",
-        "isDomain": "false"
+        "type": "centigrade"
       }
     ],
     "providingApplication": "pa=http://mysensors.com/Rooms"
@@ -117,28 +115,7 @@ echo
 echo
 
 
-echo "04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
-echo "==============================================================================="
-payload='{
-  "entities": [
-    {
-      "type": "Room",
-      "isPattern": "false",
-      "id": "ConferenceRoom"
-    }
-  ],
-  "attributes": [
-    "tempera'"'"'ture"
-  ],
-  "reference": "http://10.1.1.1:80/test/interfaceNotification",
-  "duration": "PT1M"
-}'
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload"
-echo
-echo
-
-
-echo "05. Intent to query an entity with  ';' as part of a scopeType"
+echo "04. Intent to query an entity with  ';' as part of a scopeType"
 echo "=============================================================="
 payload='{
   "entities": [
@@ -175,7 +152,7 @@ echo
 echo
 
 
-echo "06. Intent to update an entity with '(' as part of contextAttribute::type"
+echo "05. Intent to update an entity with '(' as part of contextAttribute::type"
 echo "========================================================================="
 payload='{
   "contextElements": [
@@ -199,7 +176,7 @@ echo
 echo
 
 
-echo "07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
+echo "06. Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
 echo "=============================================================================================="
 payload='{
   "contextElements": [
@@ -217,8 +194,7 @@ payload='{
             "x3" : "3"
           }
         }
-      ],
-      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+      ]
     }
   ],
   "updateAction": "APPEND"
@@ -228,7 +204,7 @@ echo
 echo
 
 
-echo "08: Intent to subscribe to an entity with ')' as part of reference"
+echo "07: Intent to subscribe to an entity with ')' as part of reference"
 echo "=================================================================="
 payload='{
   "entities": [
@@ -304,25 +280,7 @@ Date: REGEX(.*)
 }
 
 
-04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
-===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 142
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
-        "reasonPhrase": "Bad Request"
-    }, 
-    "subscriptionId": "000000000000000000000000"
-}
-
-
-05. Intent to query an entity with  ';' as part of a scopeType
+04. Intent to query an entity with  ';' as part of a scopeType
 ==============================================================
 HTTP/1.1 200 OK
 Content-Length: 98
@@ -339,7 +297,7 @@ Date: REGEX(.*)
 }
 
 
-06. Intent to update an entity with '(' as part of contextAttribute::type
+05. Intent to update an entity with '(' as part of contextAttribute::type
 =========================================================================
 HTTP/1.1 200 OK
 Content-Length: 98
@@ -356,7 +314,7 @@ Date: REGEX(.*)
 }
 
 
-07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+06. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
 ==============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 98
@@ -373,7 +331,7 @@ Date: REGEX(.*)
 }
 
 
-08: Intent to subscribe to an entity with ')' as part of reference
+07: Intent to subscribe to an entity with ')' as part of reference
 ==================================================================
 HTTP/1.1 200 OK
 Content-Length: 117

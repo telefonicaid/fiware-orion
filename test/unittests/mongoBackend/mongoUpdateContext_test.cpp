@@ -34,6 +34,7 @@
 #include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
@@ -66,7 +67,7 @@ using ::testing::_;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 
@@ -102,8 +103,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * - deleteNEntNAttr             - DELETE N entity, N attributes
 * - updateEntityFails           - trying to uddate a non existing entity, fails
 * - createEntity                - a non-existing entity is created
-* - createEntityWithId          - a non-existing entity is created (with metadata ID in attributes)
-* - createEntityMixIdNoIdFails  - attempt to create entity with same attribute with ID and not ID fails
 * - createEntityMd              - createEntity + custom metadata
 * - updateEmptyValueOK          - UPDATE with empty attribute value
 * - appendEmptyValueOk          - APPEND with empty attribute value
@@ -230,13 +229,13 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement* ceP = new ContextElement();
-  ceP->entityId.fill("E1", "T1", "false");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
   ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-  ceP->contextAttributeVector.push_back(caP);
-  req.contextElementVector.push_back(ceP);
-  req.updateActionType.set("UPDATE");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -250,10 +249,10 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -384,13 +383,13 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "", "new_val");
 
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -404,10 +403,10 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -537,13 +536,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
 
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -557,10 +556,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -570,10 +569,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -583,10 +582,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -716,13 +715,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "", "new_val");
 
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -736,10 +735,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -749,10 +748,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -762,10 +761,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -895,17 +894,17 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val3");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce2P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("UPDATE");
+    e1P->attributeVector.push_back(ca1P);
+    e2P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -919,10 +918,10 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -932,10 +931,10 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern) << "wrong entity isPattern (context element response #2)";
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern) << "wrong entity isPattern (context element response #2)";
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -1065,14 +1064,14 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
-    ceP->contextAttributeVector.push_back(ca1P);
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1086,10 +1085,10 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1224,21 +1223,21 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
     ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce1P->contextAttributeVector.push_back(ca2P);
-    ce2P->contextAttributeVector.push_back(ca3P);
-    ce2P->contextAttributeVector.push_back(ca4P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("UPDATE");
+    e1P->attributeVector.push_back(ca1P);
+    e1P->attributeVector.push_back(ca2P);
+    e2P->attributeVector.push_back(ca3P);
+    e2P->attributeVector.push_back(ca4P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1252,10 +1251,10 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1269,10 +1268,10 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern) << "wrong entity isPattern (context element response #2)";
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern) << "wrong entity isPattern (context element response #2)";
+    ASSERT_EQ(2, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -1406,12 +1405,12 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "TA8", "val8");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1425,10 +1424,10 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1563,12 +1562,12 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "", "val8");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1582,10 +1581,10 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1720,12 +1719,12 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "TA8", "val8");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1739,10 +1738,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1752,10 +1751,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -1765,10 +1764,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(2, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -1913,12 +1912,12 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "", "val8");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -1932,10 +1931,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -1945,10 +1944,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -1958,10 +1957,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -2106,17 +2105,17 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce2P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("APPEND");
+    e1P->attributeVector.push_back(ca1P);
+    e2P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2130,10 +2129,10 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2143,10 +2142,10 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A9", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA9", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -2286,14 +2285,14 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
     ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
-    ceP->contextAttributeVector.push_back(ca1P);
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2307,10 +2306,10 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2454,21 +2453,21 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A8", "TA8", "val8");
     ContextAttribute* ca2P = new ContextAttribute("A9", "TA9", "val9");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A10", "TA10", "val10");
     ContextAttribute* ca4P = new ContextAttribute("A11", "TA11", "val11");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce1P->contextAttributeVector.push_back(ca2P);
-    ce2P->contextAttributeVector.push_back(ca3P);
-    ce2P->contextAttributeVector.push_back(ca4P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("APPEND");
+    e1P->attributeVector.push_back(ca1P);
+    e1P->attributeVector.push_back(ca2P);
+    e2P->attributeVector.push_back(ca3P);
+    e2P->attributeVector.push_back(ca4P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2482,10 +2481,10 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2499,10 +2498,10 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(2, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A10", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA10", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -2657,10 +2656,10 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2674,10 +2673,10 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
-    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern) << "wrong entity isPattern (context element response #1)";
+    ASSERT_EQ(0, RES_CER(0).attributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2783,12 +2782,12 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2802,10 +2801,10 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -2929,12 +2928,12 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -2948,10 +2947,10 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3076,10 +3075,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3093,28 +3092,28 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(0, RES_CER(0).attributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(0, RES_CER(1).attributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(0, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(0, RES_CER(2).attributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -3187,12 +3186,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "TA2", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3206,10 +3205,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3219,10 +3218,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -3233,10 +3232,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
               RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(2, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -3356,12 +3355,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "", "false");
     ContextAttribute* caP = new ContextAttribute("A2", "", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3375,10 +3374,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3388,10 +3387,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("T1bis", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -3402,10 +3401,10 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
               RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
-    EXPECT_EQ("E1", RES_CER(2).entityId.id);
-    EXPECT_EQ(0, RES_CER(2).entityId.type.size());
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(2).id);
+    EXPECT_EQ(0, RES_CER(2).type.size());
+    EXPECT_EQ("false", RES_CER(2).isPattern);
+    ASSERT_EQ(1, RES_CER(2).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->type.size());
     EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
@@ -3525,17 +3524,17 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A2", "TA2", "");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce2P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("DELETE");
+    e1P->attributeVector.push_back(ca1P);
+    e2P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3549,10 +3548,10 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3563,10 +3562,10 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern) << "wrong entity isPattern (context element response #2)";
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern) << "wrong entity isPattern (context element response #2)";
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -3684,14 +3683,14 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
-    ceP->contextAttributeVector.push_back(ca1P);
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3705,10 +3704,10 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3832,21 +3831,21 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "");
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "");
-    ce2P->entityId.fill("E2", "T2", "false");
+    e2P->fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "");
     ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce1P->contextAttributeVector.push_back(ca2P);
-    ce2P->contextAttributeVector.push_back(ca3P);
-    ce2P->contextAttributeVector.push_back(ca4P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("DELETE");
+    e1P->attributeVector.push_back(ca1P);
+    e1P->attributeVector.push_back(ca2P);
+    e2P->attributeVector.push_back(ca3P);
+    e2P->attributeVector.push_back(ca4P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -3860,10 +3859,10 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -3878,10 +3877,10 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(1).id);
+    EXPECT_EQ("T2", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(2, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -3995,12 +3994,12 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
+    Entity* eP = new Entity();
+    eP->fill("E4", "T4", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4014,17 +4013,16 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
     EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-    EXPECT_EQ(NOMIMETYPE, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -4153,12 +4151,12 @@ TEST(mongoUpdateContextRequest, createEntity)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
+    Entity* eP = new Entity();
+    eP->fill("E4", "T4", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4172,10 +4170,10 @@ TEST(mongoUpdateContextRequest, createEntity)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4305,343 +4303,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     utExit();
 }
 
-/* ****************************************************************************
-*
-* createEntityWithId -
-*/
-TEST(mongoUpdateContextRequest, createEntityWithId)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
 
-    utInit();
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
-    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID1");
-    caP->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_TRUE(ent.hasField("creDate"));
-    EXPECT_TRUE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1()ID1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
-    EXPECT_TRUE(a1.hasField("creDate"));
-    EXPECT_TRUE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* createEntityMixIdNoIdFails -
-*/
-TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
-    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
-    Metadata md("ID", "string", "ID1");
-    ca1P->metadataVector.push_back(&md);
-    ceP->contextAttributeVector.push_back(ca1P);
-    ContextAttribute* ca2P = new ContextAttribute("A1", "TA1", "new_val2");
-    ceP->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
-    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
-    ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("Attributes with same name with ID and not ID at the same time in the same entity are forbidden: "
-              "entity: [E4, T4]",
-              RES_CER_STATUS(0).details);
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent, attrs;
-    std::vector<BSONElement> attrNames;
-    ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a1 = attrs.getField("A1").embeddedObject();
-    BSONObj a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a3 = attrs.getField("A3").embeddedObject();
-    BSONObj a4 = attrs.getField("A4").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    BSONObj a5 = attrs.getField("A5").embeddedObject();
-    BSONObj a6 = attrs.getField("A6").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A5"));
-    EXPECT_TRUE(findAttr(attrNames, "A6"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(1, attrs.nFields());
-    ASSERT_EQ(1, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").embeddedObject();
-    attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
-    a1 = attrs.getField("A1").embeddedObject();
-    a2 = attrs.getField("A2").embeddedObject();
-    EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
@@ -4659,16 +4321,16 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E4", "T4", "false");
+    Entity* eP = new Entity();
+    eP->fill("E4", "T4", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     Metadata md1("MD1", "TMD1", "MD1val");
     Metadata md2("MD2", "TMD2", "MD2val");
     caP->metadataVector.push_back(&md1);
     caP->metadataVector.push_back(&md2);
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4682,10 +4344,10 @@ TEST(mongoUpdateContextRequest, createEntityMd)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -4850,12 +4512,12 @@ TEST(mongoUpdateContextRequest, updateEmptyValueOk)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -4869,10 +4531,10 @@ TEST(mongoUpdateContextRequest, updateEmptyValueOk)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5002,12 +4664,12 @@ TEST(mongoUpdateContextRequest, appendEmptyValueOk)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "TA8", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -5021,10 +4683,10 @@ TEST(mongoUpdateContextRequest, appendEmptyValueOk)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5160,12 +4822,12 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "TA8", "new_val8");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("UPDATE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -5179,17 +4841,16 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
     EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-    EXPECT_EQ(NOMIMETYPE, RES_CER_ATTR(0, 0)->providingApplication.getMimeType());
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -5317,12 +4978,12 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A8", "TA8", "");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("DELETE");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -5336,10 +4997,10 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5470,17 +5131,17 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ce1P = new ContextElement();
-    ContextElement* ce2P = new ContextElement();
-    ce1P->entityId.fill("E1", "T1", "false");
+    Entity* e1P = new Entity();
+    Entity* e2P = new Entity();
+    e1P->fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val1");
-    ce2P->entityId.fill("E5", "T5", "false");
+    e2P->fill("E5", "T5", "false");
     ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val13");
-    ce1P->contextAttributeVector.push_back(ca1P);
-    ce2P->contextAttributeVector.push_back(ca2P);
-    req.contextElementVector.push_back(ce1P);
-    req.contextElementVector.push_back(ce2P);
-    req.updateActionType.set("APPEND");
+    e1P->attributeVector.push_back(ca1P);
+    e2P->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(e1P);
+    req.entityVector.push_back(e2P);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -5494,10 +5155,10 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response #1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
@@ -5507,10 +5168,10 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response #2 (create) */
-    EXPECT_EQ("E5", RES_CER(1).entityId.id);
-    EXPECT_EQ("T5", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E5", RES_CER(1).id);
+    EXPECT_EQ("T5", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
@@ -5656,12 +5317,12 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement* ceP = new ContextElement();
-    ceP->entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
-    ceP->contextAttributeVector.push_back(caP);
-    req.contextElementVector.push_back(ceP);
-    req.updateActionType.set("APPEND");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
@@ -5675,10 +5336,10 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());

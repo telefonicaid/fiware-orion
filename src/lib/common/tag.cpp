@@ -28,6 +28,7 @@
 
 #include "logMsg/logMsg.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 
 
 
@@ -140,71 +141,6 @@ char* htmlEscape(const char* s)
 }
 
 
-/* ****************************************************************************
-*
-* jsonInvalidCharsTransformation -
-*
-* FIXME P5: this is a quick fix for #1172. A better fix should de developed.
-*
-* Pretty much based in JsonHelper::toJsonString(). In fact, most of the code is
-* duplicated
-*
-*/
-std::string jsonInvalidCharsTransformation(const std::string& input)
-{
-  std::ostringstream ss;
-
-  for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
-  {
-    /* FIXME P3: This function ensures that if the DB holds special characters (which are
-     * not supported in JSON according to its specification), they are converted to their escaped
-     * representations. The process wouldn't be necessary if the DB couldn't hold such special characters,
-     * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be
-     * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the
-     * input parser (rapidjson) doesn't inject not supported JSON characters in the DB (this needs to be
-     * investigated in the rapidjson documentation)
-     *
-     * JSON specification is a bit obscure about the need of escaping / (what they call 'solidus'). The
-     * picture at JSON specification (http://www.json.org/) seems suggesting so, but after a careful reading of
-     * https://tools.ietf.org/html/rfc4627#section-2.5, we can conclude it is not mandatory. Online checkers
-     * such as http://jsonlint.com confirm this. Looking in some online discussions
-     * (http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/ and
-     * https://groups.google.com/forum/#!topic/opensocial-and-gadgets-spec/FkLsC-2blbo) it seems that
-     * escaping / may have sense in some situations related with JavaScript code, which is not the case of Orion.
-     *
-     */
-    switch (char ch = *iter)
-    {
-    case '\\': ss << "\\\\"; break;
-    case '"':  ss << "\\\""; break;    
-    case '\b': ss << "\\b";  break;
-    case '\f': ss << "\\f";  break;
-    case '\n': ss << "\\n";  break;
-    case '\r': ss << "\\r";  break;
-    case '\t': ss << "\\t";  break;
-
-    default:
-      /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
-       * correspond to UTF-8 multi-byte characters */
-      if (ch >= 0 && ch <= 0x1F)
-      {
-        static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
-
-        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
-      }
-      else
-      {
-        ss << ch;
-      }
-      break;
-    }  // end-switch
-
-  }  // end-for
-
-  return ss.str();
-}
-
-
 
 /* ****************************************************************************
 *
@@ -219,7 +155,7 @@ std::string startTag
   // Empty key is legal JSON. However, Orion doesn't use that kind of keys,
   // so we can use an empty key string as argument instead of a showkey boolean
   // parameter, keeping the function signature simpler
-  bool showKey = (key != "");
+  bool showKey = (!key.empty());
 
   if (isVector && showKey)
   {
@@ -279,7 +215,7 @@ std::string valueTag
 {
   char* value;
 
-  if (unescapedValue == "")
+  if (unescapedValue.empty())
   {
     value = (char*) malloc(1);
 
@@ -295,7 +231,7 @@ std::string valueTag
     return "ERROR: no memory";
   }
 
-  std::string effectiveValue = jsonInvalidCharsTransformation(value);
+  std::string effectiveValue = toJsonString(value);
   free(value);
 
   effectiveValue = withoutQuotes ? effectiveValue : std::string("\"") + effectiveValue + "\"";

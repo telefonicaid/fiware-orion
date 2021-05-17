@@ -63,7 +63,6 @@ typedef enum TraceLevels
   LmtParse    = 40,
   LmtParsedPayload,
   LmtParseCheck,
-  LmtPresent,
   LmtNew,
   LmtTreat = 45,
   LmtDump,
@@ -124,10 +123,11 @@ typedef enum TraceLevels
 
   /* Others (>=230) */
   LmtCm = 230,
-  LmtRush,
   LmtSoftError,
   LmtNotImplemented,
   LmtCurlContext,
+
+  LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 
   LmtBug = 250
 } TraceLevels;

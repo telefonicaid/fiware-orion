@@ -116,14 +116,14 @@ Date: REGEX(.*)
 03. Get E1 (A10 get rounded to next integer)
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 152
+Content-Length: 136
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "A1": 42.9,
-    "A10": 43.0,
+    "A10": 43,
     "A2": 42.99,
     "A3": 42.999,
     "A4": 42.9999,
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 04. Get E2 (A10 get rounded to previous integer)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 126
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

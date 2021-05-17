@@ -26,7 +26,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "ngsi/ContextElement.h"
+#include "common/globals.h"
 #include "ngsi/ContextAttribute.h"
 
 #include "common/macroSubstitute.h"
@@ -39,17 +39,17 @@
 */
 TEST(commonMacroSubstitute, simple)
 {
-  ContextElement     ce("E1", "T1", "false");
+  Entity             en("E1", "T1", "false");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
   bool               b;
 
-  ce.contextAttributeVector.push_back(caP);
+  en.attributeVector.push_back(caP);
 
   const char* s1      = "Entity ${id}/${type}, attribute '${A1}'";
   const char* correct = "Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  b = macroSubstitute(&result, s1, ce);
+  b = macroSubstitute(&result, s1, en);
   EXPECT_TRUE(b);
   EXPECT_STREQ(correct, result.c_str());
 }
@@ -62,11 +62,11 @@ TEST(commonMacroSubstitute, simple)
 */
 TEST(commonMacroSubstitute, withRealloc)
 {
-  ContextElement     ce("E1", "T1", "false");
+  Entity             en("E1", "T1", "false");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
   bool               b;
 
-  ce.contextAttributeVector.push_back(caP);
+  en.attributeVector.push_back(caP);
 
   const char* base = 
     "The test string needs to be longer than 1024 chars to test reallocs in Macro substitution"
@@ -86,7 +86,7 @@ TEST(commonMacroSubstitute, withRealloc)
   std::string correct = std::string(base) + "Now, finally something to substitute: Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  b = macroSubstitute(&result, s1, ce);
+  b = macroSubstitute(&result, s1, en);
   EXPECT_TRUE(b);
   EXPECT_STREQ(correct.c_str(), result.c_str());
 }
@@ -95,28 +95,28 @@ TEST(commonMacroSubstitute, withRealloc)
 
 /* ****************************************************************************
 *
-* bufferTooBigInitially - max size of the substituted buffer is 8MB (MAX_DYN_MSG_SIZE)
+* bufferTooBigInitially - max size of the substituted buffer is 8MB (outReqMsgMaxSize)
 *
 * This unit test provokes a buffer size > 8MB to see the error returned
 */
 TEST(commonMacroSubstitute, bufferTooBigInitially)
 {
   bool               b;
-  ContextElement     ce("EntityId000001", "EntityType000001", "false");
+  Entity             en("EntityId000001", "EntityType000001", "false");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
 
-  ce.contextAttributeVector.push_back(caP);
+  en.attributeVector.push_back(caP);
 
-  char* base = (char*) malloc(MAX_DYN_MSG_SIZE + 2);
+  char* base = (char*) malloc(outReqMsgMaxSize + 2);
 
-  memset(base, 'a', MAX_DYN_MSG_SIZE + 1);
-  base[MAX_DYN_MSG_SIZE + 1] = 0;
+  memset(base, 'a', outReqMsgMaxSize + 1);
+  base[outReqMsgMaxSize + 1] = 0;
 
   std::string s1      = std::string(base) + "${id}/${type}";
   // correct          = std::string(base) + "EntityId000001/EntityType000001";
   std::string result;
 
-  b = macroSubstitute(&result, s1, ce);
+  b = macroSubstitute(&result, s1, en);
   EXPECT_FALSE(b);
   EXPECT_STREQ("", result.c_str());
 
@@ -127,7 +127,7 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 
 /* ****************************************************************************
 *
-* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8MB (MAX_DYN_MSG_SIZE)
+* bufferTooBigAfterSubstitution - max size of the substituted buffer is 8MB (outReqMsgMaxSize)
 *
 * This unit test provokes a buffer size > 8MB to see the error returned.
 * However, unlike 'bufferTooBigInitially', this test has an incoming buffer < 8MB but
@@ -137,22 +137,22 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
 {
   bool               b;
-  ContextElement     ce("EntityId000001", "EntityType000001", "false");
+  Entity             en("EntityId000001", "EntityType000001", "false");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
 
-  ce.contextAttributeVector.push_back(caP);
+  en.attributeVector.push_back(caP);
 
-  char* base = (char*) malloc(MAX_DYN_MSG_SIZE + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8MB
+  char* base = (char*) malloc(outReqMsgMaxSize + 2 - 16);  // -16 so that '${id}/${type}' fits inside 8MB
                                                            // but 'EntityId000001/EntityType000001' does not
 
-  memset(base, 'a', MAX_DYN_MSG_SIZE + 2 - 16);
-  base[MAX_DYN_MSG_SIZE + 2 - 16] = 0;
+  memset(base, 'a', outReqMsgMaxSize + 2 - 16);
+  base[outReqMsgMaxSize + 2 - 16] = 0;
 
   std::string s1      = std::string(base) + "${id}/${type}";                   // < 8MB
   //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8MB after substitutions
   std::string result;
 
-  b = macroSubstitute(&result, s1, ce);
+  b = macroSubstitute(&result, s1, en);
   EXPECT_FALSE(b);
   EXPECT_STREQ("", result.c_str());
 

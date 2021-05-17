@@ -41,14 +41,17 @@ typedef struct EntityVector
 {
   std::vector<Entity*>  vec;
 
-  std::string   render(std::map<std::string, bool>&         uriParamOptions,
-                       std::map<std::string, std::string>&  uriParam);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
+  std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
 
   std::string   check(ApiVersion apiVersion, RequestType requestType);
-  void          present(const std::string& indent);
   void          push_back(Entity* item);
   unsigned int  size(void);
-  Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);
+  Entity*       lookup(const std::string& name, const std::string& type);
   void          release();
 
   Entity*  operator[](unsigned int ix) const;

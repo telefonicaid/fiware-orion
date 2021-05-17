@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
+#include "apiTypesV2/Entities.h"
 #include "ngsi/StatusCode.h"
 
 
@@ -52,11 +53,11 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ApiVersion apiVersion, bool asJsonObject);
+  std::string            toJsonV1(bool asJsonObject);
   std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
-  void                   present(const std::string& indent, const std::string& caller);
   void                   release(void);
   void                   fill(QueryContextResponse* qcrsP);
+  void                   fill(const Entities& entities);
   QueryContextResponse*  clone(void);
 } QueryContextResponse;
 

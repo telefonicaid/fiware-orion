@@ -348,8 +348,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "A2",
-                "A1"
+#SORT_START
+                "A2"REGEX(,?)
+                "A1"REGEX(,?)
+#SORT_END
             ],
             "name": "T1"
         },
@@ -361,8 +363,10 @@ Date: REGEX(.*)
         },
         {
             "attributes": [
-                "A2",
-                "A1"
+#SORT_START
+                "A2"REGEX(,?)
+                "A1"REGEX(,?)
+#SORT_END
             ],
             "name": "T3"
         }
@@ -498,8 +502,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "A2",
-                "A1"
+#SORT_START
+                "A2"REGEX(,?)
+                "A1"REGEX(,?)
+#SORT_END
             ],
             "name": "T1"
         },
@@ -511,8 +517,10 @@ Date: REGEX(.*)
         },
         {
             "attributes": [
-                "A2",
-                "A1"
+#SORT_START
+                "A2"REGEX(,?)
+                "A1"REGEX(,?)
+#SORT_END
             ],
             "name": "T3"
         },

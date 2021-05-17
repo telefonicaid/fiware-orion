@@ -58,17 +58,27 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 *
 * parseContextAttributeCompoundValue -
 */
-std::string parseContextAttributeCompoundValue
+static std::string parseContextAttributeCompoundValue
 (
   const rapidjson::Value::ConstValueIterator&   node,
   ContextAttribute*                             caP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
+
+    return "max deep reached";
+  }
+
   if (node->IsObject())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
@@ -77,11 +87,6 @@ std::string parseContextAttributeCompoundValue
       cvnP->valueType  = stringToCompoundType(nodeType);
 
       cvnP->name       = iter->name.GetString();
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -101,12 +106,10 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -117,31 +120,22 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
   else if (node->IsArray())
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_INT];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
-
 
       if (nodeType == "String")
       {
@@ -161,12 +155,10 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -177,13 +169,14 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
-
 
   return "OK";
 }
@@ -198,21 +191,28 @@ std::string parseContextAttributeCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   ContextAttribute*                             caP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
+
+    return "max deep reached";
+  }
+
   std::string type = jsonParseTypeNames[node->value.GetType()];
 
   if (caP->compoundValueP == NULL)
   {
     caP->compoundValueP            = new orion::CompoundValueNode();
-    caP->compoundValueP->name      = "TOP";
-    caP->compoundValueP->container = caP->compoundValueP;
+    caP->compoundValueP->name      = "";
     caP->compoundValueP->valueType = stringToCompoundType(type);
-    caP->compoundValueP->path      = "/";
-    caP->compoundValueP->rootP     = caP->compoundValueP;
-    caP->compoundValueP->level     = 0;
-    caP->compoundValueP->siblingNo = 0;
 
     parent = caP->compoundValueP;
 
@@ -228,23 +228,12 @@ std::string parseContextAttributeCompoundValue
   //
   if (type == "Array")
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_INT];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
-
 
       if (nodeType == "String")
       {
@@ -260,12 +249,10 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -276,16 +263,16 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
   else if (type == "Object")
   {
-    int counter  = 0;
-
     rapidjson::Value::ConstMemberIterator iter;
     for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
     {
@@ -294,11 +281,6 @@ std::string parseContextAttributeCompoundValue
 
       cvnP->name       = iter->name.GetString();
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -314,12 +296,10 @@ std::string parseContextAttributeCompoundValue
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -330,10 +310,12 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
-
-      ++counter;
     }
   }
 
@@ -349,18 +331,12 @@ std::string parseContextAttributeCompoundValue
 std::string parseContextAttributeCompoundValueStandAlone
 (
   rapidjson::Document&  document,
-  ContextAttribute*     caP,
-  orion::ValueType      valueType
+  ContextAttribute*     caP
 )
 {
   caP->compoundValueP            = new orion::CompoundValueNode();
-  caP->compoundValueP->name      = "TOP";
-  caP->compoundValueP->container = caP->compoundValueP;
+  caP->compoundValueP->name      = "";
   caP->compoundValueP->valueType = caP->valueType;  // Convert to other type?
-  caP->compoundValueP->path      = "/";
-  caP->compoundValueP->rootP     = caP->compoundValueP;
-  caP->compoundValueP->level     = 0;
-  caP->compoundValueP->siblingNo = 0;
 
   orion::CompoundValueNode*   parent  = caP->compoundValueP;
 
@@ -370,23 +346,12 @@ std::string parseContextAttributeCompoundValueStandAlone
   //
   if (caP->valueType == orion::ValueTypeVector)
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
     {
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[STRING_SIZE_FOR_INT];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
-
 
       if (nodeType == "String")
       {
@@ -406,12 +371,10 @@ std::string parseContextAttributeCompoundValueStandAlone
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -422,20 +385,21 @@ std::string parseContextAttributeCompoundValueStandAlone
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, 0);
+        if (r != "OK")
+        {
+          // Early return
+          return r;
+        }
       }
       else if (!caP->typeGiven)
       {
         caP->type = defaultType(caP->valueType);
       }
-
-      ++counter;
     }
   }
   else if (caP->valueType == orion::ValueTypeObject)
   {
-    int counter  = 0;
-
     for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
     {
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
@@ -443,11 +407,6 @@ std::string parseContextAttributeCompoundValueStandAlone
 
       cvnP->name       = iter->name.GetString();
       cvnP->valueType  = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
 
       if (nodeType == "String")
       {
@@ -467,12 +426,10 @@ std::string parseContextAttributeCompoundValueStandAlone
       }
       else if (nodeType == "Object")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
-        cvnP->path += "/";
         cvnP->valueType = orion::ValueTypeVector;
       }
 
@@ -483,14 +440,17 @@ std::string parseContextAttributeCompoundValueStandAlone
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, 0);
+        if (r != "OK")
+        {
+          // Early return
+          return r;
+        }
       }
       else if (!caP->typeGiven)
       {
         caP->type = defaultType(caP->valueType);
       }
-
-      ++counter;
     }
   }
 

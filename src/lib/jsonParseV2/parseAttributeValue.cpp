@@ -66,7 +66,22 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   }
 
   caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;
-  parseContextAttributeCompoundValueStandAlone(document, caP, caP->valueType);
+  std::string r   = parseContextAttributeCompoundValueStandAlone(document, caP);
+
+  if (r == "max deep reached")
+  {
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+    return oe.toJson();
+  }
+  else if (r != "OK")  // other error cases get a general treatment
+  {
+    OrionError oe(SccBadRequest, r, "BadRequest");
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+    return oe.toJson();
+  }
 
   return "OK";
 }

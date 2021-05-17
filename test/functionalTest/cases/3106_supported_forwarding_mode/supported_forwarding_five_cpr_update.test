@@ -1,0 +1,557 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+supportedFowardingMode with five CPrs (update scenario)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+dbInit CP5
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+brokerStart CP3
+brokerStart CP4
+brokerStart CP5
+
+--SHELL--
+
+# This test is based on cases/0787_cprs_full_functional_v2/ngsiv2_update_five_different_cprs_in_one_query.test
+# with some of the CPrs using fowarding mode "update" and others using "none" or "query". All operations
+# using NGSIv2 (original test has some of them using NGSIv1)
+
+#
+# 01. Create E1/T1/A1 in CP1
+# 02. Create E1/T1/A2 in CP2
+# 03. Create E1/T1/A3 in CP3
+# 04. Create E1/T1/A4 in CP4
+# 05. Create E1/T1/A5 in CP5
+# 06. Register E1/T1/A1 in CB, mode update, provApp: CP1
+# 07. Register E1/T1/A2 in CB, mode none, provApp: CP2
+# 08. Register E1/T1/A3 in CB, mode update provApp: CP3
+# 09. Register E1/T1/A4 in CB, mode query, provApp: CP4
+# 10. Register E1/T1/A5 in CB, mode update provApp: CP5
+# 11. Update E1/T1/A1+A2+A3+A4+A5 in CB
+# 12. Query E1/T1 in CP1 - see A1 via CB
+# 13. Query E1/T1 in CP2 - see A2 in CP2
+# 14. Query E1/T1 in CP3 - see A3 via CB
+# 15. Query E1/T1 in CP4 - see A4 in CP4
+# 16. Query E1/T1 in CP5 - see A5 via CB
+#
+
+
+echo "01. Create E1/T1/A1 in CP1"
+echo "=========================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": {
+    "type": "string",
+    "value": "A1 in CP1"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. Create E1/T1/A2 in CP2"
+echo "=========================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A2": {
+    "type": "string",
+    "value": "A2 in CP2"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "03. Create E1/T1/A3 in CP3"
+echo "=========================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A3": {
+    "type": "string",
+    "value": "A3 in CP3"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "04. Create E1/T1/A4 in CP4"
+echo "=========================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A4": {
+    "type": "string",
+    "value": "A4 in CP4"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "05. Create E1/T1/A5 in CP5"
+echo "=========================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A5": {
+    "type": "string",
+    "value": "A5 in CP5"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP5_PORT
+echo
+echo
+
+
+echo "06. Register E1/T1/A1 in CB, mode update, provApp: CP1"
+echo "======================================================"
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [
+       "A1"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "supportedForwardingMode": "update"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Register E1/T1/A2 in CB, mode none, provApp: CP2"
+echo "===================================================="
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [
+       "A2"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP2_PORT}'/v2"
+     },
+     "supportedForwardingMode": "none"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Register E1/T1/A3 in CB, mode update, provApp: CP3"
+echo "======================================================"
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [
+       "A3"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP3_PORT}'/v2"
+     },
+     "supportedForwardingMode": "update"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Register E1/T1/A4 in CB, mode query, provApp: CP4"
+echo "====================================================="
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [
+       "A4"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP4_PORT}'/v2"
+     },
+     "supportedForwardingMode": "query"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Register E1/T1/A5 in CB, mode update, provApp: CP5"
+echo "======================================================"
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [
+       "A5"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP5_PORT}'/v2"
+     },
+     "supportedForwardingMode": "update"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "11. Update E1/T1/A1+A2+A3+A4+A5 in CB"
+echo "====================================="
+payload='{
+  "A1": {
+    "type": "string",
+    "value": "A1 via CB"
+  },
+  "A2": {
+    "type": "string",
+    "value": "A2 via CB"
+  },
+  "A3": {
+    "type": "string",
+    "value": "A3 via CB"
+  },
+  "A4": {
+    "type": "string",
+    "value": "A4 via CB"
+  },
+  "A5": {
+    "type": "string",
+    "value": "A5 via CB"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs?type=T1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "12. Query E1/T1 in CP1 - see A1 via CB"
+echo "======================================"
+orionCurl --url /v2/entities/E1 --port $CP1_PORT
+echo
+echo
+
+
+echo "13. Query E1/T1 in CP2 - see A2 in CP2"
+echo "======================================"
+orionCurl --url /v2/entities/E1 --port $CP2_PORT
+echo
+echo
+
+
+echo "14. Query E1/T1 in CP3 - see A3 via CB"
+echo "======================================"
+orionCurl --url /v2/entities/E1 --port $CP3_PORT
+echo
+echo
+
+
+echo "15. Query E1/T1 in CP4 - see A4 in CP4"
+echo "======================================"
+orionCurl --url /v2/entities/E1 --port $CP4_PORT
+echo
+echo
+
+
+echo "16. Query E1/T1 in CP5 - see A5 via CB"
+echo "======================================"
+orionCurl --url /v2/entities/E1 --port $CP5_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/T1/A1 in CP1
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1/T1/A2 in CP2
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1/T1/A3 in CP3
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E1/T1/A4 in CP4
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E1/T1/A5 in CP5
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Register E1/T1/A1 in CB, mode update, provApp: CP1
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Register E1/T1/A2 in CB, mode none, provApp: CP2
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Register E1/T1/A3 in CB, mode update, provApp: CP3
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Register E1/T1/A4 in CB, mode query, provApp: CP4
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Register E1/T1/A5 in CB, mode update, provApp: CP5
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Update E1/T1/A1+A2+A3+A4+A5 in CB
+=====================================
+HTTP/1.1 404 Not Found
+Content-Length: 113
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A2, A4] }",
+    "error": "PartialUpdate"
+}
+
+
+12. Query E1/T1 in CP1 - see A1 via CB
+======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "string",
+        "value": "A1 via CB"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+13. Query E1/T1 in CP2 - see A2 in CP2
+======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A2": {
+        "metadata": {},
+        "type": "string",
+        "value": "A2 in CP2"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+14. Query E1/T1 in CP3 - see A3 via CB
+======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A3": {
+        "metadata": {},
+        "type": "string",
+        "value": "A3 via CB"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+15. Query E1/T1 in CP4 - see A4 in CP4
+======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A4": {
+        "metadata": {},
+        "type": "string",
+        "value": "A4 in CP4"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+16. Query E1/T1 in CP5 - see A5 via CB
+======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A5": {
+        "metadata": {},
+        "type": "string",
+        "value": "A5 via CB"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+brokerStop CP5
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4
+dbDrop CP5

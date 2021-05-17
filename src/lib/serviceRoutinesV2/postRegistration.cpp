@@ -32,6 +32,7 @@
 #include "common/clockFunctions.h"
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
@@ -59,33 +60,10 @@ std::string postRegistration
 )
 {
   // FIXME P4: See issue #3078 about servicePath for registrations
-  std::string           servicePath = (ciP->servicePathV[0] == "")? SERVICE_PATH_ROOT : ciP->servicePathV[0];
-  ngsiv2::Registration  registration;
-  OrionError            oe;
-  std::string           regId;
-  std::string           answer;
-
-  //
-  // FIXME P4: legacyForwardingMode = false to be implemented
-  //
-  if (parseDataP->reg.provider.legacyForwardingMode == false)
-  {
-    oe.fill(SccNotImplemented, "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true");
-    ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
-    return answer;
-  }
-
-  //
-  // FIXME P4: Forwarding modes "none", "query", and "update" to be implemented
-  //
-  if (parseDataP->reg.provider.supportedForwardingMode != ngsiv2::ForwardAll)
-  {
-    oe.fill(SccNotImplemented, "non-supported Forwarding Mode");
-    ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
-    return answer;
-  }
+  std::string  servicePath = (ciP->servicePathV[0].empty())? SERVICE_PATH_ROOT : ciP->servicePathV[0];
+  OrionError   oe;
+  std::string  regId;
+  std::string  answer;
 
   TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, ciP->tenant, servicePath, &regId, &oe));
   ciP->httpStatusCode = oe.code;
@@ -98,7 +76,7 @@ std::string postRegistration
   {
     std::string location = "/v2/registrations/" + regId;
 
-    ciP->httpHeader.push_back("Location");
+    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
     ciP->httpStatusCode = SccCreated;

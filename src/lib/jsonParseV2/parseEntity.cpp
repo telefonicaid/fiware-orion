@@ -225,7 +225,16 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->attributeVector.push_back(caP);
 
       std::string r = parseContextAttribute(ciP, iter, caP);
-      if (r != "OK")
+      if (r == "max deep reached")
+      {
+        OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
+
+        alarmMgr.badInput(clientIp, "max json deep reached at parsing");
+        ciP->httpStatusCode = SccBadRequest;
+
+        return oe.toJson();
+      }
+      else if (r != "OK")  // other error cases get a general treatment
       {
         OrionError oe(SccBadRequest, r, "BadRequest");
 
@@ -249,7 +258,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (eidInURL == false)
   {
-    if (eP->id == "")
+    if (eP->id.empty())
     {
       OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
 

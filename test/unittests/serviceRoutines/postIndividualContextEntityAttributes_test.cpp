@@ -39,16 +39,19 @@
 *
 * service vectors -
 */
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
 static RestService postV[] =
 {
-  { IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes" }, "", postIndividualContextEntityAttributes },
-  { InvalidRequest,                    0, {                                                }, "", NULL                                  }
+  { ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, postIndividualContextEntityAttributes },
+  { IR,   0, {                                                }, NULL                                  }
 };
 
 static RestService badVerbV[] =
 {
-  { InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                   }, "", badRequest                            },
-  { InvalidRequest,                    0, {                                                }, "", NULL                                  }
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                            },
+  { IR,   0, {                                                }, NULL                                  }
 };
 
 

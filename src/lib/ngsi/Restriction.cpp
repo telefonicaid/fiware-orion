@@ -73,21 +73,9 @@ std::string Restriction::check(int counter)
 
 /* ****************************************************************************
 *
-* Restriction::present -
+* Restriction::toJsonV1 -
 */
-void Restriction::present(const std::string& indent)
-{
-  attributeExpression.present(indent);
-  scopeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* Restriction::render -
-*/
-std::string Restriction::render(int restrictions, bool comma)
+std::string Restriction::toJsonV1(int restrictions, bool comma)
 {
   std::string  tag = "restriction";
   std::string  out = "";
@@ -99,8 +87,8 @@ std::string Restriction::render(int restrictions, bool comma)
   }
 
   out += startTag(tag);
-  out += attributeExpression.render(scopeVectorRendered);
-  out += scopeVector.render(false);
+  out += attributeExpression.toJsonV1(scopeVectorRendered);
+  out += scopeVector.toJsonV1(false);
   out += endTag(comma);
 
   return out;

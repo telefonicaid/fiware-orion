@@ -53,9 +53,8 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(bool comma);
+  std::string   toJsonV1(bool comma);
   int64_t       parse(void);
-  void          present(const std::string& indent);
   void          release(void);
 
   std::string   check(void);

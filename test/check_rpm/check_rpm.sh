@@ -38,7 +38,7 @@ _logStage "######## Checking MongoDB... ########"
 _log "#### Check the MongoDB process... ####"
 # Check the if the mongod is installed/running
 _log "#### Checking the mongodb status... #####"
-if [ "`sudo /etc/init.d/mongod status | grep pid`" == "" ]; then
+if [ "`sudo service mongod status | grep 'forked process' | awk -F 'forked process: ' '{print $2}'`" == "" ]; then
 	_logError ".............. Mongo is NOT running .............."
 	exit 1
 else
@@ -102,8 +102,9 @@ fi
 echo ""
 
 ## Check if the contextBroker is listen the specific ports
+## (We use contextBroke as we have discovered that in CentOS 8 netstat may cut the name in the display)
 _logStage "######## Checking the contextBroker service ########"
-if [ "`sudo netstat -putan | grep contextBroker`" == "" ]; then
+if [ "`sudo netstat -putan | grep contextBroke`" == "" ]; then
 	_logError ".............. contextBroker is not LISTEN .............."
 	exit 1
 else
@@ -137,7 +138,7 @@ echo ""
 
 ## Uninstall the contextBroker RPM
 _logStage "######## Uninstall the contextBroker RPM ########"
-sudo rpm -e contextBroker &> /dev/null
+sudo rpm -e contextBroker contextBroker-tests &> /dev/null
 result=$?
 if [[ $result -ne 0 ]]; then 
 	_logError ".............. Uninstall failed .............."

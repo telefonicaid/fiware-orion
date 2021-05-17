@@ -51,7 +51,7 @@ TEST(SubscribeContextRequest, ok_json)
   ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_EQ("OK", result);
   lmTraceLevelSet(LmtDump, false);
 
@@ -60,7 +60,6 @@ TEST(SubscribeContextRequest, ok_json)
   // With the data obtained present and release methods are exercised
   //
   SubscribeContextRequest*  scrP    = &parseData.scr.res;
-  scrP->present(""); // No output
   scrP->release();
 
   utExit();
@@ -87,7 +86,7 @@ TEST(SubscribeContextRequest, badIsPattern_json)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
-  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -114,7 +113,7 @@ TEST(SubscribeContextRequest, invalidDuration_json)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
-  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -139,7 +138,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -164,7 +163,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -191,7 +190,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -218,7 +217,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -243,7 +242,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -268,7 +267,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -295,7 +294,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -322,7 +321,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -349,7 +348,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();
@@ -376,7 +375,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 
   utExit();

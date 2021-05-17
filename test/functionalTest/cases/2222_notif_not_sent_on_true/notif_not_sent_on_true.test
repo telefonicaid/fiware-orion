@@ -96,7 +96,7 @@ payload2='{
   },
   "timestamp": {
     "type": "DateTime",
-    "value": "2017-06-15T07:21:24.00Z"
+    "value": "2017-06-15T07:21:24.000Z"
   },
   "value_str": {
     "value": "true"
@@ -148,7 +148,7 @@ Ngsiv2-Attrsformat: values
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

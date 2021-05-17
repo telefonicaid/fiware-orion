@@ -22,34 +22,10 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "apiTypesV2/EntityVector.h"
 #include "unittests/unittest.h"
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(EntityVector, present)
-{
-  utInit();
-
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-
-  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
-  enP->attributeVector.push_back(caP);
-
-  EntityVector eV;
-  eV.push_back(enP);
-
-  eV.present("");
-
-  utExit();
-}
 
 
 
@@ -79,8 +55,32 @@ TEST(EntityVector, check)
   EntityVector enV2;
   enV2.push_back(enP);
 
-  EXPECT_EQ("OK", enV1.check(V1, EntitiesRequest));
-  EXPECT_EQ("No Entity ID", enV2.check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", enV1.check(V2, EntitiesRequest));
+  EXPECT_EQ("entity id length: 0, min length supported: 1", enV2.check(V2, EntitiesRequest));
 
   utExit();
+}
+
+
+/* ****************************************************************************
+*
+* render -
+*
+*/
+TEST(EntityVector, render)
+{
+  Entity*       eP = new Entity();
+  std::string   rendered;
+  EntityVector  eV;
+
+  rendered = eV.toJsonV1(false, UpdateContextElement, false);
+  EXPECT_STREQ("", rendered.c_str());
+
+  eP->id   = "E_ID";
+  eP->type = "E_TYPE";
+  eV.push_back(eP);
+
+  rendered = eV.toJsonV1(false, UpdateContextElement, false);
+
+  eV.release();
 }

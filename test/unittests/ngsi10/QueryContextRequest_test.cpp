@@ -81,7 +81,7 @@ TEST(QueryContextRequest, ok_json)
   ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
-  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
   lmTraceLevelSet(LmtDump, false);
 
   EXPECT_EQ("OK", out) << "this test should be OK";
@@ -92,13 +92,10 @@ TEST(QueryContextRequest, ok_json)
   //
   QueryContextRequest*  qcrP = &parseData.qcr.res;
 
-  qcrP->present(""); // No output
-
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = qcrP->render();
+  rendered = qcrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  qcrP->present("");
   qcrP->release();
 
   utExit();
@@ -124,7 +121,7 @@ TEST(QueryContextRequest, badIsPattern_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -150,7 +147,7 @@ TEST(QueryContextRequest, emptyAttribute_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -176,7 +173,7 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -201,7 +198,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleOkJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();
@@ -226,7 +223,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();
@@ -253,7 +250,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -280,7 +277,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -305,7 +302,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -330,7 +327,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
   ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
 
   utExit();
@@ -358,7 +355,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -386,7 +383,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -414,7 +411,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -442,7 +439,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

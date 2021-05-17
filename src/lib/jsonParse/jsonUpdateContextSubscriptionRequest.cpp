@@ -473,21 +473,3 @@ std::string jsonUcsrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
   s = parseDataP->ucsr.res.check(parseDataP->errorString, 0);
   return s;
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUcsrPresent - 
-*/
-void jsonUcsrPresent(ParseData* parseDataP)
-{
-  printf("jsonUcsrPresent\n");
-
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  parseDataP->ucsr.res.present("");
-}

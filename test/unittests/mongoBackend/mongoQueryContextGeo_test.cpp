@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -49,7 +50,7 @@ using mongo::BSONObj;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 
@@ -155,7 +156,7 @@ int getEntityIndex(ContextElementResponseVector& v, const std::string& id)
 {
   for (unsigned int ix = 0; ix < v.size(); ++ix)
   {
-    if (v[ix]->contextElement.entityId.id == id)
+    if (v[ix]->entity.id == id)
     {
       return ix;
     }
@@ -214,10 +215,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "Madrid");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Madrid", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 0)->stringValue);
@@ -235,10 +236,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "Leganes");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Leganes", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 0)->stringValue);
@@ -307,10 +308,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
 
     i = getEntityIndex(res.contextElementResponseVector, "Madrid");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Madrid", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 0)->stringValue);
@@ -328,10 +329,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Alcobendas", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 0)->stringValue);
@@ -349,10 +350,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     /* Context Element response # 3 */
     i = getEntityIndex(res.contextElementResponseVector, "Leganes");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Leganes", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 0)->stringValue);
@@ -422,10 +423,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
-    EXPECT_EQ("City", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("Alcobendas", RES_CER(i).id);
+    EXPECT_EQ("City", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 0)->stringValue);
@@ -509,10 +510,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("A", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("A", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 0)->stringValue);
@@ -530,10 +531,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("B", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("B", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 0)->stringValue);
@@ -617,10 +618,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("B", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("B", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 0)->stringValue);
@@ -638,10 +639,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "C");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("C", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("C", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 0)->stringValue);
@@ -721,10 +722,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("A", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("A", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 0)->stringValue);
@@ -809,10 +810,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "A");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("A", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("A", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 0)->stringValue);
@@ -893,10 +894,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     /* Context Element response # 1 */
     i = getEntityIndex(res.contextElementResponseVector, "B");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("B", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("B", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 0)->stringValue);
@@ -914,10 +915,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     /* Context Element response # 2 */
     i = getEntityIndex(res.contextElementResponseVector, "C");
     ASSERT_GE(i, 0);
-    EXPECT_EQ("C", RES_CER(i).entityId.id);
-    EXPECT_EQ("Point", RES_CER(i).entityId.type);
-    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("C", RES_CER(i).id);
+    EXPECT_EQ("Point", RES_CER(i).type);
+    EXPECT_EQ("false", RES_CER(i).isPattern);
+    ASSERT_EQ(2, RES_CER(i).attributeVector.size());
     EXPECT_EQ("foo", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 0)->stringValue);

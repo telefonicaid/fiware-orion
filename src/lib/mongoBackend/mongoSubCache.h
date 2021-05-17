@@ -30,9 +30,10 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
 #include "common/RenderFormat.h"
 #include "rest/StringFilter.h"
+
+#include "mongoDriver/BSONObj.h"
 
 
 
@@ -40,7 +41,7 @@
 *
 * mongoSubCacheItemInsert - 
 */
-extern int mongoSubCacheItemInsert(const char* tenant, const mongo::BSONObj& sub);
+extern int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub);
 
 
 
@@ -51,12 +52,10 @@ extern int mongoSubCacheItemInsert(const char* tenant, const mongo::BSONObj& sub
 extern int mongoSubCacheItemInsert
 (
   const char*            tenant,
-  const mongo::BSONObj&  sub,
+  const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
   int                    lastNotificationTime,
-  int                    lastFailure,
-  int                    lastSuccess,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -90,7 +89,9 @@ extern void mongoSubCountersUpdate
   long long           count,
   long long           lastNotificationTime,
   long long           lastFailure,
-  long long           lastSuccess
+  long long           lastSuccess,
+  const std::string&  failureReason,
+  long long           statusCode
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

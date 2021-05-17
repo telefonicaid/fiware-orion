@@ -50,13 +50,13 @@ TEST(AppendContextElementResponse, render_json)
   utInit();
 
   // 1. empty acer
-  out = acer.render(V1, false, AppendContextElement);
+  out = acer.toJsonV1(false, AppendContextElement);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. errorCode 'active'
   acer.errorCode.fill(SccBadRequest, "very bad request");
-  out = acer.render(V1, false, AppendContextElement);
+  out = acer.toJsonV1(false, AppendContextElement);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -102,7 +102,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     response.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
@@ -110,7 +110,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
   else
   {
     // 03. Fill in UpdateContextRequest
-    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "APPEND");
+    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, ActionTypeAppend);
 
     // 04. Call standard operation postUpdateContext
     postUpdateContext(ciP, components, compV, parseDataP);
@@ -122,7 +122,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();

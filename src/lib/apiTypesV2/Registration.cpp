@@ -26,6 +26,7 @@
 
 #include "apiTypesV2/Registration.h"
 #include "common/JsonHelper.h"
+#include "common/globals.h"
 
 
 
@@ -67,23 +68,23 @@ Registration::~Registration()
 */
 std::string Registration::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("id", id);
 
-  if (description != "")
+  if (!description.empty())
   {
     jh.addString("description", description);
   }
 
-  if (expires != -1)
+  if (expires < PERMANENT_EXPIRES_DATETIME)
   {
     jh.addDate("expires", expires);
   }
 
   jh.addRaw("dataProvided", dataProvided.toJson());
   jh.addRaw("provider", provider.toJson());
-  jh.addString("status", (status != "")? status : "active");
+  jh.addString("status", (!status.empty())? status : "active");
 
   //
   // FIXME P6: once forwarding is implemented for APIv2, include this call
@@ -101,7 +102,7 @@ std::string Registration::toJson(void)
 */
 std::string DataProvided::toJson(void)
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addRaw("entities", vectorToJson(entities));
   jh.addRaw("attrs", vectorToJson(attributes));
@@ -117,10 +118,11 @@ std::string DataProvided::toJson(void)
 */
 std::string Provider::toJson(void)
 {
-  JsonHelper   jh;
-  std::string  urlAsJson = "{\"url\": \"" + http.url + "\"}";
+  JsonObjectHelper jhUrl;
+  jhUrl.addString("url", http.url);
 
-  jh.addRaw("http", urlAsJson);
+  JsonObjectHelper   jh;
+  jh.addRaw("http", jhUrl.str());
   jh.addString("supportedForwardingMode", forwardingModeToString(supportedForwardingMode));
   jh.addBool("legacyForwarding", legacyForwardingMode? "true" : "false");
 
@@ -135,7 +137,7 @@ std::string Provider::toJson(void)
 */
 std::string ForwardingInformation::toJson()
 {
-  JsonHelper  jh;
+  JsonObjectHelper  jh;
 
   jh.addNumber("timesSent", timesSent);
 

@@ -7,8 +7,8 @@
 * [src/lib/orionTypes/](#srcliboriontypes) (Common types)
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
-* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types)
-* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types)
+* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
+* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
 * [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
@@ -16,7 +16,8 @@
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
 * [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
-* [src/lib/mongoBackend/](#srclibmongobackend) (Database interface to mongodb, using external library libmongoclient)
+* [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
+* [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSIv1 notifications)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
@@ -80,6 +81,7 @@ source code of the broker:
 * string: string parsing/manipulation functions
 * tag: macros/functions for JSON rendering
 * wsStrip: function that strips a string from leading and trailing whitespace
+* logTracing: helper functions for the logging subsystem
 
 [Top](#top)
 
@@ -202,33 +204,31 @@ The **ngsi** library contains a collection of classes for the different payloads
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
-* `ContextElementVector`
 
 ### Methods and hierarchy
 
 These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
 
-* `render()`, to render the object to a JSON string (mainly for NGSIv1)
-* `toJson()`, to render the object to a JSON string (for NGSIv2)
+* `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
+  in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
+  need to bother with starting/ending brackets, quotes and comma control.
+* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
 
-The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a `ContextElementVector`. `ContextElementVector` is of course a vector of `ContextElement`.
-`ContextElement` in its turn contains:
+The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a
+`EntityVector`. `EntityVector` is of course a vector of `Entity`.
 
-* `EntityId`
-* `AttributeDomainName`
-* `ContextAttributeVector`
-* `MetadataVector` (this field `MetadataVector domainMetadataVector` is part of NGSIv1 but Orion doesn't make use of it)
+Note that both `EntityVector` and `Entity` classes doesn't belong to this library, but to [`src/lib/apiTypesV2`](#srclibapitypesv2).
+In general, given that NGSIv1 is now deprecated, we try to use NGSIv2 classes as much as possible, reducing the number
+of equivalente classes within `src/lib/ngsi`.
 
-The methods `render()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
+The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
 * `UpdateContextRequest::check()` calls:
-  * `ContextElementVector::check()` calls (for each item in the vector):
-      * `ContextElement::check()` calls:
-          * `EntityId::check()`
-          * `AttributeDomainName::check()`
+  * `EntityVector::check()` calls (for each item in the vector):
+      * `Entity::check()` calls:
           * `ContextAttributeVector::check()` calls (for each item in the vector):
               * `ContextAttribute::check()` calls:
                   * `MetadataVector::check()` calls  (for each item in the vector):
@@ -267,14 +267,6 @@ Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy c
 * `RegisterContextResponse`
 * `DiscoverContextAvailabilityRequest`
 * `DiscoverContextAvailabilityResponse`
-* `SubscribeContextAvailabilityRequest`
-* `SubscribeContextAvailabilityResponse`
-* `UnsubscribeContextAvailabilityRequest`
-* `UnsubscribeContextAvailabilityResponse`
-* `UpdateContextAvailabilitySubscriptionRequest`
-* `UpdateContextAvailabilitySubscriptionResponse`
-* `NotifyContextAvailabilityRequest` (outgoing request, sent by Orion, to notify subscribers)
-* `NotifyContextAvailabilityResponse` (incoming response from subscriber)
 
 See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
 
@@ -335,9 +327,6 @@ Two service routines are especially important as many other service routines end
 * `postQueryContext()`
 
 Forwarding of queries/updates to context providers are implemented in these two service routines.  
-
-**IMPORTANT**: Also NGSIv2 requests depend on these two service routines, so even if NGSIv2 still has no forwarding mechanism of its own, these two routines 'gives' forwarding to NGSIv2. Note that the forwarded messages are translated into NGSIv1 requests.
-
 See full documentation on Context Providers and Forwarding in its [dedicated document](cprs.md).
 
 The function signature is common to all the service routines:
@@ -394,8 +383,61 @@ This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srcli
 
 ## src/lib/mongoBackend/
 
-The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction takes place. This library is described in detail in [a separate document](mongoBackend.md).
+The most important of all libraries of the broker, the **mongoBackend** library is where all the database interaction takes place (through the "wrapping" library **mongoDriver**). This library is described in detail in [a separate document](mongoBackend.md).
 
+[Top](#top)
+
+
+## src/lib/mongoDriver/
+
+This library interfaces with MongoDB, wrapping database operations at driver level and BSON data structures. It is based in the
+[Mongo C driver](https://mongoc.org) but the good thing is that relying in the API provided by this library you can ignore
+the internals of the driver (except if you need to expand this library with new operations or BSON information structures).
+
+This API is provided by the following classes:
+
+* `orion::DBConnection`: implementing a connection to the database
+* `orion::DBCursor`: implementing the DB cursor provided by query and aggregation operations
+* Several classes implementing the different BSON data structures:
+    * `orion::BSONObjBuilder` (builder class for `orion::BSONObj`)
+    * `orion::BSONArayBuilder` (builder class for `orion::BSONArray`)
+    * `orion::BSONElement`
+    * `orion::BSONDate`
+    * `orion::OID`
+
+and the following additional modules:
+
+* `mongoConnectionPool`: provides the functions to initialize the MongoDB connection pool at Orion startup and to get/release
+   connection. More on this on [the section below](#connection-pool-management).
+* `connectionOperations`: a wrapper for database operations (such as insert, find, update, etc.), adding Orion specific aspects (e.g. concurrency management in the database connection pool, error handling, logging, etc.).
+* `safeMongo`: safe methods to get fields from BSON objects.
+
+### Connection pool management
+
+The module `mongoConnectionPool` manages the database connection pool. How the pool works is important and deserves an explanation. Basically, Orion Context Broker keeps a list of connections to the database (the `connectionPool` defined in `mongoConnectionPool.cpp`). The list is sized with 
+`-dbPoolSize` [CLI parameter](../admin/cli.md) (10 by default). Each element in the list is an object of this type:
+
+```
+typedef struct MongoConnection
+{
+  orion::DBConnection  connection;
+  bool                 free;
+} MongoConnection;
+```
+
+where `connection` is the actual connection (a `orion::DBConnection` object) and `free` a flag to know whether the connection is currently in use or not. This is important, as `orion::DBConnection` objects are not thread safe so the Context Broker logic must ensure that the same connections is not being used by two threads at the same time.
+
+Taking this into account, the main functions within the `mongoConnectionPool` module are (there are more than this, but the rest are secondary modules, related to metrics logic):
+
+* `mongoConnectionPoolInit()`: to initialize the pool, called from the Context Broker bootstrapping logic.
+* `mongoPoolConnectionGet()`: to get a free connection from the pool
+* `mongoPoolConnectionRelease()`: to release a connection, so it returns to the pool and it is ready to be selected again by next call to `mongoConnectionGet()`.
+
+A semaphore system is used to protect connection usage. Have a look at [this separate document](semaphores.md#mongo-connection-pool-semaphores) for details.
+
+**NOTE:** this way of managing connections is legacy from an old version of the driver not supporting native pool management. With the
+current driver, native pool management is possible, so maybe we will change implementation in the future to use the native capabilities
+of the driver and simplify our codebase. [Issue #3789](https://github.com/telefonicaid/fiware-orion/issues/3789) is about this.
 
 [Top](#top)
 
@@ -436,22 +478,6 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 * One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
 * The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
-
-### Context availability notifications
-
-<a name="flow-nf-02"></a>
-![Notification on entity-attribute availability Registration/Update](images/Flow-NF-02.png)
-
-_NF-02: Notification on entity-attribute availability Registration/Update_
-
-* Extract IP, port and path from the value of the second parameter (url) to the method `sendNotifyContextAvailabilityRequest()` (step 1).
-* Create an instance of `SenderThreadParams` and fill it in with the data for the notification (step 2). Then create a vector of `SenderThreadParams` and push the instance to the vector. This is the input that is expected by `startSenderThread()` that is shared between `sendNotifyContextAvailabilityRequest()` and `sendNotifyContextRequest()`. In the case of `sendNotifyContextAvailabilityRequest()`, the vector will always contain only one item.
-* `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result (step 3). The control is returned to mongoBackend.
-* `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 4).
-* `startSenderThread()` sends the notification described by the `SenderThreadParams` item in the vector (step 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
-
-[Top](#top)
-
 
 ## src/lib/alarmMgr/
 [Alarms](../admin/logs.md#alarms) are special log messages inserted into the log file. However, to record the number of consecutive alarms of the same type, and to not repeat them when they're already active, etc. a manager has been implemented. This *Alarm Manager* resides in the library **alarmMgr**.

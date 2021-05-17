@@ -50,7 +50,9 @@ extern std::string mongoCreateSubscription
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPTION_H_

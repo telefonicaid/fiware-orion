@@ -18,7 +18,8 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# NOT VALGRIND READY ...
+# The log summary is heavily dependent on the timing, which is totally off under valgrind ...
 
 --NAME--
 More than ONE Bad Input in a request
@@ -61,7 +62,9 @@ echo
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+# Sometimes (see https://github.com/telefonicaid/fiware-orion/issues/3828) we can get an initial
+# summary at the start of the test. Thus, we take only the last four lines for the test
+tail -n 4 /tmp/contextBroker.log | grep 'SUMMARY' | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -77,13 +80,13 @@ echo
 01. Provoke FOUR Bad Inputs
 ===========================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 HTTP/1.1 400 Bad Request

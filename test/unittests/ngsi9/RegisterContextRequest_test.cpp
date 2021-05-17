@@ -61,9 +61,6 @@
 *   json_overwriteEntityIdType
 *   durationError
 *   emptyContextRegistrationAttributeName
-*   emptyContextRegistrationAttributeIsDomain
-*   badContextRegistrationAttributeIsDomain
-*   json_badContextRegistrationAttributeIsDomain
 *   emptyContextMetadataName
 *   emptyContextMetadataValue
 *   emptyRegistrationMetadataValue
@@ -92,10 +89,10 @@ TEST(RegisterContextRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", &reqP);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, &reqP);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  out = rcrP->render();
+  out = rcrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   reqP->release(&parseData);
@@ -121,7 +118,7 @@ TEST(RegisterContextRequest, json_noContextRegistration)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -144,7 +141,7 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -167,7 +164,7 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
@@ -190,7 +187,7 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_STREQ(expectedBuf, result.c_str()) << "entityIdWithIsPatternTrue error";
 }
 
@@ -212,7 +209,7 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_EQ(expect, result);
 }
 
@@ -233,31 +230,8 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_EQ("OK", result) << "error at overwriting EntityIdType";
-}
-
-
-
-/* ****************************************************************************
-*
-* json_badContextRegistrationAttributeIsDomain -
-*/
-TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
-{
-  ParseData       parseData;
-  const char*     inFile  = "ngsi9.registerContextRequest.badContextRegistrationAttributeIsDomain.invalid.json";
-  const char*     outFile = "ngsi9.registerContextResponse.badContextRegistrationAttributeIsDomain.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -278,6 +252,6 @@ TEST(RegisterContextRequest, json_reregistration)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, NULL);
   EXPECT_EQ(expect, result);
 }

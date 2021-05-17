@@ -50,7 +50,6 @@ typedef struct DiscoverContextAvailabilityRequest
   DiscoverContextAvailabilityRequest();
 
   void                 release(void);
-  void                 present(const std::string& indent);
 
   std::string          check(const std::string&  predetectedError);
 

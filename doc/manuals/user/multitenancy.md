@@ -19,8 +19,7 @@ Installation and Administration
 manual](../admin/database_admin.md#multiservicemultitenant-database-separation).
 
 In addition, note that when "-multiservice" is used Orion includes the
-"Fiware-Service" header in the notifyContextRequest and
-notifyContextAvailability request messages associated to subscriptions
+"Fiware-Service" header in the notifyContextRequest request messages associated to subscriptions
 in the given tenant/service (except for the default service/tenant, in
 which case the header is not present), e.g.:
 
@@ -40,9 +39,9 @@ Regarding service/tenant name syntax, it must be a string of
 alphanumeric characters (and the "\_" symbol). Maximum length is 50
 characters,
 which should be enough for most use cases. Orion Context Broker
-interprets the tentant name in lowercase, thus, although you can use
+interprets the tenant name in lowercase, thus, although you can use
 tenants such as in updateContext "MyService" it is not advisable, as the
 notifications related with that tenant will be sent with "myservice"
-and, in that sense, it is not coherent the tentant you used in
+and, in that sense, it is not coherent the tenant you used in
 updateContext compared with the one that Orion sends in
 notifyContextRequest.

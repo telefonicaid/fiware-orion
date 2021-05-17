@@ -78,7 +78,7 @@ std::string deleteIndividualContextEntity
   StatusCode   response;
 
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
-  parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "false", "", ActionTypeDelete);
 
   // 02. Call postUpdateContext standard service routine
   answer = postUpdateContext(ciP, components, compV, parseDataP);
@@ -87,13 +87,13 @@ std::string deleteIndividualContextEntity
   response.fill(parseDataP->upcrs.res);
 
   // 04. If not found, put entity info in details
-  if ((response.code == SccContextElementNotFound) && (response.details == ""))
+  if ((response.code == SccContextElementNotFound) && (response.details.empty()))
   {
     response.details = entityId;
   }
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   response.release();
   parseDataP->upcr.res.release();

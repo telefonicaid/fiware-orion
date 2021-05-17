@@ -58,10 +58,7 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  std::string  render(ApiVersion   apiVersion,
-                      bool         asJsonObject,
-                      RequestType  requestType);
-  void         present(const std::string&  indent);
+  std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release();
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

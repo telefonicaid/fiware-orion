@@ -29,71 +29,64 @@
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Attribute.h"
+#include "rest/OrionError.h"
+
 
 
 
 /* ****************************************************************************
 *
-* Attribute::render -
+* Attribute::toJson -
 */
-std::string Attribute::render
+std::string Attribute::toJson
 (
-  ApiVersion          apiVersion,          // in parameter (pass-through)
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outMimeTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
-  bool                keyValues,           // in parameter
-  const std::string&  metadataList,        // in parameter
-  RequestType         requestType,         // in parameter
-  bool                comma                // in parameter
+  bool                             acceptedTextPlain,   // in parameter (pass-through)
+  bool                             acceptedJson,        // in parameter (pass-through)
+  MimeType                         outFormatSelection,  // in parameter (pass-through)
+  MimeType*                        outMimeTypeP,        // out parameter (pass-through)
+  HttpStatusCode*                  scP,                 // out parameter (pass-through)
+  bool                             keyValues,           // in parameter
+  const std::vector<std::string>&  metadataFilter,      // in parameter
+  RequestType                      requestType          // in parameter
 )
 {
-  RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
-
-  if (pcontextAttribute)
-  {
-    std::string out;
-
-    if (requestType == EntityAttributeValueRequest)
-    {
-      out = pcontextAttribute->toJsonAsValue(apiVersion,
-                                             acceptedTextPlain,
-                                             acceptedJson,
-                                             outFormatSelection,
-                                             outMimeTypeP,
-                                             scP);
-    }
-    else
-    {
-      std::vector<std::string> metadataFilter;
-
-      if (metadataList != "")
-      {
-        stringSplit(metadataList, ',', metadataFilter);
-      }
-
-      out = "{";
-
-      // First parameter (isLastElement) is 'true' as it is the last and only element
-      out += pcontextAttribute->toJson(true, renderFormat, metadataFilter, requestType);
-
-      out += "}";
-    }
-
-
-    if (comma)
-    {
-      out += ",";
-    }
-
-    return out;
+  if (contextAttributeP == NULL) {
+    LM_E(("Runtime Error (NULL contextAttributeP)"));
+    return "";
   }
 
-  return oe.toJson();
+  RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
+
+  std::string out;
+
+  if (requestType == EntityAttributeValueRequest)
+  {
+    out = contextAttributeP->toJsonAsValue(V2,
+                                           acceptedTextPlain,
+                                           acceptedJson,
+                                           outFormatSelection,
+                                           outMimeTypeP,
+                                           scP);
+  }
+  else
+  {
+    if (renderFormat == NGSI_V2_KEYVALUES)
+    {
+      JsonObjectHelper jh;
+      jh.addRaw(contextAttributeP->name, contextAttributeP->toJsonValue());
+      out = jh.str();
+    }
+    else  // NGSI_V2_NORMALIZED
+    {
+      out = contextAttributeP->toJson(metadataFilter);
+    }
+  }
+
+  return out;
 }
 
 
@@ -107,45 +100,45 @@ std::string Attribute::render
 *   The Query should be for an indvidual entity
 *
 */
-void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
+void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrName, OrionError* oeP)
 {
-  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  if (qcrs.errorCode.code == SccContextElementNotFound)
   {
-    oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
-  else if (qcrsP->errorCode.code != SccOk)
+  else if (qcrs.errorCode.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    oe.fill(qcrsP->errorCode.code, qcrsP->errorCode.details, qcrsP->errorCode.reasonPhrase);
+    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
   }
-  else if (qcrsP->contextElementResponseVector.size() > 1)  // qcrsP->errorCode.code == SccOk
+  else if (qcrs.contextElementResponseVector.size() > 1)  // qcrs.errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
     //
-    oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
   }
   else
   {
-    pcontextAttribute = NULL;
+    contextAttributeP = NULL;
     // Look for the attribute by name
 
-    ContextElementResponse* cerP = qcrsP->contextElementResponseVector[0];
+    ContextElementResponse* cerP = qcrs.contextElementResponseVector[0];
 
-    for (std::size_t i = 0; i < cerP->contextElement.contextAttributeVector.size(); ++i)
+    for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->name == attrName)
+      if (cerP->entity.attributeVector[i]->name == attrName)
       {
-        pcontextAttribute = cerP->contextElement.contextAttributeVector[i];
+        contextAttributeP = cerP->entity.attributeVector[i];
         break;
       }
     }
 
-    if (pcontextAttribute == NULL)
+    if (contextAttributeP == NULL)
     {
-      oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+      oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
     }
   }
 }

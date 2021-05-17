@@ -32,18 +32,6 @@ brokerStart CB
 echo "0: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -54,18 +42,6 @@ REG_ID=$(echo "$_response" | grep registrationId | awk -F\" '{ print $4}')
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc",
   "registrationId": "'$REG_ID'"
@@ -75,18 +51,6 @@ orionCurl --url "$url" --payload "$payload"
 echo "2: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT3H",
   "providingApplication" : "http://kz.tid.es/abc",
   "registrationId": "012301230123012301230123"

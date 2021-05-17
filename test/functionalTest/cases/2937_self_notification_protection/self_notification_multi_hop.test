@@ -338,7 +338,6 @@ Date: REGEX(.*)
 07. Activate sub1 at CB1
 ========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -347,7 +346,6 @@ Date: REGEX(.*)
 08. Activate sub2 at CB2
 ========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -356,7 +354,6 @@ Date: REGEX(.*)
 09. Activate sub3 at CB3
 ========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -365,7 +362,6 @@ Date: REGEX(.*)
 10. Update entity at CB1, thus triggering CB1->CB2->CB3 notifications
 =====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -374,7 +370,7 @@ Date: REGEX(.*)
 11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -393,6 +389,8 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -412,7 +410,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -431,6 +429,8 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -469,6 +469,8 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",

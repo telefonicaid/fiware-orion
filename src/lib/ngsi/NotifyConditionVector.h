@@ -42,8 +42,7 @@ typedef struct NotifyConditionVector
 
   NotifyConditionVector();
 
-  std::string       render(bool comma);
-  void              present(const std::string& indent);
+  std::string       toJsonV1(bool comma);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void) const;
   void              release(void);

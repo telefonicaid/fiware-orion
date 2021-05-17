@@ -50,7 +50,7 @@ std::string AttributeExpression::check(void)
 */
 bool AttributeExpression::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -84,29 +84,11 @@ std::string AttributeExpression::get(void)
 
 /* ****************************************************************************
 *
-* AttributeExpression::present - 
+* AttributeExpression::toJsonV1 -
 */
-void AttributeExpression::present(const std::string& indent)
+std::string AttributeExpression::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sAttributeExpression: %s", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo AttributeExpression", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* AttributeExpression::render - 
-*/
-std::string AttributeExpression::render(bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

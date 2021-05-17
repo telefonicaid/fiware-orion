@@ -48,8 +48,7 @@ typedef struct NotifyCondition
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
 
-  std::string   render(bool notLastInVector);
-  void          present(const std::string& indent, int ix);
+  std::string   toJsonV1(bool notLastInVector);
   void          release(void);
 
   std::string   check(RequestType         requestType,

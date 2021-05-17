@@ -51,16 +51,15 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
   lmTraceLevelSet(LmtDump, true);
-  out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_STREQ("OK", out.c_str());
 
   UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;
 
-  ucrP->present("");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucrP->render();
+  out = ucrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucrP->release();

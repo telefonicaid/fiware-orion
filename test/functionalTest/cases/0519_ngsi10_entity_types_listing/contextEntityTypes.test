@@ -29,6 +29,7 @@ brokerStart CB 0-255 IPV4
 --SHELL--
 
 echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
+echo "=============================================================================================="
 payload='{
   "contextElements": [
     {
@@ -57,18 +58,21 @@ echo
 
 
 echo "1. Listing of Entity Types. Response in JSON"
+echo "============================================"
 orionCurl --url '/v1/contextTypes' 
 echo
 echo
 
 
 echo "2. Listing of Entity Types. Response in JSON, with details=on"
+echo "============================================================="
 orionCurl --url '/v1/contextTypes?details=on' 
 echo
 echo
 
 
 echo "3. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
+echo "==============================================================================="
 orionCurl --url '/v1/contextTypes?details=on&collapse=true'  
 echo
 echo
@@ -76,6 +80,7 @@ echo
 
 --REGEXPECT--
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
+==============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 258
 Content-Type: application/json
@@ -112,6 +117,7 @@ Date: REGEX(.*)
 
 
 1. Listing of Entity Types. Response in JSON
+============================================
 HTTP/1.1 200 OK
 Content-Length: 115
 Content-Type: application/json
@@ -126,8 +132,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "pressure",
-                "temperature"
+#SORT_START
+                "pressure"REGEX(,?)
+                "temperature"REGEX(,?)
+#SORT_END
             ],
             "name": "Room"
         }
@@ -136,6 +144,7 @@ Date: REGEX(.*)
 
 
 2. Listing of Entity Types. Response in JSON, with details=on
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 136
 Content-Type: application/json
@@ -151,8 +160,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "pressure",
-                "temperature"
+#SORT_START
+                "pressure"REGEX(,?)
+                "temperature"REGEX(,?)
+#SORT_END
             ],
             "name": "Room"
         }
@@ -161,6 +172,7 @@ Date: REGEX(.*)
 
 
 3. Listing of Entity Types. Response in JSON, with details=on and collapse=true
+===============================================================================
 HTTP/1.1 200 OK
 Content-Length: 96
 Content-Type: application/json

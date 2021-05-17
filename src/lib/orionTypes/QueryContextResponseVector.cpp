@@ -86,45 +86,9 @@ void QueryContextResponseVector::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector::present -
+* QueryContextResponseVector::toJsonV1 -
 */
-void QueryContextResponseVector::present(void)
-{
-  LM_T(LmtPresent, ("Presenting QueryContextResponseVector of %d QueryContextResponses", vec.size()));
-  for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
-  {
-    LM_T(LmtPresent, ("QueryContextResponse %d:", qcrIx));
-
-    for (unsigned int eIx = 0; eIx < vec[qcrIx]->contextElementResponseVector.size(); ++eIx)
-    {
-      ContextElement*         ceP  = &vec[qcrIx]->contextElementResponseVector[eIx]->contextElement;
-      EntityId*               eP   = &ceP->entityId;
-
-
-      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }",
-                        eIx, eP->id.c_str(),
-                        eP->type.c_str(),
-                        eP->isPattern.c_str()));
-
-      for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
-      {
-        ContextAttribute* aP = ceP->contextAttributeVector[aIx];
-        LM_T(LmtPresent, ("  attribute %02d: %s: %s",
-                          aIx, aP->name.c_str(),
-                          aP->getValue().c_str()));
-      }
-    }
-
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponseVector::render -
-*/
-std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJsonObject, bool details, const std::string& detailsString)
+std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;
@@ -168,7 +132,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     //
     // Also, if same errorCode.code but no details ...
     //
-    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details == ""))
+    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details.empty()))
     {
       responseP->errorCode.details = vec[0]->errorCode.details;
     }
@@ -216,15 +180,15 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector, true);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {
-        ContextElementResponse* newCerP = new ContextElementResponse(cerP);
+        ContextElementResponse* newCerP = new ContextElementResponse(cerP, true);
 
         newCerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(newCerP);
@@ -232,7 +196,7 @@ std::string QueryContextResponseVector::render(ApiVersion apiVersion, bool asJso
     }
   }
 
-  answer = responseP->render(apiVersion, asJsonObject);
+  answer = responseP->toJsonV1(asJsonObject);
   responseP->release();
   delete responseP;
 
@@ -308,11 +272,11 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
       // If so, we just add the attributes of cerP to that contextElementResponse
       //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
 
       if (targetCerP != NULL)
       {
-        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {

@@ -1,0 +1,491 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Force update for NGSIv2 POST /v2/op/update, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/subscriptions, Dump and reset accumulator, POST /v2/op/update, Dump and reset accumulator, POST /v2/op/update?options=forcedUpdate, Dump and reset accumulator.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to true.
+# 02. POST /v2/subscriptions, to create subscription for Slot1.
+# 03. Dump and reset accumulator, see notification.
+# 04. POST /v2/subscriptions, to create subscription for Slot2.
+# 05. Dump and reset accumulator, see notification.
+# 06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+# 07. Dump and reset accumulator, see no notification (as there was no actual update).
+# 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
+# 09. Dump and reset accumulator, see notification.
+# 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+# 11. Dump and reset accumulator, see notification.
+#
+
+echo '01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to true.'
+echo '=============================================================================================='
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/subscriptions, to create subscription for Slot1.'
+echo '============================================================='
+payload='{
+  "description": "A subscription to get info about Slot1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Slot1",
+        "type": "Slot"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "availability"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "availability"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '04. POST /v2/subscriptions, to create subscription for Slot2.'
+echo '============================================================='
+payload='{
+  "description": "A subscription to get info about Slot2",
+  "subject": {
+    "entities": [
+      {
+        "id": "Slot2",
+        "type": "Slot"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "availability"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "availability"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '05. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.'
+echo '============================================================================================'
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '07. Dump and reset accumulator, see no notification (as there was no actual update).'
+echo '===================================================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.'
+echo '=============================================================================================================='
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '09. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.'
+echo '=============================================================================================================='
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo '11. Dump and reset accumulator, see notification.'
+echo '================================================='
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to true.
+==============================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/subscriptions, to create subscription for Slot1.
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+04. POST /v2/subscriptions, to create subscription for Slot2.
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see notification.
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot2", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+============================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump and reset accumulator, see no notification (as there was no actual update).
+====================================================================================
+
+
+08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
+==============================================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump and reset accumulator, see notification.
+#SORT_START
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot2", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+#SORT_END
+
+
+10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+==============================================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Dump and reset accumulator, see notification.
+#SORT_START
+=================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot1", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 144
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {}, 
+                "type": "Boolean", 
+                "value": true
+            }, 
+            "id": "Slot2", 
+            "type": "Slot"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+#SORT_END
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

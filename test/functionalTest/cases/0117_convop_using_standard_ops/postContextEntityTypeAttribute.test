@@ -95,7 +95,7 @@ Date: REGEX(.*)
 02. Discover entities of type ET
 ================================
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -106,7 +106,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": ""
                     }
@@ -142,7 +141,7 @@ Date: REGEX(.*)
 04. Discover entities of type ET
 ================================
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 184
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -153,7 +152,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": ""
                     }

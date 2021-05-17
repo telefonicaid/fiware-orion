@@ -40,7 +40,8 @@ std::string parseStringList
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   StringList*                                   sP,
-  const std::string&                            fieldName
+  const std::string&                            fieldName,
+  bool                                          unique
 )
 {
   std::string type = jsonParseTypeNames[iter->value.GetType()];
@@ -61,8 +62,14 @@ std::string parseStringList
       return "only JSON Strings allowed in " + fieldName + " list";
     }
 
+
     val  = iter2->GetString();
-    sP->push_back(val);
+
+    // If unique is true, we need to ensure the element hasn't been added previousy in order to add it
+    if ((!unique) || (!sP->lookup(val)))
+    {
+      sP->push_back(val);
+    }
   }
 
   return "OK";

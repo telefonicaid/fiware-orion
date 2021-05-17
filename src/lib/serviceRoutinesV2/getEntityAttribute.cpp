@@ -36,6 +36,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
 #include "rest/OrionError.h"
 
@@ -76,7 +77,6 @@ std::string getEntityAttribute
 
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-  parseDataP->qcr.res.metadataList.fill(ciP->uriParam[URI_PARAM_METADATA]);
 
 
   // 02. Call standard op postQueryContext
@@ -84,23 +84,32 @@ std::string getEntityAttribute
 
 
   // 03. Render entity attribute response
-  attribute.fill(&parseDataP->qcrs.res, compV[4]);
+  OrionError oe;
+  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
 
-  TIMED_RENDER(answer = attribute.render(ciP->apiVersion,
-                                         ciP->httpHeaders.accepted("text/plain"),
-                                         ciP->httpHeaders.accepted("application/json"),
-                                         ciP->httpHeaders.outformatSelect(),
-                                         &(ciP->outMimeType),
-                                         &(ciP->httpStatusCode),
-                                         ciP->uriParamOptions[OPT_KEY_VALUES],
-                                         ciP->uriParam[URI_PARAM_METADATA],
-                                         EntityAttributeResponse));
+  if (oe.code == SccNone)
+  {
+    StringList metadataFilter;
+    setMetadataFilter(ciP->uriParam, &metadataFilter);
+    TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
+                                           ciP->httpHeaders.accepted("application/json"),
+                                           ciP->httpHeaders.outformatSelect(),
+                                           &(ciP->outMimeType),
+                                           &(ciP->httpStatusCode),
+                                           ciP->uriParamOptions[OPT_KEY_VALUES],
+                                           metadataFilter.stringV,
+                                           EntityAttributeResponse));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
-  if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)
+  if (oe.reasonPhrase == ERROR_TOO_MANY)
   {
     ciP->httpStatusCode = SccConflict;
   }
-  else if (attribute.oe.reasonPhrase == ERROR_NOT_FOUND)
+  else if (oe.reasonPhrase == ERROR_NOT_FOUND)
   {
     ciP->httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
   }

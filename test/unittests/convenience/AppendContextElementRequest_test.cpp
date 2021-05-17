@@ -27,7 +27,6 @@
 
 #include "common/MimeType.h"
 #include "convenience/AppendContextElementRequest.h"
-#include "ngsi/ContextElement.h"
 #include "ngsi/Metadata.h"
 #include "rest/ConnectionInfo.h"
 
@@ -49,10 +48,9 @@ TEST(AppendContextElementRequest, render_json)
 
    utInit();
 
-   acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
-   out = acer.render(V1, false, UpdateContext);
+   out = acer.toJsonV1(false, UpdateContext);
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
@@ -71,16 +69,12 @@ TEST(AppendContextElementRequest, check_json)
    AppendContextElementRequest  acer;
    std::string                  out;
    ContextAttribute             ca("caName", "caType", "121");
-   Metadata                     md("mdName", "mdType", "122");
    const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.json";
    const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.valid.json";
-   const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.valid.json";
 
    utInit();
 
-   acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
-   acer.domainMetadataVector.push_back(&md);
 
    // 1. ok
    out = acer.check(V1, false, AppendContextElement, "");
@@ -102,40 +96,7 @@ TEST(AppendContextElementRequest, check_json)
    EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";
 
-
-   // 4. Bad domainMetadata
-   Metadata  md2("", "mdType", "122");
-
-   acer.domainMetadataVector.push_back(&md2);
-   out = acer.check(V1, false, AppendContextElement, "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
-   EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-   // 5. Bad attributeDomainName
-   // FIXME P3: AttributeDomainName::check always returns "OK"
-
    utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - just exercise the code
-*/
-TEST(AppendContextElementRequest, present)
-{
-   AppendContextElementRequest  acer;
-   std::string                  out;
-   ContextAttribute             ca("caName", "caType", "121");
-   Metadata                     md("mdName", "mdType", "122");
-
-   acer.attributeDomainName.set("ADN");
-   acer.contextAttributeVector.push_back(&ca);
-   acer.domainMetadataVector.push_back(&md);
-
-   acer.present("");
 }
 
 
@@ -151,9 +112,7 @@ TEST(AppendContextElementRequest, release)
    ContextAttribute*            caP = new ContextAttribute("caName", "caType", "121");
    Metadata*                    mdP = new Metadata("mdName", "mdType", "122");
 
-   acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(caP);
-   acer.domainMetadataVector.push_back(mdP);
 
    acer.release();
 }

@@ -1,0 +1,458 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check "location" metadata is included in NGSIv1 notifications
+triggered by NGSIV1 subscription creation, update or attribute update 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E with type T
+# 02. Create NGSIv1 subscription for E
+# 03. Trigger notification by updating value of "name" attribute (in NGSIv1)
+# 04. Trigger notification by updating the subscription itself (in NGSIv1)
+# 05. See NGSIv1 notifications and make sure "location" metadata is included
+#
+
+echo "01. Create E with type: T"
+echo "========================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "name":{
+    "value": "SD3",
+    "type": "Text"
+  },
+  "perimeter": {
+    "type":"geo:json",
+    "value":{
+    "type": "Polygon",
+    "coordinates": [
+                    [
+                        [-13.806454999999991,33.46727800000001,0],
+                        [-13.806707999999981,33.46723400000001,0],
+                        [-13.806863999999999,33.46720599999997,0],
+                        [-13.807017000000008,33.46719100000001,0],
+                        [-13.806454999999991,33.46727800000001,0]
+                    ]
+                ]
+        }
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create NGSIv1 subscription for E"
+echo "===================================="
+payload='{
+   "entities": [
+      {
+         "type": "T",
+         "isPattern": "false",
+         "id": "E"
+      }
+   ],
+   "attributes": [],
+   "reference": "http://localhost:'$LISTENER_PORT'/notify",
+   "notifyConditions": [
+      {
+         "type": "ONCHANGE",
+         "condValues": []
+      }
+   ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+
+
+echo "03. Trigger notification by updating value of name attribute (in NGSIv1)"
+echo "========================================================================"
+payload='{
+    "contextElements": [
+        {
+            "type": "T",
+            "isPattern": "false",
+            "id": "E",
+            "attributes": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": "2"
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Trigger notification by updating the subscription itself (in NGSIv1)"
+echo "========================================================================"
+payload='{
+    "subscriptionId": "'$SUB_ID'",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+            ]
+        }
+    ]
+}'
+orionCurl --url /v1/updateContextSubscription  --payload "$payload"
+echo
+echo
+
+
+echo "05. See NGSIv1 notifications and make sure location metadata is included"
+echo "========================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E with type: T
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create NGSIv1 subscription for E
+====================================
+HTTP/1.1 200 OK
+Content-Length: 86
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT24H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+03. Trigger notification by updating value of name attribute (in NGSIv1)
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Trigger notification by updating the subscription itself (in NGSIv1)
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 67
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+05. See NGSIv1 notifications and make sure location metadata is included
+========================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 534
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name", 
+                        "type": "Text", 
+                        "value": "SD3"
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location", 
+                                "type": "string", 
+                                "value": "WGS84"
+                            }
+                        ], 
+                        "name": "perimeter", 
+                        "type": "geo:json", 
+                        "value": {
+                            "coordinates": [
+                                [
+                                    [
+                                        -13.806455, 
+                                        33.467278, 
+                                        0
+                                    ], 
+                                    [
+                                        -13.806708, 
+                                        33.467234, 
+                                        0
+                                    ], 
+                                    [
+                                        -13.806864, 
+                                        33.467206, 
+                                        0
+                                    ], 
+                                    [
+                                        -13.807017, 
+                                        33.467191, 
+                                        0
+                                    ], 
+                                    [
+                                        -13.806455, 
+                                        33.467278, 
+                                        0
+                                    ]
+                                ]
+                            ], 
+                            "type": "Polygon"
+                        }
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 534
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": "2"
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ], 
+                        "name": "perimeter", 
+                        "type": "geo:json", 
+                        "value": {
+                            "coordinates": [
+                                [
+                                    [
+                                        -13.806455,
+                                        33.467278,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806708,
+                                        33.467234,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806864,
+                                        33.467206,
+                                        0
+                                    ], 
+                                    [
+                                        -13.807017,
+                                        33.467191,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806455,
+                                        33.467278,
+                                        0
+                                    ]
+                                ]
+                            ],
+                            "type": "Polygon"
+                        }
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 534
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": "2"
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ], 
+                        "name": "perimeter",
+                        "type": "geo:json",
+                        "value": {
+                            "coordinates": [
+                                [
+                                    [
+                                        -13.806455,
+                                        33.467278,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806708,
+                                        33.467234,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806864,
+                                        33.467206,
+                                        0
+                                    ], 
+                                    [
+                                        -13.807017,
+                                        33.467191,
+                                        0
+                                    ], 
+                                    [
+                                        -13.806455,
+                                        33.467278,
+                                        0
+                                    ]
+                                ]
+                            ], 
+                            "type": "Polygon"
+                        }
+                    }
+                ], 
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

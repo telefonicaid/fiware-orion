@@ -33,6 +33,7 @@ accumulatorStart --pretty-print
 #
 # Note we use sleep in some point to let time the DB to sync with regards to
 # cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+# [ Under VALGRIND we need to sleep a little more ]
 #
 WAIT_TIME=1.5s
 #
@@ -71,6 +72,7 @@ echo
 echo
 id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
+valgrindSleep 1
 
 echo '02. Create entity (triggers notification)'
 echo "========================================="
@@ -85,6 +87,8 @@ payload='
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
+
+
 sleep $WAIT_TIME
 
 
@@ -117,7 +121,10 @@ payload='
 orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
 echo
 echo
+
+
 sleep $WAIT_TIME
+valgrindSleep 2
 
 
 echo "09. Accumulator dump"
@@ -151,13 +158,13 @@ Date: REGEX(.*)
 03. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 429
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
@@ -167,6 +174,8 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -189,7 +198,6 @@ Date: REGEX(.*)
 04. Subcription update not involving actual update
 ==================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -198,7 +206,6 @@ Date: REGEX(.*)
 05. Update entity (triggers notification)
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -214,7 +221,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -239,7 +246,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

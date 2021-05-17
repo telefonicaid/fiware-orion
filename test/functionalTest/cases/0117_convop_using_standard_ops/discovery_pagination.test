@@ -78,8 +78,7 @@ payload='{
     "attributes": [
       {
         "name": "A0",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -107,8 +106,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -136,8 +134,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -165,8 +162,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -194,8 +190,7 @@ payload='{
     "attributes": [
       {
         "name": "A4",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -223,8 +218,7 @@ payload='{
     "attributes": [
       {
         "name": "A5",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -252,8 +246,7 @@ payload='{
     "attributes": [
       {
         "name": "A6",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -281,8 +274,7 @@ payload='{
     "attributes": [
       {
         "name": "A7",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -310,8 +302,7 @@ payload='{
     "attributes": [
       {
         "name": "A8",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -339,8 +330,7 @@ payload='{
     "attributes": [
       {
         "name": "A9",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -368,8 +358,7 @@ payload='{
     "attributes": [
       {
         "name": "A9",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -397,8 +386,7 @@ payload='{
     "attributes": [
       {
         "name": "A9",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -426,8 +414,7 @@ payload='{
     "attributes": [
       {
         "name": "A10",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -455,8 +442,7 @@ payload='{
     "attributes": [
       {
         "name": "A10",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -484,8 +470,7 @@ payload='{
     "attributes": [
       {
         "name": "A10",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://kz.tid.es/abc"
@@ -815,7 +800,7 @@ Date: REGEX(.*)
 16. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 613
+Content-Length: 556
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -826,7 +811,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A0", 
                         "type": "string"
                     }
@@ -845,7 +829,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -864,7 +847,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -886,7 +868,7 @@ Date: REGEX(.*)
 17. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1385
+Content-Length: 1252
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -897,7 +879,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": "string"
                     }
@@ -916,7 +897,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -935,7 +915,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -954,7 +933,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A6", 
                         "type": "string"
                     }
@@ -973,7 +951,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A7", 
                         "type": "string"
                     }
@@ -992,7 +969,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A8", 
                         "type": "string"
                     }
@@ -1011,7 +987,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1033,7 +1008,7 @@ Date: REGEX(.*)
 18. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1044,7 +1019,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -1071,7 +1045,7 @@ Date: REGEX(.*)
 19. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '0-2'
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 613
+Content-Length: 556
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1082,7 +1056,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A0", 
                         "type": "string"
                     }
@@ -1101,7 +1074,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -1120,7 +1092,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -1142,7 +1113,7 @@ Date: REGEX(.*)
 20. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '3-23'
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1385
+Content-Length: 1252
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1153,7 +1124,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": "string"
                     }
@@ -1172,7 +1142,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -1190,8 +1159,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {
-                        "isDomain": "false", 
+                    {                        
                         "name": "A5", 
                         "type": "string"
                     }
@@ -1210,7 +1178,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A6", 
                         "type": "string"
                     }
@@ -1229,7 +1196,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A7", 
                         "type": "string"
                     }
@@ -1248,7 +1214,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A8", 
                         "type": "string"
                     }
@@ -1267,7 +1232,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1289,7 +1253,7 @@ Date: REGEX(.*)
 21. Discover E1 using /v1/registry/contextEntities/E1/attributes, pagination '5', with details
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1300,7 +1264,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -1327,7 +1290,7 @@ Date: REGEX(.*)
 22. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0-1'
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 420
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1338,7 +1301,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1357,7 +1319,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1379,7 +1340,7 @@ Date: REGEX(.*)
 23. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '1-21'
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 208
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1390,7 +1351,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1412,7 +1372,7 @@ Date: REGEX(.*)
 24. Discover E2 using /v1/registry/contextEntities/E2/attributes/A9, pagination '0', with details
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 276
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1423,7 +1383,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1450,7 +1409,7 @@ Date: REGEX(.*)
 25. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0-1'
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 420
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1461,7 +1420,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A0", 
                         "type": "string"
                     }
@@ -1480,7 +1438,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -1502,7 +1459,7 @@ Date: REGEX(.*)
 26. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '1-21'
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1771
+Content-Length: 1600
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1513,7 +1470,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -1532,7 +1488,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A2", 
                         "type": "string"
                     }
@@ -1551,7 +1506,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A3", 
                         "type": "string"
                     }
@@ -1570,7 +1524,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A4", 
                         "type": "string"
                     }
@@ -1589,7 +1542,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A5", 
                         "type": "string"
                     }
@@ -1608,7 +1560,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A6", 
                         "type": "string"
                     }
@@ -1627,7 +1578,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A7", 
                         "type": "string"
                     }
@@ -1646,7 +1596,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A8", 
                         "type": "string"
                     }
@@ -1665,7 +1614,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A9", 
                         "type": "string"
                     }
@@ -1687,7 +1635,7 @@ Date: REGEX(.*)
 27. Discover type T1 using /v1/registry/contextEntityTypes/T1, pagination '0', with details
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1698,7 +1646,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A0", 
                         "type": "string"
                     }
@@ -1725,7 +1672,7 @@ Date: REGEX(.*)
 28. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0-1'
 ==============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1736,7 +1683,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A10", 
                         "type": "string"
                     }
@@ -1755,7 +1701,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A10", 
                         "type": "string"
                     }
@@ -1777,7 +1722,7 @@ Date: REGEX(.*)
 29. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '1-21'
 ===============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1788,7 +1733,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A10", 
                         "type": "string"
                     }
@@ -1807,7 +1751,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A10", 
                         "type": "string"
                     }
@@ -1829,7 +1772,7 @@ Date: REGEX(.*)
 30. Discover type T4, attribute A10, using /v1/registry/contextEntityTypes/T4/attributes/A10, pagination '0', with details
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1839,8 +1782,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {
-                        "isDomain": "false", 
+                    {                        
                         "name": "A10", 
                         "type": "string"
                     }

@@ -22,6 +22,9 @@
 # Author: Leandro Guillen
 #
 
+# FIXME: this script is not going to work... we are no longer using mongodb-linux-x86_64-2.2.3.tgz
+# This script needs a deep update or being removed if it is obsolete and no longer used
+
 # Setting up EPEL Repo
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 sudo rpm -ivh epel-release-6-8.noarch.rpm

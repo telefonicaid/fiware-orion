@@ -70,19 +70,19 @@ TEST(OrionError, all)
 
   ci.outMimeType = JSON;
 
-  out = e1.render();
+  out = e1.toJsonV1();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render();
+  out = e3.toJsonV1();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.render();
+  out = e4.toJsonV1();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile3)) << "Error getting test data from '" << outfile3 << "'";

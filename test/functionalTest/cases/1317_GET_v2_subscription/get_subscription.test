@@ -108,7 +108,7 @@ echo
 
 
 echo "02. GET /v2/subscriptions/$SUB_ID"
-echo "=================================================="
+echo "============================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
@@ -154,15 +154,15 @@ Date: REGEX(.*)
 
 
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
-==================================================
+=============================================
 HTTP/1.1 200 OK
-Content-Length: 385
+Content-Length: 411
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+    "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -173,7 +173,8 @@ Date: REGEX(.*)
         "attrsFormat": "legacy",
         "http": {
             "url": "http://127.0.0.1:REGEX(\d+)/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -201,13 +202,13 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 317
+Content-Length: 343
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+    "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -217,7 +218,8 @@ Date: REGEX(.*)
         "attrsFormat": "legacy",
         "http": {
             "url": "http://127.0.0.1:REGEX(\d+)/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

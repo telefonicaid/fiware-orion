@@ -61,7 +61,6 @@ std::string postSubscribeContext
 {
   SubscribeContextResponse  scr;
   std::string               answer;
-
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
   //           Personally (kz) I kind of like that. If you want additional service-paths, just add another subscription!
@@ -78,12 +77,12 @@ std::string postSubscribeContext
 
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render());
+    TIMED_RENDER(answer = scr.toJsonV1());
     return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
-  TIMED_RENDER(answer = scr.render());
+  TIMED_RENDER(answer = scr.toJsonV1());
 
   parseDataP->scr.res.release();
 

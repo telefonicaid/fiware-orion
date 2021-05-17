@@ -12,8 +12,6 @@ the value of attribute "A" to a vector and the value of attribute B to a
 key-map object (we show it in an entity creation operation, but the
 same applies to attribute updates).
 
-In NGSIv2:
-
 ```
 curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' \
    -d @- <<EOF
@@ -53,71 +51,3 @@ curl localhost:1026/v2/entities -s -S --header 'Content-Type: application/json' 
 }
 EOF
 ```
-
-In NGSIv1:
-
-``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "contextElements": [
-        {
-            "type": "T1",
-            "isPattern": "false",
-            "id": "E1",
-            "attributes": [
-                {
-                    "name": "A",
-                    "type": "T",
-                    "value": [
-                        "22",
-                        {
-                            "x": [
-                                "x1",
-                                "x2"
-                            ],
-                            "y": "3"
-                        },
-                        [
-                            "z1",
-                            "z2"
-                        ]
-                    ]
-                },
-                {
-                    "name": "B",
-                    "type": "T",
-                    "value": {
-                        "x": {
-                            "x1": "a",
-                            "x2": "b"
-                        },
-                        "y": [
-                            "y1",
-                            "y2"
-                        ]
-                    }
-                }
-            ]
-        }
-    ],
-    "updateAction": "UPDATE"
-}
-EOF
-``` 
-
-The value of the attribute is stored internally by Orion Context Broker
-in a format-independent representation. 
-
-Note that for NGSIv1 in order to align JSON representations, the final "leaf"
-elements of the structured attribute values after traversing all vectors
-and key-maps are always considered as strings. Thus, take into account that
-although you can use for instance a JSON number as a field value in updates
-(such as `{"x": 3.2 }`), you will retrieve a string in queries and notifications 
-(i.e. `{ "x": "3.2"}`).
-
-In NGSIv2, the final "leaf" elements of the structured attribute values after traversing
-all vectors and key-maps uses the right native JSON type (number, boolean, etc.).
-Thus, if you use for instance a JSON number as a field value in updates
-(such as `{"x": 3.2 }`), you will get also a number in queries
-and notifications (i.e. `{ "x": 3.2}`).

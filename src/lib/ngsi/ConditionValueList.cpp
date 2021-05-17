@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ConditionValueList::render(bool comma)
+std::string ConditionValueList::toJsonV1(bool comma)
 {
   std::string  out = "";
 
@@ -70,29 +70,13 @@ std::string ConditionValueList::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix] == "")
+    if (vec[ix].empty())
     {
       return "empty condValue name";
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ConditionValueList::present - 
-*/
-void ConditionValueList::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sConditionValue List",    indent.c_str()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    LM_T(LmtPresent, ("%s  %s", 
-		      indent.c_str(), 
-		      vec[ix].c_str()));
 }
 
 

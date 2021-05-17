@@ -36,6 +36,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
@@ -53,9 +54,9 @@
 *
 * URI parameters:
 *   - type=<TYPE>
-*   - options=keyValues|values|unique   (used in Entity::render)
-*   - attrs=A1,A2,...An                 (used in Entity::render)
-*   - metadata=M1,M2,...Mn              (used in Entity::render)
+*   - options=keyValues|values|unique   (used in Entity::toJson)
+*   - attrs=A1,A2,...An                 (used in Entity::toJson)
+*   - metadata=M1,M2,...Mn              (used in Entity::toJson)
 */
 std::string getEntity
 (
@@ -68,7 +69,7 @@ std::string getEntity
   std::string entityId        = compV[2];
   std::string type            = ciP->uriParam[URI_PARAM_TYPE];
 
-  if (entityId == "")
+  if (entityId.empty())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -85,9 +86,12 @@ std::string getEntity
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
 
+  // Get attrs and metadata filters from URL params
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
+
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
-
 
   // Render entity response
   Entity       entity;
@@ -98,10 +102,24 @@ std::string getEntity
     entity.hideIdAndType();
   }
 
-  entity.fill(&parseDataP->qcrs.res);
+  OrionError   oe;
+  std::string  answer;
 
-  std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam, false));
+  entity.fill(parseDataP->qcrs.res, &oe);
+
+  if (oe.code == SccNone)
+  {
+    // Filtering again attributes may seem redundant, but it will prevent
+    // that faulty CPrs inject attributes not requested by client
+    TIMED_RENDER(answer = entity.toJson(getRenderFormat(ciP->uriParamOptions),
+                                        parseDataP->qcr.res.attrsList.stringV,
+                                        false,
+                                        parseDataP->qcr.res.metadataList.stringV));
+  }
+  else
+  {
+    TIMED_RENDER(answer = oe.toJson());
+  }
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

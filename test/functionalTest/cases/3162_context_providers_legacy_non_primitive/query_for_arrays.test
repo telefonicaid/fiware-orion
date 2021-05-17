@@ -1,0 +1,330 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+#
+# Uncached/Cached query
+#
+# 01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 02. Update/APPEND E1/A1(=CP) in CP - this is a non-primitive element e.g. an Array
+# 03. Query CP for E1/A1
+# 04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)
+# 05. Update/APPEND E1/A2(=broker) in broker - this is also a non-primitive element e.g. an Array
+# 06. Query broker for E1/A2 (broker's local info is returned (A2=broker))
+# 07. Query E1 in CB
+
+--NAME--
+Query Redirect Operation
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
+
+
+--SHELL--
+
+echo "01. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+echo "=================================================================================="
+payload='{
+  "description": "Register a E1/A1 with CP as provider",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "E"
+      }
+    ],
+    "attrs": [
+      "A1"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'$CP1_PORT'/v1"
+    },
+     "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Update/APPEND E1/A1(=CP) in CP"
+echo "=================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "Array",
+          "value": ["Data", "from CP"]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Query CP for E1/A1"
+echo "======================"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)"
+echo "======================================================================================"
+orionCurl --url /v2/entities/E1/attrs/A1/value
+echo
+echo
+
+
+echo "05. Update/APPEND E1/A2(=broker) in broker"
+echo "=========================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "Array",
+          "value": ["Data", "from CB"]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "06. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)"
+echo "================================================================================"
+orionCurl --url /v2/entities/E1/attrs/A2/value --out "text/plain"
+echo
+echo
+
+
+echo "07. Query E1 in CB - expect two arrays returned"
+echo "==============================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Update/APPEND E1/A1(=CP) in CP
+==================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Array",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Query CP for E1/A1
+======================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Array",
+                        "value": [
+                            "Data",
+                            "from CP"
+                        ]
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 18
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "Data",
+    "from CP"
+]
+
+
+05. Update/APPEND E1/A2(=broker) in broker
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "Array",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 18
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+["Data","from CB"]
+
+
+07. Query E1 in CB - expect two arrays returned
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 148
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Array",
+        "value": [
+            "Data",
+            "from CP"
+        ]
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Array",
+        "value": [
+            "Data",
+            "from CB"
+        ]
+    },
+    "id": "E1",
+    "type": "E"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

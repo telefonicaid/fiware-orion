@@ -1,0 +1,190 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attrs field in POST /v2/op/query with builtin attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attributes A
+# 02. Query attrs: dateModified -> get E-dateModified
+# 03. Query attrs: dateModified,* -> get E-(A,dateModified)
+# 04. Query attrs: dateModified,A -> get E-(A,dateModified)
+#
+
+
+echo "01. Create entity E1 with attributes A"
+echo "======================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": "1A",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Query attrs: dateModified -> get E-dateModified"
+echo "==================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "dateModified" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "03. Query attrs: dateModified,* -> get E-(A,dateModified)"
+echo "========================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "dateModified", "*" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "03. Query attrs: dateModified,A -> get E-(A,dateModified)"
+echo "========================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "attrs": [ "dateModified", "A" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attributes A
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Query attrs: dateModified -> get E-dateModified
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+03. Query attrs: dateModified,* -> get E-(A,dateModified)
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "1A"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+03. Query attrs: dateModified,A -> get E-(A,dateModified)
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Text",
+            "value": "1A"
+        },
+        "dateModified": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "REGEX(.*)"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

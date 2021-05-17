@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -40,11 +41,10 @@
 
 /* ****************************************************************************
 *
-* EntityTypeVectorResponse::render -
+* EntityTypeVectorResponse::toJsonV1 -
 */
-std::string EntityTypeVectorResponse::render
+std::string EntityTypeVectorResponse::toJsonV1
 (
-  ApiVersion  apiVersion,
   bool        asJsonObject,
   bool        asJsonOut,
   bool        collapsed
@@ -56,10 +56,10 @@ std::string EntityTypeVectorResponse::render
 
   if (entityTypeVector.size() > 0)
   {
-    out += entityTypeVector.render(apiVersion, asJsonObject, asJsonOut, collapsed, true);
+    out += entityTypeVector.toJsonV1(asJsonObject, asJsonOut, collapsed, true);
   }
 
-  out += statusCode.render(false);
+  out += statusCode.toJsonV1(false);
 
   out += endTag();
 
@@ -82,7 +82,7 @@ std::string EntityTypeVectorResponse::check
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
@@ -96,23 +96,7 @@ std::string EntityTypeVectorResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, asJsonOut, collapsed);
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVectorResponse::present -
-*/
-void EntityTypeVectorResponse::present(const std::string& indent)
-{
-  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n",
-		  indent.c_str(),
-		  entityTypeVector.size()));
-
-  entityTypeVector.present(indent + "  ");
-  statusCode.present(indent + "  ");
+  return toJsonV1(asJsonObject, asJsonOut, collapsed);
 }
 
 
@@ -134,27 +118,19 @@ void EntityTypeVectorResponse::release(void)
 */
 std::string EntityTypeVectorResponse::toJson(bool values)
 {
-  std::string  out = "[";
+  JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
     if (values)
     {
-      out += JSON_STR(entityTypeVector.vec[ix]->type);
+      jh.addString(entityTypeVector.vec[ix]->type);
     }
     else  // default
     {
-      out += entityTypeVector.vec[ix]->toJson(true);
+      jh.addRaw(entityTypeVector.vec[ix]->toJson(true));
     }
-
-    if (ix != entityTypeVector.vec.size() - 1)
-    {
-      out += ",";
-    }
-
   }
 
-  out += "]";
-
-  return out;
+  return jh.str();
 }

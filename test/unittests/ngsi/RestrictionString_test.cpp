@@ -89,35 +89,14 @@ TEST(RestrictionString, render)
 
   utInit();
 
-  out = restrictionString.render(false);
+  out = restrictionString.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   restrictionString.string = "String";
 
-  out = restrictionString.render(false);
+  out = restrictionString.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(RestrictionString, present)
-{
-  RestrictionString   restrictionString;
-
-  utInit();
-
-  restrictionString.set("");
-  restrictionString.present("");
-
-  restrictionString.set("STR");
-  restrictionString.present("");
 
   utExit();
 }

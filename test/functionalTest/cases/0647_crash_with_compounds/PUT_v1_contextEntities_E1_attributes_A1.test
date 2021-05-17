@@ -146,7 +146,7 @@ Date: REGEX(.*)
 02. POST /v1/updateContext to create Entity E, attribute A
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 241
+Content-Length: 239
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -160,7 +160,7 @@ Date: REGEX(.*)
                         "metadatas": [
                             {
                                 "name": "ID",
-                                "type": "string",
+                                "type": "none",
                                 "value": "253"
                             }
                         ],
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/E to make sure 03 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 219
+Content-Length: 217
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
                 "metadatas": [
                     {
                         "name": "ID",
-                        "type": "string",
+                        "type": "none",
                         "value": "253"
                     }
                 ],
@@ -234,7 +234,7 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/E to make sure 05 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 224
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +246,7 @@ Date: REGEX(.*)
                 "metadatas": [
                     {
                         "name": "ID",
-                        "type": "string",
+                        "type": "none",
                         "value": "253"
                     }
                 ],

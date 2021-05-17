@@ -58,19 +58,31 @@ int QueueNotifier::start()
 
 /* ****************************************************************************
 *
+* QueueNotifier::queueSize -
+*/
+size_t QueueNotifier::queueSize()
+{
+  return queue.size();
+}
+
+
+
+/* ****************************************************************************
+*
 * QueueNotifier::sendNotifyContextRequest -
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-  NotifyContextRequest*            ncr,
+  NotifyContextRequest&            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blacklist
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
@@ -78,10 +90,11 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
+                                                                          correlatorCounter,
                                                                           renderFormat,
-                                                                          attrsOrder,
-                                                                          metadataFilter,
-                                                                          blacklist);
+                                                                          attrsFilter,
+                                                                          blacklist,
+                                                                          metadataFilter);
 
   size_t notificationsNum = paramsV->size();
   for (unsigned ix = 0; ix < notificationsNum; ix++)

@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "ngsi/MetadataVector.h"
 
 #include "mongoBackend/dbFieldEncoding.h"
@@ -49,21 +50,23 @@ MetadataVector::MetadataVector(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::render -
+* MetadataVector::toJsonV1 -
+*
+* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
 */
-std::string MetadataVector::render(bool comma)
+std::string MetadataVector::toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma)
 {
   std::string out = "";
 
-  if (vec.size() == 0)
+  if (orderedMetadata.size() == 0)
   {
     return "";
   }
 
   out += startTag("metadatas", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1);
+    out += orderedMetadata[ix]->toJsonV1(ix != orderedMetadata.size() - 1);
   }
   out += endTag(comma, true);
 
@@ -101,61 +104,18 @@ bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<st
 *
 * If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
+*
 */
-std::string MetadataVector::toJson(bool isLastElement, const std::vector<std::string>& metadataFilter)
+std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata)
 {
-  if (vec.size() == 0)
+  JsonObjectHelper jh;
+
+  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
   {
-    return "";
+    jh.addRaw(orderedMetadata[ix]->name, orderedMetadata[ix]->toJson());
   }
 
-
-  //
-  // Pass 1 - count the total number of metadatas valid for rendering.
-  //
-  // Metadatas named 'value' or 'type' are not rendered.
-  // This gives us a small problem in the logic here, about knowing whether the
-  // comma should be rendered or not.
-  //
-  // To fix this problem we need to do two passes over the vector, the first pass to
-  // count the number of valid metadatas and the second to do the work.
-  // In the second pass, if the number of rendered metadatas "so far" is less than the total
-  // number of valid metadatas, then the comma must be rendered.
-  //
-  int validMetadatas = 0;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
-    {
-      continue;
-    }
-
-    ++validMetadatas;
-  }
-
-
-  //
-  // And this is pass 2, where the real work is done.
-  //
-  std::string  out;
-  int          renderedMetadatas = 0;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if ((vec[ix]->name == "value") || (vec[ix]->name == "type") || !(matchFilter(vec[ix]->name, metadataFilter)))
-    {
-      continue;
-    }
-
-    ++renderedMetadatas;
-    out += vec[ix]->toJson(renderedMetadatas == validMetadatas);
-  }
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  return jh.str();
 }
 
 
@@ -177,26 +137,6 @@ std::string MetadataVector::check(ApiVersion apiVersion)
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* MetadataVector::present -
-*/
-void MetadataVector::present(const std::string& metadataType, const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%lu %s Metadata%s", 
-		    indent.c_str(), 
-		    (uint64_t) vec.size(), 
-		    metadataType.c_str(), 
-		    (vec.size() == 1)? "" : "s"));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(metadataType, ix, indent + "  ");
-  }
 }
 
 
@@ -281,7 +221,7 @@ Metadata* MetadataVector::lookupByName(const std::string& _name)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (dbDotEncode(vec[ix]->name) == _name)
+    if (dbEncode(vec[ix]->name) == _name)
     {
       return vec[ix];
     }

@@ -43,7 +43,7 @@ TEST(Scope, render)
 
   utInit();
 
-  out = scope.render(false);
+  out = scope.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -83,24 +83,6 @@ TEST(Scope, check)
 
   checked = scope3.check();
   EXPECT_STREQ(checked.c_str(), expected3.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Scope, present)
-{
-  Scope   scope("Type", "Value");
-
-  utInit();
-
-  scope.present("", -1);
-  scope.present("", 0);
 
   utExit();
 }

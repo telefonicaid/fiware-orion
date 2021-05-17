@@ -240,14 +240,6 @@ extern int noOfRegistrationUpdates;
 extern int noOfRegistrationUpdateErrors;
 extern int noOfDiscoveries;
 extern int noOfDiscoveryErrors;
-extern int noOfAvailabilitySubscriptions;
-extern int noOfAvailabilitySubscriptionErrors;
-extern int noOfAvailabilityUnsubscriptions;
-extern int noOfAvailabilityUnsubscriptionErrors;
-extern int noOfAvailabilitySubscriptionUpdates;
-extern int noOfAvailabilitySubscriptionUpdateErrors;
-extern int noOfAvailabilityNotificationsReceived;
-extern int noOfAvailabilityNotificationsSent;
 
 extern int noOfQueries;
 extern int noOfQueryErrors;
@@ -296,9 +288,6 @@ extern int noOfStatisticsRequests;
 extern int noOfInvalidRequests;
 extern int noOfRegisterResponses;
 
-extern int noOfRtSubscribeContextAvailabilityResponse;
-extern int noOfRtUpdateContextAvailabilitySubscriptionResponse;
-extern int noOfRtUnsubscribeContextAvailabilityResponse;
 extern int noOfRtUnsubscribeContextResponse;
 extern int noOfRtSubscribeResponse;
 extern int noOfRtSubscribeError;

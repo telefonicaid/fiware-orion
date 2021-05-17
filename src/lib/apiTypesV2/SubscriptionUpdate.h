@@ -45,6 +45,7 @@ class SubscriptionUpdate : public Subscription
   bool  attrsFormatProvided;
   bool  throttlingProvided;
   bool  blacklistProvided;
+  bool  onlyChangedProvided;
   bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
   SubscriptionUpdate():
@@ -55,6 +56,7 @@ class SubscriptionUpdate : public Subscription
     attrsFormatProvided(false),
     throttlingProvided(false),
     blacklistProvided(false),
+    onlyChangedProvided(false),
     fromNgsiv1(false)
   {
     descriptionProvided = false;

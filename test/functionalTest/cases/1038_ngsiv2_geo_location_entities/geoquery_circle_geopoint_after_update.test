@@ -38,6 +38,7 @@ brokerStart CB
 # 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
 # 05. Query inside 15 kms radius from Madrid center  -> Madrid, Alcobendas, Leganes
 # 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
+# 07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes
 
 echo "01. Create and update entity corresponding to Madrid"
 echo "===================================================="
@@ -129,6 +130,14 @@ orionCurl --url '/v2/entities?georel=near;minDistance:13500&geometry=point&coord
 echo
 echo
 
+
+echo "07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?georel=near;minDistance:0&geometry=point&coords=40.418889,-3.691944'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create and update entity corresponding to Madrid
 ====================================================
@@ -141,7 +150,6 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -158,7 +166,6 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -175,7 +182,6 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -265,6 +271,45 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "geo:point",
             "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
         },
         "type": "City"
     }

@@ -160,7 +160,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   reqDataP->dcar.res.restriction.attributeExpression.set(value);
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute expression");
     return "Empty attribute expression";
@@ -254,23 +254,6 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
   return reqDataP->dcar.res.check(reqDataP->errorString);
 }
 
-
-
-
-/* ****************************************************************************
-*
-* jsonDcarPresent - 
-*/
-void jsonDcarPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent,("\n\n"));
-  reqDataP->dcar.res.present("");
-}
 
 
 

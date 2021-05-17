@@ -1,4 +1,4 @@
- Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -30,8 +30,6 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# FIXME P2, once 'null' values are supported (issue #2359), this test should be enabled
-#
 # 01. Create E1 with A1 with compound value containing all JSON types
 # 02. GET /v2/entities?q=A1.N:null, see E1
 # 03. GET /v2/entities?q=A1.N==null, see E1
@@ -50,7 +48,7 @@ payload='{
       "T": true,
       "F": false,
       "N": null,
-      "D": "2016-07-22T10:42:42.00Z"
+      "D": "2016-07-22T10:42:42.000Z"
     }
   },
   "A2": { "value": 22 }
@@ -86,7 +84,7 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/entities/E1?type=Thing
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -95,7 +93,7 @@ Date: REGEX(.*)
 02. GET /v2/entities?q=A1.N:null, see E1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -104,9 +102,9 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -117,11 +115,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 
@@ -129,7 +127,7 @@ Date: REGEX(.*)
 03. GET /v2/entities?q=A1.N==null, see E1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 210
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,9 +136,9 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": "none",
+            "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -151,11 +149,11 @@ Date: REGEX(.*)
         },
         "A2": {
             "metadata": {},
-            "type": "none",
+            "type": "Number",
             "value": 22
         },
         "id": "E1",
-        "type": "none"
+        "type": "Thing"
     }
 ]
 

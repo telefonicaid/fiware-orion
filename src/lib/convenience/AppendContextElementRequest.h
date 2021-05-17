@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/EntityId.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 #include "rest/ConnectionInfo.h"
@@ -50,14 +49,11 @@
 typedef struct AppendContextElementRequest
 {
   EntityId                   entity;                     // See NOTE in type header above
-  AttributeDomainName        attributeDomainName;        // Optional
   ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
 
   AppendContextElementRequest();
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType);
-  void         present(const std::string&  indent);
+  std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release();
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

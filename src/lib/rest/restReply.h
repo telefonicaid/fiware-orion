@@ -44,6 +44,6 @@ extern void restReply(ConnectionInfo* ciP, const std::string& answer);
 *
 * restErrorReplyGet - 
 */
-extern std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& detail);
+extern void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& detail, std::string* outStringP);
 
 #endif

@@ -3,6 +3,7 @@
 * [Adding a command line parameter](#adding-a-command-line-parameter)
 * [Adding a REST service](#adding-a-rest-service)
 * [Adding a Functional Test Case](#adding-a-functional-test-case)
+* [Debug a Functional Test Case](#debug-a-functional-test-case)
 * [Catching a '405 Method Not Allowed'](#catching-a-405-method-not-allowed)
 * [Fixing a memory leak](#fixing-a-memory-leak)
 
@@ -161,7 +162,7 @@ The `entity id`, `attribute name`, and `metadata name` (all part of the URL path
 All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
 
 ```
-  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, "APPEND");  
+  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, ActionTypeAppend);
   postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);    
 ```
 
@@ -244,6 +245,22 @@ brokerStart CP2
 brokerStart CP3  
 brokerStart CP4  
 brokerStart CP5  
+```
+
+We have found problems with test files using "ASCII text, with CRLF line terminators" format (which is the
+typical one used by Microsoft Windows and Mac), eg:
+
+```
+$ file path/to/sample_test.test
+path/to/sample_test.test: ASCII text, with CRLF line terminators
+```
+
+Thus, it is advisable to ensure file uses regular ASCII format. Some tools like [`dos2unix`](http://freshmeat.sourceforge.net/projects/dos2unix) can be used
+to do the automatic conversion. At the end you should have something like this:
+
+```
+$ file path/to/sample_test.test
+path/to/sample_test.test: ASCII text
 ```
 
 ### SHELL Section
@@ -364,6 +381,60 @@ Note that `t1` is used and not `T1`. This is because Orion converts tenants to a
 
 [Top](#top)
 
+## Debug a Functional Test Case
+
+Sometimes you have the need of debugging a test case (i.e., a .test file). Maybe is an existing .test
+that has started to fail due to some modification in the code. Or maybe it is a bug that has been reported
+as a new .test (the preferred way to report new bugs! :)
+
+Whatever the case, it may be useful to run Orion in a debugger (e.g. [`gdb`](https://www.gnu.org/software/gdb) or any of its [graphical front-ends](https://sourceware.org/gdb/wiki/GDB%20Front%20Ends)),
+with that test as "input". That way you can set breakpoints, use step-by-step execution, inspect
+function call stack and variables etc., as the program logic is executed.
+
+For this end, the functional test suite has a CLI that tells the suite to *not* start the contextBroker itself, but assume
+that the contextBroker is started already, and just run the tests against that "external contextBroker".
+This CLI option is called `--xbroker`.
+
+Please take into account a couple of remarks regarding the `--xbroker` switch:
+
+* It is only supported for a **single test case**, i.e., you have to run `testHarness.sh` with a test file as parameter.
+* It doesn't start **any** of the contextBrokers involved in the tests (main context broker and brokers serving as context providers). In some cases, you may need to debug only one of the brokers, letting the other brokers be started by the functional test suite. In such a case, `--xbroker` should **not** be used - instead edit the .test file and comment out the `brokerStart` (and corresponding`brokerStop` lines) you need to disable (and remember to revert the changes afterwards!).
+
+Before running `testHarness.sh` you must start your "external contextBroker", running under gdb, valgrind or whatever program you prefer
+for debugging.
+
+*In some cases it may be a good idea to comment out `dbDrop` lines, so you can have a look at the DB after the test finalizes.
+Once you have finished debugging, remember to restore any `dbDrop` lines in the .test file (just revert the test file with `git checkout`).*
+
+It is crucial to use the following CLI parameters when starting the "external contextBroker", as they correspond to the port and 
+database used by the functional test framework:
+
+```
+-db ftest -port 9999
+```
+
+In addition, the following other CLI parameters may be useful in execution under debugger:
+
+```
+-fg                  (to run in foreground)
+-logLevel INFO       (to have useful information in /tmp/contextBroker.log file)
+-httpTimeout 100000  (to avoid problems with timeout, e.g. due to you are holding in a breakpoint for a long time)
+-reqTimeout 0        (also to avoid problems with timeouts)
+-noCache             (in some cases, cache management adds "noise" to logs; this flag disables it)
+```
+
+Finally, execute the functional test for `test_to_debug.test`:  
+
+```
+CB_MAX_TRIES=1 /path/to/testHarness.sh /path/to/test_to_debug.test
+```
+
+The test will start execution against the contextBroker process running in the debugger.
+So, if you have set a breakpoint in a place traversed by the .test cases, the execution will stop there, and you
+can step etc, as always when in GDB.
+
+[Top](#top)
+
 ## Catching a '405 Method Not Allowed'
 Orion supports the requests
 
@@ -409,6 +480,10 @@ So, as you can see:
 [Top](#top)
 
 ## Fixing a memory leak
+
+NOTE: some of the classes/functions used in this example no longer exists in the code (e.g. ContextElementVector class).
+However, the example is still valid to illustrate how a memory leak is debugged.
+
 Memory leaks are detected using [valgrind memcheck](http://valgrind.org/docs/manual/mc-manual.html). A special shell script `test/valgrind/valgrindTestSuite.sh` has been developed for this purpose and a make step is linked to it: `make valgrind`.
 
 If `valgrindTestSuite.sh` is run by hand, remember that Orion must be compiled in DEBUG mode for it to work (`make debug install`).  

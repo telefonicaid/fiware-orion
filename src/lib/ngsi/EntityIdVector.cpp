@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/EntityVector.h"
 
@@ -41,9 +42,27 @@
 
 /* ****************************************************************************
 *
-* EntityIdVector::render -
+* EntityIdVector::toJson -
 */
-std::string EntityIdVector::render(bool comma)
+std::string EntityIdVector::toJson(void)
+{
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    jh.addRaw(vec[ix]->toJson());
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::toJsonV1 -
+*/
+std::string EntityIdVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -55,7 +74,7 @@ std::string EntityIdVector::render(bool comma)
   out += startTag("entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1, true);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
   }
 
   out += endTag(comma, true);
@@ -73,8 +92,6 @@ std::string EntityIdVector::check(RequestType requestType)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == SubscribeContextAvailability)          ||
-      (requestType == UpdateContextAvailabilitySubscription) ||
       (requestType == QueryContext)                          ||
       (requestType == SubscribeContext))
   {
@@ -103,22 +120,6 @@ std::string EntityIdVector::check(RequestType requestType)
 
 /* ****************************************************************************
 *
-* EntityIdVector::present -
-*/
-void EntityIdVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityIdVector::lookup - find a matching entity in the entity-vector
 */
 EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)
@@ -127,7 +128,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   // isPattern:  "false" or "" is the same
   //
   std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam == "")
+  if (isPatternFromParam.empty())
   {
     isPatternFromParam = "false";
   }
@@ -136,7 +137,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   {
     std::string isPatternFromVec = vec[ix]->isPattern;
 
-    if (isPatternFromVec == "")
+    if (isPatternFromVec.empty())
     {
       isPatternFromVec = "false";
     }

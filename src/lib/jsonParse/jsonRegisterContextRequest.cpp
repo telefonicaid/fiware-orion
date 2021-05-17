@@ -34,6 +34,7 @@
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonParse.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
@@ -153,7 +154,7 @@ static std::string crAttribute(const std::string& path, const std::string& value
 */
 static std::string craName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->rcr.attributeP->name = value;
+  reqDataP->rcr.attributeP->name = safeValue(value);
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->name.c_str()));
 
   return "OK";
@@ -170,143 +171,6 @@ static std::string craType(const std::string& path, const std::string& value, Pa
   reqDataP->rcr.attributeP->type = value;
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->type.c_str()));
 
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craIsDomain - 
-*/
-static std::string craIsDomain(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  if (!isTrue(value) && !isFalse(value))
-  {
-    return "invalid isDomain value for context registration attribute: /" + value + "/";
-  }
-
-  reqDataP->rcr.attributeP->isDomain = value;
-  LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute",
-                  reqDataP->rcr.attributeP->isDomain.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadata - 
-*/
-static std::string craMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a metadata"));
-
-  reqDataP->rcr.attributeMetadataP = new Metadata();
-  reqDataP->rcr.attributeP->metadataVector.push_back(reqDataP->rcr.attributeMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataName - 
-*/
-static std::string craMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataType - 
-*/
-static std::string craMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataValue - 
-*/
-static std::string craMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->stringValue = value;
-  reqDataP->rcr.attributeMetadataP->valueType = orion::ValueTypeString;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadata - 
-*/
-static std::string regMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a reg metadata"));
-
-  reqDataP->rcr.registrationMetadataP = new Metadata();
-  reqDataP->rcr.crP->registrationMetadataVector.push_back(reqDataP->rcr.registrationMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataName - 
-*/
-static std::string regMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataType - 
-*/
-static std::string regMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataValue - 
-*/
-static std::string regMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->stringValue = value;
-  reqDataP->rcr.registrationMetadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -373,19 +237,6 @@ JsonNode jsonRcrParseVector[] =
   { CR "/contextRegistration/attributes/attribute",                                     crAttribute              },
   { CR "/contextRegistration/attributes/attribute/name",                                craName                  },
   { CR "/contextRegistration/attributes/attribute/type",                                craType                  },
-  { CR "/contextRegistration/attributes/attribute/isDomain",                            craIsDomain              },
-
-  { CR "/contextRegistration/attributes/attribute/metadatas",                           jsonNullTreat            },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata",                  craMetadata              },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/name",             craMetadataName          },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/type",             craMetadataType          },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/value",            craMetadataValue         },
-
-  { CR "/contextRegistration/metadatas",                                                jsonNullTreat            },
-  { CR "/contextRegistration/metadatas/metadata",                                       regMetadata              },
-  { CR "/contextRegistration/metadatas/metadata/name",                                  regMetadataName          },
-  { CR "/contextRegistration/metadatas/metadata/type",                                  regMetadataType          },
-  { CR "/contextRegistration/metadatas/metadata/value",                                 regMetadataValue         },
 
   { CR "/contextRegistration/providingApplication",                                     providingApplication     },
   { "/duration",                                                                        duration                 },
@@ -430,24 +281,4 @@ void jsonRcrRelease(ParseData* reqDataP)
 std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   return reqData->rcr.res.check(ciP->apiVersion, reqData->errorString, 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonRcrPresent - 
-*/
-void jsonRcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-  {
-    return;
-  }
-
-  LM_T(LmtPresent,("\n\n"));
-
-  reqDataP->rcr.res.contextRegistrationVector.present("");
-  reqDataP->rcr.res.duration.present("");
-  reqDataP->rcr.res.registrationId.present("");
 }

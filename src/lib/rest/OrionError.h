@@ -52,7 +52,7 @@ public:
   std::string  smartRender(ApiVersion apiVersion);
   std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
   std::string  toJson(void);
-  std::string  render(void);
+  std::string  toJsonV1(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
   void         fill(const StatusCode& sc);
 

@@ -51,16 +51,18 @@ class QueueNotifier : public Notifier
 public:
   QueueNotifier(size_t queueSize, int numThreads);
 
-  void sendNotifyContextRequest(NotifyContextRequest*            ncr,
+  void sendNotifyContextRequest(NotifyContextRequest&            ncr,
                                 const ngsiv2::HttpInfo&          httpInfo,
                                 const std::string&               tenant,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
+                                unsigned int                     correlatorCounter,
                                 RenderFormat                     renderFormat,
-                                const std::vector<std::string>&  attrsOrder,
-                                const std::vector<std::string>&  metadataFilter,
-                                bool                             blacklist);
+                                const std::vector<std::string>&  attrsFilter,
+                                bool                             blacklist,
+                                const std::vector<std::string>&  metadataFilter);
   int start();
+  size_t queueSize();
 
 private:
  SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;

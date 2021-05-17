@@ -82,7 +82,6 @@ int noOfEntityByIdAttributeByName                        = -1;
 int noOfContextEntityTypes                               = -1;
 int noOfContextEntityTypeAttributeContainer              = -1;
 int noOfContextEntityTypeAttribute                       = -1;
-int noOfNgsi9SubscriptionsConvOp                         = -1;
 
 int noOfIndividualContextEntity                          = -1;
 int noOfIndividualContextEntityAttributes                = -1;
@@ -114,9 +113,6 @@ int noOfStatisticsRequests                               = -1;
 int noOfInvalidRequests                                  = -1;
 int noOfRegisterResponses                                = -1;
 
-int noOfRtSubscribeContextAvailabilityResponse           = -1;
-int noOfRtUpdateContextAvailabilitySubscriptionResponse  = -1;
-int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
 int noOfRtUnsubscribeContextResponse                     = -1;
 int noOfRtSubscribeResponse                              = -1;
 int noOfRtSubscribeError                                 = -1;
@@ -224,35 +220,35 @@ std::string renderTimingStatistics(void)
     return "{}";
   }
 
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   if (acc)
   {
-    JsonHelper accJh;
+    JsonObjectHelper accJh;
 
-    if (accJsonV1ParseTime)      accJh.addFloat("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
-    if (accJsonV2ParseTime)      accJh.addFloat("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
-    if (accMongoBackendTime)     accJh.addFloat("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
-    if (accMongoReadWaitTime)    accJh.addFloat("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
-    if (accMongoWriteWaitTime)   accJh.addFloat("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
-    if (accMongoCommandWaitTime) accJh.addFloat("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
-    if (accRenderTime)           accJh.addFloat("render",           timeSpecToFloat(accTimeStat.renderTime));
-    if (accReqTime)              accJh.addFloat("total",            timeSpecToFloat(accTimeStat.reqTime));
+    if (accJsonV1ParseTime)      accJh.addNumber("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
+    if (accJsonV2ParseTime)      accJh.addNumber("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
+    if (accMongoBackendTime)     accJh.addNumber("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
+    if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
+    if (accMongoWriteWaitTime)   accJh.addNumber("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
+    if (accMongoCommandWaitTime) accJh.addNumber("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accRenderTime)           accJh.addNumber("render",           timeSpecToFloat(accTimeStat.renderTime));
+    if (accReqTime)              accJh.addNumber("total",            timeSpecToFloat(accTimeStat.reqTime));
 
     jh.addRaw("accumulated", accJh.str());
   }
   if (last)
   {
-    JsonHelper lastJh;
+    JsonObjectHelper lastJh;
 
-    if (lastJsonV1ParseTime)      lastJh.addFloat("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
-    if (lastJsonV2ParseTime)      lastJh.addFloat("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
-    if (lastMongoBackendTime)     lastJh.addFloat("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
-    if (lastMongoReadWaitTime)    lastJh.addFloat("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
-    if (lastMongoWriteWaitTime)   lastJh.addFloat("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
-    if (lastMongoCommandWaitTime) lastJh.addFloat("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
-    if (lastRenderTime)           lastJh.addFloat("render",           timeSpecToFloat(lastTimeStat.renderTime));
-    if (lastReqTime)              lastJh.addFloat("total",            timeSpecToFloat(lastTimeStat.reqTime));
+    if (lastJsonV1ParseTime)      lastJh.addNumber("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
+    if (lastJsonV2ParseTime)      lastJh.addNumber("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
+    if (lastMongoBackendTime)     lastJh.addNumber("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
+    if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
+    if (lastMongoWriteWaitTime)   lastJh.addNumber("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
+    if (lastMongoCommandWaitTime) lastJh.addNumber("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastRenderTime)           lastJh.addNumber("render",           timeSpecToFloat(lastTimeStat.renderTime));
+    if (lastReqTime)              lastJh.addNumber("total",            timeSpecToFloat(lastTimeStat.reqTime));
 
     jh.addRaw("last", lastJh.str());
   }
@@ -298,10 +294,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case NoRequest:                                        break;
   case RegisterContext:                                  ++noOfRegistrations; break;
   case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
-  case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;
-  case UpdateContextAvailabilitySubscription:            ++noOfAvailabilitySubscriptionUpdates; break;
-  case UnsubscribeContextAvailability:                   ++noOfAvailabilityUnsubscriptions; break;
-  case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
 
   case QueryContext:                                     ++noOfQueries; break;
   case SubscribeContext:                                 ++noOfSubscriptions; break;
@@ -323,7 +315,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
   case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
   case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
-  case Ngsi9SubscriptionsConvOp:                         ++noOfNgsi9SubscriptionsConvOp; break;
 
   case UpdateContextElement:                             ++noOfUpdateContextElement; break;
   case AppendContextElement:                             ++noOfAppendContextElement; break;
@@ -352,9 +343,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case InvalidRequest:                                   ++noOfInvalidRequests; break;
   case RegisterResponse:                                 ++noOfRegisterResponses; break;
 
-  case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
-  case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
-  case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;

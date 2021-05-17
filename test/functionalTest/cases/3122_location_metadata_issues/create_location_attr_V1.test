@@ -1,0 +1,215 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create 2 entities with NGSIV1 POST. One with the location metadata (defining a location attribute
+according to the "old way"), the other without a location metadata (and then without location attribute)
+Then check both entities in DB.
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with NGSIV1 with location metadata
+# 02. Create E2 with NGSIV1 without location metadata
+# 03. Check E1 entity in DB has location metadata and location GeoJSON field
+# 04. Check E2 entity in DB has no location metadata nor location GeoJSON field
+
+echo "01. Create E1 with NGSIV1 with location metadata"
+echo "================================================"
+payload='
+{
+    "attributes": [
+        {
+            "name": "A",
+            "type": "whatever",
+            "value": "40,-3",
+            "metadatas": [
+               {
+                  "name": "location",
+                  "type": "string",
+                  "value": "WGS84"
+               }
+            ]
+        }
+    ]
+}
+'
+orionCurl --url '/v1/contextEntities/type/T/id/E1' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with NGSIV1 without location metadata"
+echo "==================================================="
+payload='
+{
+    "attributes": [
+        {
+            "name": "A",
+            "type": "whatever",
+            "value": "39,-2"
+        }
+    ]
+}
+'
+orionCurl --url '/v1/contextEntities/type/T/id/E2' --payload "$payload"
+echo
+echo
+
+
+echo "03. Check E1 entity in DB has location metadata and location GeoJSON field"
+echo "=========================================================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python -mjson.tool
+echo
+echo
+
+
+echo "04. Check E2 entity in DB has no location metadata nor location GeoJSON field"
+echo "============================================================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E2",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python -mjson.tool
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with NGSIV1 with location metadata
+================================================
+HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "metadatas": [
+                        {
+                            "name": "location",
+                            "type": "string",
+                            "value": "WGS84"
+                        }
+                    ], 
+                    "name": "A", 
+                    "type": "whatever", 
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": "T"
+}
+
+
+02. Create E2 with NGSIV1 without location metadata
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 170
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A", 
+                    "type": "whatever", 
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E2", 
+    "isPattern": "false", 
+    "type": "T"
+}
+
+
+03. Check E1 entity in DB has location metadata and location GeoJSON field
+==========================================================================
+{
+    "attrs": {
+        "A": {
+            "creDate": REGEX(.*),
+            "md": {
+                "location": {
+                    "type": "string",
+                    "value": "WGS84"
+                }
+            },
+            "mdNames": [
+                "location"
+            ],
+            "modDate": REGEX(.*),
+            "type": "whatever",
+            "value": "40,-3"
+        }
+    },
+    "location": {
+        "attrName": "A",
+        "coords": {
+            "coordinates": [
+                -3,
+                40
+            ],
+            "type": "Point"
+        }
+    }
+}
+
+
+04. Check E2 entity in DB has no location metadata nor location GeoJSON field
+=============================================================================
+{
+    "attrs": {
+        "A": {
+            "creDate": REGEX(.*),
+            "mdNames": [],
+            "modDate": REGEX(.*),
+            "type": "whatever",
+            "value": "39,-2"
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

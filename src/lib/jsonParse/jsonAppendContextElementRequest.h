@@ -64,10 +64,4 @@ extern std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP);
 
 
 
-/* ****************************************************************************
-*
-* jsonAcerPresent -
-*/
-extern void jsonAcerPresent(ParseData* reqData);
-
 #endif  // SRC_LIB_JSONPARSE_JSONAPPENDCONTEXTELEMENTREQUEST_H_

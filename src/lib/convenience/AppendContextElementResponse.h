@@ -71,10 +71,7 @@ typedef struct AppendContextElementResponse
 
   AppendContextElementResponse();
 
-  std::string  render(ApiVersion          apiVersion,
-                      bool                asJsonObject,
-                      RequestType         requestType);
-  void         present(void);
+  std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release(void);
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

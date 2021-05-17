@@ -27,12 +27,11 @@
 */
 #include <string>
 
-#include "mongo/client/dbclient.h"
-
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "apiTypesV2/Registration.h"
 
+#include "mongoDriver/OID.h"
 
 
 /* ****************************************************************************
@@ -43,7 +42,7 @@ extern HttpStatusCode processRegisterContext
 (
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
-  mongo::OID*               id,
+  orion::OID*               id,
   const std::string&        tenant,
   const std::string&        servicePath,
   const std::string&        format,

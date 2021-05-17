@@ -5,8 +5,7 @@
 Considering a given subscription, Orion Context Broker notifies whenever an update occurs and the 
 subscription conditions are met on the updated entity. That is, the entity an attribute being update
 are covered by the subscription and other optional filters (attribute values, geolocation, etc.) 
-also match. Thus, notifications are synchronous to entity updates. This is the basic mechanism that 
-works for NGSIv1 and for NGSIv2 (although the notification format vary depending of the API version, of course).
+also match. Thus, notifications are synchronous to entity updates.
 
 However, there is a special case of notification, named *initial notification*, which is sent synchronous 
 to the subscription creation (or update) transaction. This notification includes all the entities 
@@ -122,12 +121,19 @@ initial notification is required.
 Between both options, We have opted to implement the more flexible approach, which provide 
 the initial notification to users who can exploit is and can be ignore for who doesn't need it.
 
+## Avoid initial notification
+
+For ignoring the initial notification, a URI parameter option `skipInitialNotification` can be used. Using this URI 
+option, initial notification is always skipped at subscription creation/updation time. In particular:
+
+* `POST /v2/subscriptions?options=skipInitialNotification`
+* `PATCH /v2/subscriptions/<subId>?options=skipInitialNotification`
+
 ## Additional considerations
 
 Note that initial notification is not always sent. It is sent only in the case some entity 
-matches the subscription criteria at subscription creation/update time. But if the matching
-occurs, it is not possible at the present moment to avoid it. Such possibility has been 
-proposed and it is [part of the present backlog](https://github.com/telefonicaid/fiware-orion/issues/920).
+matches the subscription criteria at subscription creation/update time. If the matching occurs, 
+it is possible to avoid it by using URI option (check [above section](#avoid-initial-notification)).
 
 Initial notification uses the same entities limit that synchronous queries. That is, as much 
 as 20 entities are included in the initial notification, no matter how much entities got covered 

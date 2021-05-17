@@ -56,23 +56,6 @@ namespace orion
 * o childV       A vector of the children of a Vector or Object.
 *                Contains pointers to CompoundValueNode.
 *
-* o container    A pointer to the father of the node. The father is the Object/Vector node
-*                that owns this node.
-*
-* o rootP        A pointer to the owner of the entire tree
-*
-* o error        This string is used by the 'check' function to save any errors detected during
-*                the 'check' phase.
-*                FIXME P1: May be removed if the check function is modified.
-*
-* o path         Absolute path of the node in the tree.
-*                Used for error messages, e.g. duplicated tag-name in a struct.
-*
-* o level        The depth or nesting level in which this node lives.
-*
-* o siblingNo:   This field is used for rendering JSON. It tells us whether a comma should
-*                be added after a field (a comma is added unless the sibling number is
-*                equal to the number of siblings (the size of the containers child vector).
 */
 class CompoundValueNode
 {
@@ -85,69 +68,38 @@ class CompoundValueNode
   bool                               boolValue;
   std::vector<CompoundValueNode*>    childV;
 
-
-  // Auxiliar fields for creation of the tree
-  CompoundValueNode*                 container;
-  CompoundValueNode*                 rootP;
-  std::string                        error;
-
-  // Needed for JSON rendering
-  int                                siblingNo;
-  bool                               renderName;
-
-  // Fields that may not be necessary
-  // FIXME P4: when finally sure, remove the unnecessary fields
-  std::string                        path;
-  int                                level;
-
   // Constructors/Destructors
   CompoundValueNode();
   explicit CompoundValueNode(orion::ValueType _type);
 
   CompoundValueNode
   (
-    CompoundValueNode*  _container,
-    const std::string&  _path,
     const std::string&  _name,
     const std::string&  _value,
-    int                 _siblingNo,
-    orion::ValueType    _type,
-    int                 _level = -1
+    orion::ValueType    _type
   );
 
 
   CompoundValueNode
   (
-    CompoundValueNode*  _container,
-    const std::string&  _path,
     const std::string&  _name,
     const char*         _value,
-    int                 _siblingNo,
-    orion::ValueType    _type,
-    int                 _level = -1
+    orion::ValueType    _type
   );
 
 
   CompoundValueNode
   (
-    CompoundValueNode*  _container,
-    const std::string&  _path,
     const std::string&  _name,
     double              _value,
-    int                 _siblingNo,
-    orion::ValueType    _type,
-    int                 _level = -1
+    orion::ValueType    _type
   );
 
   CompoundValueNode
   (
-    CompoundValueNode*  _container,
-    const std::string&  _path,
     const std::string&  _name,
     bool                 _value,
-    int                 _siblingNo,
-    orion::ValueType    _type,
-    int                 _level = -1
+    orion::ValueType    _type
   );
 
   ~CompoundValueNode();
@@ -158,10 +110,10 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
-  std::string         check(void);
+  std::string         check(const std::string& path);
   std::string         finish(void);
-  std::string         render(ApiVersion apiVersion, bool noComma = false, bool noTag = false);
-  std::string         toJson(bool isLastElement, bool comma);
+
+  std::string         toJson(void);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
@@ -171,7 +123,6 @@ class CompoundValueNode
   bool                isString(void);
 
   const char*         cname(void);
-  const char*         cpath(void);
 };
 
 }  // namespace orion

@@ -31,17 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription with q: birthday!=2016-02-24T10:00:00..00Z,2016-02-26T10:00:00.00Z
-# 02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
-# 03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
-# 04. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
-# 05. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)
-# 06. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)
+# 01. Create subscription with q: birthday!=2016-02-24T10:00:00..000Z,2016-02-26T10:00:00.000Z
+# 02. Create entity with birthday: 2016-02-23T10:00:00.000Z (notif)
+# 03. Update entity to birthday: 2016-02-24T10:00:00.000Z (not notif)
+# 04. Update entity to birthday: 2016-02-25T10:00:00.000Z (not notif)
+# 05. Update entity to birthday: 2016-02-26T10:00:00.000Z (not notif)
+# 06. Update entity to birthday: 2016-02-27T10:00:00.000Z (notif)
 # 07. Dump accumulator (2 notifications)
 #
 
-echo "01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z"
-echo "=========================================================================================="
+echo "01. Create subscription with q: birthday!=2016-02-24T10:00:00.000Z..2016-02-26T10:00:00.000Z"
+echo "============================================================================================"
 payload='
 {
     "subject": {
@@ -54,7 +54,7 @@ payload='
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z"
+               "q": "birthday!=2016-02-24T10:00:00.000Z..2016-02-26T10:00:00.000Z"
             }
          }
     },
@@ -70,13 +70,13 @@ echo
 echo
 
 
-echo "02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)"
+echo "02. Create entity with birthday: 2016-02-23T10:00:00.000Z (notif)"
 echo "================================================================="
 payload='{
   "id": "E1",
   "type": "T",
   "birthday": {
-    "value": "2016-02-23T10:00:00.00Z",
+    "value": "2016-02-23T10:00:00.000Z",
     "type": "DateTime"
   }
 }'
@@ -85,11 +85,11 @@ echo
 echo
 
 
-echo "03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)"
+echo "03. Update entity to birthday: 2016-02-24T10:00:00.000Z (not notif)"
 echo "==================================================================="
 payload='{
  "birthday": {
-   "value": "2016-02-24T10:00:00.00Z",
+   "value": "2016-02-24T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -98,11 +98,11 @@ echo
 echo
 
 
-echo "05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)"
+echo "04. Update entity to birthday: 2016-02-25T10:00:00.000Z (not notif)"
 echo "==================================================================="
 payload='{
  "birthday": {
-   "value": "2016-02-25T10:00:00.00Z",
+   "value": "2016-02-25T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -111,11 +111,11 @@ echo
 echo
 
 
-echo "06. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)"
+echo "05. Update entity to birthday: 2016-02-26T10:00:00.000Z (not notif)"
 echo "==================================================================="
 payload='{
  "birthday": {
-   "value": "2016-02-26T10:00:00.00Z",
+   "value": "2016-02-26T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -124,11 +124,11 @@ echo
 echo
 
 
-echo "07. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)"
+echo "06. Update entity to birthday: 2016-02-27T10:00:00.000Z (notif)"
 echo "==============================================================="
 payload='{
  "birthday": {
-   "value": "2016-02-27T10:00:00.00Z",
+   "value": "2016-02-27T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -137,7 +137,7 @@ echo
 echo
 
 
-echo "06. Get accumulator dump (2 notifications)"
+echo "07. Get accumulator dump (2 notifications)"
 echo "=========================================="
 accumulatorDump
 echo
@@ -145,8 +145,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z
-==========================================================================================
+01. Create subscription with q: birthday!=2016-02-24T10:00:00.000Z..2016-02-26T10:00:00.000Z
+============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -155,7 +155,7 @@ Date: REGEX(.*)
 
 
 
-02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
+02. Create entity with birthday: 2016-02-23T10:00:00.000Z (notif)
 =================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -165,53 +165,49 @@ Date: REGEX(.*)
 
 
 
-03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
+03. Update entity to birthday: 2016-02-24T10:00:00.000Z (not notif)
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
+04. Update entity to birthday: 2016-02-25T10:00:00.000Z (not notif)
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)
+05. Update entity to birthday: 2016-02-26T10:00:00.000Z (not notif)
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-07. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)
+06. Update entity to birthday: 2016-02-27T10:00:00.000Z (notif)
 ===============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Get accumulator dump (2 notifications)
+07. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 156
+Content-Length: 157
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -219,7 +215,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "birthday": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2016-02-23T10:00:00.00Z"
+                "value": "2016-02-23T10:00:00.000Z"
             },
             "id": "E1",
             "type": "T"
@@ -230,13 +226,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 156
+Content-Length: 157
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -244,7 +240,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "birthday": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2016-02-27T10:00:00.00Z"
+                "value": "2016-02-27T10:00:00.000Z"
             },
             "id": "E1",
             "type": "T"

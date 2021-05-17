@@ -72,14 +72,14 @@ static bool parseContextElementResponse
   std::string     r;
   Entity          entity;
 
-  if ((r = parseEntityObject(ciP, iter, &entity, true)) != "OK")
+  if ((r = parseEntityObject(ciP, iter, &entity, true, true)) != "OK")
   {
     oeP->fill(SccBadRequest, r);
     return false;
   }
 
-  cerP->contextElement.entityId.fill(entity.id, entity.type, entity.isPattern);
-  cerP->contextElement.contextAttributeVector.push_back(&entity.attributeVector);
+  cerP->entity.fill(entity.id, entity.type, entity.isPattern);
+  cerP->entity.attributeVector.push_back(entity.attributeVector);
   entity.release();
 
   return true;
@@ -244,7 +244,7 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
   OrionError  oe;
   bool        ok = false;
 
-  if ((ciP->httpHeaders.ngsiv2AttrsFormat == "normalized") || (ciP->httpHeaders.ngsiv2AttrsFormat == ""))
+  if ((ciP->httpHeaders.ngsiv2AttrsFormat == "normalized") || (ciP->httpHeaders.ngsiv2AttrsFormat.empty()))
   {
     ok = parseNotificationNormalized(ciP, ncrP, &oe);
   }

@@ -71,12 +71,9 @@ brokerStart CB 0-255 IPv4 -statCounters
 # 40. provider/http/url invalid
 # 41. status is not a string
 # 42. invalid value for status
-# 43. legacyForwarding missing
-# 44. legacyForwarding not a boolean
-# 45. legacyForwarding set to false
-# 46. supportedForwardingMode set to 'none'
-# 47. supportedForwardingMode set to 'query'
-# 48. supportedForwardingMode set to 'update'
+# 43. legacyForwarding not a boolean
+# 44. dataProvided:entities:entity:idPattern too complex
+# 45. dataProvided:entities:entity:typePattern is used (it's not supported)
 #
 
 
@@ -815,32 +812,7 @@ echo
 echo
 
 
-echo "43. legacyForwarding missing"
-echo "============================"
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    }
-  },
-  "status": "active"
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "44. legacyForwarding not a boolean"
+echo "43. legacyForwarding not a boolean"
 echo "=================================="
 payload='{
   "description": "DESC",
@@ -866,14 +838,14 @@ echo
 echo
 
 
-echo "45. legacyForwarding set to false"
-echo "================================="
+echo "44. dataProvided:entities:entity:idPattern too complex"
+echo "======================================================"
 payload='{
   "description": "DESC",
   "dataProvided": {
     "entities": [
       {
-        "id": "E1",
+        "idPattern": "E.*",
         "type": "T1"
       }
     ],
@@ -883,34 +855,7 @@ payload='{
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
     },
-    "legacyForwarding": false
-  },
-  "status": "active"
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "46. supportedForwardingMode set to 'none'"
-echo "========================================="
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "none"
+    "legacyForwarding": true
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
@@ -918,15 +863,15 @@ echo
 echo
 
 
-echo "47. supportedForwardingMode set to 'query'"
-echo "=========================================="
+echo "45. dataProvided:entities:entity:typePattern is used (it's not supported)"
+echo "========================================================================="
 payload='{
   "description": "DESC",
   "dataProvided": {
     "entities": [
       {
         "id": "E1",
-        "type": "T1"
+        "typePattern": ".*"
       }
     ],
     "attrs": [ "A1", "A2" ]
@@ -935,34 +880,7 @@ payload='{
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
     },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "query"
-  }
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "48. supportedForwardingMode set to 'update'"
-echo "==========================================="
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "update"
+    "legacyForwarding": true
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
@@ -1559,21 +1477,7 @@ Date: REGEX(.*)
 }
 
 
-43. legacyForwarding missing
-============================
-HTTP/1.1 501 Not Implemented
-Content-Length: 144
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
-    "error": "NotImplemented"
-}
-
-
-44. legacyForwarding not a boolean
+43. legacyForwarding not a boolean
 ==================================
 HTTP/1.1 400 Bad Request
 Content-Length: 85
@@ -1587,58 +1491,30 @@ Date: REGEX(.*)
 }
 
 
-45. legacyForwarding set to false
-=================================
+44. dataProvided:entities:entity:idPattern too complex
+======================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 144
+Content-Length: 64
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true",
+    "description": "Unsupported idPattern",
     "error": "NotImplemented"
 }
 
 
-46. supportedForwardingMode set to 'none'
-=========================================
+45. dataProvided:entities:entity:typePattern is used (it's not supported)
+=========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 72
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "non-supported Forwarding Mode",
-    "error": "NotImplemented"
-}
-
-
-47. supportedForwardingMode set to 'query'
-==========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "non-supported Forwarding Mode",
-    "error": "NotImplemented"
-}
-
-
-48. supportedForwardingMode set to 'update'
-===========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "non-supported Forwarding Mode",
+    "description": "typePattern is not supported", 
     "error": "NotImplemented"
 }
 

@@ -37,7 +37,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "mongo/client/dbclient.h"
 
 
 
@@ -63,6 +62,7 @@ static HttpStatusCode processDiscoverContextAvailability
 
   if (!registrationsQuery(requestP->entityIdVector,
                           requestP->attributeList,
+                          ngsiv2::ForwardNone,
                           &responseP->responseVector,
                           &err,
                           tenant,

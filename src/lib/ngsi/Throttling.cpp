@@ -54,7 +54,7 @@ std::string Throttling::check(void)
   // FIXME - make Throttling and Duration inherit from same class
   //         that implements the 'parse' method
 
-  if (string == "")
+  if (string.empty())
   {
     return "OK";
   }
@@ -75,7 +75,7 @@ std::string Throttling::check(void)
 */
 bool Throttling::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -104,31 +104,11 @@ const std::string Throttling::get(void)
 
 /* ****************************************************************************
 *
-* Throttling::present -
+* Throttling::toJsonV1 -
 */
-void Throttling::present(const std::string& indent)
+std::string Throttling::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sThrottling: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Throttling\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Throttling::render -
-*/
-std::string Throttling::render(bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
