@@ -317,7 +317,7 @@ Date: REGEX(.*)
   "boost version": REGEX(.*),
   "microhttpd version": REGEX(.*),
   "openssl version": REGEX(.*),
-  "mongocpp version": "1.1.2",
+  "mongocpp version": "REGEX((1.1.2|1.1.3))",
   "mongoc version": "1.17.5",
   "rapidjson version": REGEX(.*),
   "libcurl version": REGEX(.*),

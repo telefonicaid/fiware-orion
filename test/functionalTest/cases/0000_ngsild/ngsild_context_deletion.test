@@ -222,9 +222,9 @@ Date: REGEX(.*)
 
 05. See the contexts in mongo
 =============================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/orionld
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "REGEX(.*)",
 	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -318,9 +318,9 @@ Date: REGEX(.*)
 
 08. See the contexts in mongo
 =============================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/orionld
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "REGEX(.*)",
 	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
