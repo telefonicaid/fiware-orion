@@ -16,6 +16,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [Custom notifications without payload](#custom-notifications-without-payload)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
@@ -24,7 +25,6 @@
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
-* [Additional fields in `httpInfo` for custom notifications](#additional-fields-in-httpInfo-for-custom-notifications)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -323,6 +323,18 @@ Check details in the document about [initial notifications](initial_notification
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
+[Top](#top)
+
+## Custom notifications without payload
+
+If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notications
+associated to that subscription will not include any payload (i.e. conten-length 0 notifications).
+
+Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
+the notification will be sent using the NGSIv2 normalized format.
+
+[Top](#top)
+
 ## Notify only attributes that change
 
 Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
@@ -476,12 +488,5 @@ you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 * `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
 which attributes to include in the response to the query) and unary attribute filter in `q` within
 `expression` (to return only entities which have these attributes). Use them instead.
-
-[Top](#top)
-
-## Additional fields in `httpInfo` for custom notifications
-
-Orion supports a boolean field `includePayload` in `httpCustom` for custom notifications that can be used to avoid payload in the outgoing notification. If `includePayload` is set to `false` then no payload is included in the notification (and `payload` field, if used, is ignored).
-Default value if `includePayload` if omitted is `true` (that is, payload is included by default).
 
 [Top](#top)

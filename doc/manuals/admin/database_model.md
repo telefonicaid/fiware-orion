@@ -311,7 +311,9 @@ Fields:
 -   **headers**: optional field to store the HTTP headers keymap for notification customization functionality in NGSIv2.
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
--   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
+-   **payload**: optional field to store the payload for notification customization functionality in NGSIv2. If
+    its value is `null` means that no payload has to be included in the notification. If its value is `""` or if
+    the field is omitted, then the NGSIv2 normalized format is used.
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
@@ -321,8 +323,6 @@ Fields:
 -   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
     time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
--   **includePayload**: a boolean field that can be used to avoid payload in the outgoing notification. 
-    If `includePayload` is set to `false` then no payload is included in the notification (and `payload` field, if used, is ignored).
 
 Example document:
 

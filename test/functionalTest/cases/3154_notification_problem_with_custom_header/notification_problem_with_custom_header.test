@@ -202,7 +202,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 459
+Content-Length: 436
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -216,7 +216,6 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "legacy",
             "httpCustom": {
-                "includePayload": false,
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "REGEX(.*)",

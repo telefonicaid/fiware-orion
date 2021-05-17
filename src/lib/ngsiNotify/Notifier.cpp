@@ -166,7 +166,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.payload.empty())
+    if (!httpInfo.includePayload)
+    {
+      payload      = "";
+      renderFormat = NGSI_V2_CUSTOM;
+    }
+    else if (httpInfo.payload.empty())
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;

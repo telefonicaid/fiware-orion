@@ -110,7 +110,6 @@
 #define CSUB_HEADERS                 "headers"
 #define CSUB_QS                      "qs"
 #define CSUB_PAYLOAD                 "payload"
-#define CSUB_INCLUDEPAYLOAD          "includePayload"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
 #define CSUB_LASTFAILURE             "lastFailure"

@@ -120,7 +120,12 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
   }
 
-  if (!httpInfo.payload.empty())
+  if (!httpInfo.includePayload)
+  {
+    b->appendNull(CSUB_PAYLOAD);
+    LM_T(LmtMongo, ("Subscription payload: null"));
+  }
+  else if (!httpInfo.payload.empty())
   {
     b->append(CSUB_PAYLOAD, httpInfo.payload);
     LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));

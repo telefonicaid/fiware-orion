@@ -1,4 +1,4 @@
-# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification sending 0-length request
+Custom notification with null payload basic case
 
 --SHELL-INIT--
 dbInit CB
@@ -30,15 +30,17 @@ accumulatorStart --pretty-print
 
 --SHELL--
 #
-# 01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false
-# 02. Create sub2 without payload, includePayload=false
-# 03. Create entity E1/T1
-# 04. Dumps acummulator (see 2 notifications, both without payload)
+# 01. Create sub1 for E1 without payload field
+# 02. Create entity E1/T
+# 03. Dumps & reset acummulator: see notification in normalized format
+# 04. Create sub2 for E1 with payload: null
+# 05. Create entity E2/T
+# 06. Dumps & reset acummulator: see notification without payload
 #
 
 
-echo '01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false'
-echo "=================================================================="
+echo '01. Create sub1 for E1 without payload field'
+echo "============================================"
 payload='{
   "subject": {
     "entities": [
@@ -52,9 +54,7 @@ payload='{
   },
   "notification": {
     "httpCustom": {
-      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "payload": "{ %22x%22: 1}",
-      "includePayload":false
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify"
     }
   }
 }'
@@ -63,53 +63,74 @@ echo
 echo
 
 
-echo '02. Create sub2 without payload, includePayload=false'
-echo "====================================================="
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "id" : "E1"
-      }
-    ],
-    "condition": {
-      "attrs": []
-    }
-  },
-  "notification": {
-    "httpCustom": {
-      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "includePayload":false
-    }
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-echo "03. Create entity E1/T1"
-echo "======================="
+echo "02. Create entity E1/T"
+echo "======================"
 payload='{
   "id": "E1",
-  "type": "T1",
-  "A1": true
+  "type": "T",
+  "A": 1
 }'
 orionCurl --url /v2/entities?options=keyValues --payload "$payload"
 echo
 echo
 
 
-echo "Dumps acummulator (see 2 notifications, both without payload)"
-echo "============================================================="
+echo "03. Dumps & reset acummulator: see notification in normalized format"
+echo "===================================================================="
 accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '05. Create sub2 for E2 with payload: null'
+echo "========================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E2"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload": null
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity E2/T"
+echo "======================"
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": 2
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. see notification without payload"
+echo "===================================="
+accumulatorDump
+accumulatorReset
 echo
 echo
 
 
 --REGEXPECT--
-01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false
-==================================================================
+01. Create sub1 for E1 without payload field
+============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -118,66 +139,75 @@ Date: REGEX(.*)
 
 
 
-02. Create sub2 without payload, includePayload=false
-=====================================================
+02. Create entity E1/T
+======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-03. Create entity E1/T1
-=======================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-Dumps acummulator (see 2 notifications, both without payload)
-=============================================================
+03. Dumps & reset acummulator: see notification in normalized format
+====================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 129
+Content-Length: 123
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=2
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
         {
-            "A1": {
+            "A": {
                 "metadata": {},
-                "type": "Boolean",
-                "value": true
+                "type": "Number",
+                "value": 1
             },
             "id": "E1",
-            "type": "T1"
+            "type": "T"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+05. Create sub2 for E2 with payload: null
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create entity E2/T
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. see notification without payload
+====================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 9
+Content-Length: 0
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "x": 1
-}
 =======================================
 
 
