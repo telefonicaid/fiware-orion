@@ -34,7 +34,7 @@
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/context/orionldContextDownload.h"              // orionldContextDownload
-#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
+#include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
 #include "orionld/context/orionldContextFromUrl.h"               // Own interface
 
 
@@ -173,26 +173,20 @@ static OrionldContext* contextCacheWait(char* url, OrionldProblemDetails* pdP)
   int             sleepTime = 0;
   OrionldContext* contextP;
 
-  // LM_TMP(("CLIST: Request %d: Waiting for context '%s'", orionldState.requestNo, url));
   while (sleepTime < 3000000)  // 3 secs - 3 million microsecs ... CLI param?
   {
     usleep(20000);  // sleep 20 millisecs ... CLI param?
     contextP = orionldContextCacheLookup(url);
     if (contextP != NULL)
-    {
-      // LM_TMP(("CLIST: Request %d: Got context '%s'", orionldState.requestNo, url));
       return contextP;
-    }
     sleepTime += 20000;
-    // LM_TMP(("CLIST: Request %d: Still waiting for context '%s'", orionldState.requestNo, url));
   }
 
   // The wait timed out
   pdP->status     = 400;  // Assuming the URL is invalid, this a "400 Bad Request"
-  pdP->title      = (char*) "Assumed Bad Request";
-  pdP->detail     = (char*) "Unable to download context";
+  pdP->title      = (char*) "Timeout awaiting other thread to download a context";
+  pdP->detail     = (char*) url;
 
-  // LM_TMP(("CLIST: Request %d: Failure for context '%s'", orionldState.requestNo, url));
   return NULL;
 }
 
@@ -228,8 +222,6 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
   bool urlDownloading = contextDownloadListLookup(url);
   if (urlDownloading == false)
   {
-    // LM_TMP(("CLIST: Request %d: context '%s' is not downloading (before taking list semaphore)", orionldState.requestNo, url));
-
     //
     // Not there, so, we'll download it
     // First take the 'download semaphore'
@@ -245,35 +237,19 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
     //
     urlDownloading = contextDownloadListLookup(url);
     if (urlDownloading == false)
-    {
-      // LM_TMP(("CLIST: Request %d: context '%s' is not downloading (after taking list semaphore)", orionldState.requestNo, url));
       contextDownloadListAdd(url);  // CASE 1: Mark the URL as being downloading
-    }
-    // else
-    //   LM_TMP(("CLIST: Request %d: context '%s' IS DOWNLOADING (after taking list semaphore)", orionldState.requestNo, url));
 
     sem_post(&contextDownloadListSem);
 
-    if (urlDownloading == true)  // Somebody took the semaphore before me and is downloading the context - I'll wait
-    {
-      // LM_TMP(("CLIST: Request %d: context '%s' IS DOWNLOADING (after taking list semaphore) - let's wait for it", orionldState.requestNo, url));
+    if (urlDownloading == true)  // If somebody has taken the semaphore before me and is downloading the context - I'll have to wait
       return contextCacheWait(url, pdP);  // CASE 2 - another thread has downloaded the context
-    }
 
-    // LM_TMP(("CLIST: Request %d: context '%s' is NOT downloading (after taking list semaphore) - let's download it !", orionldState.requestNo, url));
     // CASE 1 - the context will be downloaded
   }
   else
-  {
-    // LM_TMP(("CLIST: Request %d: context '%s' is downloading (before taking list semaphore) - let's wait for it II", orionldState.requestNo, url));
-
     return contextCacheWait(url, pdP);  // CASE 3 - another thread has downloaded the context
-  }
-
-  // LM_TMP(("CLIST: Request %d: context '%s': starting download", orionldState.requestNo, url));
 
   char* buffer = orionldContextDownload(url, pdP);
-
   if (buffer == NULL)
   {
     // orionldContextDownload fills in pdP
@@ -282,17 +258,29 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
   }
 
   contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer, pdP);
+  if (contextP == NULL)
+  {
+    //
+    // Uncomfortable problem here ...
+    // The downloaded @context is erroneous and cannot be used.
+    // The response to the request indicates this fact, but, if the client
+    // insists on trying to use the context (without fixing it), the broker will download it over and over again.
+    // Still, I believe this is the best solution.
+    //
+    LM_E(("Context Error (%s: %s)", pdP->title, pdP->detail));
+    contextDownloadListRemove(url);
+    return NULL;  // Parse Error?
+  }
 
-  if (contextP != NULL)
-    contextP->origin = OrionldContextDownloaded;
+  contextP->origin    = OrionldContextDownloaded;
+  contextP->createdAt = orionldState.requestTime;
+  contextP->usedAt    = orionldState.requestTime;
 
-  // Remove the 'url' from the contextDownloadList
-
-  // LM_TMP(("CLIST: Request %d: context '%s': finished download - removing the item from the download list", orionldState.requestNo, url));
+  // Remove the 'url' from the contextDownloadList and persist it to DB
   sem_wait(&contextDownloadListSem);
   contextDownloadListRemove(url);
   sem_post(&contextDownloadListSem);
-  // LM_TMP(("CLIST: Request %d: context '%s': finished download - removed the item from the download list", orionldState.requestNo, url));
+  orionldContextCachePersist(contextP);
 
   return contextP;
 }

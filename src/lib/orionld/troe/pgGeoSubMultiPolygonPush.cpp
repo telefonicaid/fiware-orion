@@ -88,7 +88,6 @@ bool pgGeoSubMultiPolygonPush
              instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, orionldState.requestTimeString, coordsString);
   }
 
-  // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

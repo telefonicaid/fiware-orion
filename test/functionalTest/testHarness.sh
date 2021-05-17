@@ -844,13 +844,22 @@ function partExecute()
   #
   # Remove all 'already exists' lines from stderr - postgres is tooooo verbose!!!
   #
-  grep -v "already exists" $dirname/$filename.$what.stderr >  $dirname/$filename.$what.stderr.withoutAlready_Exists
-  mv $dirname/$filename.$what.stderr.withoutAlready_Exists  $dirname/$filename.$what.stderr
-  linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
+  #
+  # Remove all 'mongoc: Falling back to malloc' from stderr - this is quite annoying
+  # See https://jira.mongodb.org/browse/CDRIVER-1504
+  #
+  # FIXME: Download the source and compile the mongoc driver myself - turn on shared memory!
+  #
+  grep -v "already exists"                               $dirname/$filename.$what.stderr  > $dirname/$filename.$what.stderr2
+  grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.$what.stderr2 > $dirname/$filename.$what.stderr3
+  grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.$what.stderr3 > $dirname/$filename.$what.stderr
+  rm -f $dirname/$filename.$what.stderr2
+  rm -f $dirname/$filename.$what.stderr3
 
   #
   # Check that stderr is empty
   #
+  linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
     if [ $__tryNo == $MAX_TRIES ]
@@ -1004,11 +1013,18 @@ function runTest()
   rm -f $dirname/$filename.shellInit.stdout
   $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
   exitCode=$?
-  logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
-  grep -v "already exists" $dirname/$filename.shellInit.stderr >  $dirname/$filename.shellInit.stderr.withoutAlready_Exists
-  mv $dirname/$filename.shellInit.stderr.withoutAlready_Exists  $dirname/$filename.shellInit.stderr
-  linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
+  logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
+  grep -v "already exists"                               $dirname/$filename.shellInit.stderr  > $dirname/$filename.shellInit.stderr2
+  grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.shellInit.stderr2 > $dirname/$filename.shellInit.stderr3
+  grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.shellInit.stderr3 > $dirname/$filename.shellInit.stderr
+  rm $dirname/$filename.shellInit.stderr2
+  rm $dirname/$filename.shellInit.stderr3
+
+  #
+  # Check that stderr is empty
+  #
+  linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
     exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"

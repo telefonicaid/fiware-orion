@@ -39,7 +39,6 @@ bool pgTransactionCommit(PGconn* connectionP)
 {
   PGresult* res;
 
-  // LM_TMP(("SQL[%p]: COMMIT", connectionP));
   res = PQexec(connectionP, "COMMIT");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));

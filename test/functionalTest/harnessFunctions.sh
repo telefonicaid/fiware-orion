@@ -122,7 +122,22 @@ function dbInit()
 #
 function dbDrop()
 {
-  if [ "$CB_DB_DROP" != "No" ]
+  if [ "$1" == "orionld" ]
+  then
+    host="${CB_DATABASE_HOST}"
+    if [ "$host" == "" ]
+    then
+      host="localhost"
+    fi
+
+    port="${CB_DATABASE_PORT}"
+    if [ "$port" == "" ]
+    then
+      port="27017"
+    fi
+
+    echo 'db.dropDatabase()' | mongo mongodb://$host:$port/orionld --quiet
+  elif [ "$CB_DB_DROP" != "No" ]
   then
     # FIXME: Not sure if $@ should be better...
     dbInit $*

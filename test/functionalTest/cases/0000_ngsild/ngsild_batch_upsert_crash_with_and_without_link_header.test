@@ -192,7 +192,8 @@ Date: REGEX(.*)
     "libcurl version": "REGEX(.*)",
     "libuuid version": "REGEX(.*)",
     "microhttpd version": "REGEX(.*)",
-    "mongo version": "REGEX(.*)",
+    "mongoc version": "1.17.5",
+    "mongocpp version": "1.1.2",
     "openssl version": "REGEX(.*)",
     "rapidjson version": "REGEX(.*)"
 }

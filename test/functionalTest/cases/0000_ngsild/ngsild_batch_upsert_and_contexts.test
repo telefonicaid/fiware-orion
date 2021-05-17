@@ -27,6 +27,7 @@ Batch Upsert with an array of three entities, with context arrays in payload
 export BROKER=orionld
 dbInit CB
 dbInit CB smartmaas001
+dbDrop orionld
 brokerStart CB 212-249
 
 --SHELL--
@@ -725,16 +726,17 @@ Date: REGEX(.*)
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1066
+Content-Length: 1281
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -745,9 +747,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://schema.lab.fiware.org/ld/context",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
     "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 5,
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -964,16 +969,17 @@ Date: REGEX(.*)
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1066
+Content-Length: 1282
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -984,9 +990,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://schema.lab.fiware.org/ld/context",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
     "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 16,
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",

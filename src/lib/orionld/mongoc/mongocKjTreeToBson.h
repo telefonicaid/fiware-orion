@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREETOBSON_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREETOBSON_H_
+
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,27 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
+#include <bson/bson.h>                                         // bson_t
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/troe/pgTransactionRollback.h"                // Own interface
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionRollback - rollback a transaction
+// mongocKjTreeToBson -
 //
-bool pgTransactionRollback(PGconn* connectionP)
-{
-  PGresult* res;
+extern void mongocKjTreeToBson(KjNode* treeP, bson_t* bsonP);
 
-  res = PQexec(connectionP, "ROLLBACK");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(ROLLBACK): %s)", PQresStatus(PQresultStatus(res))));
-  PQclear(res);
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREETOBSON_H_

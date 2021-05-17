@@ -85,5 +85,6 @@ OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin,
     return NULL;
   }
 
-  return orionldContextFromTree(url, origin, id, false, contextNodeP, pdP);
+  OrionldContext* contextP = orionldContextFromTree(url, origin, id, false, contextNodeP, pdP);
+  return contextP;
 }

@@ -26,6 +26,7 @@ Alternative Context implementation - context in HTTP Link header
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -72,16 +73,17 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 873
+Content-Length: 1088
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -92,9 +94,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
     "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 0,
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",

@@ -26,6 +26,7 @@ Alternative Context implementation - mixed inline context
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -144,12 +145,13 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 975
+Content-Length: 1286
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -157,12 +159,13 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "Core",
-        "origin": "REGEX((FileCached|Downloaded))",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "P1": "http://example.org/P1",
             "P2": "http://example.org/P2",
@@ -170,7 +173,9 @@ Date: REGEX(.*)
             "R1": "http://example.org/R1",
             "T": "http://example.org/T"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
@@ -179,7 +184,10 @@ Date: REGEX(.*)
         "URLs": [
             "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
         ],
-        "id": "None",
+        "createdAt": "REGEX(.*)",
+        "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "Downloaded",
         "parent": "REGEX(.*)",
         "type": "array",

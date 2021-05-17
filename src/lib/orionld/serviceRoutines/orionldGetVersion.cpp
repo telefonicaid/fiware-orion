@@ -32,6 +32,7 @@
 #include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
 #include <mongo/version.h>                                     // MONGOCLIENT_VERSION
 #include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
+#include <mongoc/mongoc.h>                                     // MONGOC_VERSION_S
 
 extern "C"
 {
@@ -138,7 +139,9 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "mongo version", mongo::client::kVersionString);
+  nodeP = kjString(orionldState.kjsonP, "mongocpp version", mongo::client::kVersionString);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "mongoc version", MONGOC_VERSION_S);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
   kjChildAdd(orionldState.responseTree, nodeP);

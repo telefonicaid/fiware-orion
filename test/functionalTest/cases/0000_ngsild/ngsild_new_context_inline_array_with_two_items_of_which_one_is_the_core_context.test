@@ -26,6 +26,7 @@ Alternative Context implementation - inline context that is an array with two it
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -83,9 +84,10 @@ Date: REGEX(.*)
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "Core",
+    "id": "REGEX(.*)",
     "type": "hash-table",
-    "origin": "REGEX((FileCached|Downloaded))",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -96,9 +98,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
     "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 0,
     "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",

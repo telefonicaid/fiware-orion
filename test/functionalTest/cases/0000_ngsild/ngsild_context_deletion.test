@@ -26,6 +26,7 @@ Create and DELETE contexts
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 212-249
 
 --SHELL--
@@ -35,10 +36,12 @@ brokerStart CB 212-249
 # 02. Create context B in the broker
 # 03. Create context C in the broker
 # 04. GET all contexts, with details, see A-B-C
-# 05. Delete context B
-# 06. GET all contexts, with details, see A-C
-# 07. Create context D in the broker
-# 08. GET all contexts, with details, see A-D-C
+# 05. See the contexts in mongo
+# 06. Delete context B
+# 07. GET all contexts, with details, see A-C
+# 08. See the contexts in mongo
+# 09. Create context D in the broker
+# 10. GET all contexts, with details, see A-D-C
 #
 
 echo "01. Create context A in the broker"
@@ -90,7 +93,14 @@ echo
 echo
 
 
-echo "05. Delete context B"
+echo "05. See the contexts in mongo"
+echo "============================="
+mongoCmd2 orionld 'db.contexts.find({}, {"value": 0}).pretty()'
+echo
+echo
+
+
+echo "06. Delete context B"
 echo "===================="
 idB=$(echo $urlB | awk -F/ '{print $5}')
 orionCurl --url /ngsi-ld/v1/jsonldContexts/$idB -X DELETE
@@ -98,9 +108,16 @@ echo
 echo
 
 
-echo "06. GET all contexts, with details, see A-C"
+echo "07. GET all contexts, with details, see A-C"
 echo "==========================================="
 orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
+echo
+echo
+
+
+echo "08. See the contexts in mongo"
+echo "============================="
+mongoCmd2 orionld 'db.contexts.find({}, {"value": 0}).pretty()'
 echo
 echo
 
@@ -145,6 +162,7 @@ Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -152,40 +170,49 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "Core",
-        "origin": "REGEX((FileCached|Downloaded))",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "A1": "urn:ngsi-ld:attributes:A1",
             "A2": "urn:ngsi-ld:attributes:A2",
             "A3": "urn:ngsi-ld:attributes:A3"
         },
         "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "UserCreated",
         "type": "hash-table",
         "url": "http://REGEX(.*)
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "B1": "urn:ngsi-ld:attributes:B1",
             "B2": "urn:ngsi-ld:attributes:B2",
             "B3": "urn:ngsi-ld:attributes:B3"
         },
         "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "UserCreated",
         "type": "hash-table",
         "url": "http://REGEX(.*)
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "C1": "urn:ngsi-ld:attributes:C1",
             "C2": "urn:ngsi-ld:attributes:C2",
             "C3": "urn:ngsi-ld:attributes:C3"
         },
         "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "UserCreated",
         "type": "hash-table",
         "url": "http://REGEX(.*)
@@ -193,14 +220,50 @@ Date: REGEX(.*)
 ]
 
 
-05. Delete context B
+05. See the contexts in mongo
+=============================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/orionld
+MongoDB server version: 3.6.23
+{
+	"_id" : "REGEX(.*)",
+	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"parent" : null,
+	"origin" : "Downloaded",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+bye
+
+
+06. Delete context B
 ====================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-06. GET all contexts, with details, see A-C
+07. GET all contexts, with details, see A-C
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
@@ -209,6 +272,7 @@ Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -216,34 +280,69 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "Core",
-        "origin": "REGEX((FileCached|Downloaded))",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "A1": "urn:ngsi-ld:attributes:A1",
             "A2": "urn:ngsi-ld:attributes:A2",
             "A3": "urn:ngsi-ld:attributes:A3"
         },
         "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "UserCreated",
         "type": "hash-table",
         "url": "http://REGEX(.*)
     },
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "C1": "urn:ngsi-ld:attributes:C1",
             "C2": "urn:ngsi-ld:attributes:C2",
             "C3": "urn:ngsi-ld:attributes:C3"
         },
         "id": "REGEX(.*)",
+        "lastUse": "REGEX(.*)",
+        "lookups": 0,
         "origin": "UserCreated",
         "type": "hash-table",
         "url": "http://REGEX(.*)
     }
 ]
+
+
+08. See the contexts in mongo
+=============================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/orionld
+MongoDB server version: 3.6.23
+{
+	"_id" : "REGEX(.*)",
+	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"parent" : null,
+	"origin" : "Downloaded",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "http://xps:9999/ngsi-ld/v1/jsonldContexts/REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+bye
 
 
 --TEARDOWN--

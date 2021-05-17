@@ -29,6 +29,7 @@ SET (SOURCES
     orionldContextCacheGet.cpp
     orionldContextCacheRelease.cpp
     orionldContextCacheDelete.cpp
+    orionldContextCachePersist.cpp
 )
 
 # Include directories

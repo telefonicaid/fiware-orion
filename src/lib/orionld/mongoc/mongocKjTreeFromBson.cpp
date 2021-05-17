@@ -30,6 +30,9 @@ extern "C"
 #include "kjson/kjParse.h"                                     // kjParse
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mongoc/mongocKjTreeFromBson.h"               // Own interface
 
@@ -45,6 +48,9 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
   char*          json;
   KjNode*        treeP = NULL;
 
+#if 0
+  // FIXME: Real implementation - avoiding the extra step going via JSON
+#else
   if ((json = bson_as_json(bsonP, NULL)) == NULL)
   {
     *titleP   = (char*) "Internal Error";
@@ -58,9 +64,9 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
       *titleP   = (char*) "Internal Error";
       *detailsP = (char*) "Error parsing JSON output from bson_as_json";
     }
+
+    // bson_free(json);
   }
-
-  bson_free(json);
-
+#endif
   return treeP;
 }

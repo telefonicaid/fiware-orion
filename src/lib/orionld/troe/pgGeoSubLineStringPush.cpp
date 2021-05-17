@@ -88,7 +88,6 @@ bool pgGeoSubLineStringPush
              instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, attrDatasetId, lineStringCoordsString);
   }
 
-  // LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
