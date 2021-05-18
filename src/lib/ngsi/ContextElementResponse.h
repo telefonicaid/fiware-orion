@@ -34,7 +34,7 @@
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
 
-#include "mongo/client/dbclient.h"
+#include "mongoDriver/BSONObj.h"
 
 
 /* ****************************************************************************
@@ -60,7 +60,7 @@ typedef struct ContextElementResponse
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
-  ContextElementResponse(const mongo::BSONObj&  entityDoc,
+  ContextElementResponse(const orion::BSONObj&  entityDoc,
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);

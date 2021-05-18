@@ -31,8 +31,6 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/RenderFormat.h"
@@ -56,6 +54,7 @@
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
+#include "mongoDriver/BSONArray.h"
 
 
 /* ****************************************************************************
@@ -80,6 +79,7 @@ void mongoInit
   const char*  mechanism,
   const char*  authDb,
   bool         dbSSL,
+  bool         dbDisableRetryWrites,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -146,58 +146,10 @@ extern std::string tenantFromDb(const std::string& database);
 
 /* ****************************************************************************
 *
-* setEntitiesCollectionName -
-*/
-extern void setEntitiesCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-extern void setRegistrationsCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-extern void setSubscribeContextCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
 * composeDatabaseName -
 *
 */
 extern std::string composeDatabaseName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-extern std::string getEntitiesCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-extern std::string getRegistrationsCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-extern std::string getSubscribeContextCollectionName(const std::string& tenant);
 
 
 
@@ -262,7 +214,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
 
 
 
@@ -329,7 +281,7 @@ extern bool registrationsQuery
 *
 * condValueAttrMatch -
 */
-extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+extern bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
 
 
 
@@ -340,7 +292,7 @@ extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std:
 * Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
 */
-extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
+extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 
 
 
@@ -369,7 +321,7 @@ void subToNotifyList
 */
 extern StringList subToAttributeList
 (
-  const mongo::BSONObj&           attrL,
+  const orion::BSONObj&           attrL,
   const bool&                     onlyChanged,
   const bool&                     blacklist,
   const std::vector<std::string>  modifiedAttrs,
@@ -385,7 +337,7 @@ extern StringList subToAttributeList
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern StringList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const orion::BSONObj& attrL);
 
 
 
@@ -395,7 +347,7 @@ extern StringList subToAttributeList(const mongo::BSONObj& attrL);
 *
 * NGSIv2 wrapper
 */
-extern mongo::BSONArray processConditionVector
+extern orion::BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,
@@ -452,7 +404,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath);
 *
 * fillQueryServicePath -
 */
-extern mongo::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
+extern orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
 
 
 

@@ -173,15 +173,14 @@ Date: REGEX(.*)
 02. DELETE /v1/contextSubscriptions/123456789012345678901234 and see it fail
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404", 
-        "details": "subscriptionId: /123456789012345678901234/", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }, 
     "subscriptionId": "123456789012345678901234"

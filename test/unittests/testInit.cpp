@@ -27,25 +27,18 @@
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongo/client/dbclient.h"
+// #include "mongoBackend/mongoConnectionPool.h"
 
 
 
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::DBClientBase;
-
-
-
+#if 0
+// FIXME #3775: pending on mongo unit test re-enabling
 /* ****************************************************************************
 *
 * External declarations
 */
-extern DBClientBase* mongoInitialConnectionGetForUnitTest();
-extern void          setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern orion::DBClientBase mongoInitialConnectionGetForUnitTest();
+extern void                orion::setMongoConnectionForUnitTest(orion::DBClientBase* _connection);
 
 
 
@@ -66,6 +59,7 @@ void setupDatabase(void)
     /* In fact, the mongoConnectionPoolInit() parameters related with the pool, e.g. pool size, are irrelevant,
      * given that the connection creation is mocked under UNIT_TEST in the mongoBackend library
      */
+    // FIXME #3775: mongoConnectionPoolInit() signature changed. Review this specially.
     mongoConnectionPoolInit("localhost", "", "", "", "", "", "", false, false, 0, 10);
     mongoStarted = true;
   }
@@ -81,6 +75,7 @@ void setupDatabase(void)
   setEntitiesCollectionName("entities");
   setSubscribeContextCollectionName("csubs");
 }
+#endif
 
 
 

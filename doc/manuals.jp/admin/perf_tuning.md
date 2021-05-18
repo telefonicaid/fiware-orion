@@ -3,6 +3,7 @@
 * [MongoDB の設定](#mongodb-configuration)
 * [データベース・インデックス](#database-indexes)
 * [書き込み確認](#write-concern)
+* [MongoDB ドライバ・パフォーマンス・カウンタ](#mongodb-driver-performance-counters)
 * [通知モードとパフォーマンス](#notification-modes-and-performance)
 * [フロー制御メカニズムの更新](#updates-flow-control-mechanism)
 * [ペイロードとメッセージのサイズとパフォーマンス](#payload-and-message-size-and-performance)
@@ -20,7 +21,7 @@
 <a name="mongodb-configuration"></a>
 ##  MongoDB の設定
 
-パフォーマンスの観点から、特に Update-Intensive シナリオでは、WireTiger で MongoDB 3.6 を使用することをお勧めします。
+パフォーマンスの観点から、特に Update-Intensive シナリオでは、WireTiger で MongoDB 4.4 を使用することをお勧めします。
 
 さらに、パフォーマンスに影響を与える可能性があるため、公式の MongoDB のドキュメントから次の情報を考慮してください :
 
@@ -66,6 +67,37 @@ Orion Context Broker が実際に保証している唯一のインデックス�
 [書き込み確認 (Write concern)](https://docs.mongodb.org/manual/core/write-concern/) は、MongoDB の書き込み操作のパラメータです。デフォルトでは、Orion は MongoDB がオペレーションをメモリに適用したことを Orion が確認するまで待機することを意味する "承認された" 書き込み確認を使用します。この動作は、`-writeConcern` [CLI オプション](cli.md)で変更できます。"承認されていない" 書き込み確認が設定されている場合、Orion は確認を待つことがないため、書き込み操作をはるかに高速に実行できます。
 
 ただし、パフォーマンスと信頼性にはトレードオフがあります。"承認されていない" 書き込み確認を使用するとパフォーマンスは向上しますが、情報を失うリスクは高くなります (Orion は書込み操作が成功したという確認を得られません)。
+
+[トップ](#top)
+
+<a name="mongodb-driver-performance-counters"></a>
+## MongoDB ドライバ・パフォーマンス・カウンタ
+
+Orion で使用される MongoDB ドライバには、DB に関連するいくつかのパフォーマンス・カウンタを
+取得できる優れた機能があります。
+
+この機能を使用するには、ドライバに付属の `mongoc-stat` ツールが必要です。そのため、
+[このドキュメント](build_source.md)で説明されている手順に従ってドライバをインストールする
+必要があります。
+
+"contextBroker" プロセスの PID を取得します, 例:
+
+```
+ps ax | grep contextBroker
+```
+
+次に、その PID をパラメータとして使用して `mongoc-stat` ツールを実行します, 例:
+
+```
+mongoc-stat <contextBroker PID>
+```
+
+Context Broker の起動時に `MONGOC_DISABLE_SHM=true` を使用して、パフォーマンス・カウンタの生成を無効に
+することができます。
+
+使用可能なカウンタとこの機能の一般的な詳細については、
+[ドライバの公式ドキュメント](http://mongoc.org/libmongoc/current/basic-troubleshooting.html#performance-counters)
+を参照してください。
 
 [トップ](#top)
 

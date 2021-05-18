@@ -16,14 +16,17 @@
 <a name="introduction"></a>
 ## イントロダクション
 
-推奨される手順は、CentOS 7.x で RPM パッケージを使用してインストールすることです。ソースからのビルドに興味がある場合は、[このドキュメント](build_source.md)を確認してください。
+推奨される手順は、公式の [Docker Hub の Orion docker コンテナ](https://hub.docker.com/r/fiware/orion/) を使用してインストールすることです。
+
+ただし、Docker 化されたインフラストラクチャがない場合は、インストールすることをお勧めします。
+CentOS8.x で RPM パッケージを使用します。 ソースからのビルドに興味がある場合は、[このドキュメント](build_source.md)を確認してください。
 
 <a name="requirements"></a>
 ## 要件
 
 * システムリソース : [これらの推奨事項](diagnosis.md#resource-availability)を参照
-* オペレーティング・システム : CentOS/RedHat。リファレンス・オペレーティング・システムは CentOS 7.4.1708 ですが、それ以降の CentOS/RedHat 7.x バージョンでも動作します
-* データベース : MongoDB は、Orion Context Broker をインストールするホストと同じホストで実行するか、ネットワーク経由でアクセス可能な別のホストで実行する必要があります。推奨される MongoDB のバージョンは 3.6 です。古いバージョンでは動作しますが、推奨しません
+* オペレーティング・システム : CentOS/RedHat。リファレンス・オペレーティング・システムは CentOS 8.3.2011 ですが、それ以降の CentOS/RedHat 8.x バージョンでも動作します
+* データベース : MongoDB は、Orion Context Broker をインストールするホストと同じホストで実行するか、ネットワーク経由でアクセス可能な別のホストで実行する必要があります。推奨される MongoDB のバージョンは 4.4 です。古いバージョンでは動作しますが、推奨しません
 * RPM の依存関係 (これらのパッケージのいくつかは、公式の CentOS/RedHat リポジトリにはありませんが、EPEL にあります。EPEL リポジトリを設定する必要があります。<http://fedoraproject.org/wiki/EPEL> を参照してください) :
     * contextBroker パッケージ (必須) は次のパッケージに依存しています : libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate, libuuid
 

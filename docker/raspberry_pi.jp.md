@@ -17,7 +17,7 @@ ARM ベースのデバイスであり、ARM アーキテクチャ用にコンパ
 
 ### Linux OS
 
-現在のところ、Raspberry Pi で64 ビット Linux を使用するオプションは多くありません。Ubuntu 18.04 LTS または 19.10
+現在のところ、Raspberry Pi で64 ビット Linux を使用するオプションは多くありません。Ubuntu 20.04 LTS
 を使用することをお勧めします。[こちら](https://ubuntu.com/download/raspberry-pi)から OS イメージを取得し、
 インストール手順を見つけることができます。
 
@@ -42,25 +42,19 @@ sudo add-apt-repository \
 sudo apt-get install -y docker-ce
 ```
 
-Ubuntu 19.10 (Eoan) 用の Docker バイナリは提供されていないため、Ubuntu 18.04 LTS (Bionic) 用の Docker バイナリを
-インストールする必要があります。`add-apt-repository` コマンドで、`$(lsb_release -cs)` を `bionic` に置き換えてください。
-
 Docker のインストールの詳細は[こちら](https://docs.docker.com/install/linux/docker-ce/ubuntu/)です。
 
 ### Dokcer compose
 
 aarch64 の Docker Compose のバイナリは提供されていません。ソースコードからビルドする必要があります。
-次のようにコマンドを実行して、Docker Compose のバージョン 1.25.1 をインストールできます :
+次のようにコマンドを実行して、Docker Compose のバージョン 1.27.4 をインストールできます :
 
 ```
-git clone -b 1.25.1 https://github.com/docker/compose.git
+git clone -b 1.27.4 https://github.com/docker/compose.git
 cd compose/
-sed -i -e "43i'setuptools<45.0.0'," setup.py
 sudo ./script/build/linux
 sudo cp dist/docker-compose-Linux-aarch64 /usr/local/bin/docker-compose
 ```
-
-注 : sed コマンドを使用して、ビルドエラーを回避するためのパッチが追加されます。
 
 ## Orion のビルド方法
 
@@ -69,7 +63,7 @@ Orion の Docker イメージをビルドするには、Orion リポジトリを
 ```
 git clone https://github.com/telefonicaid/fiware-orion.git
 cd fiware-orion/docker
-docker build --build-arg=centos7 -t orion .
+docker build -t orion .
 ```
 
 ## Orion の実行方法
@@ -89,7 +83,7 @@ services:
     command: -dbhost mongo
 
   mongo:
-    image: mongo:3.6
+    image: mongo:4.4
     command: --nojournal
 ```
 

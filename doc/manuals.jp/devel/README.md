@@ -1,6 +1,6 @@
 # <a name="top"></a>開発マニュアル
 
-*注 : このドキュメントでは、リリース 2.6.x の Orion Context Broker について説明しています。*
+*注 : このドキュメントでは、リリース 3.0.x の Orion Context Broker について説明しています。*
 
 ## 対象読者
 
@@ -13,7 +13,7 @@ Orion が依存している外部ライブラリに関するこれまでの知�
 * Microhttpd
 * Libcurl
 * Rapidjson (NGSIv2 JSON パーシング)
-* MongoDB C++ ドライバ
+* MongoDB C ドライバ
 * Boost property tree (NGSIv1 JSON パーシング)
 
 MongoDB の場合は、ドライバの知識だけでなく、一般的な MongoDB 技術も推奨されます。

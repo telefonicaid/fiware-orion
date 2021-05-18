@@ -158,8 +158,8 @@ static std::string parseContextAttributeObject
     }
   }
 
-  // Is it a date?
-  if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
+  // Is it a (not null) date?
+  if (((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT)) && (caP->valueType != orion::ValueTypeNull))
   {
     caP->numberValue =  parse8601Time(caP->stringValue);
 

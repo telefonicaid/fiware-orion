@@ -7,7 +7,7 @@ on:
       - master
 
 env:
-  TEST_IMAGE_NAME: fiware/orion-ci:rpm7
+  TEST_IMAGE_NAME: fiware/orion-ci:rpm8
 
 jobs:
   unit:
@@ -15,7 +15,7 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:4.0
+        image: mongo:4.4
         ports:
           - 27017:27017
 

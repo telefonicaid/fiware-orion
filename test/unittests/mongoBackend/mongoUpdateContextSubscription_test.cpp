@@ -61,7 +61,7 @@ using ::testing::Return;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 
@@ -4382,7 +4382,6 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 /* ****************************************************************************
 *
 * MongoDbFindOneFail -
-*
 */
 TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
 {
@@ -4433,7 +4432,6 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
 /* ****************************************************************************
 *
 * MongoDbUpdateFail -
-*
 */
 TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
 {

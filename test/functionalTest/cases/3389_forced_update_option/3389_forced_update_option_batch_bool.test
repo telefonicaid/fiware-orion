@@ -366,6 +366,7 @@ Date: REGEX(.*)
 
 
 09. Dump and reset accumulator, see notification.
+#SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -417,6 +418,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+#SORT_END
 
 
 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
@@ -428,6 +430,7 @@ Date: REGEX(.*)
 
 
 11. Dump and reset accumulator, see notification.
+#SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -479,6 +482,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--

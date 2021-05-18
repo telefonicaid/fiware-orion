@@ -40,11 +40,10 @@
 #include "ngsi/Metadata.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
-using namespace mongo;
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -181,7 +180,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 *
 * Metadata::Metadata -
 */
-Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
+Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
 {
   name            = _name;
   type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
@@ -189,36 +188,36 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
   compoundValueP  = NULL;
   shadowed        = false;
 
-  BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
+  orion::BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
   {
-  case String:
+  case orion::String:
     valueType   = orion::ValueTypeString;
     stringValue = getStringFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
-  case NumberDouble:
+  case orion::NumberDouble:
     valueType   = orion::ValueTypeNumber;
     numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
-  case Bool:
+  case orion::Bool:
     valueType = orion::ValueTypeBoolean;
     boolValue = getBoolFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
-  case jstNULL:
+  case orion::jstNULL:
     valueType = orion::ValueTypeNull;
     break;
 
-  case Object:
+  case orion::Object:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
     compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
     compoundValueP->valueType = orion::ValueTypeObject;
     break;
 
-  case Array:
+  case orion::Array:
     valueType      = orion::ValueTypeVector;
     compoundValueP = new orion::CompoundValueNode();
     compoundVectorResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
@@ -525,7 +524,7 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
+      if (dbEncode(current->childV[cIx]->name) == compoundPathV[ix])
       {
         current = current->childV[cIx];
         found   = true;

@@ -193,7 +193,7 @@ GET /v2/entities?offset=54882
 DB はリソースの不足によるソート動作の失敗に関連するエラーを発生させている。Orion ログ・ファイルに次のような ERROR トレースが含まれていることを確認できます :
 
 ```
-Raising alarm DatabaseError: nextSafe(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
+Raising alarm DatabaseError: next(): { $err: "Executor error: OperationFailed Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit.", code: 17144 }
 ```
 
 これに対する典型的な解決策は、ソートに使用されるフィールドにインデックスを作成することです。特に、(作成日に基づいて) デフォルトのエンティティの順序を使用している場合は、mongo シェルで次のコマンドを使用してインデックスを作成できます :

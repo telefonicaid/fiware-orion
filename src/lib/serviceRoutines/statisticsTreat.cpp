@@ -38,7 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/rest.h"
 #include "serviceRoutines/statisticsTreat.h"
-#include "mongoBackend/mongoConnectionPool.h"
+#include "mongoDriver/mongoConnectionPool.h"
 #include "cache/subCache.h"
 #include "ngsiNotify/QueueStatistics.h"
 #include "common/JsonHelper.h"
@@ -131,7 +131,7 @@ static void resetStatistics(void)
   semTimeTransReset();
   semTimeCacheReset();
   semTimeTimeStatReset();
-  mongoPoolConnectionSemWaitingTimeReset();
+  orion::mongoPoolConnectionSemWaitingTimeReset();
   mutexTimeCCReset();
 
   timingStatisticsReset();
@@ -236,7 +236,7 @@ std::string renderSemWaitStats(void)
   JsonObjectHelper jh;
 
   jh.addNumber("request",           semTimeReqGet());
-  jh.addNumber("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
+  jh.addNumber("dbConnectionPool",  orion::mongoPoolConnectionSemWaitingTimeGet());
   jh.addNumber("transaction",       semTimeTransGet());
   jh.addNumber("subCache",          semTimeCacheGet());
   jh.addNumber("connectionContext", mutexTimeCCGet());

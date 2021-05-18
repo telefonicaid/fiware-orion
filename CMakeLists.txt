@@ -22,7 +22,9 @@
 # Project name and basic prerequisities
 #
 PROJECT(contextBroker)
-cmake_minimum_required(VERSION 2.6)
+
+# find_package() for mongo driver doesn't work with cmake 2
+cmake_minimum_required(VERSION 3.0)
 
 #
 # DEBUG or RELEASE build ?
@@ -55,6 +57,8 @@ add_definitions(-fPIC)
 
 # Baseline compiler flags, any change here will affect all build types
 
+# FIXME #3775 currently the only place in which std::auto_ptr<std::auto_ptr> is being used
+# is the code in commonMocks.h. Thus. probably this can be removed and #2979 definitively solved.
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.
@@ -81,10 +85,13 @@ add_definitions(-fPIC)
 if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.3)
   message ("gcc version less than 6.3, compiling without -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
-else()
+elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.3)
   # Formerly this was a condition based in distribution, set for Ubuntu_17.*, Ubuntu_18.* and Debian_9.*
-  message("gcc version 6.3 or higher, compiling with -Wno-deprecated-declarations")
+  message("gcc version between 6.3 and 8.3, compiling with -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+else()
+  message("gcc version higher than 8.3, compiling with -Wno-deprecated-declarations -Wno-format-truncation -Wno-stringop-truncation")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments -Wno-format-truncation -Wno-stringop-truncation")
 endif()
 
 #
@@ -184,6 +191,7 @@ SET (ORION_LIBS
     ngsi
     cache
     mongoBackend
+    mongoDriver
     parse
     apiTypesV2
     orionTypes
@@ -209,10 +217,15 @@ SET (BOOST_MT
     boost_regex-mt
 )
 
+# See http://mongoc.org/libmongoc/current/tutorial.html#cmake
+# This find_package() command provides the mongo::mongoc_static used in
+# SET for common static libs. We use 1.17.4 as reference version.
+find_package (mongoc-1.0 1.17.4 EXACT)
+
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
-    mongoclient.a
+    mongo::mongoc_static
 )
 
 SET (DYNAMIC_LIBS
@@ -242,6 +255,12 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+
+
+# Needed for the new C driver
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libbson-1.0")
+
 
 #
 # Library directories
@@ -288,6 +307,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
+  ADD_SUBDIRECTORY(src/lib/mongoDriver)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)

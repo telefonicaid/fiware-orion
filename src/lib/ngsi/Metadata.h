@@ -30,11 +30,11 @@
 
 #include "common/globals.h"
 
-#include "mongo/client/dbclient.h"
-
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
+
+#include "mongoDriver/BSONObj.h"
 
 
 
@@ -88,7 +88,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
-  Metadata(const std::string& _name, const mongo::BSONObj& mdB);
+  Metadata(const std::string& _name, const orion::BSONObj& mdB);
   ~Metadata();
 
   std::string  toJsonV1(bool comma);

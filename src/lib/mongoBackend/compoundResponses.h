@@ -25,10 +25,10 @@
 *
 * Author: Fermín Galán
 */
-#include "mongo/client/dbclient.h"
 
 #include "parse/CompoundValueNode.h"
 
+#include "mongoDriver/BSONElement.h"
 
 
 /* ****************************************************************************
@@ -36,7 +36,7 @@
 * compoundVectorResponse -
 *
 */
-extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
+extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const orion::BSONElement& be);
 
 
 
@@ -45,6 +45,6 @@ extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const mongo::B
 * compoundObjectResponse -
 *
 */
-extern void compoundObjectResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
+extern void compoundObjectResponse(orion::CompoundValueNode* cvP, const orion::BSONElement& be);
 
 #endif  // SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_

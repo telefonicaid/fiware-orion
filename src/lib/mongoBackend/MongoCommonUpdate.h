@@ -29,8 +29,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "orionTypes/UpdateActionType.h"
 #include "ngsi10/UpdateContextResponse.h"
 

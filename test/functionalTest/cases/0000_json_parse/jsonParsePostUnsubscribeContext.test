@@ -98,7 +98,7 @@ echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 115
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -106,7 +106,6 @@ Date: REGEX(.*)
 {
     "statusCode": {
         "code": "404",
-        "details": "subscriptionId: /012345678901234567890123/",
         "reasonPhrase": "No context element found"
     },
     "subscriptionId": "012345678901234567890123"

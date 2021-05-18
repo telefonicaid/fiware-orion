@@ -37,14 +37,11 @@ SET (SOURCES
     mongoCreateSubscription.cpp
     mongoUpdateSubscription.cpp
     TriggeredSubscription.cpp
-    mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
     mongoRegistrationGet.cpp
     mongoRegistrationCreate.cpp
     mongoRegistrationDelete.cpp
-    connectionOperations.cpp
     mongoSubCache.cpp
-    safeMongo.cpp    
     compoundResponses.cpp
     location.cpp
     compoundValueBson.cpp
@@ -69,14 +66,11 @@ SET (HEADERS
     mongoCreateSubscription.h
     mongoUpdateSubscription.h
     TriggeredSubscription.h
-    mongoConnectionPool.h
     mongoGetSubscriptions.h
     mongoRegistrationGet.h
     mongoRegistrationCreate.h
     mongoRegistrationDelete.h
-    connectionOperations.h
     mongoSubCache.h
-    safeMongo.h
     dbFieldEncoding.h
     compoundResponses.h
     location.h

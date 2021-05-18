@@ -130,6 +130,9 @@ static bool isFatherProcess = false;
 /* ****************************************************************************
 *
 * Option variables
+*
+* No hint on max length for user and pwd (see see https://stackoverflow.com/questions/66671107/username-and-passwor-field-length-limit-in-mongo-uri),
+* but 256 seems to be a reasonable limit
 */
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
@@ -137,11 +140,12 @@ int             port;
 char            dbHost[256];
 char            rplSet[64];
 char            dbName[64];
-char            user[64];
-char            pwd[64];
+char            user[256];
+char            pwd[256];
 char            authMech[64];
 char            authDb[64];
 bool            dbSSL;
+bool            dbDisableRetryWrites;
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -209,9 +213,10 @@ unsigned long   fcMaxInterval;
 #define RPLSET_DESC            "replica set"
 #define DBUSER_DESC            "database user"
 #define DBPASSWORD_DESC        "database password"
-#define DBAUTHMECH_DESC        "database authentication mechanism (either SCRAM-SHA-1 or MONGODB-CR)"
+#define DBAUTHMECH_DESC        "database authentication mechanism (either SCRAM-SHA-1 or SCRAM-SHA-256)"
 #define DBAUTHDB_DESC          "database used for authentication"
 #define DBSSL_DESC             "enable SSL connection to DB"
+#define DBDISABLERETRYWRITES_DESC  "set retryWrite parameter to false in DB connections"
 #define DB_DESC                "database name"
 #define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define USEIPV4_DESC           "use ip v4 only"
@@ -279,12 +284,13 @@ PaArgument paArgs[] =
   { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBUSER_DESC                  },
   { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBPASSWORD_DESC              },
 
-  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "SCRAM-SHA-1",                PaNL,  PaNL,             DBAUTHMECH_DESC              },
+  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHMECH_DESC              },
   { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHDB_DESC                },
   { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,             DBSSL_DESC                   },
+  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,             DBDISABLERETRYWRITES_DESC    },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,             DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaDouble, PaOpt, 10000,                           PaNL,  PaNL,             DB_TMO_DESC                  },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     MAX_L,            DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,            DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,             USEIPV4_DESC                 },
@@ -493,9 +499,6 @@ void daemonize(void)
   {
     LM_X(1, ("Fatal Error (chdir: %s)", strerror(errno)));
   }
-
-  // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  mongo::OID::justForked();
 }
 
 
@@ -865,7 +868,12 @@ static void logEnvVars(void)
   {
     if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
     {
-      if (aP->type == PaString)
+      if (strcmp(aP->envName, "MONGO_PASSWORD") == 0)
+      {
+        // Offuscate sensible information
+        LM_I(("env var ORION_%s (%s): ******", aP->envName, aP->option));
+      }
+      else if (aP->type == PaString)
       {
         LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
       }
@@ -960,7 +968,7 @@ int main(int argC, char* argV[])
     paConfig("log to screen",                 (void*) true);  
     if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
     {
-      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+      paConfig("screen line format", (void*) "TYPE@DATE  FILE[LINE]: TEXT");
     }
     else
     {
@@ -1000,7 +1008,8 @@ int main(int argC, char* argV[])
   }
 
   // print startup info in logs
-  LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
+  std::string cmdLine = offuscatePassword(cmdLineString(argC, argV), std::string(pwd));
+  LM_I(("start command line <%s>", cmdLine.c_str()));
   logEnvVars();
 
   // Argument consistency check (-t AND NOT -logLevel)
@@ -1026,9 +1035,9 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
-  if ((strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "MONGODB-CR", strlen("MONGODB-CR")) != 0))
+  if ((strlen(authMech) > 0) && (strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "SCRAM-SHA-256", strlen("SCRAM-SHA-256")) != 0))
   {
-    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or MONGODB-CR"));
+    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or SCRAM-SHA-256"));
   }
 
   if (useOnlyIPv6 && useOnlyIPv4)
@@ -1104,9 +1113,9 @@ int main(int argC, char* argV[])
   }
 
   SemOpType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
