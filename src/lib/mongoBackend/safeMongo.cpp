@@ -281,7 +281,7 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, co
 *
 * getBoolField -
 */
-bool getBoolField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
+bool getBoolField(const BSONObj& b, const std::string& field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::Bool)
   {
@@ -296,7 +296,7 @@ bool getBoolField(const BSONObj& b, const std::string& field, const std::string&
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return false;
@@ -453,7 +453,7 @@ bool nextSafeOrError
   const std::auto_ptr<DBClientCursor>&  cursor,
   BSONObj*                              r,
   std::string*                          err,
-  const std::string&                    caller,
+  const char*                           caller,
   int                                   line
 )
 {
@@ -476,7 +476,7 @@ bool nextSafeOrError
     char lineString[STRING_SIZE_FOR_INT];
 
     snprintf(lineString, sizeof(lineString), "%d", line);
-    *err = "generic exception at " + caller + ":" + lineString;
+    *err = std::string("generic exception at ") + caller + ":" + lineString;
 
     return false;
   }

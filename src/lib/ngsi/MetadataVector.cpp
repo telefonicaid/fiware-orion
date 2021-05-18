@@ -187,7 +187,14 @@ std::string MetadataVector::check(ApiVersion apiVersion)
 */
 void MetadataVector::push_back(Metadata* item)
 {
-  vec.push_back(item);
+  try
+  {
+    vec.push_back(item);
+  }
+  catch (...)
+  {
+    LM_E(("Out of memory"));
+  }
 }
 
 
@@ -257,7 +264,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 *
 * MetadataVector::lookupByName - 
 */
-Metadata* MetadataVector::lookupByName(const std::string& _name)
+Metadata* MetadataVector::lookupByName(const char* _name)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

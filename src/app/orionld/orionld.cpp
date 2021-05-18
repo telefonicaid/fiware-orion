@@ -66,6 +66,7 @@
 #include <string>
 #include <vector>
 #include <limits.h>
+#include <sys/mman.h>                    // mlockall
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
@@ -211,6 +212,7 @@ bool            socketService;
 unsigned short  socketServicePort;
 bool            forwarding;
 bool            idIndex;
+bool            noswap;
 
 
 
@@ -284,6 +286,7 @@ bool            idIndex;
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define FORWARDING_DESC        "turn on forwarding"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
+#define NOSWAP_DESC            "no swapping - for testing only!!!"
 
 
 
@@ -298,6 +301,7 @@ bool            idIndex;
 */
 PaArgument paArgs[] =
 {
+  { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
   { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                  },
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC             },
   { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            PaNL,   PaNL,             PORT_DESC                },
@@ -901,6 +905,12 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  if (noswap == true)
+  {
+    LM_W(("All the broker's memory is locked in RAM - swapping disabled!!!"));
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+  }
 
 
   //

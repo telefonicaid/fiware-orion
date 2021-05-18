@@ -81,8 +81,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
   ++replyIx;
-  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
-  LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
+  LM_TMP(("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
 
   response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)

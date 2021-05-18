@@ -78,7 +78,15 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
 
   for (KjNode* idNodeP = entityIdsArray->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
   {
-    idList.append(idNodeP->value.s);
+    try
+    {
+      idList.append(idNodeP->value.s);
+    }
+    catch (...)
+    {
+      LM_E(("Out of memory?"));
+      return NULL;
+    }
   }
 
   inObj.append("$in", idList.arr());
@@ -96,8 +104,17 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::Query                          query(filter.obj());
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
-  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  std::auto_ptr<mongo::DBClientCursor>  cursorP;
 
+  try
+  {
+    cursorP = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  }
+  catch (...)
+  {
+    LM_E(("mongo query threw an exception"));
+    return NULL;
+  }
 
   KjNode*  entitiesArray = NULL;
   int      entities      = 0;
@@ -175,11 +192,11 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
     // Add the Entity to the entity array
     kjChildAdd(entitiesArray, entityTree);
 
-    // A limit of 100 entities has been established.
+    // A limit of 1000 entities has been established (KZ: where???)
     ++entities;
-    if (entities >= 200)
+    if (entities >= 1000)
     {
-      LM_W(("Too many entities - breaking loop at 200"));
+      LM_W(("Too many entities - breaking loop at 1000"));
       break;
     }
   }

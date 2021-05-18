@@ -175,7 +175,7 @@ extern bool getBoolField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -227,7 +227,7 @@ extern bool nextSafeOrError
   const std::auto_ptr<mongo::DBClientCursor>&  cursor,
   mongo::BSONObj*                              r,
   std::string*                                 err,
-  const std::string&                           caller = "<none>",
+  const char*                                  caller = "<none>",
   int                                          line   = 0
 );
 

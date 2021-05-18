@@ -32,7 +32,7 @@
 
 #include "parse/CompoundValueNode.h"
 #include "mongoBackend/compoundValueBson.h"
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/dotForEq.h"
 
 
 
@@ -107,7 +107,11 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode*  child         = children[ix];
-    std::string                effectiveName = dbDotEncode(child->name);
+    char                       effectiveName[256];
+
+    strncpy(effectiveName, child->name.c_str(), sizeof(effectiveName));
+
+    dotForEq(effectiveName);
 
     if (child->valueType == orion::ValueTypeString)
     {
