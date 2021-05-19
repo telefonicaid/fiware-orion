@@ -734,7 +734,8 @@ std::string postQueryContext
   // the response. This fragment of code filters them out.
   //
   // FIXME P5: this is a kind of dirty hack. But if CPrs functionality is removed at the end, there is no
-  // reason to provide a more costly fix for this.
+  // reason to provide a more costly fix for this. Maybe this should be done in QueryContextResponseVector::populate()
+  // method. Check https://github.com/telefonicaid/fiware-orion/issues/3463#issuecomment-477312079 for additional ideas
   for (unsigned int ix = 0; ix < responseV.size(); ++ix)
   {
     std::vector<int> ixToBeErased;
@@ -768,7 +769,6 @@ std::string postQueryContext
   }
 
   TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
-  //LM_W(("FGM: answer: %s", answer.c_str()));
 
 
   //
@@ -784,7 +784,6 @@ std::string postQueryContext
   //
   qcrsP->release();
   responseV.populate(qcrsP);
-  //responseV.populate(qcrP, qcrsP);
 
   qcrP->release();
   requestV.release();

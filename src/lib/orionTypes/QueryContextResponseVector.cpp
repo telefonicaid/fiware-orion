@@ -209,7 +209,6 @@ std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details
 *
 * QueryContextResponseVector::populate -
 */
-//void QueryContextResponseVector::populate(QueryContextRequest* qcrP, QueryContextResponse* responseP)
 void QueryContextResponseVector::populate(QueryContextResponse* responseP)
 {
   //
@@ -279,31 +278,8 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       {
         targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector);
       }
-      else  // Not found so we will have to create a new ContextElementResponse (filtering out first entities not in the request)
+      else  // Not found so we will have to create a new ContextElementResponse
       {
-        /*
-        bool toFilter = true;
-        for (unsigned int iix = 0; iix < qcrP->entityIdVector.size(); ++iix)
-        {
-          EntityId* enFromQuery = qcrP->entityIdVector[iix];
-
-          // Works for queries id so: 1) not pattern, 2) the '.*' pattern
-          bool idMatch = ((enFromQuery->id == ".*") && (enFromQuery->isPattern == "true")) ||
-              (enFromQuery->id == cerP->entity.id);
-
-          // Note missing or "" entity type is not taken into account: it is not allowed in NGSIv2
-          bool typeMatch = (enFromQuery->type == cerP->entity.type);
-
-          if (idMatch && typeMatch)
-          {
-            toFilter = false;
-            break;
-          }
-        }
-        if (toFilter)
-        {
-          continue;
-        }*/
 
         ContextElementResponse* newCerP = new ContextElementResponse(cerP);
 

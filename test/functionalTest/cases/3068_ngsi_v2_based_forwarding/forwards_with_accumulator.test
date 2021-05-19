@@ -44,12 +44,6 @@ accumulatorStart --pretty-print
 # 11. Query entities of type T4 - get empty response as the accumulator doesn't respond
 # 12. Dump the accumulator, see the forwarded query
 #
-# FIXME: Due to a bug in Orion, the forward provoked by the query of steps 5 and 11 make the broker send not one but TWO forwarded
-#        request of the query to the accumulator.
-#        This is a bug of the broker that is also present in V1 forwarding and it is 'more or less acceptable', but should be fixed some day ...
-#        Note that the queries in step 2 and 8 DO NOT provoke the bug.
-#        This fact may be of help to locate the bug.
-#
 
 echo "01. Register entities of type T1, with ID .*, and attribute A1, for the accumulator"
 echo "==================================================================================="
@@ -294,25 +288,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
     ]
 }
 =======================================
-POST http://localhost:REGEX(\d+)/v2/op/query
-Fiware-Servicepath: /
-Content-Length: 56
-User-Agent: REGEX(.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=2
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "idPattern": ".*",
-            "type": "T2"
-        }
-    ]
-}
-=======================================
 
 
 07. Register entities of type T3, with ID E1, and attribute A1, for the accumulator
@@ -392,25 +367,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "id": "E1",
-            "type": "T4"
-        }
-    ]
-}
-=======================================
-POST http://localhost:9997/v2/op/query
-Fiware-Servicepath: /
-Content-Length: 49
-User-Agent: REGEX(.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=2
 
 {
     "attrs": [],

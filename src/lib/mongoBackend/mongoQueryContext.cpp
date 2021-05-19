@@ -113,7 +113,7 @@ static void addContextProviderEntity
   {
     if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
-      // Avoid duplicate pa in the vector
+      // Avoid duplicate PA in the vector
       if (!lookupProvidingApplication(cerV[ix]->entity.providingApplicationList, pa))
       {
         cerV[ix]->entity.providingApplicationList.push_back(pa);
