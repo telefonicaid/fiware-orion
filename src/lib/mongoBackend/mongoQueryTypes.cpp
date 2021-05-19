@@ -140,7 +140,7 @@ static void getAttributeTypes
 
     for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
     {
-      std::string currentAttr = *i;
+      const char* currentAttr = i->c_str();
 
       if (basePart(currentAttr) == attrName)
       {

@@ -92,7 +92,14 @@ MHD_Result orionldMhdConnectionPayloadRead
   if (ciP->payloadSize == 0)  // First call with payload
   {
     if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    {
       ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      if (ciP->payload == NULL)
+      {
+        LM_E(("Out of memory!!!"));
+        return MHD_NO;
+      }
+    }
     else
       ciP->payload = static_buffer;
   }

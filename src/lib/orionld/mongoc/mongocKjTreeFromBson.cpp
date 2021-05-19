@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -65,7 +66,13 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
       *detailsP = (char*) "Error parsing JSON output from bson_as_json";
     }
 
-    // bson_free(json);
+    //
+    // Cloning the tree, so that I can free the string 'json'
+    // FIXME: Not optimal for performance - would be better to delay the free to after the request and not clone the tree
+    //
+    treeP = kjClone(orionldState.kjsonP, treeP);
+
+    bson_free(json);
   }
 #endif
   return treeP;

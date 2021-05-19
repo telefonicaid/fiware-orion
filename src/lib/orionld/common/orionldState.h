@@ -252,7 +252,7 @@ typedef struct OrionldConnectionState
   void*                   delayedFreePointer;
 
   int                     notificationRecords;
-  OrionldNotificationInfo notificationInfo[100];
+  OrionldNotificationInfo notificationInfo[16];
   bool                    notify;
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;

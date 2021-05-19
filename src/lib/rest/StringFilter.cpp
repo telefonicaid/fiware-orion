@@ -2316,7 +2316,7 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
 
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
-      Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName);
+      Metadata*  mdP = (caP == NULL)? NULL : caP->metadataVector.lookupByName(itemP->metadataName.c_str());
 
       if (itemP->compoundPath.size() == 0)
       {
@@ -2361,7 +2361,7 @@ bool StringFilter::mqMatch(ContextElementResponse* cerP)
     }
     else if (itemP->op != SfopNotExists)
     {
-      mdP = caP->metadataVector.lookupByName(itemP->metadataName);
+      mdP = caP->metadataVector.lookupByName(itemP->metadataName.c_str());
 
       // If the metadata doesn't exist, no need to go further: filter fails
       if (mdP == NULL)

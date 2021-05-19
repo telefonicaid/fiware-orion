@@ -277,7 +277,7 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
 
   for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
-    std::string currentMd = *i;
+    const char* currentMd = i->c_str();
 
     if (!md2.hasField(currentMd))
     {
@@ -547,7 +547,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
-      std::string  currentMd = *i;
+      const char*  currentMd = i->c_str();
       BSONObj      mdItem    = getObjectFieldF(md, currentMd);
       Metadata     md(currentMd, mdItem);
 
@@ -768,7 +768,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getObjectFieldF(attrs, effectiveName);
+    BSONObj attr = getObjectFieldF(attrs, effectiveName.c_str());
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (*actualUpdate)

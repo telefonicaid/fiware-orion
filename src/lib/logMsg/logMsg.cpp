@@ -1928,6 +1928,9 @@ char* lmTextGet(const char* format, ...)
   va_list  args;
   char*    vmsg = (char*) calloc(1, LM_LINE_MAX);
 
+  if (vmsg == NULL)
+    return (char*) "out of memory";
+
   /* "Parse" the varible arguments */
   va_start(args, format);
 
@@ -2291,7 +2294,7 @@ LmStatus lmOut
     if (line   != NULL)   free(line);
     if (format != NULL)   free(format);
 
-    return LmsNull;
+    return LmsMalloc;
   }
 
   tmP = strrchr((char*) file, '/');
@@ -2764,6 +2767,9 @@ LmStatus lmReopen(int index)
     char* line = (char*) calloc(1, LM_LINE_MAX);
     int   len;
 
+    if (line == NULL)
+      return LmsMalloc;
+
     if (fgets(line, LM_LINE_MAX, fP) == NULL)
     {
       s = LmsFgets;
@@ -2870,6 +2876,9 @@ int64_t lmLogLineGet
   char*         lineP  = line;
   char*         delimiter;
   int64_t       ret;
+
+  if (line == NULL)
+    return LmsMalloc;
 
   if (allP != NULL)
   {
@@ -3048,6 +3057,9 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   int         fd;
   static int  headerLines = 4;
 
+  if (line == NULL)
+    return LmsMalloc;
+
   POINTER_CHECK(line);
 
   if (logLines < (keepLines + lastLines))
@@ -3171,6 +3183,9 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     if (lrV[i].remove == false)
     {
       char*  line  = (char*) calloc(1, LM_LINE_MAX);
+
+      if (line == NULL)
+        return LmsMalloc;
 
       if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
       {

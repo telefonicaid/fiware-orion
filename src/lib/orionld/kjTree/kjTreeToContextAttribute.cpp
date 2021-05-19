@@ -302,16 +302,24 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
     valueNodeP = nodeP;
   }
 
-  Metadata* mdP = new Metadata();
+  Metadata* mdP = NULL;
+  try
+  {
+    mdP = new Metadata();
+    mdP->name = nodeP->name;
+  }
+  catch (...)
+  {
+    LM_E(("caught exception from 'new Metadata' - out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, attributeName));
+    mdP = NULL;
+  }
 
   if (mdP == NULL)
   {
-    LM_E(("out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, attributeName));
+    LM_E(("Out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, attributeName));
     orionldErrorResponseCreate(OrionldInternalError, "cannot create property/relationship for attribute", "out of memory");
     return false;
   }
-
-  mdP->name = nodeP->name;
 
   if (typeNodeP != NULL)  // Only if the metadata is a JSON Object
     mdP->type = typeNodeP->value.s;

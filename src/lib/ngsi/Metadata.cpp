@@ -43,7 +43,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/eqForDot.h"
 
 using namespace mongo;
 
@@ -611,10 +611,14 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
   for (int ix = 0; ix < levels; ++ix)
   {
     bool found = false;
+    char compoundPathEncoded[256];
+
+    strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded));
+    eqForDot(compoundPathEncoded);
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
+      if (strcmp(current->childV[cIx]->name.c_str(), compoundPathEncoded) == 0)
       {
         current = current->childV[cIx];
         found   = true;

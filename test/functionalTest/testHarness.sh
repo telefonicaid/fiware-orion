@@ -1053,9 +1053,14 @@ function runTest()
     logMsg "Executing SHELL-INIT part for $path"
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
     exitCode=$?
+
     logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
-    grep -v "^NOTICE: " $dirname/$filename.shellInit.stderr > $dirname/$filename.shellInit.stderr2
-    mv $dirname/$filename.shellInit.stderr2 $dirname/$filename.shellInit.stderr
+
+    grep -v "^NOTICE: "                                    $dirname/$filename.shellInit.stderr  > $dirname/$filename.shellInit.stderr2
+    grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.shellInit.stderr2 > $dirname/$filename.shellInit.stderr3
+    grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.shellInit.stderr3 > $dirname/$filename.shellInit.stderr
+    rm $dirname/$filename.shellInit.stderr2
+    rm $dirname/$filename.shellInit.stderr3
     linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]

@@ -37,7 +37,8 @@
 #include "ngsi/Request.h"
 #include "ngsi/ContextElement.h"
 
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/dotForEq.h"
+
 
 
 /* ****************************************************************************
@@ -143,20 +144,57 @@ std::string ContextElement::toJson
 
 
 
+// -----------------------------------------------------------------------------
+//
+// eqCmp - string comparison that ignores difference in '.'/'='
+//
+bool eqCmp(const char* s1, const char* s2)
+{
+  int ix = 0;
+
+  while (s1[ix] != 0)
+  {
+    if (s1[ix] != s2[ix])
+    {
+      // They differ - if '.' or '=', then they don't differ
+      // They aren't the same, meaning that to match, one must be '.' and the other one '='
+      // The sum of the two must be '.' + '='
+      // '.' + '=' == 0x2E + 0x3D == 0x6B
+      //
+      if ((s1[ix] + s2[ix]) != 0x6B)
+        return false;
+    }
+
+    ++ix;
+  }
+
+  //
+  // s1 has ended. Has s2 also ended?
+  //
+  if (s2[ix] != 0)
+    return false;
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * ContextElement::getAttribute
 */
 ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
 {
+  const char*  attrNameC = attrName.c_str();
+
   for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
   {
-    ContextAttribute* caP = contextAttributeVector[ix];
-
-    if (dbDotEncode(caP->name) == attrName)
-    {
+    ContextAttribute*  caP    = contextAttributeVector[ix];
+    const char*        caName = caP->name.c_str();
+    
+    LM_TMP(("EQDOT: Comparing '%s' to '%s'", caName, attrNameC));
+    if (eqCmp(caName, attrNameC) == true)
       return caP;
-    }
   }
 
   return NULL;

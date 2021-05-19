@@ -62,8 +62,8 @@
 extern mongo::BSONObj getObjectField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -76,8 +76,8 @@ extern mongo::BSONObj getObjectField
 extern mongo::BSONArray getArrayField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -90,8 +90,8 @@ extern mongo::BSONArray getArrayField
 extern std::string getStringField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -104,8 +104,8 @@ extern std::string getStringField
 extern double getNumberField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller,
+  const char*            field,
+  const char*            caller,
   int                    line
 );
 
@@ -118,8 +118,8 @@ extern double getNumberField
 extern int getIntField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -132,9 +132,9 @@ extern int getIntField
 extern long long getLongField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
-  int                    line = 0
+  const char*            field,
+  const char*            caller = "<none>",
+  int                    line   = 0
 );
 
 
@@ -146,8 +146,8 @@ extern long long getLongField
 extern long long getIntOrLongFieldAsLong
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -160,8 +160,8 @@ extern long long getIntOrLongFieldAsLong
 extern double getNumberFieldAsDouble
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -174,8 +174,8 @@ extern double getNumberFieldAsDouble
 extern bool getBoolField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -188,8 +188,8 @@ extern bool getBoolField
 extern mongo::BSONElement getField
 (
   const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -202,9 +202,9 @@ extern mongo::BSONElement getField
 extern void setStringVector
 (
   const mongo::BSONObj&      b,
-  const std::string&         field,
+  const char*                field,
   std::vector<std::string>*  v,
-  const std::string&         caller,
+  const char*                caller,
   int                        line
 );
 
@@ -227,7 +227,7 @@ extern bool nextSafeOrError
   const std::auto_ptr<mongo::DBClientCursor>&  cursor,
   mongo::BSONObj*                              r,
   std::string*                                 err,
-  const std::string&                           caller = "<none>",
+  const char*                                  caller = "<none>",
   int                                          line   = 0
 );
 

@@ -537,7 +537,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 
   //
   // Initialize the KBASE library
-  // This call redirects all log messaghes from the K-libs to the brokers log file.
+  // This call redirects all log messahes from the K-libs to the brokers log file.
   //
   kInit(libLogFunction);
 
