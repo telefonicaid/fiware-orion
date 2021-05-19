@@ -64,6 +64,7 @@ void* startSenderThread(void* p)
 
     long long    statusCode = -1;
     std::string  out;
+    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
     if (!simulatedNotification)
     {
@@ -85,6 +86,8 @@ void* startSenderThread(void* p)
                           &out,
                           &statusCode,
                           params->extraHeaders);
+
+      LM_T(LmtNotificationResponsePayload, ("notification response payload: %s", out.c_str()));
 
       if (r == 0)
       {
