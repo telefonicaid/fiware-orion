@@ -327,7 +327,7 @@ Apart from the `status` values defined for subscription in the NGSIv2 specificat
 
 ## Custom notifications without payload
 
-If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notications
+If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
 associated to that subscription will not include any payload (i.e. conten-length 0 notifications).
 
 Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
