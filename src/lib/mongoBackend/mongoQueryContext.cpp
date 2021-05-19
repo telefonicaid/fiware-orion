@@ -84,6 +84,24 @@ static void fillContextProviders(ContextElementResponseVector& cerV, const Conte
 *
 * addContextProviderEntity -
 */
+static bool lookupProvidingApplication(const std::vector<ProvidingApplication>& paV, const ProvidingApplication &pa)
+{
+  for (unsigned int ix = 0; ix < paV.size(); ++ix)
+  {
+    if ((paV[ix].string == pa.string) && (paV[ix].regId == pa.regId))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* addContextProviderEntity -
+*/
 static void addContextProviderEntity
 (
   ContextElementResponseVector&  cerV,
@@ -95,7 +113,11 @@ static void addContextProviderEntity
   {
     if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
-      cerV[ix]->entity.providingApplicationList.push_back(pa);
+      // Avoid duplicate pa in the vector
+      if (!lookupProvidingApplication(cerV[ix]->entity.providingApplicationList, pa))
+      {
+        cerV[ix]->entity.providingApplicationList.push_back(pa);
+      }
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }

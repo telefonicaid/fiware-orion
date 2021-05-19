@@ -115,13 +115,17 @@ std::string getEntity
                                         parseDataP->qcr.res.attrsList.stringV,
                                         false,
                                         parseDataP->qcr.res.metadataList.stringV));
+
+    // response code the same of the wrapped operation
+    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
   else
   {
     TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
 
-  if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
+  /*if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
     // No problem found, but we expect only one entity
     ciP->httpStatusCode = SccConflict;
@@ -130,7 +134,7 @@ std::string getEntity
   {
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
-  }
+  }*/
 
   // 04. Cleanup and return result
   entity.release();

@@ -1883,7 +1883,14 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
   en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
   en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
-  if (includedEntity(en, enV))
+  /*if ((en.isPattern == "true") && (en.id == ".*"))
+  {
+    // The .* pattern always matches
+    EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
+
+    crr->contextRegistration.entityIdVector.push_back(enP);
+  }
+  else*/ if (includedEntity(en, enV))
   {
     EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
 

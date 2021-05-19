@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+//#include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -45,6 +46,7 @@ typedef struct QueryContextResponseVector
   void                   release(void);
   std::string            toJsonV1(bool asJsonObject, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
+  //void                   populate(QueryContextRequest* qcrP, QueryContextResponse* responseP);
 
   QueryContextResponse*  operator[](unsigned int ix) const;
 
