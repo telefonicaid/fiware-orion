@@ -646,6 +646,8 @@ void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
 */
 void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 {
+  Entity* eP = NULL;
+
   if (qcrs.errorCode.code == SccContextElementNotFound)
   {
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
@@ -657,16 +659,27 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
     //
     oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
   }
-  else if (qcrs.contextElementResponseVector.size() > 1)  // qcrs.errorCode.code == SccOk
+  else  // qcrs.errorCode.code == SccOk
   {
     //
-    // If there are more than one entity, we return an error
+    // If there are more than one entity (ignoring SccContextElementNotFound cases), we return an error
+    // Note SccContextElementNotFound could has been inserted by CPrs scenarios in some cases
     //
-    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
-  }
-  else
-  {
-    Entity* eP = &qcrs.contextElementResponseVector[0]->entity;
+    for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
+    {
+      if (qcrs.contextElementResponseVector[ix]->statusCode.code != SccContextElementNotFound)
+      {
+        if (eP != NULL)
+        {
+          oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+          return;  // early return
+        }
+        else
+        {
+          eP = &qcrs.contextElementResponseVector[ix]->entity;
+        }
+      }
+    }
 
     fill(eP->id,
          eP->type,

@@ -1,5 +1,7 @@
 - Fix: potential crash (although under very rare situations) in log trace code 
 - Fix: support attributes and metadata starting with dollar sign ($) (#3841)
 - Add: null as allowed value for httpCustom.notification.payload to avoid sending payloads in custom notification (#3272)
+- Fix: avoid duplicating forwarded query requests to CPrs in some cases (this may cause illegal JSON with duplicated attribute keys in the response to clients at the end)
+- Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
 - Add: support to null in DateTime attributes and metadata (#3533)
 - Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
