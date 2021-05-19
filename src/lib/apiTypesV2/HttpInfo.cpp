@@ -133,9 +133,11 @@ void HttpInfo::fill(const BSONObj& bo)
   bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
 
 #ifdef ORIONLD
-  std::string mimeTypeString;
+  char* mimeTypeString = (char*) getStringFieldF(bo, CSUB_MIMETYPE);
 
-  mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo, CSUB_MIMETYPE) : "application/json";  // Default
+  if (mimeTypeString[0] == 0)
+    mimeTypeString = (char*) "application/json";  // Default value
+
   this->mimeType = longStringToMimeType(mimeTypeString);
 
   if (bo.hasField("notifierInfo"))

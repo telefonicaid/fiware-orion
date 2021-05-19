@@ -176,6 +176,10 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     {
       return false;
     }
+
+    char* md1Type;
+    char* md2Type;
+
     switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
       /* FIXME #643 P6: metadata array/object are now supported, but we haven't
@@ -204,10 +208,11 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       break;
 
     case mongo::String:
-      if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
-      {
+      md1Type = (char*) getStringFieldF(md1, ENT_ATTRS_MD_TYPE);
+      md2Type = (char*) getStringFieldF(md2, ENT_ATTRS_MD_TYPE);
+
+      if (strcmp(md1Type, md2Type) != 0)
         return false;
-      }
       break;
 
     case mongo::jstNULL:
@@ -230,6 +235,8 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     return false;
   }
 
+  char* md1Value;
+  char* md2Value;
   switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
@@ -242,21 +249,23 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       break;
     */
 
-    case mongo::NumberDouble:
-      return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
+  case mongo::NumberDouble:
+    return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
-    case mongo::Bool:
-      return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
+  case mongo::Bool:
+    return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
-    case mongo::String:
-      return getStringFieldF(md1, ENT_ATTRS_MD_VALUE) == getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
+  case mongo::String:
+    md1Value = (char*) getStringFieldF(md1, ENT_ATTRS_MD_VALUE);
+    md2Value = (char*) getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
+    return (strcmp(md1Value, md2Value) == 0);
 
-    case mongo::jstNULL:
-      return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
+  case mongo::jstNULL:
+    return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
 
-    default:
-      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
-      return false;
+  default:
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
+    return false;
   }
 }
 
@@ -332,6 +341,8 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::String:
+    // getStringFieldF is OK here as caP->stringValue is a std::string ...
+    // Should be amended though. Some day
     return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::jstNULL:
@@ -604,10 +615,15 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     if (orionldState.apiVersion == NGSI_LD_V1)
       actualUpdate = true;
     else
-      actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
-                      ((caP->type != "") &&
-                       (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
-                      mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+    {
+      const char* attrType        = getStringFieldF(attr, ENT_ATTRS_TYPE);
+      bool        attrTypeChanged = (strcmp(attrType, caP->type.c_str()) != 0);
+
+      actualUpdate = (attrValueChanges(attr, caP, apiVersion)  ||
+                      ((caP->type != "") && attrTypeChanged)   ||
+                       mdNew.nFields() != mdSize               ||
+                       !equalMetadata(md, mdNew));
+    }
   }
   else
   {
@@ -3310,7 +3326,7 @@ static void updateEntity
   BSONObj            idField           = getObjectFieldF(r, "_id");
 
   std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
-  std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
+  std::string        entityType        = getStringFieldF(idField, ENT_ENTITY_TYPE);
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
@@ -3414,7 +3430,7 @@ static void updateEntity
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+    loopDetected = (strcmp(getStringFieldF(r, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
   }
 
   if (!processContextAttributeVector(ceP,

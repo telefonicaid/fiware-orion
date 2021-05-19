@@ -501,14 +501,14 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    std::string  dbName  = getStringFieldF(db, "name");
+    const char*  dbName  = getStringFieldF(db, "name");
     std::string  prefix  = dbPrefix + "-";
 
-    if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+    if (strncmp(prefix.c_str(), dbName, strlen(prefix.c_str())) == 0)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+      LM_T(LmtMongo, ("Orion database found: %s", dbName));
       dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      LM_T(LmtBug, ("Pushed back db name '%s'", dbName));
     }
   }
 
@@ -1815,7 +1815,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
   EntityId en;
 
   en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
+  en.type = getStringFieldF(entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct

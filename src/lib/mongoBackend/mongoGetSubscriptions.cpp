@@ -139,21 +139,22 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
 
-    std::string  q           = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
-    std::string  mq          = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
-    std::string  geo         = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
-    std::string  coords      = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
-    std::string  georel      = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
-    std::string  geoproperty = expression.hasField("geoproperty") ?    getStringFieldF(expression, "geoproperty")    : "";
+    const char*  q           = getStringFieldF(expression, CSUB_EXPR_Q);
+    const char*  mq          = getStringFieldF(expression, CSUB_EXPR_MQ);
+    const char*  geo         = getStringFieldF(expression, CSUB_EXPR_GEOM);
+    const char*  coords      = getStringFieldF(expression, CSUB_EXPR_COORDS);
+    const char*  georel      = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+    const char*  geoproperty = getStringFieldF(expression, "geoproperty");
 
-    if (q  != "")          s->subject.condition.expression.q           = q;
-    if (mq != "")          s->subject.condition.expression.mq          = mq;
-    if (geo != "")         s->subject.condition.expression.geometry    = geo;
-    if (coords != "")      s->subject.condition.expression.coords      = coords;
-    if (georel != "")      s->subject.condition.expression.georel      = georel;
-    if (geoproperty != "") s->subject.condition.expression.geoproperty = geoproperty;
+    if (q[0]  != 0)           s->subject.condition.expression.q           = q;
+    if (mq[0] != 0)           s->subject.condition.expression.mq          = mq;
+    if (geo[0] != 0)          s->subject.condition.expression.geometry    = geo;
+    if (coords[0] != 0)       s->subject.condition.expression.coords      = coords;
+    if (georel[0] != 0)       s->subject.condition.expression.georel      = georel;
+    if (geoproperty[0] != 0)  s->subject.condition.expression.geoproperty = geoproperty;
   }
 }
+
 
 
 /* ****************************************************************************
@@ -274,7 +275,7 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 */
 static void setName(Subscription* s, const BSONObj& r)
 {
-  s->name = r.hasField(CSUB_NAME) ? getStringFieldF(r, CSUB_NAME) : "";
+  s->name = getStringFieldF(r, CSUB_NAME);
 }
 
 
@@ -285,7 +286,7 @@ static void setName(Subscription* s, const BSONObj& r)
 */
 static void setContext(Subscription* s, const BSONObj& r)
 {
-  s->ldContext = r.hasField(CSUB_LDCONTEXT) ? getStringFieldF(r, CSUB_LDCONTEXT) : "";
+  s->ldContext = getStringFieldF(r, CSUB_LDCONTEXT);
 }
 
 
@@ -296,7 +297,7 @@ static void setContext(Subscription* s, const BSONObj& r)
 */
 static void setCsf(Subscription* s, const BSONObj& r)
 {
-  s->csf = r.hasField("csf") ? getStringFieldF(r, "csf") : "";
+  s->csf = getStringFieldF(r, "csf");
 }
 
 
@@ -309,7 +310,7 @@ static void setMimeType(Subscription* s, const BSONObj& r)
 {
   if (r.hasField(CSUB_NAME))
   {
-    std::string mimeTypeString = getStringFieldF(r, CSUB_MIMETYPE);
+    const char* mimeTypeString = getStringFieldF(r, CSUB_MIMETYPE);
 
     s->notification.httpInfo.mimeType = longStringToMimeType(mimeTypeString);
   }

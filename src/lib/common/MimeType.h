@@ -75,7 +75,7 @@ extern const char* mimeTypeToString(MimeType mimeType);
 * stringToMimeType
 */
 extern MimeType stringToMimeType(const std::string& s);
-extern MimeType longStringToMimeType(const std::string& s);
+extern MimeType longStringToMimeType(const char* s);
 
 
 

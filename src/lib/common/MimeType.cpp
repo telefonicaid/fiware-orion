@@ -77,14 +77,14 @@ MimeType stringToMimeType(const std::string& s)
 *
 * longStringToMimeType
 */
-MimeType longStringToMimeType(const std::string& s)
+MimeType longStringToMimeType(const char* s)
 {
-  if      (s == "application/json")      return JSON;
-  else if (s == "application/ld+json")   return JSONLD;
-  else if (s == "application/geo+json")  return GEOJSON;
-  else if (s == "plain/text")            return TEXT;
-  else if (s == "application/html")      return HTML;
-  else if (s == "NOMIMETYPE")            return NOMIMETYPE;
+  if      (strcmp(s, "application/json")      == 0) return JSON;
+  else if (strcmp(s, "application/ld+json")   == 0) return JSONLD;
+  else if (strcmp(s, "application/geo+json")  == 0) return GEOJSON;
+  else if (strcmp(s, "plain/text")            == 0) return TEXT;
+  else if (strcmp(s, "application/html")      == 0) return HTML;
+  else if (strcmp(s, "NOMIMETYPE")            == 0) return NOMIMETYPE;
 
   return NOMIMETYPE;
 }
