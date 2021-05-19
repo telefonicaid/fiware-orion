@@ -43,7 +43,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
+HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true)
 {
 }
 
@@ -53,7 +53,7 @@ HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), includePayload(true)
 {
 }
 
@@ -71,7 +71,11 @@ std::string HttpInfo::toJson()
 
   if (custom)
   {
-    if (!this->payload.empty())
+    if (!this->includePayload)
+    {
+      jh.addNull("payload");
+    }
+    else if (!this->payload.empty())
     {
       jh.addString("payload", this->payload);
     }
@@ -108,7 +112,25 @@ void HttpInfo::fill(const orion::BSONObj& bo)
 
   if (this->custom)
   {
-    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+    if (bo.hasField(CSUB_PAYLOAD))
+    {
+      if (getFieldF(bo, CSUB_PAYLOAD).isNull())
+      {
+        // We initialize also this->payload in this case, although its value is irrelevant
+        this->payload = "";
+        this->includePayload = false;
+      }
+      else
+      {
+        this->payload = getStringFieldF(bo, CSUB_PAYLOAD);
+        this->includePayload = true;
+      }
+    }
+    else
+    {
+      this->payload = "";
+      this->includePayload = true;
+    }
 
     if (bo.hasField(CSUB_METHOD))
     {

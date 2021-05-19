@@ -48,6 +48,7 @@ struct HttpInfo
   std::map<std::string, std::string>  headers;
   std::string                         payload;
   bool                                custom;
+  bool                                includePayload;
 
   HttpInfo();
   explicit HttpInfo(const std::string& _url);
