@@ -49,8 +49,6 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
-
   if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));

@@ -54,8 +54,6 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
   OrionError                        oe;
   int64_t                           count  = 0;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
-
   mongoGetLdSubscriptions(ciP, &subVec, orionldState.tenant, (long long*) &count, &oe);
 
   if (orionldState.uriParams.count == true)

@@ -198,7 +198,6 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& at
 */
 ContextAttribute::ContextAttribute()
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute 1"));
   name                  = "";
   type                  = "";
   stringValue           = "";
@@ -256,15 +255,9 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
 
-  LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
-                  compoundValueP,
-                  name.c_str(),
-                  this));
-
   // Cloning metadata
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
-    LM_T(LmtClone, ("Copying metadata %d ('%s' of type '%s')", mIx, caP->metadataVector[mIx]->name.c_str(),  valueTypeName(caP->metadataVector[mIx]->valueType)));
     Metadata* mP = new Metadata(caP->metadataVector[mIx], useDefaultType);
     metadataVector.push_back(mP);
   }
@@ -302,11 +295,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value));
-
   name                  = _name;
   type                  = _type;
   stringValue           = std::string(_value);
@@ -340,11 +328,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value.c_str()));
-
   name                  = _name;
   type                  = _type;
   stringValue           = _value;
@@ -378,11 +361,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a number ContextAttribute '%s':'%s':'%d', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value));
-
   name                  = _name;
   type                  = _type;
   numberValue           = _value;
@@ -415,11 +393,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a boolean ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value ? "true" : "false"));
-
   name                  = _name;
   type                  = _type;
   boolValue             = _value;
@@ -452,8 +425,6 @@ ContextAttribute::ContextAttribute
   orion::CompoundValueNode*  _compoundValueP
 )
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute, maintaining a pointer to compound value (at %p)", _compoundValueP));
-
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();

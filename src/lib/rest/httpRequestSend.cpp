@@ -396,7 +396,7 @@ int httpRequestSendWithCurl
 
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     rushHeaderValue = rushHeaderIP + ":" + rushHeaderPortAsString;
-    LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushHostHeaderName + ": " + rushHeaderValue).c_str()));
+
     httpHeaderAdd(&headers,
                   rushHostHeaderName,
                   rushHeaderValue,
@@ -409,7 +409,7 @@ int httpRequestSendWithCurl
       // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
       protocol        = "http://";
       rushHeaderValue = "https";
-      LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushProtocolHeaderName + ": " + rushHeaderValue).c_str()));
+
       httpHeaderAdd(&headers, rushProtocolHeaderName, rushHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
     }
   }
@@ -422,7 +422,6 @@ int httpRequestSendWithCurl
   std::string userAgentHeaderName = HTTP_USER_AGENT;
 
   snprintf(userAgentHeaderValue, sizeof(userAgentHeaderValue), "orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
 
   httpHeaderAdd(&headers, userAgentHeaderName, userAgentHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
@@ -431,7 +430,6 @@ int httpRequestSendWithCurl
   std::string hostHeaderName = HTTP_HOST;
 
   snprintf(hostHeaderValue, sizeof(hostHeaderValue), "%s:%d", ip.c_str(), (int) port);
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
@@ -471,7 +469,6 @@ int httpRequestSendWithCurl
   std::string contentLengthHeaderName  = HTTP_CONTENT_LENGTH;
   std::string contentLengthHeaderValue = contentLengthStringStream.str();
 
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (contentLengthHeaderName + ": " + contentLengthHeaderValue).c_str()));
   httpHeaderAdd(&headers, contentLengthHeaderName, contentLengthHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   //

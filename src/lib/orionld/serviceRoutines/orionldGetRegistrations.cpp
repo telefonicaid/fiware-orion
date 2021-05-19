@@ -74,8 +74,6 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
   OrionError                         oe;
   long long                          count;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
-
   if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenant, &count, &oe))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str());

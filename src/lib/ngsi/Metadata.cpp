@@ -93,8 +93,6 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   typeGiven       = mP->typeGiven;
   createdAt       = mP->createdAt;
   modifiedAt      = mP->modifiedAt;
-
-  LM_T(LmtClone, ("mP->compoundValueP at %p", mP->compoundValueP));
   compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)

@@ -163,7 +163,6 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       DUPLICATE_CHECK(formatP, "Notification::format", itemP->value.s);
       STRING_CHECK(itemP, "Notification::format");
 
-      LM_T(LmtNotificationFormat, ("Got a subscription format: '%s'", itemP->value.s));
       if (formatExtract(formatP, subP) == false)
         return false;
 
@@ -174,8 +173,6 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
         orionldState.httpStatusCode = 501;
         return false;
       }
-
-      LM_T(LmtNotificationFormat, ("Extracted subscription format: %d", subP->attrsFormat));
     }
     else if (SCOMPARE9(itemP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {

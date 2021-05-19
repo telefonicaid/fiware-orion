@@ -181,9 +181,6 @@ std::string payloadParse
 {
   std::string result = "NONE";
 
-  LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParsedPayload, ("outMimeType: %s", mimeTypeToString(ciP->outMimeType)));
-
   ciP->requestType = service->request;
 
   if (ciP->inMimeType == JSON)
@@ -212,9 +209,6 @@ std::string payloadParse
     alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
     return "Bad inMimeType";
   }
-
-  LM_T(LmtParsedPayload, ("result:      '%s'", result.c_str()));
-  LM_T(LmtParsedPayload, ("outMimeType: '%s'", mimeTypeToString(ciP->outMimeType)));
 
   if (result != "OK")
   {
@@ -573,10 +567,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     ciP->parseDataP = &parseData;
     metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
-    LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
 
     response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
-    LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
     if (response != "OK")
     {
@@ -595,7 +587,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-  LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+  // LM_TMP(("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
   if (ciP->payloadSize == 0)
   {
     ciP->inMimeType = NOMIMETYPE;
@@ -634,7 +626,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
-  LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
   commonFilters(ciP, &parseData, ciP->restServiceP);
   scopeFilter(ciP, &parseData, ciP->restServiceP);
 

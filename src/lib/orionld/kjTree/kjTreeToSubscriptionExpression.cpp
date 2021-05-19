@@ -72,7 +72,6 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates");
         return false;
       }
-      LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
     }
     else if (SCOMPARE7(itemP->name, 'g', 'e', 'o', 'r', 'e', 'l', 0))
     {
@@ -109,7 +108,6 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     return false;
   }
 
-  LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
   if (coordinatesNodeP->type == KjArray)
   {
     char coords[512];

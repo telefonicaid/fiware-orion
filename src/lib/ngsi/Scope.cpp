@@ -115,8 +115,6 @@ int Scope::fill
   std::string                 coordsString2 = coordsString;
   std::string                 georelString2 = georelString;
 
-  LM_T(LmtGeoJson, ("coordsString: %s", coordsString.c_str()));
-
   type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
 #ifdef ORIONLD
@@ -331,10 +329,8 @@ int Scope::fill
     LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
-  LM_T(LmtGeoJson, ("calling stringSplit with ';' as FS and string '%s'", coordsString2.c_str()));
-  points = stringSplit(coordsString2, ';', pointStringV);
-  LM_T(LmtGeoJson, ("got %d points", points));
 
+  points = stringSplit(coordsString2, ';', pointStringV);
   if (points == 0)
   {
     *errorStringP = "erroneous coordinates for geometry";
@@ -345,7 +341,6 @@ int Scope::fill
   //
   // Convert point-strings into instances of the orion::Point class
   //
-  LM_T(LmtGeoJson, ("%d points", points));
   for (int ix = 0; ix < points; ++ix)
   {
     std::vector<std::string>  coordV;
@@ -408,15 +403,11 @@ int Scope::fill
 
     if (apiVersion == NGSI_LD_V1)  // SWAP
     {
+      // Swapping longitude and latitude
       double saved = longitude;
-
-      LM_T(LmtGeoJson, ("swapping longitude and latitude"));
       longitude    = latitude;
       latitude     = saved;
     }
-
-    LM_T(LmtGeoJson, ("longitude: %f", longitude));
-    LM_T(LmtGeoJson, ("latitude:  %f", latitude));
 
     orion::Point* pointP = new Point(latitude, longitude);
     pointV.push_back(pointP);

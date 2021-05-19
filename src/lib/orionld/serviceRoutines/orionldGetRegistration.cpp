@@ -44,8 +44,6 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
   ngsiv2::Registration  registration;
   char*                 details;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetRegistration (%s)", orionldState.wildcard[0]));
-
   if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoLdRegistrationGet error: %s", details));

@@ -61,8 +61,6 @@ bool mongoLdRegistrationGet
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Get Registration"));
-
   //
   // Query
   //
@@ -96,7 +94,6 @@ bool mongoLdRegistrationGet
       *statusCodeP = SccReceiverInternalError;
       return false;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
     if (regP == NULL)
     {
@@ -174,7 +171,6 @@ bool mongoLdRegistrationGet
       releaseMongoConnection(connection);
 
       // Ooops, we expected only one
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       *detailP    = (char*) "more than one registration matched";
       *statusCodeP = SccConflict;
@@ -184,7 +180,6 @@ bool mongoLdRegistrationGet
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not found: '%s'", regId));
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     *detailP     = (char*) "registration not found";
     *statusCodeP = SccContextElementNotFound;
