@@ -550,7 +550,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (attrsFormatOpt.given)
   {
-    std::string   attrsFormatString = attrsFormatOpt.value;
+    const char*   attrsFormatString = attrsFormatOpt.value.c_str();
     RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
     if (nFormat == NO_FORMAT)

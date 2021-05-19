@@ -72,6 +72,6 @@ extern const char* renderFormatToString(RenderFormat format, bool noDefault = tr
 *
 * stringToRenderFormat
 */
-extern RenderFormat stringToRenderFormat(const std::string& s, bool noDefault = false);
+extern RenderFormat stringToRenderFormat(const char* s, bool noDefault = false);
 
 #endif  // SRC_LIB_COMMON_RENDERFORMAT_H_

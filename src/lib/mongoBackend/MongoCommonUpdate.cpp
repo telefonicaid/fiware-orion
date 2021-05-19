@@ -60,6 +60,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
 #include "orionld/common/isSpecialSubAttribute.h"                  // isSpecialSubAttribute
+#include "orionld/common/dotForEq.h"                               // dotForEq
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 
 #include "mongoBackend/connectionOperations.h"
@@ -375,7 +376,9 @@ static void appendMetadata
   }
 
   mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbDotEncode(mdP->name);
+  char effectiveName[256];
+  strncpy(effectiveName, mdP->name.c_str(), sizeof(effectiveName));
+  dotForEq(effectiveName);
 
   //
   // Filling in the RHS of the metadata ("mdName": RHS)
@@ -1556,7 +1559,7 @@ static bool addTriggeredSubscriptions_noCache
       //
       double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
       double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
