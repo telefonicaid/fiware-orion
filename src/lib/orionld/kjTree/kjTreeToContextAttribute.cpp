@@ -310,7 +310,7 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   }
   catch (...)
   {
-    LM_E(("caught exception from 'new Metadata' - out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, attributeName));
+    LM_E(("caught exception from 'new Metadata' - out of memory creating property/relationship for an attribute"));
     mdP = NULL;
   }
 

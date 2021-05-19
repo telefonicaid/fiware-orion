@@ -1254,12 +1254,9 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
 
     strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded));
     eqForDot(compoundPathEncoded);
-    LM_TMP(("EQDOT2: Initial path: '%s'", compoundPathV[ix].c_str()));
-    LM_TMP(("EQDOT2: Encoded path: '%s'", compoundPathEncoded));
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      LM_TMP(("EQDOT2: Comparing '%s' to '%s'", current->childV[cIx]->name.c_str(), compoundPathEncoded));
       if (strcmp(current->childV[cIx]->name.c_str(), compoundPathEncoded) == 0)
       {
         current = current->childV[cIx];

@@ -192,7 +192,6 @@ ContextAttribute* ContextElement::getAttribute(const std::string& attrName)
     ContextAttribute*  caP    = contextAttributeVector[ix];
     const char*        caName = caP->name.c_str();
     
-    LM_TMP(("EQDOT: Comparing '%s' to '%s'", caName, attrNameC));
     if (eqCmp(caName, attrNameC) == true)
       return caP;
   }
