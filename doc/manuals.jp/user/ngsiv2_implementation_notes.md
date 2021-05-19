@@ -16,6 +16,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
@@ -293,6 +294,17 @@ NGSIv2 仕様では、サブスクリプションの対象となるエンティ�
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[トップ](#top)
+
+<a name="custom-notifications-without-payload"></a>
+## ペイロードなしのカスタム通知
+
+カスタム通知の `httpCustom` フィールド内で `payload` が `null` に設定されている場合、そのサブスクリプションに
+関連付けられた通知にはペイロードが含まれません (つまり、conten-length 0 の通知)。
+
+これは、`payload` を `""` に設定したり、フィールドを省略したりすることと同じではないことに注意してください。
+その場合、通知は NGSIv2 正規化形式を使用して送信されます。
 
 [トップ](#top)
 
