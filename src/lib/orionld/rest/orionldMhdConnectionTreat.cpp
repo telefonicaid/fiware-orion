@@ -122,8 +122,6 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
   if (orionldState.ngsildContent == true)
   {
-    LM_T(LmtContext, ("Content-Type is: application/ld+json"));
-
     if (orionldState.linkHttpHeaderPresent == true)
     {
       errorTitle   = (char*) "@context in Link HTTP Header";
@@ -138,8 +136,6 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
   }
   else
   {
-    LM_T(LmtContext, ("Content-Type is: application/json"));
-
     if (orionldState.payloadContextNode != NULL)
     {
       errorTitle   = (char*) "Mismatch between /Content-Type/ and contents of the request payload body";
@@ -346,8 +342,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     return false;
   }
 
-  LM_T(LmtPayloadParse, ("All good - payload parsed. orionldState.requestTree at %p", orionldState.requestTree));
-
   //
   // Looking up "@context" attribute at first level in payload
   // Checking also for duplicates.
@@ -380,7 +374,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
-        LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.payloadContextNode));
 
         attrNodeP = orionldState.payloadContextNode->next;
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
@@ -446,7 +439,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         }
 
         orionldState.payloadContextNode = attrNodeP;
-        LM_T(LmtContext, ("Found a @context in the payload (%p)", orionldState.payloadContextNode));
 
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
@@ -711,8 +703,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
-
-  LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
   //
   // Predetected Error from orionldMhdConnectionInit?

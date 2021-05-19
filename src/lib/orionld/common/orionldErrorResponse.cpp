@@ -84,8 +84,6 @@ void orionldErrorResponseCreate
   const char*               detail
 )
 {
-  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
-
   orionldState.pd.title  = (char*) title;
   orionldState.pd.detail = (char*) detail;
 

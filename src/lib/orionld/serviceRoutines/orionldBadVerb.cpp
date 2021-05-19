@@ -42,9 +42,6 @@ bool orionldBadVerb(ConnectionInfo* ciP)
 {
   uint16_t  bitmask = 0;
 
-  LM_T(LmtBadVerb, ("PATH: %s", orionldState.urlPath));
-  LM_T(LmtBadVerb, ("VERB: %s", orionldState.verbString));
-
   //
   // There are nine verbs/methods, but only GET, POST, PATCH and DELETE are supported by ORIONLD
   // This loop looks up the URL PATH for each "orionld-valid" verb and keeps a bitmask of the hits

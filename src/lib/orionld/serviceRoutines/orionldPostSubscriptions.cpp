@@ -97,7 +97,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?
 
-  LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
 

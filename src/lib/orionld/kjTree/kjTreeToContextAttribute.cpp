@@ -208,8 +208,6 @@ static bool metadataValueSet(Metadata* mdP, KjNode* valueNodeP)
 //
 bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
 {
-  LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), attributeName));
-
   KjNode*   typeNodeP       = NULL;
   KjNode*   valueNodeP      = NULL;
   KjNode*   objectNodeP     = NULL;
@@ -222,8 +220,6 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   //
   // FIXME: 'observedAt' is an API reserved word and should NEVER be expanded!
   //
-
-  LM_T(LmtMetadata, ("'%s' ALIAS: '%s'", nodeP->name, shortName));
 
   if (SCOMPARE11(shortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
   {
@@ -239,11 +235,8 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   }
   else if (nodeP->type == KjObject)
   {
-    LM_T(LmtMetadata, ("'%s' is an Object", nodeP->name));
     for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
     {
-      LM_T(LmtMetadata, ("Treating sub-attr '%s' of '%s'", kNodeP->name, shortName));
-
       if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
       {
         DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
@@ -437,8 +430,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
   if (contextP == NULL)
     contextP = orionldCoreContextP;
-
-  LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", attributeName, kNodeP));
 
   if (kNodeP->type != KjObject)
   {

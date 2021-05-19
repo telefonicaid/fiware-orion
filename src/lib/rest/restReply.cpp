@@ -286,7 +286,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     OrionError oe(errorCode);
 
-    LM_T(LmtRest, ("Unknown request type: '%d'", ciP->restServiceP->request));
+    LM_E(("Unknown request type: '%d'", ciP->restServiceP->request));
     ciP->httpStatusCode = oe.code;
     *outStringP = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &ciP->httpStatusCode);
   }

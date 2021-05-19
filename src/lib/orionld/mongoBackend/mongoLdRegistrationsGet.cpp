@@ -279,7 +279,6 @@ bool mongoLdRegistrationsGet
       continue;
     }
     docs++;
-    LM_T(LmtMongo, ("retrieved document %d: '%s'", docs, bob.toString().c_str()));
 
     //
     // FIXME: All these calls to mongoSet-functions is also done in mongoLdRegistrationGet().

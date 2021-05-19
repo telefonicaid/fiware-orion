@@ -186,14 +186,6 @@ bool orionldRequestSend
       snprintf(url, sizeof(url), "%s://%s", protocol, ip);
   }
 
-  LM_T(LmtRequestSend, ("protocol:     %s", protocol));
-  LM_T(LmtRequestSend, ("IP:           %s", ip));
-  LM_T(LmtRequestSend, ("port:         %d", port));
-  LM_T(LmtRequestSend, ("verb:         %s", verb));
-  LM_T(LmtRequestSend, ("URL Path:     %s", urlPath));
-  LM_T(LmtRequestSend, ("URL:          %s", url));
-  LM_T(LmtRequestSend, ("payload data: %s", payload));
-
   get_curl_context(ip, &cc);
   if (cc.curl == NULL)
   {
@@ -221,7 +213,6 @@ bool orionldRequestSend
   struct curl_slist* headers = NULL;
 
 
-  LM_T(LmtRequestSend, ("HTTP Headers:"));
   if (contentType != NULL)  // then also payload and payloadLen is supplied
   {
     char contentTypeHeader[128];
@@ -232,11 +223,9 @@ bool orionldRequestSend
 
     headers = curl_slist_append(headers, contentTypeHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
-    LM_T(LmtRequestSend, ("  Content-Type: %s", contentType));
 
     headers = curl_slist_append(headers, contentLenHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
-    LM_T(LmtRequestSend, ("  Content-Len: %d", payloadLen));
 
     curl_easy_setopt(cc.curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
   }
@@ -248,14 +237,12 @@ bool orionldRequestSend
     snprintf(linkHeaderString, sizeof(linkHeaderString), "Link: %s", linkHeader);
     headers = curl_slist_append(headers, linkHeaderString);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
-    LM_T(LmtRequestSend, ("  Link: %s", linkHeader));
   }
 
   if (acceptHeader != NULL)
   {
     headers = curl_slist_append(headers, acceptHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);  // Should be enough with one call ...
-    LM_T(LmtRequestSend, ("  Accept: %s", acceptHeader));
   }
 
   int ix = 0;
@@ -266,7 +253,6 @@ bool orionldRequestSend
 
     snprintf(headerString, sizeof(headerString), "%s:%s", headerName[headerP->type], headerP->value);
     headers = curl_slist_append(headers, headerString);
-    LM_T(LmtRequestSend, ("  %s: %s", headerName[headerP->type], headerP->value));
     ++ix;
   }
 

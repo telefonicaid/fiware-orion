@@ -240,7 +240,6 @@ bool             subCacheMultitenant = false;
 */
 void subCacheInit(bool multitenant)
 {
-  LM_T(LmtSubCache, ("Initializing subscription cache"));
   subCacheMultitenant = multitenant;
 
   subCache.head   = NULL;
@@ -412,26 +411,26 @@ static bool subMatch
     {
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
-        LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
+        // No match due to tenant I
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
-        LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
+        // No match due to tenant II
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
-      LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
+      // No match due to tenant III
       return false;
     }
   }
 
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
-    LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
+    // No match due to servicePath
     return false;
   }
 
@@ -444,7 +443,7 @@ static bool subMatch
   //
   if (!attributeMatch(cSubP, attrV))
   {
-    LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+    // No match due to attributes
     return false;
   }
 
@@ -458,7 +457,7 @@ static bool subMatch
     }
   }
 
-  LM_T(LmtSubCacheMatch, ("No match due to EntityInfo"));
+  // No match due to EntityInfo
   return false;
 }
 
@@ -489,8 +488,6 @@ void subCacheMatch
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
-      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
-                         cSubP->subscriptionId, cSubP->lastNotificationTime));
     }
 
     cSubP = cSubP->next;
@@ -520,8 +517,6 @@ void subCacheMatch
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
-      LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
-                         cSubP->subscriptionId, cSubP->lastNotificationTime));
     }
 
     cSubP = cSubP->next;
@@ -692,9 +687,6 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 {
   cSubP->next = NULL;
 
-  LM_T(LmtSubCache, ("inserting sub '%s', lastNotificationTime: %lu",
-                     cSubP->subscriptionId, cSubP->lastNotificationTime));
-
   ++subCache.noOfInserts;
 
   // First insertion?
@@ -763,7 +755,6 @@ void subCacheItemInsert
   //
 
   CachedSubscription* cSubP = new CachedSubscription();
-  LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
 
   //
@@ -841,9 +832,6 @@ void subCacheItemInsert
   //
   // Insert the subscription in the cache
   //
-  LM_T(LmtSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu",
-                     cSubP->subscriptionId, cSubP->lastNotificationTime));
-
   subCacheItemInsert(cSubP);
 }
 
@@ -923,8 +911,6 @@ void subCacheStatisticsGet
   {
     snprintf(list, listSize, "too many subscriptions");
   }
-
-  LM_T(LmtSubCache, ("Statistics: refreshes: %d (%d)", *refreshes, subCache.noOfRefreshes));
 }
 
 
@@ -939,8 +925,6 @@ void subCacheStatisticsReset(const char* by)
   subCache.noOfInserts    = 0;
   subCache.noOfRemoves    = 0;
   subCache.noOfUpdates    = 0;
-
-  LM_T(LmtSubCache, ("Statistics reset by %s: refreshes is now %d", by, subCache.noOfRefreshes));
 }
 
 
@@ -954,7 +938,6 @@ int subCacheItemRemove(CachedSubscription* cSubP)
   CachedSubscription* current = subCache.head;
   CachedSubscription* prev    = NULL;
 
-  LM_T(LmtSubCache, ("in subCacheItemRemove, trying to remove '%s'", cSubP->subscriptionId));
   while (current != NULL)
   {
     if (current == cSubP)
@@ -977,7 +960,6 @@ int subCacheItemRemove(CachedSubscription* cSubP)
         prev->next = cSubP->next;
       }
 
-      LM_T(LmtSubCache, ("in subCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
       ++subCache.noOfRemoves;
 
       subCacheItemDestroy(cSubP);
@@ -1009,8 +991,6 @@ void subCacheRefresh(void)
 {
   std::vector<std::string> databases;
 
-  LM_T(LmtSubCache, ("Refreshing subscription cache"));
-
   // Empty the cache
   subCacheDestroy();
 
@@ -1027,12 +1007,10 @@ void subCacheRefresh(void)
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
-    LM_T(LmtSubCache, ("DB %d: %s", ix, databases[ix].c_str()));
     mongoSubCacheRefresh(databases[ix]);
   }
 
   ++subCache.noOfRefreshes;
-  LM_T(LmtSubCache, ("Refreshed subscription cache [%d]", subCache.noOfRefreshes));
 }
 
 
@@ -1113,8 +1091,6 @@ void subCacheSync(void)
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
   }
-
-  LM_T(LmtCacheSync, ("Pushed back %d items to savedSubV", savedSubV.size()));
 
 
   //

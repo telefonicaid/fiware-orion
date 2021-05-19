@@ -58,8 +58,6 @@ MHD_Result orionldMhdConnectionPayloadRead
 {
   size_t  dataLen = *upload_data_size;
 
-  LM_T(LmtMhd, ("Reading %d bytes of payload", dataLen));
-
   //
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
   // just silently "eat" the entire message.
@@ -115,8 +113,6 @@ MHD_Result orionldMhdConnectionPayloadRead
 
   // Acknowledge the data and return
   *upload_data_size = 0;
-
-  LM_T(LmtMhd, ("Got payload '%s'", ciP->payload));
 
   return MHD_YES;
 }
