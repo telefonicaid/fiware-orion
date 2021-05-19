@@ -169,7 +169,7 @@ ContextElementResponse::ContextElementResponse
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
-    BSONObj            attr     = getObjectFieldF(attrs, attrName);
+    BSONObj            attr     = getObjectFieldF(attrs, attrName.c_str());
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
@@ -273,7 +273,7 @@ ContextElementResponse::ContextElementResponse
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
-        std::string currentMd = *i;
+        const char* currentMd = i->c_str();
         Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
         caP->metadataVector.push_back(md);
       }

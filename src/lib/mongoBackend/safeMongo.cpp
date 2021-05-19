@@ -53,27 +53,23 @@ using mongo::AssertionException;
 *
 * getObjectField -
 */
-BSONObj getObjectField(const BSONObj& b, const std::string& field, const char* caller, int line)
+BSONObj getObjectField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::Object)
-  {
     return b.getObjectField(field);
-  }
 
   // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
+
   return BSONObj();
 }
 
@@ -83,7 +79,7 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field, const char* c
 *
 * getArrayField -
 */
-BSONArray getArrayField(const BSONObj& b, const std::string& field, const char* caller, int line)
+BSONArray getArrayField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::Array)
   {
@@ -95,16 +91,14 @@ BSONArray getArrayField(const BSONObj& b, const std::string& field, const char* 
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
+
   return BSONArray();
 }
 
@@ -114,18 +108,17 @@ BSONArray getArrayField(const BSONObj& b, const std::string& field, const char* 
 *
 * getStringField -
 */
-std::string getStringField(const BSONObj& b, const std::string& field, const char* caller, int line)
+std::string getStringField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::String)
-  {
     return b.getStringField(field);
-  }
+
 
   // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
+          field,
           b.toString().c_str(),
           caller,
           line));
@@ -133,7 +126,7 @@ std::string getStringField(const BSONObj& b, const std::string& field, const cha
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return "";
@@ -145,7 +138,7 @@ std::string getStringField(const BSONObj& b, const std::string& field, const cha
 *
 * getNumberField -
 */
-double getNumberField(const BSONObj& b, const std::string& field, const char* caller, int line)
+double getNumberField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::NumberDouble)
   {
@@ -156,15 +149,12 @@ double getNumberField(const BSONObj& b, const std::string& field, const char* ca
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an double but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return -1;
@@ -176,7 +166,7 @@ double getNumberField(const BSONObj& b, const std::string& field, const char* ca
 *
 * getIntField -
 */
-int getIntField(const BSONObj& b, const std::string& field, const char* caller, int line)
+int getIntField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::NumberInt)
   {
@@ -187,15 +177,12 @@ int getIntField(const BSONObj& b, const std::string& field, const char* caller, 
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return -1;
@@ -207,7 +194,7 @@ int getIntField(const BSONObj& b, const std::string& field, const char* caller, 
 *
 * getLongField -
 */
-long long getLongField(const BSONObj& b, const std::string& field, const char* caller, int line)
+long long getLongField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && (b.getField(field).type() == mongo::NumberLong))
   {
@@ -218,15 +205,12 @@ long long getLongField(const BSONObj& b, const std::string& field, const char* c
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return -1;
@@ -238,7 +222,7 @@ long long getLongField(const BSONObj& b, const std::string& field, const char* c
 *
 * getIntOrLongFieldAsLong -
 */
-long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, const char* caller, int line)
+long long getIntOrLongFieldAsLong(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field))
   {
@@ -251,25 +235,19 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, co
       return b.getField(field).Int();
     }
     else if (b.getField(field).type() == mongo::NumberDouble)
-    {
-      LM_W(("The field '%s' was a DOUBLE - converting to long long", field.c_str()));
       return (long long) b.getField(field).Double();
-    }
   }
 
   // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller,
-          line));
+          field, b.toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be int or long but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return -1;
@@ -281,7 +259,7 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, co
 *
 * getBoolField -
 */
-bool getBoolField(const BSONObj& b, const std::string& field, const char* caller, int line)
+bool getBoolField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::Bool)
   {
@@ -291,12 +269,12 @@ bool getBoolField(const BSONObj& b, const std::string& field, const char* caller
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, b.toString().c_str()));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, b.getField(field).type(), b.toString().c_str(), caller, line));
   }
 
   return false;
@@ -308,7 +286,7 @@ bool getBoolField(const BSONObj& b, const std::string& field, const char* caller
 *
 * getNumberFieldAsDouble -
 */
-double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const char* caller, int line)
+double getNumberFieldAsDouble(const BSONObj& b, const char* field, const char* caller, int line)
 {
   double retVal = -1;
 
@@ -319,13 +297,13 @@ double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const 
     else if (b.getField(field).type() == mongo::NumberInt)         retVal = b.getField(field).Int();
     else
       LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-            field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller, line));
+            field, mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller, line));
 
     return retVal;
   }
 
   LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-        field.c_str(),
+        field,
         b.toString().c_str(),
         caller,
         line));
@@ -339,15 +317,13 @@ double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const 
 *
 * getField -
 */
-BSONElement getField(const BSONObj& b, const std::string& field, const char* caller, int line)
+BSONElement getField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field))
-  {
     return b.getField(field);
-  }
 
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-        field.c_str(),
+        field,
         b.toString().c_str(),
         caller,
         line));
@@ -364,7 +340,7 @@ BSONElement getField(const BSONObj& b, const std::string& field, const char* cal
 void setStringVector
 (
   const BSONObj&             b,
-  const std::string&         field,
+  const char*                field,
   std::vector<std::string>*  v,
   const char*                caller,
   int                        line
@@ -399,15 +375,12 @@ void setStringVector
     if (!b.hasField(field))
     {
       LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-            field.c_str(),
-            b.toString().c_str(),
-            caller,
-            line));
+            field, b.toString().c_str(), caller, line));
     }
     else
     {
       LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
-            field.c_str(), b.getField(field).type(), b.toString().c_str(), caller, line));
+            field, b.getField(field).type(), b.toString().c_str(), caller, line));
     }
   }
 }
