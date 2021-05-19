@@ -280,7 +280,6 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       }
       else  // Not found so we will have to create a new ContextElementResponse
       {
-
         ContextElementResponse* newCerP = new ContextElementResponse(cerP);
 
         newCerP->statusCode.fill(SccOk);
