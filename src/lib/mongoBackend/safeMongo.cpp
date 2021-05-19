@@ -108,7 +108,7 @@ BSONArray getArrayField(const BSONObj& b, const char* field, const char* caller,
 *
 * getStringField -
 */
-std::string getStringField(const BSONObj& b, const char* field, const char* caller, int line)
+const char* getStringField(const BSONObj& b, const char* field, const char* caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == mongo::String)
     return b.getStringField(field);

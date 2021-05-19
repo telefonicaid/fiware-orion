@@ -62,7 +62,7 @@ function usage()
 verbose=off
 attributes=1000
 brokerMaxMem=6000000000
-entities=10
+entities=200
 threads=10
 requests=10000
 testCase=/X

@@ -142,14 +142,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  std::string    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : "";
-  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  const char*    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : NULL;
+  const char*    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
-  if (ldContext != "")  // NGSI-LD subscription
+  if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
   {
     if (orionldStartup == false)
-      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext.c_str());
+      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext);
     else
       cSubP->ldContext = ldContext;
 
@@ -165,13 +165,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   }
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH) : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                   : "active";
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                  : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;

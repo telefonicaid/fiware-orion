@@ -269,14 +269,12 @@ void MetadataVector::fill(MetadataVector* mvP)
 Metadata* MetadataVector::lookupByName(const char* _name)
 {
   char nameEncoded[256];
+
   strncpy(nameEncoded, _name, sizeof(nameEncoded));
   eqForDot(nameEncoded);
-  LM_TMP(("EQDOT: Initial _name: '%s'", _name));
-  LM_TMP(("EQDOT: Encoded _name: '%s'", nameEncoded));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    LM_TMP(("EQDOT: Comparing '%s' to '%s'", vec[ix]->name.c_str(), nameEncoded));
     if (strcmp(vec[ix]->name.c_str(), nameEncoded) == 0)
     {
       return vec[ix];

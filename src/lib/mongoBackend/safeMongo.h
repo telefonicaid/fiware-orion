@@ -87,7 +87,7 @@ extern mongo::BSONArray getArrayField
 *
 * getStringField -
 */
-extern std::string getStringField
+extern const char* getStringField
 (
   const mongo::BSONObj&  b,
   const char*            field,
