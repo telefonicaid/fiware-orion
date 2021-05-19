@@ -63,7 +63,7 @@ extern mongo::BSONObj getObjectField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -77,7 +77,7 @@ extern mongo::BSONArray getArrayField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -91,7 +91,7 @@ extern std::string getStringField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -105,7 +105,7 @@ extern double getNumberField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller,
+  const char*            caller,
   int                    line
 );
 
@@ -119,7 +119,7 @@ extern int getIntField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -133,8 +133,8 @@ extern long long getLongField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
-  int                    line = 0
+  const char*            caller = "<none>",
+  int                    line   = 0
 );
 
 
@@ -147,7 +147,7 @@ extern long long getIntOrLongFieldAsLong
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -161,7 +161,7 @@ extern double getNumberFieldAsDouble
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -189,7 +189,7 @@ extern mongo::BSONElement getField
 (
   const mongo::BSONObj&  b,
   const std::string&     field,
-  const std::string&     caller = "<none>",
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -204,7 +204,7 @@ extern void setStringVector
   const mongo::BSONObj&      b,
   const std::string&         field,
   std::vector<std::string>*  v,
-  const std::string&         caller,
+  const char*                caller,
   int                        line
 );
 
