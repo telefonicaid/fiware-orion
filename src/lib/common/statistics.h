@@ -267,20 +267,14 @@ extern int noOfRequestsWithoutPayload;
 extern UrlCounter noOfRequestCounters[];
 
 // Special
+extern int noOfVersionRequests;
 extern int noOfLegacyNgsiv1Requests;
 extern int noOfInvalidRequests;
 extern int noOfMissedVerb;
-extern int noOfSimulatedNotifications;
 extern int noOfRegistrationUpdateErrors;
 extern int noOfDiscoveryErrors;
-
-// FIXME: seem they are not actually used. Check in master branch
-extern int noOfSubCacheEntries;
-extern int noOfSubCacheLookups;
-extern int noOfSubCacheRemovals;
-extern int noOfSubCacheRemovalFailures;
-
-
+extern int noOfNotificationsSent;
+extern int noOfSimulatedNotifications;
 
 
 /* ****************************************************************************

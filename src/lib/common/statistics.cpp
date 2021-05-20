@@ -74,7 +74,6 @@ UrlCounter noOfRequestCounters[] =
 
   {LogTraceRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
   {StatisticsRequest,             -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
-  {VersionRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
   {LogLevelRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
   {SemStateRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {MetricsRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
@@ -83,18 +82,14 @@ UrlCounter noOfRequestCounters[] =
 };
 
 // Special
+int noOfVersionRequests          = -1;
 int noOfLegacyNgsiv1Requests     = -1;
 int noOfInvalidRequests          = -1;
 int noOfMissedVerb               = -1;
-int noOfSimulatedNotifications   = -1;
 int noOfRegistrationUpdateErrors = -1;
 int noOfDiscoveryErrors          = -1;
-
-int noOfSubCacheEntries          = -1;
-int noOfSubCacheLookups          = -1;
-int noOfSubCacheRemovals         = -1;
-int noOfSubCacheRemovalFailures  = -1;
-
+int noOfNotificationsSent        = -1;
+int noOfSimulatedNotifications   = -1;
 
 
 /* ****************************************************************************
@@ -250,6 +245,14 @@ bool isLegacyNgsiv1(RequestType request)
 *
 * FIXME P6: No statistics for received QueryResponses (Response from Provider Application
 *           after forwarding a query)
+*
+* There are some counter that are not updated by this function (but are rendered
+* by the renderStatCounters() function). In particular:
+*
+* - noOfRegistrationUpdateErrors
+* - noOfDiscoveryErrors
+* - noOfNotificationsSent
+* - noOfSimulatedNotifications (this one not in renderStatCountersU(), but in statisticsTreat() directly)
 */
 void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
 {
@@ -259,10 +262,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
   {
     return;
   }
-
-  // TBD: look for calls to statisticsUpdate
-  // Take into acccount NotifyContextSent
-
 
   if (inMimeType == JSON)
   {

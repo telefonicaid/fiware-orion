@@ -88,7 +88,7 @@ void* startSenderThread(void* p)
 
       if (r == 0)
       {
-        statisticsUpdate(NotifyContextSent, params->mimeType, POST);
+        __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
 
         if (params->registration == false)

@@ -128,7 +128,7 @@ const char* requestType(RequestType rt)
 */
 const char* requestTypeForCounter(RequestType rt)
 {
-  // It support only NGSIv2 requests (as are the ones that may appear in statistics counters)
+  // It supports only NGSIv2 and administrative requests (as are the ones that may appear in statistics counters)
   switch (rt)
   {
   case EntryPointsRequest:             return "entryPoint";
@@ -146,6 +146,15 @@ const char* requestTypeForCounter(RequestType rt)
   case BatchUpdateRequest:             return "batchUpdate";
   case NotifyContext:                  return "notify";
 
-  default:                             return "notANgsiv2Request";
+  case LogTraceRequest:                return "logTrace";
+  case StatisticsRequest:              return "statistics";
+  case LogLevelRequest:                return "logLevel";
+  case SemStateRequest:                return "semState";
+  case MetricsRequest:                 return "metrics";
+  case ExitRequest:                    return "exit";
+  case LeakRequest:                    return "leak";
+
+  default:
+    return "notNgsiv2Request";
   }
 }

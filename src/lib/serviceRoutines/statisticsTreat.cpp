@@ -83,18 +83,14 @@ static void resetStatistics(void)
     }
   }
 
+  noOfVersionRequests          = -1;
   noOfLegacyNgsiv1Requests     = -1;
   noOfInvalidRequests          = -1;
   noOfMissedVerb               = -1;
-  noOfSimulatedNotifications   = -1;
   noOfRegistrationUpdateErrors = -1;
   noOfDiscoveryErrors          = -1;
-
-  // FIXME: not sure if this is reset in another place...
-  //noOfSubCacheEntries = -1;
-  //noOfSubCacheLookups = -1;
-  //noOfSubCacheRemovals = -1;
-  //noOfSubCacheRemovalFailures = -1;
+  noOfNotificationsSent        = -1;
+  noOfSimulatedNotifications   = -1;
 
   QueueStatistics::reset();
 
@@ -148,7 +144,13 @@ std::string renderCounterStats(void)
     renderUsedCounter(&jsRequest, "DELETE",  noOfRequestCounters[ix]._delete);
     renderUsedCounter(&jsRequest, "OPTIONS", noOfRequestCounters[ix].options);
 
-    jsRequest.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request), jsRequest.str());
+    // We add the object only in the case at least some verb has been included
+    if ((noOfRequestCounters[ix].get != -1) || (noOfRequestCounters[ix].post != -1) ||
+        (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
+        (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
+    {
+      jsRequests.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request), jsRequest.str());
+    }
 
     // We know that LeakRequest is the last request type in the array, by construction
     // FIXME: this is weak (but it works)
@@ -162,6 +164,19 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "legacyNgsiv1",    noOfLegacyNgsiv1Requests);
   renderUsedCounter(&js, "missedVerb",      noOfMissedVerb);
   renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests);
+
+  renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
+  renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);
+  renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent);
+
+  //
+  // The valgrind test suite uses REST GET /version to check that the broker is alive
+  // This fact makes the statistics change and some working functests fail under valgrindTestSuite
+  // due to the 'extra' version-request in the statistics.
+  // Instead of removing version-requests from the statistics,
+  // we report the number of version-requests even if zero (-1).
+  //
+  js.addNumber("versionRequests", (long long)(noOfVersionRequests + 1));
 
   return js.str();
 }
