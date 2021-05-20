@@ -87,7 +87,7 @@ void* startSenderThread(void* p)
                           &statusCode,
                           params->extraHeaders);
 
-      LM_T(LmtNotificationResponsePayload, ("notification response payload: %s", out.c_str()));
+      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
 
       if (r == 0)
       {
