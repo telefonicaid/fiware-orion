@@ -76,7 +76,7 @@ static void resetStatistics(void)
     noOfRequestCounters[ix].options = -1;
 
     // We know that LeakRequest is the last request type in the array, by construction
-    // FIXME: this is weak (but it works)
+    // FIXME P7: this is weak (but it works)
     if (noOfRequestCounters[ix].request == LeakRequest)
     {
       break;
@@ -153,7 +153,7 @@ std::string renderCounterStats(void)
     }
 
     // We know that LeakRequest is the last request type in the array, by construction
-    // FIXME: this is weak (but it works)
+    // FIXME P7: this is weak (but it works)
     if (noOfRequestCounters[ix].request == LeakRequest)
     {
       break;

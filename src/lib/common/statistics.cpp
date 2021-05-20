@@ -69,7 +69,7 @@ UrlCounter noOfRequestCounters[] =
   {RegistrationRequest,           -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
   {BatchQueryRequest,             -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
   {BatchUpdateRequest,            -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
-  // FIXME: NotifyContext is shared for v1 and v2, both use postNotifyContext(). Weird...
+  // FIXME P5: NotifyContext is shared for v1 and v2, both use postNotifyContext(). Weird...
   {NotifyContext,                 -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
   {LogTraceRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
@@ -355,7 +355,7 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
     }
 
     // We know that LeakRequest is the last request type in the array, by construction
-    // FIXME: this is weak (but it works)
+    // FIXME P7: this is weak (but it works)
     if ((requestFound) || (noOfRequestCounters[ix].request == LeakRequest))
     {
       break;
