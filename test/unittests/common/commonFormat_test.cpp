@@ -43,9 +43,6 @@ TEST(commonMimeType, mimeTypeToString)
    mimeType = (char*) mimeTypeToString(TEXT);
    EXPECT_STREQ("TEXT", mimeType) << "bad string translation for TEXT mimeType";
 
-   mimeType = (char*) mimeTypeToString(HTML);
-   EXPECT_STREQ("HTML", mimeType) << "bad string translation for HTML mimeType";
-
    mimeType = (char*) mimeTypeToString(NOMIMETYPE);
    EXPECT_STREQ("NOMIMETYPE", mimeType) << "bad string translation for NOMIMETYPE mimeType";
 

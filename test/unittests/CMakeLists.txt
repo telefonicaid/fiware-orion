@@ -92,7 +92,9 @@ SET (SOURCES
     common/commonString_test.cpp
     common/commonTag_test.cpp
     common/commonSem_test.cpp
-    common/commonStatistics_test.cpp
+    # FIXME P3: this test is aligned with the old version of the statistics logic for NGSIv1
+    # it should be moved to NGSIv2 or, alternatively, removed the file at the end
+    #common/commonStatistics_test.cpp
     common/commonWsStrip_test.cpp
     common/commonMacroSubstitute_test.cpp
 
