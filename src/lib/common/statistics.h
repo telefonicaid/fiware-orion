@@ -228,75 +228,55 @@ extern TimeStat           lastTimeStat;
 extern __thread TimeStat  threadLastTimeStat;
 
 
+/* ****************************************************************************
+*
+* UrlCounter -
+*/
+typedef struct UrlCounter
+{
+  RequestType request;
+
+  int get;
+  int post;
+  int patch;
+  int put;
+  int _delete;
+  int options;
+
+  bool getAllowed;
+  bool postAllowed;
+  bool patchAllowed;
+  bool putAllowed;
+  bool deleteAllowed;
+  bool optionsAllowed;
+
+} UrlCounter;
+
 
 /* ****************************************************************************
 *
 * Statistic counters for NGSI REST requests
 */
+// By content
 extern int noOfJsonRequests;
-extern int noOfRegistrations;
-extern int noOfRegistrationErrors;
-extern int noOfRegistrationUpdates;
+extern int noOfTextRequests;
+extern int noOfRequestsWithoutPayload;
+
+// By url
+extern UrlCounter noOfRequestCounters[];
+
+// Special
+extern int noOfLegacyNgsiv1Requests;
+extern int noOfInvalidRequests;
+extern int noOfSimulatedNotifications;
 extern int noOfRegistrationUpdateErrors;
-extern int noOfDiscoveries;
 extern int noOfDiscoveryErrors;
 
-extern int noOfQueries;
-extern int noOfQueryErrors;
-extern int noOfUpdates;
-extern int noOfUpdateErrors;
-extern int noOfSubscriptions;
-extern int noOfSubscriptionErrors;
-extern int noOfSubscriptionUpdates;
-extern int noOfSubscriptionUpdateErrors;
-extern int noOfUnsubscriptions;
-extern int noOfUnsubscriptionErrors;
-extern int noOfNotificationsReceived;
-extern int noOfNotificationsSent;
-extern int noOfQueryContextResponses;
-extern int noOfUpdateContextResponses;
-extern int noOfContextEntitiesByEntityId;
-extern int noOfContextEntityAttributes;
-extern int noOfEntityByIdAttributeByName;
-extern int noOfContextEntityTypes;
-extern int noOfContextEntityTypeAttributeContainer;
-extern int noOfContextEntityTypeAttribute;
-extern int noOfIndividualContextEntity;
-extern int noOfIndividualContextEntityAttributes;
-extern int noOfAttributeValueInstance;
-extern int noOfIndividualContextEntityAttribute;
-extern int noOfUpdateContextElement;
-extern int noOfAppendContextElement;
-extern int noOfUpdateContextAttribute;
-extern int noOfNgsi10ContextEntityTypes;
-extern int noOfNgsi10ContextEntityTypesAttributeContainer;
-extern int noOfNgsi10ContextEntityTypesAttribute;
-extern int noOfNgsi10SubscriptionsConvOp;
-extern int noOfAllContextEntitiesRequests;
-extern int noOfAllEntitiesWithTypeAndIdRequests;
-extern int noOfIndividualContextEntityAttributeWithTypeAndId;
-extern int noOfAttributeValueInstanceWithTypeAndId;
-extern int noOfContextEntitiesByEntityIdAndType;
-extern int noOfEntityByIdAttributeByNameIdAndType;
+extern int noOfSubCacheEntries;
+extern int noOfSubCacheLookups;
+extern int noOfSubCacheRemovals;
+extern int noOfSubCacheRemovalFailures;
 
-extern int noOfLogTraceRequests;
-extern int noOfLogLevelRequests;
-extern int noOfVersionRequests;
-extern int noOfExitRequests;
-extern int noOfLeakRequests;
-extern int noOfStatisticsRequests;
-extern int noOfInvalidRequests;
-extern int noOfRegisterResponses;
-
-extern int noOfRtUnsubscribeContextResponse;
-extern int noOfRtSubscribeResponse;
-extern int noOfRtSubscribeError;
-
-extern int noOfSimulatedNotifications;
-extern int noOfBatchQueryRequest;
-extern int noOfBatchUpdateRequest;
-extern int noOfRegistrationRequest;
-extern int noOfRegistrationsRequest;
 
 
 

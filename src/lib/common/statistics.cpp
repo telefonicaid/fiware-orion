@@ -44,119 +44,55 @@ __thread TimeStat  threadLastTimeStat;
 *
 * Statistic counters for NGSI REST requests
 */
-int noOfJsonRequests                                     = -1;
-int noOfRequestsWithoutPayload                           = -1;
-int noOfRegistrations                                    = -1;
-int noOfRegistrationErrors                               = -1;
-int noOfRegistrationUpdates                              = -1;
-int noOfRegistrationUpdateErrors                         = -1;
-int noOfDiscoveries                                      = -1;
-int noOfDiscoveryErrors                                  = -1;
-int noOfAvailabilitySubscriptions                        = -1;
-int noOfAvailabilitySubscriptionErrors                   = -1;
-int noOfAvailabilityUnsubscriptions                      = -1;
-int noOfAvailabilityUnsubscriptionErrors                 = -1;
-int noOfAvailabilitySubscriptionUpdates                  = -1;
-int noOfAvailabilitySubscriptionUpdateErrors             = -1;
-int noOfAvailabilityNotificationsReceived                = -1;
-int noOfAvailabilityNotificationsSent                    = -1;
+// By content
+int noOfJsonRequests           = -1;
+int noOfTextRequests           = -1;
+int noOfRequestsWithoutPayload = -1;
 
-int noOfQueries                                          = -1;
-int noOfQueryErrors                                      = -1;
-int noOfUpdates                                          = -1;
-int noOfUpdateErrors                                     = -1;
-int noOfSubscriptions                                    = -1;
-int noOfSubscriptionErrors                               = -1;
-int noOfSubscriptionUpdates                              = -1;
-int noOfSubscriptionUpdateErrors                         = -1;
-int noOfUnsubscriptions                                  = -1;
-int noOfUnsubscriptionErrors                             = -1;
-int noOfNotificationsReceived                            = -1;
-int noOfNotificationsSent                                = -1;
-int noOfQueryContextResponses                            = -1;
-int noOfUpdateContextResponses                           = -1;
+// By url
+// FIXME P3: EntityRequest is used both tor /v2/entities/{id} and /v2/entities/{id}/attrs although
+// not the same verbs are allowed in both. Thus, counters are not perfect in that case but I think
+// we can live with it...
+UrlCounter noOfRequestCounters[] =
+{
+  //                                                      GET    POST   PATCH  PUT    DELET  OPT
+  {EntryPointsRequest,            -1, -1, -1, -1, -1, -1, true,  false, false, false ,false, true},
+  {EntitiesRequest,               -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {EntityRequest,                 -1, -1, -1, -1, -1, -1, true,  true,  true,  true,  true,  true},
+  {EntityAttributeRequest,        -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  true},
+  {EntityAttributeValueRequest,   -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, true},
+  {EntityAllTypesRequest,         -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {EntityTypes,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {SubscriptionsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {IndividualSubscriptionRequest, -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {RegistrationsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {RegistrationRequest,           -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {BatchQueryRequest,             -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  {BatchUpdateRequest,            -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  // FIXME: NotifyContext is shared for v1 and v2, both use postNotifyContext(). Weird...
+  {NotifyContext,                 -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
-int noOfContextEntitiesByEntityId                        = -1;
-int noOfContextEntityAttributes                          = -1;
-int noOfEntityByIdAttributeByName                        = -1;
-int noOfContextEntityTypes                               = -1;
-int noOfContextEntityTypeAttributeContainer              = -1;
-int noOfContextEntityTypeAttribute                       = -1;
+  {LogTraceRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
+  {StatisticsRequest,             -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {VersionRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {LogLevelRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
+  {SemStateRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {MetricsRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {ExitRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {LeakRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false}
+};
 
-int noOfIndividualContextEntity                          = -1;
-int noOfIndividualContextEntityAttributes                = -1;
-int noOfIndividualContextEntityAttribute                 = -1;
-int noOfAttributeValueInstance                           = -1;
-int noOfNgsi10ContextEntityTypes                         = -1;
-int noOfNgsi10ContextEntityTypesAttributeContainer       = -1;
-int noOfNgsi10ContextEntityTypesAttribute                = -1;
-int noOfNgsi10SubscriptionsConvOp                        = -1;
+// Special
+int noOfLegacyNgsiv1Requests     = -1;
+int noOfInvalidRequests          = -1;
+int noOfSimulatedNotifications   = -1;
+int noOfRegistrationUpdateErrors = -1;
+int noOfDiscoveryErrors          = -1;
 
-int noOfUpdateContextElement                             = -1;
-int noOfAppendContextElement                             = -1;
-int noOfUpdateContextAttribute                           = -1;
-
-int noOfAllContextEntitiesRequests                       = -1;
-int noOfAllEntitiesWithTypeAndIdRequests                 = -1;
-int noOfIndividualContextEntityAttributeWithTypeAndId    = -1;
-int noOfAttributeValueInstanceWithTypeAndId              = -1;
-int noOfEntityByIdAttributeByNameIdAndType               = -1;
-
-int noOfLogTraceRequests                                 = -1;
-int noOfLogLevelRequests                                 = -1;
-int noOfSemStateRequests                                 = -1;
-int noOfMetricsRequests                                  = -1;
-int noOfVersionRequests                                  = -1;
-int noOfExitRequests                                     = -1;
-int noOfLeakRequests                                     = -1;
-int noOfStatisticsRequests                               = -1;
-int noOfInvalidRequests                                  = -1;
-int noOfRegisterResponses                                = -1;
-
-int noOfRtUnsubscribeContextResponse                     = -1;
-int noOfRtSubscribeResponse                              = -1;
-int noOfRtSubscribeError                                 = -1;
-int noOfContextElementResponse                           = -1;
-int noOfContextAttributeResponse                         = -1;
-
-int noOfEntityTypesRequest                               = -1;
-int noOfEntityTypesResponse                              = -1;
-int noOfAttributesForEntityTypeRequest                   = -1;
-int noOfAttributesForEntityTypeResponse                  = -1;
-int noOfContextEntitiesByEntityIdAndType                 = -1;
-
-int noOfEntitiesRequests                                 = -1;
-int noOfEntitiesResponses                                = -1;
-
-int noOfEntryPointsRequests                              = -1;
-int noOfEntryPointsResponses                             = -1;
-
-int noOfEntityRequests                                   = -1;
-int noOfEntityResponses                                  = -1;
-
-int noOfEntityAttributeRequests                          = -1;
-int noOfEntityAttributeResponses                         = -1;
-
-int noOfEntityAttributeValueRequests                     = -1;
-int noOfEntityAttributeValueResponses                    = -1;
-
-int noOfPostEntity                                       = -1;
-
-int noOfPostAttributes                                   = -1;
-int noOfDeleteEntity                                     = -1;
-int noOfSubCacheEntries                                  = -1;
-int noOfSubCacheLookups                                  = -1;
-int noOfSubCacheRemovals                                 = -1;
-int noOfSubCacheRemovalFailures                          = -1;
-int noOfEntityTypeRequest                                = -1;
-int noOfEntityAllTypesRequest                            = -1;
-int noOfSubscriptionsRequest                             = -1;
-int noOfIndividualSubscriptionRequest                    = -1;
-int noOfSimulatedNotifications                           = -1;
-int noOfBatchQueryRequest                                = -1;
-int noOfBatchUpdateRequest                               = -1;
-int noOfRegistrationRequest                              = -1;
-int noOfRegistrationsRequest                             = -1;
+int noOfSubCacheEntries          = -1;
+int noOfSubCacheLookups          = -1;
+int noOfSubCacheRemovals         = -1;
+int noOfSubCacheRemovalFailures  = -1;
 
 
 
@@ -268,6 +204,43 @@ void timingStatisticsReset(void)
   memset(&accTimeStat, 0, sizeof(accTimeStat));
 }
 
+bool isLegacyNgsiv1(RequestType request)
+{
+  switch(request)
+  {
+  case AllContextEntities:
+  case AllEntitiesWithTypeAndId:
+  case AttributesForEntityType:
+  case ContextEntitiesByEntityId:
+  case ContextEntitiesByEntityIdAndType:
+  case ContextEntityAttributes:
+  case ContextEntityTypeAttribute:
+  case ContextEntityTypeAttributeContainer:
+  case ContextEntityTypes:
+  case DiscoverContextAvailability:
+  case EntityByIdAttributeByName:
+  case EntityByIdAttributeByNameIdAndType:
+  case EntityTypes:
+  case IndividualContextEntity:
+  case IndividualContextEntityAttribute:
+  case IndividualContextEntityAttributes:
+  case IndividualContextEntityAttributeWithTypeAndId:
+  case Ngsi10ContextEntityTypes:
+  case Ngsi10ContextEntityTypesAttribute:
+  case Ngsi10ContextEntityTypesAttributeContainer:
+  case Ngsi10SubscriptionsConvOp:
+  //case NotifyContext:  //FIXME: this is also used for v2. Weird...
+  case QueryContext:
+  case RegisterContext:
+  case SubscribeContext:
+  case UnsubscribeContext:
+  case UpdateContext:
+  case UpdateContextSubscription:
+    return true;
+  default:
+    return false;
+  }
+}
 
 
 /* ****************************************************************************
@@ -279,6 +252,10 @@ void timingStatisticsReset(void)
 */
 void statisticsUpdate(RequestType request, MimeType inMimeType)
 {
+  // TBD: look for calls to statisticsUpdate
+  // Take into acccount NotifyContextSent
+  // Take into account countersStatistics for early return
+
   if (inMimeType == JSON)
   {
     ++noOfJsonRequests;
@@ -289,8 +266,67 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
     ++noOfRequestsWithoutPayload;
   }
 
-  switch (request)
+  /*switch (request)
   {
+  // v2
+  case EntryPointsRequest:  ++noOfEntryPoint; break;
+  case EntitiesRequest: ++noOfEntitiesGet; break;
+  case EntityRequest: ++noOfEntityGet; break;
+  case EntityAttributeRequest: ++noOfArrributeGet; break;
+  case EntityAttributeValueRequest: ++noOfAttributeValueGet; break;
+  case EntityAllTypesRequest: ++noOfEntityTypesGet; break;
+  case EntityTypeRequest: ++noOfEntityTypeGet; break;
+  case SubscriptionsRequest: ++noOfSubscriptionsGet; break;
+  case IndividualSubscriptionRequest: ++noOfSubscriptionsGet; break;
+  case RegistrationsRequest: ++noOfRegistrationsGet; break;
+  case RegistrationRequest: ++noOfRegistrationGet; break;
+
+  // legacy ngsiv1
+  case AllContextEntities:
+  case AllEntitiesWithTypeAndId:
+  case AttributesForEntityType:
+  case ContextEntitiesByEntityId:
+  case ContextEntitiesByEntityId:
+  case ContextEntitiesByEntityIdAndType:
+  case ContextEntityAttributes:
+  case ContextEntityAttributes:
+  case ContextEntityTypeAttribute:
+  case ContextEntityTypeAttribute:
+  case ContextEntityTypeAttributeContainer:
+  case ContextEntityTypeAttributeContainer:
+  case ContextEntityTypes:
+  case ContextEntityTypes:
+  case EntityByIdAttributeByName:
+  case EntityByIdAttributeByName:
+  case EntityByIdAttributeByNameIdAndType:
+  case EntityTypes:
+  case IndividualContextEntity:
+  case IndividualContextEntity:
+  case IndividualContextEntityAttribute:
+  case IndividualContextEntityAttribute:
+  case IndividualContextEntityAttributes:
+  case IndividualContextEntityAttributes:
+  case IndividualContextEntityAttributeWithTypeAndId:
+  case Ngsi10ContextEntityTypes:
+  case Ngsi10ContextEntityTypes:
+  case Ngsi10ContextEntityTypesAttribute:
+  case Ngsi10ContextEntityTypesAttribute:
+  case Ngsi10ContextEntityTypesAttributeContainer:
+  case Ngsi10ContextEntityTypesAttributeContainer:
+    ++noOfLegacyNgsiv1Requests;
+    break;
+
+  // Special
+  case LogTraceRequest:
+  case StatisticsRequest:
+  case VersionRequest:
+  case LogLevelRequest:
+  case SemStateRequest:
+  case MetricsRequest:
+  case ExitRequest:
+  case LeakRequest:
+
+
   case NoRequest:                                        break;
   case RegisterContext:                                  ++noOfRegistrations; break;
   case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
@@ -377,5 +413,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
 
   case RegistrationRequest:                              ++noOfRegistrationRequest; break;
   case RegistrationsRequest:                             ++noOfRegistrationsRequest; break;
-  }
+
+  }*/
 }
