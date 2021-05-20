@@ -47,32 +47,49 @@ Unconditional fields are:
 
 ### Counter block
 
-The counter block provides information about counters for the times a particular request type has been received (also for notifications being sent), e.g:
+The counter block provides information about counters for the times a particular request type has been received
+(also for notifications being sent), e.g:
 
 ```
 {
   ...
-  "counters" : {
-    "jsonRequests" : 75916,
-    "queries" : 3698,
-    "updates" : 2416,
-    "subscriptions" : 138,
-    "registrationRequest": 11,
-    "registrations": 41,
-    "unsubscriptions" : 6,
-    "notificationsReceived" : 216936,
-    "notificationsSent" : 579542,
-    "individualContextEntity" : 360,
-    "allContextEntitiesRequests" : 3,
-    "versionRequests" : 1109,
-    "statisticsRequests" : 13,
-    "invalidRequests" : 2
+  "counters": {
+    "invalidRequests": 2,
+    "jsonRequests": 4,
+    "noPayloadRequests": 250,
+    "notificationsSent": 4,
+    "requests": {
+      "entities": {
+        "GET": 231
+      },
+      "entity": {
+        "GET": 2,
+        "PATCH": 1,
+        "POST": 3
+      },
+      "entityTypes": {
+        "GET": 1
+      },
+      "metrics": {
+        "GET": 2
+      },
+      "statistics": {
+        "GET": 9
+      },
+      "subscription": {
+        "GET": 1
+      },
+      "subscriptions": {
+        "GET": 2
+      }
+    },
+    "versionRequests": 0
   },
   ...
 }
 ```
 
-If a particular request type has not been received, its corresponding counter is not shown.
+If a particular request type (or verb) has not been received, its corresponding counter is not shown.
 
 ### SemWait block
 
