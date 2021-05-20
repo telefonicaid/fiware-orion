@@ -89,7 +89,7 @@ The counter block provides information about counters for the times a particular
 }
 ```
 
-If a particular request type+verb has not been received, its corresponding counter is not shown.
+If a particular request type (or verb) has not been received, its corresponding counter is not shown.
 
 ### SemWait block
 
