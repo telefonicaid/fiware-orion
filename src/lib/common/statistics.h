@@ -28,6 +28,7 @@
 #include "ngsi/Request.h"
 #include "common/MimeType.h"
 #include "common/clockFunctions.h"
+#include "rest/Verb.h"
 
 
 
@@ -268,10 +269,12 @@ extern UrlCounter noOfRequestCounters[];
 // Special
 extern int noOfLegacyNgsiv1Requests;
 extern int noOfInvalidRequests;
+extern int noOfMissedVerb;
 extern int noOfSimulatedNotifications;
 extern int noOfRegistrationUpdateErrors;
 extern int noOfDiscoveryErrors;
 
+// FIXME: seem they are not actually used. Check in master branch
 extern int noOfSubCacheEntries;
 extern int noOfSubCacheLookups;
 extern int noOfSubCacheRemovals;
@@ -300,6 +303,6 @@ extern void timingStatisticsReset(void);
 *
 * statisticsUpdate - 
 */
-extern void statisticsUpdate(RequestType request, MimeType inMimeType);
+extern void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb);
 
 #endif  // SRC_LIB_COMMON_STATISTICS_H_

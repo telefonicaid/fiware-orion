@@ -105,9 +105,6 @@ const char* requestType(RequestType rt)
   case EntityAttributeResponse:                          return "EntityAttributeResponse";
   case EntityAttributeValueRequest:                      return "EntityAttributeValueRequest";
   case EntityAttributeValueResponse:                     return "EntityAttributeValueResponse";
-  case PostEntity:                                       return "PostEntity";
-  case PostAttributes:                                   return "PostAttributes";
-  case DeleteEntity:                                     return "DeleteEntity";
 
   case EntityTypeRequest:                                return "EntityTypeRequest";
   case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
@@ -121,4 +118,34 @@ const char* requestType(RequestType rt)
   }
 
   return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* requestTypeForCounter -
+*/
+const char* requestTypeForCounter(RequestType rt)
+{
+  // It support only NGSIv2 requests (as are the ones that may appear in statistics counters)
+  switch (rt)
+  {
+  case EntryPointsRequest:             return "entryPoint";
+  case EntitiesRequest:                return "entities";
+  case EntityRequest:                  return "entity";
+  case EntityAttributeRequest:         return "attribute";
+  case EntityAttributeValueRequest:    return "attributeValue";
+  case EntityAllTypesRequest:          return "entityTypes";
+  case EntityTypes:                    return "entityType";
+  case SubscriptionsRequest:           return "subscriptions";
+  case IndividualSubscriptionRequest:  return "subscription";
+  case RegistrationsRequest:           return "registrations";
+  case RegistrationRequest:            return "registration";
+  case BatchQueryRequest:              return "batchQuery";
+  case BatchUpdateRequest:             return "batchUpdate";
+  case NotifyContext:                  return "notify";
+
+  default:                             return "notANgsiv2Request";
+  }
 }

@@ -85,6 +85,7 @@ UrlCounter noOfRequestCounters[] =
 // Special
 int noOfLegacyNgsiv1Requests     = -1;
 int noOfInvalidRequests          = -1;
+int noOfMissedVerb               = -1;
 int noOfSimulatedNotifications   = -1;
 int noOfRegistrationUpdateErrors = -1;
 int noOfDiscoveryErrors          = -1;
@@ -250,169 +251,128 @@ bool isLegacyNgsiv1(RequestType request)
 * FIXME P6: No statistics for received QueryResponses (Response from Provider Application
 *           after forwarding a query)
 */
-void statisticsUpdate(RequestType request, MimeType inMimeType)
+void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
 {
+  // If statistics are not enabled at CLI, then there is no point of recording anything
+  // Performance will be increased in this case
+  if (!countersStatistics)
+  {
+    return;
+  }
+
   // TBD: look for calls to statisticsUpdate
   // Take into acccount NotifyContextSent
-  // Take into account countersStatistics for early return
+
 
   if (inMimeType == JSON)
   {
     ++noOfJsonRequests;
   }
-  else if (inMimeType == NOMIMETYPE)
+  else if (inMimeType == TEXT)
   {
-    // FIXME P4: Include this counter in the statistics (Issue #1400)
+    ++noOfTextRequests;
+  }
+  else  // inMimeType == NOMIMETYPE
+  {
     ++noOfRequestsWithoutPayload;
   }
 
-  /*switch (request)
+  bool requestFound = false;
+  for (unsigned int ix = 0; ; ++ix)
   {
-  // v2
-  case EntryPointsRequest:  ++noOfEntryPoint; break;
-  case EntitiesRequest: ++noOfEntitiesGet; break;
-  case EntityRequest: ++noOfEntityGet; break;
-  case EntityAttributeRequest: ++noOfArrributeGet; break;
-  case EntityAttributeValueRequest: ++noOfAttributeValueGet; break;
-  case EntityAllTypesRequest: ++noOfEntityTypesGet; break;
-  case EntityTypeRequest: ++noOfEntityTypeGet; break;
-  case SubscriptionsRequest: ++noOfSubscriptionsGet; break;
-  case IndividualSubscriptionRequest: ++noOfSubscriptionsGet; break;
-  case RegistrationsRequest: ++noOfRegistrationsGet; break;
-  case RegistrationRequest: ++noOfRegistrationGet; break;
+    if (noOfRequestCounters[ix].request == request)
+    {
+      requestFound = true;
+      switch(verb)
+      {
+      case GET:
+        if (noOfRequestCounters[ix].getAllowed)
+        {
+          ++noOfRequestCounters[ix].get;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  // legacy ngsiv1
-  case AllContextEntities:
-  case AllEntitiesWithTypeAndId:
-  case AttributesForEntityType:
-  case ContextEntitiesByEntityId:
-  case ContextEntitiesByEntityId:
-  case ContextEntitiesByEntityIdAndType:
-  case ContextEntityAttributes:
-  case ContextEntityAttributes:
-  case ContextEntityTypeAttribute:
-  case ContextEntityTypeAttribute:
-  case ContextEntityTypeAttributeContainer:
-  case ContextEntityTypeAttributeContainer:
-  case ContextEntityTypes:
-  case ContextEntityTypes:
-  case EntityByIdAttributeByName:
-  case EntityByIdAttributeByName:
-  case EntityByIdAttributeByNameIdAndType:
-  case EntityTypes:
-  case IndividualContextEntity:
-  case IndividualContextEntity:
-  case IndividualContextEntityAttribute:
-  case IndividualContextEntityAttribute:
-  case IndividualContextEntityAttributes:
-  case IndividualContextEntityAttributes:
-  case IndividualContextEntityAttributeWithTypeAndId:
-  case Ngsi10ContextEntityTypes:
-  case Ngsi10ContextEntityTypes:
-  case Ngsi10ContextEntityTypesAttribute:
-  case Ngsi10ContextEntityTypesAttribute:
-  case Ngsi10ContextEntityTypesAttributeContainer:
-  case Ngsi10ContextEntityTypesAttributeContainer:
-    ++noOfLegacyNgsiv1Requests;
-    break;
+      case POST:
+        if (noOfRequestCounters[ix].postAllowed)
+        {
+          ++noOfRequestCounters[ix].post;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  // Special
-  case LogTraceRequest:
-  case StatisticsRequest:
-  case VersionRequest:
-  case LogLevelRequest:
-  case SemStateRequest:
-  case MetricsRequest:
-  case ExitRequest:
-  case LeakRequest:
+      case PATCH:
+        if (noOfRequestCounters[ix].patchAllowed)
+        {
+          ++noOfRequestCounters[ix].patch;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
+      case PUT:
+        if (noOfRequestCounters[ix].putAllowed)
+        {
+          ++noOfRequestCounters[ix].put;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case NoRequest:                                        break;
-  case RegisterContext:                                  ++noOfRegistrations; break;
-  case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
+      case DELETE:
+        if (noOfRequestCounters[ix].deleteAllowed)
+        {
+          ++noOfRequestCounters[ix]._delete;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case QueryContext:                                     ++noOfQueries; break;
-  case SubscribeContext:                                 ++noOfSubscriptions; break;
-  case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
-  case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
-  case NotifyContext:                                    ++noOfNotificationsReceived; break;
-  case NotifyContextSent:                                ++noOfNotificationsSent; break;
-  case UpdateContext:                                    ++noOfUpdates; break;
-  case RtQueryContextResponse:                           ++noOfQueryContextResponses; break;
-  case RtUpdateContextResponse:                          ++noOfUpdateContextResponses; break;
+      case OPTIONS:
+        if (noOfRequestCounters[ix].optionsAllowed)
+        {
+          ++noOfRequestCounters[ix].options;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
+      default:
+        ++noOfMissedVerb;
+      }
+    }
 
-  case ContextEntitiesByEntityId:                        ++noOfContextEntitiesByEntityId; break;
-  case ContextEntityAttributes:                          ++noOfContextEntityAttributes; break;
-  case EntityByIdAttributeByName:                        ++noOfEntityByIdAttributeByName; break;
-  case ContextEntityTypes:                               ++noOfContextEntityTypes; break;
-  case ContextEntityTypeAttributeContainer:              ++noOfContextEntityTypeAttributeContainer; break;
-  case ContextEntityTypeAttribute:                       ++noOfContextEntityTypeAttribute; break;
-  case IndividualContextEntity:                          ++noOfIndividualContextEntity; break;
-  case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
-  case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
-  case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
+    // We know that LeakRequest is the last request type in the array, by construction
+    // FIXME: this is weak (but it works)
+    if ((requestFound) || (noOfRequestCounters[ix].request == LeakRequest))
+    {
+      break;
+    }
+  }
 
-  case UpdateContextElement:                             ++noOfUpdateContextElement; break;
-  case AppendContextElement:                             ++noOfAppendContextElement; break;
-  case UpdateContextAttribute:                           ++noOfUpdateContextAttribute; break;
-  case Ngsi10ContextEntityTypes:                         ++noOfNgsi10ContextEntityTypes; break;
-  case Ngsi10ContextEntityTypesAttributeContainer:       ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
-  case Ngsi10ContextEntityTypesAttribute:                ++noOfNgsi10ContextEntityTypesAttribute; break;
-  case Ngsi10SubscriptionsConvOp:                        ++noOfNgsi10SubscriptionsConvOp; break;
-
-  case AllContextEntities:                               ++noOfAllContextEntitiesRequests; break;
-  case AllEntitiesWithTypeAndId:                         ++noOfAllEntitiesWithTypeAndIdRequests; break;
-  case IndividualContextEntityAttributeWithTypeAndId:    ++noOfIndividualContextEntityAttributeWithTypeAndId; break;
-  case AttributeValueInstanceWithTypeAndId:              ++noOfAttributeValueInstanceWithTypeAndId; break;
-  case ContextEntitiesByEntityIdAndType:                 ++noOfContextEntitiesByEntityIdAndType; break;
-  case EntityByIdAttributeByNameIdAndType:               ++noOfEntityByIdAttributeByNameIdAndType; break;
-
-  case LogTraceRequest:                                  ++noOfLogTraceRequests; break;
-  case LogLevelRequest:                                  ++noOfLogLevelRequests; break;
-  case SemStateRequest:                                  ++noOfSemStateRequests; break;
-  case MetricsRequest:                                   ++noOfMetricsRequests; break;
-  case VersionRequest:                                   ++noOfVersionRequests; break;
-  case ExitRequest:                                      ++noOfExitRequests; break;
-  case LeakRequest:                                      ++noOfLeakRequests; break;
-  case StatisticsRequest:                                ++noOfStatisticsRequests; break;
-
-  case InvalidRequest:                                   ++noOfInvalidRequests; break;
-  case RegisterResponse:                                 ++noOfRegisterResponses; break;
-
-  case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
-  case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
-  case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
-  case RtContextElementResponse:                         ++noOfContextElementResponse; break;
-  case RtContextAttributeResponse:                       ++noOfContextAttributeResponse; break;
-  case EntityTypes:                                      ++noOfEntityTypesRequest; break;
-  case AttributesForEntityType:                          ++noOfAttributesForEntityTypeRequest; break;
-  case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;
-  case RtAttributesForEntityTypeResponse:                ++noOfAttributesForEntityTypeResponse; break;
-
-  case EntitiesRequest:                                  ++noOfEntitiesRequests; break;
-  case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
-  case EntryPointsRequest:                               ++noOfEntryPointsRequests; break;
-  case EntryPointsResponse:                              ++noOfEntryPointsResponses; break;
-  case EntityRequest:                                    ++noOfEntityRequests; break;
-  case EntityResponse:                                   ++noOfEntityResponses; break;
-  case EntityAttributeRequest:                           ++noOfEntityAttributeRequests; break;
-  case EntityAttributeResponse:                          ++noOfEntityAttributeResponses; break;
-  case EntityAttributeValueRequest:                      ++noOfEntityAttributeValueRequests; break;
-  case EntityAttributeValueResponse:                     ++noOfEntityAttributeValueResponses; break;
-
-  case PostEntity:                                       ++noOfPostEntity; break;
-  case PostAttributes:                                   ++noOfPostAttributes; break;
-  case DeleteEntity:                                     ++noOfDeleteEntity; break;
-
-  case EntityTypeRequest:                                ++noOfEntityTypeRequest; break;
-  case EntityAllTypesRequest:                            ++noOfEntityAllTypesRequest; break;
-  case SubscriptionsRequest:                             ++noOfSubscriptionsRequest; break;
-  case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
-  case BatchQueryRequest:                                ++noOfBatchQueryRequest; break;
-  case BatchUpdateRequest:                               ++noOfBatchUpdateRequest; break;
-
-  case RegistrationRequest:                              ++noOfRegistrationRequest; break;
-  case RegistrationsRequest:                             ++noOfRegistrationsRequest; break;
-
-  }*/
+  // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
+  if (!requestFound)
+  {
+    if (isLegacyNgsiv1(request))
+    {
+      ++noOfLegacyNgsiv1Requests;
+    }
+    else
+    {
+      ++noOfInvalidRequests;
+    }
+  }
 }

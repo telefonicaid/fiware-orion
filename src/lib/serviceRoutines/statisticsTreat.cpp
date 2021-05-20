@@ -85,6 +85,7 @@ static void resetStatistics(void)
 
   noOfLegacyNgsiv1Requests     = -1;
   noOfInvalidRequests          = -1;
+  noOfMissedVerb               = -1;
   noOfSimulatedNotifications   = -1;
   noOfRegistrationUpdateErrors = -1;
   noOfDiscoveryErrors          = -1;
@@ -131,66 +132,36 @@ std::string renderCounterStats(void)
 {
   JsonObjectHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs
-  /*renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
-  renderUsedCounter(&js, "registrations",                             noOfRegistrations);
-  renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
-  renderUsedCounter(&js, "discoveries",                               noOfDiscoveries);
-  renderUsedCounter(&js, "queries",                                   noOfQueries);
-  renderUsedCounter(&js, "updates",                                   noOfUpdates);
-  renderUsedCounter(&js, "subscriptions",                             noOfSubscriptions);
-  renderUsedCounter(&js, "subscriptionUpdates",                       noOfSubscriptionUpdates);
-  renderUsedCounter(&js, "unsubscriptions",                           noOfUnsubscriptions);
-  renderUsedCounter(&js, "notificationsReceived",                     noOfNotificationsReceived);
-  renderUsedCounter(&js, "notificationsSent",                         noOfNotificationsSent);
-  renderUsedCounter(&js, "queryResponsesReceived",                    noOfQueryContextResponses);
-  renderUsedCounter(&js, "updateResponsesReceived",                   noOfUpdateContextResponses);
-  renderUsedCounter(&js, "contextEntitiesByEntityId",                 noOfContextEntitiesByEntityId);
-  renderUsedCounter(&js, "contextEntityAttributes",                   noOfContextEntityAttributes);
-  renderUsedCounter(&js, "entityByIdAttributeByName",                 noOfEntityByIdAttributeByName);
-  renderUsedCounter(&js, "ctxEntityTypes",                            noOfContextEntityTypes);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeContainer",           noOfContextEntityTypeAttributeContainer);
-  renderUsedCounter(&js, "ctxEntityTypeAttribute",                    noOfContextEntityTypeAttribute);
-  renderUsedCounter(&js, "individualContextEntity",                   noOfIndividualContextEntity);
-  renderUsedCounter(&js, "individualContextEntityAttributes",         noOfIndividualContextEntityAttributes);
-  renderUsedCounter(&js, "individualContextEntityAttribute",          noOfIndividualContextEntityAttribute);
-  renderUsedCounter(&js, "updateContextElement",                      noOfUpdateContextElement);
-  renderUsedCounter(&js, "appendContextElement",                      noOfAppendContextElement);
-  renderUsedCounter(&js, "updateContextAttribute",                    noOfUpdateContextAttribute);
-  renderUsedCounter(&js, "ctxEntityTypesNgsi10",                      noOfNgsi10ContextEntityTypes);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeContainerNgsi10",     noOfNgsi10ContextEntityTypesAttributeContainer);
-  renderUsedCounter(&js, "ctxEntityTypeAttributeNgsi10",              noOfNgsi10ContextEntityTypesAttribute);
-  renderUsedCounter(&js, "subscriptionsNgsi10ConvOp",                 noOfNgsi10SubscriptionsConvOp);
-  renderUsedCounter(&js, "allContextEntitiesRequests",                noOfAllContextEntitiesRequests);
-  renderUsedCounter(&js, "allEntitiesWithTypeAndIdRequests",          noOfAllEntitiesWithTypeAndIdRequests);
-  renderUsedCounter(&js, "individualCtxEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
-  renderUsedCounter(&js, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
-  renderUsedCounter(&js, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
-  renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
-  renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
-  renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
-  renderUsedCounter(&js, "registrationRequest",                       noOfRegistrationRequest);
-  renderUsedCounter(&js, "registrationsRequest",                      noOfRegistrationsRequest);
-  renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
-  renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);*/
+  renderUsedCounter(&js, "jsonRequests",      noOfJsonRequests);
+  renderUsedCounter(&js, "textRequests",      noOfTextRequests);
+  renderUsedCounter(&js, "noPayloadRequests", noOfRequestsWithoutPayload);
 
-  //
-  // The valgrind test suite uses REST GET /version to check that the broker is alive
-  // This fact makes the statistics change and some working functests fail under valgrindTestSuite
-  // due to the 'extra' version-request in the statistics.
-  // Instead of removing version-requests from the statistics,
-  // we report the number of version-requests even if zero (-1).
-  //
-  /*js.addNumber("versionRequests", (long long)(noOfVersionRequests + 1));
+  JsonObjectHelper jsRequests;
+  for (unsigned int ix = 0; ; ++ix)
+  {
+    // Note there is no need of checking allowed flags, as not allowed counter will be in -1
+    JsonObjectHelper jsRequest;
+    renderUsedCounter(&jsRequest, "GET",     noOfRequestCounters[ix].get);
+    renderUsedCounter(&jsRequest, "POST",    noOfRequestCounters[ix].post);
+    renderUsedCounter(&jsRequest, "PATCH",   noOfRequestCounters[ix].patch);
+    renderUsedCounter(&jsRequest, "PUT",     noOfRequestCounters[ix].put);
+    renderUsedCounter(&jsRequest, "DELETE",  noOfRequestCounters[ix]._delete);
+    renderUsedCounter(&jsRequest, "OPTIONS", noOfRequestCounters[ix].options);
 
-  renderUsedCounter(&js, "exitRequests", noOfExitRequests);
-  renderUsedCounter(&js, "leakRequests", noOfLeakRequests);
-  renderUsedCounter(&js, "statisticsRequests", noOfStatisticsRequests);
+    jsRequest.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request), jsRequest.str());
+
+    // We know that LeakRequest is the last request type in the array, by construction
+    // FIXME: this is weak (but it works)
+    if (noOfRequestCounters[ix].request == LeakRequest)
+    {
+      break;
+    }
+  }
+  js.addRaw("requests", jsRequests.str());
+
+  renderUsedCounter(&js, "legacyNgsiv1",    noOfLegacyNgsiv1Requests);
+  renderUsedCounter(&js, "missedVerb",      noOfMissedVerb);
   renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests);
-  renderUsedCounter(&js, "registerResponses", noOfRegisterResponses);
-  renderUsedCounter(&js, "registrationErrors", noOfRegistrationErrors);
-  renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
-  renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);*/
 
   return js.str();
 }
