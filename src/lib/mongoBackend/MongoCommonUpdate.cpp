@@ -387,6 +387,7 @@ static void appendMetadata
   }
 
   mdNamesBuilder->append(mdP->name);
+
   char effectiveName[256];
   strncpy(effectiveName, mdP->name.c_str(), sizeof(effectiveName));
   dotForEq(effectiveName);
@@ -731,11 +732,21 @@ static bool updateAttribute
   *actualUpdate = false;
 
   /* Attributes with metadata ID are stored as <attrName>()<ID> in the attributes embedded document */
-  std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
+  char         effectiveName[512];
+  const char*  metadataId = caP->getMetadataId();
+
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  dotForEq(effectiveName);
+
+  if (metadataId != NULL)
   {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
+    int eIx = strlen(effectiveName);
+
+    effectiveName[eIx++] = '(';
+    effectiveName[eIx++] = ')';
+    strncpy(&effectiveName[eIx], metadataId, sizeof(effectiveName) - eIx);
   }
+
 
   if (isReplace)
   {
@@ -781,13 +792,13 @@ static bool updateAttribute
   }
   else
   {
-    if (!attrs.hasField(effectiveName.c_str()))
+    if (!attrs.hasField(effectiveName))
     {
       return false;
     }
 
     BSONObj newAttr;
-    BSONObj attr = getObjectFieldF(attrs, effectiveName.c_str());
+    BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (*actualUpdate)

@@ -465,6 +465,26 @@ std::string ContextAttribute::getId(void) const
 
 /* ****************************************************************************
 *
+* ContextAttribute::getMetadataId -
+*/
+const char* ContextAttribute::getMetadataId() const
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+  {
+    const char* mdName = metadataVector[ix]->name.c_str();
+
+    if ((mdName[0] == 'I') && (mdName[1] == 'D') && (mdName[2] == 0))
+    {
+      return metadataVector[ix]->stringValue.c_str();
+    }
+  }
+
+  return NULL;
+}
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::getLocation() -
 */
 std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
