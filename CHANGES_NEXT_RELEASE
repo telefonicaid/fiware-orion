@@ -1,4 +1,5 @@
-- Fix logs (Other Error and forwarding related traces) (issue #1794)
+- Add: new alarm (id number 6) for forwarding errors (#1794)
+- Fix: use "Forwarding Error" instead of "Other Error" in WARN traces (#1794)
 - Fix: Log trace signals: notifications payload request/response (#2895)
 - Fix: potential crash (although under very rare situations) in log trace code 
 - Fix: support attributes and metadata starting with dollar sign ($) (#3841)
