@@ -75,7 +75,6 @@ extern "C"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 

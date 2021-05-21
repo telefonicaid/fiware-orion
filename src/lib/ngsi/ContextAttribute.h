@@ -89,6 +89,7 @@ public:
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId() const;
+  const char*  getMetadataId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
   std::string  render(ApiVersion   apiVersion,

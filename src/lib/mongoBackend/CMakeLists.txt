@@ -85,7 +85,6 @@ SET (HEADERS
     connectionOperations.h
     mongoSubCache.h
     safeMongo.h
-    dbFieldEncoding.h
     compoundResponses.h
     location.h
     compoundValueBson.h
