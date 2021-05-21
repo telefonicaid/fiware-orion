@@ -51,6 +51,9 @@
 #include "jsonParse/jsonRequest.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
 
+// FIXME P3: matchEntity() should be in a better place, and the following include to be removed
+#include "mongoBackend/MongoGlobal.h"  // matchEntity()
+
 
 
 /* ****************************************************************************
@@ -726,6 +729,44 @@ std::string postQueryContext
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
+  // In the case of registrations with ".*" some entities could be over-added to
+  // the response. This fragment of code filters them out.
+  //
+  // FIXME P5: this is a kind of dirty hack. But if CPrs functionality is removed at the end, there is no
+  // reason to provide a more costly fix for this. Maybe this should be done in QueryContextResponseVector::populate()
+  // method. Check https://github.com/telefonicaid/fiware-orion/issues/3463#issuecomment-477312079 for additional ideas
+  for (unsigned int ix = 0; ix < responseV.size(); ++ix)
+  {
+    std::vector<int> ixToBeErased;
+
+    // First step: store in ixToBeErased the indexes of cerV to be erased
+    // Second step: remove indexes in cerV, from greater to lower
+
+    for (unsigned int jx = 0; jx < responseV[ix]->contextElementResponseVector.size(); ++jx)
+    {
+      bool found = false;
+      EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false");
+      for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
+      {
+        if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
+        {
+          found = true;
+          break; // kx
+        }
+      }
+      if (!found)
+      {
+        ixToBeErased.push_back((jx));
+      }
+    }
+
+    for (int jx = ixToBeErased.size() - 1; jx >= 0; jx--)
+    {
+      responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]]->release();
+      responseV[ix]->contextElementResponseVector.vec.erase(responseV[ix]->contextElementResponseVector.vec.begin() + ixToBeErased[jx]);
+    }
+  }
 
   TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
 

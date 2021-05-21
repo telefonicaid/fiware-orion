@@ -35,10 +35,6 @@ accumulatorStart --pretty-print
 # 02. Query of entities with id E1 - get empty response as the accumulator doesn't respond, but a forward is provoked
 # 03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format
 #
-# FIXME: Due to a bug in Orion, the forward provoked by the query of step 2 makes the broker send not one but TWO forwarded
-#        request of the query to the accumulator.
-#        This is a bug of the broker that is also present in V1 forwarding and it is 'more or less acceptable', but should be fixed some day ...
-#
 
 echo "01. Registration of E1 without Legacy Forwarding, for the accumulator - forward to be in NGSIv2 format"
 echo "======================================================================================================"
@@ -108,24 +104,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
-
-{
-    "attrs": [],
-    "entities": [
-        {
-            "id": "E1"
-        }
-    ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/v2/op/query
-Fiware-Servicepath: /
-Content-Length: 37
-User-Agent: REGEX(.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=2
 
 {
     "attrs": [],

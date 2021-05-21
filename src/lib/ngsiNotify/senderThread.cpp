@@ -71,6 +71,7 @@ void* startSenderThread(void* p)
 
     long long    statusCode = -1;
     std::string  out;
+    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
     if (!simulatedNotification)
     {
@@ -93,9 +94,11 @@ void* startSenderThread(void* p)
                           &statusCode,
                           params->extraHeaders);
 
+      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
+
       if (r == 0)
       {
-        statisticsUpdate(NotifyContextSent, params->mimeType);
+        __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
         alarmMgr.forwardingErrorReset(url);
 

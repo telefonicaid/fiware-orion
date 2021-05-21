@@ -16,6 +16,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [Custom notifications without payload](#custom-notifications-without-payload)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
@@ -321,6 +322,18 @@ Check details in the document about [initial notifications](initial_notification
 ## Oneshot subscriptions
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
+
+[Top](#top)
+
+## Custom notifications without payload
+
+If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
+associated to that subscription will not include any payload (i.e. conten-length 0 notifications).
+
+Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
+the notification will be sent using the NGSIv2 normalized format.
+
+[Top](#top)
 
 ## Notify only attributes that change
 

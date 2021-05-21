@@ -206,16 +206,21 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 176
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "counters": {
-        "entityByIdAttributeByNameIdAndType": 5,
         "jsonRequests": 2,
-        "statisticsRequests": 1,
+        "legacyNgsiv1": 5,
+        "noPayloadRequests": 4,
+        "requests": {
+            "statistics": {
+                "GET": 1
+            }
+        },
         "versionRequests": 0
     },
     "measuring_interval_in_secs": REGEX(\d+),

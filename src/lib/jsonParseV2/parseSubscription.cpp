@@ -422,19 +422,30 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     {
-      Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
-
-      if (!payloadOpt.ok())
+      if (isNull(httpCustom, "payload"))
       {
-        return badInput(ciP, payloadOpt.error);
-      }
+        subsP->notification.httpInfo.includePayload = false;
 
-      if (forbiddenChars(payloadOpt.value.c_str()))
+        // We initialize also httpInfo.payload in this case, although its value is irrelevant
+        subsP->notification.httpInfo.payload = "";
+      }
+      else
       {
-        return badInput(ciP, "forbidden characters in custom /payload/");
-      }
+        Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
 
-      subsP->notification.httpInfo.payload = payloadOpt.value;
+        if (!payloadOpt.ok())
+        {
+          return badInput(ciP, payloadOpt.error);
+        }
+
+        if (forbiddenChars(payloadOpt.value.c_str()))
+        {
+          return badInput(ciP, "forbidden characters in custom /payload/");
+        }
+
+        subsP->notification.httpInfo.includePayload = true;
+        subsP->notification.httpInfo.payload = payloadOpt.value;
+      }
     }
 
     // qs
