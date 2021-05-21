@@ -32,14 +32,6 @@
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
 
-/* ***************************************************************************
-* jsonPayloadClean -
-*/
-static char* jsonPayloadClean(const char* payload)
-{
-  return (char*) strstr(payload, "{");
-}
-
 /* ****************************************************************************
 *
 * startSenderThread -
@@ -100,7 +92,6 @@ void* startSenderThread(void* p)
       {
         __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
-        alarmMgr.forwardingErrorReset(url);
 
         if (params->registration == false)
         {
@@ -109,22 +100,12 @@ void* startSenderThread(void* p)
       }
       else
       {
-        char*     cleanPayload = jsonPayloadClean(out.c_str());
+        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
 
-        if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+        if (params->registration == false)
         {
-    	   alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out); 
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
-
-        else
-        {
-          alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
-
-          if (params->registration == false)
-          {
-            subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
-          }
-        } 
       }
     }
     else

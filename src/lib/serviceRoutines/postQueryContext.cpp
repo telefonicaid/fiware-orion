@@ -255,6 +255,7 @@ static bool queryForward
   //
   std::string     out;
   int             r;
+  std::string     url;
 
   LM_T(LmtCPrForwardRequestPayload, ("Forward Query: %s %s: %s", verb.c_str(), resource.c_str(), payload.c_str()));
 
@@ -283,10 +284,13 @@ static bool queryForward
                       noHeaders,
                       mimeType);
 
+  alarmMgr.forwardingErrorReset(url);
+
   if (r != 0)
   {
     LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
+    alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
   }
 
