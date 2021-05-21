@@ -15,11 +15,12 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
-* Initial notification in subscriptions in Orion 3.1.0. The results covered by initial notification
-  can be very large and we cannot apply pagination here (as it is done in the synchronous retrieval of
-  entities using `GET /v2/entities`). In fact, only the first 20 entities are returned, which makes this
-  funcionality very limited. As alternative, if you need to know the status of your system at subscription
-  time, then use `GET /v2/entities` with proper pagination.
+* Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
+  The results covered by initial notification can be very large and we cannot apply pagination here
+  (as it is done in the synchronous retrieval of entities using `GET /v2/entities`). In fact, only
+  the first 20 entities are returned, which makes this funcionality very limited. As alternative,
+  if you need to know the status of your system at subscription time, then use `GET /v2/entities`
+  with proper pagination.
 * Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0 (removed in Orion 2.3.0).
 * NGSIv1 API (along with related CLI parameters: `-strictNgsiv1Ids` and `-ngsiv1Autocast`) in Orion 2.0.0.
   Use NGSIv2 API instead.
