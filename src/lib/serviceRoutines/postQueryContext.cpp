@@ -764,6 +764,7 @@ std::string postQueryContext
     for (int jx = ixToBeErased.size() - 1; jx >= 0; jx--)
     {
       responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]]->release();
+      delete responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]];
       responseV[ix]->contextElementResponseVector.vec.erase(responseV[ix]->contextElementResponseVector.vec.begin() + ixToBeErased[jx]);
     }
   }
