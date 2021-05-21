@@ -35,7 +35,6 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
@@ -140,9 +139,16 @@ static void getAttributeTypes
 
     for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
     {
-      const char* currentAttr = i->c_str();
+      char*  currentAttr  = (char*) i->c_str();
+      char*  midSeparator = strstr(currentAttr, "()");
+      int    cmpLen;
 
-      if (basePart(currentAttr) == attrName)
+      if (midSeparator != NULL)
+        cmpLen = midSeparator - currentAttr;
+      else
+        cmpLen = strlen(currentAttr);
+
+      if (strncmp(currentAttr, attrName.c_str(), cmpLen) == 0)
       {
         BSONObj attr = getObjectFieldF(attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
@@ -158,7 +164,6 @@ static void getAttributeTypes
 /* ****************************************************************************
 *
 * countEntities -
-*
 */
 static long long countEntities
 (
@@ -184,10 +189,11 @@ static long long countEntities
   return c;
 }
 
+
+
 /* ****************************************************************************
 *
 * countCmd -
-*
 */
 static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelineForCount)
 {
@@ -205,8 +211,6 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
   }
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
 
   if (result.hasField("cursor"))
@@ -247,9 +251,6 @@ HttpStatusCode mongoEntityTypesValues
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
-
-  LM_T(LmtMongo, ("Query Entity Types"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
@@ -393,9 +394,6 @@ HttpStatusCode mongoEntityTypes
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
-
-  LM_T(LmtMongo, ("Query Entity Types"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 

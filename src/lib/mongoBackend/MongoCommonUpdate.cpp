@@ -61,12 +61,12 @@ extern "C"
 #include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
 #include "orionld/common/isSpecialSubAttribute.h"                  // isSpecialSubAttribute
 #include "orionld/common/dotForEq.h"                               // dotForEq
+#include "orionld/common/eqForDot.h"                               // eqForDot
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "mongoBackend/location.h"
@@ -570,7 +570,11 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
 
       if (apiVersion != V2 || caP->onlyValue)
       {
-        if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
+        char decodedMdName[256];
+
+        strncpy(decodedMdName, md.name.c_str(), sizeof(decodedMdName));
+        eqForDot(decodedMdName);
+        if (!hasMetadata(decodedMdName, md.type, caP))
         {
           appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
         }
@@ -838,15 +842,23 @@ static bool appendAttribute
   ApiVersion          apiVersion
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  char         effectiveName[512];
+  const char*  metadataId = caP->getMetadataId();
 
-  if (caP->getId() != "")
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  dotForEq(effectiveName);
+
+  if (metadataId != NULL)
   {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
+    int eIx = strlen(effectiveName);
+
+    effectiveName[eIx++] = '(';
+    effectiveName[eIx++] = ')';
+    strncpy(&effectiveName[eIx], metadataId, sizeof(effectiveName) - eIx);
   }
 
   /* APPEND with existing attribute equals to UPDATE */
-  if (attrs.hasField(effectiveName.c_str()))
+  if (attrs.hasField(effectiveName))
   {
     if (orionldState.uriParamOptions.noOverwrite == true)
       return false;
@@ -924,7 +936,7 @@ static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
 {
   std::string prefix = caP->name + MD_ID_SEPARATOR;
 
-  if (caP->getId() == "")
+  if (caP->getMetadataId() == NULL)
   {
     /* Attribute attempting to append doesn't have any ID. Thus, no attribute with same name can have ID in attrs,
      * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>()" */
@@ -981,16 +993,15 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
   {
     std::string  attrName  = caV[ix]->name;
     std::string  attrType  = caV[ix]->type;
-    std::string  attrId    = caV[ix]->getId();
 
-    if (attrId == "")
+    if (caV[ix]->getMetadataId()  == NULL)
     {
       /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
       for (unsigned int jx = 0; jx < caV.size(); ++jx)
       {
         const ContextAttribute* ca = caV[jx];
 
-        if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
+        if (attrName == ca->name && attrType == ca->type && ca->getMetadataId() != NULL)
         {
           return false;
         }
@@ -1019,14 +1030,22 @@ static bool deleteAttribute
   ContextAttribute*                     caP
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  char         effectiveName[512];
+  const char*  metadataId = caP->getMetadataId();
 
-  if (caP->getId() != "")
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  dotForEq(effectiveName);
+
+  if (metadataId != NULL)
   {
-    effectiveName += MD_ID_SEPARATOR + caP->getId();
+    int eIx = strlen(effectiveName);
+
+    effectiveName[eIx++] = '(';
+    effectiveName[eIx++] = ')';
+    strncpy(&effectiveName[eIx], metadataId, sizeof(effectiveName) - eIx);
   }
 
-  if (!attrs.hasField(effectiveName.c_str()))
+  if (!attrs.hasField(effectiveName))
   {
     return false;
   }
@@ -1140,7 +1159,6 @@ static bool addTriggeredSubscriptions_withCache
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
-  LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1149,15 +1167,12 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < orionldState.requestTime)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%f, NOW:%f, DIFF: %f)",
-                         cSubP->subscriptionId, cSubP->expirationTime, orionldState.requestTime, orionldState.requestTime - cSubP->expirationTime));
       continue;
     }
 
     // Status is inactive
     if (cSubP->status == STATUS_INACTIVE)
     {
-      LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
       continue;
     }
 
@@ -1177,47 +1192,12 @@ static bool addTriggeredSubscriptions_withCache
     aList.fill(cSubP->attributes);
 
     // Throttling
-    LM_T(LmtSubCache, ("---------------- Throttling check ------------------"));
-    LM_T(LmtSubCache, ("cSubP->throttling:           %f", cSubP->throttling));
-    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %f", cSubP->lastNotificationTime));
-    LM_T(LmtSubCache, ("Now:                         %f", orionldState.requestTime));
-
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((orionldState.requestTime - cSubP->lastNotificationTime) < cSubP->throttling)
       {
-        LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           orionldState.requestTime,
-                           orionldState.requestTime - cSubP->lastNotificationTime,
-                           cSubP->throttling));
         continue;
       }
-      else
-      {
-        LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           orionldState.requestTime,
-                           orionldState.requestTime - cSubP->lastNotificationTime,
-                           cSubP->throttling));
-      }
-    }
-    else
-    {
-      LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
-                         cSubP->subscriptionId,
-                         cSubP->throttling,
-                         cSubP->lastNotificationTime,
-                         orionldState.requestTime,
-                         orionldState.requestTime - cSubP->lastNotificationTime,
-                         cSubP->throttling));
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription(cSubP->throttling,
@@ -1340,7 +1320,6 @@ static void fill_idPtypeNP
             "}" +
             "return false; " +
          "}";
-  LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
 
   bgP->boPNP.append(entPatternQ, "true");
   bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
@@ -1380,7 +1359,6 @@ static void fill_idNPtypeP
          "}" +
          "return false; " +
       "}";
-  LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
 
   bgP->boNPP.append(entPatternQ, "false");
   bgP->boNPP.append(typePatternQ, true);
@@ -1422,7 +1400,6 @@ static void fill_idPtypeP
          "}" +
          "return false; " +
       "}";
-  LM_T(LmtMongo, ("idPtypeP function: %s", bgP->functionIdPtypeP.c_str()));
 
   bgP->boPP.append(entPatternQ, "true");
   bgP->boPP.append(typePatternQ, true);
@@ -1517,9 +1494,7 @@ static bool addTriggeredSubscriptions_noCache
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    errorString;
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextCollectionName(tenant).c_str(),
-                  bgP->query.toString().c_str()));
+  // LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), bgP->query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
@@ -1579,7 +1554,6 @@ static bool addTriggeredSubscriptions_noCache
         continue;
       }
 
-      LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
@@ -2183,8 +2157,6 @@ static bool processSubscriptions
 
 
     /* Send notification */
-    LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
-
     bool  notificationSent;
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
@@ -2228,9 +2200,6 @@ static bool processSubscriptions
         {
           cSubP->lastNotificationTime = orionldState.requestTime;
           cSubP->count               += 1;
-
-          LM_T(LmtSubCache, ("set lastNotificationTime to %f and count to %lld for '%s'",
-                             cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
         }
         else
         {
@@ -2295,9 +2264,10 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   Metadata*  md;
 
   /* Not custom */
-  if (caReq->getId().length() > 0)
+  const char* metadataId = caReq->getMetadataId();
+  if (metadataId != NULL)
   {
-    md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
+    md = new Metadata(NGSI_MD_ID, "string", metadataId);
     caRes->metadataVector.push_back(md);
   }
 
@@ -2332,18 +2302,25 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * BSON (taken from DB). This use to be 1, except in the case of using ID.
 *
 */
-static unsigned int howManyAttrs(BSONObj& attrs, const std::string& attrName)
+static unsigned int howManyAttrs(const BSONObj& attrs, const char* attrName)
 {
-  unsigned int           c = 0;
+  unsigned int           c   = 0;
+  unsigned int           len = strlen(attrName);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    if (basePart(*i) == attrName)
-    {
+    const char* aName = i->c_str();
+
+    //
+    // OK if they match in the first 'len' chars
+    // - Complete match if aName[len] is ZERO or aName[len] == "()metadataId"
+    //
+    // So, I revers the if condition to first check aName[len] - MUCH faster
+    //
+    if (((aName[len] == 0) || (aName[len] == '(')) && (strncmp(attrName, aName, len) == 0))
       c++;
-    }
   }
 
   return c;
@@ -2920,7 +2897,7 @@ static bool processContextAttributeVector
 
     for (it = deletedAttributesCounter.begin(); it != deletedAttributesCounter.end(); ++it)
     {
-      std::string  attrName     = it->first;
+      const char*  attrName     = it->first.c_str();
       unsigned int deletedTimes = it->second;
 
       if (howManyAttrs(attrs, attrName) <= deletedTimes)
@@ -2973,8 +2950,6 @@ static bool createEntity
   OrionError*                      oeP
 )
 {
-  LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
-
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
@@ -3024,7 +2999,6 @@ static bool createEntity
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
     std::string attrType;
@@ -3051,16 +3025,20 @@ static bool createEntity
 
     attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
-    std::string effectiveName = dbDotEncode(attrsV[ix]->name);
-    if (attrId.length() != 0)
-    {
-      effectiveName += MD_ID_SEPARATOR + attrId;
-    }
+    char         effectiveName[512];
+    const char*  metadataId = attrsV[ix]->getMetadataId();
 
-    LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
-                    effectiveName.c_str(),
-                    attrsV[ix]->type.c_str(),
-                    attrsV[ix]->getValue().c_str()));
+    strncpy(effectiveName, attrsV[ix]->name.c_str(), sizeof(effectiveName));
+    dotForEq(effectiveName);
+
+    if (metadataId != NULL)
+    {
+      int eIx = strlen(effectiveName);
+
+      effectiveName[eIx++] = '(';
+      effectiveName[eIx++] = ')';
+      strncpy(&effectiveName[eIx], metadataId, sizeof(effectiveName) - eIx);
+    }
 
     /* Custom metadata */
     BSONObj   md;
@@ -3340,21 +3318,17 @@ static void updateEntity
   std::string        entityType        = getStringFieldF(idField, ENT_ENTITY_TYPE);
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
-  LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
-
   ContextElementResponse* cerP = new ContextElementResponse();
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
   if ((action == ActionTypeDelete) && (ceP->contextAttributeVector.size() == 0))
   {
-    LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
     return;
   }
 
-  LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
   /* We take as input the attrs array in the entity document and generate two outputs: a
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
@@ -3406,7 +3380,7 @@ static void updateEntity
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
-      if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
+      if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name.c_str()) != 0)
       {
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
@@ -3502,8 +3476,6 @@ static void updateEntity
   }
 
   /* Compose the final update on database */
-  LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
-
   if (action != ActionTypeReplace)
   {
     toSet.append(ENT_MODIFICATION_DATE, orionldState.requestTime);
@@ -3693,18 +3665,30 @@ static bool contextElementPreconditionsCheck
   /* Checking there aren't duplicate attributes */
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
-    std::string name = ceP->contextAttributeVector[ix]->name;
-    std::string id   = ceP->contextAttributeVector[ix]->getId();
+    const char*  name = ceP->contextAttributeVector[ix]->name.c_str();
+    const char*  id   = ceP->contextAttributeVector[ix]->getMetadataId();
+
     for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
     {
-      if ((name == ceP->contextAttributeVector[jx]->name) && (id == ceP->contextAttributeVector[jx]->getId()))
+      const char* itemId  = ceP->contextAttributeVector[jx]->getMetadataId();
+      bool        idEqual = (id == NULL) && (itemId == NULL);
+
+      if ((id != NULL) && (itemId != NULL))
+        idEqual = (strcmp(id, itemId) == 0);
+
+      if ((idEqual == true) && (strcmp(name, ceP->contextAttributeVector[jx]->name.c_str()) == 0))
       {
-        ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
+        ContextAttribute*  ca      = new ContextAttribute(ceP->contextAttributeVector[ix]);
+        char               details[512];
+
+        if (id == NULL)
+          snprintf(details, sizeof(details), "duplicated attribute name: '%s'", name);
+        else
+          snprintf(details, sizeof(details), "duplicated attribute name: '%s' (metadata id:'%s')", name, id);
+
         alarmMgr.badInput(clientIp, details);
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
-                                  "duplicated attribute /" + name + "/");
-        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", "BadRequest");
+        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, "duplicated attribute /" + std::string(name) + "/");
+        responseP->oe.fill(SccBadRequest, std::string("duplicated attribute /") + name + "/", "BadRequest");
         return false;  // Error already in responseP
       }
     }
@@ -3907,7 +3891,6 @@ void processContextElement
     }
 
     docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     BSONElement idField = getFieldF(r, "_id");
 
@@ -3932,8 +3915,6 @@ void processContextElement
   }
 
   releaseMongoConnection(connection);
-
-  LM_T(LmtServicePath, ("Docs found: %d", results.size()));
 
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;

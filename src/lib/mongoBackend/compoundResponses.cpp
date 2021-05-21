@@ -28,7 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "mongoBackend/compoundResponses.h"
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/eqForDot.h"            // eqForDot
 
 
 
@@ -60,7 +60,8 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   }
 
   orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = dbDotDecode(e.fieldName());
+  child->name = e.fieldName();
+  eqForDot((char*) child->name.c_str());
 
   switch (e.type())
   {

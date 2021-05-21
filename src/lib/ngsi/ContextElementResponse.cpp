@@ -36,10 +36,10 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 
 #include "orionld/common/orionldState.h"                // orionldState
+#include "orionld/common/eqForDot.h"                    // eqForDot
 
 using namespace mongo;
 
@@ -98,7 +98,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 * get implemented.
 *
 */
-static bool includedAttribute(const ContextAttribute& attr, const StringList& attrsV)
+static bool includedAttribute(const ContextAttribute* attrP, const StringList& attrsV)
 {
   //
   // This is the case in which the queryContextRequest doesn't include attributes,
@@ -111,7 +111,7 @@ static bool includedAttribute(const ContextAttribute& attr, const StringList& at
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV[ix] == attr.name)
+    if (attrsV[ix] == attrP->name)
     {
       return true;
     }
@@ -168,18 +168,28 @@ ContextElementResponse::ContextElementResponse
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    std::string        attrName = *i;
-    BSONObj            attr     = getObjectFieldF(attrs, attrName.c_str());
+    const char*        attrName = i->c_str();
+    BSONObj            attr     = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
+    char               aName[512];
+    char*              delimiterP;
+    char*              metadataId = NULL;
 
-    // Name and type
-    ca.name           = dbDotDecode(basePart(attrName));
-    std::string mdId  = idPart(attrName);
-    ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
+    strncpy(aName, attrName, sizeof(aName));
+    delimiterP = strstr(aName, "()");
+    if (delimiterP != NULL)
+    {
+      *delimiterP = 0;
+      metadataId  = &delimiterP[2];
+    }
+    eqForDot(aName);
+
+    ca.name = aName;
+    ca.type = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
-    if (!includedAttribute(ca, attrL))
+    if (!includedAttribute(&ca, attrL))
     {
       continue;
     }
@@ -246,9 +256,9 @@ ContextElementResponse::ContextElementResponse
     }
 
     /* Setting ID (if found) */
-    if (mdId != "")
+    if (metadataId != NULL)
     {
-      Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
+      Metadata* md = new Metadata(NGSI_MD_ID, "string", metadataId);
       caP->metadataVector.push_back(md);
     }
 
@@ -264,6 +274,7 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
@@ -273,9 +284,14 @@ ContextElementResponse::ContextElementResponse
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
-        const char* currentMd = i->c_str();
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
-        caP->metadataVector.push_back(md);
+        char* currentMd = (char*) i->c_str();
+        char  mdName[512];
+
+        strncpy(mdName, currentMd, sizeof(mdName));
+        eqForDot(mdName);
+
+        Metadata*   mdP = new Metadata(mdName, getObjectFieldF(mds, currentMd));
+        caP->metadataVector.push_back(mdP);
       }
     }
 

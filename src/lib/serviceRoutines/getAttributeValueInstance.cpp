@@ -127,7 +127,7 @@ std::string getAttributeValueInstance
     //
     for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
+      if (metaIdValue == cerP->contextElement.contextAttributeVector[i]->getMetadataId())
       {
         response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
       }
