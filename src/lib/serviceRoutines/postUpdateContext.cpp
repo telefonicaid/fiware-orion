@@ -191,6 +191,7 @@ static bool updateForward
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
   std::string         url;
+  char                portV[STRING_SIZE_FOR_INT];
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -203,6 +204,9 @@ static bool updateForward
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
+  snprintf(portV, sizeof(portV), "%d", port);
+  url = ip + ":" + portV + resource;
 
   r = httpRequestSend(fromIp,   // thread variable
                       ip,

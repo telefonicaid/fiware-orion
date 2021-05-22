@@ -256,6 +256,7 @@ static bool queryForward
   std::string     out;
   int             r;
   std::string     url;
+  char            portV[STRING_SIZE_FOR_INT];
 
   LM_T(LmtCPrForwardRequestPayload, ("Forward Query: %s %s: %s", verb.c_str(), resource.c_str(), payload.c_str()));
 
@@ -265,6 +266,9 @@ static bool queryForward
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
+  snprintf(portV, sizeof(portV), "%d", port);
+  url = ip + ":" + portV + resource;
 
   r = httpRequestSend(fromIp,  // thread variable
                       ip,
