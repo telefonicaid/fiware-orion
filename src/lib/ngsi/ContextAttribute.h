@@ -88,7 +88,6 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getId() const;
   const char*  getMetadataId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
