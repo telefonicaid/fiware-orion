@@ -61,6 +61,7 @@
   "datetime,"                                               \
   "compound,"                                               \
   "geoPoint,"                                               \
+  "geoMultiPoint,"                                          \
   "geoPolygon,"                                             \
   "geoMultiPolygon,"                                        \
   "geoLineString,"                                          \
@@ -88,6 +89,7 @@
   "datetime,"                                                      \
   "compound,"                                                      \
   "geoPoint,"                                                      \
+  "geoMultiPoint,"                                                 \
   "geoPolygon,"                                                    \
   "geoMultiPolygon,"                                               \
   "geoLineString,"                                                 \

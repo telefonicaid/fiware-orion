@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOPOINTEXTRACT_H_
+#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#define SRC_LIB_ORIONLD_TROE_KJGEOMULYIPOINTEXTRACT_H_
 
 /*
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoPointExtract -
+// kjGeoMultiPointExtract -
 //
-extern bool kjGeoPointExtract(KjNode* coordinatesP, double* longitudeP, double* latitudeP, double* altitudeP);
+extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOPOINTEXTRACT_H_
+#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
