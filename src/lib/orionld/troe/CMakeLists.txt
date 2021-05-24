@@ -39,7 +39,6 @@ SET (SOURCES
     pgConnectionRelease.cpp
     pgDatabaseCreate.cpp
     pgDatabasePrepare.cpp
-    pgDatabaseTableExists.cpp
     pgDatabaseTableCreateAll.cpp
     pgTransactionBegin.cpp
     pgTransactionCommit.cpp
@@ -52,12 +51,6 @@ SET (SOURCES
     troeEntityArrayExpand.cpp
     troeSubAttrsExpand.cpp
     pgObservedAtExtract.cpp
-    pgGeoSubPropertyPush.cpp
-    pgGeoSubPointPush.cpp
-    pgGeoSubPolygonPush.cpp
-    pgGeoSubLineStringPush.cpp
-    pgGeoSubMultiPolygonPush.cpp
-    pgGeoSubMultiLineStringPush.cpp
     dbCreationCommand.cpp
     pgAppendInit.cpp
     pgAppend.cpp
@@ -90,7 +83,6 @@ SET (HEADERS
     pgConnectionRelease.h
     pgDatabaseCreate.h
     pgDatabasePrepare.h
-    pgDatabaseTableExists.h
     pgDatabaseTableCreateAll.h
     pgTransactionBegin.h
     pgTransactionCommit.h
@@ -103,12 +95,6 @@ SET (HEADERS
     troeEntityArrayExpand.h
     troeSubAttrsExpand.h
     pgObservedAtExtract.h
-    pgGeoSubPropertyPush.h
-    pgGeoSubPointPush.h
-    pgGeoSubPolygonPush.h
-    pgGeoSubLineStringPush.h
-    pgGeoSubMultiPolygonPush.h
-    pgGeoSubMultiLineStringPush.h
     pgAppendInit.h
     pgAppend.h
     pgEntityBuild.h

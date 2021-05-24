@@ -49,12 +49,4 @@ typedef enum AttributeType
   ATTRIBUTE_RELATIONSHIP
 } AttributeType;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTypeName -
-//
-extern const char* attributeTypeName(AttributeType aType);
-
 #endif  // SRC_LIB_ORIONLD_TYPES_ATTRIBUTETYPE_H_

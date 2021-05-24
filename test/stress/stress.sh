@@ -44,11 +44,11 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
-  echo "$empty [--attributes|-a (number of attributes for the entities in the test)]"
-  echo "$empty [--maxmem|-m (max RAM (in bytes) for the broker)]"
-  echo "$empty [--entities|-e (number of entities to create before the 'real' test starts)]"
-  echo "$empty [--threads|-t (number of threads for the load test)]"
-  echo "$empty [--requests|-r (total number of requests for the load test)]"
+  echo "$empty [--attributes|-a (number of attributes for the entities in the test - default: 1000)]"
+  echo "$empty [--maxmem|-m (max RAM (in bytes) for the broker - default: 6000000000 (6 gigabytes))]"
+  echo "$empty [--entities|-e (number of entities to create before the 'real' test starts - default: 200)]"
+  echo "$empty [--threads|-t (number of threads for the load test - default: 10)]"
+  echo "$empty [--requests|-r (total number of requests for the load test - default: 10000)]"
   echo "$empty <test case> (path to the file to be executed in this stress test)"
   exit 1
 }

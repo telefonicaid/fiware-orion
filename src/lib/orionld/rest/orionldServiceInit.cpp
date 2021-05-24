@@ -45,7 +45,6 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                             // orionldState
-#include "orionld/common/urlCheck.h"                                 // urlCheck
 #include "orionld/common/orionldTenantInit.h"                        // orionldTenantInit
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit

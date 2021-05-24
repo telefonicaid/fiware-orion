@@ -58,7 +58,6 @@ extern "C"
 
 #include "orionld/types/AttributeType.h"                           // AttributeType
 #include "orionld/common/orionldState.h"                           // orionldState
-#include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
 #include "orionld/common/isSpecialSubAttribute.h"                  // isSpecialSubAttribute
 #include "orionld/common/dotForEq.h"                               // dotForEq
 #include "orionld/common/eqForDot.h"                               // eqForDot
