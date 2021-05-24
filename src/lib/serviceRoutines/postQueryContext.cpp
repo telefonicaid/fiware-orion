@@ -287,7 +287,7 @@ static bool queryForward
                       &statusCode,
                       noHeaders,
                       mimeType);
-                
+  
   if (r != 0)
   {
     LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
