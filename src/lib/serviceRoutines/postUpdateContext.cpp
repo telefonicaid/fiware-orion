@@ -226,8 +226,6 @@ static bool updateForward
                       noHeaders,
                       mimeType);
 
-  alarmMgr.forwardingErrorReset(url);
-
   if (r != 0)
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
@@ -236,7 +234,11 @@ static bool updateForward
     alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
   }
-
+  else
+  {
+    alarmMgr.forwardingErrorReset(url);
+  }
+  
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
   //
