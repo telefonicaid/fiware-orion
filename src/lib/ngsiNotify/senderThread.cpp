@@ -32,7 +32,6 @@
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
 
-
 /* ****************************************************************************
 *
 * startSenderThread -

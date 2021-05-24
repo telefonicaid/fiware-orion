@@ -255,6 +255,8 @@ static bool queryForward
   //
   std::string     out;
   int             r;
+  std::string     url;
+  char            portV[STRING_SIZE_FOR_INT];
 
   LM_T(LmtCPrForwardRequestPayload, ("Forward Query: %s %s: %s", verb.c_str(), resource.c_str(), payload.c_str()));
 
@@ -264,6 +266,9 @@ static bool queryForward
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
+  snprintf(portV, sizeof(portV), "%d", port);
+  url = ip + ":" + portV + resource;
 
   r = httpRequestSend(fromIp,  // thread variable
                       ip,
@@ -282,12 +287,17 @@ static bool queryForward
                       &statusCode,
                       noHeaders,
                       mimeType);
-
+  
   if (r != 0)
   {
     LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
+    alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
+  }
+  else
+  {
+    alarmMgr.forwardingErrorReset(url);
   }
 
   LM_T(LmtCPrForwardResponsePayload, ("forward queryContext response payload: %s", out.c_str()));
@@ -304,7 +314,7 @@ static bool queryForward
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    LM_W(("Other Error (context provider response to QueryContext is empty)"));
+    LM_W(("Forwarding Error (context provider response to QueryContext is empty)"));
     return false;
   }
 
@@ -764,6 +774,7 @@ std::string postQueryContext
     for (int jx = ixToBeErased.size() - 1; jx >= 0; jx--)
     {
       responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]]->release();
+      delete responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]];
       responseV[ix]->contextElementResponseVector.vec.erase(responseV[ix]->contextElementResponseVector.vec.begin() + ixToBeErased[jx]);
     }
   }
