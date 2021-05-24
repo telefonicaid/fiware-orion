@@ -99,7 +99,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
   else if (strcmp(georel, "intersects") == 0)
   {
     // FIXME: Should be possible to use any Geomtry ...
-    //        But, the mngodb docs talk about Polygon or MultiPolygon:
+    //        But, the mongodb docs talk about Polygon or MultiPolygon:
     //          https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/
     //        For now, I'll allow any Geometry
   }

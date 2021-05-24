@@ -36,7 +36,6 @@ extern "C"
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/qLexRender.h"                         // qLexRender - DEBUG
 #include "orionld/common/qParse.h"                             // Own interface
 
 
@@ -513,3 +512,111 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
 
   return qNodeV[0];
 }
+
+
+#if 0
+//
+// qTreePresent - might be useful for debugging in the future
+// qLexRender   - might be useful for debugging in the future
+//
+static const char* indentV[] = {
+  "",
+  "  ",
+  "    ",
+  "      ",
+  "        ",
+  "          ",
+  "            ",
+  "              ",
+  "                "
+};
+
+
+
+// ----------------------------------------------------------------------------
+//
+// qTreePresent - DEBUG function to see an entire QNode Tree in the log file
+//
+void qTreePresent(QNode* qNodeP, int level)
+{
+  const char* indent = indentV[level];
+
+  if      (qNodeP->type == QNodeVariable)       LM_K(("Q: %sVAR: '%s'",   indent, qNodeP->value.v));
+  else if (qNodeP->type == QNodeIntegerValue)   LM_K(("Q: %sINT: %lld",   indent, qNodeP->value.i));
+  else if (qNodeP->type == QNodeFloatValue)     LM_K(("Q: %sFLT: %f",     indent, qNodeP->value.f));
+  else if (qNodeP->type == QNodeStringValue)    LM_K(("Q: %sSTR: '%s'",   indent, qNodeP->value.s));
+  else if (qNodeP->type == QNodeTrueValue)      LM_K(("Q: %sTRUE",        indent));
+  else if (qNodeP->type == QNodeFalseValue)     LM_K(("Q: %sFALSE",       indent));
+  else if (qNodeP->type == QNodeRegexpValue)    LM_K(("Q: %sRE: '%s'",    indent, qNodeP->value.re));
+  else
+  {
+    ++level;
+    LM_K(("Q: %s%s", indent, qNodeType(qNodeP->type)));
+    for (QNode* childP = qNodeP->value.children; childP != NULL; childP = childP->next)
+      qTreePresent(childP, level);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qValueGet -
+//
+static int qValueGet(QNode* qLexP, char* buf, int bufLen)
+{
+  if (qLexP->type == QNodeVariable)
+    snprintf(buf, bufLen, "VAR:%s", qLexP->value.v);
+  else if (qLexP->type == QNodeIntegerValue)
+    snprintf(buf, bufLen, "INT:%lld", qLexP->value.i);
+  else if (qLexP->type == QNodeFloatValue)
+    snprintf(buf, bufLen, "FLT:%f", qLexP->value.f);
+  else if (qLexP->type == QNodeTrueValue)
+    strncpy(buf, "TRUE", bufLen);
+  else if (qLexP->type == QNodeFalseValue)
+    strncpy(buf, "FALSE", bufLen);
+  else
+    strncpy(buf, qNodeType(qLexP->type), bufLen);
+
+  return strlen(buf);
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// qLexRender - render the linked list into a char buffer
+//
+bool qLexRender(QNode* qLexList, char* buf, int bufLen)
+{
+  QNode*  qLexP = qLexList;
+  int     left  = bufLen;
+  int     sz;
+
+  if (qLexP == NULL)
+    return false;
+
+  sz = qValueGet(qLexP, buf, left);
+  left -= sz;
+
+  qLexP = qLexP->next;
+
+  while (qLexP != NULL)
+  {
+    if (left <= 4)
+      return false;
+
+    strcpy(&buf[bufLen - left], " -> ");
+    left -= 4;
+
+    sz = qValueGet(qLexP, &buf[bufLen - left], left);
+    left -= sz;
+    if (left <= 0)
+      return false;
+
+    qLexP = qLexP->next;
+  }
+
+  return true;
+}
+#endif

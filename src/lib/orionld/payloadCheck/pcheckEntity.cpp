@@ -45,8 +45,6 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/payloadCheck/pcheckEntity.h"                   // Own interface

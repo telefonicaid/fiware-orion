@@ -27,7 +27,6 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/qLexRender.h"                         // qLexRender - DEBUG
 #include "orionld/common/qLexCheck.h"                          // Own interface
 
 

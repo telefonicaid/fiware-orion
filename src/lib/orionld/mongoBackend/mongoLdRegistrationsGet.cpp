@@ -34,7 +34,7 @@
 #include "apiTypesV2/Registration.h"                             // ngsiv2::Registration
 #include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, ...
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
@@ -141,7 +141,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   {
     char* type = (char*) typeVec[ix].c_str();
 
-    if ((strncmp(type, "http", 4) == 0) && (urlCheck(type, &details) == true))
+    if ((strncmp(type, "http", 4) == 0) && (pcheckUri(type, true, &details) == true))
     {
       // No expansion desired, the type is already a FQN
       bsonArray.append(type);
