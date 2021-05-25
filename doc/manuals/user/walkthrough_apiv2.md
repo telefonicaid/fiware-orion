@@ -728,7 +728,6 @@ Now that subscription has been created you can trigger it with any change in Roo
 pressure. For instance, let's do the following update:
 
 ```
-```
 curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 802
 ```
 
