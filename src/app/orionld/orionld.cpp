@@ -493,12 +493,6 @@ void orionExit(int code, const std::string& reason)
   }
 
   orionldStateRelease();
-
-  //
-  // Contexts that have been cloned must be freed
-  //
-  orionldContextCacheRelease();
-
   exit(code);
 }
 
@@ -534,10 +528,13 @@ void exitFunc(void)
   // Or, is freeing up the global KAlloc instance sufficient ... ?
   //
 
+  // Free up the context download list, if needed
+  contextDownloadListRelease();
+
   //
-  // Free the kalloc buffer
+  // Contexts that have been cloned must be freed
   //
-  kaBufferReset(&kalloc, false);
+  orionldContextCacheRelease();
 
   // Free the tenant list
   for (unsigned int ix = 0; ix < tenants; ix++)
@@ -546,8 +543,10 @@ void exitFunc(void)
   // Disconnect from all MQTT btokers and free the connections
   mqttRelease();
 
-  // Free up the context download list, if needed
-  contextDownloadListRelease();
+  //
+  // Free the kalloc buffer
+  //
+  kaBufferReset(&kalloc, false);
 }
 
 
