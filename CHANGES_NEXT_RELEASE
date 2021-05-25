@@ -19,4 +19,5 @@
 * Issue  #280   Experimental implementation of POST /ngsi-ld/v1/contexts - yet to be defined in the NGSI-LD API
 * Issue  #280   Experimental implementation of DELETE /ngsi-ld/v1/contexts/{contextId} - yet to be defined in the NGSI-LD API
 * Issue  #280   Persisting contexts from the cache in mongo
+* Issue  #280   Added support for MultiPoint in TRoE
 * Issue  #854   The name of the "value" field was missing in sub-attrs of array or object type in notifications, e.g. "": [1,2,3], instead of "value": [1,2,3]

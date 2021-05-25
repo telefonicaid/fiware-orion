@@ -44,6 +44,7 @@ SET (SOURCES
     pgTransactionCommit.cpp
     pgTransactionRollback.cpp
     kjGeoPointExtract.cpp
+    kjGeoMultiPointExtract.cpp
     kjGeoPolygonExtract.cpp
     kjGeoMultiPolygonExtract.cpp
     kjGeoLineStringExtract.cpp
@@ -88,6 +89,7 @@ SET (HEADERS
     pgTransactionCommit.h
     pgTransactionRollback.h
     kjGeoPointExtract.h
+    kjGeoMultiPointExtract.h
     kjGeoPolygonExtract.h
     kjGeoMultiPolygonExtract.h
     kjGeoLineStringExtract.h
