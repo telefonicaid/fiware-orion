@@ -1,0 +1,190 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo::MultiPoint
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with a location attribute
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+# 05. GET the entity
+# 06. GET the attribute from TRoE
+# 07. GET the attribute from TRoE using postgis
+# 08. GET nothing from TRoE using postgis
+#
+
+echo "01. Create an entity E1 with a location attribute"
+echo "================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "MultiPoint",
+      "coordinates": [ [ 1, 2, 3 ], [ 4, 5, 6 ] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,geoMultiPoint,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+echo "05. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "06. GET the attribute from TRoE"
+echo "==============================="
+postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes"
+echo
+echo
+
+
+echo "07. GET the attribute from TRoE using postgis"
+echo "============================================="
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
+echo
+echo
+
+
+echo "08. GET nothing from TRoE using postgis"
+echo "======================================="
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(11 12)'::geography, 10)"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a location attribute
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geomultipoint,observedat
+Create,location,GeoMultiPoint,urn:ngsi-ld:entities:E1,f,,None,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
+
+
+05. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                [
+                    1,
+                    2,
+                    3
+                ],
+                [
+                    4,
+                    5,
+                    6
+                ]
+            ],
+            "type": "MultiPoint"
+        }
+    },
+    "type": "T"
+}
+
+
+06. GET the attribute from TRoE
+===============================
+id,valuetype,entityid,id,unitcode,geomultipoint,observedat
+location,GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+
+
+07. GET the attribute from TRoE using postgis
+=============================================
+valuetype,entityid,id,unitcode,geomultipoint,observedat
+GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+
+
+08. GET nothing from TRoE using postgis
+=======================================
+valuetype,entityid,id,unitcode,geomultipoint,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

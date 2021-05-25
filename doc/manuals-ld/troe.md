@@ -8,6 +8,10 @@ While Orion-LD takes care of populating the TRoE databases, another component ha
 
 So, for queries of the temporal data, instead of sending the requests to Orion-LD, on (default) port 1026, the queries are sent to Mintaka, on (default) port 8080.
 
+## Compatibility
+
+Compatibility with the latest release version of mintaka will always be assured. See the test results at the [mintaka-compatibility github action.](https://github.com/FIWARE/context.Orion-LD/actions/workflows/mintaka-compatibility.yml) 
+
 ## Database setup
 To run Orion-LD with TroE enabled, a PostgreSQL with PostGIS and TimescaleDB is needed.
 For local installations, this [timescaledb-postgis image](https://hub.docker.com/layers/timescale/timescaledb-postgis/latest-pg12/images/sha256-40be823de6035faa44d3e811f04f3f064868ee779ebb49b287e1c809ec786994?context=explore) is recommended.
@@ -61,3 +65,4 @@ all changesets at once. If the db is already updated to a certain version, only 
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | v1 | Changed primary keys to include the timestamp in preparation of timescale-hypertable support, added index for (sub-)attributes. |
 | v2 | Added the datasetId to the combined primary key and optimizes its datatype. |
+| v3 | Add multipoint for attributes and subAttributes table. |

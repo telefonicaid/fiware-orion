@@ -262,6 +262,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if (geometry != NULL)
   {
     if ((strcmp(geometry, "Point")           != 0) &&
+        (strcmp(geometry, "MultiPoint")      != 0) &&
         (strcmp(geometry, "Polygon")         != 0) &&
         (strcmp(geometry, "MultiPolygon")    != 0) &&
         (strcmp(geometry, "LineString")      != 0) &&
