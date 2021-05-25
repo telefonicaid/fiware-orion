@@ -161,7 +161,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         }
 
         eP->id = iter->value.GetString();
-        
+
         if (eP->id.empty())
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
@@ -171,7 +171,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
           return oe.toJson();
         }
-        
+
         if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
