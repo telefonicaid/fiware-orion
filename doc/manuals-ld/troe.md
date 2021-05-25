@@ -61,3 +61,4 @@ all changesets at once. If the db is already updated to a certain version, only 
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | v1 | Changed primary keys to include the timestamp in preparation of timescale-hypertable support, added index for (sub-)attributes. |
 | v2 | Added the datasetId to the combined primary key and optimizes its datatype. |
+| v3 | Add multipoint for attributes and subAttributes table. |
