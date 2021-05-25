@@ -29,7 +29,7 @@ jobs:
         with:
           push: true
           file: docker/Dockerfile
-          tags: latest
+          tags:  localhost:5000/orion-ld:latest
 
       - uses: actions/checkout@v2
         with:
@@ -43,4 +43,4 @@ jobs:
       - name: Run tests
         run: mvn clean test
         env:
-          ORION_IMAGE: fiware/orion-ld:latest
+          ORION_IMAGE: localhost:5000/orion-ld:latest
