@@ -49,9 +49,12 @@ static const char* validOptions[] =
   OPT_DATE_MODIFIED,
   OPT_NO_ATTR_DETAIL,
   OPT_UPSERT,
-  OPT_SKIPINITALNOTIFICATION,
   OPT_FORCEDUPDATE,
-  OPT_FLOW_CONTROL
+  OPT_FLOW_CONTROL,
+
+  // FIXME P3: initial notification feature was removed in CB 3.2.0, but we leave this
+  // here for a while, so existing clients using options=skipInitialNotification don't break
+  OPT_SKIPINITALNOTIFICATION
 };
 
 

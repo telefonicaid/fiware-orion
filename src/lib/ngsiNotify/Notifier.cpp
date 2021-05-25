@@ -314,18 +314,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
 
-    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
-    // case of initial notification)
-    if (correlatorCounter > 0)
-    {
-      char suffix[STRING_SIZE_FOR_INT];
-      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
-    }
-    else
-    {
-      params->fiwareCorrelator = fiwareCorrelator;
-    }
+    char suffix[STRING_SIZE_FOR_INT];
+    snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
     paramsV->push_back(params);
   }
@@ -415,6 +406,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 
     //
+    // FIXME PR: no longer needed due to the removal of initial notification???
+    //
     // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
     // request not having that header. However, this causes as side-effect that a
     // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
@@ -475,18 +468,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
 
-    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
-    // case of initial notification)
-    if (correlatorCounter > 0)
-    {
-      char suffix[STRING_SIZE_FOR_INT];
-      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
-    }
-    else
-    {
-      params->fiwareCorrelator = fiwareCorrelator;
-    }
+    char suffix[STRING_SIZE_FOR_INT];
+    snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
     paramsV->push_back(params);
     return paramsV;

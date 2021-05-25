@@ -60,11 +60,7 @@ static void insertInCache
   const Subscription&  sub,
   const std::string&   subId,
   const std::string&   tenant,
-  const std::string&   servicePath,
-  bool                 notificationDone,
-  long long            lastNotification,
-  long long            lastFailure,
-  long long            lastSuccess
+  const std::string&   servicePath
 )
 {
   //
@@ -101,10 +97,9 @@ static void insertInCache
                      sub.expires,
                      sub.throttling,
                      sub.attrsFormat,
-                     notificationDone,
-                     lastNotification,
-                     lastSuccess,
-                     lastFailure,
+                     0,
+                     0,
+                     0,
                      -1,
                      "",
                      stringFilterP,
@@ -136,11 +131,7 @@ std::string mongoCreateSubscription
   const Subscription&              sub,
   OrionError*                      oe,
   const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
+  const std::vector<std::string>&  servicePathV
 )
 {
   bool reqSemTaken = false;
@@ -149,7 +140,6 @@ std::string mongoCreateSubscription
 
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty()  ? SERVICE_PATH_ALL : servicePathV[0];
-  bool                   notificationDone = false;
   const std::string      subId            = setNewSubscriptionId(&b);
 
   // Build the BSON object to insert
@@ -165,39 +155,12 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
 
-  std::string status = sub.status.empty()?  STATUS_ACTIVE : sub.status;
-
-  // We need to insert the csub in the cache before (potentially) sending the
-  // initial notification (have a look to issue #2974 for details)
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
+    insertInCache(sub, subId, tenant, servicePath);
   }
 
-  setCondsAndInitialNotify(sub,
-                           subId,
-                           status,
-                           sub.notification.attributes,
-                           sub.notification.metadata,
-                           sub.notification.httpInfo,
-                           sub.notification.blacklist,
-                           sub.attrsFormat,
-                           tenant,
-                           servicePathV,
-                           xauthToken,
-                           fiwareCorrelator,
-                           &b,
-                           &notificationDone,
-                           skipInitialNotification,
-                           apiVersion);
-
-  if (notificationDone)
-  {
-    long long  lastNotification = (long long) getCurrentTime();
-
-    setLastNotification(lastNotification, &b);
-    setCount(1, &b);
-  }
+  setCondsAndInitialNotify(sub, sub.notification.attributes, &b);
 
   setExpression(sub, &b);
   setFormat(sub, &b);

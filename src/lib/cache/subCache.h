@@ -194,7 +194,6 @@ extern void subCacheItemInsert
   int64_t                            expiration,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
-  bool                               notificationDone,
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,

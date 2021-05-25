@@ -113,21 +113,8 @@ extern void setAttrs(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 extern void setCondsAndInitialNotify
 (
   const ngsiv2::Subscription&      sub,
-  const std::string&               subId,
-  const std::string&               status,
   const std::vector<std::string>&  notifAttributesV,
-  const std::vector<std::string>&  metadataV,
-  const ngsiv2::HttpInfo&          httpInfo,
-  bool                             blacklist,
-  RenderFormat                     attrsFormat,
-  const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  orion::BSONObjBuilder*           b,
-  bool*                            notificationDone,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
+  orion::BSONObjBuilder*           b
 );
 
 

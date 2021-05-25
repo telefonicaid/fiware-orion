@@ -90,90 +90,6 @@ static bool                 multitenant;
 
 /* ****************************************************************************
 *
-* DelayedRelease -
-*
-* This structure is used simply to hold the vector of 'ContextElementResponse'
-* for the delaying of release() of these structures.
-* This was invented to overcome the fact that 'thread_local' is not supported by the
-* older compiler in Centos 6. Initially, the following construct was used:
-*
-*  thread_local std::vector<ContextElementResponse*>  cerVector;
-*
-* And this works just fine in Ubuntu 17.04, but it fails to compile in CentOS 6.
-*
-* For more info about this, see github issue #2994
-*/
-typedef struct DelayedRelease
-{
-  std::vector<ContextElementResponse*>  cerVector;
-} DelayedRelease;
-
-static __thread DelayedRelease* delayedReleaseP = NULL;
-
-
-
-/* ****************************************************************************
-*
-* WORKAROUND_2994 - see github issue #2994
-*/
-#define WORKAROUND_2994 1
-
-
-
-
-#ifdef WORKAROUND_2994
-/* ****************************************************************************
-*
-* delayedReleaseAdd -
-*/
-static void delayedReleaseAdd(const ContextElementResponseVector& cerV)
-{
-  if (delayedReleaseP == NULL)
-  {
-    delayedReleaseP = new DelayedRelease();
-  }
-
-  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
-  {
-    delayedReleaseP->cerVector.push_back(cerV[ix]);
-  }
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* delayedReleaseExecute -
-*
-* NOTE
-*   This function doesn't depend on WORKAROUND_2994 being defined, as delayedReleaseP
-*   will be NULL if WORKAROUND_2994 is not defined and its action is null and void, if so.
-*   'delayedReleaseExecute()' is called in rest/rest.cpp and with this 'idea', that file doesn't
-*   need to know about the WORKAROUND_2994 definition.
-*/
-void delayedReleaseExecute(void)
-{
-  if (delayedReleaseP == NULL)
-  {
-    return;
-  }
-
-  for (unsigned int ix = 0; ix < delayedReleaseP->cerVector.size(); ++ix)
-  {
-    delayedReleaseP->cerVector[ix]->release();
-    delete delayedReleaseP->cerVector[ix];
-  }
-
-  delayedReleaseP->cerVector.clear();
-  delete delayedReleaseP;
-  delayedReleaseP = NULL;
-}
-
-
-
-/* ****************************************************************************
-*
 * mongoMultitenant -
 */
 bool mongoMultitenant(void)
@@ -2491,205 +2407,11 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 
 /* ****************************************************************************
 *
-* processOnChangeConditionForSubscription -
-*
-* This function is called from initial processing of an ONCHANGE condition in
-* processConditionVector (used from subscribeContext and updateContextSubscription),
-* so an "initial" notification for all the entites/attributes included in the entity
-* in the case that some of them are within the ones in the condValues.
-*
-* Note that ONCHANGE notifications sent due to updateContext are processed by a
-* different function (see processOnChangeConditionForUpdateContext)
-*
-* The argument enV is the entities and attributes in the subscribeContext
-* request. The argument attrL is the attributes in the subscribeContext request.
-*
-* This method returns true if the notification was actually send. Otherwise, false
-* is returned. This is used in the caller to know if lastNotification field in the
-* subscription document in csubs collection has to be modified or not.
-*/
-static bool processOnChangeConditionForSubscription
-(
-  const EntityIdVector&            enV,
-  const StringList&                attrL,
-  const std::vector<std::string>&  metadataV,
-  ConditionValueList*              condValues,
-  const std::string&               subId,
-  const HttpInfo&                  notifyHttpInfo,
-  RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const Restriction*               resP,
-  const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  ApiVersion                       apiVersion
-)
-{
-  std::string                   err;
-  NotifyContextRequest          ncr;
-  ContextElementResponseVector  rawCerV;
-  StringList                    emptyList;
-  StringList                    metadataList;
-
-  metadataList.fill(metadataV);
-  if (!blacklist && !entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
-  {
-    ncr.contextElementResponseVector.release();
-    rawCerV.release();
-
-    return false;
-  }
-  else if (blacklist && !entitiesQuery(enV, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
-  {
-    ncr.contextElementResponseVector.release();
-    rawCerV.release();
-
-    return false;
-  }
-
-  /* Prune "not found" CERs */
-  pruneContextElements(apiVersion, emptyList, rawCerV, &ncr.contextElementResponseVector);
-
-  // Add builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
-  // for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-  for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size() ; ix++)
-  {
-    addBuiltins(ncr.contextElementResponseVector[ix]);
-  }
-
-#ifdef WORKAROUND_2994
-  delayedReleaseAdd(rawCerV);
-  rawCerV.vec.clear();
-#else
-  rawCerV.release();
-#endif
-
-#if 0
-  // FIXME #920: disabled for the moment, maybe to be removed in the end
-  /* Append notification metadata */
-  if (metadataFlags)
-  {
-    setOnSubscriptionMetadata(&ncr.contextElementResponseVector);
-  }
-#endif
-
-  if (ncr.contextElementResponseVector.size() > 0)
-  {
-    /* Complete the fields in NotifyContextRequest */
-    ncr.subscriptionId.set(subId);
-    // FIXME: we use a proper origin name
-    ncr.originator.set("localhost");
-
-    if (condValues != NULL)
-    {
-      /* Check if some of the attributes in the NotifyCondition values list are in the entity.
-       * Note that in this case we do a query for all the attributes, not restricted to attrV */
-      ContextElementResponseVector  allCerV;
-
-
-      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV, 0, 0, NULL, NULL, "", apiVersion))
-      {
-#ifdef WORKAROUND_2994
-        delayedReleaseAdd(rawCerV);
-        rawCerV.vec.clear();
-#else
-        rawCerV.release();
-#endif
-        ncr.contextElementResponseVector.release();
-
-        return false;
-      }
-
-      /* Prune "not found" CERs */
-      pruneContextElements(apiVersion, emptyList, rawCerV, &allCerV);
-
-#ifdef WORKAROUND_2994
-      delayedReleaseAdd(rawCerV);
-      rawCerV.vec.clear();
-#else
-      rawCerV.release();
-#endif
-
-      if (isCondValueInContextElementResponse(condValues, &allCerV))
-      {
-        /* Send notification */
-        // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
-        getNotifier()->sendNotifyContextRequest(ncr,
-                                                notifyHttpInfo,
-                                                tenant,
-                                                xauthToken,
-                                                fiwareCorrelator,
-                                                0,
-                                                renderFormat,
-                                                attrsOrder,
-                                                blacklist,
-                                                metadataV);
-        allCerV.release();
-        ncr.contextElementResponseVector.release();
-
-        return true;
-      }
-
-      allCerV.release();
-    }
-    else
-    {
-      // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
-      getNotifier()->sendNotifyContextRequest(ncr,
-                                              notifyHttpInfo,
-                                              tenant,
-                                              xauthToken,
-                                              fiwareCorrelator,
-                                              0,
-                                              renderFormat,
-                                              attrsOrder,
-                                              blacklist,
-                                              metadataV);
-
-      ncr.contextElementResponseVector.release();
-
-      return true;
-    }
-  }
-
-  ncr.contextElementResponseVector.release();
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * processConditionVector -
 */
-static orion::BSONArray processConditionVector
-(
-  NotifyConditionVector*           ncvP,
-  const EntityIdVector&            enV,
-  const StringList&                attrL,
-  const std::vector<std::string>&  metadataV,
-  const std::string&               subId,
-  const HttpInfo&                  httpInfo,
-  bool*                            notificationDone,
-  RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const Restriction*               resP,
-  const std::string&               status,
-  const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
-)
+static orion::BSONArray processConditionVector(NotifyConditionVector* ncvP)
 {
   orion::BSONArrayBuilder conds;
-
-  *notificationDone = false;
 
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
@@ -2700,26 +2422,6 @@ static orion::BSONArray processConditionVector
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
         conds.append(nc->condValueList[jx]);
-      }
-
-      if ((status == STATUS_ACTIVE) && !skipInitialNotification &&
-          (processOnChangeConditionForSubscription(enV,
-                                                   attrL,
-                                                   metadataV,
-                                                   &(nc->condValueList),
-                                                   subId,
-                                                   httpInfo,
-                                                   renderFormat,
-                                                   tenant,
-                                                   xauthToken,
-                                                   servicePathV,
-                                                   resP,
-                                                   fiwareCorrelator,
-                                                   attrsOrder,
-                                                   blacklist,
-                                                   apiVersion)))
-      {
-        *notificationDone = true;
       }
     }
     else
@@ -2744,22 +2446,7 @@ orion::BSONArray processConditionVector
 (
   const std::vector<std::string>&  condAttributesV,
   const std::vector<EntID>&        entitiesV,
-  const std::vector<std::string>&  notifAttributesV,
-  const std::vector<std::string>&  metadataV,
-  const std::string&               subId,
-  const HttpInfo&                  httpInfo,
-  bool*                            notificationDone,
-  RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const Restriction*               resP,
-  const std::string&               status,
-  const std::string&               fiwareCorrelator,
-  const std::vector<std::string>&  attrsOrder,
-  bool                             blacklist,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
+  const std::vector<std::string>&  notifAttributesV
 )
 {
   NotifyConditionVector ncV;
@@ -2770,24 +2457,7 @@ orion::BSONArray processConditionVector
   entIdStdVector2EntityIdVector(entitiesV, &enV);
   attrL.fill(notifAttributesV);
 
-  orion::BSONArray arr = processConditionVector(&ncV,
-                                         enV,
-                                         attrL,
-                                         metadataV,
-                                         subId,
-                                         httpInfo,
-                                         notificationDone,
-                                         renderFormat,
-                                         tenant,
-                                         xauthToken,
-                                         servicePathV,
-                                         resP,
-                                         status,
-                                         fiwareCorrelator,
-                                         attrsOrder,
-                                         blacklist,
-                                         skipInitialNotification,
-                                         apiVersion);
+  orion::BSONArray arr = processConditionVector(&ncV);
 
   enV.release();
   ncV.release();
