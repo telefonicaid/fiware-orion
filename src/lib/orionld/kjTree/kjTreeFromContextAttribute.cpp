@@ -183,9 +183,9 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
-    nodeP->name = (char*) "value";
     if (nodeP == NULL)
       return NULL;
+    nodeP->name = (char*) "value";
     break;
 
   case orion::ValueTypeNotGiven:
@@ -292,7 +292,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
           valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, false, detailsP);
-          valueNodeP->name = (char*) "value";
+          if (valueNodeP != NULL)
+            valueNodeP->name = (char*) "value";
           break;
 
         case orion::ValueTypeNotGiven:
