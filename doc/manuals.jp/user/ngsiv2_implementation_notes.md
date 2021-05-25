@@ -14,7 +14,6 @@
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
-* [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
@@ -272,21 +271,6 @@ NGISv2 仕様 "Ordering Results" セクションから :
 6. Boolean
 
 [Top](#top)
-
-<a name="initial-notifications"></a>
-## 初期通知
-
-NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、Orion は、また、サブスクリプションの作成/更新時時に初期通知を送信することがあります。
-
-初期通知は、新しい URI パラメータオプション `skipInitialNotification`
-を使用して設定できます。
-例えば、`POST /v2/subscriptions?options=skipInitialNotification` または、
-`PATCH /v2/subscriptions/{subId}?options=skipInitialNotification` です。
-
-[初期通知](initial_notification.md) について、ドキュメントで詳細を
-確認してください。
-
-[トップ](#top)
 
 <a name="oneshot-subscriptions"></a>
 ## Oneshot サブスクリプション
