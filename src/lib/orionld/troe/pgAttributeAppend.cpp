@@ -131,7 +131,7 @@ void pgAttributeAppend
 
       kjGeoPointExtract(coordinatesNodeP, &longitude, &latitude, &altitude);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPoint', null, null, null, null, null, ST_GeomFromText('POINT Z(%f %f %f)'), null, null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPoint', null, null, null, null, null, ST_GeomFromText('POINT(%f %f %f)'), null, null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, longitude, latitude, altitude, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiPoint") == 0)
@@ -140,7 +140,7 @@ void pgAttributeAppend
 
       kjGeoMultiPointExtract(coordinatesNodeP, coordsString, 2048);
 
-      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPoint', null, null, null, null, null, null, ST_GeomFromText('MULTIPOINT Z(%s)', 4326), null, null, null, null, '%s')",
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPoint', null, null, null, null, null, null, ST_GeomFromText('MULTIPOINT(%s)', 4326), null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "LineString") == 0)

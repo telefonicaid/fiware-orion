@@ -69,7 +69,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,geoMultiLineString,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoMultiLineString),observedAt FROM attributes"
 echo
 echo
 
@@ -90,21 +90,21 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,geoMultiLineString,observedAt FROM attributes"
+postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,ST_AsText(geoMultiLineString),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the attribute from TRoE using postgis"
 echo "============================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiLineString,observedAt FROM attributes WHERE ST_DWithin(geoMultiLineString, 'SRID=4326;POINT(2 2)'::geography, 1000)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiLineString),observedAt FROM attributes WHERE ST_DWithin(geoMultiLineString, 'SRID=4326;POINT(2 2)'::geography, 1000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiLineString,observedAt FROM attributes WHERE ST_DWithin(geoMultiLineString, 'SRID=4326;POINT(-2 -2)'::geography, 1)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiLineString),observedAt FROM attributes WHERE ST_DWithin(geoMultiLineString, 'SRID=4326;POINT(-2 -2)'::geography, 1)"
 echo
 echo
 
@@ -127,8 +127,8 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geomultilinestring,observedat
-Create,location,GeoMultiLineString,urn:ngsi-ld:entities:E1,f,,None,0105000020E61000000200000001020000000300000000000000000000000000000000000000000000000000F03F000000000000F03F00000000000010400000000000001040010200000003000000000000000000F03F000000000000F03F0000000000000040000000000000004000000000000014400000000000001440,
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
+Create,location,GeoMultiLineString,urn:ngsi-ld:entities:E1,f,,None,"MULTILINESTRING Z ((0 0 0,1 1 0,4 4 0),(1 1 0,2 2 0,5 5 0))",
 
 
 04. See the sub-attributes in the temporal database
@@ -188,19 +188,19 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-id,valuetype,entityid,id,unitcode,geomultilinestring,observedat
-location,GeoMultiLineString,urn:ngsi-ld:entities:E1,location,,0105000020E61000000200000001020000000300000000000000000000000000000000000000000000000000F03F000000000000F03F00000000000010400000000000001040010200000003000000000000000000F03F000000000000F03F0000000000000040000000000000004000000000000014400000000000001440,
+id,valuetype,entityid,id,unitcode,st_astext,observedat
+location,GeoMultiLineString,urn:ngsi-ld:entities:E1,location,,"MULTILINESTRING Z ((0 0 0,1 1 0,4 4 0),(1 1 0,2 2 0,5 5 0))",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
-valuetype,entityid,id,unitcode,geomultilinestring,observedat
-GeoMultiLineString,urn:ngsi-ld:entities:E1,location,,0105000020E61000000200000001020000000300000000000000000000000000000000000000000000000000F03F000000000000F03F00000000000010400000000000001040010200000003000000000000000000F03F000000000000F03F0000000000000040000000000000004000000000000014400000000000001440,
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoMultiLineString,urn:ngsi-ld:entities:E1,location,,"MULTILINESTRING Z ((0 0 0,1 1 0,4 4 0),(1 1 0,2 2 0,5 5 0))",
 
 
 08. GET nothing from TRoE using postgis
 =======================================
-valuetype,entityid,id,unitcode,geomultilinestring,observedat
+valuetype,entityid,id,unitcode,st_astext,observedat
 
 
 --TEARDOWN--

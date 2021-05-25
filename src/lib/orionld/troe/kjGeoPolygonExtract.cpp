@@ -72,16 +72,13 @@ bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int po
     {
       double  longitude;
       double  latitude;
-      double  altitude;
+      double  altitude = 0;
       char    pointBuffer[64];
 
       if (kjGeoPointExtract(pointP, &longitude, &latitude, &altitude) == false)
         LM_RE(false, ("Internal Error (unable to extract longitude/latitude/altitude for a Point) "));
 
-      if (altitude != 0)
-        snprintf(pointBuffer, sizeof(pointBuffer), "%f %f %f", longitude, latitude, altitude);
-      else
-        snprintf(pointBuffer, sizeof(pointBuffer), "%f %f", longitude, latitude);
+      snprintf(pointBuffer, sizeof(pointBuffer), "%f %f %f", longitude, latitude, altitude);
 
       int pointBufferLen = strlen(pointBuffer);
 

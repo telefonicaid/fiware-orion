@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo::Point as a Sub-Property
+Geo::LineString as a Sub-Property
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,7 +32,7 @@ brokerStart CB 100 IPv4 -troe
 --SHELL--
 
 #
-# 01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Point'
+# 01. Create an entity E1 with an attribute A1 that has a GeoProperty 'LineString'
 # 02. See E1 in the temporal database
 # 03. See the attributes in the temporal database
 # 04. See the sub-attributes in the temporal database
@@ -41,7 +41,7 @@ brokerStart CB 100 IPv4 -troe
 # 07. GET nothing from TRoE using postgis
 #
 
-echo "01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Point'"
+echo "01. Create an entity E1 with an attribute A1 that has a GeoProperty 'LineString'"
 echo "==========================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:E1",
@@ -51,12 +51,12 @@ payload='{
     "unitCode": "milliseconds",
     "value": 77,
     "observedAt": "2021-01-08T13:15:17.123",
-    "Point": {
+    "LineString": {
       "type": "GeoProperty",
       "observedAt": "2021-01-08T13:15:17.456Z",
       "value": {
-        "type": "Point",
-        "coordinates": [ 1, 2 ]
+        "type": "LineString",
+        "coordinates": [ [ 1, 1, 7 ], [ 2, 2, 17 ] ]
       }
     }
   }
@@ -82,7 +82,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoPoint),observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoLineString),observedAt FROM subAttributes"
 echo
 echo
 
@@ -96,20 +96,20 @@ echo
 
 echo "06. GET the sub-attributes from TRoE using postgis"
 echo "=================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoPoint),observedAt FROM subAttributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoLineString),observedAt FROM subAttributes WHERE ST_DWithin(geoLineString, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
 echo
 echo
 
 
 echo "07. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoPoint),observedAt FROM subAttributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(11 12)'::geography, 100)"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoLineString),observedAt FROM subAttributes WHERE ST_DWithin(geoLineString, 'SRID=4326;POINT(11 12)'::geography, 100)"
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Point'
+01. Create an entity E1 with an attribute A1 that has a GeoProperty 'LineString'
 ===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -133,27 +133,35 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entiti
 04. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 0),2021-01-08 13:15:17.456
+https://uri.etsi.org/ngsi-ld/default-context/LineString,GeoLineString,urn:ngsi-ld:entities:E1,,"LINESTRING Z (1 1 7,2 2 17)",2021-01-08 13:15:17.456
 
 
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 221
+Content-Length: 244
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
     "A1": {
-        "Point": {
+        "LineString": {
             "type": "GeoProperty",
             "value": {
                 "coordinates": [
-                    1,
-                    2
+                    [
+                        1,
+                        1,
+                        7
+                    ],
+                    [
+                        2,
+                        2,
+                        17
+                    ]
                 ],
-                "type": "Point"
+                "type": "LineString"
             }
         },
         "observedAt": "2021-01-08T13:15:17.123Z",
@@ -169,7 +177,7 @@ Date: REGEX(.*)
 06. GET the sub-attributes from TRoE using postgis
 ==================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 0),2021-01-08 13:15:17.456
+https://uri.etsi.org/ngsi-ld/default-context/LineString,GeoLineString,urn:ngsi-ld:entities:E1,,"LINESTRING Z (1 1 7,2 2 17)",2021-01-08 13:15:17.456
 
 
 07. GET nothing from TRoE using postgis

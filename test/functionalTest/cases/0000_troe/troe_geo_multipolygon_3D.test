@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo::LineString
+Geo::MultiPolygon with altitude
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,7 +32,7 @@ brokerStart CB 100 IPv4 -troe
 --SHELL--
 
 #
-# 01. Create an entity E1 with a location attribute
+# 01. Create an entity E1 with a GeoProperty named 'pol' that is a multipolygon
 # 02. See E1 in the temporal database
 # 03. See the attributes in the temporal database
 # 04. See the sub-attributes in the temporal database
@@ -42,16 +42,16 @@ brokerStart CB 100 IPv4 -troe
 # 08. GET nothing from TRoE using postgis
 #
 
-echo "01. Create an entity E1 with a location attribute"
-echo "================================================="
+echo "01. Create an entity E1 with a GeoProperty named 'pol' that is a polygon"
+echo "========================================================================"
 payload='{
   "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
-  "location": {
+  "pol": {
     "type": "GeoProperty",
     "value": {
-      "type": "LineString",
-      "coordinates": [ [ 0, 0 ], [ 1, 1 ], [4, 4] ]
+      "type": "MultiPolygon",
+      "coordinates": [ [[ [0,0,9], [4,0,9], [4,-2,9], [0,-2,9], [0,0,9] ]], [[ [10,0,9], [14,0,9], [14,-2,9], [10,-2,9], [10,0,9] ]] ]
     }
   }
 }'
@@ -69,7 +69,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoLineString),observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoMultiPolygon),observedAt FROM attributes"
 echo
 echo
 
@@ -90,28 +90,28 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,ST_AsText(geoLineString),observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the attribute from TRoE using postgis"
 echo "============================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoLineString),observedAt FROM attributes WHERE ST_DWithin(geoLineString, 'SRID=4326;POINT(2 2)'::geography, 1000)"
+postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(2 2)'::geography, 10000000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoLineString),observedAt FROM attributes WHERE ST_DWithin(geoLineString, 'SRID=4326;POINT(2 2)'::geography, 1)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(11 12)'::geography, 10)"
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity E1 with a location attribute
-=================================================
+01. Create an entity E1 with a GeoProperty named 'pol' that is a polygon
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
@@ -128,7 +128,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
-Create,location,GeoLineString,urn:ngsi-ld:entities:E1,f,,None,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+Create,https://uri.etsi.org/ngsi-ld/default-context/pol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,f,,None,"MULTIPOLYGON Z (((0 0 9,4 0 9,4 -2 9,0 -2 9,0 0 9),(10 0 9,14 0 9,14 -2 9,10 -2 9,10 0 9)))",
 
 
 04. See the sub-attributes in the temporal database
@@ -139,31 +139,77 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 217
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
     "id": "urn:ngsi-ld:entities:E1",
-    "location": {
+    "pol": {
         "type": "GeoProperty",
         "value": {
             "coordinates": [
                 [
-                    0,
-                    0
+                    [
+                        [
+                            0,
+                            0,
+                            9
+                        ],
+                        [
+                            4,
+                            0,
+                            9
+                        ],
+                        [
+                            4,
+                            -2,
+                            9
+                        ],
+                        [
+                            0,
+                            -2,
+                            9
+                        ],
+                        [
+                            0,
+                            0,
+                            9
+                        ]
+                    ]
                 ],
                 [
-                    1,
-                    1
-                ],
-                [
-                    4,
-                    4
+                    [
+                        [
+                            10,
+                            0,
+                            9
+                        ],
+                        [
+                            14,
+                            0,
+                            9
+                        ],
+                        [
+                            14,
+                            -2,
+                            9
+                        ],
+                        [
+                            10,
+                            -2,
+                            9
+                        ],
+                        [
+                            10,
+                            0,
+                            9
+                        ]
+                    ]
                 ]
             ],
-            "type": "LineString"
+            "type": "MultiPolygon"
         }
     },
     "type": "T"
@@ -172,14 +218,14 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-id,valuetype,entityid,id,unitcode,st_astext,observedat
-location,GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+opmode,valuetype,entityid,id,unitcode,st_astext,observedat
+Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,"MULTIPOLYGON Z (((0 0 9,4 0 9,4 -2 9,0 -2 9,0 0 9),(10 0 9,14 0 9,14 -2 9,10 -2 9,10 0 9)))",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
-valuetype,entityid,id,unitcode,st_astext,observedat
-GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+opmode,valuetype,entityid,id,unitcode,st_astext,observedat
+Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,"MULTIPOLYGON Z (((0 0 9,4 0 9,4 -2 9,0 -2 9,0 0 9),(10 0 9,14 0 9,14 -2 9,10 -2 9,10 0 9)))",
 
 
 08. GET nothing from TRoE using postgis

@@ -51,7 +51,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "MultiPoint",
-      "coordinates": [ [ 1, 2, 3 ], [ 4, 5, 6 ] ]
+      "coordinates": [ [ 1, 2 ], [ 4, 5 ] ]
     }
   }
 }'
@@ -69,7 +69,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,geoMultiPoint,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoMultiPoint),observedAt FROM attributes"
 echo
 echo
 
@@ -90,21 +90,21 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes"
+postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,ST_AsText(geoMultiPoint),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the attribute from TRoE using postgis"
 echo "============================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPoint),observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPoint,observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(11 12)'::geography, 10)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPoint),observedAt FROM attributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(11 12)'::geography, 10)"
 echo
 echo
 
@@ -127,8 +127,8 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geomultipoint,observedat
-Create,location,GeoMultiPoint,urn:ngsi-ld:entities:E1,f,,None,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
+Create,location,GeoMultiPoint,urn:ngsi-ld:entities:E1,f,,None,"MULTIPOINT Z (1 2 0,4 5 0)",
 
 
 04. See the sub-attributes in the temporal database
@@ -139,7 +139,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 139
+Content-Length: 135
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -152,13 +152,11 @@ Date: REGEX(.*)
             "coordinates": [
                 [
                     1,
-                    2,
-                    3
+                    2
                 ],
                 [
                     4,
-                    5,
-                    6
+                    5
                 ]
             ],
             "type": "MultiPoint"
@@ -170,19 +168,19 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-id,valuetype,entityid,id,unitcode,geomultipoint,observedat
-location,GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+id,valuetype,entityid,id,unitcode,st_astext,observedat
+location,GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z (1 2 0,4 5 0)",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
-valuetype,entityid,id,unitcode,geomultipoint,observedat
-GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z (1 2 0,4 5 0)",
 
 
 08. GET nothing from TRoE using postgis
 =======================================
-valuetype,entityid,id,unitcode,geomultipoint,observedat
+valuetype,entityid,id,unitcode,st_astext,observedat
 
 
 --TEARDOWN--
