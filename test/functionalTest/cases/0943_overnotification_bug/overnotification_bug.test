@@ -31,42 +31,14 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create region entity
-# 02. Create subscription
+# 01. Create subscription
+# 02. Create region entity
 # 03. Update not covered attribute with APPEND
 # 04. Dump accumulator count (only one notification)
 #
 
-echo "01. Create region entity"
-echo "========================"
-payload='{
-"contextElements": [
-    {
-        "type": "region",
-        "isPattern": "false",
-        "id": "qa_ok",
-        "attributes": [
-        {
-            "name": "sanity_status",
-            "type": "string",
-            "value": "OK"
-        },
-        {
-            "name": "_timestamp",
-            "type": "string",
-            "value": "21"
-        }
-        ]
-    }
-],
-"updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
 
-
-echo "02. Create subscription"
+echo "01. Create subscription"
 echo "======================="
 payload='{
      "entities": [
@@ -91,6 +63,35 @@ payload='{
      ]
 }'
 orionCurl --url /v1/subscribeContext --payload "$payload"
+echo
+echo
+
+
+echo "02. Create region entity"
+echo "========================"
+payload='{
+"contextElements": [
+    {
+        "type": "region",
+        "isPattern": "false",
+        "id": "qa_ok",
+        "attributes": [
+        {
+            "name": "sanity_status",
+            "type": "string",
+            "value": "OK"
+        },
+        {
+            "name": "_timestamp",
+            "type": "string",
+            "value": "21"
+        }
+        ]
+    }
+],
+"updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
 echo
 
@@ -132,7 +133,23 @@ echo
 
 
 --REGEXPECT--
-01. Create region entity
+01. Create subscription
+=======================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create region entity
 ========================
 HTTP/1.1 200 OK
 Content-Length: 256
@@ -166,22 +183,6 @@ Date: REGEX(.*)
             }
         }
     ]
-}
-
-
-02. Create subscription
-=======================
-HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "subscribeResponse": {
-        "duration": "P1M",
-        "subscriptionId": "REGEX([0-9a-f]{24})"
-    }
 }
 
 

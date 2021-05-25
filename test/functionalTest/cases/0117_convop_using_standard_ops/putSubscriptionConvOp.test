@@ -38,11 +38,11 @@ accumulatorStart --pretty-print
 # 05. Create E1/T1/A1+A2
 # 06. Dump accumulator, see E1/T1/A1+A2
 # 07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions
-# 08. Dump accumulator, see two notifications
+# 08. Dump accumulator, see same notification
 # 09. Update E1/T1/A2
-# 10. Dump accumulator, still the same two notifications
+# 10. Dump accumulator, still the same notifications
 # 11. Update E1/T1/A1
-# 12. Dump accumulator, see three notifications
+# 12. Dump accumulator, see two notifications
 #
 
 echo "01. PUT /v1/contextSubscriptions/1234567890 and see it fail"
@@ -191,7 +191,7 @@ echo
 echo
 
 
-echo "08. Dump accumulator, see two notifications"
+echo "08. Dump accumulator, see same notification"
 echo "==========================================="
 accumulatorDump
 echo
@@ -221,8 +221,8 @@ echo
 echo
 
 
-echo "10. Dump accumulator, still the same two notifications"
-echo "======================================================"
+echo "10. Dump accumulator, still the same notification"
+echo "================================================="
 accumulatorDump
 echo
 echo
@@ -254,8 +254,8 @@ echo
 echo
 
 
-echo "12. Dump accumulator, see three notifications"
-echo "============================================="
+echo "12. Dump accumulator, see two notifications"
+echo "==========================================="
 accumulatorDump
 echo
 echo
@@ -435,7 +435,7 @@ Date: REGEX(.*)
 }
 
 
-08. Dump accumulator, see two notifications
+08. Dump accumulator, see same notification
 ===========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -445,45 +445,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1",
-                        "type": "string",
-                        "value": "1"
-                    },
-                    {
-                        "name": "A2",
-                        "type": "string",
-                        "value": "2"
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "originator": "localhost",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 301
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -549,8 +510,8 @@ Date: REGEX(.*)
 }
 
 
-10. Dump accumulator, still the same two notifications
-======================================================
+10. Dump accumulator, still the same notification
+=================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 301
@@ -559,45 +520,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1",
-                        "type": "string",
-                        "value": "1"
-                    },
-                    {
-                        "name": "A2",
-                        "type": "string",
-                        "value": "2"
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "originator": "localhost",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 301
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -663,8 +585,8 @@ Date: REGEX(.*)
 }
 
 
-12. Dump accumulator, see three notifications
-=============================================
+12. Dump accumulator, see two notifications
+===========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 301
@@ -673,45 +595,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1",
-                        "type": "string",
-                        "value": "1"
-                    },
-                    {
-                        "name": "A2",
-                        "type": "string",
-                        "value": "2"
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "originator": "localhost",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 301
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

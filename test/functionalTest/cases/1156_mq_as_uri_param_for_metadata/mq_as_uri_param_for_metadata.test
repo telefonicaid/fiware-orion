@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -25,98 +25,39 @@ mq as URI param for metadata in filters
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 --cache
-accumulatorStart --pretty-print
+brokerStart CB 0 IPv4
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+accumulatorStart --pretty-print localhost $LISTENER2_PORT
+accumulatorStart --pretty-print localhost $LISTENER3_PORT
 
 --SHELL--
 
 #
-# 01. Create an entity E1 with attr A1 with metadata M1=12
-# 02. Create an entity E2 with attr A1 with metadata M1=13
-# 03. Create an entity E3 with attr A1 with metadata M1=14
-# 04. Lookup all entities having A1.M1==12, see E1
-# 05. Create a subscription for all entities/A1 AND mq=A1.M1==13
-# 05b. GET subscription to see 'mq' correctly rendered
-# 06. Dump accumulator, see E2, then reset accumulator
-# 07. Modify E1/A1, setting A1/M1=13
-# 08. Dump accumulator, see E1, then reset accumulator
-# 09. Update subscription, without really changing anything
-# 10. Dump accumulator, see E1 and E2, then reset accumulator
-# 11. Check unary operator for mq: !A1.M1 - nothing found
-# 12. Check unary operator for mq: A1.M1 - all three entities
-# 13. Check unary operator for mq: !A1.M2 - all three entities
-# 14. Check unary operator for mq: A1.M2 - nothing found
-# 15. Check unary operator for mq: A2.M9 - nothing found
-# 16. Check unary operator for mq: !A2.M9 - all three entities
-# 17. Create subscription with mq: !A2.M2
-# 18. Dump accumulator, see all three, then reset accumulator
-# 19. Create subscription with mq: A2.M2
-# 20. Dump accumulator, see nothing
+# 01. Create a subscription for all entities/A1 AND mq=A1.M1==13 (accum1)
+# 02. GET subscription to see 'mq' correctly rendered
+# 03. Create subscription with mq: !A1.M2 (accum2)
+# 04. Create subscription with mq: A2.M2 (accum3)
+# 05. Create subscription with mq: !A2.M2 (accum3)
+# 06. Create an entity E1 with attr A1 with metadata M1=12 (+1 accum2)
+# 07. Create an entity E2 with attr A1 with metadata M1=13 (+1 accum1, +1 accum2)
+# 08. Create an entity E3 with attr A1 with metadata M1=14 (+1 accum2)
+# 09. Lookup all entities having A1.M1==12, see E1
+# 10. Dump accum1, see E2, then reset accumulator
+# 11. Modify E1/A1, setting A1/M1=13 (+1 accum1, +1 accum2)
+# 12. Dump accum1, see E1
+# 13. Check unary operator for mq: !A1.M1 - nothing found
+# 14. Check unary operator for mq: A1.M1 - all three entities
+# 15. Check unary operator for mq: !A1.M2 - all three entities
+# 16. Check unary operator for mq: A1.M2 - nothing found
+# 17. Check unary operator for mq: A2.M9 - nothing found
+# 18. Check unary operator for mq: !A2.M9 - all three entities
+# 19. Dump accum2, see four
+# 20. Dump accum3, see nothing
 #
 
-echo "01. Create an entity E1 with attr A1 with metadata M1=12"
-echo "========================================================"
-payload='{
-  "id": "E1",
-  "A1": {
-    "value": "01",
-    "metadata": {
-      "M1": {
-        "value": 12
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo "02. Create an entity E2 with attr A1 with metadata M1=13"
-echo "========================================================"
-payload='{
-  "id": "E2",
-  "A1": {
-    "value": "02",
-    "metadata": {
-      "M1": {
-        "value": 13
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Create an entity E3 with attr A1 with metadata M1=14"
-echo "========================================================"
-payload='{
-  "id": "E3",
-  "A1": {
-    "value": "03",
-    "metadata": {
-      "M1": {
-        "value": 14
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "04. Lookup all entities having A1.M1==12, see E1"
-echo "================================================"
-orionCurl --url '/v2/entities?mq=A1.M1==12'
-echo
-echo
-
-
-echo "05. Create a subscription for all entities/A1 AND mq=A1.M1==13"
-echo "=============================================================="
+echo "01. Create a subscription for all entities/A1 AND mq=A1.M1==13 (accum1)"
+echo "======================================================================="
 payload='
 {
   "subject": {
@@ -145,120 +86,15 @@ echo
 echo
 
 
-echo "05b. GET subscription to see 'mq' correctly rendered"
-echo "===================================================="
+echo "02. GET subscription to see 'mq' correctly rendered"
+echo "==================================================="
 orionCurl --url /v2/subscriptions/$subId
 echo
 echo
 
 
-echo "06. Dump accumulator, see E2, then reset accumulator"
-echo "===================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "07. Modify E1/A1, setting A1/M1=13"
-echo "=================================="
-payload='{
-  "A1": {
-    "value": "07",
-    "metadata": {
-      "M1": {
-        "value": 13
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "08. Dump accumulator, see E1"
-echo "============================"
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "09. Update subscription, without really changing anything"
-echo "========================================================="
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "idPattern": ".*"
-      }
-    ],
-    "condition": {
-      "attrs": [ "A1" ],
-      "expression": {
-        "mq": "A1.M1==13"
-      }
-    }
-  }
-}'
-orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "10. Dump accumulator, see E1 and E2, then reset accumulator"
-echo "==========================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "11. Check unary operator for mq: !A1.M1 - nothing found"
-echo "======================================================="
-orionCurl --url '/v2/entities?mq=!A1.M1'
-echo
-echo
-
-
-echo "12. Check unary operator for mq: A1.M1 - all three entities"
-echo "==========================================================="
-orionCurl --url '/v2/entities?mq=A1.M1'
-echo
-echo
-
-
-echo "13. Check unary operator for mq: !A1.M2 - all three entities"
-echo "==========================================================="
-orionCurl --url '/v2/entities?mq=!A1.M2'
-echo
-echo
-
-
-echo "14. Check unary operator for mq: A1.M2 - nothing found"
-echo "======================================================="
-orionCurl --url '/v2/entities?mq=A1.M2'
-echo
-echo
-
-
-echo "15. Check unary operator for mq: A2.M9 - nothing found"
-echo "======================================================"
-orionCurl --url '/v2/entities?mq=A2.M9'
-echo
-echo
-
-
-echo "16. Check unary operator for mq: !A2.M9 - all three entities"
-echo "============================================================"
-orionCurl --url '/v2/entities?mq=!A2.M9'
-echo
-echo
-
-
-echo "17. Create subscription with mq: !A2.M2"
-echo "======================================="
+echo "03. Create subscription with mq: !A1.M2 (accum2)"
+echo "================================================"
 payload='
 {
   "subject": {
@@ -270,12 +106,12 @@ payload='
     "condition": {
       "attrs": [ ],
       "expression": {
-        "mq": "!A2.M2"
+        "mq": "!A1.M2"
       }
     }
   },
   "notification": {
-    "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+    "http": {"url": "http://localhost:'${LISTENER2_PORT}'/notify"},
     "attrs": [ ]
   },
   "expires": "2050-04-05T14:00:00.00Z",
@@ -286,16 +122,8 @@ echo
 echo
 
 
-echo "18. Dump accumulator, see all three, then reset accumulator"
-echo "==========================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "19. Create subscription with mq: A2.M2"
-echo "======================================"
+echo "04. Create subscription with mq: A2.M2 (accum3)"
+echo "==============================================="
 payload='
 {
   "subject": {
@@ -312,7 +140,7 @@ payload='
     }
   },
   "notification": {
-    "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+    "http": {"url": "http://localhost:'${LISTENER3_PORT}'/notify"},
     "attrs": [ ]
   },
   "expires": "2050-04-05T14:00:00.00Z",
@@ -323,73 +151,191 @@ echo
 echo
 
 
-echo "20. Dump accumulator, see nothing"
-echo "================================="
+echo "05. Create subscription with mq: !A2.M2 (accum3)"
+echo "================================================"
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ],
+    "condition": {
+      "attrs": [ ],
+      "expression": {
+        "mq": "!A2.M2"
+      }
+    }
+  },
+  "notification": {
+    "http": {"url": "http://localhost:'${LISTENER3_PORT}'/notify"},
+    "attrs": [ ]
+  },
+  "expires": "2050-04-05T14:00:00.00Z",
+  "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+
+echo "06. Create an entity E1 with attr A1 with metadata M1=12 (+1 accum2)"
+echo "===================================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": "06",
+    "metadata": {
+      "M1": {
+        "value": 12
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Create an entity E2 with attr A1 with metadata M1=13 (+1 accum1, +1 accum2)"
+echo "==============================================================================="
+payload='{
+  "id": "E2",
+  "A1": {
+    "value": "07",
+    "metadata": {
+      "M1": {
+        "value": 13
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Create an entity E3 with attr A1 with metadata M1=14 (+1 accum2)"
+echo "===================================================================="
+payload='{
+  "id": "E3",
+  "A1": {
+    "value": "08",
+    "metadata": {
+      "M1": {
+        "value": 14
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "09. Lookup all entities having A1.M1==12, see E1"
+echo "================================================"
+orionCurl --url '/v2/entities?mq=A1.M1==12'
+echo
+echo
+
+
+echo "10. Dump accum1, see E2, then reset accumulator"
+echo "==============================================="
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
---REGEXPECT--
-01. Create an entity E1 with attr A1 with metadata M1=12
-========================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Create an entity E2 with attr A1 with metadata M1=13
-========================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Create an entity E3 with attr A1 with metadata M1=14
-========================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Lookup all entities having A1.M1==12, see E1
-================================================
-HTTP/1.1 200 OK
-Content-Length: 109
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-[
-    {
-        "A1": {
-            "metadata": {
-                "M1": {
-                    "type": "Number",
-                    "value": 12
-                }
-            },
-            "type": "Text",
-            "value": "01"
-        },
-        "id": "E1",
-        "type": "Thing"
+echo "11. Modify E1/A1, setting A1/M1=13 (+1 accum1, +1 accum2)"
+echo "========================================================="
+payload='{
+  "A1": {
+    "value": "11",
+    "metadata": {
+      "M1": {
+        "value": 13
+      }
     }
-]
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
 
 
-05. Create a subscription for all entities/A1 AND mq=A1.M1==13
-==============================================================
+echo "12. Dump accum1, see E1"
+echo "======================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "13. Check unary operator for mq: !A1.M1 - nothing found"
+echo "======================================================="
+orionCurl --url '/v2/entities?mq=!A1.M1'
+echo
+echo
+
+
+echo "14. Check unary operator for mq: A1.M1 - all three entities"
+echo "==========================================================="
+orionCurl --url '/v2/entities?mq=A1.M1'
+echo
+echo
+
+
+echo "15. Check unary operator for mq: !A1.M2 - all three entities"
+echo "==========================================================="
+orionCurl --url '/v2/entities?mq=!A1.M2'
+echo
+echo
+
+
+echo "16. Check unary operator for mq: A1.M2 - nothing found"
+echo "======================================================="
+orionCurl --url '/v2/entities?mq=A1.M2'
+echo
+echo
+
+
+echo "17. Check unary operator for mq: A2.M9 - nothing found"
+echo "======================================================"
+orionCurl --url '/v2/entities?mq=A2.M9'
+echo
+echo
+
+
+echo "18. Check unary operator for mq: !A2.M9 - all three entities"
+echo "============================================================"
+orionCurl --url '/v2/entities?mq=!A2.M9'
+echo
+echo
+
+
+echo "19. Dump accum2, see four"
+echo "========================="
+accumulator2Dump
+accumulator2Reset
+echo
+echo
+
+
+echo "20. Dump accum3, see nothing"
+echo "============================"
+accumulator3Dump
+accumulator3Reset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription for all entities/A1 AND mq=A1.M1==13 (accum1)
+=======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -398,10 +344,10 @@ Date: REGEX(.*)
 
 
 
-05b. GET subscription to see 'mq' correctly rendered
-====================================================
+02. GET subscription to see 'mq' correctly rendered
+===================================================
 HTTP/1.1 200 OK
-Content-Length: 442
+Content-Length: 319
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -413,13 +359,9 @@ Date: REGEX(.*)
         "attrs": [],
         "attrsFormat": "normalized",
         "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
+            "url": "http://localhost:9997/notify"
         },
-        "lastNotification": "REGEX(.*)",
-        "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
-        "onlyChangedAttrs": false,
-        "timesSent": 1
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -440,50 +382,94 @@ Date: REGEX(.*)
 }
 
 
-06. Dump accumulator, see E2, then reset accumulator
-====================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 162
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 13
-                    }
-                }, 
-                "type": "Text", 
-                "value": "02"
-            }, 
-            "id": "E2", 
-            "type": "Thing"
-        }
-    ], 
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-07. Modify E1/A1, setting A1/M1=13
-==================================
-HTTP/1.1 204 No Content
+03. Create subscription with mq: !A1.M2 (accum2)
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-08. Dump accumulator, see E1
-============================
+04. Create subscription with mq: A2.M2 (accum3)
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create subscription with mq: !A2.M2 (accum3)
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create an entity E1 with attr A1 with metadata M1=12 (+1 accum2)
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create an entity E2 with attr A1 with metadata M1=13 (+1 accum1, +1 accum2)
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Create an entity E3 with attr A1 with metadata M1=14 (+1 accum2)
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Lookup all entities having A1.M1==12, see E1
+================================================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "Number",
+                    "value": 12
+                }
+            },
+            "type": "Text",
+            "value": "06"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+10. Dump accum1, see E2, then reset accumulator
+===============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 162
@@ -500,23 +486,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "Number", 
+                        "type": "Number",
                         "value": 13
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "07"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E2",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
 
-09. Update subscription, without really changing anything
+11. Modify E1/A1, setting A1/M1=13 (+1 accum1, +1 accum2)
 =========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -524,17 +510,17 @@ Date: REGEX(.*)
 
 
 
-10. Dump accumulator, see E1 and E2, then reset accumulator
-===========================================================
+12. Dump accum1, see E1
+=======================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 270
+Content-Length: 162
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -542,37 +528,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "Number", 
+                        "type": "Number",
                         "value": 13
                     }
-                }, 
-                "type": "Text", 
-                "value": "07"
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }, 
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 13
-                    }
-                }, 
-                "type": "Text", 
-                "value": "02"
-            }, 
-            "id": "E2", 
+                },
+                "type": "Text",
+                "value": "11"
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
 
-11. Check unary operator for mq: !A1.M1 - nothing found
+13. Check unary operator for mq: !A1.M1 - nothing found
 =======================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -583,7 +555,7 @@ Date: REGEX(.*)
 []
 
 
-12. Check unary operator for mq: A1.M1 - all three entities
+14. Check unary operator for mq: A1.M1 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 325
@@ -601,7 +573,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "07"
+            "value": "11"
         },
         "id": "E1",
         "type": "Thing"
@@ -615,7 +587,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "02"
+            "value": "07"
         },
         "id": "E2",
         "type": "Thing"
@@ -629,7 +601,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "03"
+            "value": "08"
         },
         "id": "E3",
         "type": "Thing"
@@ -637,7 +609,7 @@ Date: REGEX(.*)
 ]
 
 
-13. Check unary operator for mq: !A1.M2 - all three entities
+15. Check unary operator for mq: !A1.M2 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 325
@@ -655,7 +627,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "07"
+            "value": "11"
         },
         "id": "E1",
         "type": "Thing"
@@ -669,7 +641,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "02"
+            "value": "07"
         },
         "id": "E2",
         "type": "Thing"
@@ -683,7 +655,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "03"
+            "value": "08"
         },
         "id": "E3",
         "type": "Thing"
@@ -691,7 +663,7 @@ Date: REGEX(.*)
 ]
 
 
-14. Check unary operator for mq: A1.M2 - nothing found
+16. Check unary operator for mq: A1.M2 - nothing found
 =======================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -702,7 +674,7 @@ Date: REGEX(.*)
 []
 
 
-15. Check unary operator for mq: A2.M9 - nothing found
+17. Check unary operator for mq: A2.M9 - nothing found
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -713,7 +685,7 @@ Date: REGEX(.*)
 []
 
 
-16. Check unary operator for mq: !A2.M9 - all three entities
+18. Check unary operator for mq: !A2.M9 - all three entities
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 325
@@ -731,7 +703,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "07"
+            "value": "11"
         },
         "id": "E1",
         "type": "Thing"
@@ -745,7 +717,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "02"
+            "value": "07"
         },
         "id": "E2",
         "type": "Thing"
@@ -759,7 +731,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "Text",
-            "value": "03"
+            "value": "08"
         },
         "id": "E3",
         "type": "Thing"
@@ -767,27 +739,17 @@ Date: REGEX(.*)
 ]
 
 
-17. Create subscription with mq: !A2.M2
-=======================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-18. Dump accumulator, see all three, then reset accumulator
-===========================================================
+19. Dump accum2, see four
+=========================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 378
+Content-Length: 162
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -795,65 +757,119 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "Number", 
-                        "value": 13
+                        "type": "Number",
+                        "value": 12
                     }
-                }, 
-                "type": "Text", 
-                "value": "07"
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }, 
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 13
-                    }
-                }, 
-                "type": "Text", 
-                "value": "02"
-            }, 
-            "id": "E2", 
-            "type": "Thing"
-        },
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 14
-                    }
-                }, 
-                "type": "Text", 
-                "value": "03"
-            }, 
-            "id": "E3", 
+                },
+                "type": "Text",
+                "value": "06"
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=2
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "Number",
+                        "value": 13
+                    }
+                },
+                "type": "Text",
+                "value": "07"
+            },
+            "id": "E2",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "Number",
+                        "value": 14
+                    }
+                },
+                "type": "Text",
+                "value": "08"
+            },
+            "id": "E3",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=2
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "Number",
+                        "value": 13
+                    }
+                },
+                "type": "Text",
+                "value": "11"
+            },
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
 
-19. Create subscription with mq: A2.M2
-======================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-20. Dump accumulator, see nothing
-=================================
+20. Dump accum3, see nothing
+============================
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-accumulatorStop
+accumulatorStop $LISTENER_PORT
+accumulatorStop $LISTENER2_PORT
+accumulatorStop $LISTENER3_PORT

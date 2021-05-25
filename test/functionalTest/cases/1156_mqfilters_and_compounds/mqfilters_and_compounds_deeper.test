@@ -26,32 +26,87 @@ String filters for compound values of metadata: deeper level in compound
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+accumulatorStart --pretty-print localhost $LISTENER2_PORT
 
 --SHELL--
 
 #
-# 01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
-# 02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
-# 03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
-# 04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
-# 05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
-# 06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
-# 07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
-# 08. String match: A1.M1.L1.L2.s~=t_str: see E1
-# 09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
-# 10. Existence: A1.M1.L1.L2.F: see E1
-# 11. Existence: A1.M1.L1.L2: see E1
-# 12. Non Existence: A1.M1.L1.L3: see E1
-# 13. Non Existence: A1.M1.L1.L2.Not: see E1
-# 14. Existence: A1.M1.L1.L2.Not: see nothing
-# 15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
-# 16. Dump and reset accumulator, see one notification
-# 17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
-# 18. Dump accumulator, see nothing
+# 01. Create subscription for A1.M1.L1.L2.T==true (accum 1)
+# 02. Create subscription for A1.M1.L1.L2.i!=10 (accum 2)
+# 03. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
+# 04. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
+# 05. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
+# 06. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
+# 07. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
+# 08. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
+# 09. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
+# 10. String match: A1.M1.L1.L2.s~=t_str: see E1
+# 11. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
+# 12. Existence: A1.M1.L1.L2.F: see E1
+# 13. Existence: A1.M1.L1.L2: see E1
+# 14. Non Existence: A1.M1.L1.L3: see E1
+# 15. Non Existence: A1.M1.L1.L2.Not: see E1
+# 17. Existence: A1.M1.L1.L2.Not: see nothing
+# 17. Dump accum 1, see one notification (step 04)
+# 18. Dump accum 2, see nothing
 #
 
-echo "01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one"
+echo "01. Create subscription for A1.M1.L1.L2.T==true (accum 1)"
+echo "========================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.T==true"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "02. Create subscription for A1.M1.L1.L2.i!=10 (accum 2)"
+echo "======================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "E.*"
+            }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "expression": {
+               "mq": "A1.M1.L1.L2.i!=10"
+            }
+         }
+    },
+    "notification": {
+        "http": { "url": "http://localhost:'$LISTENER2_PORT'/notify" },
+        "attrs": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+echo "03. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one"
 echo "=================================================================================================================="
 payload='{
   "id": "E1",
@@ -80,168 +135,133 @@ echo
 echo
 
 
-echo "02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1"
+echo "04. EQ match with Bool: A1.M1.L1.L2.T==true: see E1"
 echo "==================================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.T==true'
 echo
 echo
 
 
-echo "03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1"
+echo "05. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1"
 echo "====================================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.f!=3.15'
 echo
 echo
 
 
-echo "04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1"
+echo "06. LT match with String: A1.M1.L1.L2.s<uest_string: See E1"
 echo "==========================================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s<uest_string'
 echo
 echo
 
 
-echo "05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1"
+echo "07. LE match with Integer: A1.M1.L1.L2.i<=10: see E1"
 echo "===================================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.i<=10'
 echo
 echo
 
 
-echo "06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1"
+echo "08. GT match with Float: A1.M1.L1.L2.f>3.13: see E1"
 echo "==================================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.f>3.13'
 echo
 echo
 
 
-echo "07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1"
+echo "09. GE match with String: A1.M1.L1.L2.s>=test_string: see E1"
 echo "============================================================"
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s>=test_string'
 echo
 echo
 
 
-echo "08. String match: A1.M1.L1.L2.s~=t_str: see E1"
+echo "10. String match: A1.M1.L1.L2.s~=t_str: see E1"
 echo "=============================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s~=t_str'
 echo
 echo
 
 
-echo "09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing"
+echo "11. String no-match: A1.M1.L1.L2.s~=f_str: see nothing"
 echo "======================================================"
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.s~=f_str'
 echo
 echo
 
 
-echo "10. Existence: A1.M1.L1.L2.F: see E1"
+echo "12. Existence: A1.M1.L1.L2.F: see E1"
 echo "================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.F'
 echo
 echo
 
 
-echo "11. Existence: A1.M1.L1.L2: see E1"
+echo "13. Existence: A1.M1.L1.L2: see E1"
 echo "==============================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2'
 echo
 echo
 
 
-echo "12. Non Existence: A1.M1.L1.L3: see E1"
+echo "14. Non Existence: A1.M1.L1.L3: see E1"
 echo "==================================="
 orionCurl --url '/v2/entities?mq=!A1.M1.L1.L3'
 echo
 echo
 
 
-echo "13. Non Existence: A1.M1.L1.L2.Not: see E1"
+echo "15. Non Existence: A1.M1.L1.L2.Not: see E1"
 echo "=========================================="
 orionCurl --url '/v2/entities?mq=!A1.M1.L1.L2.Not'
 echo
 echo
 
 
-echo "14. Existence: A1.M1.L1.L2.Not: see nothing"
+echo "16. Existence: A1.M1.L1.L2.Not: see nothing"
 echo "==========================================="
 orionCurl --url '/v2/entities?mq=A1.M1.L1.L2.Not'
 echo
 echo
 
 
-echo "15. Create subscription for A1.M1.L1.L2.T==true, giving a notification"
-echo "======================================================================"
-payload='{
-    "subject": {
-        "entities": [
-            {
-                "idPattern": "E.*"
-            }
-        ],
-        "condition": {
-            "attrs": [ ],
-            "expression": {
-               "mq": "A1.M1.L1.L2.T==true"
-            }
-         }
-    },
-    "notification": {
-        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-        "attrs": [ ]
-    },
-    "expires": "2050-04-05T14:00:00.00Z"
-}'
-orionCurl --url /v2/subscriptions --payload "${payload}"
-echo
-echo
-
-
-echo "16. Dump accumulator, see one notification"
-echo "=========================================="
+echo "17. Dump accum 1, see one notification (step 04)"
+echo "================================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 
 
-echo "17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification"
-echo "====================================================================="
-payload='{
-    "subject": {
-        "entities": [
-            {
-                "idPattern": "E.*"
-            }
-        ],
-        "condition": {
-            "attrs": [ ],
-            "expression": {
-               "mq": "A1.M1.L1.L2.i!=10"
-            }
-         }
-    },
-    "notification": {
-        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
-        "attrs": [ ]
-    },
-    "expires": "2050-04-05T14:00:00.00Z"
-}'
-orionCurl --url /v2/subscriptions --payload "${payload}"
-echo
-echo
-
-
-echo "18. Dump accumulator, see nothing"
-echo "================================="
-accumulatorDump
+echo "18. Dump accum 2, see nothing"
+echo "============================="
+accumulator2Dump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
+01. Create subscription for A1.M1.L1.L2.T==true (accum 1)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create subscription for A1.M1.L1.L2.i!=10 (accum 2)
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
 ==================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -251,7 +271,7 @@ Date: REGEX(.*)
 
 
 
-02. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
+04. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -288,7 +308,7 @@ Date: REGEX(.*)
 ]
 
 
-03. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
+05. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
 =====================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -325,7 +345,7 @@ Date: REGEX(.*)
 ]
 
 
-04. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
+06. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -362,7 +382,7 @@ Date: REGEX(.*)
 ]
 
 
-05. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
+07. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
 ====================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -399,7 +419,7 @@ Date: REGEX(.*)
 ]
 
 
-06. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
+08. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -436,7 +456,7 @@ Date: REGEX(.*)
 ]
 
 
-07. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
+09. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -473,7 +493,7 @@ Date: REGEX(.*)
 ]
 
 
-08. String match: A1.M1.L1.L2.s~=t_str: see E1
+10. String match: A1.M1.L1.L2.s~=t_str: see E1
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -510,7 +530,7 @@ Date: REGEX(.*)
 ]
 
 
-09. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
+11. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -521,7 +541,7 @@ Date: REGEX(.*)
 []
 
 
-10. Existence: A1.M1.L1.L2.F: see E1
+12. Existence: A1.M1.L1.L2.F: see E1
 =================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -558,7 +578,7 @@ Date: REGEX(.*)
 ]
 
 
-11. Existence: A1.M1.L1.L2: see E1
+13. Existence: A1.M1.L1.L2: see E1
 ===============================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -595,7 +615,7 @@ Date: REGEX(.*)
 ]
 
 
-12. Non Existence: A1.M1.L1.L3: see E1
+14. Non Existence: A1.M1.L1.L3: see E1
 ===================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -632,7 +652,7 @@ Date: REGEX(.*)
 ]
 
 
-13. Non Existence: A1.M1.L1.L2.Not: see E1
+15. Non Existence: A1.M1.L1.L2.Not: see E1
 ==========================================
 HTTP/1.1 200 OK
 Content-Length: 204
@@ -669,7 +689,7 @@ Date: REGEX(.*)
 ]
 
 
-14. Existence: A1.M1.L1.L2.Not: see nothing
+16. Existence: A1.M1.L1.L2.Not: see nothing
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -680,18 +700,8 @@ Date: REGEX(.*)
 []
 
 
-15. Create subscription for A1.M1.L1.L2.T==true, giving a notification
-======================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-16. Dump accumulator, see one notification
-==========================================
+17. Dump accum 1, see one notification (step 04)
+================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 257
@@ -700,7 +710,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -735,21 +745,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-17. Create subscription for A1.M1.L1.L2.i!=10, giving NO notification
-=====================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-18. Dump accumulator, see nothing
-=================================
+18. Dump accum 2, see nothing
+=============================
 
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
+accumulatorStop $LISTENER_PORT
+accumulatorStop $LISTENER2_PORT
 dbDrop CB
