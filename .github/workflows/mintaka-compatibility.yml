@@ -43,4 +43,4 @@ jobs:
       - name: Run tests
         run: mvn clean test
         env:
-          ORION_VERSION: latest
+          ORION_IMAGE: fiware/orion-ld:latest
