@@ -43,8 +43,7 @@
 * postSubscriptions -
 *
 * URI parameters -
-*   - skipInitialNotification 
-*
+*   NONE
 */
 extern std::string postSubscriptions
 (

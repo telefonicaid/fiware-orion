@@ -47,7 +47,7 @@
 * Payload Out: None
 *
 * URI parameters:
-*   - skipInitialNotification
+*   NONE
 */
 std::string patchSubscription
 (
