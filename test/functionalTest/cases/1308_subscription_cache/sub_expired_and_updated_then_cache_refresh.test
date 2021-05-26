@@ -181,7 +181,7 @@ echo
 
 
 echo "13. Dump accumulator - see three notifications"
-echo "=================================== ==========="
+echo "=============================================="
 accumulatorDump
 echo
 echo
