@@ -1003,16 +1003,23 @@ function dbInsertEntity()
   doc='doc = {
     "_id": {
         "id": entity,
-        "type": "T"
+        "type": "T",
+        "servicePath": "/"
     },
-    "attrNames": [ "A" ],
+    "attrNames": [ "A", "B" ],
     "attrs": {
         "A": {
             "type": "TA",
-            "value": s,
+            "value": 0,
             "creDate" : 1389376081,
             "modDate" : 1389376081
         },
+        "B": {
+            "type": "TB",
+            "value": s,
+            "creDate" : 1389376081,
+            "modDate" : 1389376081
+        }
     },
     "creDate": 1389376081,
     "modDate": 1389376081
