@@ -7,6 +7,7 @@
 - Fix: avoid duplicating forwarded query requests to CPrs in some cases (this may cause illegal JSON with duplicated attribute keys in the response to clients at the end)
 - Fix: statistic counter re-worked, based in NGSIv2 requests (#3805)
 - Add: counter for requests without payload in statistics (#1400)
+- Add: skipForwarding option in queries to avoid request forwarding to Context Provider (#3851)
 - Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
 - Add: support to null in DateTime attributes and metadata (#3533)
 - Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
