@@ -31,41 +31,19 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E1 with A1 with compound value, including i==10 and s='test_string'
-# 02. Create subscription 1 for q=A1.i - notification
-# 03. Dump and reset accumulator, see one notification
-# 04. Create subscription 2 for q=A1.i2 - no notification
-# 05. Dump accumulator, see no notification
-# 06. Create subscription 3 for q=A2.i - no notification
-# 07. Dump accumulator, see no notification
-# 08. Create subscription 4 for q=!A1.i2 - notification
-# 09. Dump and reset accumulator, see one notification
-# 10. Create subscription 5 for q=!A1.i - no notification
-# 11. Dump accumulator, see no notification
-# 12. Create subscription 6 for q=!A2.i - notification
-# 13. Dump and reset accumulator, see one notification
-# 14. Update E1, to provoke another 3 notifications
-# 15. Dump and reset accumulator, see three notifications
+# 01. Create subscription 1 for q=A1.i
+# 02. Create subscription 2 for q=A1.i2
+# 03. Create subscription 3 for q=A2.i
+# 04. Create subscription 4 for q=!A1.i2
+# 05. Create subscription 5 for q=!A1.i
+# 06. Create subscription 6 for q=!A2.i
+# 07. Create E1 with A1 with compound value, including i==11 and s='test_string2'
+# 08. Dump accumulator, see three notifications (sub1, sub4, sub6)
 #
 
-echo "01. Create E1 with A1 with compound value, including i==10 and s='test_string'"
-echo "=============================================================================="
-payload='{
-  "id": "E1",
-  "A1": {
-    "value": {
-      "i": 10,
-      "s": "test_string"
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "${payload}"
-echo
-echo
 
-
-echo "02. Create subscription 1 for q=A1.i - notification"
-echo "==================================================="
+echo "01. Create subscription 1 for q=A1.i"
+echo "===================================="
 payload='{
     "subject": {
         "entities": [
@@ -91,16 +69,8 @@ echo
 echo
 
 
-echo "03. Dump and reset accumulator, see one notification"
-echo "===================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "04. Create subscription 2 for q=A1.i2 - no notification"
-echo "======================================================="
+echo "02. Create subscription 2 for q=A1.i2"
+echo "====================================="
 payload='{
     "subject": {
         "entities": [
@@ -126,15 +96,8 @@ echo
 echo
 
 
-echo "05. Dump accumulator, see no notification"
-echo "========================================="
-accumulatorDump
-echo
-echo
-
-
-echo "06. Create subscription 3 for q=A2.i - no notification"
-echo "======================================================"
+echo "03. Create subscription 3 for q=A2.i"
+echo "===================================="
 payload='{
     "subject": {
         "entities": [
@@ -160,15 +123,8 @@ echo
 echo
 
 
-echo "07. Dump accumulator, see no notification"
-echo "========================================="
-accumulatorDump
-echo
-echo
-
-
-echo "08. Create subscription 4 for q=!A1.i2 - notification"
-echo "====================================================="
+echo "04. Create subscription 4 for q=!A1.i2"
+echo "======================================"
 payload='{
     "subject": {
         "entities": [
@@ -194,16 +150,8 @@ echo
 echo
 
 
-echo "09. Dump and reset accumulator, see one notification"
-echo "===================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "10. Create subscription 5 for q=!A1.i - no notification"
-echo "======================================================="
+echo "05. Create subscription 5 for q=!A1.i"
+echo "====================================="
 payload='{
     "subject": {
         "entities": [
@@ -229,15 +177,8 @@ echo
 echo
 
 
-echo "11. Dump accumulator, see no notification"
-echo "========================================="
-accumulatorDump
-echo
-echo
-
-
-echo "12. Create subscription 6 for q=!A2.i - notification"
-echo "===================================================="
+echo "06. Create subscription 6 for q=!A2.i"
+echo "====================================="
 payload='{
     "subject": {
         "entities": [
@@ -263,17 +204,10 @@ echo
 echo
 
 
-echo "13. Dump and reset accumulator, see one notification"
-echo "===================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "14. Update E1, to provoke another 3 notifications"
-echo "================================================="
+echo "07. Create E1 with A1 with compound value, including i==11 and s='test_string2'"
+echo "==============================================================================="
 payload='{
+  "id": "E1",
   "A1": {
     "value": {
       "i": 11,
@@ -281,21 +215,81 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+orionCurl --url /v2/entities --payload "${payload}"
 echo
 echo
 
-echo "15. Dump and reset accumulator, see three notifications"
-echo "======================================================="
+
+echo "08. Dump accumulator, see three notifications (sub1, sub4, sub6)"
+echo "================================================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E1 with A1 with compound value, including i==10 and s='test_string'
-==============================================================================
+01. Create subscription 1 for q=A1.i
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create subscription 2 for q=A1.i2
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create subscription 3 for q=A2.i
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create subscription 4 for q=!A1.i2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create subscription 5 for q=!A1.i
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create subscription 6 for q=!A2.i
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create E1 with A1 with compound value, including i==11 and s='test_string2'
+===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -304,184 +298,8 @@ Date: REGEX(.*)
 
 
 
-02. Create subscription 1 for q=A1.i - notification
-===================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Dump and reset accumulator, see one notification
-====================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 162
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-04. Create subscription 2 for q=A1.i2 - no notification
-=======================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. Dump accumulator, see no notification
-=========================================
-
-
-06. Create subscription 3 for q=A2.i - no notification
-======================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-07. Dump accumulator, see no notification
-=========================================
-
-
-08. Create subscription 4 for q=!A1.i2 - notification
-=====================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-09. Dump and reset accumulator, see one notification
-====================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 162
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-10. Create subscription 5 for q=!A1.i - no notification
-=======================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-11. Dump accumulator, see no notification
-=========================================
-
-
-12. Create subscription 6 for q=!A2.i - notification
-====================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-13. Dump and reset accumulator, see one notification
-====================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 162
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-14. Update E1, to provoke another 3 notifications
-=================================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-15. Dump and reset accumulator, see three notifications
-=======================================================
+08. Dump accumulator, see three notifications (sub1, sub4, sub6)
+================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 163

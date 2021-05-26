@@ -48,7 +48,7 @@ accumulatorStart --pretty-print localhost $LISTENER2_PORT
 # 14. Non Existence: A1.M1.L1.L3: see E1
 # 15. Non Existence: A1.M1.L1.L2.Not: see E1
 # 17. Existence: A1.M1.L1.L2.Not: see nothing
-# 17. Dump accum 1, see one notification (step 04)
+# 17. Dump accum 1, see one notification (step 03)
 # 18. Dump accum 2, see nothing
 #
 
@@ -226,7 +226,7 @@ echo
 echo
 
 
-echo "17. Dump accum 1, see one notification (step 04)"
+echo "17. Dump accum 1, see one notification (step 03)"
 echo "================================================"
 accumulatorDump
 echo
@@ -700,7 +700,7 @@ Date: REGEX(.*)
 []
 
 
-17. Dump accum 1, see one notification (step 04)
+17. Dump accum 1, see one notification (step 03)
 ================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
