@@ -31,8 +31,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
-# 02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.
+# 01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.
+# 02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
 # 03. Dump and reset accumulator, see B, C and D (as this is initial notification).
 # 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 # 05. Dump and reset accumulator, see B.
@@ -46,34 +46,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 13. Dump and reset accumulator, see nothing.
 #
 
-echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
-echo '=========================================================================='
-payload='{
-  "id": "Room1",
-  "type": "Room",
-  "A": {
-    "value": 10,
-    "type": "Integer"
-  },
-  "B": {
-    "value": 20,
-    "type": "Integer"
-  },
-  "C": {
-    "value": 30,
-    "type": "Integer"
-  },
-  "D": {
-    "value": 40,
-    "type": "Integer"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo '02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.'
+echo '01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.'
 echo '========================================================================================================================================'
 payload='{
   "description": "A subscription to get info about Room1",
@@ -101,6 +74,33 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
+echo '=========================================================================='
+payload='{
+  "id": "Room1",
+  "type": "Room",
+  "A": {
+    "value": 10,
+    "type": "Integer"
+  },
+  "B": {
+    "value": 20,
+    "type": "Integer"
+  },
+  "C": {
+    "value": 30,
+    "type": "Integer"
+  },
+  "D": {
+    "value": 40,
+    "type": "Integer"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -243,21 +243,21 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
-==========================================================================
+01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.
+========================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room1?type=Room
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [B, C, D], onlyChangedAttrs: true.
-========================================================================================================================================
+02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
+==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/Room1?type=Room
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -273,7 +273,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

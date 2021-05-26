@@ -31,9 +31,9 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}
-# 02. Create entity E2 with geo:json attribute loc with value null
-# 03. Create subscription covering all planet (triggers initial notif, see E1)
+# 01. Create subscription covering all planet
+# 02. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]} (triggers notif)
+# 03. Create entity E2 with geo:json attribute loc with value null (doesn't trigger notification)
 # 04. Update E1-loc: null (doesn't trigger notification)
 # 05. Update E2-loc: {type: Point, coordinates: [ -4, 36 ]} (triggers notif)
 # 06. Dump accumulator, see 2 notifications (one for E1 and one for E2)
@@ -42,41 +42,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # See https://stackoverflow.com/questions/67493504/earth-wide-polygon-query-in-mongodb-doesnt-return-geo-located-document/67501039#67501039)
 #
 
-echo "01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}"
-echo "======================================================================================="
-payload='{
-  "id": "E1",
-  "type": "T",
-  "loc": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -4, 36 ]
-    },
-    "type": "geo:json"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create entity E2 with geo:json attribute loc with value null"
-echo "================================================================"
-payload='{
-  "id": "E2",
-  "type": "T",
-  "loc": {
-    "value": null,
-    "type": "geo:json"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Create subscription covering all planet (triggers initial notif, see E1)"
-echo "============================================================================"
+echo "01. Create subscription covering all planet"
+echo "==========================================="
 payload='{
   "subject": {
     "entities": [
@@ -100,6 +67,39 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]} (triggers notif)"
+echo "========================================================================================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "loc": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 with geo:json attribute loc with value null (doesn't trigger notification)"
+echo "==============================================================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "loc": {
+    "value": null,
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -142,8 +142,18 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]}
-=======================================================================================
+01. Create subscription covering all planet
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 with geo:json attribute loc {type: Point, coordinates: [ -4, 36 ]} (triggers notif)
+========================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -152,21 +162,11 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E2 with geo:json attribute loc with value null
-================================================================
+03. Create entity E2 with geo:json attribute loc with value null (doesn't trigger notification)
+===============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Create subscription covering all planet (triggers initial notif, see E1)
-============================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -198,7 +198,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

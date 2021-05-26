@@ -31,20 +31,82 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
-# 02. POST /v2/subscriptions, to create subscription for Room1.
-# 03. Dump and reset accumulator, see notification.
-# 04. POST /v2/subscriptions, to create subscription for Room2.
-# 05. Dump and reset accumulator, see notification.
-# 06. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
-# 07. Dump and reset accumulator, see no notification (as there was no actual update).
-# 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room1 with same values.
-# 09. Dump and reset accumulator, see notification.
-# 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
-# 11. Dump and reset accumulator, see notification.
+# 01. POST /v2/subscriptions, to create subscription for Room1.
+# 02. POST /v2/subscriptions, to create subscription for Room2.
+# 03. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
+# 04. Dump and reset accumulator, see Room1 and Room2 notifications.
+# 05. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
+# 06. Dump and reset accumulator, see no notification (as there was no actual update).
+# 07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room1 with same values.
+# 08. Dump and reset accumulator, see notification.
+# 09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
+# 10. Dump and reset accumulator, see notification.
 #
 
-echo '01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.'
+
+echo '01. POST /v2/subscriptions, to create subscription for Room1.'
+echo '============================================================='
+payload='{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/subscriptions, to create subscription for Room2.'
+echo '============================================================='
+payload='{
+  "description": "A subscription to get info about Room2",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room2",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.'
 echo '================================================================================'
 payload='{
   "actionType": "append",
@@ -80,85 +142,15 @@ echo
 echo
 
 
-echo '02. POST /v2/subscriptions, to create subscription for Room1.'
-echo '============================================================='
-payload='{
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [
-      "temperature"
-    ]
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-echo '03. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '04. Dump and reset accumulator, see Room1 and Room2 notifications.'
+echo '=================================================================='
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '04. POST /v2/subscriptions, to create subscription for Room2.'
-echo '============================================================='
-payload='{
-  "description": "A subscription to get info about Room2",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room2",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [
-      "temperature"
-    ]
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-echo '05. Dump and reset accumulator, see notification.'
-echo '================================================='
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo '06. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.'
+echo '05. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.'
 echo '============================================================================================'
 payload='{
   "actionType": "update",
@@ -194,7 +186,7 @@ echo
 echo
 
 
-echo '07. Dump and reset accumulator, see no notification (as there was no actual update).'
+echo '06. Dump and reset accumulator, see no notification (as there was no actual update).'
 echo '===================================================================================='
 accumulatorDump
 accumulatorReset
@@ -202,7 +194,7 @@ echo
 echo
 
 
-echo '08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.'
+echo '07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.'
 echo '=============================================================================================================='
 payload='{
   "actionType": "update",
@@ -238,7 +230,7 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see notification.'
+echo '08. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -246,7 +238,7 @@ echo
 echo
 
 
-echo '10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.'
+echo '09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.'
 echo '=============================================================================================================='
 payload='{
   "actionType": "append",
@@ -282,7 +274,7 @@ echo
 echo
 
 
-echo '11. Dump and reset accumulator, see notification.'
+echo '10. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -291,15 +283,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
-================================================================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. POST /v2/subscriptions, to create subscription for Room1.
+01. POST /v2/subscriptions, to create subscription for Room1.
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -309,8 +293,26 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see notification.
-=================================================
+02. POST /v2/subscriptions, to create subscription for Room2.
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
+================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Dump and reset accumulator, see Room1 and Room2 notifications.
+==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 141
@@ -319,7 +321,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -336,20 +338,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-
-
-04. POST /v2/subscriptions, to create subscription for Room2.
-=============================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. Dump and reset accumulator, see notification.
-=================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 141
@@ -358,7 +346,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -377,7 +365,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-06. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
+05. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
 ============================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -385,11 +373,11 @@ Date: REGEX(.*)
 
 
 
-07. Dump and reset accumulator, see no notification (as there was no actual update).
+06. Dump and reset accumulator, see no notification (as there was no actual update).
 ====================================================================================
 
 
-08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.
+07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -397,7 +385,7 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset accumulator, see notification.
+08. Dump and reset accumulator, see notification.
 #SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify
@@ -453,7 +441,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 #SORT_END
 
 
-10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
+09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -461,7 +449,7 @@ Date: REGEX(.*)
 
 
 
-11. Dump and reset accumulator, see notification.
+10. Dump and reset accumulator, see notification.
 #SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify

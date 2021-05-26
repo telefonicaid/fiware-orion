@@ -33,8 +33,8 @@ accumulatorStart --pretty-print
 #
 # Same script as special_metadata_in_notifications_ngsiv1.test but using "legacy" as attrsFormat
 #
-# 01. Create E1 with attributes A:1, B:2, C:3, D:4
-# 02. Subscribe to E.* for A, B and C; triggered by B, C or D
+# 01. Subscribe to E.* for A, B and C; triggered by B, C or D
+# 02. Create E1 with attributes A:1, B:2, C:3, D:4
 # 03. Dump and reset: see initial notification with A, B and C
 # 04. Update B:20
 # 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
@@ -46,38 +46,14 @@ accumulatorStart --pretty-print
 # 11. Dump and reset: see notification with actionType=update and previousValue=10 for A
 # 12. Create E2 with attributes A:x, B:y, C:z, D:u
 # 13. Dump and reset: see notification with actionType=append for A, B, C
-# 14. Update subscription conditions (to re-trigger initial notification)
+# 14. Update subscription conditions
+# 15. Update E1 A:10, D:41 (forced)
+# 16. Update E2 A:x, B:y, C:z, D:u (forced)
 # 15. Dump and reset: see notification with 2 entities with A, B and C
 #
 
-echo "01. Create E1 with attributes A:1, B:2, C:3, D:4"
-echo "================================================"
-payload='{
-  "type": "T",
-  "id": "E1",
-  "A": {
-    "type": "Number",
-    "value": 1
-  },
-  "B": {
-    "type": "Number",
-    "value": 2
-  },
-  "C": {
-    "type": "Number",
-    "value": 3
-  },
-  "D": {
-    "type": "Number",
-    "value": 4
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo "02. Subscribe to E.* for A, B and C; triggered by B, C or D"
+echo "01. Subscribe to E.* for A, B and C; triggered by B, C or D"
 echo "==========================================================="
 payload='{
   "subject": {
@@ -105,6 +81,33 @@ echo
 echo
 
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create E1 with attributes A:1, B:2, C:3, D:4"
+echo "================================================"
+payload='{
+  "type": "T",
+  "id": "E1",
+  "A": {
+    "type": "Number",
+    "value": 1
+  },
+  "B": {
+    "type": "Number",
+    "value": 2
+  },
+  "C": {
+    "type": "Number",
+    "value": 3
+  },
+  "D": {
+    "type": "Number",
+    "value": 4
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
 
 
 echo "03. Dump and reset: see initial notification with A, B and C"
@@ -246,8 +249,8 @@ echo
 echo
 
 
-echo "14. Update subscription conditions (to re-trigger initial notification)"
-echo "======================================================================="
+echo "14. Update subscription conditions"
+echo "=================================="
 payload='{
   "subject": {
     "entities": [
@@ -266,7 +269,49 @@ echo
 echo
 
 
-echo "15. Dump and reset: see notification with 2 entities with A, B and C"
+echo "15. Update E1 A:10, D:41 (forced)"
+echo "================================="
+payload='{
+  "A": {
+    "type": "Number",
+    "value": 10
+  },
+  "D": {
+    "type": "Number",
+    "value": 41
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs?options=forcedUpdate -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. Update E2 A:x, B:y, C:z, D:u (forced)"
+echo "========================================="
+payload='{
+  "A": {
+    "type": "Text",
+    "value": "x"
+  },
+  "B": {
+    "type": "Text",
+    "value": "y"
+  },
+  "C": {
+    "type": "Text",
+    "value": "z"
+  },
+  "D": {
+    "type": "Text",
+    "value": "u"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs?options=forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "17. Dump and reset: see notification with 2 entities with A, B and C"
 echo "===================================================================="
 accumulatorDump
 accumulatorReset
@@ -275,17 +320,7 @@ echo
 
 
 --REGEXPECT--
-01. Create E1 with attributes A:1, B:2, C:3, D:4
-================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Subscribe to E.* for A, B and C; triggered by B, C or D
+01. Subscribe to E.* for A, B and C; triggered by B, C or D
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -295,16 +330,26 @@ Date: REGEX(.*)
 
 
 
+02. Create E1 with attributes A:1, B:2, C:3, D:4
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
 03. Dump and reset: see initial notification with A, B and C
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 333
+Content-Length: 534
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -312,16 +357,37 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
+                            }
+                        ],
                         "name": "A",
                         "type": "Number",
                         "value": 1
                     },
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
+                            }
+                        ],
                         "name": "B",
                         "type": "Number",
                         "value": 2
                     },
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "append"
+                            }
+                        ],
                         "name": "C",
                         "type": "Number",
                         "value": 3
@@ -707,24 +773,40 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 
 
-14. Update subscription conditions (to re-trigger initial notification)
-=======================================================================
+14. Update subscription conditions
+==================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-15. Dump and reset: see notification with 2 entities with A, B and C
+15. Update E1 A:10, D:41 (forced)
+=================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+16. Update E2 A:x, B:y, C:z, D:u (forced)
+=========================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+17. Dump and reset: see notification with 2 entities with A, B and C
 ====================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 578
+Content-Length: 455
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -732,6 +814,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Number",
+                                "value": 10
+                            }
+                        ],
                         "name": "A",
                         "type": "Number",
                         "value": 10
@@ -755,21 +849,73 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 687
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Text",
+                                "value": "x"
+                            }
+                        ],
                         "name": "A",
                         "type": "Text",
                         "value": "x"
                     },
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Text",
+                                "value": "y"
+                            }
+                        ],
                         "name": "B",
                         "type": "Text",
                         "value": "y"
                     },
                     {
+                        "metadatas": [
+                            {
+                                "name": "actionType",
+                                "type": "Text",
+                                "value": "update"
+                            },
+                            {
+                                "name": "previousValue",
+                                "type": "Text",
+                                "value": "z"
+                            }
+                        ],
                         "name": "C",
                         "type": "Text",
                         "value": "z"

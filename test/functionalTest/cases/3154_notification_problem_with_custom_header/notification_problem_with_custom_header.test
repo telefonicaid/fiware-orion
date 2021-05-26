@@ -32,17 +32,16 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create custom subscription
-# 02. Create entity to trigger the subscription
-# 03. Dump accumulator to see the notification
-# 04. GET the subscription
-# 05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
-# 06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides
+# 02. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
+# 03. Create entity to trigger the subscriptions
+# 04. GET the subscriptions
+# 05. Dump accumulator and see first notification in legacy mode, second notification not in legacy mode, as custom payload overrides
 #
 
 echo "01. Create custom subscription"
 echo "=============================="
 payload='{
-  "description": "x_yz4hahh",
+  "description": "not custom",
   "expires": "2040-01-01T14:00:00.00Z",                  
   "subject": {
     "entities": [
@@ -67,39 +66,11 @@ echo
 echo
 
 
-echo "02. Create entity to trigger the subscription"
-echo "============================================="
-payload='{
-  "id": "E1",
-  "A1": "a1",
-  "A2": "a2",
-  "A3": 13
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "03. Dump accumulator to see the notification"
-echo "============================================"
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "04. GET the subscription"
-echo "========================"
-orionCurl --url /v2/subscriptions
-echo
-echo
-
-
-echo '05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"'
+echo '02. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"'
 echo "================================================================================================"
 payload='{
-  "description": "x_yz4hahh",
-  "expires": "2040-01-01T14:00:00.00Z",                  
+  "description": "custom",
+  "expires": "2040-01-01T14:00:00.00Z",
   "subject": {
     "entities": [
       {
@@ -124,8 +95,28 @@ echo
 echo
 
 
-echo "06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides"
-echo "===================================================================================================="
+echo "03. Create entity to trigger the subscriptions"
+echo "=============================================="
+payload='{
+  "id": "E1",
+  "A1": "a1",
+  "A2": "a2",
+  "A3": 13
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. GET the subscriptions"
+echo "========================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "05. Dump accumulator and see first notification in legacy mode, second notification not in legacy mode, as custom payload overrides"
+echo "==================================================================================================================================="
 accumulatorDump
 echo
 echo
@@ -142,8 +133,18 @@ Date: REGEX(.*)
 
 
 
-02. Create entity to trigger the subscription
-=============================================
+02. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
+================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity to trigger the subscriptions
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -152,64 +153,17 @@ Date: REGEX(.*)
 
 
 
-03. Dump accumulator to see the notification
-============================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 316
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "Text", 
-                        "value": "a1"
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "Text", 
-                        "value": "a2"
-                    }, 
-                    {
-                        "name": "A3", 
-                        "type": "Number", 
-                        "value": 13
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "Thing"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": ""
-            }
-        }
-    ], 
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
-=======================================
-
-
-04. GET the subscription
-========================
+04. GET the subscriptions
+=========================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 920
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "description": "x_yz4hahh",
+        "description": "not custom",
         "expires": "2040-01-01T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
@@ -235,22 +189,84 @@ Date: REGEX(.*)
                 }
             ]
         }
+    },
+    {
+        "description": "custom",
+        "expires": "2040-01-01T14:00:00.000Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "legacy",
+            "httpCustom": {
+                "payload": "{ %22A1%22: %22Value of A1: ${A1}%22 }",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "idPattern": ".*"
+                }
+            ]
+        }
     }
 ]
 
 
-05. Create custom subscription with payload inside httpCustom and with "attrsFormat" == "legacy"
-================================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+05. Dump accumulator and see first notification in legacy mode, second notification not in legacy mode, as custom payload overrides
+===================================================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 316
+User-Agent: orion/3.0.0-next libcurl/7.52.1
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-
-
-06. Dump accumulator to see the second notification, not in legacy mode, as custom payload overrides
-====================================================================================================
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Text",
+                        "value": "a1"
+                    },
+                    {
+                        "name": "A2",
+                        "type": "Text",
+                        "value": "a2"
+                    },
+                    {
+                        "name": "A3",
+                        "type": "Number",
+                        "value": 13
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "Thing"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": ""
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 27
@@ -259,7 +275,7 @@ Ngsiv2-Attrsformat: custom
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "A1": "Value of A1: a1"

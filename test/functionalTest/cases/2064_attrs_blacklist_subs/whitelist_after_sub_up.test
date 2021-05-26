@@ -31,41 +31,16 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E1 with attributes A:1, B:2, C:3, D:4
-# 02. Subscribe to E.* for B, C, D; triggered by B, C or D
+# 01. Subscribe to E.* for B, C, D; triggered by B, C or D
+# 02. Create E1 with attributes A:1, B:2, C:3, D:4
 # 03. Dump and reset: see B, C, D
-# 04. Update subscription conditions (to re-trigger initial notification)
-# 05. Dump and reset: see B, C, D
+# 04. Update subscription conditions
+# 05. Update E1 with attributes A:11, B:22, C:33, D:44
+# 06. Dump and reset: see B, C, D
 #
 
-echo "01. Create E1 with attributes A:1, B:2, C:3, D:4"
-echo "================================================"
-payload='{
-  "type": "T",
-  "id": "E1",
-  "A": {
-    "type": "Number",
-    "value": 1
-  },
-  "B": {
-    "type": "Number",
-    "value": 2
-  },
-  "C": {
-    "type": "Number",
-    "value": 3
-  },
-  "D": {
-    "type": "Number",
-    "value": 4
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo "02. Subscribe to E.* for B, C, D; triggered by B, C or D"
+echo "01. Subscribe to E.* for B, C, D; triggered by B, C or D"
 echo "========================================================"
 payload='{
   "subject": {
@@ -93,6 +68,33 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
+echo "02. Create E1 with attributes A:1, B:2, C:3, D:4"
+echo "================================================"
+payload='{
+  "type": "T",
+  "id": "E1",
+  "A": {
+    "type": "Number",
+    "value": 1
+  },
+  "B": {
+    "type": "Number",
+    "value": 2
+  },
+  "C": {
+    "type": "Number",
+    "value": 3
+  },
+  "D": {
+    "type": "Number",
+    "value": 4
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
 echo "03. Dump and reset: see B, C, D"
 echo "==============================="
 accumulatorDump
@@ -101,8 +103,8 @@ echo
 echo
 
 
-echo "04. Update subscription conditions (to re-trigger initial notification)"
-echo "======================================================================="
+echo "04. Update subscription conditions"
+echo "=================================="
 payload='{
   "subject": {
     "entities": [
@@ -121,7 +123,32 @@ echo
 echo
 
 
-echo "05. Dump and reset: see B, C, D"
+echo "05. Update E1 with attributes A:11, B:22, C:33, D:44"
+echo "===================================================="
+payload='{
+  "A": {
+    "type": "Number",
+    "value": 11
+  },
+  "B": {
+    "type": "Number",
+    "value": 22
+  },
+  "C": {
+    "type": "Number",
+    "value": 33
+  },
+  "D": {
+    "type": "Number",
+    "value": 44
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump and reset: see B, C, D"
 echo "==============================="
 accumulatorDump
 accumulatorReset
@@ -130,21 +157,21 @@ echo
 
 
 --REGEXPECT--
-01. Create E1 with attributes A:1, B:2, C:3, D:4
-================================================
+01. Subscribe to E.* for B, C, D; triggered by B, C or D
+========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Subscribe to E.* for B, C, D; triggered by B, C or D
-========================================================
+02. Create E1 with attributes A:1, B:2, C:3, D:4
+================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -160,7 +187,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -189,25 +216,33 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-04. Update subscription conditions (to re-trigger initial notification)
-=======================================================================
+04. Update subscription conditions
+==================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Dump and reset: see B, C, D
+05. Update E1 with attributes A:11, B:22, C:33, D:44
+====================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump and reset: see B, C, D
 ===============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 215
+Content-Length: 218
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -215,17 +250,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "B": {
                 "metadata": {},
                 "type": "Number",
-                "value": 2
+                "value": 22
             },
             "C": {
                 "metadata": {},
                 "type": "Number",
-                "value": 3
+                "value": 33
             },
             "D": {
                 "metadata": {},
                 "type": "Number",
-                "value": 4
+                "value": 44
             },
             "id": "E1",
             "type": "T"
