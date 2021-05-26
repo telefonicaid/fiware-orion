@@ -22,6 +22,7 @@
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
+* [`skipForwarding` オプション](#skipforwarding-option)
 * [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
@@ -407,6 +408,18 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
+
+[Top](#top)
+
+<a name="skipforwarding-option"></a>
+## `skipForwarding` オプション
+
+CPrs への転送をスキップするために、クエリで `skipForwarding` オプションを使用できます (例:
+`GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
+されます。
+
+`skipForwarding` を転送しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)
 

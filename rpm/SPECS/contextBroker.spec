@@ -72,7 +72,7 @@ fi
 
 %pre
 getent group %{owner} >/dev/null || groupadd -r %{owner}
-getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /opt/orion -s /bin/bash -c 'Orion account' %{owner}
+getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /home/orion -s /bin/bash -c 'Orion account' %{owner}
 # Backup previous sysconfig file (if any)
 DATE=$(date "+%Y-%m-%d")
 if [ -f "/etc/sysconfig/%{name}" ]; then
