@@ -298,7 +298,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;  // Tenant will be created if necessary
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;  // FIXME: Issue #860
   }
   else if (serviceP->serviceRoutine == orionldGetRegistrations)
   {
