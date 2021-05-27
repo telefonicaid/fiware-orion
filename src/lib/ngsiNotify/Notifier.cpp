@@ -388,37 +388,17 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
-    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
+    // Since the removal of initial notification feature, notificationa are mono-entity
+    // by construction, i.e. ncr vector has only one element.
     //
-    std::string spathList;
-    bool        atLeastOneNotDefault = false;
+    // FIXME P3: not sure if the check on ncr size > 0 is done in some previous point
+    // In that case the if guard could be removed
+    //
+    std::string spath;
 
-    for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size(); ++ix)
+    if (ncr.contextElementResponseVector.size() > 0)
     {
-      Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
-
-      if (!spathList.empty())
-      {
-        spathList += ",";
-      }
-      spathList += eP->servicePath;
-      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
-    }
-
-    //
-    // FIXME PR: no longer needed due to the removal of initial notification???
-    //
-    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
-    // request not having that header. However, this causes as side-effect that a
-    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
-    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
-    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
-    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
-    // this FIXME will be removed (and all the test harness adjusted, if needed)
-    //
-    if (!atLeastOneNotDefault)
-    {
-      spathList = "";
+      spath = ncr.contextElementResponseVector[0]->entity.servicePath;
     }
 
     ci.outMimeType = JSON;
@@ -458,7 +438,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->protocol         = protocol;
     params->verb             = verbName(verb);
     params->tenant           = tenant;
-    params->servicePath      = spathList;
+    params->servicePath      = spath;
     params->xauthToken       = xauthToken;
     params->resource         = uriPath;
     params->content_type     = content_type;
