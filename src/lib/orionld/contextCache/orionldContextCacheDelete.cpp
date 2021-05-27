@@ -24,6 +24,11 @@
 */
 #include <string.h>                                              // strcmp
 
+extern "C"
+{
+#include "kjson/kjFree.h"                                        // kjFree
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -31,6 +36,18 @@
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheDelete.h"      // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// contextCacheReleaseOne -
+//
+static void contextCacheReleaseOne(OrionldContext* contextP)
+{
+  if (contextP->tree != NULL)
+    kjFree(contextP->tree);
+}
 
 
 
@@ -52,13 +69,13 @@ bool orionldContextCacheDelete(const char* id)
     if ((orionldContextCache[ix]->id != NULL) && (strcmp(id, orionldContextCache[ix]->id) == 0))
     {
       mongocContextCacheDelete(orionldContextCache[ix]->id);
-      // contextCacheReleaseOne(orionldContextCache[ix]) ?
+      contextCacheReleaseOne(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
     }
     else if ((orionldContextCache[ix]->origin != OrionldContextDownloaded) && (orionldContextCache[ix]->parent != NULL) && (strcmp(id, orionldContextCache[ix]->parent) == 0))
     {
       mongocContextCacheDelete(orionldContextCache[ix]->id);
-      // contextCacheReleaseOne(orionldContextCache[ix]) ?
+      contextCacheReleaseOne(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
     }
   }

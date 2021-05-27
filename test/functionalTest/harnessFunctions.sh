@@ -427,7 +427,7 @@ function localBrokerStart()
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
     #
     # Use the CLI --gen-suppressions=all for valgrind to get suppressions (to put in suppressions.supp)
-    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=../valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
   fi
 
   # Waiting for broker/valgrind to start

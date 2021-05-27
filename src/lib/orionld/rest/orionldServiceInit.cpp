@@ -246,7 +246,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;  // Tenant will be created if necessary
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntities)
   {
@@ -414,7 +413,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {

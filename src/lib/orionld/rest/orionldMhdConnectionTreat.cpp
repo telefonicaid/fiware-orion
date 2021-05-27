@@ -803,12 +803,15 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       char* id  = NULL;
       char* url = NULL;
 
-      if (orionldState.payloadContextNode->type == KjString)
-        url = NULL;  // orionldState.payloadContextNode->value.s
-      else
+      //
+      // Inline contexts in sub/reg-creation go to the context cache
+      // But, not if the context is a simple string, e.g.:
+      //   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+      //
+      if (((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CREATE_CONTEXT) != 0) && (orionldState.payloadContextNode->type != KjString))
         url = orionldContextUrlGenerate(&id);
 
-      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, true, orionldState.payloadContextNode, &pd);
+      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, orionldState.payloadContextNode, &pd);
       if (orionldState.contextP == NULL)
       {
         LM_W(("Bad Input (invalid context - %s: %s)", pd.title, pd.detail));

@@ -136,7 +136,7 @@ Date: REGEX(.*)
 03. GET all contexts from the brokers context cache - see only 2
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 1069
+Content-Length: 1021
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -168,7 +168,6 @@ Date: REGEX(.*)
         "lastUse": "REGEX(.*)",
         "lookups": 200,
         "origin": "Downloaded",
-        "parent": "REGEX(.*)",
         "type": "hash-table",
         "url": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }

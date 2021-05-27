@@ -36,10 +36,10 @@ extern "C"
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextSimplify.h"              // orionldContextSimplify
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromObject.h"            // orionldContextFromObject
-#include "orionld/context/orionldContextFromArray.h"             // orionldContextFromArray
 #include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
@@ -76,7 +76,7 @@ bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
 //
 // orionldContextFromTree -
 //
-OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP, OrionldProblemDetails* pdP)
 {
   int itemsInArray;
 
@@ -91,21 +91,24 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
       return orionldCoreContextP;
     }
 
-    bool insert = true;
-    if (url == NULL)
-    {
-      url    = (char*) "no url";
-      insert = false;
-    }
+    //
+    // Need to clone the array and add it to the context cache
+    //
+    bool            arrayToCache = (url != NULL);
+    OrionldContext* contextP     = orionldContextCreate(url, origin, id, contextTreeP, false);
 
-    // Need to clone the array and add it to the cache before it is destroyed
-    OrionldContext* contextP = orionldContextCreate(url, origin, id, contextTreeP, false, insert);
+    //
+    // Once created, the parameter 'url' needs to be "invalidated", as it's already been used - to avoid to use the same URL for children of the context
+    //
+    url = NULL;
+    id  = NULL;
 
     if (contextP == NULL)
     {
       LM_E(("Internal Error (unable to create context)"));
       return NULL;
     }
+
 
     contextP->context.array.items     = itemsInArray;
     contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, itemsInArray * sizeof(OrionldContext*));
@@ -125,23 +128,37 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
         pdP->detail = (char*) kjValueType(ctxItemP->type);
         pdP->status = 400;
 
-        if (insert == true)
+        if (contextP->url != NULL)  // Only contexts with a URL are "kj-cloned"
           kjFree(contextP->tree);
+
         return NULL;
       }
 
       if (cachedContextP == NULL)
       {
-        contextP->context.array.vector[ix] = orionldContextFromTree(NULL, origin, NULL, true, ctxItemP, pdP);
+        if (ctxItemP->type == KjString)
+        {
+          url = ctxItemP->value.s;
+          id  = (char*) "downloaded";  // FIXME: perhaps NULL is a better value ...
+        }
+        else if (origin == OrionldContextUserCreated)
+          url = orionldContextUrlGenerate(&id);
+
+        contextP->context.array.vector[ix] = orionldContextFromTree(url, origin, id, ctxItemP, pdP);
         if (contextP->context.array.vector[ix] != NULL)
           contextP->context.array.vector[ix]->parent = contextP->id;
       }
       else
         contextP->context.array.vector[ix] = cachedContextP;
+
+      // Again, url and id needs to be NULLed out for the next loop
+      url = NULL;
+      id  = NULL;
+
       ++ix;
     }
 
-    if (insert)
+    if (arrayToCache == true)
       orionldContextCacheInsert(contextP);
 
     return contextP;
@@ -154,7 +171,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
 
       if (contextP == NULL)
       {
-        contextP = orionldContextCreate(url, origin, id, contextTreeP, false, true);
+        contextP = orionldContextCreate(url, origin, id, contextTreeP, false);
 
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
@@ -182,8 +199,8 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
   }
   else if (contextTreeP->type == KjObject)
   {
-    OrionldContext* contextP;
-    contextP = orionldContextFromObject(url, origin, id, toBeCloned, contextTreeP, pdP);
+    OrionldContext* contextP = orionldContextFromObject(url, origin, id, contextTreeP, pdP);
+
     if (contextP)
       contextP->origin = origin;
 

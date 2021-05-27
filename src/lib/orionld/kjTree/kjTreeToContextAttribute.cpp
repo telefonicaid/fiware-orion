@@ -445,7 +445,11 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   OrionldContextItem*  contextItemP = NULL;
 
   kNodeP->name = orionldAttributeExpand(contextP, kNodeP->name, true, &contextItemP);
-  caP->name    = kNodeP->name;
+
+  //
+  // This line had to be moced to the end of the function as it introduces a possible leak
+  // caP->name    = kNodeP->name;
+  //
 
   //
   // For performance issues, all predefined names should have their char-sum precalculated
@@ -877,5 +881,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", attributeName);
   }
 
+  caP->name    = kNodeP->name;
   return true;
 }

@@ -201,7 +201,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       }
 
       OrionldProblemDetails pd;
-      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, false, contextNodeP, &pd);
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
 
       if (contextP == NULL)
       {

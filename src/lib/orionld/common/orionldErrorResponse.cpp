@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_VEC_SIZE
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString
 }
@@ -64,7 +65,9 @@ static const char* errorTypeStringV[] =
 //
 const char* orionldErrorTypeToString(OrionldResponseErrorType type)
 {
-  return errorTypeStringV[type];
+  if (type < K_VEC_SIZE(errorTypeStringV))
+    return errorTypeStringV[type];
+  return "UnknownError";
 }
 
 

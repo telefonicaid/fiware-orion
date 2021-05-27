@@ -69,7 +69,7 @@ void dbContextToCache(KjNode* dbContextP, KjNode* atContextP, bool keyValues, bo
   double                createdAt    = createdAtNodeP->value.f;
   OrionldContextOrigin  origin       = orionldOriginFromString(originNodeP->value.s);
   OrionldProblemDetails pd;
-  OrionldContext*       contextP     = orionldContextFromTree(url, origin, id, true, atContextP, &pd);
+  OrionldContext*       contextP     = orionldContextFromTree(url, origin, id, atContextP, &pd);
 
   if (contextP == NULL)
     LM_RVE(("Internal Error (unable to create context '%s' from DB - %s: %s)", url, pd.title, pd.detail));
