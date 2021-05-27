@@ -104,7 +104,6 @@ Date: REGEX(.*)
     "createdAt": "REGEX(.*)",
     "lastUse": "REGEX(.*)",
     "lookups": 0,
-    "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",

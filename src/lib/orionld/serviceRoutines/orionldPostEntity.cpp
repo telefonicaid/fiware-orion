@@ -428,7 +428,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         LM_E(("kjTreeToContextAttribute(%s): %s: %s", attrP->name, orionldState.pd.title, orionldState.pd.detail));
         attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.titleAndDetail);
         caP->release();
-        free(caP);
+        delete caP;
         continue;
       }
 

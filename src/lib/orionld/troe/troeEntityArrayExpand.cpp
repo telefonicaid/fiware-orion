@@ -67,7 +67,7 @@ void troeEntityArrayExpand(KjNode* tree)
         OrionldProblemDetails  pd;
 
         kjChildRemove(entityP, contextNodeP);
-        contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, false, contextNodeP, &pd);
+        contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
       }
     }
 

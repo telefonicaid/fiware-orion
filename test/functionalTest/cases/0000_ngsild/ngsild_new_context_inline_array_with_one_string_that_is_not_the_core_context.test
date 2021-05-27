@@ -76,7 +76,7 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 1088
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -103,7 +103,6 @@ Date: REGEX(.*)
     "createdAt": "REGEX(.*)",
     "lastUse": "REGEX(.*)",
     "lookups": 0,
-    "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",

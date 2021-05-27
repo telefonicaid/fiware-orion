@@ -184,7 +184,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         OrionldContext* contextP = NULL;
 
         if (contextNodeP != NULL)
-          contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, false, contextNodeP, &pd);
+          contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
         else if (orionldState.contextP != NULL)
           contextP = orionldState.contextP;
 

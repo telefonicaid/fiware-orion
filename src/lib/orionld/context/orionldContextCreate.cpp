@@ -82,18 +82,34 @@ OrionldContextOrigin orionldOriginFromString(const char* s)
 //
 // orionldContextCreate -
 //
-OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
+OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues)
 {
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   if (contextP == NULL)
     LM_X(1, ("out of memory - trying to allocate a OrionldContext of %d bytes", sizeof(OrionldContext)));
 
-  contextP->url       = (url == NULL)? (char*) "no URL" : kaStrdup(&kalloc, url);
   contextP->origin    = origin;
   contextP->parent    = NULL;
-  contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
-  contextP->tree      = kjClone(NULL, tree);
+
+  // NULL URL means NOT to be saved - will live just inside the request-thread
+  if (url != NULL)
+  {
+    contextP->url   = kaStrdup(&kalloc, url);
+    contextP->id    = (id != NULL)? kaStrdup(&kalloc, id) : NULL;
+
+    //
+    // If just a string, no clone needed
+    //
+    contextP->tree = (tree->type != KjString)? kjClone(NULL, tree) : tree;
+  }
+  else
+  {
+    contextP->tree = tree;
+    contextP->url  = NULL;
+    contextP->id   = NULL;
+  }
+
   contextP->keyValues = keyValues;
   contextP->lookups   = 0;
 
