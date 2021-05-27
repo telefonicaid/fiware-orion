@@ -228,7 +228,7 @@ Date: REGEX(.*)
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 316
-User-Agent: orion/3.0.0-next libcurl/7.52.1
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8

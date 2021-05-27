@@ -313,6 +313,7 @@ Date: REGEX(.*)
 
 04. Dump and reset accumulator, see Room1 and Room2 notifications.
 ==================================================================
+#SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 141
@@ -363,6 +364,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+#SORT_END
 
 
 05. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
