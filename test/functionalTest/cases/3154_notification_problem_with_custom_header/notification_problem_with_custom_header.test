@@ -224,6 +224,7 @@ Date: REGEX(.*)
 
 05. Dump accumulator and see first notification in legacy mode, second notification not in legacy mode, as custom payload overrides
 ===================================================================================================================================
+#SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 316
@@ -281,6 +282,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     "A1": "Value of A1: a1"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--
