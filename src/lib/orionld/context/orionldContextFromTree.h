@@ -39,6 +39,6 @@ extern "C"
 //
 // orionldContextFromTree -
 //
-extern OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_

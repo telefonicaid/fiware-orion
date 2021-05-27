@@ -12,6 +12,8 @@ So, for queries of the temporal data, instead of sending the requests to Orion-L
 
 Compatibility with the latest release version of mintaka will always be assured. See the test results at the [mintaka-compatibility github action.](https://github.com/FIWARE/context.Orion-LD/actions/workflows/mintaka-compatibility.yml) 
 
+More fine-grained information on compatibility can be found at the [compatibility-matrix](https://github.com/FIWARE/mintaka/blob/main/doc/compatibility/compatibility.md).
+
 ## Database setup
 To run Orion-LD with TroE enabled, a PostgreSQL with PostGIS and TimescaleDB is needed.
 For local installations, this [timescaledb-postgis image](https://hub.docker.com/layers/timescale/timescaledb-postgis/latest-pg12/images/sha256-40be823de6035faa44d3e811f04f3f064868ee779ebb49b287e1c809ec786994?context=explore) is recommended.

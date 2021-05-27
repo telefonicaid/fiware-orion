@@ -44,12 +44,6 @@ extern "C"
 //
 bool orionldDeleteContext(ConnectionInfo* ciP)
 {
-  if (strcmp(orionldState.wildcard[0], "Core") == 0)
-  {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Operation Not Allowed", "The core context cannot be deleted, sorry :)");
-    orionldState.httpStatusCode = 403;
-  }
-
   if (orionldContextCacheDelete(orionldState.wildcard[0]) == false)
   {
     orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0]);

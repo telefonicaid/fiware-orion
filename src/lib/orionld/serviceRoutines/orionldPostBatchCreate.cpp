@@ -192,7 +192,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
   //
   // Attempts to create an entity more than once (more than one instance with the same Entity ID in the entity array)
-  // shall result in an error message (part of 207 response) for the all but the first instance
+  // shall result in an error message (part of 207 response) for all but the first instance
   //
   KjNode* eidP = orionldState.requestTree->value.firstChildP;
   while (eidP != NULL)

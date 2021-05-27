@@ -39,7 +39,6 @@ SET (SOURCES
     orionldContextFromTree.cpp
     orionldContextFromObject.cpp
     orionldContextUrlGenerate.cpp
-    orionldContextFromArray.cpp
     orionldContextItemAlreadyExpanded.cpp
     orionldAttributeExpand.cpp
     orionldSubAttributeExpand.cpp

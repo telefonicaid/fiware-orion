@@ -110,7 +110,6 @@ Date: REGEX(.*)
     "createdAt": "REGEX(.*)",
     "lastUse": "REGEX(.*)",
     "lookups": 0,
-    "parent": "REGEX(.*)",
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",
@@ -127,7 +126,6 @@ Date: REGEX(.*)
     "createdAt": "REGEX(.*)",
     "lastUse": "REGEX(.*)",
     "lookups": 0,
-    "parent": "REGEX(.*)",
     "hash-table": {
       "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
       "commercial": "https://uri.fiware.org/ns/data-models#commercial",

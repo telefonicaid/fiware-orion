@@ -72,7 +72,7 @@ bool orionldPostContexts(ConnectionInfo* ciP)
   url = orionldContextUrlGenerate(&id);
 
   OrionldProblemDetails  pd;
-  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, true, orionldState.requestTree, &pd);
+  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree, &pd);
 
   if (contextP == NULL)
   {

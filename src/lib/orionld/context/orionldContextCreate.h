@@ -33,6 +33,6 @@
 //
 // orionldContextCreate -
 //
-extern OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues, bool toBeCloned);
+extern OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTCREATE_H_

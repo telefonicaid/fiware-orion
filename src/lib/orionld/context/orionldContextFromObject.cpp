@@ -105,7 +105,6 @@ OrionldContext* orionldContextFromObject
   char*                   url,
   OrionldContextOrigin    origin,
   char*                   id,
-  bool                    toBeCloned,
   KjNode*                 contextObjectP,
   OrionldProblemDetails*  pdP
 )
@@ -113,10 +112,7 @@ OrionldContext* orionldContextFromObject
   OrionldContext*  contextP;
   bool             ok = true;
 
-  if (url == NULL)
-    url  = orionldContextUrlGenerate(&id);
-
-  contextP = orionldContextCreate(url, origin, id, contextObjectP, true, toBeCloned);
+  contextP = orionldContextCreate(url, origin, id, contextObjectP, true);
   if (contextP == NULL)
   {
     LM_E(("orionldContextCreate failed"));
@@ -146,11 +142,13 @@ OrionldContext* orionldContextFromObject
 
   if (ok == false)
   {
-    if (toBeCloned == true)
+    if (url != NULL)  // If URL present, the tree of the context has been cloned by orionldContextCreate
       kjFree(contextP->tree);
     return NULL;
   }
 
-  orionldContextCacheInsert(contextP);
+  if (url != NULL)
+    orionldContextCacheInsert(contextP);
+
   return contextP;
 }

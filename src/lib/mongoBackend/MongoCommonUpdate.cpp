@@ -2316,10 +2316,15 @@ static unsigned int howManyAttrs(const BSONObj& attrs, const char* attrName)
     // OK if they match in the first 'len' chars
     // - Complete match if aName[len] is ZERO or aName[len] == "()metadataId"
     //
-    // So, I revers the if condition to first check aName[len] - MUCH faster
-    //
-    if (((aName[len] == 0) || (aName[len] == '(')) && (strncmp(attrName, aName, len) == 0))
-      c++;
+    if (strncmp(attrName, aName, len) == 0)
+    {
+      unsigned int  aLen = strlen(aName);
+
+      if (aLen == len)             // Same length? Then they're an exact match
+        ++c;
+      else if (aName[len] == '(')  // Same length, only a metadataID is appended - still a match
+        ++c;
+    }
   }
 
   return c;

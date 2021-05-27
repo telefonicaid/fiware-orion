@@ -136,7 +136,6 @@ Date: REGEX(.*)
         "lastUse": "REGEX(.*)",
         "lookups": 0,
         "origin": "Downloaded",
-        "parent": "REGEX(.*)",
         "type": "hash-table",
         "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
     },
