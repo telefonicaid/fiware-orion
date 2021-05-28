@@ -69,7 +69,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,geoMultiPolygon,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoMultiPolygon),observedAt FROM attributes"
 echo
 echo
 
@@ -90,21 +90,21 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the attribute from TRoE using postgis"
 echo "============================================="
-postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(2 2)'::geography, 10000000)"
+postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(2 2)'::geography, 10000000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(11 12)'::geography, 10)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(11 12)'::geography, 10)"
 echo
 echo
 
@@ -127,8 +127,8 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geomultipolygon,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/pol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,f,,None,0106000020E610000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/pol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,f,,None,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
 
 
 04. See the sub-attributes in the temporal database
@@ -208,19 +208,19 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-opmode,valuetype,entityid,id,unitcode,geomultipolygon,observedat
-Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,0106000020E610000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+opmode,valuetype,entityid,id,unitcode,st_astext,observedat
+Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
-opmode,valuetype,entityid,id,unitcode,geomultipolygon,observedat
-Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,0106000020E610000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+opmode,valuetype,entityid,id,unitcode,st_astext,observedat
+Create,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/pol,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
 
 
 08. GET nothing from TRoE using postgis
 =======================================
-valuetype,entityid,id,unitcode,geomultipolygon,observedat
+valuetype,entityid,id,unitcode,st_astext,observedat
 
 
 --TEARDOWN--

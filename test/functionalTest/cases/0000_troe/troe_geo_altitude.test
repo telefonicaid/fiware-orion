@@ -1,0 +1,140 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo Altitude tests, 2D vs 3D
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with location 1,1, altitude 5
+# 02. Create an entity E2 with location 1,1, altitude 0
+# 03. Query TRoE attributes table for entities matching the point 1,1 - see location for both E1 and E2
+# 04. Query TRoE attributes table for entities matching the point 1,1,5 - see location for E1 only
+#
+# The idea with step 3 and 4 (well, with this entire test) is to make sure the altitude of 0 that the broker assigns two dimensional coordinates doesn't
+# "hide" the geoproperty in PostGIS searches.
+# As step 3 and 4 match both E1 and E2, that part is confirmed.
+# What I can't explain is why step 4 shows not only E1 but also E2 - I'm not an expert on PostGIS (nor on Postgres) but it seems to me as if the altitude (elevation, Z Coord) is ignored. 
+#
+# PostGIS documentation on ST_DWithin says:
+# - Use ST_3DDWithin for 3D geometries (The Z coordinate is dropped - explaining wht step 4 sees both E1 and E2)
+#
+# I tried to make ST_3DDWithin work but was not able.
+# Not 100% necessary though, I already have confirmation that adding the Z coordinate with a value of 0 doesn't introduce any problems.
+#
+echo "01. Create an entity E1 with location 1,1, altitude 5"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 1, 5 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 with location 1,1, altitude 0"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 1, 0 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Query TRoE attributes table for entities matching the point 1,1 - see location for both E1 and E2"
+echo "====================================================================================================="
+#postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_Equals(geoPoint::geometry, 'SRID=4326;POINT(1 1)')"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(1 1)'::geography, 1)"
+echo
+echo
+
+
+echo "04. Query TRoE attributes table for entities matching the point 1,1,5 - see location for E1 only"
+echo "================================================================================================"
+#postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_3DDWithin(geoPoint, 'SRID=4326;POINTZ(1 1 5)'::geography, 0.0)"
+#postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_Equals(geoPoint::geometry, 'SRID=4326;POINTZ(1 1 5)')"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINTZ(1 1 5)'::geography, 1)"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with location 1,1, altitude 5
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 with location 1,1, altitude 0
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+03. Query TRoE attributes table for entities matching the point 1,1 - see location for both E1 and E2
+=====================================================================================================
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoPoint,urn:ngsi-ld:entities:E1,location,,POINT Z (1 1 5),
+GeoPoint,urn:ngsi-ld:entities:E2,location,,POINT Z (1 1 0),
+
+
+04. Query TRoE attributes table for entities matching the point 1,1,5 - see location for E1 only
+================================================================================================
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoPoint,urn:ngsi-ld:entities:E1,location,,POINT Z (1 1 5),
+GeoPoint,urn:ngsi-ld:entities:E2,location,,POINT Z (1 1 0),
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME

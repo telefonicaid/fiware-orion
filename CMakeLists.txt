@@ -57,6 +57,13 @@ add_definitions(-std=c++11)
 
 # Baseline compiler flags, any change here will affect all build types
 
+
+#
+# Compile RELEASE optimized for size, not speed
+#
+# set (CMAKE_CXX_FLAGS_RELEASE "-Os")
+
+
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.

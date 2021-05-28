@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo::LineString
+Geo::LineString with altitude
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -51,7 +51,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "LineString",
-      "coordinates": [ [ 0, 0 ], [ 1, 1 ], [4, 4] ]
+      "coordinates": [ [ 0, 0, 4 ], [ 1, 1, 4 ], [ 4, 4, 4 ] ]
     }
   }
 }'
@@ -128,7 +128,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
-Create,location,GeoLineString,urn:ngsi-ld:entities:E1,f,,None,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+Create,location,GeoLineString,urn:ngsi-ld:entities:E1,f,,None,"LINESTRING Z (0 0 4,1 1 4,4 4 4)",
 
 
 04. See the sub-attributes in the temporal database
@@ -139,7 +139,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 147
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -152,13 +152,16 @@ Date: REGEX(.*)
             "coordinates": [
                 [
                     0,
-                    0
+                    0,
+                    4
                 ],
                 [
                     1,
-                    1
+                    1,
+                    4
                 ],
                 [
+                    4,
                     4,
                     4
                 ]
@@ -173,13 +176,13 @@ Date: REGEX(.*)
 06. GET the attribute from TRoE
 ===============================
 id,valuetype,entityid,id,unitcode,st_astext,observedat
-location,GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+location,GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 4,1 1 4,4 4 4)",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
 valuetype,entityid,id,unitcode,st_astext,observedat
-GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 0,1 1 0,4 4 0)",
+GeoLineString,urn:ngsi-ld:entities:E1,location,,"LINESTRING Z (0 0 4,1 1 4,4 4 4)",
 
 
 08. GET nothing from TRoE using postgis

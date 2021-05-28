@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS attributes (
     compound JSONB,
     geoPoint GEOGRAPHY(POINTZ, 4326),
     geoMultiPoint GEOGRAPHY(MULTIPOINTZ, 4326),
-    geoPolygon GEOGRAPHY(POLYGON, 4326),
-    geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326),
-    geoLineString GEOGRAPHY(LINESTRING, 4326),
-    geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326),
+    geoPolygon GEOGRAPHY(POLYGONZ, 4326),
+    geoMultiPolygon GEOGRAPHY(MULTIPOLYGONZ, 4326),
+    geoLineString GEOGRAPHY(LINESTRINGZ, 4326),
+    geoMultiLineString GEOGRAPHY(MULTILINESTRINGZ, 4326),
     ts TIMESTAMP NOT NULL,
     CONSTRAINT attributes_pkey PRIMARY KEY (instanceId,datasetId,ts));
 
@@ -68,10 +68,10 @@ CREATE TABLE IF NOT EXISTS subAttributes (
     compound JSONB,
     geoPoint GEOGRAPHY(POINTZ, 4326),
     geoMultiPoint GEOGRAPHY(MULTIPOINTZ, 4326),
-    geoPolygon GEOGRAPHY(POLYGON, 4326),
-    geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4326),
-    geoLineString GEOGRAPHY(LINESTRING, 4326),
-    geoMultiLineString GEOGRAPHY(MULTILINESTRING, 4326),
+    geoPolygon GEOGRAPHY(POLYGONZ, 4326),
+    geoMultiPolygon GEOGRAPHY(MULTIPOLYGONZ, 4326),
+    geoLineString GEOGRAPHY(LINESTRINGZ, 4326),
+    geoMultiLineString GEOGRAPHY(MULTILINESTRINGZ, 4326),
     ts TIMESTAMP NOT NULL,
     CONSTRAINT subattributes_pkey PRIMARY KEY (instanceId,ts));
 

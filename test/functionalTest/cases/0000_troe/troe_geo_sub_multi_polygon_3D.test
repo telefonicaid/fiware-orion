@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo::MultiPolygon as a Sub-Property
+Geo::MultiPolygon with altitude as a Sub-Property
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -54,7 +54,7 @@ payload='{
       "type": "GeoProperty",
       "value": {
         "type": "MultiPolygon",
-        "coordinates": [ [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]], [[ [10,0], [14,0], [14,-2], [10,-2], [10,0] ]] ]
+        "coordinates": [ [[ [0,0,9], [4,0,9], [4,-2,9], [0,-2,9], [0,0,9] ]], [[ [10,0,9], [14,0,9], [14,-2,9], [10,-2,9], [10,0,9] ]] ]
       }
     }
   }
@@ -138,13 +138,13 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Relationship,urn:ngsi-ld:
 04. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
+https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,,"MULTIPOLYGON Z (((0 0 9,4 0 9,4 -2 9,0 -2 9,0 0 9),(10 0 9,14 0 9,14 -2 9,10 -2 9,10 0 9)))",
 
 
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 245
+Content-Length: 265
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -159,23 +159,28 @@ Date: REGEX(.*)
                         [
                             [
                                 0,
-                                0
+                                0,
+                                9
                             ],
                             [
                                 4,
-                                0
+                                0,
+                                9
                             ],
                             [
                                 4,
-                                -2
+                                -2,
+                                9
                             ],
                             [
                                 0,
-                                -2
+                                -2,
+                                9
                             ],
                             [
                                 0,
-                                0
+                                0,
+                                9
                             ]
                         ]
                     ],
@@ -183,23 +188,28 @@ Date: REGEX(.*)
                         [
                             [
                                 10,
-                                0
+                                0,
+                                9
                             ],
                             [
                                 14,
-                                0
+                                0,
+                                9
                             ],
                             [
                                 14,
-                                -2
+                                -2,
+                                9
                             ],
                             [
                                 10,
-                                -2
+                                -2,
+                                9
                             ],
                             [
                                 10,
-                                0
+                                0,
+                                9
                             ]
                         ]
                     ]
@@ -224,7 +234,7 @@ Create,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default
 07. GET the sub-attribute from TRoE using postgis
 =================================================
 valuetype,entityid,id,unitcode,st_astext,observedat
-GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/mpol,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
+GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/mpol,,"MULTIPOLYGON Z (((0 0 9,4 0 9,4 -2 9,0 -2 9,0 0 9),(10 0 9,14 0 9,14 -2 9,10 -2 9,10 0 9)))",
 
 
 08. GET nothing from TRoE using postgis

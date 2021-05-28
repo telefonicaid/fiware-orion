@@ -51,7 +51,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "Point",
-      "coordinates": [ 1, 2, 3 ]
+      "coordinates": [ 1, 2 ]
     }
   }
 }'
@@ -69,7 +69,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,geoPoint,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,ST_AsText(geoPoint),observedAt FROM attributes"
 echo
 echo
 
@@ -90,21 +90,21 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,geoPoint,observedAt FROM attributes"
+postgresCmd -sql "SELECT id,valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the attribute from TRoE using postgis"
 echo "============================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoPoint,observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoPoint,observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(11 12)'::geography, 10)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoPoint),observedAt FROM attributes WHERE ST_DWithin(geoPoint, 'SRID=4326;POINT(11 12)'::geography, 10)"
 echo
 echo
 
@@ -127,8 +127,8 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,geopoint,observedat
-Create,location,GeoPoint,urn:ngsi-ld:entities:E1,f,,None,01010000A0E6100000000000000000F03F00000000000000400000000000000840,
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
+Create,location,GeoPoint,urn:ngsi-ld:entities:E1,f,,None,POINT Z (1 2 0),
 
 
 04. See the sub-attributes in the temporal database
@@ -139,7 +139,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 124
+Content-Length: 122
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -151,8 +151,7 @@ Date: REGEX(.*)
         "value": {
             "coordinates": [
                 1,
-                2,
-                3
+                2
             ],
             "type": "Point"
         }
@@ -163,21 +162,22 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-id,valuetype,entityid,id,unitcode,geopoint,observedat
-location,GeoPoint,urn:ngsi-ld:entities:E1,location,,01010000A0E6100000000000000000F03F00000000000000400000000000000840,
+id,valuetype,entityid,id,unitcode,st_astext,observedat
+location,GeoPoint,urn:ngsi-ld:entities:E1,location,,POINT Z (1 2 0),
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
-valuetype,entityid,id,unitcode,geopoint,observedat
-GeoPoint,urn:ngsi-ld:entities:E1,location,,01010000A0E6100000000000000000F03F00000000000000400000000000000840,
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoPoint,urn:ngsi-ld:entities:E1,location,,POINT Z (1 2 0),
 
 
 08. GET nothing from TRoE using postgis
 =======================================
-valuetype,entityid,id,unitcode,geopoint,observedat
+valuetype,entityid,id,unitcode,st_astext,observedat
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+pgDrop $CB_DB_NAME

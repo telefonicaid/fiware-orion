@@ -56,7 +56,7 @@ payload='{
       "observedAt": "2021-01-08T13:15:17.456Z",
       "value": {
         "type": "MultiPoint",
-        "coordinates": [ [ 1, 2, 3 ], [ 4, 5, 6] ]
+        "coordinates": [ [ 1, 2 ], [ 4, 5 ] ]
       }
     }
   }
@@ -82,7 +82,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiPoint,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoMultiPoint),observedAt FROM subAttributes"
 echo
 echo
 
@@ -96,14 +96,14 @@ echo
 
 echo "06. GET the sub-attributes from TRoE using postgis"
 echo "=================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiPoint,observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoMultiPoint),observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(1 2)'::geography, 1000000)"
 echo
 echo
 
 
 echo "07. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiPoint,observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(11 12)'::geography, 100)"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoMultiPoint),observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPoint, 'SRID=4326;POINT(11 12)'::geography, 100)"
 echo
 echo
 
@@ -132,14 +132,14 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entiti
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attrinstanceid,unitcode,geomultipoint,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,2021-01-08 13:15:17.456
+id,valuetype,entityid,unitcode,st_astext,observedat
+https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z (1 2 0,4 5 0)",2021-01-08 13:15:17.456
 
 
 05. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 239
+Content-Length: 235
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -152,13 +152,11 @@ Date: REGEX(.*)
                 "coordinates": [
                     [
                         1,
-                        2,
-                        3
+                        2
                     ],
                     [
                         4,
-                        5,
-                        6
+                        5
                     ]
                 ],
                 "type": "MultiPoint"
@@ -176,13 +174,13 @@ Date: REGEX(.*)
 
 06. GET the sub-attributes from TRoE using postgis
 ==================================================
-id,valuetype,entityid,attrinstanceid,unitcode,geomultipoint,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,01040000A0E6100000020000000101000080000000000000F03F000000000000004000000000000008400101000080000000000000104000000000000014400000000000001840,2021-01-08 13:15:17.456
+id,valuetype,entityid,unitcode,st_astext,observedat
+https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z (1 2 0,4 5 0)",2021-01-08 13:15:17.456
 
 
 07. GET nothing from TRoE using postgis
 =======================================
-id,valuetype,entityid,attrinstanceid,unitcode,geomultipoint,observedat
+id,valuetype,entityid,unitcode,st_astext,observedat
 
 
 --TEARDOWN--

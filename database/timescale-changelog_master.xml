@@ -8,5 +8,6 @@
     <include file="timescale-changelog_v1.xml" relativeToChangelogFile="true" />
     <include file="timescale-changelog_v2.xml" relativeToChangelogFile="true" />
     <include file="timescale-changelog_v3.xml" relativeToChangelogFile="true" />
+    <include file="timescale-changelog_v4.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>
