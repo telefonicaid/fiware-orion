@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v4_step_1">
+        <comment>Change polygon type.</comment>
+        <modifyDataType
+                         columnName="geoPolygon"
+                         newDataType="GEOGRAPHY(POLYGONZ, 4326)"
+                         schemaName="public"
+                         tableName="attributes"/>
+        <modifyDataType
+                columnName="geoPolygon"
+                newDataType="GEOGRAPHY(POLYGONZ, 4326)"
+                schemaName="public"
+                tableName="subAttributes"/>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v4_step_2">
+        <comment>Change multi-polygon type.</comment>
+        <modifyDataType
+                columnName="geoMultiPolygon"
+                newDataType="GEOGRAPHY(MULTIPOLYGONZ, 4326)"
+                schemaName="public"
+                tableName="attributes"/>
+        <modifyDataType
+                columnName="geoMultiPolygon"
+                newDataType="GEOGRAPHY(MULTIPOLYGONZ, 4326)"
+                schemaName="public"
+                tableName="subAttributes"/>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v4_step_3">
+        <comment>Change linestring type.</comment>
+        <modifyDataType
+                columnName="geoLineString"
+                newDataType="GEOGRAPHY(LINESTRINGZ, 4326)"
+                schemaName="public"
+                tableName="attributes"/>
+        <modifyDataType
+                columnName="geoLineString"
+                newDataType="GEOGRAPHY(LINESTRINGZ, 4326)"
+                schemaName="public"
+                tableName="subAttributes"/>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v4_step_4">
+        <comment>Change multi-linestring type.</comment>
+        <modifyDataType
+                columnName="geoMultiLineString"
+                newDataType="GEOGRAPHY(MULTILINESTRINGZ, 4326)"
+                schemaName="public"
+                tableName="attributes"/>
+        <modifyDataType
+                columnName="geoMultiLineString"
+                newDataType="GEOGRAPHY(MULTILINESTRINGZ, 4326)"
+                schemaName="public"
+                tableName="subAttributes"/>
+    </changeSet>
+</databaseChangeLog>
