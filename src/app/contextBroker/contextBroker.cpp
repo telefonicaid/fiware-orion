@@ -568,7 +568,9 @@ void exitFunc(void)
   if ((strcmp(notificationMode, "threadpool") == 0))
   {
     // Note the destructor in QueueNotifier will do the releasing work on service queues
-    delete getNotifier();
+    if (getNotifier() != NULL){
+      delete getNotifier();
+    }
   }
 
   curl_context_cleanup();
