@@ -36,11 +36,27 @@
 
 /* ****************************************************************************
 *
-* QueueNotifier::Notifier -
+* QueueNotifier::QueueNotifier -
 */
-QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize), workers(&queue, numThreads)
+QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): defaultSq(queueSize, numThreads)
 {
-  LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+  // FIXME PR: unhardwire this
+  serviceSq["serv1"] = new ServiceQueue(1, 2);
+  serviceSq["serv2"] = new ServiceQueue(2, 2);
+}
+
+
+
+/* ****************************************************************************
+*
+* QueueNotifier::~QueueNotifier -
+*/
+QueueNotifier::~QueueNotifier(void)
+{
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    delete it->second;
+  }
 }
 
 
@@ -51,7 +67,12 @@ QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize)
 */
 int QueueNotifier::start()
 {
-  return workers.start();
+  int r = defaultSq.start();
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    r += it->second->start();
+  }
+  return r;
 }
 
 
@@ -59,10 +80,12 @@ int QueueNotifier::start()
 /* ****************************************************************************
 *
 * QueueNotifier::queueSize -
+*
 */
 size_t QueueNotifier::queueSize()
 {
-  return queue.size();
+  // FIXME PR: per-service. Adjust flow control documentation
+  return defaultSq.size();
 }
 
 
@@ -102,11 +125,27 @@ void QueueNotifier::sendNotifyContextRequest
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
 
-  bool enqueued = queue.try_push(paramsV);
+  // Try to use per-service queue. If not found, use the default queue
+  ServiceQueue* sq;
+
+  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(tenant);
+  std::string queueName;
+  if (iter != serviceSq.end())
+  {
+    queueName = tenant;
+    sq = iter->second;
+  }
+  else
+  {
+    queueName = "default";
+    sq = &defaultSq;
+  }
+
+  bool enqueued = sq->try_push(paramsV);
   if (!enqueued)
   {
     QueueStatistics::incReject(notificationsNum);
-    LM_E(("Runtime Error (notification queue is full)"));
+    LM_E(("Runtime Error (%s notification queue is full)", queueName.c_str()));
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
       delete (*paramsV)[ix];

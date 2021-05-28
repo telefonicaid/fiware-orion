@@ -1,9 +1,8 @@
-#ifndef SRC_LIB_NGSINOTIFY_THREADDATA_H_
-#define SRC_LIB_NGSINOTIFY_THREADDATA_H_
-
+#ifndef SRC_LIB_NGSINOTIFY_SERVICEQUEUE_H_
+#define SRC_LIB_NGSINOTIFY_SERVICEQUEUE_H_
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,11 +25,30 @@
 * Author: Fermin Galan
 */
 
-#include "OnIntervalThreadParams.h"
+#include "common/SyncQOverflow.h"
 
-typedef struct ThreadData {
-    pthread_t tid;
-    OnIntervalThreadParams* params;
-} ThreadData;
+#include "ngsiNotify/senderThread.h"
+#include "ngsiNotify/QueueWorkers.h"
 
-#endif  // SRC_LIB_NGSINOTIFY_THREADDATA_H_
+
+/* ****************************************************************************
+*
+* class ServiceQueue -
+*/
+class ServiceQueue
+{
+public:
+  ServiceQueue(size_t queueSize, int numThreads);
+  int start(void);
+  bool try_push(std::vector<SenderThreadParams*>* item);
+  size_t size() const;
+
+private:
+  SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;
+  QueueWorkers                                      workers;
+
+};
+
+
+#endif // SRC_LIB_NGSINOTIFY_SERVICEQUEUE_H_
+

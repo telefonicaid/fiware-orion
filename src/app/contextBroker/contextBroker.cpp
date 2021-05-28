@@ -230,7 +230,6 @@ unsigned long   fcMaxInterval;
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"
-#define MAX_L                  900000
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
@@ -290,7 +289,7 @@ PaArgument paArgs[] =
   { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,             DBDISABLERETRYWRITES_DESC    },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,             DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     MAX_L,            DB_TMO_DESC                  },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,         DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,            DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,             USEIPV4_DESC                 },
@@ -303,7 +302,7 @@ PaArgument paArgs[] =
 
   { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,             MULTISERVICE_DESC            },
 
-  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_L,            HTTP_TMO_DESC                },
+  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    UINT_MAX,         HTTP_TMO_DESC                },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,             REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,             MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                WRITE_CONCERN_DESC           },
@@ -566,6 +565,12 @@ void exitFunc(void)
 
   metricsMgr.release();
 
+  if ((strcmp(notificationMode, "threadpool") == 0))
+  {
+    // Note the destructor in QueueNotifier will do the releasing work on service queues
+    delete getNotifier();
+  }
+
   curl_context_cleanup();
   curl_global_cleanup();
 
@@ -596,7 +601,7 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(std::string dbPrefix, bool multitenant)
+static void contextBrokerInit(void)
 {
   Notifier* pNotifier = NULL;
 
@@ -1152,7 +1157,7 @@ int main(int argC, char* argV[])
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
   // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
   // Otherwise, we have empirically checked that CB may randomly crash
-  contextBrokerInit(dbName, mtenant);
+  contextBrokerInit();
 
   if (https)
   {

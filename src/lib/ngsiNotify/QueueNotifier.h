@@ -33,6 +33,7 @@
 #include "ngsiNotify/Notifier.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/ServiceQueue.h"
 
 
 // default queue size
@@ -50,6 +51,7 @@ class QueueNotifier : public Notifier
 {
 public:
   QueueNotifier(size_t queueSize, int numThreads);
+  ~QueueNotifier(void);
 
   void sendNotifyContextRequest(NotifyContextRequest&            ncr,
                                 const ngsiv2::HttpInfo&          httpInfo,
@@ -63,10 +65,11 @@ public:
                                 const std::vector<std::string>&  metadataFilter);
   int start();
   size_t queueSize();
+  void release();
 
 private:
- SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;
- QueueWorkers                        workers;
+ ServiceQueue                          defaultSq;
+ std::map<std::string, ServiceQueue*>  serviceSq;
 
 };
 
