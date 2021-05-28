@@ -33,6 +33,7 @@ extern "C"
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
 #include "kjson/kjRender.h"                                      // kjRender, kjFastRender
+#include "kjson/kjRenderSize.h"                                  // kjRenderSize, kjFastRenderSize
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
@@ -698,7 +699,6 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //
 //
 //
-static __thread char responsePayload[1024 * 1024];
 MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
@@ -1017,16 +1017,43 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
     }
 
-    if (orionldState.uriParams.prettyPrint == false)
-      kjFastRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
-    else
-      kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
 
+    //
+    // Smart allocation of the response buffer
+    //
+    // If there is room in the current kalloc biffer (no extra malloc needed), then use it.
+    // If not, then it's better to do a separate call to malloc, as:
+    //   - the rest of the kalloc buffer isn't thrown away
+    //   - the entire logic of kalloc is avoided (not much, but still ...)
+    //
+    unsigned int responsePayloadSize;
+
+    if (orionldState.uriParams.prettyPrint == false)
+      responsePayloadSize = kjFastRenderSize(orionldState.kjsonP, orionldState.responseTree);
+    else
+      responsePayloadSize = kjRenderSize(orionldState.kjsonP, orionldState.responseTree);
+
+    if (responsePayloadSize < orionldState.kalloc.bytesLeft + 8)
+      orionldState.responsePayload = kaAlloc(&orionldState.kalloc, responsePayloadSize);
+    else
+    {
+      orionldState.responsePayload = (char*) malloc(responsePayloadSize);
+
+      if (orionldState.responsePayload == NULL)
+      {
+        LM_E(("Out of memory"));
+        orionldState.responsePayload = (char*) "{ \"error\": \"Out of memory\"}";
+      }
+    }
+
+    if (orionldState.uriParams.prettyPrint == false)
+      kjFastRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
+    else
+      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
 
 #ifdef REQUEST_PERFORMANCE
     kTimeGet(&timestamps.renderEnd);
 #endif
-    orionldState.responsePayload = responsePayload;
   }
 
   //
