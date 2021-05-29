@@ -117,7 +117,7 @@ PGconn* pgConnectionGet(const char* db)
     if (connectionP != NULL)
       break;
 
-    usleep(100000);  // Sleep 0.1 seconds before we try again
+    usleep(500);  // Sleep half a millisecond before we try again
   }
 
   if (connectionP == NULL)
