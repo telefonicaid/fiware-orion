@@ -1961,6 +1961,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 #endif
   }
 
+  serverMode |= MHD_USE_ERROR_LOG | MHD_USE_DEBUG;
+
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   {
     memset(&sad, 0, sizeof(sad));
