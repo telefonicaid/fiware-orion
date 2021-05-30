@@ -28,8 +28,9 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
+#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgDatabaseCreate.h"                     // Own interface
 
 
@@ -40,19 +41,19 @@
 //
 // FIXME: the connection to the new database could be returned - avoid an extra close/connect
 //
-bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
+PgConnection* pgDatabaseCreate(PgConnection* nullConnectionP, const char* dbName)
 {
-  char       sql[512];
-  PGresult*  res;
-  PGconn*    dbConnectionP;
+  char          sql[512];
+  PGresult*     res;
+  PgConnection* dbConnectionP;
 
   //
   // Create the database (using an already established connection to the "NULL" database)
   //
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
-  res = PQexec(connectionP, sql);
+  res = PQexec(nullConnectionP->connectionP, sql);
   if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
+    LM_RE(NULL, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
   PQclear(res);
 
 
@@ -60,19 +61,19 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   // Connect to the newly created database
   //
   dbConnectionP = pgConnectionGet(dbName);
-  if (dbConnectionP == NULL)
-    LM_RE(false, ("Database Error (unable to connect to postgres database '%s')", dbName));
+  if ((dbConnectionP == NULL) || (dbConnectionP->connectionP == NULL))
+    LM_RE(NULL, ("Database Error (unable to connect to postgres database '%s')", dbName));
 
 #if 0
   //
   // Add extension 'timescaledb' to the database
   //
-  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS timescaledb");
+  res = PQexec(dbConnectionP->connectionP, "CREATE EXTENSION IF NOT EXISTS timescaledb");
   if (res == NULL)
   {
     PQclear(res);
     pgConnectionRelease(dbConnectionP);
-    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS timescaledb)"));
+    LM_RE(NULL, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS timescaledb)"));
   }
   PQclear(res);
 #endif
@@ -80,16 +81,14 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   //
   // Add extension 'postgis' to the database
   //
-  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS postgis");
+  res = PQexec(dbConnectionP->connectionP, "CREATE EXTENSION IF NOT EXISTS postgis");
   if (res == NULL)
   {
     PQclear(res);
     pgConnectionRelease(dbConnectionP);
-    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS postgis)"));
+    LM_RE(NULL, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS postgis)"));
   }
   PQclear(res);
 
-  pgConnectionRelease(dbConnectionP);
-
-  return true;
+  return dbConnectionP;
 }

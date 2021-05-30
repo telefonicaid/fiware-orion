@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_
+#define SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_
 
 /*
 *
@@ -25,17 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <postgresql/libpq-fe.h>                                 // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// PgConnection -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
+typedef struct PgConnection
+{
+  bool    busy;          // In use or free
+  PGconn* connectionP;   // the postgres connection
+  int     uses;          // Number of times the connection has been used
+} PgConnection;
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_

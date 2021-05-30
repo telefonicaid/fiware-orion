@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-
 /*
 *
 * Copyright 2021 FIWARE Foundation e.V.
@@ -25,17 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
+#include "orionld/troe/pgConnectionPoolInsert.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgConnectionPoolInsert -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
-
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+// The linked list of connection pools will always have the NULL database as its first pool
+// So, insertions are done on pgPoolMaster->next.
+// New pools are inserted in the beginning of the list, so we don't need to maintain a pointer
+// to the last item in the linked list.
+//
+void pgConnectionPoolInsert(PgConnectionPool* poolP)
+{
+  poolP->next        = pgPoolMaster->next;
+  pgPoolMaster->next = poolP;
+}

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-
 /*
 *
 * Copyright 2021 FIWARE Foundation e.V.
@@ -25,17 +22,37 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <stdlib.h>                                            // free
+#include <semaphore.h>                                         // sem_destroy
+
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/troe/pgConnectionPoolFree.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgConnectionPoolFree -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
+void pgConnectionPoolFree(PgConnectionPool* poolP)
+{
+  sem_destroy(&poolP->queueSem);
+  sem_destroy(&poolP->poolSem);
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+  for (int ix = 0; ix < poolP->items; ix++)
+  {
+    if (poolP->connectionV[ix] != NULL)
+    {
+      if (poolP->connectionV[ix]->busy == true)
+        PQfinish(poolP->connectionV[ix]->connectionP);
+      free(poolP->connectionV[ix]);
+    }
+  }
+
+  free(poolP->db);
+  free(poolP->connectionV);
+  free(poolP);
+}

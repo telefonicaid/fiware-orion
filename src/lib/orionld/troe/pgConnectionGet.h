@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 
 
 
@@ -33,6 +33,6 @@
 //
 // pgConnectionGet - get a connection to a postgres database
 //
-extern PGconn* pgConnectionGet(const char* dbName);
+extern PgConnection* pgConnectionGet(const char* dbName);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTIONGET_H_

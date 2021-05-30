@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGCONNECT_H_
+#define SRC_LIB_ORIONLD_TROE_PGCONNECT_H_
 
 /*
 *
@@ -25,17 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <postgresql/libpq-fe.h>                                 // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgConnect - connect to a postgres database
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
+extern PGconn* pgConnect(const char* dbName);
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGCONNECT_H_

@@ -658,19 +658,21 @@ function brokerStop
     port=$CP5_PORT
   fi
 
+  logMsg "killing broker by sending /exit/harakiri request"
   if [ "$VALGRIND" == "" ]
   then
-    logMsg "killing with PID from pidFile"
-    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
-    logMsg "should be dead"
-    rm -f /tmp/orion_${port}.pid 2> /dev/null
+    curl localhost:${port}/exit/harakiri 2> /dev/null
   else
-    logMsg "killing broker by sending /exit/harakiri request"
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
-    # Waiting for valgrind to terminate (sleep a max of 10)
-    logMsg "waiting broker to stop"
-    brokerStopAwait $port
-    logMsg "broker seems to have stopped"
+
+
+    # The following three lines makes the valgrind runs TWO seconds slower
+    #
+    #   logMsg "awaiting broker to stop"
+    #   brokerStopAwait $port
+    #   logMsg "broker seems to have stopped"
+    #
+    # It seems to work just find without them
   fi
 }
 
@@ -1438,6 +1440,9 @@ function neqTimestamp()
 function pgDrop()
 {
   dbName="$1"
+  logMsg "Dropping postgres DB $dbName"
+  ps aux | grep orionld >> /tmp/testHarness.log
+
   echo "DROP DATABASE IF EXISTS $dbName" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
   egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
   egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
@@ -1446,10 +1451,12 @@ function pgDrop()
   if [ "$lines" != 0 ]
   then
     cat /tmp/pg-stderr-01
-    echo FT unable to drop DB $dbName 1>&2
+    # If the broker is already running (-eb option), then it's OK not being able to drop the DB - already done from elsewhere
+    #echo Unable to drop Postgres DB $dbName 1>&2
   else
     echo Postgres DB $dbName has been dropped
   fi
+  logMsg "Dropped postgres DB $dbName"
 }
 
 

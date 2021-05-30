@@ -123,8 +123,11 @@ extern "C"
 
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
+#include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
+#include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 
 using namespace orion;
+
 
 extern void contextDownloadListInit(void);     // FIXME PR: include header ...
 extern void contextDownloadListRelease(void);  // FIXME PR: include header ...
@@ -540,13 +543,22 @@ void exitFunc(void)
   for (unsigned int ix = 0; ix < tenants; ix++)
     free(tenantV[ix]);
 
-  // Disconnect from all MQTT btokers and free the connections
+  // Disconnect from all MQTT brokers and free the connections
   mqttRelease();
 
   //
   // Free the kalloc buffer
   //
   kaBufferReset(&kalloc, false);
+
+  //
+  // Freeing the postgres connection pools
+  //
+  if (troe)
+  {
+    pgConnectionPoolsPresent();
+    pgConnectionPoolsFree();
+  }
 }
 
 
@@ -1030,7 +1042,6 @@ int main(int argC, char* argV[])
   //
   contextDownloadListInit();
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
-  dbInit(dbHost, dbName);
 
   //
   // The database for Temporal Representation of Entities must be initialized before mongodb
@@ -1040,10 +1051,13 @@ int main(int argC, char* argV[])
   if (troe)
   {
     // Close stderr, as postgres driver prints garbage to it!
-    close(2);
+    // close(2);
+
     if (troeInit() == false)
       LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
   }
+
+  dbInit(dbHost, dbName);
 
   //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,

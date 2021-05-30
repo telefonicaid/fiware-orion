@@ -63,6 +63,15 @@ SET (SOURCES
     pgCommands.cpp
     pgEntityAppend.cpp
     pgAttributeAppend.cpp
+    pgConnect.cpp
+    pgConnectionPools.cpp
+    pgConnectionPoolsPresent.cpp
+    pgConnectionPoolsFree.cpp
+    pgConnectionPoolFree.cpp
+    pgConnectionPoolGet.cpp
+    pgConnectionPoolCreate.cpp
+    pgConnectionPoolInsert.cpp
+    pgConnectionPoolInit.cpp
 )
 
 SET (HEADERS
@@ -106,6 +115,15 @@ SET (HEADERS
     pgCommands.h
     pgEntityAppend.h
     pgAttributeAppend.h
+    pgConnect.h
+    pgConnectionPools.h
+    pgConnectionPoolsPresent.h
+    pgConnectionPoolsFree.h
+    pgConnectionPoolFree.h
+    pgConnectionPoolGet.h
+    pgConnectionPoolCreate.h
+    pgConnectionPoolInsert.h
+    pgConnectionPoolInit.h
 )
 
 
