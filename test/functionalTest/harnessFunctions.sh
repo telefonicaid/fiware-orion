@@ -661,10 +661,10 @@ function brokerStop
   logMsg "killing broker by sending /exit/harakiri request"
   if [ "$VALGRIND" == "" ]
   then
-    curl localhost:${port}/exit/harakiri 2> /dev/null
+    curl localhost:${port}/exit/harakiri > /dev/null 2> /dev/null
     # In case that didn't work, let's try with killall
     sleep .1
-    killall orionld
+    killall orionld > /dev/null 2> /dev/null
   else
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
 
