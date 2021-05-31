@@ -95,11 +95,11 @@ prepare_debug: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 
 prepare_coverage_func: src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_COVERAGE || true
-	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=False -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=False -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_coverage: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_COVERAGE || true
-	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_unit_test: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
