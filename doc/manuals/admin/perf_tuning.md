@@ -150,6 +150,38 @@ on [the `notifQueue` block](statistics.md#notifqueue-block) may help you to tune
 
 ![](notif_queue.png "notif_queue.png")
 
+**(Experimental feature)** You can also set reserved queues/pools per service. This is very useful if you
+want to avoid that notifications in a high-loaded service may starve the notifications in other
+services. In this case, the queue (q) and pool of workers (n) defined for threadpool mode are
+the default (so services without a reserved queue will use it) but, in addition, extra queues/pools can be
+defined per service in the following syntax:
+
+```
+-notificationMode threadpool:q:n,service1:q1:n1,...,serviceN:qN:nN
+```
+
+For instance, consider the following setting:
+
+```
+-notificationMode threadpool:q:n,serv1:q1:n1,serv2:q2:n2
+```
+
+It will work as follows:
+
+* Notification associated to service `serv1` (i.e. notifications triggered by update requests using
+`fiware-service: serv1` header) will use queue q1 and workers pool n1.
+* Notification associated to service `serv2` will use queue q2 and workers pool n2.
+* Any other notification (i.e. not associated to `serv1` or `serv2` will use queue q and workers pool n.
+
+So, if for instance `serv1` has a load peak in notifications, notifications in that service may be
+discarded (with `Runtime Error (serv1 notification queue is full)` errors in the logs) but the saturation
+of its queue will not penalize to other services.
+
+![](notif_queue.png "notif_queue_per_service.png")
+
+A detailed example of reserved queues/pools per service in operation can be found in
+[this document](https://github.com/telefonicaid/fiware-orion/blob/master/test/perServiceNotifQueuesTest/README.md).
+
 [Top](#top)
 
 ## Updates flow control mechanism
@@ -203,6 +235,10 @@ Flow control is especially interesting in these two cases:
 
 A detailed example of flow control in operation can be found in
 [this document](https://github.com/telefonicaid/fiware-orion/blob/master/test/flowControlTest/README.md).
+
+Note that in the case of using [per-service reserved queues/pools](notification-modes-and-performance),
+que queue used for flow control is the one corresponding to the service (or the default one, if the
+service doesn't have any reserved queue).
 
 [Top](#top)
 
@@ -301,6 +337,8 @@ There are two pools that can be configured independently:
   in this pool. See [HTTP server tuning section](#http-server-tuning) in this page for more information.
 * Notifications pool. Set by `-notificationMode threadpool:q:n`, being `n` the number of threads in this pool.
   See [notification modes and performance section](#notification-modes-and-performance) in this page.
+  Note that in the case of using per-service reserved queues/pools, `n` is the sum of the threads in
+  every per-service pool plus the threads in the default pool.
 
 Using both parameters, in any situation (either idle or busy) Orion consumes a fixed number of threads:
 
@@ -329,8 +367,8 @@ where
 
 * **max fds** is the per process file descriptors limit, i.e. the output of the `ulimit -n` command. It can
   be changed with `ulimit -n <new limit>`.
-* **n**, number of threads in the notification thread pool. The factor 5 is due to that each thread can
-  hold up to 5 connections ([libcurl pool](https://curl.haxx.se/libcurl/c/CURLOPT_MAXCONNECTS.html)).
+* **n**, number of threads in the notification thread pools (per-service plus default). The factor 5 is due to
+  that each thread can hold up to 5 connections ([libcurl pool](https://curl.haxx.se/libcurl/c/CURLOPT_MAXCONNECTS.html)).
 * **max cons** is the size of the thread pool for incoming connections, configured with `-reqPoolSize`
   [CLI parameter](cli.md). Note that if you don't use this parameter, default is not using any pool for incoming
   connections. Thus, a burst of incoming connections large enough could exhaust in theory all 

@@ -68,7 +68,7 @@ public:
                                 bool                             blacklist,
                                 const std::vector<std::string>&  metadataFilter);
   int start();
-  size_t queueSize();
+  size_t queueSize(const std::string& service);
   void release();
 
 private:

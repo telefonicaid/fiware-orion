@@ -47,7 +47,7 @@ QueueNotifier::QueueNotifier
   const std::vector<int>&          serviceNumThreadV
 ): defaultSq(defaultQueueSize, defaultNumThreads)
 {
-  // By construction, all the vector has the same size
+  // By construction, all the vectors have the same size
   for (unsigned int ix = 0; ix < serviceV.size(); ++ix)
   {
     serviceSq[serviceV[ix]] = new ServiceQueue(serviceQueueSizeV[ix], serviceNumThreadV[ix]);
@@ -92,10 +92,19 @@ int QueueNotifier::start()
 *
 * QueueNotifier::queueSize -
 *
+* Returns the size of the queue associated to a given service (which is the
+* default queue for those services without a reserved queue)
+*
 */
-size_t QueueNotifier::queueSize()
+size_t QueueNotifier::queueSize(const std::string& service)
 {
-  // FIXME PR: per-service. Adjust flow control documentation
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    if (service == it->first)
+    {
+      return it->second->size();
+    }
+  }
   return defaultSq.size();
 }
 
