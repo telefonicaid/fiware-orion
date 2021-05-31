@@ -315,10 +315,11 @@ ftd: functional_test_debug
 
 test: unit_test functional_test
 
-coverage: clean install_coverage
+coverage: install_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
+	rm -f coverage/broker.init.info
 	lcov -i --zerocounters --directory BUILD_COVERAGE/
 	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage
