@@ -242,7 +242,7 @@ typedef struct OrionldConnectionState
   //
   // Array of allocated buffers that are to be freed when the request thread ends
   //
-  void*                   delayedFreeVec[1001];
+  void*                   delayedFreeVec[1001];  // FIXME: try to make this number smaller ...
   int                     delayedFreeVecIndex;
   int                     delayedFreeVecSize;
 

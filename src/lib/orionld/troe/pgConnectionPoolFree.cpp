@@ -46,7 +46,7 @@ void pgConnectionPoolFree(PgConnectionPool* poolP)
   {
     if (poolP->connectionV[ix] != NULL)
     {
-      if (poolP->connectionV[ix]->busy == true)
+      if (poolP->connectionV[ix]->connectionP != NULL)
         PQfinish(poolP->connectionV[ix]->connectionP);
       free(poolP->connectionV[ix]);
     }
