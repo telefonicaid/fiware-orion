@@ -90,15 +90,11 @@ jobs:
         run: |
           docker run --rm  -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s ${{ matrix.test }} -qtC
 
-      - name: Rename individual
-        run: |
-          cp  coverage/broker.info coverage/${{ matrix.test }}.info
-
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.test }}.info
-          path: coverage/${{ matrix.test }}.info
+          path: coverage/broker.info
 
   aggregate-report:
     needs: [ test ]
