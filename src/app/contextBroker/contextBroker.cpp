@@ -568,7 +568,8 @@ void exitFunc(void)
   if ((strcmp(notificationMode, "threadpool") == 0))
   {
     // Note the destructor in QueueNotifier will do the releasing work on service queues
-    if (getNotifier() != NULL){
+    if (getNotifier() != NULL)
+    {
       delete getNotifier();
     }
   }

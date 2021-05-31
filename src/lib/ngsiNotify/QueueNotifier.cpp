@@ -67,12 +67,14 @@ QueueNotifier::~QueueNotifier(void)
 */
 int QueueNotifier::start()
 {
-  int r = defaultSq.start();
+  // exitCode = 0 means everything ok. We sum all the results, so only if all them are
+  // ok then the result of this function is ok
+  int exitCode = defaultSq.start();
   for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
   {
-    r += it->second->start();
+    exitCode += it->second->start();
   }
-  return r;
+  return exitCode;
 }
 
 
