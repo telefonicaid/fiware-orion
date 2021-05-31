@@ -65,7 +65,8 @@ jobs:
                   'functional_801_900',
                   'functional_901_1000',
                   'functional_1001_1100',
-                  'functional_1106_end'  ]
+                  'functional_1106_end',
+                  'unit']
 
     steps:
       - uses: actions/checkout@v2
