@@ -9,6 +9,7 @@
 - Add: counter for requests without payload in statistics (#1400)
 - Add: skipForwarding option in queries to avoid request forwarding to Context Provider (#3851)
 - Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
+- Add: per-service reserved queues/pools to threadpool notification mode (#3843)
 - Add: support to null in DateTime attributes and metadata (#3533)
 - Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
 
