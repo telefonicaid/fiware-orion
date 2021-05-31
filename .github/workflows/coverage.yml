@@ -55,18 +55,20 @@ jobs:
       fail-fast: true
       matrix:
         test: [ 'functional_0_100',
-                  'functional_101_200',
-                  'functional_201_300',
-                  'functional_301_400',
-                  'functional_401_500',
-                  'functional_501_600',
-                  'functional_601_700',
-                  'functional_701_800',
-                  'functional_801_900',
-                  'functional_901_1000',
-                  'functional_1001_1100',
-                  'functional_1106_end',
-                  'unit']
+                'functional_101_200',
+                'functional_201_300',
+                'functional_301_400',
+                'functional_401_500',
+                'functional_501_600',
+                'functional_601_700',
+                'functional_701_800',
+                'functional_801_900',
+                'functional_901_1000',
+                'functional_1001_1100',
+                'functional_1101_1200',
+                'functional_1201_1300',
+                'functional_1301_1400',
+                'functional_1401_end' ]
 
     steps:
       - uses: actions/checkout@v2
@@ -99,7 +101,7 @@ jobs:
           path: coverage/${{ matrix.test }}.info
 
   aggregate-report:
-    needs: [test]
+    needs: [ test ]
 
     runs-on: ubuntu-18.04
 

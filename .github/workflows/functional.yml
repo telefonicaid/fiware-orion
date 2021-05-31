@@ -64,7 +64,10 @@ jobs:
                    'functional_801_900',
                    'functional_901_1000',
                    'functional_1001_1100',
-                   'functional_1106_end' ]
+                   'functional_1101_1200',
+                  'functional_1201_1300',
+                  'functional_1301_1400',
+                  'functional_1401_end' ]
 
     steps:
       - uses: actions/checkout@v2
