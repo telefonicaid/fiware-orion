@@ -33,24 +33,24 @@ jobs:
 
   test:
     runs-on: ubuntu-18.04
-      needs: build-test-image
-      services:
-        mosquitto:
-          image: eclipse-mosquitto:1.6
-          ports:
-            - 1883:1883
-            - 9001:9001
-        postgres:
-          image: postgis/postgis:12-3.1-alpine
-          env:
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_HOST_AUTH_METHOD: trust
-          ports:
-            - 5432:5432
-        mongodb:
-          image: mongo:4.0
-          ports:
-            - 27017:27017
+    needs: build-test-image
+    services:
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
+      postgres:
+        image: postgis/postgis:12-3.1-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
     strategy:
       fail-fast: true
       matrix:
