@@ -315,7 +315,7 @@ ftd: functional_test_debug
 
 test: unit_test functional_test
 
-coverage: install_coverage
+coverage: clean install_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
