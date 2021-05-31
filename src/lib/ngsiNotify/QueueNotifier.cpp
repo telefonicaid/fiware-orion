@@ -38,11 +38,20 @@
 *
 * QueueNotifier::QueueNotifier -
 */
-QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): defaultSq(queueSize, numThreads)
+QueueNotifier::QueueNotifier
+(
+  size_t                           defaultQueueSize,
+  int                              defaultNumThreads,
+  const std::vector<std::string>&  serviceV,
+  const std::vector<int>&          serviceQueueSizeV,
+  const std::vector<int>&          serviceNumThreadV
+): defaultSq(defaultQueueSize, defaultNumThreads)
 {
-  // FIXME PR: unhardwire this
-  serviceSq["serv1"] = new ServiceQueue(1, 2);
-  serviceSq["serv2"] = new ServiceQueue(2, 2);
+  // By construction, all the vector has the same size
+  for (unsigned int ix = 0; ix < serviceV.size(); ++ix)
+  {
+    serviceSq[serviceV[ix]] = new ServiceQueue(serviceQueueSizeV[ix], serviceNumThreadV[ix]);
+  }
 }
 
 

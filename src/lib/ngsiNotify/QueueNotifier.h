@@ -50,7 +50,11 @@
 class QueueNotifier : public Notifier
 {
 public:
-  QueueNotifier(size_t queueSize, int numThreads);
+  QueueNotifier(size_t                           defaultQueueSize,
+                int                              defaultNumThreads,
+                const std::vector<std::string>&  serviceV,
+                const std::vector<int>&          serviceQueueSizeV,
+                const std::vector<int>&          serviceNumThreadV);
   ~QueueNotifier(void);
 
   void sendNotifyContextRequest(NotifyContextRequest&            ncr,

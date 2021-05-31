@@ -7,7 +7,7 @@ Run the broker in multiservice way, with the following configuration:
 (Queue/pool sizes and HTTP timeout take absurd values for the sake of demostrability)
 
 ```
-contextBroker -fg -httpTimeout 10000000 -logLevel INFO -multiservice -notificationMode threadpool:3:2 -serviceQueues serv1:1:2:serv2:2:2
+contextBroker -fg -httpTimeout 10000000 -logLevel INFO -multiservice -notificationMode threadpool:3:2,serv1:1:2,serv2:2:2
 ```
 
 Run the accumulator server, as notification receptor.

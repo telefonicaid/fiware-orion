@@ -27,7 +27,7 @@ Attributes and metadata starting with dollar sign in the name in subscriptions
 dbInit ${CB_DB_NAME} serv1
 dbInit ${CB_DB_NAME} serv2
 dbInit ${CB_DB_NAME} serv3
-brokerStart CB 0 IPv4 -multiservice -notificationMode threadpool:3:2
+brokerStart CB 0 IPv4 -multiservice -notificationMode threadpool:3:2,serv1:1:2,serv2:2:2
 accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
