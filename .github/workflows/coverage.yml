@@ -9,14 +9,32 @@ env:
   IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test 0000_ipv6_support/ipv4_ipv6_both.test 0000_ngsild/ngsild_uri_params_in_orionldState.test 2145_sem_status_operation/get_admin_sem_request.test'
 
 jobs:
+  build-test-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          file: docker/Dockerfile-test
+          tags: ${{ env.IMAGE_NAME }}
+          outputs: type=docker,dest=/tmp/test-image.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-image
+          path: /tmp/test-image.tar
+
   functional-part1:
     runs-on: ubuntu-18.04
-
+    needs: build-test-image
     services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
       mosquitto:
         image: eclipse-mosquitto:1.6
         ports:
@@ -40,17 +58,15 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          driver-opts: network=host
+          name: test-image
+          path: /tmp
 
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/test-image.tar
 
       - name: Run functional test
         run: |
@@ -64,12 +80,9 @@ jobs:
 
   functional-part2:
     runs-on: ubuntu-18.04
+    needs: build-test-image
 
     services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
       mosquitto:
         image: eclipse-mosquitto:1.6
         ports:
@@ -90,20 +103,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
 
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
+          name: test-image
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/test-image.tar
 
       - name: Run functional test
         run: |
@@ -117,12 +128,9 @@ jobs:
 
   functional-part3:
     runs-on: ubuntu-18.04
+    needs: build-test-image
 
     services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
       mosquitto:
         image: eclipse-mosquitto:1.6
         ports:
@@ -143,20 +151,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
 
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
+          name: test-image
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/test-image.tar
 
       - name: Run functional test
         run: |
@@ -170,12 +176,9 @@ jobs:
 
   functional-part4:
     runs-on: ubuntu-18.04
+    needs: build-test-image
 
     services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
       mosquitto:
         image: eclipse-mosquitto:1.6
         ports:
@@ -196,21 +199,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
 
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
+          name: test-image
+          path: /tmp
 
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/test-image.tar
       - name: Run functional test
         run: |
           docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1106_end -qtC
@@ -223,12 +223,9 @@ jobs:
 
   unit:
     runs-on: ubuntu-18.04
+    needs: build-test-image
 
     services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
       mongodb:
         image: mongo:4.0
         ports:
@@ -237,20 +234,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
 
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: localhost:5000/orion-ld-test:latest
+          name: test-image
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/test-image.tar
 
       - name: Run unit test
         run: |
