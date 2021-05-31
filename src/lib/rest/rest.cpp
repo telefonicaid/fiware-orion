@@ -1937,7 +1937,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 {
   bool      mhdStartError  = true;
   size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
-  int       serverMode     = MHD_USE_THREAD_PER_CONNECTION | MHD_USE_POLL;
+  int       serverMode     = MHD_USE_THREAD_PER_CONNECTION | MHD_USE_INTERNAL_POLLING_THREAD;
 
   if (port == 0)
   {
@@ -1961,6 +1961,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 #endif
   }
 
+  //
+  // Adding logging for MHD
+  //
   serverMode |= MHD_USE_ERROR_LOG | MHD_USE_DEBUG;
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
@@ -1977,39 +1980,71 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       serverMode |= MHD_USE_SSL;
-      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d, serverMode: 0x%x", bindIp, port, serverMode));
-      mhdDaemon = MHD_start_daemon(serverMode,
-                                   htons(port),
-                                   NULL,
-                                   NULL,
-                                   connectionTreat,                     NULL,
-                                   MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
-                                   MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
-                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
-                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
-                                   MHD_OPTION_END);
-
+      if (threadPoolSize == 0)
+      {
+        mhdDaemon = MHD_start_daemon(serverMode,
+                                     htons(port),
+                                     NULL,
+                                     NULL,
+                                     connectionTreat,                     NULL,
+                                     MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                     MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                     MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                     MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                     MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                     MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                     MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                     MHD_OPTION_END);
+      }
+      else
+      {
+        mhdDaemon = MHD_start_daemon(serverMode,
+                                     htons(port),
+                                     NULL,
+                                     NULL,
+                                     connectionTreat,                     NULL,
+                                     MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                     MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                     MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                     MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                     MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
+                                     MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                     MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                     MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                     MHD_OPTION_END);
+      }
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d, serverMode: 0x%x", bindIp, port, serverMode));
-      mhdDaemon = MHD_start_daemon(serverMode,
-                                   htons(port),
-                                   NULL,
-                                   NULL,
-                                   connectionTreat,                     NULL,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
-                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
-                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                   MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
-                                   MHD_OPTION_END);
-
+      if (threadPoolSize == 0)
+      {
+        mhdDaemon = MHD_start_daemon(serverMode,
+                                     htons(port),
+                                     NULL,
+                                     NULL,
+                                     connectionTreat,                     NULL,
+                                     MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                     MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                     MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                     MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                     MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                     MHD_OPTION_END);
+      }
+      else
+      {
+        mhdDaemon = MHD_start_daemon(serverMode,
+                                     htons(port),
+                                     NULL,
+                                     NULL,
+                                     connectionTreat,                     NULL,
+                                     MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                     MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                     MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
+                                     MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                     MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                     MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                     MHD_OPTION_END);
+      }
     }
 
     if (mhdDaemon != NULL)
@@ -2034,37 +2069,71 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       serverMode |= MHD_USE_SSL;
-      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d, serverMode: 0x%x", bindIPv6, port, serverMode));
-      mhdDaemon_v6 = MHD_start_daemon(serverMode,
-                                      htons(port),
-                                      NULL,
-                                      NULL,
-                                      connectionTreat,                     NULL,
-                                      MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
-                                      MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
-                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
-                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
-                                      MHD_OPTION_END);
+      if (threadPoolSize == 0)
+      {
+        mhdDaemon_v6 = MHD_start_daemon(serverMode,
+                                        htons(port),
+                                        NULL,
+                                        NULL,
+                                        connectionTreat,                     NULL,
+                                        MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                        MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                        MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                        MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                        MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                        MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                        MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                        MHD_OPTION_END);
+      }
+      else
+      {
+        mhdDaemon_v6 = MHD_start_daemon(serverMode,
+                                        htons(port),
+                                        NULL,
+                                        NULL,
+                                        connectionTreat,                     NULL,
+                                        MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                        MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                        MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                        MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                        MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
+                                        MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                        MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                        MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                        MHD_OPTION_END);
+      }
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d, serverMode: 0x%x", bindIPv6, port, serverMode));
-      mhdDaemon_v6 = MHD_start_daemon(serverMode,
-                                      htons(port),
-                                      NULL,
-                                      NULL,
-                                      connectionTreat,                     NULL,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
-                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
-                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                      MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
-                                      MHD_OPTION_END);
+      if (threadPoolSize == 0)
+      {
+        mhdDaemon_v6 = MHD_start_daemon(serverMode,
+                                        htons(port),
+                                        NULL,
+                                        NULL,
+                                        connectionTreat,                     NULL,
+                                        MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                        MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                        MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                        MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                        MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                        MHD_OPTION_END);
+      }
+      else
+      {
+        mhdDaemon_v6 = MHD_start_daemon(serverMode,
+                                        htons(port),
+                                        NULL,
+                                        NULL,
+                                        connectionTreat,                     NULL,
+                                        MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                        MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                        MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
+                                        MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                        MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                        MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                        MHD_OPTION_END);
+      }
     }
 
     if (mhdDaemon_v6 != NULL)
