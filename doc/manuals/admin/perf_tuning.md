@@ -177,7 +177,7 @@ So, if for instance `serv1` has a load peak in notifications, notifications in t
 discarded (with `Runtime Error (serv1 notification queue is full)` errors in the logs) but the saturation
 of its queue will not penalize to other services.
 
-![](notif_queue.png "notif_queue_per_service.png")
+![](notif_queue_per_service.png "notif_queue_per_service.png")
 
 A detailed example of reserved queues/pools per service in operation can be found in
 [this document](https://github.com/telefonicaid/fiware-orion/blob/master/test/perServiceNotifQueuesTest/README.md).
