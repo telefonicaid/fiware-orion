@@ -40,6 +40,7 @@ class ServiceQueue
 public:
   ServiceQueue(size_t queueSize, int numThreads);
   int start(void);
+  int stop(void);
   bool try_push(std::vector<SenderThreadParams*>* item);
   size_t size() const;
 

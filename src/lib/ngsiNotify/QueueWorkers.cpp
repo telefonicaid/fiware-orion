@@ -66,6 +66,24 @@ int QueueWorkers::start()
       LM_E(("Internal Error (pthread_create: %s)", strerror(errno)));
       return rc;
     }
+    threadIds.push_back(tid);
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueueWorkers::stop() -
+*/
+int QueueWorkers::stop()
+{
+  for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
+  {
+    pthread_cancel(threadIds[ix]);
+    pthread_join(threadIds[ix], NULL);
   }
 
   return 0;

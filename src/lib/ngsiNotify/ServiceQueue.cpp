@@ -53,6 +53,16 @@ int ServiceQueue::start(void)
 
 /* ****************************************************************************
 *
+* ServiceQueue::stop -
+*/
+int ServiceQueue::stop(void)
+{
+  return workers.stop();
+}
+
+
+/* ****************************************************************************
+*
 * ServiceQueue::try_push -
 */
 bool ServiceQueue::try_push(std::vector<SenderThreadParams*>* item)

@@ -62,8 +62,10 @@ QueueNotifier::QueueNotifier
 */
 QueueNotifier::~QueueNotifier(void)
 {
+  defaultSq.stop();
   for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
   {
+    it->second->stop();
     delete it->second;
   }
 }
