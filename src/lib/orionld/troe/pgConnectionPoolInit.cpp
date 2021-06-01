@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-
 /*
 *
 * Copyright 2021 FIWARE Foundation e.V.
@@ -25,17 +22,26 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
+#include "orionld/troe/pgConnectionPoolCreate.h"               // pgConnectionPoolCreate
+#include "orionld/troe/pgConnectionPoolInit.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgConnectionPoolInit -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
+bool pgConnectionPoolInit(int poolSize)
+{
+  // Create the connection pool for the NULL database
+  pgPoolMaster = pgConnectionPoolCreate(NULL, poolSize);
+  if (pgPoolMaster == NULL)
+    LM_RE(false, ("Database Error (unable to create initial connection pool)"));
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+  pgPoolMaster->next = NULL;
+  return true;
+}

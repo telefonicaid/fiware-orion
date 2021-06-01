@@ -157,7 +157,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   }
 
   // Value
-  const char* valueName = (isRelationship == false)? "value" : "object";
+  char* valueName = (isRelationship == false)? (char*) "value" : (char*) "object";
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
@@ -185,7 +185,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
     if (nodeP == NULL)
       return NULL;
-    nodeP->name = (char*) "value";
+    nodeP->name = valueName;
     break;
 
   case orion::ValueTypeNotGiven:
@@ -262,6 +262,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjObject(orionldState.kjsonP, mdLongName);
 
       kjChildAdd(nodeP, typeNodeP);
+
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)
       {
         if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))

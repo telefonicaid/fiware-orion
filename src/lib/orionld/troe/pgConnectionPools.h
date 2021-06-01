@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOLS_H_
+#define SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOLS_H_
 
 /*
 *
@@ -25,17 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgPoolMaster -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
+extern PgConnectionPool* pgPoolMaster;
 
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOLS_H_

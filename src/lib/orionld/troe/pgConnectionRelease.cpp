@@ -22,24 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn, PQfinish
-
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 
 
 
-#ifdef PG_CONNECTION_COUNT
-extern void connectionCountDecr(const char* who, void* connectionP);
-#endif
 // -----------------------------------------------------------------------------
 //
 // pgConnectionRelease - release a connection to a postgres database
 //
-void pgConnectionRelease(PGconn* connectionP)
+void pgConnectionRelease(PgConnection* connectionP)
 {
-  PQfinish(connectionP);
-#ifdef PG_CONNECTION_COUNT
-  connectionCountDecr("pgConnectionRelease", connectionP);
-#endif
+  // Return the connection to its pool
+  connectionP->busy = false;
 }

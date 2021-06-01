@@ -98,6 +98,7 @@ OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
 sem_t             tenantSem;
+char              pgPortString[16];
 
 
 //

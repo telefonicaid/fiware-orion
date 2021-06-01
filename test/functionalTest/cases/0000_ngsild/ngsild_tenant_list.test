@@ -89,6 +89,7 @@ brokerStart CB 0-255 IPv4 -multiservice
 echo
 echo
 
+
 echo "06. Get the list of tenants"
 echo "==========================="
 orionCurl --url "/ngsi-ld/ex/v1/tenants?prettyPrint=yes" --noPayloadCheck
