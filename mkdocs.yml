@@ -30,7 +30,6 @@ pages:
       - 'Context Broker federation': 'user/federation.md'
       - 'Forbidden characters': 'user/forbidden_characters.md'
       - 'Using regular expressions in payloads': 'user/regex_in_payload.md'
-      - 'Initial notification': 'user/initial_notification.md'
       - 'Oneshot Subscription': 'user/oneshot_subscription.md'
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'      

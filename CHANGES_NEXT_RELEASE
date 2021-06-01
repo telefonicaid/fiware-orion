@@ -11,4 +11,4 @@
 - Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
 - Add: support to null in DateTime attributes and metadata (#3533)
 - Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
-
+- Deprecated: initial notification upon subscription creation or update (along with skipInitialNotification option)
