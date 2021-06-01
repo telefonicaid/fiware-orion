@@ -22,109 +22,145 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // Postgres
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/orionldState.h"                       // troeHost, troePort, troeUser, troePwd
+#include "orionld/common/orionldState.h"                       // troeHost, pgPortString, troeUser, troePwd
+#include "orionld/troe/pgConnect.h"                            // pgConnect
+#include "orionld/troe/PgConnection.h"                         // PgConnection
+#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/troe/pgConnectionPoolGet.h"                  // pgConnectionPoolGet
 #include "orionld/troe/pgConnectionGet.h"                      // Own interface
 
 
-#ifdef PG_CONNECTION_COUNT
-static int connectionCount = 0;
-
-void connectionCountIncr(const char* who, void* connectionP)
-{
-  // Just debugging - no semaphore necessary
-  ++connectionCount;
-}
-
-void connectionCountDecr(const char* who, void* connectionP)
-{
-  // Just debugging - no semaphore necessary
-  --connectionCount;
-}
-#endif
-
-
-//
-// FIXME:
-//   typedef struct PgConnection
-//   {
-//     sem_t    sem;
-//     bool     taken;
-//     PGconn*  connectionP;
-//     char*    dbName;
-//   } PgConnection;
-//
-// The connection pool will be simply a linked list of PgConnection.
-// If none is free (for the dbName in question), another connection is opened.
-//
 
 // -----------------------------------------------------------------------------
 //
-// pgConnectionGet - get a connection to a postgres database
+// wsTrim -
 //
-// FIXME: use a connection pool
-//
-// For now we open and close the connection every time - this is not very good for performance, of course ...
-//
-PGconn* pgConnectionGet(const char* db)
+static char* wsTrim(char* s)
 {
-  // Empty tenant => use default db name
-  if ((db != NULL) && (*db == 0))
-    db = dbName;
+  // trim initial whitespace
+  while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
+    ++s;
 
-  //
-  // FIXME: connection pool: lookup a free connection to 'db' ...
-  //
-  // 1. PgDb* pgDbP = pgDatabaseLookup(db)
-  // 2. if (pgDbP == NULL)
-  //    {
-  // 3.   pgDbSemTake();
-  // 4.   pgDbP = pgDatabaseLookup(db);
-  // 5.   if (pgDbP == NULL)
-  // 6.     pgDbP = pgDatabaseAdd(db);
-  //    }
-  // 7.
-
-  char     port[16];
-  PGconn*  connectionP;
-  snprintf(port, sizeof(port), "%d", troePort);
-
-  int attemptNo   = 0;
-  int maxAttempts = 100;
-
-  while (attemptNo < maxAttempts)
+  // trim trailing whitespace
+  int last = strlen(s);
+  while ((s[last] == ' ') || (s[last] == '\t') || (s[last] == '\n'))
   {
-    if (db != NULL)
+    ++s;
+  }
+  s[last] = 0;
+
+  return s;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pgConnectionGet -
+//
+PgConnection* pgConnectionGet(const char* db)
+{
+  char* _db = (char*) db;
+
+  //
+  // Empty tenant => use default db name
+  //
+  // Note that a non-NULL 'db' that points to an empty string "" correcponds to the default database (orion)
+  // Something very different is db == NULL - the "default" postgres database - to where we need to connect to create new databases
+  //
+  if ((db != NULL) && (*db == 0))
+    _db = dbName;
+
+  if (_db != NULL)
+    _db = wsTrim(_db);
+
+  // FIXME: Need a semaphore to protect the list of pools
+  PgConnectionPool* poolP = pgConnectionPoolGet(_db);  // pgConnectionPoolGet creates the pool if it doesn't already exist
+
+  if (poolP == NULL)
+    LM_RE(NULL, ("unable to obtain a connection pool reference"));
+
+  // Await a free slot in the pool
+  sem_wait(&poolP->queueSem);
+
+  // Await the right to modify the pool
+  sem_wait(&poolP->poolSem);
+
+  // Search for a free but already connected PgConnection in the pool
+  for (int ix = 0; ix < poolP->items; ix++)
+  {
+    PgConnection* cP = poolP->connectionV[ix];
+
+    if ((cP == NULL) || (cP->busy == true))
+      continue;
+
+    if (cP->connectionP != NULL)
     {
-      const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
-      const char*  values[]     = { troeHost, port,     troeUser, troePwd,     db,       NULL };
+      // Great - found a free and already connected item - let's use it !
+      cP->busy = true;
 
-      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+      sem_post(&poolP->poolSem);
+      sem_post(&poolP->queueSem);
+
+      cP->uses += 1;
+      return cP;
     }
-    else
-    {
-      const char*  keywords[]   = { "host",   "port",   "user",   "password",  NULL };
-      const char*  values[]     = { troeHost, port,     troeUser, troePwd,     NULL };
-
-      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
-    }
-
-    ++attemptNo;
-    if (connectionP != NULL)
-      break;
-
-    usleep(500);  // Sleep half a millisecond before we try again
   }
 
-  if (connectionP == NULL)
-    LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, db));
+  //
+  // No already connected item was found - just look for an unused item and connect it to postgres
+  //
+  PgConnection* cP = NULL;
+  for (int ix = 0; ix < poolP->items; ix++)
+  {
+    if (poolP->connectionV[ix] == NULL)
+    {
+      //
+      // We found a completely unused slot - need to allocate
+      // Pity doing this with the semaphore taken ...
+      // But, there's no other choice as the slot must be marked as 'busy' before the sem can be released
+      //
+      poolP->connectionV[ix] = (PgConnection*) calloc(1, sizeof(PgConnection));
+      if (poolP->connectionV[ix] == NULL)
+      {
+        sem_post(&poolP->poolSem);
+        sem_post(&poolP->queueSem);
+        LM_RE(NULL, ("Out of memory (unable to allocate room for a Postgres Connection - %d bytes)", sizeof(PgConnection)));
+      }
 
-#ifdef PG_CONNECTION_COUNT
-  connectionCountIncr("pgConnectionGet", connectionP);
-#endif
-  return connectionP;
+      cP = poolP->connectionV[ix];
+      break;
+    }
+    else if (poolP->connectionV[ix]->busy == false)
+    {
+      cP = poolP->connectionV[ix];
+      break;
+    }
+  }
+
+
+  if (cP != NULL)
+    cP->busy = true;  // Now the pool item 'cP' is ours - after this we can let go of the semaphore
+
+  sem_post(&poolP->poolSem);
+  sem_post(&poolP->queueSem);
+
+  if (cP == NULL)
+    LM_RE(NULL, ("Internal Error (bug in postgres connection pool logic)"));
+
+  if (cP->connectionP == NULL)  // Virgin connection
+  {
+    cP->connectionP = pgConnect(_db);
+    if (cP->connectionP == NULL)
+    {
+      cP->busy = false;  // So the slot can be used again!
+      LM_RE(NULL, ("Database Error (unable to connect to postgres(%s))", _db));
+    }
+  }
+
+  cP->uses += 1;
+  return cP;
 }

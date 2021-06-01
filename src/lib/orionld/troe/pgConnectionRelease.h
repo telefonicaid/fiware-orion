@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 
 
 
@@ -33,6 +33,6 @@
 //
 // pgConnectionRelease - release a connection to a postgres database
 //
-extern void pgConnectionRelease(PGconn* connectionP);
+extern void pgConnectionRelease(PgConnection* connectionP);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTIONRELEASE_H_

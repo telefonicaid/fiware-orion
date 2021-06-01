@@ -1044,6 +1044,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         LM_E(("Out of memory"));
         orionldState.responsePayload = (char*) "{ \"error\": \"Out of memory\"}";
       }
+      else
+        orionldStateDelayedFreeEnqueue(orionldState.responsePayload);
     }
 
     if (orionldState.uriParams.prettyPrint == false)
