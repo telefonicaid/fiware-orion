@@ -167,7 +167,6 @@ static void* workerFunc(void* pSyncQ)
                                     params->content,
                                     params->fiwareCorrelator,
                                     params->renderFormat,
-                                    true,
                                     NOTIFICATION_WAIT_MODE,
                                     &out,
                                     params->extraHeaders);
