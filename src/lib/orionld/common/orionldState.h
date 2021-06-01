@@ -242,7 +242,7 @@ typedef struct OrionldConnectionState
   //
   // Array of allocated buffers that are to be freed when the request thread ends
   //
-  void*                   delayedFreeVec[1001];
+  void*                   delayedFreeVec[1001];  // FIXME: try to make this number smaller ...
   int                     delayedFreeVecIndex;
   int                     delayedFreeVecSize;
 
@@ -383,6 +383,7 @@ extern unsigned short    troePort;                 // From orionld.cpp
 extern char              troeUser[64];             // From orionld.cpp
 extern char              troePwd[64];              // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
+extern char              pgPortString[16];
 extern bool              forwarding;               // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];

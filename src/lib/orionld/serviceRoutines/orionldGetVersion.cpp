@@ -177,13 +177,13 @@ bool orionldGetVersion(ConnectionInfo* ciP)
     //
     // Postgres Server
     //
-    PGconn* connectionP     = pgConnectionGet(NULL);
-    int     pgServerVersion = -1;
-    char    pgServerVersionString[32];
+    PgConnection*  connectionP     = pgConnectionGet(NULL);
+    int            pgServerVersion = -1;
+    char           pgServerVersionString[32];
 
-    if (connectionP != NULL)
+    if ((connectionP != NULL) && (connectionP->connectionP != NULL))
     {
-      pgServerVersion = PQserverVersion(connectionP);
+      pgServerVersion = PQserverVersion(connectionP->connectionP);
       pgConnectionRelease(connectionP);
 
       pgVersionToString(pgServerVersion, pgServerVersionString, sizeof(pgServerVersionString));

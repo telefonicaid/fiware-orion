@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-#define SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
-
 /*
 *
 * Copyright 2021 FIWARE Foundation e.V.
@@ -25,17 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/troe/pgConnectionPools.h"                    // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPointExtract -
+// pgPoolMaster -
 //
-extern bool kjGeoMultiPointExtract(KjNode* coordinatesP, char* coordsString, int coordsLen);
-
-#endif  // SRC_LIB_ORIONLD_TROE_KJGEOMULTIPOINTEXTRACT_H_
+PgConnectionPool* pgPoolMaster = NULL;

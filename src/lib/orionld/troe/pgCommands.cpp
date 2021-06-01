@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
@@ -43,11 +44,12 @@
 //
 void pgCommands(char* sql[], int commands)
 {
-  PGconn* connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
+  PgConnection* connectionP = pgConnectionGet(orionldState.troeDbName);
+
+  if ((connectionP == NULL) || (connectionP->connectionP == NULL))
     LM_RVE(("no connection to postgres"));
 
-  if (pgTransactionBegin(connectionP) != true)
+  if (pgTransactionBegin(connectionP->connectionP) != true)
   {
     pgConnectionRelease(connectionP);
     LM_RVE(("pgTransactionBegin failed"));
@@ -55,29 +57,29 @@ void pgCommands(char* sql[], int commands)
 
   for (int ix = 0; ix < commands; ix++)
   {
-    // LM_TMP(("SQL: %s", sql[ix]));
-    PGresult* res = PQexec(connectionP, sql[ix]);
+    // LM_TMP(("SQL: %s;", sql[ix]));
+    PGresult* res = PQexec(connectionP->connectionP, sql[ix]);
     if (res == NULL)
     {
       LM_E(("Database Error (%s)", PQresStatus(PQresultStatus(res))));
-      if (pgTransactionRollback(connectionP) == false)
+      if (pgTransactionRollback(connectionP->connectionP) == false)
         LM_E(("Database Error (pgTransactionRollback failed too)"));
       pgConnectionRelease(connectionP);
       return;
     }
     PQclear(res);
 
-    if (PQstatus(connectionP) != CONNECTION_OK)
+    if (PQstatus(connectionP->connectionP) != CONNECTION_OK)
     {
-      LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
-      if (pgTransactionRollback(connectionP) == false)
+      LM_E(("SQL[%p]: bad connection: %d", connectionP->connectionP, PQstatus(connectionP->connectionP)));  // FIXME: string! (last error?)
+      if (pgTransactionRollback(connectionP->connectionP) == false)
         LM_E(("Database Error (pgTransactionRollback failed too)"));
       pgConnectionRelease(connectionP);
       return;
     }
   }
 
-  if (pgTransactionCommit(connectionP) != true)
+  if (pgTransactionCommit(connectionP->connectionP) != true)
     LM_E(("pgTransactionCommit failed"));
 
   pgConnectionRelease(connectionP);
