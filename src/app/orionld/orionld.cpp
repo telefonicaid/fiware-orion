@@ -515,9 +515,7 @@ void exitFunc(void)
 
 #ifdef DEBUG
   // Take mongo req-sem ?
-  LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
-  LM_T(LmtSubCache, ("calling subCacheDestroy"));
   subCacheDestroy();
 #endif
 
@@ -663,7 +661,7 @@ static int loadFile(char* path, char* out, int outSize)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * rushParse - parse rush host and port from CLI argument
@@ -696,7 +694,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 
   free(copy);
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -960,7 +958,6 @@ int main(int argC, char* argV[])
   }
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
-  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
 
   LM_I(("Orion Context Broker is running"));
 
@@ -999,8 +996,8 @@ int main(int argC, char* argV[])
 
   if (rush[0] != 0)
   {
-    rushParse(rush, &rushHost, &rushPort);
-    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+    LM_X(1, ("Rush is no longer supported"));
+    // rushParse(rush, &rushHost, &rushPort);
   }
 
   if (noCache == false)
@@ -1019,10 +1016,6 @@ int main(int argC, char* argV[])
       subCacheStart();
     }
     orionldStartup = false;
-  }
-  else
-  {
-    LM_T(LmtSubCache, ("noCache == false"));
   }
 
   //
@@ -1079,9 +1072,6 @@ int main(int argC, char* argV[])
     {
       LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
     }
-
-    LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
-    LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
     orionRestServicesInit(ipVersion,
                           bindAddress,
