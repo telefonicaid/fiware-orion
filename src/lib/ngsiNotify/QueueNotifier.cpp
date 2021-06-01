@@ -36,11 +36,38 @@
 
 /* ****************************************************************************
 *
-* QueueNotifier::Notifier -
+* QueueNotifier::QueueNotifier -
 */
-QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize), workers(&queue, numThreads)
+QueueNotifier::QueueNotifier
+(
+  size_t                           defaultQueueSize,
+  int                              defaultNumThreads,
+  const std::vector<std::string>&  serviceV,
+  const std::vector<int>&          serviceQueueSizeV,
+  const std::vector<int>&          serviceNumThreadV
+): defaultSq(defaultQueueSize, defaultNumThreads)
 {
-  LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+  // By construction, all the vectors have the same size
+  for (unsigned int ix = 0; ix < serviceV.size(); ++ix)
+  {
+    serviceSq[serviceV[ix]] = new ServiceQueue(serviceQueueSizeV[ix], serviceNumThreadV[ix]);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* QueueNotifier::~QueueNotifier -
+*/
+QueueNotifier::~QueueNotifier(void)
+{
+  defaultSq.stop();
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    it->second->stop();
+    delete it->second;
+  }
 }
 
 
@@ -51,7 +78,14 @@ QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize)
 */
 int QueueNotifier::start()
 {
-  return workers.start();
+  // exitCode = 0 means everything ok. We sum all the results, so only if all them are
+  // ok then the result of this function is ok
+  int exitCode = defaultSq.start();
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    exitCode += it->second->start();
+  }
+  return exitCode;
 }
 
 
@@ -59,10 +93,21 @@ int QueueNotifier::start()
 /* ****************************************************************************
 *
 * QueueNotifier::queueSize -
+*
+* Returns the size of the queue associated to a given service (which is the
+* default queue for those services without a reserved queue)
+*
 */
-size_t QueueNotifier::queueSize()
+size_t QueueNotifier::queueSize(const std::string& service)
 {
-  return queue.size();
+  for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
+  {
+    if (service == it->first)
+    {
+      return it->second->size();
+    }
+  }
+  return defaultSq.size();
 }
 
 
@@ -102,11 +147,27 @@ void QueueNotifier::sendNotifyContextRequest
     clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
   }
 
-  bool enqueued = queue.try_push(paramsV);
+  // Try to use per-service queue. If not found, use the default queue
+  ServiceQueue* sq;
+
+  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(tenant);
+  std::string queueName;
+  if (iter != serviceSq.end())
+  {
+    queueName = tenant;
+    sq = iter->second;
+  }
+  else
+  {
+    queueName = "default";
+    sq = &defaultSq;
+  }
+
+  bool enqueued = sq->try_push(paramsV);
   if (!enqueued)
   {
     QueueStatistics::incReject(notificationsNum);
-    LM_E(("Runtime Error (notification queue is full)"));
+    LM_E(("Runtime Error (%s notification queue is full)", queueName.c_str()));
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
       delete (*paramsV)[ix];

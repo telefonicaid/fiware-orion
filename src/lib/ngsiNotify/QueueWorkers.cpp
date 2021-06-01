@@ -66,9 +66,40 @@ int QueueWorkers::start()
       LM_E(("Internal Error (pthread_create: %s)", strerror(errno)));
       return rc;
     }
+    threadIds.push_back(tid);
   }
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueueWorkers::stop() -
+*/
+int QueueWorkers::stop()
+{
+  for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
+  {
+    pthread_cancel(threadIds[ix]);
+    pthread_join(threadIds[ix], NULL);
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* workerFinish -
+*
+* This is invoked upon worker thread termination (typically using pthread_cancel on it)
+*/
+static void workerFinishes(void* curl)
+{
+  curl_easy_cleanup((CURL*) curl);
 }
 
 
@@ -90,6 +121,9 @@ static void* workerFunc(void* pSyncQ)
     LM_E(("Runtime Error (curl_easy_init)"));
     pthread_exit(NULL);
   }
+
+  // Set pthread_cancel handler
+  pthread_cleanup_push(workerFinishes, curl);
 
   for (;;)
   {
@@ -207,4 +241,9 @@ static void* workerFunc(void* pSyncQ)
     // Reset curl for next iteration
     curl_easy_reset(curl);
   }
+
+  // Next statemement never executes but compilation breaks without it. See this note in pthread.h:
+  // "pthread_cleanup_push and pthread_cleanup_pop are macros and must always be used in
+  // matching pairs at the same nesting level of braces".
+  pthread_cleanup_pop(0);
 }
