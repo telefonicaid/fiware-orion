@@ -474,7 +474,7 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
   associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
   `ServiceQueue` is used to put the notification in the right queue (step 2).
 * The vector is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
-* One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
+* One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using `SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
 * The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
