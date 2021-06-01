@@ -43,12 +43,15 @@
 #include "rest/httpHeaderAdd.h"
 
 #ifdef ORIONLD
-extern "C" {
+extern "C"
+{
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjson.h"                                       // Kjson
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
+
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
@@ -554,10 +557,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         notificationDataToGeoJson(kjTree, keyValues);
       }
 
-      int   bufSize = 512 * 1024;
-      char* buf     = (char*) malloc(bufSize);  // FIXME: Use kjFastRenderSize for better allocation
+      int   bufSize = kjFastRenderSize(kjTree);
+      char* buf     = (char*) malloc(bufSize);
 
-      kjFastRender(orionldState.kjsonP, kjTree, buf, bufSize);
+      kjFastRender(kjTree, buf);
       payloadString = buf;
       toFree        = buf;
     }

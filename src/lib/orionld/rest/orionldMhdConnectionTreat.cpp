@@ -32,8 +32,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjRender.h"                                      // kjRender, kjFastRender
 #include "kjson/kjRenderSize.h"                                  // kjRenderSize, kjFastRenderSize
+#include "kjson/kjRender.h"                                      // kjRender, kjFastRender
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
@@ -1029,7 +1029,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     unsigned int responsePayloadSize;
 
     if (orionldState.uriParams.prettyPrint == false)
-      responsePayloadSize = kjFastRenderSize(orionldState.kjsonP, orionldState.responseTree);
+      responsePayloadSize = kjFastRenderSize(orionldState.responseTree);
     else
       responsePayloadSize = kjRenderSize(orionldState.kjsonP, orionldState.responseTree);
 
@@ -1049,7 +1049,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
 
     if (orionldState.uriParams.prettyPrint == false)
-      kjFastRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
+      kjFastRender(orionldState.responseTree, orionldState.responsePayload);
     else
       kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
 

@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 }
 
@@ -59,15 +60,8 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     }
     else if (SCOMPARE12(itemP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
-      if (itemP->type == KjString)
-      {
-        DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
-      }
-      else if (itemP->type == KjArray)
-      {
-        DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
-      }
-      else
+      DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
+      if ((itemP->type != KjString) && (itemP->type != KjArray))
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates");
         return false;
@@ -110,7 +104,12 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
 
   if (coordinatesNodeP->type == KjArray)
   {
-    char coords[512];
+    char  coords[512];  // 512 should be enough for most cases - if not, kaAlloc
+    char* coordsString   = coords;
+    int   coordinatesLen = kjFastRenderSize(coordinatesNodeP);
+
+    if (coordinatesLen > 512)
+      coordsString = kaAlloc(&orionldState.kalloc, coordinatesLen);
 
     //
     // We have a little problem here ...
@@ -118,9 +117,9 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     // NGSI-LD needs it to be able to be an array.
     // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
     //
-    kjFastRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
-    coords[strlen(coords) - 1] = 0;       // Removing last ']'
-    subExpressionP->coords = &coords[1];  // Removing first '['
+    kjFastRender(coordinatesNodeP, coordsString);
+    coordsString[strlen(coordsString) - 1] = 0;       // Removing last ']'
+    subExpressionP->coords = &coordsString[1];        // Removing first '['
   }
   else
     subExpressionP->coords = coordinatesNodeP->value.s;

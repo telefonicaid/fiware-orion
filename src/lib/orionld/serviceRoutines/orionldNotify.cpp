@@ -28,6 +28,7 @@
 
 extern "C"
 {
+#include "kjson/kjRenderSize.h"                                  // kjFastRenderSize
 #include "kjson/kjRender.h"                                      // kjFastRender
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray, kjString, kjChildAdd, ...
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
@@ -260,7 +261,15 @@ void orionldNotify(void)
     kjChildAdd(notificationTree, dataNodeP);
     kjChildAdd(dataNodeP, niP->attrsForNotification);
 
-    kjFastRender(orionldState.kjsonP, notificationTree, payload, payloadLen);
+    int renderedSize = kjFastRenderSize(notificationTree);
+
+    if (renderedSize > payloadLen)
+    {
+      LM_W(("No Room in the notification buffer"));
+      strncpy(payload, "{\"error\": \"Implementation problem in Orion-LD - the notification buffer size needs a smarter allocation algorithm\"}", payloadLen);
+    }
+    else
+      kjFastRender(notificationTree, payload);
 
     int sizeLeftForLen = 16;  // sizeof(contentLenHeader) - 16
     contentLength = strlen(payload);
