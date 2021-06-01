@@ -156,7 +156,8 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 [Top](#top)
 
 ## Notification queue semaphore
-When a thread pool is used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore. 
+When thread pools are used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore.
+If serveral queues are used (i.e. a default queue and a per-service queues) then a semaphore exists in each queue.
 
 The semaphore, of type `boost::mutex`, is called `mtx` and it is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
 
@@ -176,7 +177,8 @@ public:
   size_t   size() const;
 };
 ```
-The class `QueueWorkers` includes a private member of type `SyncQOverflow`, while the class `QueueNotifier` includes a private member of type `QueueWorkers`.
+Both classes `QueueWorkers` and `ServiceQueue` include a private member of type `SyncQOverflow`, while the class `ServiceQueue` also includes a private member of type `QueueWorkers`.
+Class `QueueNotifier` may include a vector of per-service `ServiceQueue` and also a default `ServiceQueue` (for notifications not associated to any service with reserved queue).
 
 Finally, `contextBrokerInit()` in `src/app/contextBroker/contextBroker.cpp` creates an instance of `QueueNotifier` as a singleton, when requested (when CLI parameter `-notificationMode` equals **threadpool**).
 
