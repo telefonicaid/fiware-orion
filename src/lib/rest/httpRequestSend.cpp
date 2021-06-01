@@ -42,7 +42,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
-#include "common/sem.h"
 #include "common/limits.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
@@ -51,6 +50,7 @@
 #include "rest/httpRequestSend.h"
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "rest/curl.h"
 #include "serviceRoutines/versionTreat.h"
 
 

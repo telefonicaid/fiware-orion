@@ -85,6 +85,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/curl.h"
 #include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
