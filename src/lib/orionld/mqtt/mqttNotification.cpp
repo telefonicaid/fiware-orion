@@ -30,6 +30,7 @@
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, ...
 }
@@ -74,11 +75,10 @@ int mqttNotification
 {
   KjNode*  metadataNodeP      = kjObject(orionldState.kjsonP, "metadata");
   KjNode*  contentTypeNodeP   = kjString(orionldState.kjsonP, "Content-Type", mimeType);
-  char*    metadataBuf        = kaAlloc(&orionldState.kalloc, 4096);
   int      totalLen;
   char*    totalBuf;
 
-  if ((metadataNodeP == NULL) || (contentTypeNodeP == NULL) || (metadataBuf == NULL))
+  if ((metadataNodeP == NULL) || (contentTypeNodeP == NULL))
   {
     LM_E(("Internal Error (unable to allocate)"));
     return -1;
@@ -129,7 +129,13 @@ int mqttNotification
     kjChildAdd(metadataNodeP, kvP);
   }
 
-  kjFastRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 4096);
+  int   metadataBufLen = kjFastRenderSize(metadataNodeP);
+  char* metadataBuf    = kaAlloc(&orionldState.kalloc, metadataBufLen);
+
+  if (metadataBuf != NULL)
+    kjFastRender(metadataNodeP, metadataBuf);
+  else
+    metadataBuf = (char*) "null";
 
   totalLen = strlen(body) + strlen(metadataBuf) + 50;
   totalBuf = kaAlloc(&orionldState.kalloc, totalLen);

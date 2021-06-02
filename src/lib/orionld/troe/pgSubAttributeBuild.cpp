@@ -27,6 +27,7 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjChildRemove, kjChildAdd, ...
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjLookup.h"                                    // kjLookup
 }
@@ -193,10 +194,11 @@ static void subAttributeAppend
     }
     else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
     {
-      int          renderedValueSize   = 4 * 1024;
+      // WARNING: If a sub-attribute is HUGE, it may not have room enough in a buffer allocated by kaAlloc (there's a max-size)
+      int          renderedValueSize   = kjFastRenderSize(valueNodeP);
       char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
 
-      kjFastRender(orionldState.kjsonP, valueNodeP, renderedValue, renderedValueSize);
+      kjFastRender(valueNodeP, renderedValue);
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'Compound', null, null, null, null, '%s', null, null, null, null, null, null, '%s')",
                comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, renderedValue, orionldState.requestTimeString);

@@ -100,7 +100,7 @@ static void ssWrite(int fd, const char* data, int dataLen)
 #if 0
 // -----------------------------------------------------------------------------
 //
-// ssWrite -
+// ssGetEntity -
 //
 static void ssGetEntity(char* entityId)
 {
@@ -112,8 +112,14 @@ static void ssGetEntity(char* entityId)
                                           false,  // keyValues
                                           NULL);  // datasetId
 
-  char response[2048];
-  kjFastRender(orionldState.kjsonP, responseTree, response, sizeof(response));
+  int   responseSize = kjFastRenderSize(responseTree);
+  char* response     = (char*) malloc(responseSize);
+
+  if (response == NULL)
+    response = (char*) "Out of memory";
+  else
+    kjFastRender(responseTree, response);
+
   responseLen = strlen(response);
   ssWrite(fd, response, responseLen);
 }
