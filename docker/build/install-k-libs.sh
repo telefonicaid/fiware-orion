@@ -31,10 +31,18 @@ do
 done
 
 
-for kproj in kbase klog kalloc kjson khash
+for kproj in kbase klog kalloc khash
 do
     cd ${ROOT_FOLDER}/$kproj
     git checkout release/0.8
     make
     make install
 done
+
+#
+# kjson
+#
+cd ${ROOT_FOLDER}/kjson
+git checkout release/0.8.1
+make
+make install
