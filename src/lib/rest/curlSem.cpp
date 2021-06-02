@@ -31,7 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/clockFunctions.h"
-#include "curl.h"
+#include "curlSem.h"
 
 
 

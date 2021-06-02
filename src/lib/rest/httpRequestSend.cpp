@@ -50,7 +50,7 @@
 #include "rest/httpRequestSend.h"
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
-#include "rest/curl.h"
+#include "rest/curlSem.h"
 #include "serviceRoutines/versionTreat.h"
 
 

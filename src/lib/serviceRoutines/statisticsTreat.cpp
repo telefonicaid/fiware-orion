@@ -37,7 +37,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/rest.h"
-#include "rest/curl.h"
+#include "rest/curlSem.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "cache/subCache.h"
