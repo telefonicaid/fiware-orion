@@ -394,6 +394,7 @@ echo
 
 echo "35. GET the entity E1, make sure E1/P1's value is an array"
 echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 echo
 echo
 
@@ -1269,8 +1270,37 @@ bye
 
 35. GET the entity E1, make sure E1/P1's value is an array
 ==========================================================
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "P1-P1": {
+            "type": "Property",
+            "value": 22
+        },
+        "P1-R1": {
+            "object": "urn:ngsi-ld:entities:E19",
+            "type": "Relationship"
+        },
+        "observedAt": "2021-04-05T10:11:00.999Z",
+        "type": "Property",
+        "unitCode": "cm",
+        "value": [
+            "this",
+            "is",
+            "an",
+            "array"
+        ]
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T"
+}
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
