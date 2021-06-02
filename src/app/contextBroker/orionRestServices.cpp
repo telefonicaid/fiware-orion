@@ -580,8 +580,6 @@ void orionRestServicesInit
            connectionMemory,
            maxConnections,
            mhdThreadPoolSize,
-           "",
-           0,
            allowedOrigin,
            corsMaxAge,
            mhdTimeoutInSeconds,
