@@ -157,7 +157,7 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 
 ## Notification queue semaphore
 When thread pools are used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore.
-If serveral queues are used (i.e. a default queue and a per-service queues) then a semaphore exists in each queue.
+If several queues are used (i.e. a default queue and a per-service queues) then a semaphore exists in each queue.
 
 The semaphore, of type `boost::mutex`, is called `mtx` and it is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
 

@@ -176,6 +176,8 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
 * `timeInQueue` : キュー内で待機している通知の蓄積時間です
 * `size` : キューの現在のサイズです
 
+[サービスごとの予約済みキュー/プール](perf_tuning.md#notification-modes-and-performance)を使用する場合、このセクションの
+情報は、サービスごとのキュー/プールとデフォルトのキュー/ワーカーの合計であることに注意してください。
 
 ## GET /cache/statistics
 

@@ -75,11 +75,16 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-reqMutexPolicy <all|none|write|read>** : 内部 mutex ポリシーを指定します。詳細については、[パフォーマンス・チューニング](perf_tuning.md#mutex-policy-impact-on-performance)のドキュメントを参照してください。
 -   **-subCacheIval** : サブスクリプション・キャッシュの更新の呼び出し間隔 (秒単位)。ゼロ値は "リフレッシュしない" を意味します。デフォルト値は60秒で、mono-CB 配置に適しています。([このドキュメント](perf_tuning.md#subscription-cache)のサブスクリプション・キャッシュの詳細を参照してください
 -   **-noCache** : コンテキスト・サブスクリプション・キャッシュを無効にするので、サブスクリプション検索は常に DB で行われます。推奨されませんが、デバッグには便利です
--   **-notificationMode** : 通知モードを選択することができます。`transient`, `persistent` または `threadpool:q:n`。デフォルトモードは `transient` です
+-   **-notificationMode**。[こちら](perf_tuning.md#notification-modes-and-performance) で詳しく説明しています。
+    通知モードを選択できます: `transient`, `persistent` または `threadpool:q:n[,service1:q1:n1,...,serviceN:qN:nN]`。
+    デフォルトモードは `transient` です
     * transient モードでは、通知を送信した直後に接続は CB によって閉じられます
     * persistent 接続モードでは、通知が指定された URL パスに初めて送信されたときに、持続的な接続が作成されます (受信者が持続的な接続をサポートしている場合)。同じ URL パスへの通知が行われると、接続が再利用され、HTTP 接続時間が保存されます
-    * threadpool モードでは、通知は `q` と `n` のサイズのキューにエンキューされます。スレッドがキューからの通知を取ると、非同期に発信リクエストを行います。このモードを使用する場合は、[スレッド・モデルのセクション](perf_tuning.md#orion)を参照してください
--   **-notifFlowControl guage:stepDelay:maxInterval**. Enables flow control mechanism.
+    * スレッドプール・モードでは、通知はサイズ `q` のキューに入れられ、`n` スレッドはキューから通知を受け取り、
+      非同期的に発信要求を実行します。サービスごとに予約済みのキュー/スレッドを設定することもできます。
+      このモードを使用する場合は、[スレッド・モデル](perf_tuning.md#orion-thread-model-and-its-implications)
+      セクションをご覧ください
+-   **-notifFlowControl guage:stepDelay:maxInterval**. フロー制御メカニズムを有効にします。
     [ドキュメントのこのセクション](perf_tuning.md#updates-flow-control-mechanism)を参照してください
 -   **-simulatedNotification** : 通知は送信されませんが、内部で記録され、 [統計情報](statistics.md)オペレーション (`simulatedNotifications` カウンタ) に表示されます。これは本番用ではありませんが、デバッグでは CB の内部ロジックの観点から通知レートの最大上限を計算すると便利です。
 -   **-connectionMemory** : HTTP サーバ・ライブラリが内部的に使用する、接続ごとの接続メモリー・バッファのサイズ (KB 単位) を設定します。デフォルト値は64 KB です

@@ -114,6 +114,40 @@ Orion は、[`-notificationMode`](cli.md) 値に応じて異なる通知モー�
 
 ![](../../manuals/admin/notif_queue.png "notif_queue.png")
 
+**(実験的機能)** サービスごとに予約済みのキュー/プールを設定することもできます。これは、負荷の高いサービスの
+通知によって他のサービスの通知が枯渇する可能性があることを回避したい場合に非常に便利です。この場合、
+スレッド・プール・モードに定義されたキュー (q) とワーカーのプール (n) がデフォルトです
+ (したがって、予約済みキューのないサービスはそれを使用します)。ただし、さらに、次の構文でサービスごとに追加の
+キュー/プールを定義できます:
+
+```
+-notificationMode threadpool:q:n,service1:q1:n1,...,serviceN:qN:nN
+```
+
+たとえば、次の設定を検討してください:
+
+```
+-notificationMode threadpool:q:n,serv1:q1:n1,serv2:q2:n2
+```
+
+次のように動作します:
+
+* サービス `serv1` に関連付けられた通知 (つまり、`fiware-service: serv1` ヘッダを使用する更新リクエストに
+  よってトリガーされる通知) は、キュー q1 とワーカー・プール n1 を使用します
+* サービス `serv2` に関連付けられた通知は、キュー q2 とワーカー・プール n2 を使用します
+* その他の通知 (つまり、`serv1` または `serv2`に関連付けられていない通知は、キュー q とワーカー・プール
+  n を使用します。
+
+したがって、たとえば `serv1` に通知の負荷ピークがある場合、そのサービスの通知は破棄されます
+(ログに `Runtime Error (serv1 notification queue is full)` エラーが表示されます) が、そのキューの飽和は
+他のサービスに悪影響を及ぼしません。
+
+![](notif_queue_per_service.png "notif_queue_per_service.png")
+
+動作中のサービスごとの予約済みキュー/プールの詳細な例は
+[このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/test/perServiceNotifQueuesTest/README.md)
+にあります。
+
 [トップ](#top)
 
 <a name="updates-flow-control-mechanism"></a>
@@ -162,6 +196,10 @@ Orion は、フロー制御を使用して、更新要求にすぐに応答す�
 動作中のフロー制御の詳細な例は
 [このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/test/flowControlTest/README.md).
 にあります。
+
+なお、[サービス別予約キュー/プール](notification-modes-and-performance)を利用する場合、フロー
+制御に使用するキューはサービスに対応したキュー (または、サービスに予約済みキューがない場合は
+デフォルトのキュー) です。
 
 [トップ](#top)
 
@@ -237,7 +275,10 @@ Orion はマルチスレッド・プロセスです。デフォルトの起動�
 独立して設定できる2つのプールがあります :
 
 * 着信要求プール。`-reqPoolSize c` パラメータによって設定されます。`c` は、このプール内のスレッド数です。詳細については、このページの [HTTP サーバのチューニング](#http-server-tuning)を参照してください
-* 通知プール。`-notificationMode threadpool:q:n` で設定されます。`n` はこのプール内のスレッド数です。[通知モードとパフォーマンスのセクション](#notification-modes-and-performance)を参照してください
+* 通知プール。`-notificationMode threadpool:q:n` で設定されます。`n` はこのプール内のスレッド数です。
+  [通知モードとパフォーマンスのセクション](#notification-modes-and-performance)を参照してください。サービスごとの
+  予約済みキュー/プールを使用する場合、`n` はすべてのサービスごとのプール内のスレッドとデフォルト・プール内の
+  スレッドの合計であることに注意してください。
 
 アイドル状態またはビジー状態のいずれの状況でも、両方のパラメータを使用すると、Orion は一定数のスレッドを消費します :
 
