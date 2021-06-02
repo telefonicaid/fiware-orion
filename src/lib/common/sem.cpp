@@ -549,34 +549,3 @@ const char* timeStatSemGet(void)
 
 
 
-/* ****************************************************************************
-*  sem context
-*/
-//
-// Variables for mutexes and their state
-//
-//
-static bool                                        contexts_mutex_taken    = false;
-static int                                         endpoint_mutexes_taken  = 0;
-
-
-/* ****************************************************************************
-*
-* connectionContextSemGet - 
-*/
-const char* connectionContextSemGet(void)
-{
-  return (contexts_mutex_taken)? "taken" : "free";
-}
-
-
-
-/* ****************************************************************************
-*
-* connectionSubContextSemGet - 
-*/
-const char* connectionSubContextSemGet(void)
-{
-  return (endpoint_mutexes_taken == 0)? "free" : "taken";
-}
-
