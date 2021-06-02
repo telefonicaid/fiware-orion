@@ -150,7 +150,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
-  // FIXME P7: Should Rush be used?
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
@@ -176,7 +175,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       ciP->httpHeaders.correlator,
                       "",
                       false,
-                      true,
                       &out,
                       noHeaders,
                       mimeType);

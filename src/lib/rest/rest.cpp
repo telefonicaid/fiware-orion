@@ -104,8 +104,6 @@ static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
-std::string                      rushHost              = "";
-unsigned short                   rushPort              = NO_PORT;
 bool                             corsEnabled           = false;
 char                             corsOrigin[64];
 int                              corsMaxAge;
@@ -2176,8 +2174,6 @@ void restInit
   unsigned int        _connectionMemory,
   unsigned int        _maxConnections,
   unsigned int        _mhdThreadPoolSize,
-  const std::string&  _rushHost,
-  unsigned short      _rushPort,
   const char*         _corsOrigin,
   int                 _corsMaxAge,
   int                 _mhdTimeoutInSeconds,
@@ -2196,8 +2192,6 @@ void restInit
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;
   threadPoolSize   = _mhdThreadPoolSize;
-  rushHost         = _rushHost;
-  rushPort         = _rushPort;
   corsMaxAge       = _corsMaxAge;
 
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
