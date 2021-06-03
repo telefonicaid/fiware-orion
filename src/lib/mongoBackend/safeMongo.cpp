@@ -166,23 +166,23 @@ double getNumberField(const BSONObj& b, const char* field, const char* caller, i
 *
 * getIntField -
 */
-int getIntField(const BSONObj& b, const char* field, const char* caller, int line)
+int getIntField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::NumberInt)
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberInt)
   {
-    return b.getIntField(field);
+    return bP->getIntField(field);
   }
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, b.toString().c_str(), caller, line));
+          field, bP->toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return -1;

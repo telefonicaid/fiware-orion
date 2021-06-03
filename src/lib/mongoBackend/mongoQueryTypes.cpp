@@ -219,7 +219,8 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
     resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
-      return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+      BSONObj bo = resultsArray[0].embeddedObject();
+      return getIntFieldF(&bo, "count");
     }
   }
   else
