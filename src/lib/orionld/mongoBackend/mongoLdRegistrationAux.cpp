@@ -57,12 +57,12 @@ void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
   for (unsigned int ix = 0; ix < dbPropertyV.size(); ++ix)
   {
     mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
-    std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
+    std::string     type = getStringFieldF(&pobj, REG_ATTRS_TYPE);
     std::string     propName;
 
     if (type == REG_PROPERTIES_TYPE)
     {
-      propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
+      propName = getStringFieldF(&pobj, REG_PROPERTIES_NAME);
 
       if (propName != "")
       {
@@ -86,12 +86,12 @@ void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
   for (unsigned int ix = 0; ix < dbRelationshipV.size(); ++ix)
   {
     mongo::BSONObj  robj = dbRelationshipV[ix].embeddedObject();
-    std::string     type = getStringFieldF(robj, REG_ATTRS_TYPE);
+    std::string     type = getStringFieldF(&robj, REG_ATTRS_TYPE);
     std::string     relName;
 
     if (type == REG_RELATIONSHIPS_TYPE)
     {
-      relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
+      relName = getStringFieldF(&robj, REG_RELATIONSHIPS_NAME);
 
       if (relName != "")
       {
@@ -108,9 +108,9 @@ void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 *
 * mongoSetLdRegistrationId -
 */
-void mongoSetLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdRegistrationId(ngsiv2::Registration* reg, mongo::BSONObj* bobjP)
 {
-  reg->id = getStringFieldF(r, "_id");
+  reg->id = getStringFieldF(bobjP, "_id");
 }
 
 
@@ -119,9 +119,9 @@ void mongoSetLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r
 *
 * mongoSetLdName -
 */
-void mongoSetLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdName(ngsiv2::Registration* reg, mongo::BSONObj* bobjP)
 {
-  reg->name = r.hasField(REG_NAME) ? getStringFieldF(r, REG_NAME) : "";
+  reg->name = bobjP->hasField(REG_NAME) ? getStringFieldF(bobjP, REG_NAME) : "";
 }
 
 

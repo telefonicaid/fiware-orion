@@ -36,12 +36,12 @@
 * mongo set functions
 */
 extern void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r);
-extern void mongoSetDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r);
-extern void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r);
-extern void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0);
-extern void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0);
-extern void mongoSetExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r);
-extern void mongoSetStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r);
-extern bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed);
+extern void mongoSetDescription(ngsiv2::Registration* regP,    const mongo::BSONObj* rP);
+extern void mongoSetProvider(ngsiv2::Registration* regP,       const mongo::BSONObj* rP);
+extern void mongoSetEntities(ngsiv2::Registration* regP,       const mongo::BSONObj& cr0);
+extern void mongoSetAttributes(ngsiv2::Registration* regP,     const mongo::BSONObj& cr0);
+extern void mongoSetExpires(ngsiv2::Registration* regP,        const mongo::BSONObj& r);
+extern void mongoSetStatus(ngsiv2::Registration* regP,         const mongo::BSONObj* rP);
+extern bool mongoSetDataProvided(ngsiv2::Registration* regP,   const mongo::BSONObj& r, bool arrayAllowed);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONAUX_H_

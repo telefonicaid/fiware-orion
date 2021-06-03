@@ -98,7 +98,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   else
   {
     // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
-    std::string reference = getStringFieldF(subOrig, CSUB_REFERENCE);
+    std::string reference = getStringFieldF(&subOrig, CSUB_REFERENCE);
     bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
 
     b->append(CSUB_REFERENCE, reference);
@@ -109,7 +109,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_METHOD))
     {
-      std::string method = getStringFieldF(subOrig, CSUB_METHOD);
+      std::string method = getStringFieldF(&subOrig, CSUB_METHOD);
 
       b->append(CSUB_METHOD, method);
       LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
@@ -133,7 +133,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_PAYLOAD))
     {
-      std::string payload = getStringFieldF(subOrig, CSUB_PAYLOAD);
+      std::string payload = getStringFieldF(&subOrig, CSUB_PAYLOAD);
 
       b->append(CSUB_PAYLOAD, payload);
       LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
@@ -181,7 +181,7 @@ static void setDescription(const SubscriptionUpdate& subUp, const BSONObj& subOr
   {
     if (subOrig.hasField(CSUB_DESCRIPTION))
     {
-      std::string description = getStringFieldF(subOrig, CSUB_DESCRIPTION);
+      std::string description = getStringFieldF(&subOrig, CSUB_DESCRIPTION);
 
       b->append(CSUB_DESCRIPTION, description);
       LM_T(LmtMongo, ("Subscription description: %s", description.c_str()));
@@ -205,7 +205,7 @@ static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   {
     if (subOrig.hasField(CSUB_STATUS))
     {
-      std::string status = getStringFieldF(subOrig, CSUB_STATUS);
+      std::string status = getStringFieldF(&subOrig, CSUB_STATUS);
 
       b->append(CSUB_STATUS, status);
       LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
@@ -296,9 +296,9 @@ static void setCondsAndInitialNotifyNgsiv1
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj     ent       = ents[ix].embeddedObject();
-    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    std::string id        = getStringFieldF(&ent, CSUB_ENTITY_ID);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(&ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern = getStringFieldF(&ent, CSUB_ENTITY_ISPATTERN);
     EntID       en;
 
     if (isFalse(isPattern))
@@ -384,7 +384,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
+      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(&subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
     if (subUp.notificationProvided)
@@ -396,7 +396,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      httpInfo.fill(subOrig);
+      httpInfo.fill(&subOrig);
       blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
       setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
 
@@ -412,7 +412,7 @@ static void setCondsAndInitialNotify
     }
     else if (subOrig.hasField(CSUB_FORMAT))
     {
-      attrsFormat = stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT));
+      attrsFormat = stringToRenderFormat(getStringFieldF(&subOrig, CSUB_FORMAT));
     }
 
     if (subUp.fromNgsiv1)
@@ -626,7 +626,7 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   }
   else
   {
-    std::string format = getStringFieldF(subOrig, CSUB_FORMAT);
+    std::string format = getStringFieldF(&subOrig, CSUB_FORMAT);
 
     b->append(CSUB_FORMAT, format);
     LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
@@ -769,18 +769,18 @@ void updateInCache
 
   if (doc.hasField(CSUB_FORMAT))
   {
-    renderFormat = stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT));
+    renderFormat = stringToRenderFormat(getStringFieldF(&doc, CSUB_FORMAT));
   }
 
   if (doc.hasField(CSUB_EXPR))
   {
     BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
 
-    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
-    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
-    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
-    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
-    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
+    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
+    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(&expr, CSUB_EXPR_GEOM)   : "";
+    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(&expr, CSUB_EXPR_COORDS) : "";
+    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(&expr, CSUB_EXPR_GEOREL) : "";
   }
 
 
@@ -792,7 +792,7 @@ void updateInCache
                                           lastFailure,
                                           lastSuccess,
                                           doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldF(&doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
                                           mq,
                                           geom,

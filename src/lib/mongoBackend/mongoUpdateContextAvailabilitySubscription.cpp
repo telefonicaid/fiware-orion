@@ -163,7 +163,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Reference is not updatable, so it is appended directly */
-  newSub.append(CASUB_REFERENCE, getStringFieldF(sub, CASUB_REFERENCE));
+  newSub.append(CASUB_REFERENCE, getStringFieldF(&sub, CASUB_REFERENCE));
 
   int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(sub, CASUB_COUNT) : 0;
 
@@ -208,7 +208,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   processAvailabilitySubscription(requestP->entityIdVector,
                                   requestP->attributeList,
                                   requestP->subscriptionId.get(),
-                                  getStringFieldF(sub, CASUB_REFERENCE),
+                                  getStringFieldF(&sub, CASUB_REFERENCE),
                                   NGSI_V1_LEGACY,
                                   tenant,
                                   fiwareCorrelator);

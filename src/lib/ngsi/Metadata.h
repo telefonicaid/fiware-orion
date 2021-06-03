@@ -89,7 +89,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
-  Metadata(const std::string& _name, const mongo::BSONObj& mdB);
+  Metadata(const char* _name, mongo::BSONObj* mdB);
   ~Metadata();
 
   std::string  render(bool comma);

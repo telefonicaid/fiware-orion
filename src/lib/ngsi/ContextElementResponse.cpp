@@ -144,17 +144,18 @@ ContextElementResponse::ContextElementResponse
   // Entity
   BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
 
-  std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
-  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
+  std::string entityId   = getStringFieldF(&id, ENT_ENTITY_ID);
+  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(&id, ENT_ENTITY_TYPE) : "";
 
   contextElement.entityId.fill(entityId, entityType, "false");
-  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(id, ENT_SERVICE_PATH) : "";
+  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(&id, ENT_SERVICE_PATH) : "";
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
   if (entityDoc.hasElement(ENT_LOCATION))
   {
-    locAttr = getStringFieldF(getObjectFieldF(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
+    BSONObj objField = getObjectFieldF(entityDoc, ENT_LOCATION);
+    locAttr = getStringFieldF(&objField, ENT_LOCATION_ATTRNAME);
   }
 
 
@@ -186,7 +187,7 @@ ContextElementResponse::ContextElementResponse
     eqForDot(aName);
 
     ca.name = aName;
-    ca.type = getStringFieldF(attr, ENT_ATTRS_TYPE);
+    ca.type = getStringFieldF(&attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
     if (!includedAttribute(&ca, attrL))
@@ -205,7 +206,7 @@ ContextElementResponse::ContextElementResponse
       switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
       {
       case String:
-        ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
+        ca.stringValue = getStringFieldF(&attr, ENT_ATTRS_VALUE);
         if (!includeEmpty && ca.stringValue.length() == 0)
         {
           continue;
@@ -284,13 +285,14 @@ ContextElementResponse::ContextElementResponse
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
-        char* currentMd = (char*) i->c_str();
-        char  mdName[512];
+        char*   currentMd = (char*) i->c_str();
+        BSONObj mdObj     = getObjectFieldF(mds, currentMd); 
+        char    mdName[512];
 
         strncpy(mdName, currentMd, sizeof(mdName));
         eqForDot(mdName);
 
-        Metadata*   mdP = new Metadata(mdName, getObjectFieldF(mds, currentMd));
+        Metadata* mdP = new Metadata((const char*) mdName, &mdObj);
         caP->metadataVector.push_back(mdP);
       }
     }

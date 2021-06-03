@@ -269,7 +269,7 @@ static DBClientBase* mongoConnect
   BSONObj     result;
   std::string extra;
   runCollectionCommand(connection, "admin", BSON("buildinfo" << 1), &result, &err);
-  std::string versionString = std::string(getStringFieldF(result, "version"));
+  std::string versionString = std::string(getStringFieldF(&result, "version"));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));

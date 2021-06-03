@@ -113,7 +113,7 @@ void mongoRegistrationGet
     // Fill in the Registration with data retrieved from the data base
     //
     mongoSetRegistrationId(regP, bob);
-    mongoSetDescription(regP, bob);
+    mongoSetDescription(regP, &bob);
 
     if (mongoSetDataProvided(regP, bob, false) == false)
     {
@@ -130,7 +130,7 @@ void mongoRegistrationGet
     mongoSetLdManagementInterval(regP, bob);
 #endif
     mongoSetExpires(regP, bob);
-    mongoSetStatus(regP, bob);
+    mongoSetStatus(regP, &bob);
 
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -227,7 +227,7 @@ void mongoRegistrationsGet
     // Fill in the Registration with data retrieved from the data base
     //
     mongoSetRegistrationId(&reg, bob);
-    mongoSetDescription(&reg, bob);
+    mongoSetDescription(&reg, &bob);
 
     if (mongoSetDataProvided(&reg, bob, false) == false)
     {
@@ -239,7 +239,7 @@ void mongoRegistrationsGet
     }
 
     mongoSetExpires(&reg, bob);
-    mongoSetStatus(&reg, bob);
+    mongoSetStatus(&reg, &bob);
 
     regV->push_back(reg);
   }

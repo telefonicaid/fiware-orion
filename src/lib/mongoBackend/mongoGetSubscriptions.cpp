@@ -85,9 +85,9 @@ static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
 *
 * setDescription -
 */
-static void setDescription(Subscription* s, const BSONObj& r)
+static void setDescription(Subscription* s, const BSONObj* bobjP)
 {
-  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
+  s->description = bobjP->hasField(CSUB_DESCRIPTION) ? getStringFieldF(bobjP, CSUB_DESCRIPTION) : "";
 }
 
 
@@ -103,9 +103,9 @@ static void setSubject(Subscription* s, const BSONObj& r)
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent               = ents[ix].embeddedObject();
-    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    std::string id            = getStringFieldF(&ent, CSUB_ENTITY_ID);
+    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(&ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern     = getStringFieldF(&ent, CSUB_ENTITY_ISPATTERN);
     bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
                                   getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
@@ -139,12 +139,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
 
-    const char*  q           = getStringFieldF(expression, CSUB_EXPR_Q);
-    const char*  mq          = getStringFieldF(expression, CSUB_EXPR_MQ);
-    const char*  geo         = getStringFieldF(expression, CSUB_EXPR_GEOM);
-    const char*  coords      = getStringFieldF(expression, CSUB_EXPR_COORDS);
-    const char*  georel      = getStringFieldF(expression, CSUB_EXPR_GEOREL);
-    const char*  geoproperty = getStringFieldF(expression, "geoproperty");
+    const char*  q           = getStringFieldF(&expression, CSUB_EXPR_Q);
+    const char*  mq          = getStringFieldF(&expression, CSUB_EXPR_MQ);
+    const char*  geo         = getStringFieldF(&expression, CSUB_EXPR_GEOM);
+    const char*  coords      = getStringFieldF(&expression, CSUB_EXPR_COORDS);
+    const char*  georel      = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
+    const char*  geoproperty = getStringFieldF(&expression, "geoproperty");
 
     if (q[0]  != 0)           s->subject.condition.expression.q           = q;
     if (mq[0] != 0)           s->subject.condition.expression.mq          = mq;
@@ -172,7 +172,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
     setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
   }
 
-  subP->notification.httpInfo.fill(r);
+  subP->notification.httpInfo.fill(&r);
 
   ngsiv2::Notification* nP = &subP->notification;
 
@@ -184,7 +184,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(r, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(&r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
 
 
   //
@@ -247,7 +247,7 @@ static void setStatus(Subscription* s, const BSONObj& r)
   //
   if ((s->expires > orionldState.requestTime) || (s->expires == -1))
   {
-    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(&r, CSUB_STATUS) : STATUS_ACTIVE;
   }
   else
   {
@@ -262,9 +262,9 @@ static void setStatus(Subscription* s, const BSONObj& r)
 *
 * setSubscriptionId -
 */
-static void setSubscriptionId(Subscription* s, const BSONObj& r)
+static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 {
-  s->id = getStringFieldF(r, "_id");
+  s->id = getStringFieldF(rP, "_id");
 }
 
 
@@ -273,9 +273,9 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 *
 * setName -
 */
-static void setName(Subscription* s, const BSONObj& r)
+static void setName(Subscription* s, const BSONObj* rP)
 {
-  s->name = getStringFieldF(r, CSUB_NAME);
+  s->name = getStringFieldF(rP, CSUB_NAME);
 }
 
 
@@ -284,9 +284,9 @@ static void setName(Subscription* s, const BSONObj& r)
 *
 * setContext -
 */
-static void setContext(Subscription* s, const BSONObj& r)
+static void setContext(Subscription* s, const BSONObj* rP)
 {
-  s->ldContext = getStringFieldF(r, CSUB_LDCONTEXT);
+  s->ldContext = getStringFieldF(rP, CSUB_LDCONTEXT);
 }
 
 
@@ -295,9 +295,9 @@ static void setContext(Subscription* s, const BSONObj& r)
 *
 * setCsf -
 */
-static void setCsf(Subscription* s, const BSONObj& r)
+static void setCsf(Subscription* s, const BSONObj* rP)
 {
-  s->csf = getStringFieldF(r, "csf");
+  s->csf = getStringFieldF(rP, "csf");
 }
 
 
@@ -306,11 +306,11 @@ static void setCsf(Subscription* s, const BSONObj& r)
 *
 * setMimeType -
 */
-static void setMimeType(Subscription* s, const BSONObj& r)
+static void setMimeType(Subscription* s, const BSONObj* rP)
 {
-  if (r.hasField(CSUB_NAME))
+  if (rP->hasField(CSUB_NAME))
   {
-    const char* mimeTypeString = getStringFieldF(r, CSUB_MIMETYPE);
+    const char* mimeTypeString = getStringFieldF(rP, CSUB_MIMETYPE);
 
     s->notification.httpInfo.mimeType = longStringToMimeType(mimeTypeString);
   }
@@ -406,7 +406,7 @@ void mongoListSubscriptions
     Subscription  s;
 
     setNewSubscriptionId(&s, r);
-    setDescription(&s, r);
+    setDescription(&s, &r);
     setSubject(&s, r);
     setStatus(&s, r);
     setNotification(&s, r, tenant);
@@ -481,7 +481,7 @@ void mongoGetSubscription
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setNewSubscriptionId(sub, r);
-    setDescription(sub, r);
+    setDescription(sub, &r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
     setStatus(sub, r);
@@ -567,15 +567,15 @@ bool mongoGetLdSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setSubscriptionId(subP, r);
-    setDescription(subP, r);
-    setMimeType(subP, r);
+    setSubscriptionId(subP, &r);
+    setDescription(subP, &r);
+    setMimeType(subP, &r);
     setSubject(subP, r);
     setNotification(subP, r, tenant);
     setStatus(subP, r);
-    setName(subP, r);
-    setContext(subP, r);
-    setCsf(subP, r);
+    setName(subP, &r);
+    setContext(subP, &r);
+    setCsf(subP, &r);
     setTimeInterval(subP, r);
     mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
     mongoSetLdTimestamp(&subP->modifiedAt, "modifiedAt", r);
@@ -696,15 +696,15 @@ bool mongoGetLdSubscriptions
 
     Subscription s;
 
-    setSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setMimeType(&s, r);
+    setSubscriptionId(&s, &r);
+    setDescription(&s, &r);
+    setMimeType(&s, &r);
     setSubject(&s, r);
     setNotification(&s, r, tenant);
     setStatus(&s, r);
-    setName(&s, r);
-    setContext(&s, r);
-    setCsf(&s, r);
+    setName(&s, &r);
+    setContext(&s, &r);
+    setCsf(&s, &r);
     setTimeInterval(&s, r);
 
     subVecP->push_back(s);

@@ -125,24 +125,24 @@ std::string HttpInfo::toJson()
 *
 * HttpInfo::fill -
 */
-void HttpInfo::fill(const BSONObj& bo)
+void HttpInfo::fill(const BSONObj* boP)
 {
-  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
-  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
+  this->url    = boP->hasField(CSUB_REFERENCE)? getStringFieldF(boP,  CSUB_REFERENCE) : "";
+  this->custom = boP->hasField(CSUB_CUSTOM)?    getBoolFieldF(*boP,   CSUB_CUSTOM)    : false;
 
   bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
 
 #ifdef ORIONLD
-  char* mimeTypeString = (char*) getStringFieldF(bo, CSUB_MIMETYPE);
+  char* mimeTypeString = (char*) getStringFieldF(boP, CSUB_MIMETYPE);
 
   if (mimeTypeString[0] == 0)
     mimeTypeString = (char*) "application/json";  // Default value
 
   this->mimeType = longStringToMimeType(mimeTypeString);
 
-  if (bo.hasField("notifierInfo"))
+  if (boP->hasField("notifierInfo"))
   {
-    BSONObj ni = getObjectFieldF(bo, "notifierInfo");
+    BSONObj ni = getObjectFieldF(*boP, "notifierInfo");
 
     for (BSONObj::iterator iter = ni.begin(); iter.more();)
     {
@@ -162,17 +162,17 @@ void HttpInfo::fill(const BSONObj& bo)
 
   if (this->custom)
   {
-    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+    this->payload  = boP->hasField(CSUB_PAYLOAD)? getStringFieldF(boP, CSUB_PAYLOAD) : "";
 
-    if (bo.hasField(CSUB_METHOD))
+    if (boP->hasField(CSUB_METHOD))
     {
-      this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));
+      this->verb = str2Verb(getStringFieldF(boP, CSUB_METHOD));
     }
 
     // qs
-    if (bo.hasField(CSUB_QS))
+    if (boP->hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(bo, CSUB_QS);
+      BSONObj qs = getObjectFieldF(*boP, CSUB_QS);
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -186,9 +186,9 @@ void HttpInfo::fill(const BSONObj& bo)
   if (this->custom || mqtt)
   {
     // headers
-    if (bo.hasField(CSUB_HEADERS))
+    if (boP->hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
+      BSONObj headers = getObjectFieldF(*boP, CSUB_HEADERS);
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {

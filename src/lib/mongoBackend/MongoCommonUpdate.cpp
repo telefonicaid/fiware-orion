@@ -207,8 +207,8 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       break;
 
     case mongo::String:
-      md1Type = (char*) getStringFieldF(md1, ENT_ATTRS_MD_TYPE);
-      md2Type = (char*) getStringFieldF(md2, ENT_ATTRS_MD_TYPE);
+      md1Type = (char*) getStringFieldF(&md1, ENT_ATTRS_MD_TYPE);
+      md2Type = (char*) getStringFieldF(&md2, ENT_ATTRS_MD_TYPE);
 
       if (strcmp(md1Type, md2Type) != 0)
         return false;
@@ -255,8 +255,8 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::String:
-    md1Value = (char*) getStringFieldF(md1, ENT_ATTRS_MD_VALUE);
-    md2Value = (char*) getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
+    md1Value = (char*) getStringFieldF(&md1, ENT_ATTRS_MD_VALUE);
+    md2Value = (char*) getStringFieldF(&md2, ENT_ATTRS_MD_VALUE);
     return (strcmp(md1Value, md2Value) == 0);
 
   case mongo::jstNULL:
@@ -342,7 +342,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
   case mongo::String:
     // getStringFieldF is OK here as caP->stringValue is a std::string ...
     // Should be amended though. Some day
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(&attr, ENT_ATTRS_VALUE);
 
   case mongo::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
@@ -476,7 +476,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(ab, getStringFieldF(&attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -503,7 +503,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       break;
 
     case mongo::String:
-      ab.append(ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getStringFieldF(&attr, ENT_ATTRS_VALUE));
       break;
 
     case mongo::jstNULL:
@@ -524,7 +524,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, getStringFieldF(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringFieldF(&attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -563,7 +563,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     {
       const char*  currentMd = i->c_str();
       BSONObj      mdItem    = getObjectFieldF(md, currentMd);
-      Metadata     md(currentMd, mdItem);
+      Metadata     md(currentMd, &mdItem);
 
       mdSize++;
 
@@ -620,7 +620,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       actualUpdate = true;
     else
     {
-      const char* attrType        = getStringFieldF(attr, ENT_ATTRS_TYPE);
+      const char* attrType        = getStringFieldF(&attr, ENT_ATTRS_TYPE);
       bool        attrTypeChanged = (strcmp(attrType, caP->type.c_str()) != 0);
 
       actualUpdate = (attrValueChanges(attr, caP, apiVersion)  ||
@@ -1559,11 +1559,11 @@ static bool addTriggeredSubscriptions_noCache
       //
       double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
       double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
-      const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
-      httpInfo.fill(sub);
+      httpInfo.fill(&sub);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -1584,11 +1584,11 @@ static bool addTriggeredSubscriptions_noCache
       {
         BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expr, CSUB_EXPR_Q)      : "";
-        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
+        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
+        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(&expr, CSUB_EXPR_GEOREL) : "";
+        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(&expr, CSUB_EXPR_GEOM)   : "";
+        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(&expr, CSUB_EXPR_COORDS) : "";
 
         trigs->fillExpression(georel, geometry, coords);
 
@@ -3318,9 +3318,9 @@ static void updateEntity
 
   BSONObj            idField           = getObjectFieldF(r, "_id");
 
-  std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
-  std::string        entityType        = getStringFieldF(idField, ENT_ENTITY_TYPE);
-  std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
+  std::string        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
+  std::string        entityType        = getStringFieldF(&idField, ENT_ENTITY_TYPE);
+  std::string        entitySPath       = getStringFieldF(&idField, ENT_SERVICE_PATH);
 
   ContextElementResponse* cerP = new ContextElementResponse();
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
@@ -3359,7 +3359,7 @@ static void updateEntity
   {
     BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr        = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
+    locAttr        = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
     currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
@@ -3419,7 +3419,7 @@ static void updateEntity
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (strcmp(getStringFieldF(r, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
+    loopDetected = (strcmp(getStringFieldF(&r, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
   }
 
   if (!processContextAttributeVector(ceP,

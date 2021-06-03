@@ -142,8 +142,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  const char*    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : NULL;
-  const char*    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  const char*    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(&sub, CSUB_LDCONTEXT) : NULL;
+  const char*    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
@@ -165,12 +165,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   }
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH) : "/");
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                   : "active";
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(&sub, CSUB_STATUS)                  : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                  : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
@@ -183,7 +183,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
+  cSubP->httpInfo.fill(&sub);
 
 
   //
@@ -197,7 +197,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     {
       std::string errorString;
 
-      cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
+      cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
       if (cSubP->expression.q != "")
       {
         if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
@@ -214,7 +214,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     {
       std::string errorString;
 
-      cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
+      cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
       if (cSubP->expression.mq != "")
       {
         if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
@@ -229,17 +229,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
     if (expression.hasField(CSUB_EXPR_GEOM))
     {
-      cSubP->expression.geometry = getStringFieldF(expression, CSUB_EXPR_GEOM);
+      cSubP->expression.geometry = getStringFieldF(&expression, CSUB_EXPR_GEOM);
     }
 
     if (expression.hasField(CSUB_EXPR_COORDS))
     {
-      cSubP->expression.coords = getStringFieldF(expression, CSUB_EXPR_COORDS);
+      cSubP->expression.coords = getStringFieldF(&expression, CSUB_EXPR_COORDS);
     }
 
     if (expression.hasField(CSUB_EXPR_GEOREL))
     {
-      cSubP->expression.georel = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+      cSubP->expression.georel = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
     }
   }
 
@@ -258,15 +258,15 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string id            = getStringFieldF(&entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(&entity, CSUB_ENTITY_ISPATTERN) : "false";
     if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(&entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
@@ -384,15 +384,15 @@ int mongoSubCacheItemInsert
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string id            = getStringFieldF(&entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(&entity, CSUB_ENTITY_ISPATTERN) : "false";
     if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(&entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
@@ -442,7 +442,7 @@ int mongoSubCacheItemInsert
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
+  cSubP->httpInfo.fill(&sub);
 
 
   //
