@@ -165,12 +165,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Reference is not updatable, so it is appended directly */
   newSub.append(CASUB_REFERENCE, getStringFieldF(&sub, CASUB_REFERENCE));
 
-  int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(sub, CASUB_COUNT) : 0;
+  int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(&sub, CASUB_COUNT) : 0;
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION))
   {
-    newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(sub, CASUB_LASTNOTIFICATION));
+    newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(&sub, CASUB_LASTNOTIFICATION));
   }
 
   if (sub.hasField(CASUB_COUNT))

@@ -205,7 +205,7 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
 
   case NumberInt:
     valueType   = orion::ValueTypeNumber;
-    numberValue = (double) getIntFieldF(*mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = (double) getIntFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case NumberDouble:

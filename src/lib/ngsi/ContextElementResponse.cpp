@@ -220,7 +220,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberInt:
-        ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
+        ca.numberValue = (double) getIntFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
