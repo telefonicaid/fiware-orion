@@ -175,12 +175,12 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 
   ngsiv2::Notification* nP = &subP->notification;
 
-  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(r, CSUB_THROTTLING)       : -1;
-  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)           : -1;
-  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&r, CSUB_BLACKLIST)                 : false;
-  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(r, CSUB_LASTFAILURE)      : -1;
-  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(r, CSUB_LASTSUCCESS)      : -1;
+  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&r, CSUB_THROTTLING)       : -1;
+  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&r, CSUB_LASTNOTIFICATION) : -1;
+  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(&r, CSUB_COUNT)           : -1;
+  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&r, CSUB_BLACKLIST)                  : false;
+  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(&r, CSUB_LASTFAILURE)      : -1;
+  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(&r, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(&r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -234,7 +234,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 */
 static void setStatus(Subscription* s, const BSONObj& r)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(r, CSUB_EXPIRATION) : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&r, CSUB_EXPIRATION) : -1;
 
   //
   // Status
@@ -323,7 +323,7 @@ static void setMimeType(Subscription* s, const BSONObj* rP)
 */
 static void setTimeInterval(Subscription* s, const BSONObj& r)
 {
-  s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(r, "timeInterval") : -1);
+  s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(&r, "timeInterval") : -1);
 }
 
 #endif
