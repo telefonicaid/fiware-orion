@@ -53,21 +53,21 @@ using mongo::AssertionException;
 *
 * getObjectField -
 */
-BSONObj getObjectField(const BSONObj& b, const char* field, const char* caller, int line)
+BSONObj getObjectField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::Object)
-    return b.getObjectField(field);
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::Object)
+    return bP->getObjectField(field);
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, b.toString().c_str(), caller, line));
+          field, bP->toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return BSONObj();

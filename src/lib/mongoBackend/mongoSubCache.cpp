@@ -191,7 +191,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
+    BSONObj expression = getObjectFieldF(&sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {

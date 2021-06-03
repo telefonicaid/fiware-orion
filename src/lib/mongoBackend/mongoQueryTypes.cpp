@@ -124,15 +124,15 @@ static void getAttributeTypes
 
     /* Previous versions of this function used a simpler approach:
      *
-     *   BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
-     *   BSONObj attr  = getObjectFieldF(attrs, attrName);
+     *   BSONObj attrs = getObjectFieldF(&r, ENT_ATTRS);
+     *   BSONObj attr  = getObjectFieldF(&attrs, attrName);
      *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
      *
      * However, it doesn't work when the attribute uses metadata ID
      *
      */
 
-    BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
+    BSONObj                attrs = getObjectFieldF(&r, ENT_ATTRS);
     std::set<std::string>  attrsSet;
 
     attrs.getFieldNames(attrsSet);
@@ -150,7 +150,7 @@ static void getAttributeTypes
 
       if (strncmp(currentAttr, attrName.c_str(), cmpLen) == 0)
       {
-        BSONObj attr = getObjectFieldF(attrs, currentAttr);
+        BSONObj attr = getObjectFieldF(&attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(&attr, ENT_ATTRS_TYPE));
       }
     }
@@ -216,7 +216,7 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
   if (result.hasField("cursor"))
   {
     // abcense of "count" field in the "firtBatch" array means "zero result"
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
       BSONObj bo = resultsArray[0].embeddedObject();
@@ -339,7 +339,7 @@ HttpStatusCode mongoEntityTypesValues
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
   }
 
   if (resultsArray.size() == 0)
@@ -515,7 +515,7 @@ HttpStatusCode mongoEntityTypes
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
   }
 
   // Early return if no element was found
@@ -704,7 +704,7 @@ HttpStatusCode mongoAttributesForEntityType
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
   }
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);

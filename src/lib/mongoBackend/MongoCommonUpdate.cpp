@@ -293,8 +293,8 @@ static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
       return false;
     }
 
-    BSONObj md1Item = getObjectFieldF(md1, currentMd);
-    BSONObj md2Item = getObjectFieldF(md2, currentMd);
+    BSONObj md1Item = getObjectFieldF(&md1, currentMd);
+    BSONObj md2Item = getObjectFieldF(&md2, currentMd);
 
     if (!equalMetadataValues(md1Item, md2Item))
     {
@@ -487,7 +487,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
     case mongo::Object:
-      ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getObjectFieldF(&attr, ENT_ATTRS_VALUE));
       break;
 
     case mongo::Array:
@@ -566,7 +566,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
       const char*  currentMd = i->c_str();
-      BSONObj      mdItem    = getObjectFieldF(md, currentMd);
+      BSONObj      mdItem    = getObjectFieldF(&md, currentMd);
       Metadata     md(currentMd, &mdItem);
 
       mdSize++;
@@ -805,7 +805,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getObjectFieldF(attrs, effectiveName);
+    BSONObj attr = getObjectFieldF(&attrs, effectiveName);
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (*actualUpdate)
@@ -1586,7 +1586,7 @@ static bool addTriggeredSubscriptions_noCache
 
       if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
+        BSONObj expr = getObjectFieldF(&sub, CSUB_EXPR);
 
         std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
         std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
@@ -3320,7 +3320,7 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONObj            idField           = getObjectFieldF(r, "_id");
+  BSONObj            idField           = getObjectFieldF(&r, "_id");
 
   std::string        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
   std::string        entityType        = getStringFieldF(&idField, ENT_ENTITY_TYPE);
@@ -3342,7 +3342,7 @@ static void updateEntity
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
-  BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
+  BSONObj           attrs     = getObjectFieldF(&r, ENT_ATTRS);
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
@@ -3361,10 +3361,10 @@ static void updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
+    BSONObj loc    = getObjectFieldF(&r, ENT_LOCATION);
 
     locAttr        = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
-    currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
+    currentGeoJson = getObjectFieldF(&loc, ENT_LOCATION_COORDS);
   }
 
   /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
