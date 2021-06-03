@@ -561,14 +561,6 @@ void exitFunc(void)
     return;
   }
 
-#ifdef DEBUG
-  // Take mongo req-sem ?
-  LM_T(LmtSubCache, ("try-taking req semaphore"));
-  reqSemTryToTake();
-  LM_T(LmtSubCache, ("calling subCacheDestroy"));
-  subCacheDestroy();
-#endif
-
   metricsMgr.release();
 
   if ((strcmp(notificationMode, "threadpool") == 0))
@@ -582,6 +574,14 @@ void exitFunc(void)
 
   curl_context_cleanup();
   curl_global_cleanup();
+
+#ifdef DEBUG
+  // Take mongo req-sem ?
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
+  reqSemTryToTake();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
+#endif
 
   if (unlink(pidPath) != 0)
   {
