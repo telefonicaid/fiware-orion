@@ -25,6 +25,8 @@
 *
 * Author: Fermin Galan
 */
+#include "mongo/client/dbclient.h"
+
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "mongoBackend/safeMongo.h"
@@ -47,7 +49,13 @@
 #define RES_CER_STATUS(i)       res.contextElementResponseVector[i]->statusCode
 #define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->contextElement.contextAttributeVector[j]
 
-#define C_STR_FIELD(b, f)       getStringField(b, f)
+
+
+/* ****************************************************************************
+*
+* C_STR_FIELD -
+*/
+extern const char* C_STR_FIELD(mongo::BSONObj bob, std::string f);
 
 
 

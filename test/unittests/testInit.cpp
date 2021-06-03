@@ -22,6 +22,7 @@
 *
 * Author: Fermin Galan
 */
+#include "mongo/client/dbclient.h"
 #include "unittests/testInit.h"
 
 #include "logMsg/logMsg.h"
@@ -45,6 +46,17 @@ using mongo::DBClientBase;
 */
 extern DBClientBase* mongoInitialConnectionGetForUnitTest();
 extern void          setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
+
+/* ****************************************************************************
+*
+* C_STR_FIELD -
+*/
+const char* C_STR_FIELD(mongo::BSONObj bob, std::string f)
+{
+  return getStringField(&bob, f.c_str());
+}
 
 
 
