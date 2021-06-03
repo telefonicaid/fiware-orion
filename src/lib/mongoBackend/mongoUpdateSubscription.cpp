@@ -231,10 +231,13 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   }
   else
   {
-    BSONArray entities = getArrayFieldF(subOrig, CSUB_ENTITIES);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray entities;
+    getArrayField(&entities, &subOrig, CSUB_ENTITIES, __FILE__, __LINE__);
     b->append(CSUB_ENTITIES, entities);
-    LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
   }
 }
 
@@ -252,10 +255,13 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
   }
   else
   {
-    BSONArray attrs = getArrayFieldF(subOrig, CSUB_ATTRS);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray attrs;
+    getArrayField(&attrs, &subOrig, CSUB_ATTRS, __FILE__, __LINE__);
     b->append(CSUB_ATTRS, attrs);
-    LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
   }
 }
 
@@ -458,10 +464,13 @@ static void setCondsAndInitialNotify
   }
   else
   {
-    BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray conds;
+    getArrayField(&conds, &subOrig, CSUB_CONDITIONS, __FILE__, __LINE__);
     b->append(CSUB_CONDITIONS, conds);
-    LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
   }
 }
 
@@ -672,15 +681,14 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
     // Note that if subOrig doesn't have CSUB_METADATA (e.g. old subscription in the DB created before
     // this feature) BSONArray constructor ensures an empty array
     //
+
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
     BSONArray metadata;
-
-    if (subOrig.hasField(CSUB_METADATA))
-    {
-      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
-    }
-
+    getArrayField(&metadata, &subOrig, CSUB_METADATA, __FILE__, __LINE__);
     b->append(CSUB_METADATA, metadata);
-    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
   }
 }
 

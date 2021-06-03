@@ -41,7 +41,6 @@
 * Some macros to make the usage of these functions prettier
 */
 #define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
-#define getArrayFieldF(b, field)            getArrayField(b, field, __FUNCTION__, __LINE__)
 #define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
 #define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
@@ -72,9 +71,10 @@ extern mongo::BSONObj getObjectField
 *
 * getArrayField -
 */
-extern mongo::BSONArray getArrayField
+extern bool getArrayField
 (
-  const mongo::BSONObj&  b,
+  mongo::BSONArray*      outArrayP,
+  const mongo::BSONObj*  bP,
   const char*            field,
   const char*            caller = "<none>",
   int                    line   = 0
