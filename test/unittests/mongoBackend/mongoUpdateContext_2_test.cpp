@@ -1951,12 +1951,17 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2046,12 +2051,17 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2141,12 +2151,17 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2237,15 +2252,21 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val",   getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2336,15 +2357,21 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3", getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2440,15 +2467,21 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("new_val2", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2544,15 +2577,21 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("new_val2", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2642,12 +2681,17 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",    getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",    getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val",  getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2737,12 +2781,17 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2833,12 +2882,17 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",   getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",   getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2928,12 +2982,17 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",   getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",   getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -3930,17 +3989,25 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("s", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_FALSE(mdObj3.getBoolField("value"));
+
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
@@ -4064,17 +4131,24 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("ss", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(44.4, mds.getField("MD2").embeddedObject().getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_TRUE(mds.getField("MD3").embeddedObject().getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("ss", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(44.4, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_TRUE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();
@@ -4162,17 +4236,24 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("s", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(55.5, mdObj2.getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_FALSE(mdObj3.getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_STREQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();

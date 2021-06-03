@@ -108,25 +108,25 @@ BSONArray getArrayField(const BSONObj& b, const char* field, const char* caller,
 *
 * getStringField -
 */
-const char* getStringField(const BSONObj& b, const char* field, const char* caller, int line)
+const char* getStringField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::String)
-    return b.getStringField(field);
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::String)
+    return bP->getStringField(field);
 
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field,
-          b.toString().c_str(),
+          bP->toString().c_str(),
           caller,
           line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return "";

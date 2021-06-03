@@ -89,10 +89,10 @@ extern mongo::BSONArray getArrayField
 */
 extern const char* getStringField
 (
-  const mongo::BSONObj&  b,
-  const char*            field,
-  const char*            caller = "<none>",
-  int                    line   = 0
+  const mongo::BSONObj* bP,
+  const char*           field,
+  const char*           caller = "<none>",
+  int                   line   = 0
 );
 
 

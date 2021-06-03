@@ -285,9 +285,9 @@ bool mongoLdRegistrationsGet
     //        An aux function should be created for this to avoid the copied code.
     //
 
-    mongoSetLdRegistrationId(&reg, bob);
-    mongoSetLdName(&reg, bob);
-    mongoSetDescription(&reg, bob);
+    mongoSetLdRegistrationId(&reg, &bob);
+    mongoSetLdName(&reg, &bob);
+    mongoSetDescription(&reg, &bob);
 
     if (mongoSetDataProvided(&reg, bob, false) == false)
     {
@@ -301,7 +301,7 @@ bool mongoLdRegistrationsGet
     mongoSetLdObservationInterval(&reg, bob);
     mongoSetLdManagementInterval(&reg, bob);
     mongoSetExpires(&reg, bob);
-    mongoSetStatus(&reg, bob);
+    mongoSetStatus(&reg, &bob);
 
     mongoSetLdTimestamp(&reg.createdAt, "createdAt", bob);
     mongoSetLdTimestamp(&reg.modifiedAt, "modifiedAt", bob);

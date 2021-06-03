@@ -500,7 +500,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    const char*  dbName  = getStringFieldF(db, "name");
+    const char*  dbName  = getStringFieldF(&db, "name");
     std::string  prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName, strlen(prefix.c_str())) == 0)
@@ -1813,8 +1813,8 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = getStringFieldF(entity, REG_ENTITY_TYPE);
+  en.id   = getStringFieldF(&entity, REG_ENTITY_ID);
+  en.type = getStringFieldF(&entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct
@@ -1836,12 +1836,12 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const BSONObj& attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, BSONObj* attrObjP)
 {
   ContextRegistrationAttribute attr(
-    getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE),
-    getStringFieldF(attribute, REG_ATTRS_ISDOMAIN));
+    getStringFieldF(attrObjP, REG_ATTRS_NAME),
+    getStringFieldF(attrObjP, REG_ATTRS_TYPE),
+    getStringFieldF(attrObjP, REG_ATTRS_ISDOMAIN));
 
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
@@ -1870,7 +1870,7 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringFieldF(&cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setMimeType(mimeType);
 
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
@@ -1889,7 +1889,8 @@ static void processContextRegistrationElement
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
-        processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
+        BSONObj qaObj =  queryAttrV[ix].embeddedObject();
+        processAttribute(&crr, attrL, &qaObj);
       }
     }
   }
@@ -2162,9 +2163,9 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
+    EntityId*  en     = new EntityId(getStringFieldF(&subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(&subEnt, CSUB_ENTITY_TYPE) : "",
+                                     getStringFieldF(&subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 

@@ -4804,12 +4804,17 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_STREQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_STREQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_STREQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_STREQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",   getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",   getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));

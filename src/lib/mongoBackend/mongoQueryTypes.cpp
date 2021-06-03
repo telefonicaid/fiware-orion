@@ -151,7 +151,7 @@ static void getAttributeTypes
       if (strncmp(currentAttr, attrName.c_str(), cmpLen) == 0)
       {
         BSONObj attr = getObjectFieldF(attrs, currentAttr);
-        attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+        attrTypes->push_back(getStringFieldF(&attr, ENT_ATTRS_TYPE));
       }
     }
   }
@@ -362,7 +362,7 @@ HttpStatusCode mongoEntityTypesValues
     }
     else
     {
-      type = getStringFieldF(resultItem, "_id");
+      type = getStringFieldF(&resultItem, "_id");
     }
 
     responseP->entityTypeVector.push_back(new EntityType(type));
@@ -542,7 +542,7 @@ HttpStatusCode mongoEntityTypes
     std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
     EntityType*               entityType;
 
-    entityType = new EntityType(getStringFieldF(resultItem, "_id"));
+    entityType = new EntityType(getStringFieldF(&resultItem, "_id"));
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 

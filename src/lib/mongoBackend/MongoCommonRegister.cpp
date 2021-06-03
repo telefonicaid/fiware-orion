@@ -279,7 +279,7 @@ static bool addTriggeredSubscriptions
     {
       ngsiv2::HttpInfo httpInfo;
 
-      httpInfo.url = getStringFieldF(sub, CASUB_REFERENCE);
+      httpInfo.url = getStringFieldF(&sub, CASUB_REFERENCE);
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
@@ -287,7 +287,7 @@ static bool addTriggeredSubscriptions
       // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
-      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
+      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(&sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
       TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(sub));
 
       subs.insert(std::pair<std::string, TriggeredSubscription*>(subIdStr, trigs));

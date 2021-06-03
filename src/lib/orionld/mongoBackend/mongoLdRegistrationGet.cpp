@@ -108,9 +108,9 @@ bool mongoLdRegistrationGet
       return true;
     }
 
-    mongoSetLdRegistrationId(regP, bob);
-    mongoSetLdName(regP, bob);
-    mongoSetDescription(regP, bob);
+    mongoSetLdRegistrationId(regP, &bob);
+    mongoSetLdName(regP, &bob);
+    mongoSetDescription(regP, &bob);
 
     if (mongoSetDataProvided(regP, bob, false) == false)
     {
@@ -124,7 +124,7 @@ bool mongoLdRegistrationGet
     mongoSetLdObservationInterval(regP, bob);
     mongoSetLdManagementInterval(regP, bob);
     mongoSetExpiration(regP, bob);
-    mongoSetStatus(regP, bob);
+    mongoSetStatus(regP, &bob);
 
     mongoSetLdTimestamp(&regP->createdAt, "createdAt", bob);
     mongoSetLdTimestamp(&regP->modifiedAt, "modifiedAt", bob);
