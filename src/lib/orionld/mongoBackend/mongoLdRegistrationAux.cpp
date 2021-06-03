@@ -132,7 +132,7 @@ void mongoSetLdName(ngsiv2::Registration* reg, mongo::BSONObj* bobjP)
 */
 void mongoSetExpiration(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(&r, REG_EXPIRATION) : -1;
 }
 
 
@@ -147,8 +147,8 @@ void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONO
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
 
-    reg->observationInterval.start  = getNumberFieldAsDoubleF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(obj, REG_INTERVAL_END) : -1;
+    reg->observationInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
   }
   else
   {
@@ -169,8 +169,8 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
 
-    reg->managementInterval.start  = getNumberFieldAsDoubleF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(obj, REG_INTERVAL_END) : -1;
+    reg->managementInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
   }
   else
   {
@@ -188,7 +188,7 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 void mongoSetLdTimestamp(double* timestampP, const char* name, const mongo::BSONObj& bobj)
 {
   if (bobj.hasField(name))
-    *timestampP = getNumberFieldAsDoubleF(bobj, name);
+    *timestampP = getNumberFieldAsDoubleF(&bobj, name);
   else
     *timestampP = -1;
 }

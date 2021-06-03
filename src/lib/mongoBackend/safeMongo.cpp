@@ -138,23 +138,23 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
 *
 * getNumberField -
 */
-double getNumberField(const BSONObj& b, const char* field, const char* caller, int line)
+double getNumberField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::NumberDouble)
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberDouble)
   {
-    return b.getField(field).Number();
+    return bP->getField(field).Number();
   }
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, b.toString().c_str(), caller, line));
+          field, bP->toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an double but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return -1;
@@ -192,62 +192,34 @@ int getIntField(const BSONObj* bP, const char* field, const char* caller, int li
 
 /* ****************************************************************************
 *
-* getLongField -
-*/
-long long getLongField(const BSONObj& b, const char* field, const char* caller, int line)
-{
-  if (b.hasField(field) && (b.getField(field).type() == mongo::NumberLong))
-  {
-    return b.getField(field).Long();
-  }
-
-  // Detect error
-  if (!b.hasField(field))
-  {
-    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, b.toString().c_str(), caller, line));
-  }
-  else
-  {
-    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
-  }
-
-  return -1;
-}
-
-
-
-/* ****************************************************************************
-*
 * getIntOrLongFieldAsLong -
 */
-long long getIntOrLongFieldAsLong(const BSONObj& b, const char* field, const char* caller, int line)
+long long getIntOrLongFieldAsLong(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field))
+  if (bP->hasField(field))
   {
-    if (b.getField(field).type() == mongo::NumberLong)
+    if (bP->getField(field).type() == mongo::NumberLong)
     {
-      return b.getField(field).Long();
+      return bP->getField(field).Long();
     }
-    else if (b.getField(field).type() == mongo::NumberInt)
+    else if (bP->getField(field).type() == mongo::NumberInt)
     {
-      return b.getField(field).Int();
+      return bP->getField(field).Int();
     }
-    else if (b.getField(field).type() == mongo::NumberDouble)
-      return (long long) b.getField(field).Double();
+    else if (bP->getField(field).type() == mongo::NumberDouble)
+      return (long long) bP->getField(field).Double();
   }
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, b.toString().c_str(), caller, line));
+          field, bP->toString().c_str(), caller, line));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be int or long but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return -1;
@@ -286,25 +258,25 @@ bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int 
 *
 * getNumberFieldAsDouble -
 */
-double getNumberFieldAsDouble(const BSONObj& b, const char* field, const char* caller, int line)
+double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* caller, int line)
 {
   double retVal = -1;
 
-  if (b.hasField(field))
+  if (bP->hasField(field))
   {
-    if      (b.getField(field).type() == mongo::NumberDouble)      retVal = b.getField(field).Double();
-    else if (b.getField(field).type() == mongo::NumberLong)        retVal = b.getField(field).Long();
-    else if (b.getField(field).type() == mongo::NumberInt)         retVal = b.getField(field).Int();
+    if      (bP->getField(field).type() == mongo::NumberDouble)      retVal = bP->getField(field).Double();
+    else if (bP->getField(field).type() == mongo::NumberLong)        retVal = bP->getField(field).Long();
+    else if (bP->getField(field).type() == mongo::NumberInt)         retVal = bP->getField(field).Int();
     else
       LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-            field, mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller, line));
+            field, mongoTypeName(bP->getField(field).type()), bP->getField(field).type(), bP->toString().c_str(), caller, line));
 
     return retVal;
   }
 
   LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
         field,
-        b.toString().c_str(),
+        bP->toString().c_str(),
         caller,
         line));
 

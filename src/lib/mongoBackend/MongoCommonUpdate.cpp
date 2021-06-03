@@ -193,7 +193,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       */
 
     case mongo::NumberDouble:
-      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
+      if (getNumberFieldF(&md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(&md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
@@ -249,7 +249,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     */
 
   case mongo::NumberDouble:
-    return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
+    return getNumberFieldF(&md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(&md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::Bool:
     return getBoolFieldF(&md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(&md2, ENT_ATTRS_MD_VALUE);
@@ -334,7 +334,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return true;
 
   case mongo::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(&attr, ENT_ATTRS_VALUE);
 
   case mongo::Bool:
     return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(&attr, ENT_ATTRS_VALUE);
@@ -495,7 +495,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       break;
 
     case mongo::NumberDouble:
-      ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getNumberFieldF(&attr, ENT_ATTRS_VALUE));
       break;
 
     case mongo::Bool:
@@ -595,7 +595,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -649,7 +649,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -1557,8 +1557,8 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
-      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
+      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
+      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION) : -1;
       const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
@@ -3411,8 +3411,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(&r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(&r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification

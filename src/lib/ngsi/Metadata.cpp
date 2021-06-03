@@ -192,8 +192,8 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
   type            = mdB->hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type == "")? false : true;
   compoundValueP  = NULL;
-  createdAt       = mdB->hasField("createdAt")  ? getNumberFieldF(*mdB, "createdAt") : 0;
-  modifiedAt      = mdB->hasField("modifiedAt") ? getNumberFieldF(*mdB, "modifiedAt") : 0;
+  createdAt       = mdB->hasField("createdAt")  ? getNumberFieldF(mdB, "createdAt") : 0;
+  modifiedAt      = mdB->hasField("modifiedAt") ? getNumberFieldF(mdB, "modifiedAt") : 0;
 
   BSONType bsonType = getFieldF(*mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
@@ -210,7 +210,7 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getNumberFieldF(*mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case Bool:

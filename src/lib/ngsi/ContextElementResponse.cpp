@@ -215,7 +215,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
+        ca.numberValue = getNumberFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
@@ -300,12 +300,12 @@ ContextElementResponse::ContextElementResponse
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
-      caP->creDate = getNumberFieldAsDoubleF(attr, ENT_ATTRS_CREATION_DATE);
+      caP->creDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE);
     }
 
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      caP->modDate = getNumberFieldAsDoubleF(attr, ENT_ATTRS_MODIFICATION_DATE);
+      caP->modDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE);
     }
 
     contextElement.contextAttributeVector.push_back(caP);
@@ -314,12 +314,12 @@ ContextElementResponse::ContextElementResponse
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
   {
-    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDoc, ENT_CREATION_DATE);
+    contextElement.entityId.creDate = getNumberFieldAsDoubleF(&entityDoc, ENT_CREATION_DATE);
   }
 
   if (entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDoc, ENT_MODIFICATION_DATE);
+    contextElement.entityId.modDate = getNumberFieldAsDoubleF(&entityDoc, ENT_MODIFICATION_DATE);
   }
 }
 
