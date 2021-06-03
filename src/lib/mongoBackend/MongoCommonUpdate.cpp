@@ -491,7 +491,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       break;
 
     case mongo::Array:
-      ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
+      ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldF(&attr, ENT_ATTRS_VALUE));
       break;
 
     case mongo::NumberDouble:

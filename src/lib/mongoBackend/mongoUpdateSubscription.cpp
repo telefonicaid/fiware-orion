@@ -231,7 +231,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   }
   else
   {
-    BSONArray entities = getArrayFieldF(subOrig, CSUB_ENTITIES);
+    BSONArray entities = getArrayFieldF(&subOrig, CSUB_ENTITIES);
 
     b->append(CSUB_ENTITIES, entities);
     LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
@@ -252,7 +252,7 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
   }
   else
   {
-    BSONArray attrs = getArrayFieldF(subOrig, CSUB_ATTRS);
+    BSONArray attrs = getArrayFieldF(&subOrig, CSUB_ATTRS);
 
     b->append(CSUB_ATTRS, attrs);
     LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
@@ -458,7 +458,7 @@ static void setCondsAndInitialNotify
   }
   else
   {
-    BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
+    BSONArray conds = getArrayFieldF(&subOrig, CSUB_CONDITIONS);
 
     b->append(CSUB_CONDITIONS, conds);
     LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -676,7 +676,7 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_METADATA))
     {
-      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+      metadata = getArrayFieldF(&subOrig, CSUB_METADATA);
     }
 
     b->append(CSUB_METADATA, metadata);
