@@ -128,7 +128,7 @@ std::string HttpInfo::toJson()
 void HttpInfo::fill(const BSONObj* boP)
 {
   this->url    = boP->hasField(CSUB_REFERENCE)? getStringFieldF(boP,  CSUB_REFERENCE) : "";
-  this->custom = boP->hasField(CSUB_CUSTOM)?    getBoolFieldF(*boP,   CSUB_CUSTOM)    : false;
+  this->custom = boP->hasField(CSUB_CUSTOM)?    getBoolFieldF(boP,    CSUB_CUSTOM)    : false;
 
   bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
 

@@ -200,7 +200,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       break;
 
     case mongo::Bool:
-      if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
+      if (getBoolFieldF(&md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(&md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
@@ -252,7 +252,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::Bool:
-    return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
+    return getBoolFieldF(&md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(&md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::String:
     md1Value = (char*) getStringFieldF(&md1, ENT_ATTRS_MD_VALUE);
@@ -337,7 +337,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
 
   case mongo::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(&attr, ENT_ATTRS_VALUE);
 
   case mongo::String:
     // getStringFieldF is OK here as caP->stringValue is a std::string ...
@@ -499,7 +499,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       break;
 
     case mongo::Bool:
-      ab.append(ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getBoolFieldF(&attr, ENT_ATTRS_VALUE));
       break;
 
     case mongo::String:
@@ -1573,7 +1573,7 @@ static bool addTriggeredSubscriptions_noCache
           httpInfo,
           subToAttributeList(sub), "", "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
 
       if (sub.hasField(CSUB_METADATA))
       {

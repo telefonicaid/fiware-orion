@@ -225,7 +225,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case Bool:
-        ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
+        ca.boolValue = getBoolFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 

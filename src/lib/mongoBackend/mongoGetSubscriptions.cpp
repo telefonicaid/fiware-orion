@@ -106,8 +106,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
     std::string id            = getStringFieldF(&ent, CSUB_ENTITY_ID);
     std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(&ent, CSUB_ENTITY_TYPE) : "";
     std::string isPattern     = getStringFieldF(&ent, CSUB_ENTITY_ISPATTERN);
-    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
-                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -179,7 +178,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   subP->throttling      = r.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(r, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(r, CSUB_LASTNOTIFICATION) : -1;
   nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)           : -1;
-  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                  : false;
+  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&r, CSUB_BLACKLIST)                 : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(r, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(r, CSUB_LASTSUCCESS)      : -1;
 

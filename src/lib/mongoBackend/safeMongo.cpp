@@ -259,22 +259,22 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const char* field, const cha
 *
 * getBoolField -
 */
-bool getBoolField(const BSONObj& b, const char* field, const char* caller, int line)
+bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::Bool)
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::Bool)
   {
-    return b.getBoolField(field);
+    return bP->getBoolField(field);
   }
 
   // Detect error
-  if (!b.hasField(field))
+  if (!bP->hasField(field))
   {
-    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, b.toString().c_str()));
+    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, bP->toString().c_str()));
   }
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, b.getField(field).type(), b.toString().c_str(), caller, line));
+          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
   }
 
   return false;

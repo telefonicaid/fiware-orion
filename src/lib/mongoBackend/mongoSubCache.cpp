@@ -171,7 +171,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(&sub, CSUB_STATUS)                  : "active";
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                  : false;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&sub, CSUB_BLACKLIST)                 : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
@@ -266,8 +266,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(&entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?          getStringFieldF(&entity, CSUB_ENTITY_TYPE)        : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -392,8 +392,8 @@ int mongoSubCacheItemInsert
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(&entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?          getStringFieldF(&entity, CSUB_ENTITY_TYPE)        : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -435,7 +435,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
 
   //
   // httpInfo

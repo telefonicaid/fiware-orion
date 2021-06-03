@@ -215,7 +215,7 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
 
   case Bool:
     valueType = orion::ValueTypeBoolean;
-    boolValue = getBoolFieldF(*mdB, ENT_ATTRS_MD_VALUE);
+    boolValue = getBoolFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case jstNULL:
