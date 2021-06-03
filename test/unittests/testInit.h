@@ -25,6 +25,8 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "ngsi9/NotifyContextAvailabilityRequest.h"

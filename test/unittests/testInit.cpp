@@ -22,13 +22,14 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"
 #include "unittests/testInit.h"
 
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongo/client/dbclient.h"
 
 
 

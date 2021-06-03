@@ -3999,7 +3999,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
     BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
     BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
-    
+
     EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
     EXPECT_STREQ("s", getStringField(&mdObj1, "value"));
     EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
