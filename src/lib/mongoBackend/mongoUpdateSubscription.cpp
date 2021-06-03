@@ -99,7 +99,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   {
     // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
     std::string reference = getStringFieldF(&subOrig, CSUB_REFERENCE);
-    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
+    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(&subOrig, CSUB_CUSTOM) : false;
 
     b->append(CSUB_REFERENCE, reference);
     b->append(CSUB_CUSTOM,    custom);
@@ -397,7 +397,7 @@ static void setCondsAndInitialNotify
     else
     {
       httpInfo.fill(&subOrig);
-      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(&subOrig, CSUB_BLACKLIST) : false;
       setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
 
       if (subOrig.hasField(CSUB_METADATA))
@@ -647,7 +647,7 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
   }
   else
   {
-    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(&subOrig, CSUB_BLACKLIST) : false;
 
     b->append(CSUB_BLACKLIST, bList);
     LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));

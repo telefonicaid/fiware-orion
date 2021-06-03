@@ -173,7 +173,7 @@ extern double getNumberFieldAsDouble
 */
 extern bool getBoolField
 (
-  const mongo::BSONObj&  b,
+  const mongo::BSONObj*  bP,
   const char*            field,
   const char*            caller = "<none>",
   int                    line   = 0
