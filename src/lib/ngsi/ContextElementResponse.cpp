@@ -57,7 +57,7 @@ ContextElementResponse::ContextElementResponse()
 
 /* ****************************************************************************
 *
-* ContextElementResponse::ContextElementResponse - 
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* aP)
 {
@@ -75,7 +75,7 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
 
 /* ****************************************************************************
 *
-* ContextElementResponse::ContextElementResponse - 
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 {
@@ -154,7 +154,7 @@ ContextElementResponse::ContextElementResponse
   std::string locAttr;
   if (entityDoc.hasElement(ENT_LOCATION))
   {
-    BSONObj objField = getObjectFieldF(entityDoc, ENT_LOCATION);
+    BSONObj objField = getObjectFieldF(&entityDoc, ENT_LOCATION);
     locAttr = getStringFieldF(&objField, ENT_LOCATION_ATTRNAME);
   }
 
@@ -163,14 +163,14 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  BSONObj                attrs = getObjectFieldF(&entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     const char*        attrName = i->c_str();
-    BSONObj            attr     = getObjectFieldF(attrs, attrName);
+    BSONObj            attr     = getObjectFieldF(&attrs, attrName);
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
     char               aName[512];
@@ -279,14 +279,14 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
+      BSONObj                mds = getObjectFieldF(&attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         char*   currentMd = (char*) i->c_str();
-        BSONObj mdObj     = getObjectFieldF(mds, currentMd); 
+        BSONObj mdObj     = getObjectFieldF(&mds, currentMd);
         char    mdName[512];
 
         strncpy(mdName, currentMd, sizeof(mdName));
@@ -340,7 +340,7 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 
 /* ****************************************************************************
 *
-* ContextElementResponse::render - 
+* ContextElementResponse::render -
 */
 std::string ContextElementResponse::render
 (
@@ -365,7 +365,7 @@ std::string ContextElementResponse::render
 
 /* ****************************************************************************
 *
-* ContextElementResponse::toJson - 
+* ContextElementResponse::toJson -
 */
 std::string ContextElementResponse::toJson
 (
@@ -386,7 +386,7 @@ std::string ContextElementResponse::toJson
 
 /* ****************************************************************************
 *
-* ContextElementResponse::release - 
+* ContextElementResponse::release -
 */
 void ContextElementResponse::release(void)
 {
@@ -398,7 +398,7 @@ void ContextElementResponse::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementResponse::check - 
+* ContextElementResponse::check -
 */
 std::string ContextElementResponse::check
 (
@@ -427,7 +427,7 @@ std::string ContextElementResponse::check
 
 /* ****************************************************************************
 *
-* ContextElementResponse::fill - 
+* ContextElementResponse::fill -
 */
 void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)
 {
@@ -453,7 +453,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the 
+  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
   //           This FIXME is related to github issue #588 and (probably) #650.
@@ -476,7 +476,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
 
 /* ****************************************************************************
 *
-* ContextElementResponse::fill - 
+* ContextElementResponse::fill -
 */
 void ContextElementResponse::fill(ContextElementResponse* cerP)
 {
@@ -488,7 +488,7 @@ void ContextElementResponse::fill(ContextElementResponse* cerP)
 
 /* ****************************************************************************
 *
-* ContextElementResponse::clone - 
+* ContextElementResponse::clone -
 */
 ContextElementResponse* ContextElementResponse::clone(void)
 {

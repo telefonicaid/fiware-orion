@@ -142,7 +142,7 @@ void HttpInfo::fill(const BSONObj* boP)
 
   if (boP->hasField("notifierInfo"))
   {
-    BSONObj ni = getObjectFieldF(*boP, "notifierInfo");
+    BSONObj ni = getObjectFieldF(boP, "notifierInfo");
 
     for (BSONObj::iterator iter = ni.begin(); iter.more();)
     {
@@ -172,7 +172,7 @@ void HttpInfo::fill(const BSONObj* boP)
     // qs
     if (boP->hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(*boP, CSUB_QS);
+      BSONObj qs = getObjectFieldF(boP, CSUB_QS);
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -188,7 +188,7 @@ void HttpInfo::fill(const BSONObj* boP)
     // headers
     if (boP->hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(*boP, CSUB_HEADERS);
+      BSONObj headers = getObjectFieldF(boP, CSUB_HEADERS);
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {
