@@ -79,27 +79,32 @@ BSONObj getObjectField(const BSONObj& b, const char* field, const char* caller, 
 *
 * getArrayField -
 */
-BSONArray getArrayField(const BSONObj* bP, const char* field, const char* caller, int line)
+bool getArrayField(BSONArray* outArrayP, const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::Array)
-  {
-    // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
-    return (BSONArray) bP->getObjectField(field);
-  }
+  mongo::BSONType type = mongo::EOO;
 
-  // Detect error
-  if (!bP->hasField(field))
+  if (bP->hasField(field))
   {
-    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, bP->toString().c_str(), caller, line));
+    BSONElement element = bP->getField(field);
+
+    type = element.type();
+    if (type == mongo::Array)
+    {
+      // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
+      *outArrayP = (BSONArray) element.embeddedObject();
+      return true;
+    }
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
+    LM_E(("Runtime Error (array field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+          field, bP->toString().c_str(), caller, line));
   }
 
-  return BSONArray();
+  LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
+
+  return false;
 }
 
 
