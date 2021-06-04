@@ -132,7 +132,7 @@ static void setSubject(Subscription* s, const BSONObj* rP)
   }
 
   // Condition
-  setStringVectorF(*rP, CSUB_CONDITIONS, &(s->subject.condition.attributes));
+  setStringVectorF(rP, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
   if (rP->hasField(CSUB_EXPR))
   {
@@ -161,30 +161,30 @@ static void setSubject(Subscription* s, const BSONObj* rP)
 *
 * setNotification -
 */
-static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
+static void setNotification(Subscription* subP, const BSONObj* rP, const std::string& tenant)
 {
   // Attributes
-  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
+  setStringVectorF(rP, CSUB_ATTRS, &(subP->notification.attributes));
 
   // Metadata
-  if (r.hasField(CSUB_METADATA))
+  if (rP->hasField(CSUB_METADATA))
   {
-    setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+    setStringVectorF(rP, CSUB_METADATA, &(subP->notification.metadata));
   }
 
-  subP->notification.httpInfo.fill(&r);
+  subP->notification.httpInfo.fill(rP);
 
   ngsiv2::Notification* nP = &subP->notification;
 
-  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&r, CSUB_THROTTLING)       : -1;
-  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(&r, CSUB_COUNT)           : -1;
-  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&r, CSUB_BLACKLIST)                  : false;
-  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(&r, CSUB_LASTFAILURE)      : -1;
-  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(&r, CSUB_LASTSUCCESS)      : -1;
+  subP->throttling      = rP->hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(rP, CSUB_THROTTLING)       : -1;
+  nP->lastNotification  = rP->hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(rP, CSUB_LASTNOTIFICATION) : -1;
+  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)           : -1;
+  nP->blacklist         = rP->hasField(CSUB_BLACKLIST)?        getBoolFieldF(rP, CSUB_BLACKLIST)                  : false;
+  nP->lastFailure       = rP->hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(rP, CSUB_LASTFAILURE)      : -1;
+  nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(&r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : NGSI_V1_LEGACY;
 
 
   //
@@ -409,7 +409,7 @@ void mongoListSubscriptions
     setDescription(&sub, &r);
     setSubject(&sub, &r);
     setStatus(&sub, r);
-    setNotification(&sub, r, tenant);
+    setNotification(&sub, &r, tenant);
 
     subs->push_back(sub);
   }
@@ -440,7 +440,8 @@ void mongoGetSubscription
   OID          oid;
   StatusCode   sc;
 
-  if (safeGetSubId(idSub, &oid, &sc) == false)
+  SubscriptionId id(idSub);
+  if (safeGetSubId(&id, &oid, &sc) == false)
   {
     *oe = OrionError(sc);
     return;
@@ -483,7 +484,7 @@ void mongoGetSubscription
     setNewSubscriptionId(subP, &r);
     setDescription(subP, &r);
     setSubject(subP, &r);
-    setNotification(subP, r, tenant);
+    setNotification(subP, &r, tenant);
     setStatus(subP, r);
 
     if (moreSafe(cursor))
@@ -571,7 +572,7 @@ bool mongoGetLdSubscription
     setDescription(subP, &r);
     setMimeType(subP, &r);
     setSubject(subP, &r);
-    setNotification(subP, r, tenant);
+    setNotification(subP, &r, tenant);
     setStatus(subP, r);
     setName(subP, &r);
     setContext(subP, &r);
@@ -700,7 +701,7 @@ bool mongoGetLdSubscriptions
     setDescription(&s, &r);
     setMimeType(&s, &r);
     setSubject(&s, &r);
-    setNotification(&s, r, tenant);
+    setNotification(&s, &r, tenant);
     setStatus(&s, r);
     setName(&s, &r);
     setContext(&s, &r);

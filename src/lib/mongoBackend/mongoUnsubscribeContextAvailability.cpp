@@ -73,7 +73,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   BSONObj sub;
   OID     id;
 
-  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
+  if (!safeGetSubId(&requestP->subscriptionId, &id, &responseP->statusCode))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (safeGetSubId fail)", reqSemTaken);
 

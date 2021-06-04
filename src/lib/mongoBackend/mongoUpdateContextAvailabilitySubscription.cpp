@@ -75,7 +75,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   std::string err;
   OID         id;
 
-  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
+  if (!safeGetSubId(&requestP->subscriptionId, &id, &responseP->errorCode))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
 

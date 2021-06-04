@@ -281,13 +281,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorF(&sub, CSUB_ATTRS, &(cSubP->attributes));
 
 
   //
   // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
 
   subCacheItemInsert(cSubP);
@@ -471,20 +471,20 @@ int mongoSubCacheItemInsert
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorF(&sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
   if (sub.hasField(CSUB_METADATA))
   {
-    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+    setStringVectorF(&sub, CSUB_METADATA, &(cSubP->metadata));
   }
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   subCacheItemInsert(cSubP);
 
