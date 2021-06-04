@@ -35,8 +35,8 @@
 *
 * mongo LD functions
 */
-extern void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-extern void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+extern void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj* rP);
+extern void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj* rP);
 extern void mongoSetLdRegistrationId(ngsiv2::Registration* reg, mongo::BSONObj* bobjP);
 extern void mongoSetLdName(ngsiv2::Registration* reg, mongo::BSONObj* bobjP);
 extern void mongoSetExpiration(ngsiv2::Registration* regP, const mongo::BSONObj& r);

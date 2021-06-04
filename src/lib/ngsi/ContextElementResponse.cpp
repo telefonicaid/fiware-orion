@@ -142,10 +142,10 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
+  BSONObj id = getFieldF(&entityDoc, "_id").embeddedObject();
 
-  std::string entityId   = getStringFieldF(&id, ENT_ENTITY_ID);
-  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(&id, ENT_ENTITY_TYPE) : "";
+  const char* entityId   = getStringFieldF(&id, ENT_ENTITY_ID);
+  const char* entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(&id, ENT_ENTITY_TYPE) : "";
 
   contextElement.entityId.fill(entityId, entityType, "false");
   contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(&id, ENT_SERVICE_PATH) : "";
@@ -207,7 +207,7 @@ ContextElementResponse::ContextElementResponse
     }
     else
     {
-      switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
+      switch (getFieldF(&attr, ENT_ATTRS_VALUE).type())
       {
       case String:
         ca.stringValue = getStringFieldF(&attr, ENT_ATTRS_VALUE);
@@ -242,7 +242,7 @@ ContextElementResponse::ContextElementResponse
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
         caP->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundObjectResponse(caP->compoundValueP, getFieldF(&attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
@@ -252,11 +252,11 @@ ContextElementResponse::ContextElementResponse
         // we need to use ValueTypeObject here? Because otherwise Metadata::toJson()
         // method doesn't work. A littely crazy... it should be fixed.
         caP->valueType = orion::ValueTypeObject;
-        compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundVectorResponse(caP->compoundValueP, getFieldF(&attr, ENT_ATTRS_VALUE));
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d ('value' field of attribute: %s))", getFieldF(attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d ('value' field of attribute: %s))", getFieldF(&attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
       }
     }
 

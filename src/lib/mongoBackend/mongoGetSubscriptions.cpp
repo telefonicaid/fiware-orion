@@ -74,9 +74,9 @@ using ngsiv2::EntID;
 *
 * setSubscriptionId -
 */
-static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
+static void setNewSubscriptionId(Subscription* s, const BSONObj* rP)
 {
-  s->id = getFieldF(r, "_id").OID().toString();
+  s->id = getFieldF(rP, "_id").OID().toString();
 }
 
 
@@ -96,10 +96,10 @@ static void setDescription(Subscription* s, const BSONObj* bobjP)
 *
 * setSubject -
 */
-static void setSubject(Subscription* s, const BSONObj& r)
+static void setSubject(Subscription* s, const BSONObj* rP)
 {
   // Entities
-  std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
+  std::vector<BSONElement> ents = getFieldF(rP, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent               = ents[ix].embeddedObject();
@@ -132,12 +132,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
+  setStringVectorF(*rP, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
-  if (r.hasField(CSUB_EXPR))
+  if (rP->hasField(CSUB_EXPR))
   {
     mongo::BSONObj expression;
-    getObjectFieldF(&expression, &r, CSUB_EXPR);
+    getObjectFieldF(&expression, rP, CSUB_EXPR);
 
     const char*  q           = getStringFieldF(&expression, CSUB_EXPR_Q);
     const char*  mq          = getStringFieldF(&expression, CSUB_EXPR_MQ);
@@ -403,15 +403,15 @@ void mongoListSubscriptions
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription  s;
+    Subscription  sub;
 
-    setNewSubscriptionId(&s, r);
-    setDescription(&s, &r);
-    setSubject(&s, r);
-    setStatus(&s, r);
-    setNotification(&s, r, tenant);
+    setNewSubscriptionId(&sub, &r);
+    setDescription(&sub, &r);
+    setSubject(&sub, &r);
+    setStatus(&sub, r);
+    setNotification(&sub, r, tenant);
 
-    subs->push_back(s);
+    subs->push_back(sub);
   }
 
   releaseMongoConnection(connection);
@@ -428,7 +428,7 @@ void mongoListSubscriptions
 */
 void mongoGetSubscription
 (
-  ngsiv2::Subscription*               sub,
+  ngsiv2::Subscription*               subP,
   OrionError*                         oe,
   const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
@@ -451,7 +451,7 @@ void mongoGetSubscription
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  BSONObj                        q     = BSON("_id" << oid);
+  BSONObj                        q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
@@ -480,11 +480,11 @@ void mongoGetSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setNewSubscriptionId(sub, r);
-    setDescription(sub, &r);
-    setSubject(sub, r);
-    setNotification(sub, r, tenant);
-    setStatus(sub, r);
+    setNewSubscriptionId(subP, &r);
+    setDescription(subP, &r);
+    setSubject(subP, &r);
+    setNotification(subP, r, tenant);
+    setStatus(subP, r);
 
     if (moreSafe(cursor))
     {
@@ -570,7 +570,7 @@ bool mongoGetLdSubscription
     setSubscriptionId(subP, &r);
     setDescription(subP, &r);
     setMimeType(subP, &r);
-    setSubject(subP, r);
+    setSubject(subP, &r);
     setNotification(subP, r, tenant);
     setStatus(subP, r);
     setName(subP, &r);
@@ -699,7 +699,7 @@ bool mongoGetLdSubscriptions
     setSubscriptionId(&s, &r);
     setDescription(&s, &r);
     setMimeType(&s, &r);
-    setSubject(&s, r);
+    setSubject(&s, &r);
     setNotification(&s, r, tenant);
     setStatus(&s, r);
     setName(&s, &r);

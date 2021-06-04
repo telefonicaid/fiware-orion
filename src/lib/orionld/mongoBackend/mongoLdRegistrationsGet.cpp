@@ -289,7 +289,7 @@ bool mongoLdRegistrationsGet
     mongoSetLdName(&reg, &bob);
     mongoSetDescription(&reg, &bob);
 
-    if (mongoSetDataProvided(&reg, bob, false) == false)
+    if (mongoSetDataProvided(&reg, &bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));

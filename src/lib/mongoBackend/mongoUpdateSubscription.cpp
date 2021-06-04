@@ -278,7 +278,7 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
 static void setCondsAndInitialNotifyNgsiv1
 (
   const Subscription&              sub,
-  const BSONObj&                   subOrig,
+  const BSONObj*                   subOrigP,
   const std::string&               subId,
   const std::string&               status,
   const std::string&               url,
@@ -299,7 +299,7 @@ static void setCondsAndInitialNotifyNgsiv1
   //
 
   std::vector<EntID>        entities;
-  std::vector<BSONElement>  ents = getFieldF(subOrig, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  ents = getFieldF(subOrigP, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
@@ -325,11 +325,11 @@ static void setCondsAndInitialNotifyNgsiv1
   std::vector<std::string> attributes;
   std::vector<std::string> metadata;
 
-  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
+  setStringVectorF(*subOrigP, CSUB_ATTRS, &attributes);
 
-  if (subOrig.hasField(CSUB_METADATA))
+  if (subOrigP->hasField(CSUB_METADATA))
   {
-    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+    setStringVectorF(*subOrigP, CSUB_METADATA, &metadata);
   }
 
   /* Conds vector (and maybe an initial notification) */
@@ -434,7 +434,7 @@ static void setCondsAndInitialNotify
       // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       //
       setCondsAndInitialNotifyNgsiv1(subUp,
-                                     subOrig,
+                                     &subOrig,
                                      subUp.id,
                                      status,
                                      httpInfo.url,

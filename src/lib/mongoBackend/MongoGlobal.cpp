@@ -496,7 +496,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     return false;
   }
 
-  std::vector<BSONElement> databases = getFieldF(result, "databases").Array();
+  std::vector<BSONElement> databases = getFieldF(&result, "databases").Array();
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
@@ -1873,7 +1873,7 @@ static void processContextRegistrationElement
   crr.contextRegistration.providingApplication.set(getStringFieldF(&cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setMimeType(mimeType);
 
-  std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
+  std::vector<BSONElement> queryEntityV = getFieldF(&cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -1885,7 +1885,7 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
+      std::vector<BSONElement> queryAttrV = getFieldF(&cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
@@ -2063,7 +2063,7 @@ bool registrationsQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
-    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -2123,7 +2123,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 */
 bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
-  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<BSONElement>  conds = getFieldF(&sub, CSUB_CONDITIONS).Array();
 
   if (conds.size() == 0)
   {
@@ -2158,7 +2158,7 @@ bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modi
 EntityIdVector subToEntityIdVector(const BSONObj& sub)
 {
   EntityIdVector            enV;
-  std::vector<BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  subEnts = getFieldF(&sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
@@ -2181,10 +2181,10 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 * Extract the attribute list from a BSON document (in the format of the csubs/casub
 * collection)
 */
-StringList subToAttributeList(const BSONObj& sub)
+StringList subToAttributeList(const BSONObj* subP)
 {
   StringList                attrL;
-  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<BSONElement>  subAttrs = getFieldF(subP, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {

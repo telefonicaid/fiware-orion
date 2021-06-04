@@ -408,7 +408,7 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern StringList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const mongo::BSONObj* subP);
 
 
 

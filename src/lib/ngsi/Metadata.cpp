@@ -186,36 +186,36 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 *
 * Metadata::Metadata -
 */
-Metadata::Metadata(const char* _name, BSONObj* mdB)
+Metadata::Metadata(const char* _name, BSONObj* mdBsonP)
 {
   name            = _name;
-  type            = mdB->hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+  type            = mdBsonP->hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdBsonP, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type == "")? false : true;
   compoundValueP  = NULL;
-  createdAt       = mdB->hasField("createdAt")  ? getNumberFieldF(mdB, "createdAt") : 0;
-  modifiedAt      = mdB->hasField("modifiedAt") ? getNumberFieldF(mdB, "modifiedAt") : 0;
+  createdAt       = mdBsonP->hasField("createdAt")  ? getNumberFieldF(mdBsonP, "createdAt") : 0;
+  modifiedAt      = mdBsonP->hasField("modifiedAt") ? getNumberFieldF(mdBsonP, "modifiedAt") : 0;
 
-  BSONType bsonType = getFieldF(*mdB, ENT_ATTRS_MD_VALUE).type();
+  BSONType bsonType = getFieldF(mdBsonP, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
   {
   case String:
     valueType   = orion::ValueTypeString;
-    stringValue = getStringFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    stringValue = getStringFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case NumberInt:
     valueType   = orion::ValueTypeNumber;
-    numberValue = (double) getIntFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = (double) getIntFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = getNumberFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case Bool:
     valueType = orion::ValueTypeBoolean;
-    boolValue = getBoolFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    boolValue = getBoolFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case jstNULL:
@@ -226,7 +226,7 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
   case Array:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
-    compoundObjectResponse(compoundValueP, getFieldF(*mdB, ENT_ATTRS_VALUE));
+    compoundObjectResponse(compoundValueP, getFieldF(mdBsonP, ENT_ATTRS_VALUE));
     compoundValueP->container = compoundValueP;
     compoundValueP->name      = "value";
     compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
@@ -234,7 +234,7 @@ Metadata::Metadata(const char* _name, BSONObj* mdB)
 
   default:
     valueType = orion::ValueTypeNotGiven;
-    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(*mdB, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdBsonP, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
 }

@@ -49,9 +49,9 @@
 *
 * mongoSetRegistrationId -
 */
-void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  regP->id = getFieldF(r, "_id").OID().toString();
+  regP->id = getFieldF(rP, "_id").OID().toString();
 }
 
 
@@ -107,9 +107,9 @@ void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 *
 * mongoSetEntities -
 */
-void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj* cr0P)
 {
-  std::vector<mongo::BSONElement>  dbEntityV  = getFieldF(cr0, REG_ENTITIES).Array();
+  std::vector<mongo::BSONElement>  dbEntityV  = getFieldF(cr0P, REG_ENTITIES).Array();
   bool                             typeGiven  = false;
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
@@ -171,9 +171,9 @@ void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 *
 * mongoSetAttributes -
 */
-void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj* cr0P)
 {
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0P, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
   {
@@ -198,9 +198,9 @@ void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 * possible in V2 and we cannot respond to the request using the current implementation of V2.
 * This function will be changed to work in a different way once issue #3044 is dealt with.
 */
-bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
+bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj* rP, bool arrayAllowed)
 {
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+  std::vector<mongo::BSONElement> crV = getFieldF(rP, REG_CONTEXT_REGISTRATION).Array();
 
   if (crV.size() > 1)
   {
@@ -212,13 +212,13 @@ bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, b
   //
   mongo::BSONObj cr0 = crV[0].embeddedObject();
 
-  mongoSetEntities(regP, cr0);
-  mongoSetAttributes(regP, cr0);
+  mongoSetEntities(regP, &cr0);
+  mongoSetAttributes(regP, &cr0);
   mongoSetProvider(regP, &cr0);
 
 #ifdef ORIONLD
-  mongoSetLdPropertyV(regP, cr0);
-  mongoSetLdRelationshipV(regP, cr0);
+  mongoSetLdPropertyV(regP, &cr0);
+  mongoSetLdRelationshipV(regP, &cr0);
 #endif
 
   return true;

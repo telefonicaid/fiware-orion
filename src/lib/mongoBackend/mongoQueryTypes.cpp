@@ -210,7 +210,7 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
     // absense of "count" field in the "firstBatch" array means "zero result"
     BSONObj cursor;
     getObjectFieldF(&cursor, &result, "cursor");
-    resultsArray = getFieldF(cursor, "firstBatch").Array();
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
       BSONObj bo = resultsArray[0].embeddedObject();
@@ -335,7 +335,7 @@ HttpStatusCode mongoEntityTypesValues
   {
     BSONObj cursor;
     getObjectFieldF(&cursor, &result, "cursor");
-    resultsArray = getFieldF(cursor, "firstBatch").Array();
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
   if (resultsArray.size() == 0)
@@ -353,7 +353,7 @@ HttpStatusCode mongoEntityTypesValues
 
     LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
 
-    if (getFieldF(resultItem, "_id").isNull())
+    if (getFieldF(&resultItem, "_id").isNull())
     {
       type = "";
     }
@@ -513,7 +513,7 @@ HttpStatusCode mongoEntityTypes
   {
     BSONObj cursor;
     getObjectFieldF(&cursor, &result, "cursor");
-    resultsArray = getFieldF(cursor, "firstBatch").Array();
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
   // Early return if no element was found
@@ -538,7 +538,7 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
+    std::vector<BSONElement>  attrsArray  = getFieldF(&resultItem, "attrs").Array();
     EntityType*               entityType;
 
     entityType = new EntityType(getStringFieldF(&resultItem, "_id"));
@@ -704,7 +704,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     BSONObj cursor;
     getObjectFieldF(&cursor, &result, "cursor");
-    resultsArray = getFieldF(cursor, "firstBatch").Array();
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
@@ -720,7 +720,8 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement idField = getFieldF(resultsArray[ix].embeddedObject(), "_id");
+    BSONObj      result  = resultsArray[ix].embeddedObject();
+    BSONElement  idField = getFieldF(&result, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
