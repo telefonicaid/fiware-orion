@@ -53,24 +53,31 @@ using mongo::AssertionException;
 *
 * getObjectField -
 */
-BSONObj getObjectField(const BSONObj* bP, const char* field, const char* caller, int line)
+bool getObjectField(BSONObj* outObjectP, const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::Object)
-    return bP->getObjectField(field);
+  mongo::BSONType type = mongo::EOO;
 
-  // Detect error
-  if (!bP->hasField(field))
+  if (bP->hasField(field))
+  {
+    BSONElement element = bP->getField(field);  // wish BSONObj::getField would take a BSONObj pointer instead of returning a copy on the stack ... :(
+
+    type = element.type();
+    if (type == mongo::Object)
+    {
+      *outObjectP = element.embeddedObject();
+      return true;
+    }
+  }
+  else
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field, bP->toString().c_str(), caller, line));
   }
-  else
-  {
-    LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
-  }
 
-  return BSONObj();
+  LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+        field, bP->toString().c_str(), caller, line));
+
+  return false;
 }
 
 
@@ -85,7 +92,7 @@ bool getArrayField(BSONArray* outArrayP, const BSONObj* bP, const char* field, c
 
   if (bP->hasField(field))
   {
-    BSONElement element = bP->getField(field);
+    BSONElement element = bP->getField(field);    // wish BSONObj::getField would take a BSONObj pointer instead of returning a copy on the stack ... :(
 
     type = element.type();
     if (type == mongo::Array)

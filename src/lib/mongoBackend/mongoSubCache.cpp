@@ -191,58 +191,54 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    BSONObj expression = getObjectFieldF(&sub, CSUB_EXPR);
+    BSONObj expression;
 
-    if (expression.hasField(CSUB_EXPR_Q))
+    if (getObjectFieldF(&expression, &sub, CSUB_EXPR) == true)
     {
-      std::string errorString;
-
-      cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
-      if (cSubP->expression.q != "")
+      if (expression.hasField(CSUB_EXPR_Q))
       {
-        if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+        std::string errorString;
+
+        cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
+        if (cSubP->expression.q != "")
         {
-          LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
-          subCacheItemDestroy(cSubP);
-          delete cSubP;
-          return -5;
+          if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+          {
+            LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
+            subCacheItemDestroy(cSubP);
+            delete cSubP;
+            return -5;
+          }
         }
       }
-    }
 
-    if (expression.hasField(CSUB_EXPR_MQ))
-    {
-      std::string errorString;
-
-      cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
-      if (cSubP->expression.mq != "")
+      if (expression.hasField(CSUB_EXPR_MQ))
       {
-        if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+        std::string errorString;
+
+        cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
+        if (cSubP->expression.mq != "")
         {
-          LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
-          subCacheItemDestroy(cSubP);
-          delete cSubP;
-          return -6;
+          if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+          {
+            LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
+            subCacheItemDestroy(cSubP);
+            delete cSubP;
+            return -6;
+          }
         }
       }
-    }
 
-    if (expression.hasField(CSUB_EXPR_GEOM))
-    {
-      cSubP->expression.geometry = getStringFieldF(&expression, CSUB_EXPR_GEOM);
-    }
+      if (expression.hasField(CSUB_EXPR_GEOM))
+        cSubP->expression.geometry = getStringFieldF(&expression, CSUB_EXPR_GEOM);
 
-    if (expression.hasField(CSUB_EXPR_COORDS))
-    {
-      cSubP->expression.coords = getStringFieldF(&expression, CSUB_EXPR_COORDS);
-    }
+      if (expression.hasField(CSUB_EXPR_COORDS))
+        cSubP->expression.coords = getStringFieldF(&expression, CSUB_EXPR_COORDS);
 
-    if (expression.hasField(CSUB_EXPR_GEOREL))
-    {
-      cSubP->expression.georel = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
+      if (expression.hasField(CSUB_EXPR_GEOREL))
+        cSubP->expression.georel = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
     }
   }
-
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)

@@ -40,7 +40,7 @@
 *
 * Some macros to make the usage of these functions prettier
 */
-#define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
+#define getObjectFieldF(outP, b, field)     getObjectField(outP, b, field, __FUNCTION__, __LINE__)
 #define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
 #define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
@@ -57,8 +57,9 @@
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField
+extern bool getObjectField
 (
+  mongo::BSONObj*        outObjectP,
   const mongo::BSONObj*  bP,
   const char*            field,
   const char*            caller = "<none>",

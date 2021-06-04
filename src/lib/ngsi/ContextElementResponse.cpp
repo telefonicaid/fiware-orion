@@ -154,7 +154,8 @@ ContextElementResponse::ContextElementResponse
   std::string locAttr;
   if (entityDoc.hasElement(ENT_LOCATION))
   {
-    BSONObj objField = getObjectFieldF(&entityDoc, ENT_LOCATION);
+    BSONObj objField;
+    getObjectFieldF(&objField, &entityDoc, ENT_LOCATION);
     locAttr = getStringFieldF(&objField, ENT_LOCATION_ATTRNAME);
   }
 
@@ -163,19 +164,22 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getObjectFieldF(&entityDoc, ENT_ATTRS);
+  BSONObj                attrs;
   std::set<std::string>  attrNames;
 
+  getObjectFieldF(&attrs, &entityDoc, ENT_ATTRS);
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     const char*        attrName = i->c_str();
-    BSONObj            attr     = getObjectFieldF(&attrs, attrName);
+    BSONObj            attr;
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
     char               aName[512];
     char*              delimiterP;
     char*              metadataId = NULL;
+
+    getObjectFieldF(&attr, &attrs, attrName);    
 
     strncpy(aName, attrName, sizeof(aName));
     delimiterP = strstr(aName, "()");
@@ -279,16 +283,18 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      BSONObj                mds = getObjectFieldF(&attr, ENT_ATTRS_MD);
+      BSONObj                mds;
       std::set<std::string>  mdsSet;
 
+      getObjectFieldF(&mds, &attr, ENT_ATTRS_MD);
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         char*   currentMd = (char*) i->c_str();
-        BSONObj mdObj     = getObjectFieldF(&mds, currentMd);
+        BSONObj mdObj;
         char    mdName[512];
 
+        getObjectFieldF(&mdObj, &mds, currentMd);
         strncpy(mdName, currentMd, sizeof(mdName));
         eqForDot(mdName);
 
