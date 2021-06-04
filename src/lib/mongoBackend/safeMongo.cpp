@@ -122,6 +122,7 @@ bool getArrayField(BSONArray* outArrayP, const BSONObj* bP, const char* field, c
 */
 const char* getStringField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
+  // FIXME: Don't call getField AND getStringField
   if (bP->hasField(field) && bP->getField(field).type() == mongo::String)
     return bP->getStringField(field);
 
@@ -152,6 +153,7 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
 */
 double getNumberField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
+  // FIXME: Don't call getField twice!
   if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberDouble)
   {
     return bP->getField(field).Number();
@@ -180,6 +182,7 @@ double getNumberField(const BSONObj* bP, const char* field, const char* caller, 
 */
 int getIntField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
+  // FIXME: Don't call getField AND getIntField
   if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberInt)
   {
     return bP->getIntField(field);
@@ -210,6 +213,7 @@ long long getIntOrLongFieldAsLong(const BSONObj* bP, const char* field, const ch
 {
   if (bP->hasField(field))
   {
+    // FIXME: Don't call getField more than ONCE !!!
     if (bP->getField(field).type() == mongo::NumberLong)
     {
       return bP->getField(field).Long();
@@ -245,12 +249,14 @@ long long getIntOrLongFieldAsLong(const BSONObj* bP, const char* field, const ch
 */
 bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
+  // FIXME: Don't call getField AND getBoolField
   if (bP->hasField(field) && bP->getField(field).type() == mongo::Bool)
   {
     return bP->getBoolField(field);
   }
 
   // Detect error
+  // FIXME: Don't call hasField TWICE!!!
   if (!bP->hasField(field))
   {
     LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, bP->toString().c_str()));
@@ -276,6 +282,7 @@ double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* 
 
   if (bP->hasField(field))
   {
+    // FIXME: Don't call getField more than once!
     if      (bP->getField(field).type() == mongo::NumberDouble)      retVal = bP->getField(field).Double();
     else if (bP->getField(field).type() == mongo::NumberLong)        retVal = bP->getField(field).Long();
     else if (bP->getField(field).type() == mongo::NumberInt)         retVal = bP->getField(field).Int();
@@ -301,14 +308,14 @@ double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* 
 *
 * getField -
 */
-BSONElement getField(const BSONObj& b, const char* field, const char* caller, int line)
+BSONElement getField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  if (b.hasField(field))
-    return b.getField(field);
+  if (bP->hasField(field))
+    return bP->getField(field);
 
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s> from caller %s:%d)",
         field,
-        b.toString().c_str(),
+        bP->toString().c_str(),
         caller,
         line));
 

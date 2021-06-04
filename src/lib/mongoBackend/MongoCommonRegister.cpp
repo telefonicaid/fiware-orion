@@ -256,7 +256,7 @@ static bool addTriggeredSubscriptions
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
-    BSONElement idField = getFieldF(sub, "_id");
+    BSONElement idField = getFieldF(&sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -288,7 +288,7 @@ static bool addTriggeredSubscriptions
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
       RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(&sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
-      TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(sub));
+      TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(&sub));
 
       subs.insert(std::pair<std::string, TriggeredSubscription*>(subIdStr, trigs));
     }

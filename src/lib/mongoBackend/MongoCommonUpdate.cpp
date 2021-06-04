@@ -171,7 +171,7 @@ static bool equalMetadataValues(const BSONObj* md1, const BSONObj* md2)
   // If type exists in both metadata elments, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getFieldF(*md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(*md2, ENT_ATTRS_MD_TYPE).type())
+    if (getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(md2, ENT_ATTRS_MD_TYPE).type())
     {
       return false;
     }
@@ -179,7 +179,7 @@ static bool equalMetadataValues(const BSONObj* md1, const BSONObj* md2)
     char* md1Type;
     char* md2Type;
 
-    switch (getFieldF(*md1, ENT_ATTRS_MD_TYPE).type())
+    switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
       /* FIXME #643 P6: metadata array/object are now supported, but we haven't
          implemented yet the logic to compare compounds between them
@@ -215,28 +215,28 @@ static bool equalMetadataValues(const BSONObj* md1, const BSONObj* md2)
       break;
 
     case mongo::jstNULL:
-      if (!getFieldF(*md2, ENT_ATTRS_MD_TYPE).isNull())
+      if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
       {
         return false;
       }
       break;
 
     default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(*md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
     }
   }
 
   // declared types are equal. Same value ?
-  if (getFieldF(*md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(*md2, ENT_ATTRS_MD_VALUE).type())
+  if (getFieldF(md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
   }
 
   char* md1Value;
   char* md2Value;
-  switch (getFieldF(*md1, ENT_ATTRS_MD_VALUE).type())
+  switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
     case mongo::Object:
@@ -260,10 +260,10 @@ static bool equalMetadataValues(const BSONObj* md1, const BSONObj* md2)
     return (strcmp(md1Value, md2Value) == 0);
 
   case mongo::jstNULL:
-    return getFieldF(*md2, ENT_ATTRS_MD_VALUE).isNull();
+    return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
 
   default:
-    LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(*md1, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
     return false;
   }
 }
@@ -328,7 +328,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return false;
   }
 
-  switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
+  switch (getFieldF(&attr, ENT_ATTRS_VALUE).type())
   {
   case mongo::Object:
   case mongo::Array:
@@ -351,7 +351,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVers
     return caP->valueType != orion::ValueTypeNull;
 
   default:
-    LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+    LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(&attr, ENT_ATTRS_VALUE).type()));
     return false;
   }
 }
@@ -487,7 +487,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     // Slightly different treatment, depending on attribute value type
     // in DB (string, number, boolean, vector or object)
     //
-    switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
+    switch (getFieldF(&attr, ENT_ATTRS_VALUE).type())
     {
     case mongo::Object:
     {
@@ -522,7 +522,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       break;
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(&attr, ENT_ATTRS_VALUE).type()));
     }
   }
 
@@ -567,7 +567,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   {
     std::set<std::string>  mdsSet;
 
-    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+    md = getFieldF(&attr, ENT_ATTRS_MD).embeddedObject();
     md.getFieldNames(mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
@@ -1533,7 +1533,7 @@ static bool addTriggeredSubscriptions_noCache
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), bgP->query.toString().c_str()));
       continue;
     }
-    BSONElement  idField  = getFieldF(sub, "_id");
+    BSONElement  idField  = getFieldF(&sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -1579,20 +1579,18 @@ static bool addTriggeredSubscriptions_noCache
 
       httpInfo.fill(&sub);
 
-      TriggeredSubscription* trigs = new TriggeredSubscription
-        (
-          throttling,
-          lastNotification,
-          renderFormat,
-          httpInfo,
-          subToAttributeList(sub), "", "");
+      TriggeredSubscription* trigs = new TriggeredSubscription(throttling,
+                                                               lastNotification,
+                                                               renderFormat,
+                                                               httpInfo,
+                                                               subToAttributeList(&sub),
+                                                               "",
+                                                               "");
 
       trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
 
       if (sub.hasField(CSUB_METADATA))
-      {
         setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
-      }
 
       if (sub.hasField(CSUB_EXPR))
       {
@@ -3392,7 +3390,7 @@ static void updateEntity
 
   if (r.hasField(ENT_EXPIRATION))
   {
-    currentDateExpiration = getField(r, ENT_EXPIRATION).date();
+    currentDateExpiration = getField(&r, ENT_EXPIRATION).date();
   }
 
   //
@@ -3915,7 +3913,7 @@ void processContextElement
 
     docs++;
 
-    BSONElement idField = getFieldF(r, "_id");
+    BSONElement idField = getFieldF(&r, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'

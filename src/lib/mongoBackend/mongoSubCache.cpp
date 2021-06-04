@@ -243,7 +243,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  eVec = getFieldF(&sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
     BSONObj entity = eVec[ix].embeddedObject();
@@ -368,7 +368,7 @@ int mongoSubCacheItemInsert
   //     NOTE that if there is no patterned entity in the entity-vector,
   //     then the subscription is not valid for the sub-cache and is rejected.
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  eVec = getFieldF(&sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {

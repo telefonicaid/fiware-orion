@@ -50,9 +50,9 @@ extern "C"
 *
 * mongoSetLdPropertyV -
 */
-void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj* rP)
 {
-  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(r, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(rP, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbPropertyV.size(); ++ix)
   {
@@ -79,9 +79,9 @@ void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 *
 * mongoSetLdRelationshipV -
 */
-void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj* rP)
 {
-  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(r, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(rP, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbRelationshipV.size(); ++ix)
   {
@@ -91,11 +91,11 @@ void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
     if (type == REG_RELATIONSHIPS_TYPE)
     {
-      relName = getStringFieldF(&robj, REG_RELATIONSHIPS_NAME);
+      const char* relName = getStringFieldF(&robj, REG_RELATIONSHIPS_NAME);
 
-      if (relName != "")
+      if (relName[0] != 0)
       {
-        char* alias = orionldContextItemAliasLookup(orionldState.contextP, relName.c_str(), NULL, NULL);
+        char* alias = orionldContextItemAliasLookup(orionldState.contextP, relName, NULL, NULL);
         reg->dataProvided.relationshipV.push_back(alias);
       }
     }

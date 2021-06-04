@@ -112,10 +112,10 @@ void mongoRegistrationGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    mongoSetRegistrationId(regP, bob);
+    mongoSetRegistrationId(regP, &bob);
     mongoSetDescription(regP, &bob);
 
-    if (mongoSetDataProvided(regP, bob, false) == false)
+    if (mongoSetDataProvided(regP, &bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -226,10 +226,10 @@ void mongoRegistrationsGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    mongoSetRegistrationId(&reg, bob);
+    mongoSetRegistrationId(&reg, &bob);
     mongoSetDescription(&reg, &bob);
 
-    if (mongoSetDataProvided(&reg, bob, false) == false)
+    if (mongoSetDataProvided(&reg, &bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
