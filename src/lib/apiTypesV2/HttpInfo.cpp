@@ -142,7 +142,9 @@ void HttpInfo::fill(const BSONObj* boP)
 
   if (boP->hasField("notifierInfo"))
   {
-    BSONObj ni = getObjectFieldF(boP, "notifierInfo");
+    mongo::BSONObj ni;
+
+    getObjectFieldF(&ni, boP, "notifierInfo");  // If it fails, 'ni' is empty and the for-loop will not be entered
 
     for (BSONObj::iterator iter = ni.begin(); iter.more();)
     {
@@ -172,7 +174,9 @@ void HttpInfo::fill(const BSONObj* boP)
     // qs
     if (boP->hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(boP, CSUB_QS);
+      mongo::BSONObj qs;
+
+      getObjectFieldF(&qs, boP, CSUB_QS);  // If it fails, 'qs' is empty and the for-loop will not be entered
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -188,7 +192,9 @@ void HttpInfo::fill(const BSONObj* boP)
     // headers
     if (boP->hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(boP, CSUB_HEADERS);
+      BSONObj headers;
+
+      getObjectFieldF(&headers, boP, CSUB_HEADERS);  // If it fails, 'headers' is empty and the for-loop will not be entered
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {

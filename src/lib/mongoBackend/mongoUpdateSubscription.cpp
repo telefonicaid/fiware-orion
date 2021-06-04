@@ -117,7 +117,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(&subOrig, CSUB_HEADERS);
+      BSONObj headers;
+      getObjectFieldF(&headers, &subOrig, CSUB_HEADERS);
 
       b->append(CSUB_HEADERS, headers);
       LM_T(LmtMongo, ("Subscription headers: %s", headers.toString().c_str()));
@@ -125,7 +126,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(&subOrig, CSUB_QS);
+      BSONObj qs;
+      getObjectFieldF(&qs, &subOrig, CSUB_QS);
 
       b->append(CSUB_QS, qs);
       LM_T(LmtMongo, ("Subscription qs: %s", qs.toString().c_str()));
@@ -603,7 +605,7 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
 
     if (subOrig.hasField(CSUB_EXPR))
     {
-      expression = getObjectFieldF(&subOrig, CSUB_EXPR);
+      getObjectFieldF(&expression, &subOrig, CSUB_EXPR);
     }
     else
     {
@@ -782,7 +784,8 @@ void updateInCache
 
   if (doc.hasField(CSUB_EXPR))
   {
-    BSONObj expr = getObjectFieldF(&doc, CSUB_EXPR);
+    BSONObj expr;
+    getObjectFieldF(&expr, &doc, CSUB_EXPR);
 
     q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
     mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";

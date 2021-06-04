@@ -122,19 +122,10 @@ static void getAttributeTypes
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    /* Previous versions of this function used a simpler approach:
-     *
-     *   BSONObj attrs = getObjectFieldF(&r, ENT_ATTRS);
-     *   BSONObj attr  = getObjectFieldF(&attrs, attrName);
-     *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
-     *
-     * However, it doesn't work when the attribute uses metadata ID
-     *
-     */
-
-    BSONObj                attrs = getObjectFieldF(&r, ENT_ATTRS);
+    BSONObj                attrs;
     std::set<std::string>  attrsSet;
 
+    getObjectFieldF(&attrs, &r, ENT_ATTRS);
     attrs.getFieldNames(attrsSet);
 
     for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
@@ -150,7 +141,8 @@ static void getAttributeTypes
 
       if (strncmp(currentAttr, attrName.c_str(), cmpLen) == 0)
       {
-        BSONObj attr = getObjectFieldF(&attrs, currentAttr);
+        BSONObj attr;
+        getObjectFieldF(&attr, &attrs, currentAttr);
         attrTypes->push_back(getStringFieldF(&attr, ENT_ATTRS_TYPE));
       }
     }
@@ -215,8 +207,10 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 
   if (result.hasField("cursor"))
   {
-    // abcense of "count" field in the "firtBatch" array means "zero result"
-    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
+    // absense of "count" field in the "firstBatch" array means "zero result"
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(cursor, "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
       BSONObj bo = resultsArray[0].embeddedObject();
@@ -339,7 +333,9 @@ HttpStatusCode mongoEntityTypesValues
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(cursor, "firstBatch").Array();
   }
 
   if (resultsArray.size() == 0)
@@ -515,7 +511,9 @@ HttpStatusCode mongoEntityTypes
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(cursor, "firstBatch").Array();
   }
 
   // Early return if no element was found
@@ -704,7 +702,9 @@ HttpStatusCode mongoAttributesForEntityType
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(&result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(cursor, "firstBatch").Array();
   }
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);

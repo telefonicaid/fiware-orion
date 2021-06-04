@@ -160,7 +160,9 @@ static bool getGeoJson
     caP->valueBson(bo, "", false);
 
     mongo::BSONObj boObj = bo.obj();
-    geoJson->appendElements(getObjectFieldF(&boObj, ENT_ATTRS_VALUE));
+    mongo::BSONObj attrs;
+    getObjectFieldF(&attrs, &boObj, ENT_ATTRS_VALUE);
+    geoJson->appendElements(attrs);
 
     return true;
   }

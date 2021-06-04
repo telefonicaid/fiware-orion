@@ -145,7 +145,8 @@ void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONO
 {
   if (r.hasField(REG_OBSERVATION_INTERVAL))
   {
-    mongo::BSONObj obj              = getObjectFieldF(&r, REG_OBSERVATION_INTERVAL);
+    mongo::BSONObj obj;
+    getObjectFieldF(&obj, &r, REG_OBSERVATION_INTERVAL);
 
     reg->observationInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
     reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
@@ -167,7 +168,8 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 {
   if (r.hasField(REG_MANAGEMENT_INTERVAL))
   {
-    mongo::BSONObj obj             = getObjectFieldF(&r, REG_MANAGEMENT_INTERVAL);
+    mongo::BSONObj obj;
+    getObjectFieldF(&obj, &r, REG_MANAGEMENT_INTERVAL);
 
     reg->managementInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
     reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
@@ -206,7 +208,8 @@ bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, 
 {
   if (bobj.hasField(name))
   {
-    mongo::BSONObj   locBobj   = getObjectFieldF(&bobj, name);
+    mongo::BSONObj   locBobj;
+    getObjectFieldF(&locBobj, &bobj, name);
     KjNode*          tree      = mongoCppLegacyDataToKjTree(&locBobj, false, titleP, detailP);
 
     for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
@@ -237,7 +240,8 @@ bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mo
 {
   if (bobj.hasField(name))
   {
-    mongo::BSONObj  propertiesObj = getObjectFieldF(&bobj, name);
+    mongo::BSONObj  propertiesObj;
+    getObjectFieldF(&propertiesObj, &bobj, name);
 
     regP->properties = mongoCppLegacyDataToKjTree(&propertiesObj, false, titleP, detailP);
 

@@ -157,10 +157,10 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 *
 * equalMetadataValues -
 */
-static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
+static bool equalMetadataValues(const BSONObj* md1, const BSONObj* md2)
 {
-  bool md1TypeExist = md1.hasField(ENT_ATTRS_MD_TYPE);
-  bool md2TypeExist = md2.hasField(ENT_ATTRS_MD_TYPE);
+  bool md1TypeExist = md1->hasField(ENT_ATTRS_MD_TYPE);
+  bool md2TypeExist = md2->hasField(ENT_ATTRS_MD_TYPE);
 
   // If type exists in one metadata but not in the other, then the result is unequality
   if ((md1TypeExist && !md2TypeExist) || (!md1TypeExist && md2TypeExist))
@@ -171,7 +171,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
   // If type exists in both metadata elments, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(md2, ENT_ATTRS_MD_TYPE).type())
+    if (getFieldF(*md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(*md2, ENT_ATTRS_MD_TYPE).type())
     {
       return false;
     }
@@ -179,7 +179,7 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     char* md1Type;
     char* md2Type;
 
-    switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
+    switch (getFieldF(*md1, ENT_ATTRS_MD_TYPE).type())
     {
       /* FIXME #643 P6: metadata array/object are now supported, but we haven't
          implemented yet the logic to compare compounds between them
@@ -193,50 +193,50 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
       */
 
     case mongo::NumberDouble:
-      if (getNumberFieldF(&md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(&md2, ENT_ATTRS_MD_TYPE))
+      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case mongo::Bool:
-      if (getBoolFieldF(&md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(&md2, ENT_ATTRS_MD_TYPE))
+      if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case mongo::String:
-      md1Type = (char*) getStringFieldF(&md1, ENT_ATTRS_MD_TYPE);
-      md2Type = (char*) getStringFieldF(&md2, ENT_ATTRS_MD_TYPE);
+      md1Type = (char*) getStringFieldF(md1, ENT_ATTRS_MD_TYPE);
+      md2Type = (char*) getStringFieldF(md2, ENT_ATTRS_MD_TYPE);
 
       if (strcmp(md1Type, md2Type) != 0)
         return false;
       break;
 
     case mongo::jstNULL:
-      if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
+      if (!getFieldF(*md2, ENT_ATTRS_MD_TYPE).isNull())
       {
         return false;
       }
       break;
 
     default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(*md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
     }
   }
 
   // declared types are equal. Same value ?
-  if (getFieldF(md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(md2, ENT_ATTRS_MD_VALUE).type())
+  if (getFieldF(*md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(*md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
   }
 
   char* md1Value;
   char* md2Value;
-  switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
+  switch (getFieldF(*md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
     case mongo::Object:
@@ -249,21 +249,21 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
     */
 
   case mongo::NumberDouble:
-    return getNumberFieldF(&md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(&md2, ENT_ATTRS_MD_VALUE);
+    return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::Bool:
-    return getBoolFieldF(&md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(&md2, ENT_ATTRS_MD_VALUE);
+    return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
   case mongo::String:
-    md1Value = (char*) getStringFieldF(&md1, ENT_ATTRS_MD_VALUE);
-    md2Value = (char*) getStringFieldF(&md2, ENT_ATTRS_MD_VALUE);
+    md1Value = (char*) getStringFieldF(md1, ENT_ATTRS_MD_VALUE);
+    md2Value = (char*) getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
     return (strcmp(md1Value, md2Value) == 0);
 
   case mongo::jstNULL:
-    return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
+    return getFieldF(*md2, ENT_ATTRS_MD_VALUE).isNull();
 
   default:
-    LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(*md1, ENT_ATTRS_MD_VALUE).type()));
     return false;
   }
 }
@@ -277,26 +277,29 @@ static bool equalMetadataValues(const BSONObj& md1, const BSONObj& md2)
 * Given two metadata object assuming they have the same size (i.e. number of elements). check that all the values
 * are equal, returning false otherwise.
 */
-static bool equalMetadata(const BSONObj& md1, const BSONObj& md2)
+static bool equalMetadata(const BSONObj* md1P, const BSONObj* md2P)
 {
   std::set<std::string>  md1Set;
 
   // Assuming that md1 and md2 are of equal size, we can equally use md1 or md2 for the set
-  md1.getFieldNames(md1Set);
+  md1P->getFieldNames(md1Set);
 
   for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
     const char* currentMd = i->c_str();
 
-    if (!md2.hasField(currentMd))
+    if (!md2P->hasField(currentMd))
     {
       return false;
     }
 
-    BSONObj md1Item = getObjectFieldF(&md1, currentMd);
-    BSONObj md2Item = getObjectFieldF(&md2, currentMd);
+    BSONObj md1Item;
+    BSONObj md2Item;
 
-    if (!equalMetadataValues(md1Item, md2Item))
+    getObjectFieldF(&md1Item, md1P, currentMd);
+    getObjectFieldF(&md2Item, md2P, currentMd);
+
+    if (!equalMetadataValues(&md1Item, &md2Item))
     {
       return false;
     }
@@ -487,8 +490,12 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
     case mongo::Object:
-      ab.append(ENT_ATTRS_VALUE, getObjectFieldF(&attr, ENT_ATTRS_VALUE));
-      break;
+    {
+      BSONObj value;
+      getObjectFieldF(&value, &attr, ENT_ATTRS_VALUE);
+      ab.append(ENT_ATTRS_VALUE, value);
+    }
+    break;
 
     case mongo::Array:
     {
@@ -496,7 +503,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       if (getArrayField(&array, &attr, ENT_ATTRS_VALUE, __FILE__, __LINE__) == true)
         ab.appendArray(ENT_ATTRS_VALUE, array);
     }
-      break;
+    break;
 
     case mongo::NumberDouble:
       ab.append(ENT_ATTRS_VALUE, getNumberFieldF(&attr, ENT_ATTRS_VALUE));
@@ -566,7 +573,9 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
       const char*  currentMd = i->c_str();
-      BSONObj      mdItem    = getObjectFieldF(&md, currentMd);
+      BSONObj      mdItem;
+      getObjectFieldF(&mdItem, &md, currentMd);
+
       Metadata     md(currentMd, &mdItem);
 
       mdSize++;
@@ -630,7 +639,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       actualUpdate = (attrValueChanges(attr, caP, apiVersion)  ||
                       ((caP->type != "") && attrTypeChanged)   ||
                        mdNew.nFields() != mdSize               ||
-                       !equalMetadata(md, mdNew));
+                       !equalMetadata(&md, &mdNew));
     }
   }
   else
@@ -727,7 +736,7 @@ static bool contextAttributeCustomMetadataToBson
 */
 static bool updateAttribute
 (
-  BSONObj&            attrs,
+  BSONObj*            attrsBobjP,
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
@@ -799,13 +808,14 @@ static bool updateAttribute
   }
   else
   {
-    if (!attrs.hasField(effectiveName))
+    if (!attrsBobjP->hasField(effectiveName))
     {
       return false;
     }
 
     BSONObj newAttr;
-    BSONObj attr = getObjectFieldF(&attrs, effectiveName);
+    BSONObj attr;
+    getObjectFieldF(&attr, attrsBobjP, effectiveName);
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
     if (*actualUpdate)
@@ -837,7 +847,7 @@ static bool updateAttribute
 */
 static bool appendAttribute
 (
-  BSONObj&            attrs,
+  BSONObj*            attrsP,
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
@@ -861,7 +871,7 @@ static bool appendAttribute
   }
 
   /* APPEND with existing attribute equals to UPDATE */
-  if (attrs.hasField(effectiveName))
+  if (attrsP->hasField(effectiveName))
   {
     if (orionldState.uriParamOptions.noOverwrite == true)
       return false;
@@ -869,7 +879,7 @@ static bool appendAttribute
     //
     // If updateAttribute fails, the name of the attribute caP is added to the list of erroneous attributes
     //
-    if (updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion) == false)
+    if (updateAttribute(attrsP, toSet, toPush, caP, actualUpdate, false, apiVersion) == false)
       orionldStateErrorAttributeAdd(caP->name.c_str());
 
     return false;
@@ -935,7 +945,7 @@ static bool appendAttribute
 * name
 *
 */
-static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
+static bool legalIdUsage(const BSONObj* attrsP, ContextAttribute* caP)
 {
   std::string prefix = caP->name + MD_ID_SEPARATOR;
 
@@ -945,7 +955,7 @@ static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
      * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>()" */
     std::set<std::string> attrNames;
 
-    attrs.getFieldNames(attrNames);
+    attrsP->getFieldNames(attrNames);
 
     for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
     {
@@ -965,7 +975,7 @@ static bool legalIdUsage(const BSONObj& attrs, ContextAttribute* caP)
      */
     std::set<std::string> attrNames;
 
-    attrs.getFieldNames(attrNames);
+    attrsP->getFieldNames(attrNames);
 
     for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
     {
@@ -1027,7 +1037,7 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 */
 static bool deleteAttribute
 (
-  BSONObj&                              attrs,
+  BSONObj*                              attrsP,
   BSONObjBuilder*                       toUnset,
   std::map<std::string, unsigned int>*  deleted,
   ContextAttribute*                     caP
@@ -1048,7 +1058,7 @@ static bool deleteAttribute
     strncpy(&effectiveName[eIx], metadataId, sizeof(effectiveName) - eIx);
   }
 
-  if (!attrs.hasField(effectiveName))
+  if (!attrsP->hasField(effectiveName))
   {
     return false;
   }
@@ -1586,7 +1596,8 @@ static bool addTriggeredSubscriptions_noCache
 
       if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectFieldF(&sub, CSUB_EXPR);
+        BSONObj expr;
+        getObjectFieldF(&expr, &sub, CSUB_EXPR);
 
         std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
         std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
@@ -2305,13 +2316,13 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * BSON (taken from DB). This use to be 1, except in the case of using ID.
 *
 */
-static unsigned int howManyAttrs(const BSONObj& attrs, const char* attrName)
+static unsigned int howManyAttrs(const BSONObj* attrsP, const char* attrName)
 {
   unsigned int           c   = 0;
   unsigned int           len = strlen(attrName);
   std::set<std::string>  attrNames;
 
-  attrs.getFieldNames(attrNames);
+  attrsP->getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     const char* aName = i->c_str();
@@ -2527,7 +2538,7 @@ static bool updateContextAttributeItem
 (
   ContextElementResponse*   cerP,
   ContextAttribute*         ca,
-  BSONObj&                  attrs,
+  BSONObj*                  attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
@@ -2546,7 +2557,7 @@ static bool updateContextAttributeItem
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
+  if (updateAttribute(attrsP, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2606,7 +2617,7 @@ static bool updateContextAttributeItem
 static bool appendContextAttributeItem
 (
   ContextElementResponse*   cerP,
-  BSONObj&                  attrs,
+  BSONObj*                  attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
@@ -2623,7 +2634,7 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
-  if (!legalIdUsage(attrs, targetAttr))
+  if (!legalIdUsage(attrsP, targetAttr))
   {
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
      * we interrupt the processing and early return with
@@ -2640,7 +2651,7 @@ static bool appendContextAttributeItem
     return false;
   }
 
-  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
+  bool actualAppend = appendAttribute(attrsP, toSet, toPush, targetAttr, actualUpdate, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
@@ -2681,7 +2692,7 @@ static bool deleteContextAttributeItem
 (
   ContextElementResponse*               cerP,
   ContextAttribute*                     ca,
-  BSONObj&                              attrs,
+  BSONObj*                              attrsP,
   ContextAttribute*                     targetAttr,
   ContextElementResponse*               notifyCerP,
   EntityId*                             eP,
@@ -2694,7 +2705,7 @@ static bool deleteContextAttributeItem
   OrionError*                           oe
 )
 {
-  if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
+  if (deleteAttribute(attrsP, toUnset, deletedAttributesCounter, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
     *entityModified = true;
@@ -2767,7 +2778,7 @@ static bool processContextAttributeVector
   ActionType                                      action,
   std::map<std::string, TriggeredSubscription*>&  subsToNotify,
   ContextElementResponse*                         notifyCerP,
-  BSONObj&                                        attrs,
+  BSONObj*                                        attrsP,
   BSONObjBuilder*                                 toSet,
   BSONObjBuilder*                                 toUnset,
   BSONArrayBuilder*                               toPush,
@@ -2813,7 +2824,7 @@ static bool processContextAttributeVector
     {
       if (!updateContextAttributeItem(cerP,
                                       ca,
-                                      attrs,
+                                      attrsP,
                                       targetAttr,
                                       notifyCerP,
                                       eP,
@@ -2835,7 +2846,7 @@ static bool processContextAttributeVector
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
       if (!appendContextAttributeItem(cerP,
-                                      attrs,
+                                      attrsP,
                                       targetAttr,
                                       notifyCerP,
                                       eP,
@@ -2856,7 +2867,7 @@ static bool processContextAttributeVector
     {
       if (!deleteContextAttributeItem(cerP,
                                       ca,
-                                      attrs,
+                                      attrsP,
                                       targetAttr,
                                       notifyCerP,
                                       eP,
@@ -2908,7 +2919,7 @@ static bool processContextAttributeVector
       const char*  attrName     = it->first.c_str();
       unsigned int deletedTimes = it->second;
 
-      if (howManyAttrs(attrs, attrName) <= deletedTimes)
+      if (howManyAttrs(attrsP, attrName) <= deletedTimes)
       {
         toPull->append(attrName);
       }
@@ -3320,9 +3331,10 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONObj            idField           = getObjectFieldF(&r, "_id");
+  BSONObj            idField;
+  getObjectFieldF(&idField, &r, "_id");
 
-  std::string        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
+  const char*        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
   std::string        entityType        = getStringFieldF(&idField, ENT_ENTITY_TYPE);
   std::string        entitySPath       = getStringFieldF(&idField, ENT_SERVICE_PATH);
 
@@ -3342,7 +3354,9 @@ static void updateEntity
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
-  BSONObj           attrs     = getObjectFieldF(&r, ENT_ATTRS);
+  BSONObj           attrs;
+  getObjectFieldF(&attrs, &r, ENT_ATTRS);
+
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
@@ -3361,10 +3375,11 @@ static void updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc    = getObjectFieldF(&r, ENT_LOCATION);
+    BSONObj loc;
+    getObjectFieldF(&loc, &r, ENT_LOCATION);
 
-    locAttr        = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
-    currentGeoJson = getObjectFieldF(&loc, ENT_LOCATION_COORDS);
+    locAttr = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
+    getObjectFieldF(&currentGeoJson, &loc, ENT_LOCATION_COORDS);
   }
 
   /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
@@ -3388,7 +3403,7 @@ static void updateEntity
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
-      if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name.c_str()) != 0)
+      if (howManyAttrs(&attrs, ceP->contextAttributeVector[ix]->name.c_str()) != 0)
       {
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
@@ -3430,7 +3445,7 @@ static void updateEntity
                                      action,
                                      subsToNotify,
                                      notifyCerP,
-                                     attrs,
+                                     &attrs,
                                      &toSet,
                                      &toUnset,
                                      &toPush,
