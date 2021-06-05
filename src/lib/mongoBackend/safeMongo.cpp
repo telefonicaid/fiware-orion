@@ -186,23 +186,25 @@ double getNumberField(const BSONObj* bP, const char* field, const char* caller, 
 */
 int getIntField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  // FIXME: Don't call getField AND getIntField
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberInt)
-  {
-    return bP->getIntField(field);
-  }
+  mongo::BSONType type = mongo::EOO;
 
-  // Detect error
-  if (!bP->hasField(field))
+  if (bP->hasField(field))
   {
-    LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, bP->toString().c_str(), caller, line));
+    BSONElement element = bP->getField(field);
+
+    type = element.type();
+    if (type == mongo::NumberInt)
+      return element.numberInt();
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
+    LM_E(("Runtime Error (NumberInt field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+          field, bP->toString().c_str(), caller, line));
+    return -1;
   }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a NUMBERINT but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
 
   return -1;
 }
