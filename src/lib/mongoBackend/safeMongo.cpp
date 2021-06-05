@@ -122,13 +122,17 @@ bool getArrayField(BSONArray* outArrayP, const BSONObj* bP, const char* field, c
 */
 const char* getStringField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  // FIXME: Don't call getField AND getStringField
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::String)
-    return bP->getStringField(field);
+  mongo::BSONType type = mongo::EOO;
 
+  if (bP->hasField(field))
+  {
+    BSONElement element = bP->getField(field);    // wish BSONObj::getField would take a BSONObj pointer instead of returning a copy on the stack ... :(
 
-  // Detect error
-  if (!bP->hasField(field))
+    type = element.type();
+    if (type == mongo::String)
+      return element.valuestr();
+  }
+  else
   {
     LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field,
@@ -136,11 +140,9 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
           caller,
           line));
   }
-  else
-  {
-    LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
-  }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a STRING but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
 
   return "";
 }
