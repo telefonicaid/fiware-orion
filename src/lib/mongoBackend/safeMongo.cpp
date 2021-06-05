@@ -21,6 +21,8 @@
 * iot_support at tid dot es
 *
 * Author: Fermin Galan Marquez
+*
+* Completely Rewritten by Ken Zangelin in June 2021
 */
 #include <string>
 #include <vector>
@@ -72,10 +74,11 @@ bool getObjectField(BSONObj* outObjectP, const BSONObj* bP, const char* field, c
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field, bP->toString().c_str(), caller, line));
+    return false;
   }
 
-  LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-        field, bP->toString().c_str(), caller, line));
+  LM_E(("Runtime Error (field '%s' was supposed to be an OBJECT but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
 
   return false;
 }
@@ -106,9 +109,10 @@ bool getArrayField(BSONArray* outArrayP, const BSONObj* bP, const char* field, c
   {
     LM_E(("Runtime Error (array field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field, bP->toString().c_str(), caller, line));
+    return false;
   }
 
-  LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
+  LM_E(("Runtime Error (field '%s' was supposed to be an ARRAY but type=%d in BSONObj <%s> from caller %s:%d)",
         field, type, bP->toString().c_str(), caller, line));
 
   return false;
@@ -139,6 +143,7 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
           bP->toString().c_str(),
           caller,
           line));
+    return "";
   }
 
   LM_E(("Runtime Error (field '%s' was supposed to be a STRING but type=%d in BSONObj <%s> from caller %s:%d)",
