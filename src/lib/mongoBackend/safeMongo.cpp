@@ -376,9 +376,11 @@ void setStringVector
                 ix, ba[ix].type(), caller, line));
           v->clear();
 
-          return;
+          return;  // Error reported in logfile ...
         }
       }
+
+      return;  // All GOOD
     }
   }
   else
