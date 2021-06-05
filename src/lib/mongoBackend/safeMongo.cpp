@@ -484,11 +484,11 @@ bool safeGetSubId(const SubscriptionId* subIdP, OID* id, StatusCode* sc)
 *
 * safeGetRegId -
 */
-bool safeGetRegId(const RegistrationId& regId, OID* id, StatusCode* sc)
+bool safeGetRegId(const char* regId, OID* id, StatusCode* sc)
 {
   try
   {
-    *id = OID(regId.get());
+    *id = OID(regId);
     return true;
   }
   catch (const AssertionException &e)

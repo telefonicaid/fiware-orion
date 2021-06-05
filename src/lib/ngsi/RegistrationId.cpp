@@ -108,6 +108,17 @@ std::string RegistrationId::get(void) const
 
 /* ****************************************************************************
 *
+* RegistrationId::c_str -
+*/
+const char* RegistrationId::c_str(void) const
+{
+  return string.c_str();
+}
+
+
+
+/* ****************************************************************************
+*
 * RegistrationId::render -
 */
 std::string RegistrationId::render(RequestType requestType, bool comma)

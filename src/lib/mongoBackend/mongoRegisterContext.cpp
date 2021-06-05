@@ -91,7 +91,7 @@ HttpStatusCode mongoRegisterContext
   std::string  err;
   OID          id;
 
-  if (!safeGetRegId(requestP->registrationId, &id, &(responseP->errorCode)))
+  if (!safeGetRegId(requestP->registrationId.c_str(), &id, &(responseP->errorCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi9 register request (safeGetRegId fail)", reqSemTaken);
     responseP->registrationId = requestP->registrationId;

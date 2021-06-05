@@ -231,6 +231,6 @@ extern bool safeGetSubId(const SubscriptionId* subIdP, mongo::OID* id, StatusCod
 *
 * safeGetRegId -
 */
-extern bool safeGetRegId(const RegistrationId& regId, mongo::OID* id, StatusCode* sc);
+extern bool safeGetRegId(const char* regId, mongo::OID* id, StatusCode* sc);
 
 #endif  // SRC_LIB_MONGOBACKEND_SAFEMONGO_H_
