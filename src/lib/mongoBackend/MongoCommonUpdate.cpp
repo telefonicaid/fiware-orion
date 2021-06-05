@@ -1571,11 +1571,13 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
-      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION) : -1;
-      const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
+      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING);
+      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
+      const char*       renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
+      const char*       renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
+
 
       httpInfo.fill(&sub);
 
@@ -1587,7 +1589,7 @@ static bool addTriggeredSubscriptions_noCache
                                                                "",
                                                                "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
+      trigs->blacklist = getBoolFieldF(&sub, CSUB_BLACKLIST);
 
       if (sub.hasField(CSUB_METADATA))
         setStringVectorF(&sub, CSUB_METADATA, &trigs->metadata);
@@ -1597,11 +1599,11 @@ static bool addTriggeredSubscriptions_noCache
         BSONObj expr;
         getObjectFieldF(&expr, &sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
-        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(&expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(&expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(&expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = getStringFieldF(&expr, CSUB_EXPR_Q);
+        std::string mq       = getStringFieldF(&expr, CSUB_EXPR_MQ);
+        std::string georel   = getStringFieldF(&expr, CSUB_EXPR_GEOREL);
+        std::string geometry = getStringFieldF(&expr, CSUB_EXPR_GEOM);
+        std::string coords   = getStringFieldF(&expr, CSUB_EXPR_COORDS);
 
         trigs->fillExpression(georel, geometry, coords);
 
@@ -3428,8 +3430,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(&r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(&r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(&r, ENT_CREATION_DATE);
+  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(&r, ENT_MODIFICATION_DATE);
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
