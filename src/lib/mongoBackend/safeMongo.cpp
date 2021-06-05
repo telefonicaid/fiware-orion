@@ -281,26 +281,31 @@ bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int 
 */
 double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  double retVal = -1;
+  mongo::BSONType type = mongo::EOO;
 
   if (bP->hasField(field))
   {
-    // FIXME: Don't call getField more than once!
-    if      (bP->getField(field).type() == mongo::NumberDouble)      retVal = bP->getField(field).Double();
-    else if (bP->getField(field).type() == mongo::NumberLong)        retVal = bP->getField(field).Long();
-    else if (bP->getField(field).type() == mongo::NumberInt)         retVal = bP->getField(field).Int();
-    else
-      LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-            field, mongoTypeName(bP->getField(field).type()), bP->getField(field).type(), bP->toString().c_str(), caller, line));
+    BSONElement element = bP->getField(field);
 
-    return retVal;
+    type = element.type();
+
+    if      (type == mongo::NumberDouble)      return element.Double();
+    else if (type == mongo::NumberLong)        return element.Long();
+    else if (type == mongo::NumberInt)         return element.Int();
+  }
+  else
+  {
+    LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+          field,
+          bP->toString().c_str(),
+          caller,
+          line));
+
+    return -1;
   }
 
-  LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-        field,
-        bP->toString().c_str(),
-        caller,
-        line));
+  LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
 
   return -1;
 }
