@@ -250,23 +250,25 @@ long long getIntOrLongFieldAsLong(const BSONObj* bP, const char* field, const ch
 */
 bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  // FIXME: Don't call getField AND getBoolField
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::Bool)
-  {
-    return bP->getBoolField(field);
-  }
+  mongo::BSONType type = mongo::EOO;
 
-  // Detect error
-  // FIXME: Don't call hasField TWICE!!!
-  if (!bP->hasField(field))
+  if (bP->hasField(field))
   {
-    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, bP->toString().c_str()));
+    BSONElement element = bP->getField(field);
+
+    type = element.type();
+
+    if (type == mongo::Bool)
+      return element.Bool();
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
+    LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field, bP->toString().c_str()));
+    return false;
   }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
 
   return false;
 }
