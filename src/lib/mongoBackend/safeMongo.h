@@ -187,7 +187,7 @@ extern mongo::BSONElement getField
 */
 extern void setStringVector
 (
-  const mongo::BSONObj&      b,
+  const mongo::BSONObj*      bP,
   const char*                field,
   std::vector<std::string>*  v,
   const char*                caller,
@@ -223,7 +223,7 @@ extern bool nextSafeOrError
 *
 * safeGetSubId -
 */
-extern bool safeGetSubId(const SubscriptionId& subId, mongo::OID* id, StatusCode* sc);
+extern bool safeGetSubId(const SubscriptionId* subIdP, mongo::OID* id, StatusCode* sc);
 
 
 

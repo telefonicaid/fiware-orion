@@ -330,17 +330,17 @@ BSONElement getField(const BSONObj* bP, const char* field, const char* caller, i
 */
 void setStringVector
 (
-  const BSONObj&             b,
+  const BSONObj*             bP,
   const char*                field,
   std::vector<std::string>*  v,
   const char*                caller,
   int                        line
 )
 {
-  if (b.hasField(field) && b.getField(field).type() == mongo::Array)
+  if (bP->hasField(field) && bP->getField(field).type() == mongo::Array)
   {
     // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
-    std::vector<BSONElement> ba = b.getField(field).Array();
+    std::vector<BSONElement> ba = bP->getField(field).Array();
 
     v->clear();
 
@@ -363,15 +363,15 @@ void setStringVector
   else
   {
     // Detect error
-    if (!b.hasField(field))
+    if (!bP->hasField(field))
     {
       LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-            field, b.toString().c_str(), caller, line));
+            field, bP->toString().c_str(), caller, line));
     }
     else
     {
       LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
-            field, b.getField(field).type(), b.toString().c_str(), caller, line));
+            field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
     }
   }
 }
@@ -452,11 +452,11 @@ bool nextSafeOrError
 *
 * safeGetSubId -
 */
-bool safeGetSubId(const SubscriptionId& subId, OID* id, StatusCode* sc)
+bool safeGetSubId(const SubscriptionId* subIdP, OID* id, StatusCode* sc)
 {
   try
   {
-    *id = OID(subId.get());
+    *id = OID(subIdP->get());
     return true;
   }
   catch (const AssertionException &e)

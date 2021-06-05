@@ -325,11 +325,11 @@ static void setCondsAndInitialNotifyNgsiv1
   std::vector<std::string> attributes;
   std::vector<std::string> metadata;
 
-  setStringVectorF(*subOrigP, CSUB_ATTRS, &attributes);
+  setStringVectorF(subOrigP, CSUB_ATTRS, &attributes);
 
   if (subOrigP->hasField(CSUB_METADATA))
   {
-    setStringVectorF(*subOrigP, CSUB_METADATA, &metadata);
+    setStringVectorF(subOrigP, CSUB_METADATA, &metadata);
   }
 
   /* Conds vector (and maybe an initial notification) */
@@ -365,7 +365,7 @@ static void setCondsAndInitialNotifyNgsiv1
 static void setCondsAndInitialNotify
 (
   const SubscriptionUpdate&        subUp,
-  const BSONObj&                   subOrig,
+  const BSONObj*                   subOrigP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
@@ -392,7 +392,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(&subOrig, CSUB_STATUS) : STATUS_ACTIVE;
+      status = subOrigP->hasField(CSUB_STATUS)? getStringFieldF(subOrigP, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
     if (subUp.notificationProvided)
@@ -404,13 +404,13 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      httpInfo.fill(&subOrig);
-      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(&subOrig, CSUB_BLACKLIST) : false;
-      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
+      httpInfo.fill(subOrigP);
+      blacklist = subOrigP->hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrigP, CSUB_BLACKLIST) : false;
+      setStringVectorF(subOrigP, CSUB_ATTRS, &notifAttributesV);
 
-      if (subOrig.hasField(CSUB_METADATA))
+      if (subOrigP->hasField(CSUB_METADATA))
       {
-        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+        setStringVectorF(subOrigP, CSUB_METADATA, &metadataV);
       }
     }
 
@@ -418,9 +418,9 @@ static void setCondsAndInitialNotify
     {
       attrsFormat = subUp.attrsFormat;
     }
-    else if (subOrig.hasField(CSUB_FORMAT))
+    else if (subOrigP->hasField(CSUB_FORMAT))
     {
-      attrsFormat = stringToRenderFormat(getStringFieldF(&subOrig, CSUB_FORMAT));
+      attrsFormat = stringToRenderFormat(getStringFieldF(subOrigP, CSUB_FORMAT));
     }
 
     if (subUp.fromNgsiv1)
@@ -434,7 +434,7 @@ static void setCondsAndInitialNotify
       // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       //
       setCondsAndInitialNotifyNgsiv1(subUp,
-                                     &subOrig,
+                                     subOrigP,
                                      subUp.id,
                                      status,
                                      httpInfo.url,
@@ -471,7 +471,7 @@ static void setCondsAndInitialNotify
     // If not found, an empty array is added to 'b'
     //
     BSONArray conds;
-    getArrayField(&conds, &subOrig, CSUB_CONDITIONS, __FILE__, __LINE__);
+    getArrayField(&conds, subOrigP, CSUB_CONDITIONS, __FILE__, __LINE__);
     b->append(CSUB_CONDITIONS, conds);
   }
 }
@@ -858,7 +858,7 @@ std::string mongoUpdateSubscription
   OID            id;
   BSONObj        subOrig;
 
-  if (!safeGetSubId(subId, &id, &sc))
+  if (!safeGetSubId(&subId, &id, &sc))
   {
     std::string details;
 
@@ -922,7 +922,7 @@ std::string mongoUpdateSubscription
   setBlacklist(subUp, subOrig, &b);
 
   setCondsAndInitialNotify(subUp,
-                           subOrig,
+                           &subOrig,
                            tenant,
                            servicePathV,
                            xauthToken,
