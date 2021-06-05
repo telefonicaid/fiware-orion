@@ -494,12 +494,12 @@ std::string postUpdateContext
   HttpStatusCode httpStatusCode;
   TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP,
                                                   upcrsP,
-                                                  ciP->tenant,
+                                                  ciP->tenant.c_str(),
                                                   ciP->servicePathV,
                                                   ciP->uriParam,
-                                                  ciP->httpHeaders.xauthToken,
-                                                  ciP->httpHeaders.correlator,
-                                                  ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                  ciP->httpHeaders.xauthToken.c_str(),
+                                                  ciP->httpHeaders.correlator.c_str(),
+                                                  ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
                                                   ciP->apiVersion,
                                                   ngsiV2Flavour));
 

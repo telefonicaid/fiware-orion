@@ -52,12 +52,12 @@ HttpStatusCode mongoUpdateContext
 (
   UpdateContextRequest*                 requestP,
   UpdateContextResponse*                responseP,
-  const std::string&                    tenant,
+  const char*                           tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
-  const std::string&                    xauthToken,
-  const std::string&                    fiwareCorrelator,
-  const std::string&                    ngsiV2AttrsFormat,
+  const char*                           xauthToken,
+  const char*                           fiwareCorrelator,
+  const char*                           ngsiV2AttrsFormat,
   ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour
 )
