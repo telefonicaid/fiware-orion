@@ -3308,7 +3308,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static void updateEntity
 (
-  const BSONObj&                  r,
+  const BSONObj*                  bobP,
   ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
@@ -3332,7 +3332,7 @@ static void updateEntity
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
   BSONObj            idField;
-  getObjectFieldF(&idField, &r, "_id");
+  getObjectFieldF(&idField, bobP, "_id");
 
   const char*        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
   std::string        entityType        = getStringFieldF(&idField, ENT_ENTITY_TYPE);
@@ -3355,7 +3355,7 @@ static void updateEntity
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
   BSONObj           attrs;
-  getObjectFieldF(&attrs, &r, ENT_ATTRS);
+  getObjectFieldF(&attrs, bobP, ENT_ATTRS);
 
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
@@ -3373,10 +3373,10 @@ static void updateEntity
   BSONObj         currentGeoJson;
   BSONObjBuilder  geoJson;
 
-  if (r.hasField(ENT_LOCATION))
+  if (bobP->hasField(ENT_LOCATION))
   {
     BSONObj loc;
-    getObjectFieldF(&loc, &r, ENT_LOCATION);
+    getObjectFieldF(&loc, bobP, ENT_LOCATION);
 
     locAttr = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
     getObjectFieldF(&currentGeoJson, &loc, ENT_LOCATION_COORDS);
@@ -3390,9 +3390,9 @@ static void updateEntity
   mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
   bool dateExpirationInPayload          = false;
 
-  if (r.hasField(ENT_EXPIRATION))
+  if (bobP->hasField(ENT_EXPIRATION))
   {
-    currentDateExpiration = getField(&r, ENT_EXPIRATION).date();
+    currentDateExpiration = getField(bobP, ENT_EXPIRATION).date();
   }
 
   //
@@ -3426,19 +3426,19 @@ static void updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(bobP, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(&r, ENT_CREATION_DATE);
-  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(&r, ENT_MODIFICATION_DATE);
+  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(bobP, ENT_CREATION_DATE);
+  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(bobP, ENT_MODIFICATION_DATE);
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
-  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  if ((ngsiV2AttrsFormat == "custom") && (bobP->hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (strcmp(getStringFieldF(&r, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
+    loopDetected = (strcmp(getStringFieldF(bobP, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
   }
 
   if (!processContextAttributeVector(ceP,
@@ -3947,7 +3947,7 @@ void processContextElement
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
   {
-    updateEntity(results[ix],
+    updateEntity(&results[ix],
                  action,
                  tenant,
                  servicePathV,

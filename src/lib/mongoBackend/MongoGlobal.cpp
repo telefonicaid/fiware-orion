@@ -1647,7 +1647,7 @@ bool entitiesQuery
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(&r, attrL, includeEmpty, apiVersion);
 
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
