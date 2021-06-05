@@ -155,23 +155,25 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
 */
 double getNumberField(const BSONObj* bP, const char* field, const char* caller, int line)
 {
-  // FIXME: Don't call getField twice!
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::NumberDouble)
-  {
-    return bP->getField(field).Number();
-  }
+  mongo::BSONType type = mongo::EOO;
 
-  // Detect error
-  if (!bP->hasField(field))
+  if (bP->hasField(field))
   {
-    LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, bP->toString().c_str(), caller, line));
+    BSONElement element = bP->getField(field);
+
+    type = element.type();
+    if (type == mongo::NumberDouble)
+      return element.Number();
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an double but type=%d in BSONObj <%s> from caller %s:%d)",
-          field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
+    LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+          field, bP->toString().c_str(), caller, line));
+    return -1;
   }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a NUMBERDOUBLE but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
 
   return -1;
 }
