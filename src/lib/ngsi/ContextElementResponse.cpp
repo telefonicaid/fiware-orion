@@ -133,8 +133,8 @@ static bool includedAttribute(const ContextAttribute* attrP, const StringList& a
 */
 ContextElementResponse::ContextElementResponse
 (
-  const mongo::BSONObj&  entityDoc,
-  const StringList&   attrL,
+  const mongo::BSONObj*  entityDocP,
+  const StringList&      attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
 )
@@ -142,7 +142,7 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getFieldF(&entityDoc, "_id").embeddedObject();
+  BSONObj id = getFieldF(entityDocP, "_id").embeddedObject();
 
   const char* entityId   = getStringFieldF(&id, ENT_ENTITY_ID);
   const char* entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(&id, ENT_ENTITY_TYPE) : "";
@@ -152,10 +152,10 @@ ContextElementResponse::ContextElementResponse
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
-  if (entityDoc.hasElement(ENT_LOCATION))
+  if (entityDocP->hasElement(ENT_LOCATION))
   {
     BSONObj objField;
-    getObjectFieldF(&objField, &entityDoc, ENT_LOCATION);
+    getObjectFieldF(&objField, entityDocP, ENT_LOCATION);
     locAttr = getStringFieldF(&objField, ENT_LOCATION_ATTRNAME);
   }
 
@@ -167,7 +167,7 @@ ContextElementResponse::ContextElementResponse
   BSONObj                attrs;
   std::set<std::string>  attrNames;
 
-  getObjectFieldF(&attrs, &entityDoc, ENT_ATTRS);
+  getObjectFieldF(&attrs, entityDocP, ENT_ATTRS);
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
@@ -318,14 +318,14 @@ ContextElementResponse::ContextElementResponse
   }
 
   /* Set creDate and modDate at entity level */
-  if (entityDoc.hasField(ENT_CREATION_DATE))
+  if (entityDocP->hasField(ENT_CREATION_DATE))
   {
-    contextElement.entityId.creDate = getNumberFieldAsDoubleF(&entityDoc, ENT_CREATION_DATE);
+    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDocP, ENT_CREATION_DATE);
   }
 
-  if (entityDoc.hasField(ENT_MODIFICATION_DATE))
+  if (entityDocP->hasField(ENT_MODIFICATION_DATE))
   {
-    contextElement.entityId.modDate = getNumberFieldAsDoubleF(&entityDoc, ENT_MODIFICATION_DATE);
+    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDocP, ENT_MODIFICATION_DATE);
   }
 }
 

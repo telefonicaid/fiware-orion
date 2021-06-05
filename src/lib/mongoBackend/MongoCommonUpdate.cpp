@@ -1571,11 +1571,13 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
-      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION) : -1;
-      const char*       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
+      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING);
+      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
+      const char*       renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
+      const char*       renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
+
 
       httpInfo.fill(&sub);
 
@@ -1587,7 +1589,7 @@ static bool addTriggeredSubscriptions_noCache
                                                                "",
                                                                "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
+      trigs->blacklist = getBoolFieldF(&sub, CSUB_BLACKLIST);
 
       if (sub.hasField(CSUB_METADATA))
         setStringVectorF(&sub, CSUB_METADATA, &trigs->metadata);
@@ -1597,11 +1599,11 @@ static bool addTriggeredSubscriptions_noCache
         BSONObj expr;
         getObjectFieldF(&expr, &sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
-        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(&expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(&expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(&expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = getStringFieldF(&expr, CSUB_EXPR_Q);
+        std::string mq       = getStringFieldF(&expr, CSUB_EXPR_MQ);
+        std::string georel   = getStringFieldF(&expr, CSUB_EXPR_GEOREL);
+        std::string geometry = getStringFieldF(&expr, CSUB_EXPR_GEOM);
+        std::string coords   = getStringFieldF(&expr, CSUB_EXPR_COORDS);
 
         trigs->fillExpression(georel, geometry, coords);
 
@@ -3306,7 +3308,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static void updateEntity
 (
-  const BSONObj&                  r,
+  const BSONObj*                  bobP,
   ActionType                      action,
   const std::string&              tenant,
   const std::vector<std::string>& servicePathV,
@@ -3330,7 +3332,7 @@ static void updateEntity
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
   BSONObj            idField;
-  getObjectFieldF(&idField, &r, "_id");
+  getObjectFieldF(&idField, bobP, "_id");
 
   const char*        entityId          = getStringFieldF(&idField, ENT_ENTITY_ID);
   std::string        entityType        = getStringFieldF(&idField, ENT_ENTITY_TYPE);
@@ -3353,7 +3355,7 @@ static void updateEntity
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
   BSONObj           attrs;
-  getObjectFieldF(&attrs, &r, ENT_ATTRS);
+  getObjectFieldF(&attrs, bobP, ENT_ATTRS);
 
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
@@ -3371,10 +3373,10 @@ static void updateEntity
   BSONObj         currentGeoJson;
   BSONObjBuilder  geoJson;
 
-  if (r.hasField(ENT_LOCATION))
+  if (bobP->hasField(ENT_LOCATION))
   {
     BSONObj loc;
-    getObjectFieldF(&loc, &r, ENT_LOCATION);
+    getObjectFieldF(&loc, bobP, ENT_LOCATION);
 
     locAttr = getStringFieldF(&loc, ENT_LOCATION_ATTRNAME);
     getObjectFieldF(&currentGeoJson, &loc, ENT_LOCATION_COORDS);
@@ -3388,9 +3390,9 @@ static void updateEntity
   mongo::Date_t currentDateExpiration = NO_EXPIRATION_DATE;
   bool dateExpirationInPayload          = false;
 
-  if (r.hasField(ENT_EXPIRATION))
+  if (bobP->hasField(ENT_EXPIRATION))
   {
-    currentDateExpiration = getField(&r, ENT_EXPIRATION).date();
+    currentDateExpiration = getField(bobP, ENT_EXPIRATION).date();
   }
 
   //
@@ -3424,19 +3426,19 @@ static void updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(bobP, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(&r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(&r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(bobP, ENT_CREATION_DATE);
+  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(bobP, ENT_MODIFICATION_DATE);
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
-  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  if ((ngsiV2AttrsFormat == "custom") && (bobP->hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (strcmp(getStringFieldF(&r, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
+    loopDetected = (strcmp(getStringFieldF(bobP, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
   }
 
   if (!processContextAttributeVector(ceP,
@@ -3945,7 +3947,7 @@ void processContextElement
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
   {
-    updateEntity(results[ix],
+    updateEntity(&results[ix],
                  action,
                  tenant,
                  servicePathV,
