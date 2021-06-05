@@ -387,9 +387,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
                                                    orionldState.tenant,
                                                    ciP->servicePathV,
                                                    ciP->uriParam,
-                                                   ciP->httpHeaders.xauthToken,
-                                                   ciP->httpHeaders.correlator,
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->httpHeaders.xauthToken.c_str(),
+                                                   ciP->httpHeaders.correlator.c_str(),
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
