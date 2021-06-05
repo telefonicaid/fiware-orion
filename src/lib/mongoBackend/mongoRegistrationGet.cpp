@@ -67,7 +67,7 @@ void mongoRegistrationGet
   mongo::OID   oid;
   StatusCode   sc;
 
-  if (safeGetRegId(regId, &oid, &sc) == false)
+  if (safeGetRegId(regId.c_str(), &oid, &sc) == false)
   {
     oeP->fill(sc);
     return;
