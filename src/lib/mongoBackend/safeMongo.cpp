@@ -350,43 +350,47 @@ void setStringVector
   int                        line
 )
 {
-  if (bP->hasField(field) && bP->getField(field).type() == mongo::Array)
+  mongo::BSONType type = mongo::EOO;
+
+  if (bP->hasField(field))
   {
-    // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
-    std::vector<BSONElement> ba = bP->getField(field).Array();
+    BSONElement element = bP->getField(field);
 
-    v->clear();
-
-    for (unsigned int ix = 0; ix < ba.size(); ++ix)
+    type = element.type();
+    if (type == mongo::Array)
     {
-      if (ba[ix].type() == mongo::String)
-      {
-        v->push_back(ba[ix].String());
-      }
-      else
-      {
-        LM_E(("Runtime Error (element %d in array was supposed to be an string but type=%d from caller %s:%d)",
-              ix, ba[ix].type(), caller, line));
-        v->clear();
+      // See http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
+      std::vector<BSONElement> ba = bP->getField(field).Array();
 
-        return;
+      v->clear();
+
+      for (unsigned int ix = 0; ix < ba.size(); ++ix)
+      {
+        if (ba[ix].type() == mongo::String)
+        {
+          v->push_back(ba[ix].String());
+        }
+        else
+        {
+          LM_E(("Runtime Error (element %d in array was supposed to be a STRING but type=%d from caller %s:%d)",
+                ix, ba[ix].type(), caller, line));
+          v->clear();
+
+          return;
+        }
       }
     }
   }
   else
   {
-    // Detect error
-    if (!bP->hasField(field))
-    {
-      LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-            field, bP->toString().c_str(), caller, line));
-    }
-    else
-    {
-      LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
-            field, bP->getField(field).type(), bP->toString().c_str(), caller, line));
-    }
+    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+          field, bP->toString().c_str(), caller, line));
+
+    return;
   }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be an array but type=%d in BSONObj <%s> from caller %s:%d)",
+        field, type, bP->toString().c_str(), caller, line));
 }
 
 
