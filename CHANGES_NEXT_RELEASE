@@ -1,2 +1,2 @@
-* Issue  #857   Relationship without 'object' field in notifications
-* Issue  #280   Connection Pool for TRoE
+* Issue 885  Response of POST /ngsi-ld/v1/entityOperations/upsert is corrupted when no entities exist
+
