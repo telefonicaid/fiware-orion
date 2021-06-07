@@ -1,0 +1,1 @@
+* Issue 885  Response of POST /ngsi-ld/v1/entityOperations/upsert is corrupted when no entities exist

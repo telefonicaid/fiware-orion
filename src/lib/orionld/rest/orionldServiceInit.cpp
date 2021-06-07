@@ -367,15 +367,18 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
-    serviceP->options  = 0;  // Tenant will be created if necessary
+    serviceP->options    = 0;  // Tenant will be created if necessary
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
   {
-    serviceP->options  = 0;  // Tenant will be created if necessary
+    serviceP->options    = 0;  // Tenant will be created if necessary
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
