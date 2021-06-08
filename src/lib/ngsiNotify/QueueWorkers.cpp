@@ -82,7 +82,10 @@ int QueueWorkers::stop()
 {
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    // FIXME PR: insert comment
+    // FIXME #3877: this is not the best way of cancelling a thread in our case.
+    // By the moment is not a problem (as the release is done only during the process
+    // tear down phase) but if this gets dynamic at some moment (creation/destroying
+    // pools by API) it needs to be changed
     if (pthread_cancel(threadIds[ix]) != 0)
     {
       return -1;
@@ -126,8 +129,10 @@ static void* workerFunc(void* pSyncQ)
     pthread_exit(NULL);
   }
 
-  // FIXME PR: insert comment
-  // See: https://stackoverflow.com/questions/67872576/pthread-join-doesnt-return-on-a-just-cancelled-thread-with-pthread-cancel?noredirect=1#comment119968712_67872576
+  // FIXME #3877: this is not the best way of cancelling a thread in our case.
+  // By the moment is not a problem (as the release is done only during the process
+  // tear down phase) but if this gets dynamic at some moment (creation/destroying
+  // pools by API) it needs to be changed
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
   // Set pthread_cancel handler
@@ -250,7 +255,7 @@ static void* workerFunc(void* pSyncQ)
     curl_easy_reset(curl);
   }
 
-  // Next statemement never executes but compilation breaks without it. See this note in pthread.h:
+  // Next statement never executes but compilation breaks without it. See this note in pthread.h:
   // "pthread_cleanup_push and pthread_cleanup_pop are macros and must always be used in
   // matching pairs at the same nesting level of braces".
   pthread_cleanup_pop(0);
