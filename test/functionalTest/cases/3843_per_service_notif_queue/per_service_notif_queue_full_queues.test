@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attributes and metadata starting with dollar sign in the name in subscriptions
+Per service notification queues (full queues)
 
 --SHELL-INIT--
 dbInit ${CB_DB_NAME} serv1
@@ -32,14 +32,15 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
 
-# This test is based in the scenario described at test/perServiceNotifQueuesTest/README.md
+# This test is like the base case in per_service_notif.test but causing
+# saturation in each queue
 #
 # 01. Subscribe serv1 to the accumulator endpoint that never responses
 # 02. Subscribe serv2 to the accumulator endpoint that never responses
 # 03. Subscribe serv3 to the accumulator endpoint that never responses
 # 04. Create/update entity in serv1 4 times, causing 1 ERROR
-# 05. Create/update entity in serv1 5 times, causing 1 ERROR
-# 06. Create/update entity in serv1 6 times, causing 1 ERROR
+# 05. Create/update entity in serv2 5 times, causing 1 ERROR
+# 06. Create/update entity in serv3 6 times, causing 1 ERROR
 # 07. Grep log for ERROR, getting one in each service
 #
 
@@ -132,7 +133,7 @@ echo
 echo
 
 
-echo "05. Create/update entity in serv1 5 times, causing 1 ERROR"
+echo "05. Create/update entity in serv2 5 times, causing 1 ERROR"
 echo "=========================================================="
 for i in {1..5}
 do
@@ -143,7 +144,7 @@ echo
 echo
 
 
-echo "06. Create/update entity in serv1 6 times, causing 1 ERROR"
+echo "06. Create/update entity in serv3 6 times, causing 1 ERROR"
 echo "=========================================================="
 for i in {1..6}
 do
@@ -159,6 +160,12 @@ echo "==================================================="
 grep ERROR /tmp/contextBroker.log | grep "Runtime Error" |  awk -F 'Runtime Error ' '{print $2}'
 echo
 echo
+
+
+# It is not usual to stop accumulator in the SHELL section, but this way we
+# ensure all connections are terminated so upon stopping of Context Broker
+# no memory is lost and no false positive is reported by valgrind pass
+accumulatorStop $LISTENER_PORT
 
 
 --REGEXPECT--
@@ -200,7 +207,7 @@ Date: REGEX(.*)
 4
 
 
-05. Create/update entity in serv1 5 times, causing 1 ERROR
+05. Create/update entity in serv2 5 times, causing 1 ERROR
 ==========================================================
 1
 2
@@ -209,7 +216,7 @@ Date: REGEX(.*)
 5
 
 
-06. Create/update entity in serv1 6 times, causing 1 ERROR
+06. Create/update entity in serv3 6 times, causing 1 ERROR
 ==========================================================
 1
 2
@@ -228,7 +235,6 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop $LISTENER_PORT
 dbDrop ${CB_DB_NAME} serv1
 dbDrop ${CB_DB_NAME} serv2
 dbDrop ${CB_DB_NAME} serv3

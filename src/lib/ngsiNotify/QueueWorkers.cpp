@@ -82,7 +82,11 @@ int QueueWorkers::stop()
 {
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    pthread_cancel(threadIds[ix]);
+    // FIXME PR: insert comment
+    if (pthread_cancel(threadIds[ix]) != 0)
+    {
+      return -1;
+    }
     pthread_join(threadIds[ix], NULL);
   }
 
@@ -121,6 +125,10 @@ static void* workerFunc(void* pSyncQ)
     LM_E(("Runtime Error (curl_easy_init)"));
     pthread_exit(NULL);
   }
+
+  // FIXME PR: insert comment
+  // See: https://stackoverflow.com/questions/67872576/pthread-join-doesnt-return-on-a-just-cancelled-thread-with-pthread-cancel?noredirect=1#comment119968712_67872576
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
   // Set pthread_cancel handler
   pthread_cleanup_push(workerFinishes, curl);

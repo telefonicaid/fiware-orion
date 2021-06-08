@@ -62,10 +62,16 @@ QueueNotifier::QueueNotifier
 */
 QueueNotifier::~QueueNotifier(void)
 {
-  defaultSq.stop();
+  if (defaultSq.stop() != 0)
+  {
+    LM_X(1, ("Fatal Error (fail stoping default service queue)"));
+  }
   for (std::map<std::string, ServiceQueue*>::const_iterator it = serviceSq.begin(); it != serviceSq.end(); ++it)
   {
-    it->second->stop();
+    if (it->second->stop() != 0)
+    {
+      LM_X(1, ("Fatal Error (fail stoping service queue %s)", it->first.c_str()));
+    }
     delete it->second;
   }
 }
