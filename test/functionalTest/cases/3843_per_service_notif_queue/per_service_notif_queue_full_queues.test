@@ -32,7 +32,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
 
-# This test is like the base case in per_service_notif.test but causing
+# This test is like the base case in per_service_notif_queue.test but causing
 # saturation in each queue
 #
 # 01. Subscribe serv1 to the accumulator endpoint that never responses

@@ -32,7 +32,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
 
-# This test is like the base case in per_service_notif.test but without
+# This test is like the base case in per_service_notif_queue.test but without
 # using any per-service queue, so the default servie queue will saturate
 # earlier
 #
