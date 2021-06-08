@@ -82,7 +82,14 @@ int QueueWorkers::stop()
 {
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    pthread_cancel(threadIds[ix]);
+    // FIXME #3877: this is not the best way of cancelling a thread in our case.
+    // By the moment is not a problem (as the release is done only during the process
+    // tear down phase) but if this gets dynamic at some moment (creation/destroying
+    // pools by API) it needs to be changed
+    if (pthread_cancel(threadIds[ix]) != 0)
+    {
+      return -1;
+    }
     pthread_join(threadIds[ix], NULL);
   }
 
@@ -121,6 +128,12 @@ static void* workerFunc(void* pSyncQ)
     LM_E(("Runtime Error (curl_easy_init)"));
     pthread_exit(NULL);
   }
+
+  // FIXME #3877: this is not the best way of cancelling a thread in our case.
+  // By the moment is not a problem (as the release is done only during the process
+  // tear down phase) but if this gets dynamic at some moment (creation/destroying
+  // pools by API) it needs to be changed
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
   // Set pthread_cancel handler
   pthread_cleanup_push(workerFinishes, curl);
@@ -242,7 +255,7 @@ static void* workerFunc(void* pSyncQ)
     curl_easy_reset(curl);
   }
 
-  // Next statemement never executes but compilation breaks without it. See this note in pthread.h:
+  // Next statement never executes but compilation breaks without it. See this note in pthread.h:
   // "pthread_cleanup_push and pthread_cleanup_pop are macros and must always be used in
   // matching pairs at the same nesting level of braces".
   pthread_cleanup_pop(0);

@@ -21,26 +21,28 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Per service notification queues
+Per service notification queues (regression case)
 
 --SHELL-INIT--
 dbInit ${CB_DB_NAME} serv1
 dbInit ${CB_DB_NAME} serv2
 dbInit ${CB_DB_NAME} serv3
-brokerStart CB 0 IPv4 -multiservice -notificationMode threadpool:3:2,serv1:1:2,serv2:2:2
+brokerStart CB 0 IPv4 -multiservice -notificationMode threadpool:3:2
 accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
 
-# This test is based in the scenario described at test/perServiceNotifQueuesTest/README.md
+# This test is like the base case in per_service_notif_queue.test but without
+# using any per-service queue, so the default servie queue will saturate
+# earlier
 #
 # 01. Subscribe serv1 to the accumulator endpoint that never responses
 # 02. Subscribe serv2 to the accumulator endpoint that never responses
 # 03. Subscribe serv3 to the accumulator endpoint that never responses
 # 04. Create/update entity in serv1 3 times
-# 05. Create/update entity in serv2 4 times
-# 06. Create/update entity in serv3 5 times
-# 07. Grep log for ERROR, getting no error
+# 05. Create/update entity in serv2 4 times, causing 2 ERRORs
+# 06. Create/update entity in serv3 5 times, causing 5 ERRORs
+# 07. Grep log for ERROR, getting 7 in the default service
 #
 
 
@@ -132,8 +134,8 @@ echo
 echo
 
 
-echo "05. Create/update entity in serv2 4 times"
-echo "========================================="
+echo "05. Create/update entity in serv2 4 times, causing 2 ERRORs"
+echo "==========================================================="
 for i in {1..4}
 do
    echo $i
@@ -143,8 +145,8 @@ echo
 echo
 
 
-echo "06. Create/update entity in serv3 5 times"
-echo "========================================="
+echo "06. Create/update entity in serv3 5 times, causing 5 ERRORs"
+echo "==========================================================="
 for i in {1..5}
 do
    echo $i
@@ -154,8 +156,8 @@ echo
 echo
 
 
-echo "07. Grep log for ERROR, getting no error"
-echo "========================================"
+echo "07. Grep log for ERROR, getting 7 in the default service"
+echo "========================================================"
 grep ERROR /tmp/contextBroker.log | grep "Runtime Error" |  awk -F 'Runtime Error ' '{print $2}'
 echo
 echo
@@ -205,16 +207,16 @@ Date: REGEX(.*)
 3
 
 
-05. Create/update entity in serv2 4 times
-=========================================
+05. Create/update entity in serv2 4 times, causing 2 ERRORs
+===========================================================
 1
 2
 3
 4
 
 
-06. Create/update entity in serv3 5 times
-=========================================
+06. Create/update entity in serv3 5 times, causing 5 ERRORs
+===========================================================
 1
 2
 3
@@ -222,8 +224,15 @@ Date: REGEX(.*)
 5
 
 
-07. Grep log for ERROR, getting no error
-========================================
+07. Grep log for ERROR, getting 7 in the default service
+========================================================
+(default notification queue is full)
+(default notification queue is full)
+(default notification queue is full)
+(default notification queue is full)
+(default notification queue is full)
+(default notification queue is full)
+(default notification queue is full)
 
 
 --TEARDOWN--

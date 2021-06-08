@@ -587,6 +587,8 @@ void exitFunc(void)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
+
+  LM_I(("Orion shutdown completed"));
 }
 
 
@@ -786,6 +788,8 @@ static void notificationModeParse
     LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
   }
 
+  free(mode);
+
   // Potentially processing of second and further tokens, if any
   for (unsigned int ix = 1; ix < commaTokensV.size(); ++ix)
   {
@@ -801,6 +805,8 @@ static void notificationModeParse
     pServiceV->push_back(std::string(serviceName));
     pServiceQueueSizeV->push_back(qSize);
     pServiceNumThreadV->push_back(numThreads);
+
+    free(serviceName);
   }
 
   // get rid of params, if any, in notifModeArg
@@ -809,8 +815,6 @@ static void notificationModeParse
   {
     *first_colon = '\0';
   }
-
-  free(mode);
 }
 
 
