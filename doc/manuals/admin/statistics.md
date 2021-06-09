@@ -201,6 +201,9 @@ The particular counters are as follows:
 * `timeInQueue`: accumulated time of notifications waiting in queue
 * `size`: current size of the queue
 
+Note that in the case of using [per-service reserved queues/pools](perf_tuning.md#notification-modes-and-performance),
+the information in this section is the aggregated of every per-service queue/pool plus the
+default queue/workers.
 
 ## GET /cache/statistics
 

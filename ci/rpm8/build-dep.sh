@@ -42,6 +42,22 @@ yum -y install \
   tar \
   cyrus-sasl-devel
 
+# FIXME: this is a temporary hack due to the cmake version that comes with CentOS8
+# at the present moment (June 9th, 2021) is 3.18.2. Unfortunatelly, this version seems
+# to have problems to build the mongo C driver (see https://jira.mongodb.org/browse/CDRIVER-4020),
+# probably due to a bug already solved in 3.18.3. Thus, the solution is to build cmake
+# from scratch (we have used 3.20.1, the last version by the time being). Once CentOS8
+# upgrade cmake to a version beyond 3.18.2, we can probably remove this hack and rely again in
+# yum-based installation
+rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros \
+&& cd /opt \
+&& curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz \
+&& tar xvf cmake-3.20.1.tar.gz \
+&& cd cmake-3.20.1 \
+&& ./bootstrap \
+&& make \
+&& make install
+
 # FIXME: review this with CentOS 8. Probably CentOS 8 uses Flask >0.10.1 but, anyway
 # using virtual env seems to be a good idea
 #

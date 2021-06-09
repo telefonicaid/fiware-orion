@@ -31,7 +31,6 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
-#include "ngsiNotify/ThreadData.h"
 
 #include "ngsiNotify/senderThread.h"
 

@@ -85,6 +85,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/curlSem.h"
 #include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
@@ -163,10 +164,15 @@ char            reqMutexPolicy[16];
 int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
-char            notificationMode[64];
-char            notifFlowControl[64];
-int             notificationQueueSize;
-int             notificationThreadNum;
+
+char                      notificationMode[512];  // FIXME P5: this will limit the number of service that can have a reserved queue...
+char                      notifFlowControl[64];
+int                       notificationQueueSize;
+int                       notificationThreadNum;
+std::vector<std::string>  serviceV;
+std::vector<int>          serviceQueueSizeV;
+std::vector<int>          serviceNumThreadV;
+
 bool            noCache;
 unsigned int    connectionMemory;
 unsigned int    maxConnections;
@@ -230,12 +236,11 @@ unsigned long   fcMaxInterval;
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
 #define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC              "database connection pool size"
-#define MAX_L                  900000
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
-#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n[,serv:q:n]*)"
 #define FLOW_CONTROL_DESC      "notification flow control parameters (gauge:stepDelay:maxInterval)"
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
@@ -290,7 +295,7 @@ PaArgument paArgs[] =
   { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,             DBDISABLERETRYWRITES_DESC    },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,             DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     MAX_L,            DB_TMO_DESC                  },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,         DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,            DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,             USEIPV4_DESC                 },
@@ -303,7 +308,7 @@ PaArgument paArgs[] =
 
   { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,             MULTISERVICE_DESC            },
 
-  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_L,            HTTP_TMO_DESC                },
+  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    UINT_MAX,         HTTP_TMO_DESC                },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,             REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,             MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                WRITE_CONCERN_DESC           },
@@ -556,6 +561,20 @@ void exitFunc(void)
     return;
   }
 
+  metricsMgr.release();
+
+  if ((strcmp(notificationMode, "threadpool") == 0))
+  {
+    // Note the destructor in QueueNotifier will do the releasing work on service queues
+    if (getNotifier() != NULL)
+    {
+      delete getNotifier();
+    }
+  }
+
+  curl_context_cleanup();
+  curl_global_cleanup();
+
 #ifdef DEBUG
   // Take mongo req-sem ?
   LM_T(LmtSubCache, ("try-taking req semaphore"));
@@ -564,15 +583,12 @@ void exitFunc(void)
   subCacheDestroy();
 #endif
 
-  metricsMgr.release();
-
-  curl_context_cleanup();
-  curl_global_cleanup();
-
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
+
+  LM_I(("Orion shutdown completed"));
 }
 
 
@@ -596,14 +612,14 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(std::string dbPrefix, bool multitenant)
+static void contextBrokerInit(void)
 {
   Notifier* pNotifier = NULL;
 
   /* If we use a queue for notifications, start worker threads */
   if (strcmp(notificationMode, "threadpool") == 0)
   {
-    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum, serviceV, serviceQueueSizeV, serviceNumThreadV);
     int             rc         = pQNotifier->start();
 
     if (rc != 0)
@@ -717,17 +733,33 @@ static SemOpType policyGet(std::string mutexPolicy)
 /* ****************************************************************************
 *
 * notificationModeParse -
+*
+* Expected format is as follows:
+*
+* (persistent|transient|threadpool:q:n[,serv:qn]*)
 */
-static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+static void notificationModeParse
+(
+  char*                      notifModeArg,
+  int*                       pQueueSize,
+  int*                       pNumThreads,
+  std::vector<std::string>*  pServiceV,
+  std::vector<int>*          pServiceQueueSizeV,
+  std::vector<int>*          pServiceNumThreadV
+)
 {
+  std::vector<std::string> commaTokensV;
+  stringSplit(std::string(notifModeArg), ',', commaTokensV);
+
+  // First token processing
   char* mode;
   char* first_colon;
   int   flds_num;
 
   errno = 0;
-  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
+  // notifModeArg is a char[512], pretty sure not a huge input to break sscanf
   // cppcheck-suppress invalidscanf
-  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  flds_num = sscanf(commaTokensV[0].c_str(), "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
   if (errno != 0)
   {
     LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
@@ -756,14 +788,33 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
     LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
   }
 
+  free(mode);
+
+  // Potentially processing of second and further tokens, if any
+  for (unsigned int ix = 1; ix < commaTokensV.size(); ++ix)
+  {
+    // notifModeArg is a char[512], pretty sure not a huge input to break sscanf
+    // cppcheck-suppress invalidscanf
+    char* serviceName;
+    int   qSize;
+    int   numThreads;
+    if (sscanf(commaTokensV[ix].c_str(), "%m[^:]:%d:%d", &serviceName, &qSize, &numThreads) < 3)
+    {
+      LM_X(1, ("Fatal Error parsing service reserved queue: %s", commaTokensV[ix].c_str()));
+    }
+    pServiceV->push_back(std::string(serviceName));
+    pServiceQueueSizeV->push_back(qSize);
+    pServiceNumThreadV->push_back(numThreads);
+
+    free(serviceName);
+  }
+
   // get rid of params, if any, in notifModeArg
   first_colon = strchr(notifModeArg, ':');
   if (first_colon != NULL)
   {
     *first_colon = '\0';
   }
-
-  free(mode);
 }
 
 
@@ -1057,8 +1108,14 @@ int main(int argC, char* argV[])
     }
   }
 
-  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
-  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+  // This should be called before contextBrokerInit()
+  notificationModeParse(notificationMode,
+                        &notificationQueueSize,
+                        &notificationThreadNum,
+                        &serviceV,
+                        &serviceQueueSizeV,
+                        &serviceNumThreadV);
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, service with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
 
   if ((strcmp(notifFlowControl, "") != 0) && (strcmp(notificationMode, "threadpool") != 0))
   {
@@ -1152,7 +1209,7 @@ int main(int argC, char* argV[])
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
   // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
   // Otherwise, we have empirically checked that CB may randomly crash
-  contextBrokerInit(dbName, mtenant);
+  contextBrokerInit();
 
   if (https)
   {

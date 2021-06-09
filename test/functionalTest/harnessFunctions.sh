@@ -565,7 +565,14 @@ function brokerStart()
   # Not given notificationMode but not forbidden, use default
   if [ "$notificationModeGiven" == "FALSE" ]  &&  [ "$CB_THREADPOOL" == "ON" ]
   then
-    xParams=$xParams' -notificationMode threadpool:200:20'
+    if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+    then
+      # We reduce the number of workers for valgrind case, to reduce the stress work
+      # in the release logic
+      xParams=$xParams' -notificationMode threadpool:200:5'
+    else
+      xParams=$xParams' -notificationMode threadpool:200:20'
+    fi
   fi
 
   if [ "$role" == "" ]

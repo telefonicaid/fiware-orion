@@ -14,7 +14,6 @@
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
@@ -304,19 +303,6 @@ From lowest to highest:
 4. Object
 5. Array
 6. Boolean
-
-[Top](#top)
-
-## Initial notifications
-
-The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
-corresponding to a given subscription, based on updates to the entities covered by the subscription.
-Apart from that kind of regular notifications, Orion may send also an initial notification at
-subscription creation/update time.
-
-Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification` or `PATCH /v2/subscriptions/{subId}?options=skipInitialNotification`
-
-Check details in the document about [initial notifications](initial_notification.md)
 
 [Top](#top)
 

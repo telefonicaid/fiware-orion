@@ -374,6 +374,11 @@ def givemeDelay():
     sleep(60)
     return Response(status=200)
 
+@app.route("/waitForever", methods=['POST'])
+def waitForever():
+    sleep(6000000000)    # Arround 20 years.. close enough to "forever" :)
+    return Response(status=200)
+
 @app.route('/dump', methods=['GET'])
 def dump():
     return ac
