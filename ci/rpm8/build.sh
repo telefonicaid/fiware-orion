@@ -34,16 +34,16 @@ function _usage()
     -b   --branch        specify branch/tag to build, if not specified - the source from /opt/fiware-orion will be used
     -S   --source        specify repository to clone, if not specified - default repo (https://github.com/telefonicaid/fiware-orion) will be used
     -p   --path          specify path to use as home, if not specified - /opt/fiware-orion will be used
-    -s   --stage         specify stage (unit/functional/compliance) to use
-    -m   --make          cmake/make (works with unit/functional stage only)
-    -i   --install       make install (works with unit/functional stage only)
-    -t   --test          run unit/functional/compliance test (depends on the defined stage)
+    -s   --stage         specify stage (unit/functional/compliance/valgrind) to use
+    -m   --make          cmake/make (works with unit/functional/valgrind stage only)
+    -i   --install       make install (works with unit/functional/valgrind stage only)
+    -t   --test          run unit/functional/compliance/valgrind test (depends on the defined stage)
     -r   --rpm           specify rpm (nightly, release, testing) to build
     -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
-    -j   --jenkins       execute fix for jenkins during functional testing (disable ipv6 test)
+    -j   --jenkins       execute fix for jenkins during functional/valgrind testing (disable ipv6 test)
     -J                   execute fix for jenkins
-    -q   --speed         execute fix for functional tests during testing (improve speed)
-    -Q                   execute fix for functional tests
+    -q   --speed         execute fix for functional/valgrind tests during testing (improve speed)
+    -Q                   execute fix for functional/valgrind tests
     -a   --attempts      attempts to execute functional test
     -e   --execute       run (rerun) test stand with 2 orions
     -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
@@ -195,9 +195,16 @@ fi
 if [ -n "${make}" ]; then
     echo "===================================== MAKE ============================================="
 
+    # Build for valgrind is same as build for functional
+    if [ "${stage}" = "valgrind" ]; then
+      build_stage="functional"
+    else
+      build_stage=${stage}
+    fi
+
     _fix
-    echo "Builder: build ${stage}"
-    make build_${stage}
+    echo "Builder: build ${build_stage}"
+    make build_${build_stage}
     if [ $? -ne 0 ]; then echo "Builder: make failed"; exit 1; fi
     _unfix
 
@@ -206,9 +213,16 @@ fi
 if [ -n "${install}" ]; then
     echo "===================================== INSTALL =========================================="
 
+    # Install for valgrind is same as install for functional
+    if [ "${stage}" = "valgrind" ]; then
+      install_stage="functional"
+    else
+      install_stage=${stage}
+    fi
+
     _fix
-    echo "Builder: install ${stage}"
-    make install_${stage}
+    echo "Builder: install ${install_stage}"
+    make install_${install_stage}
     if [ $? -ne 0 ]; then echo "Builder: installation failed"; exit 1; fi
     _unfix
 
@@ -272,6 +286,25 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     if [ -n "${fix_j}" ]; then _unfix_jenkins; fi
 
     if ! ${status}; then echo "Builder: functional test failed"; exit 1; fi
+
+fi
+
+if [ -n "${test}" ] && [ "${stage}" = "valgrind" ]; then
+    echo "===================================== VALGRIND TESTS ================================="
+
+    if [ -n "${fix_j}" ]; then _fix_jenkins; fi
+
+    _fix
+
+    . scripts/testEnv.sh
+    test/valgrind/valgrindTestSuite.sh
+    if [ $? -ne 0 ]; then status=false; else status=true; fi
+
+    _unfix
+
+    if [ -n "${fix_j}" ]; then _unfix_jenkins; fi
+
+    if ! ${status}; then echo "Builder: valgrind test failed"; exit 1; fi
 
 fi
 
