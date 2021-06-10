@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 #
 # 01. Subscribe to E.* for A, B and C; triggered by B, C or D
 # 02. Create E1 with attributes A:1, B:2, C:3, D:4
-# 03. Dump and reset: see initial notification with A, B and C
+# 03. Dump and reset: see notification with A, B and C
 # 04. Update B:20
 # 05. Dump and reset: see notification with actionType=update and previousValue=2 for B
 # 06. Update B:20, C:30
@@ -110,8 +110,8 @@ echo
 echo
 
 
-echo "03. Dump and reset: see initial notification with A, B and C"
-echo "============================================================"
+echo "03. Dump and reset: see notification with A, B and C"
+echo "===================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -340,8 +340,8 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset: see initial notification with A, B and C
-============================================================
+03. Dump and reset: see notification with A, B and C
+====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 534

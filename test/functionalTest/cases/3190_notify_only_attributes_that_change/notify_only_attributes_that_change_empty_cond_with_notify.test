@@ -33,7 +33,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 #
 # 01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [] notify attrs: [B, C, D], onlyChangedAttrs: true.
 # 02. POST /v2/entities, create Room1 entity with A, B, C, D and E attributes.
-# 03. Dump and reset accumulator, see B, C and D (as this is initial notification).
+# 03. Dump and reset accumulator, see B, C and D
 # 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 # 05. Dump and reset accumulator, see B.
 # 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
@@ -112,8 +112,8 @@ echo
 echo
 
 
-echo '03. Dump and reset accumulator, see B, C and D (as this is initial notification).'
-echo '================================================================================='
+echo '03. Dump and reset accumulator, see B, C and D'
+echo '=============================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see B, C and D (as this is initial notification).
-=================================================================================
+03. Dump and reset accumulator, see B, C and D
+==============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 227

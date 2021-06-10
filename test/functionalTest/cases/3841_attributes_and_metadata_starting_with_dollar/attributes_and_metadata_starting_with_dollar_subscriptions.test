@@ -31,7 +31,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create subscription covering the entity (triggers initial notif)
+# 01. Create subscription covering the entity
 # 02. Create entity E with attribute $temperature=22 with metadata $avg=23
 # 03. Update $temperature=32 $avg=33 (triggers new notif)
 # 04. Dump accumulator, see 2 notifications
@@ -39,8 +39,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 #
 
 
-echo '01. Create subscription covering the entity (triggers initial notif)'
-echo '===================================================================='
+echo '01. Create subscription covering the entity'
+echo '==========================================='
 payload='{
   "subject": {
     "entities": [
@@ -125,8 +125,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription covering the entity (triggers initial notif)
-====================================================================
+01. Create subscription covering the entity
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
