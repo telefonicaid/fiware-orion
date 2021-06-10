@@ -108,9 +108,9 @@ extern void setAttrs(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotify -
+* setConds
 */
-extern void setCondsAndInitialNotify
+extern void setConds
 (
   const ngsiv2::Subscription&      sub,
   const std::vector<std::string>&  notifAttributesV,

@@ -388,7 +388,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
-    // Since the removal of initial notification feature, notificationa are mono-entity
+    // Since the removal of initial notification feature, notifications are mono-entity
     // by construction, i.e. ncr vector has only one element.
     //
     // FIXME P3: not sure if the check on ncr size > 0 is done in some previous point

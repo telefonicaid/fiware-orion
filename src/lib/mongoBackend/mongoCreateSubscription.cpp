@@ -160,7 +160,7 @@ std::string mongoCreateSubscription
     insertInCache(sub, subId, tenant, servicePath);
   }
 
-  setCondsAndInitialNotify(sub, sub.notification.attributes, &b);
+  setConds(sub, sub.notification.attributes, &b);
 
   setExpression(sub, &b);
   setFormat(sub, &b);

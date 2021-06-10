@@ -259,11 +259,11 @@ static void setAttrs(const SubscriptionUpdate& subUp, const orion::BSONObj& subO
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotifyNgsiv1 -
+* setCondsNgsiv1 -
 *
 * This method could be removed along with the rest of NGSIv1 stuff
 */
-static void setCondsAndInitialNotifyNgsiv1
+static void setCondsNgsiv1
 (
   const Subscription&              sub,
   const orion::BSONObj&            subOrig,
@@ -271,7 +271,7 @@ static void setCondsAndInitialNotifyNgsiv1
 )
 {
   //
-  // Similar to setCondsAndInitialNotify() in MongoCommonSubscripion.cpp, but
+  // Similar to setConds() in MongoCommonSubscripion.cpp, but
   // entities and notifications attributes are not taken from sub but from subOrig
   //
   // Most of the following code is copied from mongoGetSubscription logic but, given
@@ -324,9 +324,9 @@ static void setCondsAndInitialNotifyNgsiv1
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotify -
+* setConds
 */
-static void setCondsAndInitialNotify
+static void setConds
 (
   const SubscriptionUpdate&        subUp,
   const orion::BSONObj&            subOrig,
@@ -376,11 +376,11 @@ static void setCondsAndInitialNotify
       //
       // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       //
-      setCondsAndInitialNotifyNgsiv1(subUp, subOrig, b);
+      setCondsNgsiv1(subUp, subOrig, b);
     }
     else
     {
-      setCondsAndInitialNotify(subUp, notifAttributesV, b);
+      setConds(subUp, notifAttributesV, b);
     }
   }
   else
@@ -398,20 +398,12 @@ static void setCondsAndInitialNotify
 *
 * setCount -
 */
-static void setCount(long long inc, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setCount(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subOrig.hasField(CSUB_COUNT))
   {
     long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
-    setCount(count + inc, b);
-  }
-  else
-  {
-    // In this case we only add if inc is different from 0
-    if (inc > 0)
-    {
-      setCount(inc, b);
-    }
+    setCount(count, b);
   }
 }
 
@@ -421,12 +413,6 @@ static void setCount(long long inc, const orion::BSONObj& subOrig, orion::BSONOb
 *
 * setLastNotification -
 *
-* NOTE
-*   Unlike setLastFailure() and setLastSucces(), this function doesn't return any value.
-*   This is due to the fact that lastNotification is added to before sending the notification
-*   while the other two (lastSuccess/lastFailure) need to wait until after - to know the status
-*   of the notification and the resulting values are stored in the sub-cache only,
-*   to be added to mongo when a sub cache refresh is performed.
 */
 static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
 {
@@ -839,16 +825,17 @@ std::string mongoUpdateSubscription
   setBlacklist(subUp, subOrig, &b);
   setOnlyChanged(subUp, subOrig, &b);
 
-  setCondsAndInitialNotify(subUp, subOrig, &b);
+  setConds(subUp, subOrig, &b);
 
-  setLastNotification(subOrig, subCacheP, &b);
-  setCount(0, subOrig, &b);
-
-  setLastFailure(subOrig, subCacheP, &b);
-  setLastSuccess(subOrig, subCacheP, &b);
+  setCount(subOrig, &b);
 
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
+
+  // last* field take into account potenatially newer information in the cache
+  setLastNotification(subOrig, subCacheP, &b);
+  setLastFailure(subOrig, subCacheP, &b);
+  setLastSuccess(subOrig, subCacheP, &b);  
 
   orion::BSONObj doc = b.obj();
 

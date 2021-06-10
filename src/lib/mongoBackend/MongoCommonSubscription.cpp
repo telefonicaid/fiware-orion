@@ -290,9 +290,9 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotify -
+* setConds
 */
-void setCondsAndInitialNotify
+void setConds
 (
   const Subscription&              sub,
   const std::vector<std::string>&  notifAttributesV,
