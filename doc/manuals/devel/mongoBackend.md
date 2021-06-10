@@ -21,7 +21,6 @@
 	* [`mongoInit()`](#mongoinit)
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
-	* [`processConditionVector()`](#processconditionvector)
 
 ## Introduction
 
@@ -340,11 +339,10 @@ _MB-11: mongoCreateSubscription_
 
 * `mongoCreateSubscription()` is invoked from a service routine (step 1). This can be from either `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`) or `mongoSubscribeContext()` (which resides in `lib/mongoBackend/mongoSubscribeContext.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
-* This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.). One of these functions, namely `setCondsAndInitialNotify()`, has the side effect of potentially sending initial notifications corresponding to the subscription being created (called in step 3).
-* `processConditionVector()` is called to actually send notifications (step 4), whose details are described as part of the `MongoGlobal` module section (see diagram [MD-03](#flow-md-03)).
-* The BSON object corresponding to the new subscription is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 5 and 6).
-* If the subscription cache is enabled  (i.e. `noCache` set to `false`), the new subscription is inserted in the subscription cache (step 7). `insertInCache()` uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
-* If the request semaphore was taken in step 2, then it is released before returning (step 8). 
+* This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.) (step 3).
+* The BSON object corresponding to the new subscription is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 4 and 5).
+* If the subscription cache is enabled  (i.e. `noCache` set to `false`), the new subscription is inserted in the subscription cache (step 6). `insertInCache()` uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
+* If the request semaphore was taken in step 2, then it is released before returning (step 7).
 
 Note that potential notifications are sent before inserting the subscription in the database/cache, so the correct information regarding last notification times and count is taken into account.
 
@@ -365,12 +363,10 @@ _MB-12: mongoUpdateSubscription_
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription to be updated is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
 * If the subscription cache is enabled (i.e. `noCache` set to `false`) the subscription cache object is also retrieved from the subscription cache using `subCacheItemLoopkup()` in the `cache` module (step 5).
-* The BSON object of the final subscription is built, based on the BSON object of the original subscription, using different `set*()` functions similar to the ones in the create subscription case (`setExpiration()`, `setHttpInfo()`, etc.). One of these functions, namely `setCondsAndInitialNotify()`, has the "side effect" of potentially sending initial notifications corresponding to the subscription being updated (called in step 6).
-* This function in sequence uses `processConditionVector()` to actually send notifications (step 7), whose details are described as part of the `MongoGlobal` module section (see diagram [MD-03](#flow-md-03)).
-* The `update`, `count`. and `lastNotification` fields are updated in the subscription cache (step 9). This operation is protected by the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)) which is taken and released in steps 8 and 10 receptively.
-* The BSON object corresponding to the updated subscription is updated in the database using `collectionUpdate()` in the `connectionOperations` module (steps 11 and 12).
-* In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the new subscription is updated in the subscription cache (step 13). `updatetInCache()` uses the subscription cache semaphore internally.
-* If the request semaphore was taken in step 2, then it is released before returning (step 14). 
+* The BSON object of the final subscription is built, based on the BSON object of the original subscription, using different `set*()` functions similar to the ones in the create subscription case (`setExpiration()`, `setHttpInfo()`, etc.). (step 6).
+* The BSON object corresponding to the updated subscription is updated in the database using `collectionUpdate()` in the `connectionOperations` module (steps 7 and 8).
+* In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the new subscription is updated in the subscription cache (step 9). `updatetInCache()` uses the subscription cache semaphore internally.
+* If the request semaphore was taken in step 2, then it is released before returning (step 10).
 
 Note that potential notifications are sent before updating the subscription in the database/cache, so the correct information regarding last notification times and count is taken into account.
 
@@ -630,10 +626,7 @@ This function basically searches for entities in the database (`entities` collec
 
 `entitiesQuery()` relies on `collectionRangedQuery()` in the `connectionOperations` module in order to do the actual query in the database. After the query in the database, a part of the function annotates results in order to help in the Context Providers search done by the calling function, using the `found` attribute flag (see details in the source code). The result is then saved in a `ContextElementResponseVector` object, as output parameters.
 
-The function is called from the following places:
-
-* `mongoQueryContext()` (in the `mongoQuery` module), as the "core" of the query operation.
-* `processOnChangeConditionForSubscription()`, to search the entities to "fill" initial notifications during context subscription creation/update.
+The function is called from `mongoQueryContext()` (in the `mongoQuery` module), as the "core" of the query operation.
 
 [Top](#top)
 
@@ -648,28 +641,3 @@ It is used by several functions:
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 
 [Top](#top)
-
-#### `processConditionVector()`
-
-This function is called during context subscription creation/update and possibly sends an initial notification associated to the subscription.
-
-<a name="flow-md-03"></a>
-![`processConditionVector()` function detail](images/Flow-MD-03.png)
-
-_MD-03: `processConditionVector()` function detail_
-
-* `processConditionVector()` (step 1) is invoked by mongoBackend functions. See diagrams [MB-11](#flow-mb-11) and [MB-12](#flow-mb-12).
-* A loop iterates over each individual condition in the `NotifyConditionVector` vector (although most of the times this vector has only one item):
-   * `processOnChangeConditionForSubscription()` is called to process the individual condition (step 2).
-   * `entitiesQuery()` is called to get the entities to be included in the notification (step 3), which in sequence relies on `collectionRangedQuery()` in the `connectionOperations` module in order to get the entities from the database (steps 4 and 5).
-   * `pruneContextElements()` is called in order to remove not found elements, as it makes no sense including them in the notification (step 6).
-   * If, after pruning, there is any entity to send, steps 7 to 11 are executed.
-	   * In the case of conditions for particular attributes (i.e. not empty condition), a second lookup is done using `entitiesQuery()` (steps 7, 8 and 9, plus pruning in step 10).
-	   * Notifications are sent (step 11) using the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to actually send the notification (step 3). The detail is provided in diagrams [NF-01](sourceCode.md#flow-nf-01) or [NF-03](sourceCode.md#flow-nf-03). In the case of conditions for particular attributes, notifications are sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty condition) notifications are always sent.
-
-Note that `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
-
-[Top](#top)
-
-
-

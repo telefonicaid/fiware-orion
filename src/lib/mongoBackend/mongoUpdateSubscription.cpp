@@ -835,7 +835,7 @@ std::string mongoUpdateSubscription
   // last* field take into account potenatially newer information in the cache
   setLastNotification(subOrig, subCacheP, &b);
   setLastFailure(subOrig, subCacheP, &b);
-  setLastSuccess(subOrig, subCacheP, &b);  
+  setLastSuccess(subOrig, subCacheP, &b);
 
   orion::BSONObj doc = b.obj();
 
