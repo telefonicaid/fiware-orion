@@ -128,6 +128,7 @@ typedef enum TraceLevels
   LmtSoftError,
   LmtNotImplemented,
   LmtCurlContext,
+  LmtThreadpool,
 
   LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 
