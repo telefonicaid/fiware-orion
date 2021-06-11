@@ -31,46 +31,17 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z
-# 02. Create entity E2 with DateTime attribute T with value null
-# 03. Create subscription covering both entities (triggers initial notif)
+# 01. Create subscription covering E1 and E2
+# 02. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z (triggers notif)
+# 03. Create entity E2 with DateTime attribute T with value null (triggers notif)
 # 04. Update E1-T: null (triggers notif)
 # 05. Update E2-T: 2020-10-01T12:43:18.000Z (triggers notif)
-# 06. Dump accumulator, see 3 notifications
+# 06. Dump accumulator, see 4 notifications
 #
 
-echo "01. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z"
-echo "=================================================================================="
-payload='{
-  "id": "E1",
-  "type": "T",
-  "T": {
-    "value": "2018-12-03T13:21:42.000Z",
-    "type": "DateTime"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo "02. Create entity E2 with DateTime attribute T with value null"
-echo "=============================================================="
-payload='{
-  "id": "E2",
-  "type": "T",
-  "T": {
-    "value": null,
-    "type": "DateTime"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Create subscription covering both entities (triggers initial notif)"
-echo "======================================================================="
+echo "01. Create subscription covering E1 and E2"
+echo "=========================================="
 payload='{
   "subject": {
     "entities": [
@@ -87,6 +58,36 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z (triggers notif)"
+echo "==================================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T": {
+    "value": "2018-12-03T13:21:42.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 with DateTime attribute T with value null (triggers notif)"
+echo "==============================================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "T": {
+    "value": null,
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -117,7 +118,7 @@ echo
 echo
 
 
-echo "06. Dump accumulator, see 3 notifications"
+echo "06. Dump accumulator, see 4 notifications"
 echo "========================================="
 accumulatorDump
 accumulatorReset
@@ -126,8 +127,18 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z
-==================================================================================
+01. Create subscription covering E1 and E2
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 with DateTime attribute T with value 2018-12-03T13:21:42.000Z (triggers notif)
+===================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -136,21 +147,11 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E2 with DateTime attribute T with value null
-==============================================================
+03. Create entity E2 with DateTime attribute T with value null (triggers notif)
+===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Create subscription covering both entities (triggers initial notif)
-=======================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -172,17 +173,17 @@ Date: REGEX(.*)
 
 
 
-06. Dump accumulator, see 3 notifications
+06. Dump accumulator, see 4 notifications
 =========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 224
+Content-Length: 150
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -194,7 +195,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "id": "E1",
             "type": "T"
-        },
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 128
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
         {
             "T": {
                 "metadata": {},

@@ -894,6 +894,29 @@ function accumulatorReset()
 }
 
 
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Reset -
+#
+function accumulator2Reset()
+{
+  curl localhost:${LISTENER2_PORT}/reset -s -S -X POST
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator3Reset -
+#
+function accumulator3Reset()
+{
+  curl localhost:${LISTENER3_PORT}/reset -s -S -X POST
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # valgrindSleep
@@ -987,16 +1010,23 @@ function dbInsertEntity()
   doc='doc = {
     "_id": {
         "id": entity,
-        "type": "T"
+        "type": "T",
+        "servicePath": "/"
     },
-    "attrNames": [ "A" ],
+    "attrNames": [ "A", "B" ],
     "attrs": {
         "A": {
             "type": "TA",
-            "value": s,
+            "value": 0,
             "creDate" : 1389376081,
             "modDate" : 1389376081
         },
+        "B": {
+            "type": "TB",
+            "value": s,
+            "creDate" : 1389376081,
+            "modDate" : 1389376081
+        }
     },
     "creDate": 1389376081,
     "modDate": 1389376081
@@ -1277,6 +1307,8 @@ export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count
 export -f accumulatorReset
+export -f accumulator2Reset
+export -f accumulator3Reset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

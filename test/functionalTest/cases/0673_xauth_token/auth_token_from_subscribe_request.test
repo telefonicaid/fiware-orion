@@ -31,38 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Update/Append E1/A1
-# 02. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token
-# 03. Check that the X-Auth-Token from the subscribe request was propagated to accumulator
+# 01. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token at01
+# 02. Update/Append E1/A1, with auth-token at02
+# 03. Check that the X-Auth-Token from the update request (at02) was propagated to accumulator
 # 04. Clear the accumulator
-# 05. Update subscription, using *another* X-Auth-Token
-# 06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator
+# 05. Update subscription, using X-Auth-Token at03
+# 06. Update/Append E1/A1, with auth-token at04
+# 07. Check that the X-Auth-Token from the update request (at04) was propagated to accumulator
 #
 
-echo "01. Update/Append E1/A1"
-echo "======================="
-payload='{
-  "attributes" : [
-    {
-      "name" : "A1",
-      "type" : "AT",
-      "value" : "V"
-    },
-    {
-      "name" : "A2",
-      "type" : "AT",
-      "value" : "V"
-    }
-  ]
-}'
-sleep 3
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}"
-echo
-echo
-
-
-echo "02. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token"
-echo "========================================================================="
+echo "01. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token at01"
+echo "=============================================================================="
 payload='{
   "entities": [
     {
@@ -86,14 +65,36 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --xauthToken xauth_from_subscription
+orionCurl --url /v1/subscribeContext --payload "${payload}" --xauthToken at01
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
 
 
-echo "03. Check that the X-Auth-Token from the subscribe request was propagated to accumulator"
-echo "========================================================================================"
+echo "02. Update/Append E1/A1, with auth-token at02"
+echo "============================================="
+payload='{
+  "attributes" : [
+    {
+      "name" : "A1",
+      "type" : "AT",
+      "value" : "V"
+    },
+    {
+      "name" : "A2",
+      "type" : "AT",
+      "value" : "V"
+    }
+  ]
+}'
+sleep 3
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --xauthToken at02
+echo
+echo
+
+
+echo "03. Check that the X-Auth-Token from the update request (at02) was propagated to accumulator"
+echo "============================================================================================"
 accumulatorDump
 echo
 echo
@@ -107,8 +108,8 @@ echo
 echo
 
 
-echo "05. Update subscription, using *another* X-Auth-Token"
-echo "====================================================="
+echo "05. Update subscription, using X-Auth-Token at03"
+echo "================================================"
 payload='{
   "duration": "P1Y",
   "subscriptionId": "'$SUB_ID'",
@@ -123,56 +124,43 @@ payload='{
   ]
 }'
 sleep 1
-orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "${payload}" --xauthToken xauth_from_update_subscription -X PUT
+orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "${payload}" --xauthToken at03 -X PUT
+echo
+echo
+
+echo "06. Update/Append E1/A1, with auth-token at04"
+echo "============================================="
+payload='{
+  "attributes" : [
+    {
+      "name" : "A1",
+      "type" : "AT",
+      "value" : "V"
+    },
+    {
+      "name" : "A2",
+      "type" : "AT",
+      "value" : "Vbis"
+    }
+  ]
+}'
+sleep 3
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --xauthToken at04
 echo
 echo
 
 
-echo "06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator"
-echo "=================================================================================================="
+
+echo "07. Check that the X-Auth-Token from the update request (at04) was propagated to accumulator"
+echo "============================================================================================"
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Update/Append E1/A1
-=======================
-HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "attributes": [
-                {
-                    "name": "A1", 
-                    "type": "AT", 
-                    "value": ""
-                }, 
-                {
-                    "name": "A2", 
-                    "type": "AT", 
-                    "value": ""
-                }
-            ], 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
-    "type": "ET"
-}
-
-
-02. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token
-=========================================================================
+01. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token at01
+==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
@@ -188,17 +176,52 @@ Date: REGEX(.*)
 }
 
 
-03. Check that the X-Auth-Token from the subscribe request was propagated to accumulator
-========================================================================================
+02. Update/Append E1/A1, with auth-token at02
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1",
+                    "type": "AT",
+                    "value": ""
+                },
+                {
+                    "name": "A2",
+                    "type": "AT",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1",
+    "isPattern": "false",
+    "type": "ET"
+}
+
+
+03. Check that the X-Auth-Token from the update request (at02) was propagated to accumulator
+============================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 255
-X-Auth-Token: xauth_from_subscription
+X-Auth-Token: at02
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -231,8 +254,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =========================
 
 
-05. Update subscription, using *another* X-Auth-Token
-=====================================================
+05. Update subscription, using X-Auth-Token at03
+================================================
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
@@ -248,17 +271,52 @@ Date: REGEX(.*)
 }
 
 
-06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator
-==================================================================================================
+06. Update/Append E1/A1, with auth-token at04
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1",
+                    "type": "AT",
+                    "value": ""
+                },
+                {
+                    "name": "A2",
+                    "type": "AT",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1",
+    "isPattern": "false",
+    "type": "ET"
+}
+
+
+07. Check that the X-Auth-Token from the update request (at04) was propagated to accumulator
+============================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 255
-X-Auth-Token: xauth_from_update_subscription
+X-Auth-Token: at04
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [

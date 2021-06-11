@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription sequence ONCHANGE
+Subscription sequence
 
 --SHELL-INIT--
 dbInit CB
@@ -29,6 +29,25 @@ brokerStart CB
 accumulatorStart --pretty-print
 
 --SHELL--
+
+#
+# 01. Create subscription for Room conditions: lightstatus, temperature
+# 02. Create Room entity with lightstatus=L23: triggers notif (1)
+# 03. Append Room temperature=t100: triggers notif (2)
+# 04. Update subscription trottling to 6 seconds
+# 05. Wait >6 seconds
+# 06. Update Room lightstatus=L53: triggers notif (3)
+# 07. Update Room lightstatus=L63: notif avoided by throttling
+# 08. Wait >6 seconds to reset thottling
+# 09. Update Room temperature=t39: triggers notif (4)
+# 10. Update Room pressure=p230: doesn't trigger notif
+# 11. Remove subscription
+# 12. Update Room temperature=t40: no subscription to trigger
+# 13. Dump accumulator: see 4 notifications
+#
+
+echo "01. Create subscription for Room conditions: lightstatus, temperature"
+echo "====================================================================="
 payload='{
     "entities": [
         {
@@ -58,7 +77,9 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
 
-echo "1: ++++++++++++++++++++"
+
+echo "02. Create Room entity with lightstatus=L23: triggers notif (1)"
+echo "==============================================================="
 payload='{
   "contextElements": [
   {
@@ -86,7 +107,8 @@ echo
 echo
 
 
-echo "2: ++++++++++++++++++++"
+echo "03. Append Room temperature=t100: triggers notif (2)"
+echo "===================================================="
 payload='{
   "contextElements": [
   {
@@ -114,7 +136,8 @@ echo
 echo
 
 
-echo "3: ++++++++++++++++++++"
+echo "04. Update subscription trottling to 6 seconds"
+echo "=============================================="
 payload='{
   "subscriptionId": "'$SUB_ID'",
   "throttling": "PT6S"
@@ -124,10 +147,15 @@ echo
 echo
 
 
-# Wait - sleep >6s to reset the throttling interval
+echo "05. Wait >6 seconds"
+echo "==================="
 sleep 10
+echo
+echo
 
-echo "4: ++++++++++++++++++++"
+
+echo "06. Update Room lightstatus=L53: triggers notif (3)"
+echo "==================================================="
 payload='{
   "contextElements": [
   {
@@ -155,7 +183,8 @@ echo
 echo
 
 
-echo "5: ++++++++++++++++++++"
+echo "07. Update Room lightstatus=L63: notif avoided by throttling"
+echo "============================================================"
 payload='{
   "contextElements": [
   {
@@ -183,9 +212,15 @@ echo
 echo
 
 
-echo "6: ++++++++++++++++++++"
-# Wait - sleep >6s to reset the throttling interval
+echo "08. Wait >6 seconds to reset thottling"
+echo "======================================"
 sleep 10
+echo
+echo
+
+
+echo "09. Update Room temperature=t39: triggers notif (4)"
+echo "==================================================="
 payload='{
   "contextElements": [
   {
@@ -208,7 +243,8 @@ echo
 echo
 
 
-echo "7: ++++++++++++++++++++"
+echo "10. Update Room pressure=p230: doesn't trigger notif"
+echo "===================================================="
 payload='{
   "contextElements": [
   {
@@ -231,7 +267,8 @@ echo
 echo
 
 
-echo "8: ++++++++++++++++++++"
+echo "11. Remove subscription"
+echo "======================="
 payload='{
   "subscriptionId": "'$SUB_ID'"
 }'
@@ -240,7 +277,8 @@ echo
 echo
 
 
-echo "9: ++++++++++++++++++++"
+echo "12. Update Room temperature=t40: no subscription to trigger"
+echo "==========================================================="
 payload='{
   "contextElements": [
   {
@@ -251,7 +289,7 @@ payload='{
     {
       "name": "temperature",
       "type": "degree",
-      "value": "t39"
+      "value": "t40"
     }
     ]
   }
@@ -263,14 +301,16 @@ echo
 echo
 
 
-echo "Accumulated data:"
-echo "================="
+echo "13. Dump accumulator: see 4 notifications"
+echo "========================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
+01. Create subscription for Room conditions: lightstatus, temperature
+=====================================================================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -285,7 +325,8 @@ Date: REGEX(.*)
 }
 
 
-1: ++++++++++++++++++++
+02. Create Room entity with lightstatus=L23: triggers notif (1)
+===============================================================
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
@@ -321,7 +362,8 @@ Date: REGEX(.*)
 }
 
 
-2: ++++++++++++++++++++
+03. Append Room temperature=t100: triggers notif (2)
+====================================================
 HTTP/1.1 200 OK
 Content-Length: 257
 Content-Type: application/json
@@ -357,7 +399,8 @@ Date: REGEX(.*)
 }
 
 
-3: ++++++++++++++++++++
+04. Update subscription trottling to 6 seconds
+==============================================
 HTTP/1.1 200 OK
 Content-Length: 87
 Content-Type: application/json
@@ -372,7 +415,12 @@ Date: REGEX(.*)
 }
 
 
-4: ++++++++++++++++++++
+05. Wait >6 seconds
+===================
+
+
+06. Update Room lightstatus=L53: triggers notif (3)
+===================================================
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
@@ -408,7 +456,8 @@ Date: REGEX(.*)
 }
 
 
-5: ++++++++++++++++++++
+07. Update Room lightstatus=L63: notif avoided by throttling
+============================================================
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
@@ -444,7 +493,12 @@ Date: REGEX(.*)
 }
 
 
-6: ++++++++++++++++++++
+08. Wait >6 seconds to reset thottling
+======================================
+
+
+09. Update Room temperature=t39: triggers notif (4)
+===================================================
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
@@ -475,7 +529,8 @@ Date: REGEX(.*)
 }
 
 
-7: ++++++++++++++++++++
+10. Update Room pressure=p230: doesn't trigger notif
+====================================================
 HTTP/1.1 200 OK
 Content-Length: 204
 Content-Type: application/json
@@ -506,7 +561,8 @@ Date: REGEX(.*)
 }
 
 
-8: ++++++++++++++++++++
+11. Remove subscription
+=======================
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
@@ -522,7 +578,8 @@ Date: REGEX(.*)
 }
 
 
-9: ++++++++++++++++++++
+12. Update Room temperature=t40: no subscription to trigger
+===========================================================
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
@@ -553,8 +610,8 @@ Date: REGEX(.*)
 }
 
 
-Accumulated data:
-=================
+13. Dump accumulator: see 4 notifications
+=========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 279

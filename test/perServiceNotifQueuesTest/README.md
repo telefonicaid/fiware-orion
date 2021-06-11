@@ -20,7 +20,7 @@ We set up three subscriptions, for `serv1`, `serv2` and `serv3`. We use special 
 that nerver get a response, in order to see the effect of a "blocked" worker.
 
 ```
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'fiware-service: serv1' -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'fiware-service: serv1' -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "serv1 subscriptions",
   "subject": {
@@ -39,7 +39,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'fiware-service: serv2' -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'fiware-service: serv2' -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "serv2 subscriptions",
   "subject": {
@@ -58,7 +58,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'fiware-service: serv3' -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'fiware-service: serv3' -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "serv3 subscriptions",
   "subject": {

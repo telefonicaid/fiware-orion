@@ -70,10 +70,8 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues from RQ-02
 * [MB-11: mongoCreateSubscription](mongoBackend.md#flow-mb-11)
 	* Continues from RQ-02
-	* Continues in MD-03
 * [MB-12: mongoUpdateSubscription](mongoBackend.md#flow-mb-12)
 	* Continues from RQ-02
-	* Continues in MD-03 
 * [MB-13: mongoGetSubscription](mongoBackend.md#flow-mb-13)
 	* Continues from RQ-02
 * [MB-14: mongoListSubscriptions](mongoBackend.md#flow-mb-14)
@@ -105,16 +103,13 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues in NF-01 or NF-03  
 * [MD-02: `searchContextProviders()` function detail](mongoBackend.md#flow-md-02)
 	* Continues from MB-01, MB-02, MB-03 or MB-05
-* [MD-03: `processConditionVector()` function detail](mongoBackend.md#flow-md-03)
-	* Continues from MB-11 or MB-12
-	* Continues in NF-01 or NF-03
 
 Related to notifications (NF prefix):
 
 * [NF-01: Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
-	* Continues from MD-01 or MD-03
+  * Continues from MD-01
 * [NF-03: Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
-	* Continues from MD-01 or MD-03
+  * Continues from MD-01
 
 Related to the subscription cache (SC prefix):
 
