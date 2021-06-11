@@ -80,33 +80,29 @@ int QueueWorkers::start()
 */
 int QueueWorkers::stop()
 {
+  // Put in the queue as many kill messages as threads we have
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    // FIXME #3877: this is not the best way of cancelling a thread in our case.
-    // By the moment is not a problem (as the release is done only during the process
-    // tear down phase) but if this gets dynamic at some moment (creation/destroying
-    // pools by API) it needs to be changed
-    if (pthread_cancel(threadIds[ix]) != 0)
+    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+
+    SenderThreadParams*  params = new SenderThreadParams();
+    params->type = QUEUE_MSG_KILL;
+    paramsV->push_back(params);
+
+    if (!pQueue->try_push(paramsV, true))
     {
-      return -1;
+      LM_E(("Runtime Error (thread kill message cannot be sent due to push in queue failed)"));
     }
+  }
+
+  // Next, wait for every thread termination
+  for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
+  {
     pthread_join(threadIds[ix], NULL);
+    LM_T(LmtThreadpool, ("Thread %x joined", threadIds[ix]));
   }
 
   return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* workerFinish -
-*
-* This is invoked upon worker thread termination (typically using pthread_cancel on it)
-*/
-static void workerFinishes(void* curl)
-{
-  curl_easy_cleanup((CURL*) curl);
 }
 
 
@@ -129,18 +125,23 @@ static void* workerFunc(void* pSyncQ)
     pthread_exit(NULL);
   }
 
-  // FIXME #3877: this is not the best way of cancelling a thread in our case.
-  // By the moment is not a problem (as the release is done only during the process
-  // tear down phase) but if this gets dynamic at some moment (creation/destroying
-  // pools by API) it needs to be changed
-  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
-  // Set pthread_cancel handler
-  pthread_cleanup_push(workerFinishes, curl);
-
   for (;;)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
+
+    // The "protocol" to signal thread termination is to find a kill msg in the first
+    // element of the paramsV vector (note that by construction in QueueWorkers::stop()
+    // this vector will have only one item in this case)
+    if ((paramsV->size() == 1) && ((*paramsV)[0]->type == QUEUE_MSG_KILL))
+    {
+      LM_T(LmtThreadpool, ("Thread %x receiving termination signal...", pthread_self()));
+
+      delete (*paramsV)[0];
+      delete paramsV;
+      curl_easy_cleanup((CURL*) curl);
+
+      pthread_exit(NULL);
+    }
 
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
@@ -254,9 +255,4 @@ static void* workerFunc(void* pSyncQ)
     // Reset curl for next iteration
     curl_easy_reset(curl);
   }
-
-  // Next statement never executes but compilation breaks without it. See this note in pthread.h:
-  // "pthread_cleanup_push and pthread_cleanup_pop are macros and must always be used in
-  // matching pairs at the same nesting level of braces".
-  pthread_cleanup_pop(0);
 }
