@@ -297,6 +297,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->type             = QUEUE_MSG_NOTIF;
     params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
@@ -459,6 +460,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->type             = QUEUE_MSG_NOTIF;
     params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;

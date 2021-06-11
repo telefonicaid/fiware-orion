@@ -33,10 +33,21 @@
 
 /* ****************************************************************************
 *
+* QUEUE_MSG_NOTIF
+* QUEUE_MSG_KILL
+*/
+#define QUEUE_MSG_NOTIF 0
+#define QUEUE_MSG_KILL  1
+
+
+
+/* ****************************************************************************
+*
 * SenderThreadParams - 
 */
 typedef struct SenderThreadParams
 {
+  unsigned short                     type; // 0 -> regular notif, 1 -> kill thread
   std::string                        from;
   std::string                        ip;
   unsigned short                     port;
