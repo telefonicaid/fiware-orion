@@ -89,7 +89,10 @@ int QueueWorkers::stop()
     params->type = QUEUE_MSG_KILL;
     paramsV->push_back(params);
 
-    pQueue->try_push(paramsV);
+    if (!pQueue->try_push(paramsV))
+    {
+      LM_E(("Runtime Error (thread kill message cannot be sent due to push in queue failed)"));
+    }
   }
 
   // Next, wait for every thread termination
