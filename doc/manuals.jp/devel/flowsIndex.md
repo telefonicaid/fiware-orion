@@ -70,10 +70,8 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
     * RQ-02 からの続きです
 * [MB-11: mongoCreateSubscription](mongoBackend.md#flow-mb-11)
     * RQ-02 からの続きです
-    * MD-03 に続きます
 * [MB-12: mongoUpdateSubscription](mongoBackend.md#flow-mb-12)
     * RQ-02 からの続きです
-    * MD-03 に続きます
 * [MB-13: mongoGetSubscription](mongoBackend.md#flow-mb-13)
     * RQ-02 からの続きです
 * [MB-14: mongoListSubscriptions](mongoBackend.md#flow-mb-14)
@@ -105,16 +103,13 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
     * NF-01 または NF-03 に続きます
 * [MD-02: `searchContextProviders()` function detail](mongoBackend.md#flow-md-02)
     * MB-01、MB-02、MB-03またはMB-05 からの続きです
-* [MD-03: `processConditionVector()` function detail](mongoBackend.md#flow-md-03)
-    * MB-11 または MB-12 からの続きです
-    * NF-01 または NF-03 に続きます
 
 通知に関連する図 (NF prefix): 
 
 * [NF-01: スレッド・プールを使用しないエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-01)
-    * MD-01 または MD-03 からの続きです
+  * MD-01 からの続きです
 * [NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-03)
-    * MD-01 または MD-03 からの続きです
+  * MD-01 からの続きです
 
 サブスクリプション・キャッシュに関連する図 (SC prefix):
 
