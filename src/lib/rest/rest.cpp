@@ -204,6 +204,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
       ++cP;
     }
+    orionldState.uriParams.offset = atoi(val);
   }
   else if (key == URI_PARAM_PAGINATION_LIMIT)
   {
@@ -252,6 +253,8 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       }
       return MHD_YES;
     }
+
+    orionldState.uriParams.limit = limit;
   }
   else if (key == URI_PARAM_PAGINATION_DETAILS)
   {

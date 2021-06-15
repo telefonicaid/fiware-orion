@@ -322,6 +322,11 @@ HttpStatusCode mongoQueryContext
 
   std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
 
+  if (orionldState.uriParams.limit != 0)
+    limit = orionldState.uriParams.limit;
+  if (orionldState.uriParams.offset != 0)
+    offset = orionldState.uriParams.offset;
+
   LM_T(LmtMongo, ("QueryContext Request"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
 

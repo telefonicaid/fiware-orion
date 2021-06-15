@@ -464,6 +464,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.dbStart);
 #endif
+
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenant,
