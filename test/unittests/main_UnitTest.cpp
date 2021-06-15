@@ -159,6 +159,10 @@ int main(int argC, char** argV)
   setupDatabase();
   orionldStateInit();
 
+  // To not disturb NGSIv2 unit tests ...
+  orionldState.uriParams.offset = 0;
+  orionldState.uriParams.limit = 0;
+
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);
   return RUN_ALL_TESTS();
