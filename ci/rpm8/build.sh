@@ -23,6 +23,7 @@
 
 url_src='https://github.com/telefonicaid/fiware-orion'
 url_dst='https://nexus.lab.fiware.org/repository/el'
+# FIXME: reference RHEL/CentOS version is now 8
 releasever=7
 basearch='x86_64'
 
