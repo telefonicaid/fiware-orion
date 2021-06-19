@@ -77,8 +77,8 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
   MHD_Response*  response;
 
-  uint64_t       answerLen = answer.length();
-  std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+  uint64_t     answerLen = answer.length();
+  const char*  spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
 
   ++replyIx;
   // LM_TMP(("Response %d: responding with %d bytes, Status Code %d: %s", replyIx, answerLen, ciP->httpStatusCode, answer.c_str()));
@@ -90,7 +90,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if (ciP->apiVersion != NGSI_LD_V1)
     {
       if (metricsMgr.isOn())
-        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+        metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
     }
     
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
@@ -111,7 +111,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if (ciP->apiVersion != NGSI_LD_V1)
     {
       if (metricsMgr.isOn())
-        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
+        metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
     }
   }
 

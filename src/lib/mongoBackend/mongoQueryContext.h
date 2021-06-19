@@ -29,6 +29,7 @@
 #include <vector>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "common/globals.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -44,7 +45,7 @@ extern HttpStatusCode mongoQueryContext
 (
   QueryContextRequest*                  requestP,
   QueryContextResponse*                 responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
   std::map<std::string, bool>&          options,

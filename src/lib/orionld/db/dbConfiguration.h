@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
 
@@ -91,8 +92,8 @@ typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
 typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(bool details);
-typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
-typedef bool    (*DbIdIndexCreate)(const char* tenant);
+typedef bool    (*DbGeoIndexCreate)(OrionldTenant* tenantP, const char* attrName);
+typedef bool    (*DbIdIndexCreate)(OrionldTenant* tenantP);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 typedef KjNode* (*DbDatasetGet)(const char* entityId, const char* attributeNameExpandedEq, const char* datasetId);
 

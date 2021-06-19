@@ -30,6 +30,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldTenant.h"
+
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
@@ -51,7 +53,7 @@
 void mongoRegistrationDelete
 (
   const std::string&     regId,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePath,
   OrionError*            oeP
 )
@@ -83,7 +85,7 @@ void mongoRegistrationDelete
   // Note also that current implementation calls collectionRemove(), which uses a connection internally, without having
   // released the connection object (this is not a big problem, but a bit unneficient).
   // If the change is done, then MB-27 diagram (and related texts) in devel manual should be also changed.
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->registrations, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -119,7 +121,7 @@ void mongoRegistrationDelete
       return;
     }
 
-    if (!collectionRemove(getRegistrationsCollectionName(tenant), q, &err))
+    if (!collectionRemove(tenantP->registrations, q, &err))
     {
       releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in collectionRemove(): %s - query: %s", err.c_str(), q.toString().c_str()));

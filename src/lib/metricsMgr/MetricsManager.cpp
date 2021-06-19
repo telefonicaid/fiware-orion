@@ -62,7 +62,7 @@ MetricsManager::MetricsManager(): on(false), semWaitStatistics(false), semWaitTi
 *
 * MetricsManager::serviceValid - 
 */
-bool MetricsManager::serviceValid(const std::string& srv)
+bool MetricsManager::serviceValid(const char* srv)
 {
   if (tenantCheck(srv) != "OK")
   {
@@ -241,16 +241,17 @@ bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::stri
 *   The github issue #2781 is about better solutions for this.
 *   Note that the call to subServiceValid is inside servicePathForMetrics()
 */
-void MetricsManager::add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value)
+void MetricsManager::add(const char* srvCanBeNull, const char* subServ, const char* metric, uint64_t value)
 {
-  std::string subService = "not-set";
+  std::string  subService = "not-set";
+  const char*  srv        = (srvCanBeNull == NULL)? "" : srvCanBeNull;
 
   if (on == false)
   {
     return;
   }
 
-  if (serviceValid(srv) == false)
+  if ((srv != NULL) && (serviceValid(srv) == false))  // NULL tenant is VALID
   {
     return;
   }

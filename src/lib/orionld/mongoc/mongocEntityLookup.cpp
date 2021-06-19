@@ -32,9 +32,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState, mongoEntitiesCollectionP
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
-#include "orionld/db/dbNameGet.h"                                // dbNameGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
@@ -46,7 +45,6 @@ extern "C"
 //
 KjNode* mongocEntityLookup(const char* entityId)
 {
-  char              dbName[512];
   bson_t            mongoFilter;
   const bson_t*     mongoDocP;
   mongoc_cursor_t*  mongoCursorP;
@@ -54,9 +52,6 @@ KjNode* mongocEntityLookup(const char* entityId)
   char*             title;
   char*             details;
   KjNode*           entityNodeP = NULL;
-
-  if (dbNameGet(dbName, sizeof(dbName)) == -1)
-    return NULL;
 
   //
   // Create the filter for the query

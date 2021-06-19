@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -71,7 +73,7 @@ std::string patchSubscription
   //
   TIMED_MONGO(mongoUpdateSubscription(parseDataP->subsV2,
                                       &beError,
-                                      ciP->tenant,
+                                      orionldState.tenantP,
                                       ciP->servicePathV,
                                       ciP->httpHeaders.xauthToken,
                                       ciP->httpHeaders.correlator));

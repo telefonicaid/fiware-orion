@@ -30,6 +30,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldTenant.h"            // OrionldTenant
+
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
@@ -297,7 +299,7 @@ static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 void mongoRegistrationCreate
 (
   ngsiv2::Registration*  regP,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePath,
   std::string*           regIdP,
   OrionError*            oeP
@@ -350,7 +352,7 @@ void mongoRegistrationCreate
   mongo::BSONObj  doc = bob.obj();
   std::string     err;
 
-  if (!collectionInsert(getRegistrationsCollectionName(tenant), doc, &err))
+  if (!collectionInsert(tenantP->registrations, doc, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);

@@ -70,7 +70,7 @@ void* startSenderThread(void* p)
                           params->port,
                           params->protocol,
                           params->verb,
-                          params->tenant,
+                          params->tenant.c_str(),
                           params->servicePath,
                           params->xauthToken,
                           params->resource,

@@ -33,7 +33,7 @@
 #include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
-
+#include "orionld/common/orionldState.h"               // orionldState
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -71,14 +71,13 @@ extern std::string postSubscriptions
   OrionError  beError;
   std::string subsID;
 
-  TIMED_MONGO(subsID = mongoCreateSubscription(
-                          parseDataP->subsV2,
-                          &beError,
-                          ciP->tenant,
-                          ciP->servicePathV,
-                          ciP->httpHeaders.xauthToken,
-                          ciP->httpHeaders.correlator,
-                          ""));
+  TIMED_MONGO(subsID = mongoCreateSubscription(parseDataP->subsV2,
+                                               &beError,
+                                               orionldState.tenantP,
+                                               ciP->servicePathV,
+                                               ciP->httpHeaders.xauthToken,
+                                               ciP->httpHeaders.correlator,
+                                               ""));
 
   // Check potential error
   if (beError.code != SccNone)

@@ -30,8 +30,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "rest/ConnectionInfo.h"
+#include "orionld/types/OrionldTenant.h"
 
+#include "rest/ConnectionInfo.h"
 #include "common/idCheck.h"
 #include "common/sem.h"
 #include "common/statistics.h"
@@ -57,7 +58,7 @@ void mongoRegistrationGet
 (
   ngsiv2::Registration*  regP,
   const std::string&     regId,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePath,
   OrionError*            oeP
 )
@@ -84,7 +85,7 @@ void mongoRegistrationGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->registrations, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -166,7 +167,7 @@ void mongoRegistrationGet
 void mongoRegistrationsGet
 (
   std::vector<ngsiv2::Registration>*  regV,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,
@@ -197,7 +198,7 @@ void mongoRegistrationsGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, countP, &err))
+  if (!collectionRangedQuery(connection, tenantP->registrations, q, limit, offset, &cursor, countP, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

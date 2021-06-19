@@ -26,10 +26,10 @@
 #include <vector>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+
 #include "common/sem.h"
-
 #include "ngsi10/UpdateContextResponse.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/mongoNotifyContext.h"
@@ -47,7 +47,7 @@ HttpStatusCode mongoNotifyContext
 (
   NotifyContextRequest*            requestP,
   NotifyContextResponse*           responseP,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const std::string&               fiwareCorrelator,
@@ -65,7 +65,7 @@ HttpStatusCode mongoNotifyContext
     std::map<std::string, std::string>  uriParams;  // Unused, necessary for processContextElement()
     ContextElement*                     ceP = &requestP->contextElementResponseVector[ix]->contextElement;
 
-    processContextElement(ceP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat);
+    processContextElement(ceP, &ucr, ActionTypeAppend, tenantP, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);

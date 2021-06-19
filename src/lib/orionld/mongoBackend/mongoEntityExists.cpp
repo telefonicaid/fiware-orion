@@ -36,7 +36,8 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
 
-#include "orionld/mongoBackend/mongoEntityExists.h"     // Own Interface
+#include "orionld/types/OrionldTenant.h"                          // OrionldTenant
+#include "orionld/mongoBackend/mongoEntityExists.h"               // Own Interface
 
 
 
@@ -55,7 +56,7 @@ using mongo::DBClientCursor;
 //
 // mongoEntityExists -
 //
-bool mongoEntityExists(const char* entityId, const char* tenant)
+bool mongoEntityExists(const char* entityId, OrionldTenant* tenantP)
 {
   BSONObjBuilder bob;
 
@@ -70,7 +71,7 @@ bool mongoEntityExists(const char* entityId, const char* tenant)
   DBClientBase* connection = getMongoConnection();
   std::string   err;
 
-  if (collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err) == false)
+  if (collectionQuery(connection, tenantP->entities, query, &cursor, &err) == false)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

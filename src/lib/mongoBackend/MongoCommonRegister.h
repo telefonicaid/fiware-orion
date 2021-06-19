@@ -29,6 +29,8 @@
 
 #include "mongo/client/dbclient.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "apiTypesV2/Registration.h"
@@ -44,7 +46,7 @@ extern HttpStatusCode processRegisterContext
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
   mongo::OID*               id,
-  const std::string&        tenant,
+  OrionldTenant*            tenantP,
   const std::string&        servicePath,
   const std::string&        format,
   const std::string&        fiwareCorrelator

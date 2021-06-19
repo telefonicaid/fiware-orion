@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBNAMEGET_H_
-#define SRC_LIB_ORIONLD_DB_DBNAMEGET_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTGET_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTGET_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -28,10 +28,10 @@
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// dbNameGet -
+// orionldTenantGet -
 //
-extern int dbNameGet(char* path, int pathLen);
+extern OrionldTenant* orionldTenantGet(const char* tenantName);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBNAMEGET_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTGET_H_

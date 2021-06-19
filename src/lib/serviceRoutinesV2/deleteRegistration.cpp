@@ -25,10 +25,11 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
-
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -59,7 +60,7 @@ std::string deleteRegistration
   std::string           regId  = compV[2];
   OrionError            oe;
 
-  TIMED_MONGO(mongoRegistrationDelete(regId, ciP->tenant, ciP->servicePathV[0], &oe));
+  TIMED_MONGO(mongoRegistrationDelete(regId, orionldState.tenantP, ciP->servicePathV[0], &oe));
 
   ciP->httpStatusCode = oe.code;
 

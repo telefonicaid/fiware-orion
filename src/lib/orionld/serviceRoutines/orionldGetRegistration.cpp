@@ -44,7 +44,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
   ngsiv2::Registration  registration;
   char*                 details;
 
-  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
+  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenantP, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoLdRegistrationGet error: %s", details));
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);

@@ -34,6 +34,9 @@
 //
 // dbGeoIndexLookup -
 //
+// FIXME: OrionldGeoIndex could have a OrionldTenant pointer instead and we'd save a strcmp
+//        Would get a pointer comparison instead - much faster!
+//
 OrionldGeoIndex* dbGeoIndexLookup(const char* tenant, const char* attrName)
 {
   OrionldGeoIndex* giP = geoIndexList;

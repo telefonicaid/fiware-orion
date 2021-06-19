@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"    // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpHeaders.h"
 #include "ngsi/ParseData.h"
@@ -72,12 +73,12 @@ std::string getEntityAllTypes
 
   if (ciP->uriParamOptions[OPT_VALUES])
   {
-    TIMED_MONGO(mongoEntityTypesValues(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, totalTypesP));
+    TIMED_MONGO(mongoEntityTypesValues(&response, orionldState.tenantP, ciP->servicePathV, ciP->uriParam, totalTypesP));
   }
   else  // default
   {
     TIMED_MONGO(mongoEntityTypes(&response,
-                                 ciP->tenant,
+                                 orionldState.tenantP,
                                  ciP->servicePathV,
                                  ciP->uriParam,
                                  ciP->apiVersion,

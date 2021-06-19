@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
 
 extern "C"
 {
@@ -32,9 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 
 
@@ -61,13 +62,10 @@ extern "C"
 //
 KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attribute, int* noOfRegsP)
 {
-  char    collectionPath[256];
   KjNode* kjRegArray = NULL;
 
   if (noOfRegsP != NULL)
     *noOfRegsP = 0;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   //
   // Populate filter - on Entity ID and Attribute Name
@@ -100,7 +98,7 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  cursorP = connectionP->query(collectionPath, query);
+  cursorP = connectionP->query(orionldState.tenantP->registrations, query);
 
   while (cursorP->more())
   {

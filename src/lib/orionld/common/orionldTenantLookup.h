@@ -25,14 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                              // time, gmtime_r
-
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 
 
 // -----------------------------------------------------------------------------
 //
 // orionldTenantLookup
 //
-extern char* orionldTenantLookup(const char* tenant);
+extern OrionldTenant* orionldTenantLookup(const char* tenantName);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTLOOKUP_H_

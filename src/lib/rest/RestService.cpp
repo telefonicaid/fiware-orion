@@ -29,6 +29,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"
+
 #include "common/limits.h"
 #include "common/globals.h"
 #include "common/statistics.h"
@@ -562,11 +564,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
   {
-    std::string response;
-    std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+    std::string  response;
+    const char*  spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
 
     ciP->parseDataP = &parseData;
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
+    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
 
     response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
 
@@ -595,15 +597,15 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   statisticsUpdate(ciP->restServiceP->request, ciP->inMimeType);
 
   // Tenant to connectionInfo
-  ciP->tenant = ciP->tenantFromHttpHeader;
-  lmTransactionSetService(ciP->tenant.c_str());
+  lmTransactionSetService(orionldState.tenantP->tenant);
 
   //
   // A tenant string must not be longer than 50 characters and may only contain
   // underscores and alphanumeric characters.
   //
   std::string result;
-  if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+  LM_TMP(("TENANT: orionldState.tenantName == '%s'", orionldState.tenantName));
+  if ((orionldState.tenantName != NULL) && ((result = tenantCheck(orionldState.tenantName)) != "OK"))
   {
     OrionError  oe(SccBadRequest, result);
 

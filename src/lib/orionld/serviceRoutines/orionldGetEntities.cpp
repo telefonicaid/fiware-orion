@@ -467,7 +467,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
-                                                  orionldState.tenant,
+                                                  orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   ciP->uriParam,
                                                   ciP->uriParamOptions,

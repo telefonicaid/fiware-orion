@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
-#define SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
-
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,13 +22,41 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/common/tenantList.h"                           // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoAttributeExists -
+// tenantSem - semaphore to protect 'tenantList' - the list of tenants
 //
-extern bool mongoAttributeExists(const char* entityId, const char* attributeName, const char* tenant);
+sem_t tenantSem;
 
-#endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// tenantList - a list of tenants
+//
+OrionldTenant* tenantList = NULL;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// tenantCache - last used tenant, for quicker lookups
+//
+// Reference to the last looked up tenant - no semaphore protection - best effort
+//
+OrionldTenant* tenantCache = NULL;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// tenant0 - the default tenant
+//
+OrionldTenant tenant0;

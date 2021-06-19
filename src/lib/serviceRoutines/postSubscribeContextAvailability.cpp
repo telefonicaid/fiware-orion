@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -56,7 +58,7 @@ std::string postSubscribeContextAvailability
                                                                       &scar,
                                                                       ciP->uriParam,
                                                                       ciP->httpHeaders.correlator,
-                                                                      ciP->tenant));
+                                                                      orionldState.tenantP));
   TIMED_RENDER(answer = scar.render());
 
   return answer;

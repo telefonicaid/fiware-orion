@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"               // OrionldTenant
 #include "apiTypesV2/HttpInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
@@ -58,7 +59,7 @@ class TriggeredSubscription
   ngsiv2::HttpInfo          httpInfo;
   StringList                attrL;
   std::string               cacheSubId;
-  std::string               tenant;
+  OrionldTenant*            tenantP;
   StringFilter*             stringFilterP;
   StringFilter*             mdStringFilterP;
   bool                      blacklist;
@@ -77,7 +78,7 @@ class TriggeredSubscription
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
-                        const char*              _tenant);
+                        OrionldTenant*           _tenant);
 
   TriggeredSubscription(RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,

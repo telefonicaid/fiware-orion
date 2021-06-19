@@ -1143,7 +1143,7 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
 
       mongoSubCountersUpdate(tenant,
                              cSubP->subscriptionId,

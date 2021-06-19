@@ -32,7 +32,9 @@
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
 #include "orionld/common/orionldState.h"             // orionldState
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -63,10 +65,13 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   UpdateContextAvailabilitySubscriptionRequest*   requestP,
   UpdateContextAvailabilitySubscriptionResponse*  responseP,
   const std::string&                              fiwareCorrelator,
-  const std::string&                              tenant
+  OrionldTenant*                                  tenantP
 )
 {
   bool reqSemTaken;
+
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
 
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);
 
@@ -92,7 +97,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  if (!collectionFindOne(tenantP->avSubscriptions, BSON("_id" << id), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -188,10 +193,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 
   /* Update document in MongoDB */
 
-  std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant);
   BSONObj      bson    = BSON("_id" << OID(requestP->subscriptionId.get()));
 
-  if (!collectionUpdate(colName, bson, newSub.obj(), false, &err))
+  if (!collectionUpdate(tenantP->avSubscriptions, bson, newSub.obj(), false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -210,7 +214,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
                                   requestP->subscriptionId.get(),
                                   getStringFieldF(&sub, CASUB_REFERENCE),
                                   NGSI_V1_LEGACY,
-                                  tenant,
+                                  tenantP,
                                   fiwareCorrelator);
 
   /* Duration is an optional parameter, it is only added in the case they

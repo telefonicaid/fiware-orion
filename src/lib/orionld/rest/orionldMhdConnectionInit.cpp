@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
@@ -473,6 +474,38 @@ static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
+// tenantCheck -
+//
+static bool tenantCheck(char* tenantName, char* title, int titleLen, char* detail, int detailLen)
+{
+  int   len    = 0;
+
+  while (tenantName[len] != 0)
+  {
+    if (len > SERVICE_NAME_MAX_LEN)
+    {
+      snprintf(title, titleLen, "Invalid Tenant");
+      snprintf(detail, detailLen, "a tenant name can be max %d characters long", SERVICE_NAME_MAX_LEN);
+      return false;
+    }
+
+    if ((!isalnum(tenantName[len])) && (tenantName[len] != '_'))
+    {
+      snprintf(title, titleLen, "Invalid Tenant");
+      snprintf(detail, detailLen, "bad character in tenant name - only underscore and alphanumeric characters are allowed");
+      return false;
+    }
+
+    ++len;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionInit -
 //
 MHD_Result orionldMhdConnectionInit
@@ -623,6 +656,28 @@ MHD_Result orionldMhdConnectionInit
 
   // Get HTTP Headers
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
+
+  //
+  // Any error detected during httpHeaderGet calls?
+  //
+  if (orionldState.httpStatusCode != 200)
+    return MHD_YES;  // httpHeaderGet stes the error
+
+  if (orionldState.tenantP == NULL)
+    orionldState.tenantP = &tenant0;
+  else
+  {
+    char title[80];
+    char detail[256];
+
+    if (tenantCheck(orionldState.tenantName, title, sizeof(title), detail, sizeof(detail)) == false)
+    {
+      LM_E(("Invalid value for tenant: '%s'", orionldState.tenantName));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+      orionldState.httpStatusCode = 400;
+      return MHD_YES;
+    }
+  }
 
   if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
   {

@@ -1852,14 +1852,10 @@ inline void lmTransactionStart(const char* keyword, const char* schema, const ch
 */
 inline void lmTransactionSetService(const char* _service)
 {
-  if (strlen(_service) != 0)
-  {
+  if (_service != NULL)
     snprintf(service, sizeof(service), "%s", _service);
-  }
   else
-  {
     snprintf(service, sizeof(service), "%s", "<default>");
-  }
 }
 
 

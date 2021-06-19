@@ -57,15 +57,15 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "parse/forbiddenChars.h"
 
-#ifdef ORIONLD
+#include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
 #include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
-#endif
 
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
@@ -604,69 +604,57 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 *
 * httpHeaderGet -
 */
-MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
+MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
-  std::string      key     = ckey;
 
-  if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;
-  else if (strcasecmp(key.c_str(), HTTP_ACCEPT) == 0)
+  if      (strcasecmp(key, HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
+  else if (strcasecmp(key, HTTP_HOST) == 0)              headerP->host           = value;
+  else if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
     headerP->accept = value;
     acceptParse(ciP, value);  // Any errors are flagged in ciP->acceptHeaderError and taken care of later
   }
-  else if (strcasecmp(key.c_str(), HTTP_EXPECT) == 0)            headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), HTTP_CONNECTION) == 0)        headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), HTTP_CONTENT_TYPE) == 0)
+  else if (strcasecmp(key, HTTP_EXPECT) == 0)            headerP->expect         = value;
+  else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
+  else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
     headerP->contentType = value;
 
-#ifdef ORIONLD
     if (strcmp(value, "application/ld+json") == 0)
       orionldState.ngsildContent = true;
-#endif
   }
-  else if (strcasecmp(key.c_str(), HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), HTTP_ORIGIN) == 0)            headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICE) == 0)
+  else if (strcasecmp(key, HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key, HTTP_ORIGIN) == 0)            headerP->origin         = value;
+  else if ((strcasecmp(key, HTTP_FIWARE_SERVICE) == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
   {
-#ifdef ORIONLD
-    orionldState.tenant = (char*) value;
-    if (troe)
-      snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
-#endif
-    headerP->tenant = value;
-    ciP->tenant     = value;
-    toLowercase((char*) headerP->tenant.c_str());
+    if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
+    {
+      toLowercase((char*) value);
+      orionldState.tenantName = (char*) value;
+    }
+    else
+    {
+      // Tenant used when tenant is not supported by the broker
+      LM_E(("tenant in use but tenant support is not enable for the broker"));
+      orionldState.httpStatusCode = 400;
+      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enable for the broker");
+    }
+    LM_TMP(("TENANT: orionldState.tenantName == %s", orionldState.tenantName));
   }
-#ifdef ORIONLD
-  else if (strcasecmp(ckey, "NGSILD-Tenant") == 0)
-  {
-    headerP->tenant = value;
-    ciP->tenant     = value;
-    toLowercase((char*) headerP->tenant.c_str());
-
-    orionldState.tenant = (char*) value;
-    if (troe)
-      snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
-  }
-  else if (strcasecmp(ckey, "NGSILD-Path") == 0)
+  else if (strcasecmp(key, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
-#endif
-  else if (strcasecmp(key.c_str(), HTTP_X_AUTH_TOKEN) == 0)
+  else if (strcasecmp(key, HTTP_X_AUTH_TOKEN) == 0)
   {
-#ifdef ORIONLD
     orionldState.xauthHeader    = (char*) value;
-#endif
     headerP->xauthToken         = value;
   }
-  else if (strcasecmp(key.c_str(), HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
-  else if (strcasecmp(key.c_str(), HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
-  else if (strcasecmp(key.c_str(), HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
-  else if (strcasecmp(key.c_str(), HTTP_NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
-  else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICEPATH) == 0)
+  else if (strcasecmp(key, HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
+  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
+  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
+  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
+  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0)
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
@@ -675,22 +663,22 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 #endif
   }
 #ifdef ORIONLD
-  else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)
+  else if (strcasecmp(key, HTTP_LINK) == 0)
   {
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
   }
-  else if (strcasecmp(key.c_str(), "Prefer") == 0)
+  else if (strcasecmp(key, "Prefer") == 0)
   {
     orionldState.preferHeader = (char*) value;
   }
 #endif
   else
   {
-    LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
+    LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
   }
 
-  if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+  if ((strcasecmp(key, "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
   {
     LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
   }
@@ -729,7 +717,7 @@ static void requestCompleted
 #endif
 
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
-  std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+  const char*      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
 
   if (orionldState.notify == true)
@@ -798,7 +786,7 @@ static void requestCompleted
   // Metrics
   //
   if (metricsMgr.isOn())
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
+    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN, 1);
 
   //
   // If the httpStatusCode is above the set of 200s, an error has occurred
@@ -806,7 +794,7 @@ static void requestCompleted
   if (ciP->httpStatusCode >= SccBadRequest)
   {
     if (metricsMgr.isOn())
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+      metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
@@ -819,7 +807,7 @@ static void requestCompleted
         (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
         (end.tv_usec - ciP->transactionStart.tv_usec);
 
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      metricsMgr.add(orionldState.tenantP->tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
   }
 
@@ -1549,7 +1537,9 @@ ConnectionInfo* connectionTreatInit
 
   char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
 
-  ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
+  if (orionldState.tenantP->tenant != NULL)
+    ciP->tenantFromHttpHeader = strToLower(tenant, orionldState.tenantP->tenant, sizeof(tenant));
+
   ciP->outMimeType          = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
@@ -1776,6 +1766,19 @@ static MHD_Result connectionTreat
   // Plenty of validity checks of the request are performed here, and error responses ar sent if errors found
   // Finally, if all is OK, the request is served by calling the function orion::requestServe
   //
+
+  //
+  // As older (non NGSI-LD) requests also need orionldState.tenantP, this piece of code has been copied
+  // from orionldMhdConnectionTreat(). Had to be a little simplified though ...
+  //
+  LM_TMP(("TENANT: '%s'", orionldState.tenantName));
+  if (orionldState.tenantName != NULL)
+    orionldState.tenantP = orionldTenantGet(orionldState.tenantName);
+  else
+    orionldState.tenantP = &tenant0;
+
+  LM_TMP(("TENANT: '%s', at %p", orionldState.tenantP->tenant, orionldState.tenantP));
+
   lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 
   if ((ciP->httpStatusCode != SccOk) && (ciP->httpStatusCode != SccBadVerb))

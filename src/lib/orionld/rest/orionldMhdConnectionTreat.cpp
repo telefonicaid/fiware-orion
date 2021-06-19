@@ -59,9 +59,10 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
-#include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
+#include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
@@ -601,22 +602,11 @@ static void contextToPayload(void)
 //
 static void dbGeoIndexes(void)
 {
-  char  tenant[64];
-  char* tenantP;
-
-  if ((orionldState.tenant == NULL) || (orionldState.tenant[0] == 0))
-    tenantP = dbName;
-  else
-  {
-    snprintf(tenant, sizeof(tenant), "%s-%s", dbName, orionldState.tenant);
-    tenantP = tenant;
-  }
-
   // sem_take
   for (int ix = 0; ix < orionldState.geoAttrs; ix++)
   {
-    if (dbGeoIndexLookup(tenantP, orionldState.geoAttrV[ix]->name) == NULL)
-      dbGeoIndexCreate(tenantP, orionldState.geoAttrV[ix]->name);
+    if (dbGeoIndexLookup(orionldState.tenantP->tenant, orionldState.geoAttrV[ix]->name) == NULL)
+      dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
   }
   // sem_give
 }
@@ -729,20 +719,27 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //   * POST /ngsi-ld/v1/entityOperations/upsert
   // then if the tenant doesn't exist, an error must be returned (404)
   //
-  if ((orionldState.tenant != NULL) && (*orionldState.tenant != 0))
+  // The characteristics of the service (if create ot just check for existence) is taken care of by setting (or not)
+  // serviceP->options to ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS in orionldServiceInit.cpp (restServicePrepare)
+  //
+  if (orionldState.tenantName != NULL)
   {
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS) == ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS)
     {
-      if (orionldTenantLookup(orionldState.tenant) == NULL)
+      orionldState.tenantP = orionldTenantLookup(orionldState.tenantName);
+      if (orionldState.tenantP == NULL)
       {
-        LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenant));
-        orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenant);
+        LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenantName));
+        orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName);
         orionldState.httpStatusCode = 404;
         goto respond;
       }
     }
+    else
+      orionldState.tenantP = orionldTenantGet(orionldState.tenantName);
   }
-
+  else
+    orionldState.tenantP = &tenant0;  // No tenant give - default tenant used
 
   //
   // 03. Check for empty payload for POST/PATCH/PUT
@@ -868,53 +865,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     if (orionldState.geoAttrs > 0)
       dbGeoIndexes();
-
-    // New tenant?
-    if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
-    {
-      if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
-      {
-        //
-        // A tenant is in use, and it's a possible creation of an entity/sub/reg.
-        //
-        // FIXME: Add ORIONLD_SERVICE_OPTION_TENANT_CREATION in OrionLdRestService.h
-        //        and look at that bit, instead of just the verb ...
-        //        Some POST (on /attrs for example) DO NOT create anything
-        //
-        // If that tenant does not exist, it is to be created automatically.
-        // To make sure the lookup and insertion have no race conditions,  the tenant list
-        // is protected with a semaphore (tenantSem).
-        // This sem-protextion needs to span over the entirety of lookup-and-create.
-        // Meaning, I have to take the semaphore before even knowing if a creation will be necessary (it's necesary
-        // only once per tenant - i.e. almost never).
-        // It's costly to give and take the semaphore, so instead we will do a double lookup:
-        //
-        // 1. Lookup the tenant.
-        // 2. If it exists - all good - simply use it
-        // 3. If it did not exist (needs to be created):
-        //    - Take the tenantSem
-        //    - Look up the tenant again
-        //    - If the tenant does not exist, create it
-        //    - Post the tenantSem
-        //
-        if (orionldTenantLookup(orionldState.tenant) == NULL)
-        {
-          sem_wait(&tenantSem);
-          if (orionldTenantLookup(orionldState.tenant) == NULL)  // Second lookup - this time sem-protected
-          {
-            char prefixed[64];
-
-            snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-            orionldTenantCreate(prefixed);
-
-            if (idIndex == true)
-              dbIdIndexCreate(prefixed);
-          }
-
-          sem_post(&tenantSem);
-        }
-      }
-    }
   }
 
  respond:

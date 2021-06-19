@@ -28,8 +28,11 @@
 
 #include "mongo/client/dbclient.h"
 
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/defaultValues.h"
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
@@ -157,7 +160,7 @@ std::string mongoCreateSubscription
 (
   const Subscription&              sub,
   OrionError*                      oe,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator
@@ -219,7 +222,7 @@ std::string mongoCreateSubscription
   // We need to insert the csub in the cache before (potentially) sending the
   // initial notification (have a look to issue #2974 for details)
   if (!noCache)
-    insertInCache(sub, subId, tenant, servicePath, false, 0, 0, 0);
+    insertInCache(sub, subId, tenantP->tenant, servicePath, false, 0, 0, 0);
 
   setCondsAndInitialNotify(sub,
                            subId,
@@ -229,7 +232,7 @@ std::string mongoCreateSubscription
                            sub.notification.httpInfo,
                            sub.notification.blacklist,
                            sub.attrsFormat,
-                           tenant,
+                           tenantP,
                            servicePathV,
                            xauthToken,
                            fiwareCorrelator,
@@ -252,7 +255,7 @@ std::string mongoCreateSubscription
   // Insert in DB
   std::string err;
 
-  if (!collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
+  if (!collectionInsert(tenantP->subscriptions, doc, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);

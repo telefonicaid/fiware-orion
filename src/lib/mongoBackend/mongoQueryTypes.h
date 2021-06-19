@@ -58,7 +58,7 @@ const std::string S_ATTRNAMES      = std::string("$") + ENT_ATTRNAMES;
 extern HttpStatusCode mongoEntityTypes
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   ApiVersion                           apiVersion,
@@ -75,7 +75,7 @@ extern HttpStatusCode mongoEntityTypes
 extern HttpStatusCode mongoEntityTypesValues
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   unsigned int*                        totalTypesP
@@ -91,7 +91,7 @@ extern HttpStatusCode mongoAttributesForEntityType
 (
   const std::string&                   entityType,
   EntityTypeResponse*                  responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   bool                                 noAttrDetail,

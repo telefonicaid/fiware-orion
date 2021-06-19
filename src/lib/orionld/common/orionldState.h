@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
@@ -190,7 +191,8 @@ typedef struct OrionldConnectionState
   KjNode*                 responseTree;
   char*                   responsePayload;
   bool                    responsePayloadAllocated;
-  char*                   tenant;
+  char*                   tenantName;
+  OrionldTenant*          tenantP;
   char*                   servicePath;
   bool                    linkHttpHeaderPresent;
   char*                   link;
@@ -281,7 +283,6 @@ typedef struct OrionldConnectionState
   //
   bool                    noDbUpdate;        // If nothing changed in DB - troe is not invoked
   bool                    troeError;
-  char                    troeDbName[128];
   KjNode*                 duplicateArray;
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
@@ -374,7 +375,6 @@ extern int               dbNameLen;
 extern char              dbUser[];                 // From orionld.cpp
 extern char              dbPwd[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
-extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
@@ -386,13 +386,10 @@ extern int               troePoolSize;             // From orionld.cpp
 extern char              pgPortString[16];
 extern bool              forwarding;               // From orionld.cpp
 extern const char*       orionldVersion;
-extern char*             tenantV[100];
-extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
-extern sem_t             tenantSem;
 
 
 
