@@ -35,7 +35,6 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // Own interface
@@ -60,10 +59,7 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
   DbSubscriptionMatchCallback subMatchCallback
 )
 {
-  char                   collectionPath[256];
   mongo::BSONObjBuilder  filter;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "csubs");
 
   //
   // 1. Entity ID, which in this case is FIXED
@@ -104,7 +100,7 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  cursorP = connectionP->query(collectionPath, query);
+  cursorP = connectionP->query(orionldState.tenantP->subscriptions, query);
 
   int niIx = 0;
 

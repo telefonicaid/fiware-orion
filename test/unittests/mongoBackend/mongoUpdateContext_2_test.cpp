@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
@@ -432,7 +435,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -614,7 +617,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -798,7 +801,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -984,7 +987,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1177,7 +1180,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1356,7 +1359,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1534,7 +1537,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1711,7 +1714,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1888,7 +1891,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1992,7 +1995,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2092,7 +2095,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2192,7 +2195,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2297,7 +2300,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2404,7 +2407,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2514,7 +2517,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2622,7 +2625,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2722,7 +2725,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2823,7 +2826,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2923,7 +2926,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3027,7 +3030,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3193,7 +3196,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     uriParams[URI_PARAM_NOT_EXIST] = "entity::type";
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3353,7 +3356,7 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3562,7 +3565,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3735,7 +3738,7 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3845,7 +3848,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4063,7 +4066,7 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4180,7 +4183,7 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4290,7 +4293,7 @@ TEST(mongoUpdateContextRequest, replace)
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4454,7 +4457,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4604,7 +4607,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4810,7 +4813,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4880,7 +4883,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4938,7 +4941,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -5036,7 +5039,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -5140,7 +5143,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     servicePathVector.push_back("/home/fg");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5257,7 +5260,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     servicePathVector.push_back("/home/fg/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5372,7 +5375,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     servicePathVector.push_back("/home/kz/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5450,7 +5453,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   servicePathVector.push_back("/home/fg");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&ucReq, &ucRes, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&ucReq, &ucRes, &tenant0, servicePathVector, uriParams, "", "", "");
 
 
   /* Check response is as expected */

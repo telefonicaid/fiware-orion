@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+
 #include "common/string.h"                                       // stringSplit
 #include "common/statistics.h"                                   // TIME_STAT_MONGO_READ_WAIT_START, ...
 #include "rest/OrionError.h"                                     // OrionError
@@ -208,7 +210,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 bool mongoLdRegistrationsGet
 (
   std::vector<ngsiv2::Registration>*  regVecP,
-  const char*                         tenant,
+  OrionldTenant*                      tenantP,
   long long*                          countP,
   OrionError*                         oeP
 )
@@ -245,7 +247,7 @@ bool mongoLdRegistrationsGet
   mongo::DBClientBase*                  connection = getMongoConnection();
 
   if (!collectionRangedQuery(connection,
-                             getRegistrationsCollectionName(tenant),
+                             tenantP->registrations,
                              query,
                              orionldState.uriParams.limit,
                              orionldState.uriParams.offset,

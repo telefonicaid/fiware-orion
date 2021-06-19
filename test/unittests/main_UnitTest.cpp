@@ -43,7 +43,10 @@
 #include "ngsiNotify/Notifier.h"
 #include "alarmMgr/alarmMgr.h"
 #include "logSummary/logSummary.h"
-#include "orionld/common/orionldState.h"
+
+#include "orionld/common/orionldState.h"        // orionldState
+#include "orionld/common/orionldTenantInit.h"   // orionldTenantInit
+#include "orionld/common/tenantList.h"          // tenant0
 
 #include "unittests/unittest.h"
 
@@ -151,6 +154,7 @@ int main(int argC, char** argV)
   paParse(paArgs, argC, (char**) argV, 1, false);
 
   LM_M(("Init tests"));
+  orionldTenantInit();
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
   // Note that multitenancy and mutex time stats are disabled for unit test mongo init
   mongoInit(dbHost, rplSet, dbName, user, pwd, false, dbTimeout, writeConcern, dbPoolSize, false);
@@ -158,6 +162,7 @@ int main(int argC, char** argV)
   logSummaryInit(&lsPeriod);
   setupDatabase();
   orionldStateInit();
+  orionldState.tenantP = &tenant0;
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

@@ -245,7 +245,7 @@ int httpRequestSendWithCurl
    unsigned short                             port,
    const std::string&                         _protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
    const std::string&                         xauthToken,
    const std::string&                         resource,
@@ -384,10 +384,9 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if ((tenant != NULL) && (tenant[0] != 0))
   {
-    std::string fiwareServiceHeaderValue = tenant;
-    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
@@ -619,7 +618,7 @@ int httpRequestSend
    unsigned short                             port,
    const std::string&                         protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
    const std::string&                         xauthToken,
    const std::string&                         resource,

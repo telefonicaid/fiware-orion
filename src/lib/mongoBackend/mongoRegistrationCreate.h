@@ -30,6 +30,7 @@
 
 #include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
+#include "orionld/types/OrionldTenant.h"            // OrionldTenant
 #include "apiTypesV2/Registration.h"
 
 
@@ -41,7 +42,7 @@
 extern void mongoRegistrationCreate
 (
   ngsiv2::Registration*  regP,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePathV,
   std::string*           regIdP,
   OrionError*            oeP

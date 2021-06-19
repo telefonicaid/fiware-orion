@@ -22,25 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                                   // MongoDB C++ Client Legacy Driver
+#include "mongo/client/dbclient.h"                                // MongoDB C++ Client Legacy Driver
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                            // KjNode
-#include "kjson/kjLookup.h"                                          // kjLookup
+#include "kjson/KjNode.h"                                         // KjNode
+#include "kjson/kjLookup.h"                                       // kjLookup
 }
 
-#include "logMsg/logMsg.h"                                           // LM_*
-#include "logMsg/traceLevels.h"                                      // Lmt*
+#include "logMsg/logMsg.h"                                        // LM_*
+#include "logMsg/traceLevels.h"                                   // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                                // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/common/tenantList.h"                            // tenantList
 
-#include "orionld/common/orionldState.h"                             // tenants, tenantV
-#include "orionld/db/dbCollectionPathGet.h"                          // dbCollectionPathGetWithTenant
-#include "orionld/db/dbGeoIndexLookup.h"                             // dbGeoIndexLookup
-#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"       // mongoCppLegacyDataToKjTree
-#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"     // mongoCppLegacyGeoIndexCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexInit.h"       // Own interface
+#include "mongoBackend/MongoGlobal.h"                             // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/db/dbGeoIndexLookup.h"                          // dbGeoIndexLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"    // mongoCppLegacyDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"  // mongoCppLegacyGeoIndexCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexInit.h"    // Own interface
 
 
 
@@ -52,14 +52,20 @@ void mongoCppLegacyGeoIndexInit(void)
 {
   //
   // Loop over all tenants
-  // Index -1 is used for the default tenant
   //
-  for (int ix = -1; ix < (int) tenants; ix++)
-  {
-    char  collectionPath[256];
-    char* tenant = (ix == -1)? dbName : tenantV[ix];
+  OrionldTenant* tenantP = &tenant0;  // tenant0->next == tenantList :)
+  tenant0.next = tenantList;          // Better safe than sorry!
 
-    dbCollectionPathGetWithTenant(collectionPath, sizeof(collectionPath), tenant, "entities");
+  while (tenantP != NULL)
+  {
+    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
+    tenantP = tenantP->next;
+  }
+
+  tenantP = &tenant0;
+  while (tenantP != NULL)
+  {
+    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
 
     // Foreach ENTITY (only attrs)
     mongo::BSONObjBuilder  dbFields;
@@ -71,7 +77,7 @@ void mongoCppLegacyGeoIndexInit(void)
     mongo::Query                          query(filter.obj());
     mongo::BSONObj                        fieldsToReturn = dbFields.obj();
     mongo::DBClientBase*                  connectionP    = getMongoConnection();
-    std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+    std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(tenantP->entities, query, 0, 0, &fieldsToReturn);
 
     orionldState.jsonBuf = NULL;
     while (cursorP->more())
@@ -112,10 +118,18 @@ void mongoCppLegacyGeoIndexInit(void)
 
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
-          if (dbGeoIndexLookup(tenant, attrP->name) == NULL)
-            mongoCppLegacyGeoIndexCreate(tenant, attrP->name);
+          if (dbGeoIndexLookup(tenantP->tenant, attrP->name) == NULL)
+          {
+            LM_TMP(("TENANT: Calling mongoCppLegacyGeoIndexCreate for database '%s'", tenantP->mongoDbName));
+            mongoCppLegacyGeoIndexCreate(tenantP, attrP->name);
+            LM_TMP(("TENANT: Back from mongoCppLegacyGeoIndexCreate"));
+          }
         }
       }
     }
+
+    tenantP = tenantP->next;
   }
+
+  LM_TMP(("TENANT: Done"));
 }

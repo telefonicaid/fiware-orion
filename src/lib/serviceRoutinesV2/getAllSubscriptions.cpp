@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"        // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/JsonHelper.h"
@@ -64,7 +66,7 @@ std::string getAllSubscriptions
   TIMED_MONGO(mongoListSubscriptions(&subs,
                                      &oe,
                                      ciP->uriParam,
-                                     ciP->tenant,
+                                     orionldState.tenantP,
                                      ciP->servicePathV[0],
                                      limit,
                                      offset,

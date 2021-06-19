@@ -28,6 +28,8 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
@@ -56,7 +58,7 @@ std::string postUpdateContextSubscription
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,
-                                                                   ciP->tenant,
+                                                                   orionldState.tenantP,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,
                                                                    ciP->httpHeaders.correlator));

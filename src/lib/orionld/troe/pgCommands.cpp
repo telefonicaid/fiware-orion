@@ -44,7 +44,7 @@
 //
 void pgCommands(char* sql[], int commands)
 {
-  PgConnection* connectionP = pgConnectionGet(orionldState.troeDbName);
+  PgConnection* connectionP = pgConnectionGet(orionldState.tenantP->troeDbName);
 
   if ((connectionP == NULL) || (connectionP->connectionP == NULL))
     LM_RVE(("no connection to postgres"));

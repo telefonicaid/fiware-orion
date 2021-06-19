@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "rest/OrionError.h"
 #include "ngsi/Duration.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -44,7 +46,7 @@ HttpStatusCode mongoSubscribeContext
 (
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::string&                   xauthToken,
   const std::vector<std::string>&      servicePathV,
   const std::string&                   fiwareCorrelator
@@ -54,7 +56,7 @@ HttpStatusCode mongoSubscribeContext
   ngsiv2::Subscription  sub;
 
   requestP->toNgsiv2Subscription(&sub);
-  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator);
+  std::string subId = mongoCreateSubscription(sub, &oe, tenantP, servicePathV, xauthToken, fiwareCorrelator);
 
   if (subId != "")
   {

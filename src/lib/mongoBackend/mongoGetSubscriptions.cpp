@@ -30,6 +30,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/idCheck.h"
@@ -161,7 +163,7 @@ static void setSubject(Subscription* s, const BSONObj* rP)
 *
 * setNotification -
 */
-static void setNotification(Subscription* subP, const BSONObj* rP, const std::string& tenant)
+static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant* tenantP)
 {
   // Attributes
   setStringVectorF(rP, CSUB_ATTRS, &(subP->notification.attributes));
@@ -193,7 +195,7 @@ static void setNotification(Subscription* subP, const BSONObj* rP, const std::st
   // NOTE: only 'lastNotificationTime' and 'count'
   //
   cacheSemTake(__FUNCTION__, "get lastNotification and count");
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subP->id.c_str());
   if (cSubP)
   {
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
@@ -339,7 +341,7 @@ void mongoListSubscriptions
   std::vector<Subscription>*           subs,
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::string&                   servicePath,  // FIXME P4: vector of strings and not just a single string? See #3100
   int                                  limit,
   int                                  offset,
@@ -371,7 +373,7 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
-                             getSubscribeContextCollectionName(tenant),
+                             tenantP->subscriptions,
                              q,
                              limit,
                              offset,
@@ -409,7 +411,7 @@ void mongoListSubscriptions
     setDescription(&sub, &r);
     setSubject(&sub, &r);
     setStatus(&sub, r);
-    setNotification(&sub, &r, tenant);
+    setNotification(&sub, &r, tenantP);
 
     subs->push_back(sub);
   }
@@ -432,7 +434,7 @@ void mongoGetSubscription
   OrionError*                         oe,
   const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
+  OrionldTenant*                      tenantP
 )
 {
   bool         reqSemTaken = false;
@@ -456,7 +458,7 @@ void mongoGetSubscription
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->subscriptions, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -484,7 +486,7 @@ void mongoGetSubscription
     setNewSubscriptionId(subP, &r);
     setDescription(subP, &r);
     setSubject(subP, &r);
-    setNotification(subP, &r, tenant);
+    setNotification(subP, &r, tenantP);
     setStatus(subP, r);
 
     if (moreSafe(cursor))
@@ -525,7 +527,7 @@ bool mongoGetLdSubscription
 (
   ngsiv2::Subscription*  subP,
   const char*            subId,
-  const char*            tenant,
+  OrionldTenant*         tenantP,
   int*                   statusCodeP,
   char**                 detailsP
 )
@@ -541,7 +543,7 @@ bool mongoGetLdSubscription
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->subscriptions, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -572,7 +574,7 @@ bool mongoGetLdSubscription
     setDescription(subP, &r);
     setMimeType(subP, &r);
     setSubject(subP, &r);
-    setNotification(subP, &r, tenant);
+    setNotification(subP, &r, tenantP);
     setStatus(subP, r);
     setName(subP, &r);
     setContext(subP, &r);
@@ -620,7 +622,7 @@ bool mongoGetLdSubscriptions
 (
   ConnectionInfo*                     ciP,
   std::vector<ngsiv2::Subscription>*  subVecP,
-  const char*                         tenant,
+  OrionldTenant*                      tenantP,
   long long*                          countP,
   OrionError*                         oeP
 )
@@ -661,7 +663,7 @@ bool mongoGetLdSubscriptions
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
-                             getSubscribeContextCollectionName(tenant),
+                             tenantP->subscriptions,
                              q,
                              limit,
                              offset,
@@ -701,7 +703,7 @@ bool mongoGetLdSubscriptions
     setDescription(&s, &r);
     setMimeType(&s, &r);
     setSubject(&s, &r);
-    setNotification(&s, &r, tenant);
+    setNotification(&s, &r, tenantP);
     setStatus(&s, r);
     setName(&s, &r);
     setContext(&s, &r);

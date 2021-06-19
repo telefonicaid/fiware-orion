@@ -29,6 +29,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryTypes.h"
@@ -266,7 +268,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllType)
     //
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -384,7 +386,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationDetails)
     /* Invoke the function in mongoBackend library */
     /* Using default offset/limit */
     unsigned int totalTypes = 0;  // enables count details
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, &totalTypes, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, &totalTypes, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -501,7 +503,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationAll)
 
     /* Invoke the function in mongoBackend library */
     /* Using default offset/limit */
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -618,7 +620,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationOnlyFirst)
 
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_LIMIT] = "1";
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -691,7 +693,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationOnlySecond)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -743,7 +745,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationRange)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -821,7 +823,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationNonExisting)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -853,7 +855,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "4";
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -913,7 +915,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllPaginationNonExistingDetails)
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
     unsigned int totalTypes                = 0;  // enables count details
-    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, &totalTypes, false);
+    ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, &totalTypes, false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -950,7 +952,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllDbException)
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+  ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1000,7 +1002,7 @@ TEST(DISABLED_mongoQueryTypes, queryAllGenericException)
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
+  ms = mongoEntityTypes(&res, &tenant0, servicePathVector, uriParams, V1, NULL, false);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1046,7 +1048,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypeBasic)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1114,7 +1116,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationDetails)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
     /* Using default offset/limit */
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1182,7 +1184,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationAll)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     /* Using default offset/limit */
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1250,7 +1252,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
     /* Invoke the function in mongoBackend library */
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_LIMIT] = "1";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1290,7 +1292,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationOnlySecond)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1331,7 +1333,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationRange)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1386,7 +1388,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationNonExisting)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1419,7 +1421,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "3";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1467,7 +1469,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+    ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1504,7 +1506,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypeDbException)
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+  ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1552,7 +1554,7 @@ TEST(DISABLED_mongoQueryTypes, queryGivenTypeGenericException)
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
+  ms = mongoAttributesForEntityType("Car", &res, &tenant0, servicePathVector, uriParams, false, V1);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

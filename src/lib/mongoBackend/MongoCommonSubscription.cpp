@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+
 #include "common/defaultValues.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -335,7 +338,7 @@ void setCondsAndInitialNotify
   const HttpInfo&                  httpInfo,
   bool                             blacklist,
   RenderFormat                     attrsFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -360,7 +363,7 @@ void setCondsAndInitialNotify
                                             httpInfo,
                                             notificationDone,
                                             attrsFormat,
-                                            tenant,
+                                            tenantP,
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),

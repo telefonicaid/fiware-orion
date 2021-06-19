@@ -34,8 +34,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -182,10 +183,6 @@ void entitiesAndProprertiesExtract(KjNode* regArray, KjNode* typeArray)
 //
 KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details)
 {
-  char collectionPath[256];
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
-
   mongo::BSONObjBuilder  fields;
   mongo::BSONObjBuilder  filter;
   mongo::BSONObjBuilder  notEmpty;
@@ -202,7 +199,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details)
   mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
-  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(orionldState.tenantP->registrations, query, 0, 0, &fieldsToReturn);
 
   KjNode*  regArray   = NULL;
   KjNode*  typeArray  = NULL;

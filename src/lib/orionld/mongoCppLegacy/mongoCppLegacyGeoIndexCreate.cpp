@@ -33,9 +33,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                        // LM_*
 #include "logMsg/traceLevels.h"                                   // Lmt*
 
+#include "orionld/common/orionldState.h"                          // kalloc
 #include "mongoBackend/connectionOperations.h"                    // collectionCreateIndex
-
-#include "orionld/db/dbCollectionPathGet.h"                       // dbCollectionPathGet
 #include "orionld/db/dbGeoIndexAdd.h"                             // dbGeoIndexAdd
 #include "orionld/common/dotForEq.h"                              // dotForEq
 #include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"  // Own interface
@@ -46,26 +45,23 @@ extern "C"
 //
 // mongoCppLegacyGeoIndexCreate -
 //
-bool mongoCppLegacyGeoIndexCreate(const char* tenant, const char* attrLongName)
+bool mongoCppLegacyGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
 {
   int         len          = 6 + strlen(attrLongName) + 6 + 1;              // "attrs." == 6, ".value" == 6, 1 for string-termination
-  char*       index        = kaAlloc(&orionldState.kalloc, len);
-  char*       attrNameCopy = kaStrdup(&orionldState.kalloc, attrLongName);  // To not destroy the original attrName
+  char*       index        = kaAlloc(&kalloc, len);
+  char*       attrNameCopy = kaStrdup(&kalloc, attrLongName);  // To not destroy the original attrName
   std::string err;
 
   dotForEq(attrNameCopy);
   snprintf(index, len, "attrs.%s.value", attrNameCopy);
 
-  char collectionPath[256];
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
-  if (collectionCreateIndex(collectionPath, BSON(index << "2dsphere"), false, &err) == false)
+  if (collectionCreateIndex(tenantP->entities, BSON(index << "2dsphere"), false, &err) == false)
   {
-    LM_E(("Database Error (error creating 2dsphere index for attribute '%s' for tenant '%s')", attrNameCopy, tenant));
+    LM_E(("Database Error (error creating 2dsphere index for attribute '%s' for db '%s')", attrNameCopy, tenantP->mongoDbName));
     return false;
   }
 
-  dbGeoIndexAdd(tenant, attrNameCopy);
+  dbGeoIndexAdd(tenantP->tenant, attrNameCopy);
 
   return true;
 }

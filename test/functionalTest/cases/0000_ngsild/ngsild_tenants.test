@@ -334,13 +334,12 @@ bye
 09. Get all tenants - see 'ftest' and 'tn1'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 12
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-  "ftest",
-  "ftest-tn1"
+  "tn1"
 ]
 
 

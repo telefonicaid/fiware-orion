@@ -48,7 +48,6 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 
@@ -323,7 +322,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
                                                      &ucResponse,
-                                                     orionldState.tenant,
+                                                     orionldState.tenantP,
                                                      ciP->servicePathV,
                                                      ciP->uriParam,
                                                      ciP->httpHeaders.xauthToken.c_str(),

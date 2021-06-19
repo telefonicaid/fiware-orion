@@ -33,9 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/common/orionldState.h"                         // orionldState
 
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"   // Own interface
 
@@ -47,11 +47,9 @@ extern "C"
 //
 bool mongoCppLegacyRegistrationReplace(const char* registrationId, KjNode* dbRegistrationP)
 {
-  char            collectionPath[256];
   mongo::BSONObj  payloadAsBsonObj;
   bool            ok = true;
 
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
   dbDataFromKjTree(dbRegistrationP, &payloadAsBsonObj);
 
   //
@@ -66,7 +64,7 @@ bool mongoCppLegacyRegistrationReplace(const char* registrationId, KjNode* dbReg
 
   try
   {
-    connectionP->update(collectionPath, query, payloadAsBsonObj, false, false);
+    connectionP->update(orionldState.tenantP->registrations, query, payloadAsBsonObj, false, false);
   }
   catch (const std::exception &e)
   {

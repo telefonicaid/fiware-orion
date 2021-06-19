@@ -32,10 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
+
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldDelete.h"  // Own interface
 
 
@@ -46,11 +45,6 @@ extern "C"
 //
 bool mongoCppLegacyEntityFieldDelete(const char* entityId, const char* fieldPath)
 {
-  char collectionPath[256];
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
-
   //
   // Populate filter
   //
@@ -70,7 +64,7 @@ bool mongoCppLegacyEntityFieldDelete(const char* entityId, const char* fieldPath
   bool                  upsert      = false;
   mongo::Query          query(filter.obj());
 
-  connectionP->update(collectionPath, query, update, upsert, false);
+  connectionP->update(orionldState.tenantP->entities, query, update, upsert, false);
   releaseMongoConnection(connectionP);
 
   return true;

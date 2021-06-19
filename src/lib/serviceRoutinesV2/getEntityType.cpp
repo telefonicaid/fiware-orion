@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
-
 #include "rest/OrionError.h"
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityType.h"
@@ -73,7 +73,7 @@ std::string getEntityType
 
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName,
                                            &response,
-                                           ciP->tenant,
+                                           orionldState.tenantP,
                                            ciP->servicePathV,
                                            ciP->uriParam,
                                            noAttrDetail,

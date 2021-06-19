@@ -74,7 +74,7 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
   OrionError                         oe;
   long long                          count;
 
-  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenant, &count, &oe))
+  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenantP, &count, &oe))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str());
     orionldState.httpStatusCode = SccBadRequest;

@@ -33,9 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                            // LM_*
 #include "logMsg/traceLevels.h"                                       // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                                 // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                              // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbCollectionPathGet.h"                           // dbCollectionPathGet
+
+#include "mongoBackend/MongoGlobal.h"                                 // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/db/dbConfiguration.h"                               // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"      // Own interface
 
@@ -47,16 +47,8 @@ extern "C"
 //
 bool mongoCppLegacyEntitiesDelete(KjNode* entityIdsArray)
 {
-  char collectionPath[256];
-
-  if (dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities") == -1)
-  {
-    LM_E(("Internal Error (dbCollectionPathGet returned -1)"));
-    return false;
-  }
-
   mongo::DBClientBase*         connectionP  = getMongoConnection();
-  mongo::BulkOperationBuilder  bulk         = connectionP->initializeUnorderedBulkOp(collectionPath);
+  mongo::BulkOperationBuilder  bulk         = connectionP->initializeUnorderedBulkOp(orionldState.tenantP->entities);
   const mongo::WriteConcern    writeConcern;
   mongo::WriteResult           writeResults;
 

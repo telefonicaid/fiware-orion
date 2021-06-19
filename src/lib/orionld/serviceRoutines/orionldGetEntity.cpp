@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
@@ -249,10 +250,10 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   OrionldHttpHeader headerV[5];
   int               header = 0;
 
-  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+  if (orionldState.tenantP != &tenant0)
   {
     headerV[header].type  = HttpHeaderTenant;
-    headerV[header].value = orionldState.tenant;
+    headerV[header].value = orionldState.tenantP->tenant;
     ++header;
   }
 
@@ -433,7 +434,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   orionldState.httpStatusCode = mongoQueryContext(&request,
                                                   &response,
-                                                  orionldState.tenant,
+                                                  orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   ciP->uriParam,
                                                   ciP->uriParamOptions,

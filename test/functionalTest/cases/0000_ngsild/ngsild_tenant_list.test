@@ -130,13 +130,11 @@ echo
 01. Get the list of tenants
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 14
+Content-Length: 3
 Content-Type: application/json
 Date: REGEX(.*)
 
-[
-  "ftest"
-]
+[]
 
 
 
@@ -161,13 +159,12 @@ Date: REGEX(.*)
 04. Get the list of tenants
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 12
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-  "ftest",
-  "ftest-tn1"
+  "tn1"
 ]
 
 
@@ -179,13 +176,12 @@ Date: REGEX(.*)
 06. Get the list of tenants
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 12
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-  "ftest",
-  "ftest-tn1"
+  "tn1"
 ]
 
 
@@ -211,15 +207,14 @@ Date: REGEX(.*)
 09. Get the list of tenants
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 30
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-  "ftest",
-  "ftest-tn1",
-  "ftest-tn2",
-  "ftest-tn3"
+  "tn3",
+  "tn2",
+  "tn1"
 ]
 
 

@@ -31,6 +31,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoCreateSubscription.h"
@@ -91,7 +94,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
   sub.notification.httpInfo.custom   = false;
 
   /* Invoke the function in mongoBackend library */
-  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
+  std::string result = mongoCreateSubscription(sub, &oe, &tenant0, servicePathVector, "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);
@@ -188,7 +191,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   sub.notification.httpInfo.payload = "Hey!";
 
   /* Invoke the function in mongoBackend library */
-  std::string result = mongoCreateSubscription(sub, &oe, "", servicePathVector, "", "");
+  std::string result = mongoCreateSubscription(sub, &oe, &tenant0, servicePathVector, "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);

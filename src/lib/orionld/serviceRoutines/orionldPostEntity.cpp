@@ -464,7 +464,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     status = mongoUpdateContext(&ucr,
                                 &ucResponse,
-                                orionldState.tenant,
+                                orionldState.tenantP,
                                 ciP->servicePathV,
                                 ciP->uriParam,
                                 ciP->httpHeaders.xauthToken.c_str(),

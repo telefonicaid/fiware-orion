@@ -32,6 +32,7 @@
 #include "orionld/common/orionldState.h"                         // kalloc, orionldState
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"    // orionldPostSubscriptions
+#include "orionld/serviceRoutines/orionldPostRegistrations.h"    // orionldPostRegistrations
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheInsert.h"      // Own interface
@@ -77,10 +78,11 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   if (contextP->origin == OrionldContextFromInline)
   {
     //
-    // If the request is a subscription creation, the the context must be saved
+    // If the request is a subscription creation, then the context must be saved
+    // Same same for registrations
     // FIXME: For now it must be saved. In the end, it should be saved just as it came in, in the subscription
     //
-    if (orionldState.serviceP->serviceRoutine != orionldPostSubscriptions)
+    if ((orionldState.serviceP->serviceRoutine != orionldPostSubscriptions) && (orionldState.serviceP->serviceRoutine != orionldPostRegistrations)) 
       return;
   }
 

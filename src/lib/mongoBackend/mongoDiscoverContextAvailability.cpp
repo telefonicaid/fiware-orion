@@ -28,6 +28,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"               // OrionldTenant
+#include "orionld/common/orionldState.h"               // orionldState
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -49,7 +52,7 @@ static HttpStatusCode processDiscoverContextAvailability
 (
   DiscoverContextAvailabilityRequest*   requestP,
   DiscoverContextAvailabilityResponse*  responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   int                                   offset,
   int                                   limit,
   bool                                  details,
@@ -65,7 +68,7 @@ static HttpStatusCode processDiscoverContextAvailability
                           requestP->attributeList,
                           &responseP->responseVector,
                           &err,
-                          tenant,
+                          tenantP,
                           servicePathV,
                           offset,
                           limit,
@@ -127,7 +130,7 @@ HttpStatusCode mongoDiscoverContextAvailability
 (
   DiscoverContextAvailabilityRequest*   requestP,
   DiscoverContextAvailabilityResponse*  responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   std::map<std::string, std::string>&   uriParams,
   const std::vector<std::string>&       servicePathV
 )
@@ -144,7 +147,7 @@ HttpStatusCode mongoDiscoverContextAvailability
 
   HttpStatusCode hsCode = processDiscoverContextAvailability(requestP,
                                                              responseP,
-                                                             tenant,
+                                                             tenantP,
                                                              offset,
                                                              limit,
                                                              details,

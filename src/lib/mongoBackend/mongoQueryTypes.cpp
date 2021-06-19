@@ -29,10 +29,12 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/orionldState.h"                 // orionldState
+
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -69,7 +71,7 @@ using mongo::DBClientBase;
 */
 static void getAttributeTypes
 (
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               entityType,
   const std::string&               attrName,
@@ -99,7 +101,7 @@ static void getAttributeTypes
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->entities, query, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -159,7 +161,6 @@ static void getAttributeTypes
 */
 static long long countEntities
 (
-  const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               entityType
 )
@@ -173,7 +174,7 @@ static long long countEntities
   std::string         err;
   unsigned long long  c;
 
-  if (!collectionCount(getEntitiesCollectionName(tenant), query, &c, &err))
+  if (!collectionCount(orionldState.tenantP->entities, query, &c, &err))
   {
     return -1;
   }
@@ -187,7 +188,7 @@ static long long countEntities
 *
 * countCmd -
 */
-static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelineForCount)
+static unsigned int countCmd(OrionldTenant* tenantP, const BSONArray& pipelineForCount)
 {
   BSONObj result;
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
@@ -196,7 +197,7 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     LM_E(("Runtime Error (executing: %s, error %s)", cmd.toString().c_str(), err.c_str()));
     return 0;
@@ -237,7 +238,7 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 HttpStatusCode mongoEntityTypesValues
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   unsigned int*                        totalTypesP
@@ -312,7 +313,7 @@ HttpStatusCode mongoEntityTypesValues
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -323,7 +324,7 @@ HttpStatusCode mongoEntityTypesValues
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenantP, pipelineForCount);
   }
 
   // Processing result to build response
@@ -380,7 +381,7 @@ HttpStatusCode mongoEntityTypesValues
 HttpStatusCode mongoEntityTypes
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   ApiVersion                           apiVersion,
@@ -490,7 +491,7 @@ HttpStatusCode mongoEntityTypes
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -501,7 +502,7 @@ HttpStatusCode mongoEntityTypes
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenantP, pipelineForCount);
   }
 
   // Processing result to build response
@@ -543,7 +544,7 @@ HttpStatusCode mongoEntityTypes
 
     entityType = new EntityType(getStringFieldF(&resultItem, "_id"));
 
-    entityType->count = countEntities(tenant, servicePathV, entityType->type);
+    entityType->count = countEntities(servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -561,7 +562,7 @@ HttpStatusCode mongoEntityTypes
         {
           std::vector<std::string> attrTypes;
 
-          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
+          getAttributeTypes(orionldState.tenantP, servicePathV, entityType->type, attrsArray[jx].str(), &attrTypes);
 
           for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
           {
@@ -617,7 +618,7 @@ HttpStatusCode mongoAttributesForEntityType
 (
   const std::string&                    entityType,
   EntityTypeResponse*                   responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
   bool                                  noAttrDetail,
@@ -650,7 +651,7 @@ HttpStatusCode mongoAttributesForEntityType
    *
    * db.runCommand({aggregate: "entities",
    *                cursor: { batchSize: 1000 },
-   *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
+   *                pipeline: [ {$match: { "_id.type": "TYPE", "_id.servicePath": /.../ } },
    *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
    *                            {$unwind: "$attrNames"},
    *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
@@ -687,7 +688,7 @@ HttpStatusCode mongoAttributesForEntityType
            BSON("$sort" << BSON("_id" << 1))));
 
   std::string err;
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -707,7 +708,7 @@ HttpStatusCode mongoAttributesForEntityType
     resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
-  responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
+  responseP->entityType.count = countEntities(servicePathV, entityType);
 
   if (resultsArray.size() == 0)
   {
@@ -746,7 +747,7 @@ HttpStatusCode mongoAttributesForEntityType
     {
       std::vector<std::string> attrTypes;
 
-      getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
+      getAttributeTypes(tenantP, servicePathV, entityType, idField.str(), &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {

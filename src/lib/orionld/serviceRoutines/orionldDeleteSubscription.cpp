@@ -71,7 +71,7 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
 
   if (noCache == false)
   {
-    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenant, orionldState.wildcard[0]);
+    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
     if (cSubP != NULL)
       subCacheItemRemove(cSubP);
     else

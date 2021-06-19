@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
@@ -42,7 +44,7 @@ extern HttpStatusCode mongoUpdateContextAvailabilitySubscription
   UpdateContextAvailabilitySubscriptionRequest*   requestP,
   UpdateContextAvailabilitySubscriptionResponse*  responseP,
   const std::string&                              fiwareCorrelator = "no correlator",
-  const std::string&                              tenant           = ""
+  OrionldTenant*                                  tenantP          = NULL
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXTAVAILABILITYSUBSCRIPTION_H_

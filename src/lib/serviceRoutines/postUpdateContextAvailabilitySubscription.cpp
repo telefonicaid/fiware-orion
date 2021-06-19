@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
@@ -56,7 +57,7 @@ std::string postUpdateContextAvailabilitySubscription
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                                &ucas,
                                                                                ciP->httpHeaders.correlator,
-                                                                               ciP->tenant));
+                                                                               orionldState.tenantP));
 
   TIMED_RENDER(answer = ucas.render());
 

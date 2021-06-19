@@ -33,9 +33,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeWithDatasetsLookup.h"   // Own interface
 
@@ -47,11 +48,7 @@ extern "C"
 //
 KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, const char* attributeName)
 {
-  char    collectionPath[256];
   KjNode* kjTree = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
 
   //
   // Populate filter - Entity ID and attrs::attributeName
@@ -77,7 +74,7 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
   mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = fields.obj();
 
-  cursorP = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &fieldsToReturn);
 
   if (cursorP->more())
   {

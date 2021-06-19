@@ -35,6 +35,7 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState, dbName, dbNameLen
 #include "orionld/common/orionldTenantCreate.h"                // orionldTenantCreate
+#include "orionld/common/orionldTenantLookup.h"                // orionldTenantLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"   // mongoCppLegacyDbStringFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"   // mongoCppLegacyDbFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyTenantsGet.h"   // Own interface
@@ -73,12 +74,36 @@ bool mongoCppLegacyTenantsGet(void)
       mongo::BSONObj  db   = dbV[ix].Obj();
       char*           name = mongoCppLegacyDbStringFieldGet(&db, "name");
 
-      // Don't include the base as a tenant
-      if (strcmp(name, dbName) == 0)
-        continue;
-
+      LM_TMP(("TENANT: Got a mongo database named '%s'", name));
       if (strncmp(name, dbName, dbNameLen) == 0)
-        orionldTenantCreate(name);
+      {
+        // The prefix matches, now EOS or '-'
+        LM_TMP(("TENANT: first letter after prefix is: '%c' (0x%x)", name[dbNameLen], name[dbNameLen]));
+        if (name[dbNameLen] == 0)  // the base
+        {
+          LM_TMP(("TENANT: it's the base: '%s'", name));
+        }
+        else if (name[dbNameLen] != '-')  // not a valid tenant (orionld, for example)
+        {
+          LM_TMP(("TENANT: it's not a DB for the broker (no hyphen after dbPrefix): '%s'", name));
+        }
+        else if (name[dbNameLen + 1] == 0)
+        {
+          LM_TMP(("TENANT: invalid database name (hyphen there but no tenant): '%s'", name));
+        }
+        else
+        {
+          char* tenantName = &name[dbNameLen + 1];
+
+          if (orionldTenantLookup(tenantName) == NULL)
+          {
+            LM_TMP(("TENANT: calling orionldTenantCreate(%s)", tenantName));
+            orionldTenantCreate(tenantName);
+          }
+        }
+      }
+      else
+        LM_TMP(("TENANT: it's not a DB for the broker (doesn't start with dbPrefix): '%s'", name));
     }
   }
   catch (const std::exception &e)

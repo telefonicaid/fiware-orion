@@ -27,7 +27,7 @@ Batch Upsert Crash - for request with context in both payload and Link header
 export BROKER=orionld
 dbInit CB
 dbInit CB smartmaas001
-brokerStart CB
+brokerStart CB 0 IPv4 -multiservice
 
 --SHELL--
 

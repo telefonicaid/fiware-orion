@@ -63,7 +63,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
     char*   details;
 
     // mongoLdRegistrationGet takes the req semaphore
-    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)
+    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenantP, &statusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId);
       return false;
@@ -93,7 +93,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   // Create the Registration
   //
   mongoRegistrationCreate(&reg,
-                          orionldState.tenant,
+                          orionldState.tenantP,
                           ciP->servicePathV[0],
                           &regId,
                           &oError);

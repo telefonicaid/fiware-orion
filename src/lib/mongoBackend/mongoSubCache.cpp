@@ -164,7 +164,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
   }
 
-  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
+  cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
@@ -416,7 +416,7 @@ int mongoSubCacheItemInsert
     lastNotificationTime = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
   }
 
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
@@ -493,6 +493,25 @@ int mongoSubCacheItemInsert
 
 
 
+// -----------------------------------------------------------------------------
+//
+// tenantFromDb - extract the tenant path of a database name
+//
+// E.g., the database name "orion-openiot" => "openiot"
+// If the database name is just "orion" (no tenant), then NULL is returned
+//
+char* tenantFromDb(const char* db)
+{
+  char* hyphen = strchr((char*) db, '-');
+
+  if (hyphen == NULL)
+    return NULL;  // No tenant
+
+  return &hyphen[1];
+}
+
+
+
 /* ****************************************************************************
 *
 * mongoSubCacheRefresh -
@@ -512,15 +531,17 @@ void mongoSubCacheRefresh(const std::string& database)
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                        query;      // empty query (all subscriptions)
-  std::string                    db          = database;
-  std::string                    tenant      = tenantFromDb(db);
-  std::string                    collection  = getSubscribeContextCollectionName(tenant);
+  char*                          tenant      = tenantFromDb(database.c_str());
+  char                           collectionPath[80];
+
+  snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", database.c_str());
+
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    errorString;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
+  if (collectionQuery(connection, collectionPath, query, &cursor, &errorString) != true)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -540,7 +561,7 @@ void mongoSubCacheRefresh(const std::string& database)
       continue;
     }
 
-    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    int r = mongoSubCacheItemInsert(tenant, sub);
     if (r == 0)
     {
       ++subNo;
@@ -571,7 +592,7 @@ static void mongoSubCountersUpdateCount
   condition = BSON("_id"  << OID(subId));
   update    = BSON("$inc" << BSON(CSUB_COUNT << count));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
   }
@@ -599,7 +620,7 @@ static void mongoSubCountersUpdateLastNotificationTime
                      BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }
@@ -627,7 +648,7 @@ static void mongoSubCountersUpdateLastFailure
                      BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
   }
@@ -655,7 +676,7 @@ static void mongoSubCountersUpdateLastSuccess
                      BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
   }
@@ -678,31 +699,36 @@ void mongoSubCountersUpdate
   double             lastSuccess
 )
 {
-  std::string  collection = getSubscribeContextCollectionName(tenant);
-
   if (subId == "")
   {
     LM_E(("Runtime Error (empty subscription id)"));
     return;
   }
 
+  char collectionPath[84];
+
+  if (tenant != "")  // make char* !!!
+    snprintf(collectionPath, sizeof(collectionPath), "%s-%s.csubs", dbName, tenant.c_str());
+  else
+    snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", dbName);
+
   if (count > 0)
   {
-    mongoSubCountersUpdateCount(collection, subId, count);
+    mongoSubCountersUpdateCount(collectionPath, subId, count);
   }
 
   if (lastNotificationTime > 0)
   {
-    mongoSubCountersUpdateLastNotificationTime(collection, subId, lastNotificationTime);
+    mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime);
   }
 
   if (lastFailure > 0)
   {
-    mongoSubCountersUpdateLastFailure(collection, subId, lastFailure);
+    mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure);
   }
 
   if (lastSuccess > 0)
   {
-    mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess);
+    mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess);
   }
 }

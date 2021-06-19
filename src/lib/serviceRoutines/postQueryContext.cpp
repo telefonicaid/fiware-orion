@@ -33,6 +33,8 @@
 
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -113,7 +115,6 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
-  std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = "application/json";
   std::string     out;
@@ -126,7 +127,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       port,
                       protocol,
                       verb,
-                      tenant,
+                      orionldState.tenantP->tenant,
                       servicePath,
                       ciP->httpHeaders.xauthToken,
                       resource,
@@ -309,7 +310,7 @@ std::string postQueryContext
 
   TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
                                                       qcrsP,
-                                                      ciP->httpHeaders.tenant,
+                                                      orionldState.tenantP,
                                                       ciP->servicePathV,
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,

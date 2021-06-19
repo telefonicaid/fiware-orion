@@ -27,13 +27,14 @@
 #include "mongo/client/dbclient.h"
 #include "mongo/client/index_spec.h"
 
+#include "orionld/types/OrionldTenant.h"
+#include "orionld/common/orionldState.h"
+
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
-
-#include "orionld/common/orionldState.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 
@@ -64,7 +65,7 @@ using mongo::WriteConcern;
 bool collectionQuery
 (
   DBClientBase*                   connection,
-  const std::string&              col,
+  const char*                     col,
   const BSONObj&                  q,
   std::auto_ptr<DBClientCursor>*  cursor,
   std::string*                    err
@@ -78,11 +79,11 @@ bool collectionQuery
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col, q.toString().c_str()));
 
   try
   {
-    *cursor = connection->query(col.c_str(), q);
+    *cursor = connection->query(col, q);
 
     // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
     // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
@@ -134,7 +135,7 @@ bool collectionQuery
 bool collectionRangedQuery
 (
   DBClientBase*                   connection,
-  const std::string&              col,
+  const char*                     col,
   const Query&                    q,
   int                             limit,
   int                             offset,
@@ -152,7 +153,7 @@ bool collectionRangedQuery
   }
 
   LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  col.c_str(),
+                  col,
                   limit,
                   offset,
                   q.toString().c_str()));
@@ -161,12 +162,12 @@ bool collectionRangedQuery
   {
     if (count != NULL)
     {
-      *count = connection->count(col.c_str(), q);
+      *count = connection->count(col, q);
     }
 
     if (orionldState.onlyCount == false)
     {
-      *cursor = connection->query(col.c_str(), q, limit, offset);
+      *cursor = connection->query(col, q, limit, offset);
 
       //
       // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -183,7 +184,7 @@ bool collectionRangedQuery
   }
   catch (const std::exception &e)
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
 
@@ -194,7 +195,7 @@ bool collectionRangedQuery
   }
   catch (...)
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: generic";
 
@@ -216,7 +217,7 @@ bool collectionRangedQuery
 */
 bool collectionCount
 (
-  const std::string&   col,
+  const char*          col,
   const BSONObj&       q,
   unsigned long long*  c,
   std::string*         err
@@ -234,11 +235,11 @@ bool collectionCount
     return false;
   }
 
-  LM_T(LmtMongo, ("count() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("count() in '%s' collection: '%s'", col, q.toString().c_str()));
 
   try
   {
-    *c = connection->count(col.c_str(), q);
+    *c = connection->count(col, q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     // LM_I(("Database Operation Successful (count: %s)", q.toString().c_str()));
@@ -248,7 +249,7 @@ bool collectionCount
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - count(): " + q.toString() +
       " - exception: " + e.what();
 
@@ -262,7 +263,7 @@ bool collectionCount
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: generic";
 
@@ -284,7 +285,7 @@ bool collectionCount
 */
 bool collectionFindOne
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      q,
   BSONObj*            doc,
   std::string*        err
@@ -303,10 +304,10 @@ bool collectionFindOne
     return false;
   }
 
-  LM_T(LmtMongo, ("findOne() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("findOne() in '%s' collection: '%s'", col, q.toString().c_str()));
   try
   {
-    *doc = connection->findOne(col.c_str(), q);
+    *doc = connection->findOne(col, q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     // LM_I(("Database Operation Successful (findOne: %s)", q.toString().c_str()));
@@ -316,7 +317,7 @@ bool collectionFindOne
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
         " - findOne(): " + q.toString() +
         " - exception: " + e.what();
 
@@ -330,7 +331,7 @@ bool collectionFindOne
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
         " - findOne(): " + q.toString() +
         " - exception: generic";
 
@@ -352,7 +353,7 @@ bool collectionFindOne
 */
 bool collectionInsert
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      doc,
   std::string*        err
 )
@@ -370,12 +371,12 @@ bool collectionInsert
     return false;
   }
 
-  LM_T(LmtMongo, ("insert() in collection '%s'", col.c_str()));
+  LM_T(LmtMongo, ("insert() in collection '%s'", col));
   LM_T(LmtMongo, ("insert() document '%s'", doc.toString().c_str()));
 
   try
   {
-    connection->insert(col.c_str(), doc);
+    connection->insert(col, doc);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     // LM_I(("Database Operation Successful (insert: %s)", doc.toString().c_str()));
@@ -385,7 +386,7 @@ bool collectionInsert
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - insert(): " + doc.toString() +
       " - exception: " + e.what();
 
@@ -399,7 +400,7 @@ bool collectionInsert
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - insert(): " + doc.toString() +
       " - exception: generic";
 
@@ -421,7 +422,7 @@ bool collectionInsert
 */
 bool collectionUpdate
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      q,
   const BSONObj&      doc,
   bool                upsert,
@@ -442,14 +443,14 @@ bool collectionUpdate
   }
 
   LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s",
-                  col.c_str(),
+                  col,
                   q.toString().c_str(),
                   doc.toString().c_str(),
                   FT(upsert)));
 
   try
   {
-    connection->update(col.c_str(), q, doc, upsert);
+    connection->update(col, q, doc, upsert);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     // LM_I(("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
@@ -460,7 +461,7 @@ bool collectionUpdate
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: " + e.what();
 
@@ -474,7 +475,7 @@ bool collectionUpdate
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: generic";
 
@@ -496,7 +497,7 @@ bool collectionUpdate
 */
 bool collectionRemove
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      q,
   std::string*        err
 )
@@ -514,11 +515,11 @@ bool collectionRemove
     return false;
   }
 
-  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col, q.toString().c_str()));
 
   try
   {
-    connection->remove(col.c_str(), q);
+    connection->remove(col, q);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     // LM_I(("Database Operation Successful (remove: %s)", q.toString().c_str()));
@@ -528,7 +529,7 @@ bool collectionRemove
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - remove(): " + q.toString() +
       " - exception: " + e.what();
 
@@ -542,7 +543,7 @@ bool collectionRemove
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - remove(): " + q.toString() +
       " - exception: generic";
 
@@ -564,7 +565,7 @@ bool collectionRemove
 */
 bool collectionCreateIndex
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      indexes,
   const bool&         isTTL,
   std::string*        err
@@ -581,7 +582,7 @@ bool collectionCreateIndex
     return false;
   }
 
-  LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col.c_str(), indexes.toString().c_str()));
+  LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col, indexes.toString().c_str()));
 
   try
   {
@@ -592,11 +593,11 @@ bool collectionCreateIndex
      */
     if (isTTL)
     {
-      connection->createIndex(col.c_str(), IndexSpec().addKeys(indexes).expireAfterSeconds(0));
+      connection->createIndex(col, IndexSpec().addKeys(indexes).expireAfterSeconds(0));
     }
     else
     {
-      connection->createIndex(col.c_str(), indexes);
+      connection->createIndex(col, indexes);
     }
 
     releaseMongoConnection(connection);
@@ -608,7 +609,7 @@ bool collectionCreateIndex
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - createIndex(): " + indexes.toString() +
       " - exception: " + e.what();
 
@@ -622,7 +623,7 @@ bool collectionCreateIndex
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - createIndex(): " + indexes.toString() +
       " - exception: generic";
 
@@ -644,7 +645,7 @@ bool collectionCreateIndex
 */
 bool runCollectionCommand
 (
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      command,
   BSONObj*            result,
   std::string*        err
@@ -667,7 +668,7 @@ bool runCollectionCommand
 bool runCollectionCommand
 (
   DBClientBase*       connection,
-  const std::string&  col,
+  const char*         col,
   const BSONObj&      command,
   BSONObj*            result,
   std::string*        err
@@ -695,11 +696,11 @@ bool runCollectionCommand
     }
   }
 
-  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col.c_str(), command.toString().c_str()));
+  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col, command.toString().c_str()));
 
   try
   {
-    connection->runCommand(col.c_str(), command, *result);
+    connection->runCommand(col, command, *result);
     if (releaseConnection)
     {
       releaseMongoConnection(connection);
@@ -715,7 +716,7 @@ bool runCollectionCommand
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - runCommand(): " + command.toString() +
       " - exception: " + e.what();
 
@@ -732,7 +733,7 @@ bool runCollectionCommand
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
 
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + col +
       " - runCommand(): " + command.toString() +
       " - exception: generic";
 

@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
@@ -135,7 +138,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  mongoListSubscriptions(&subs, &oe, uriParams, "", "/#", 20, 0, &count);
+  mongoListSubscriptions(&subs, &oe, uriParams, &tenant0, "/#", 20, 0, &count);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
@@ -239,7 +242,7 @@ TEST(mongoGetSubscription, getSubscription)
   /* Invoke the function in mongoBackend library */
   Subscription empty, s;
 
-  mongoGetSubscription(&s, &oe, SUB_OID1, uriParams, "");
+  mongoGetSubscription(&s, &oe, SUB_OID1, uriParams, &tenant0);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
@@ -277,7 +280,7 @@ TEST(mongoGetSubscription, getSubscription)
   // clear subscription
   s = empty;
 
-  mongoGetSubscription(&s, &oe, SUB_OID2, uriParams, "");
+  mongoGetSubscription(&s, &oe, SUB_OID2, uriParams, &tenant0);
 
   EXPECT_EQ(SUB_OID2, s.id);
   ents = s.subject.entities;

@@ -1,1 +1,2 @@
-* Issue 885  Response of POST /ngsi-ld/v1/entityOperations/upsert is corrupted when no entities exist
+* Issue #885  Batch Ops responds with a corrupted payload body if Accept: application/ld+json - fix respond with application/json
+* Issue #280  Performace: savinf all DB collection paths ONCE in a tenant-struct instead of creating them before each and every use

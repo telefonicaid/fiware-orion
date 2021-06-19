@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"
+
 #include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/Registration.h"
@@ -42,7 +44,7 @@ extern void mongoRegistrationGet
 (
   ngsiv2::Registration*  regP,
   const std::string&     regId,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePathV,
   OrionError*            oeP
 );
@@ -56,7 +58,7 @@ extern void mongoRegistrationGet
 extern void mongoRegistrationsGet
 (
   std::vector<ngsiv2::Registration>*  regV,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,

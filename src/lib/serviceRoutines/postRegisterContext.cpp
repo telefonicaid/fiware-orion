@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
@@ -109,7 +111,7 @@ std::string postRegisterContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
   TIMED_RENDER(answer = rcr.render());
 
   return answer;

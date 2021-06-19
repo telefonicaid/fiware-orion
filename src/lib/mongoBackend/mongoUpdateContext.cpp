@@ -52,7 +52,7 @@ HttpStatusCode mongoUpdateContext
 (
   UpdateContextRequest*                 requestP,
   UpdateContextResponse*                responseP,
-  const char*                           tenant,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const char*                           xauthToken,
@@ -86,7 +86,7 @@ HttpStatusCode mongoUpdateContext
       processContextElement(requestP->contextElementVector[ix],
                             responseP,
                             requestP->updateActionType,
-                            tenant,
+                            tenantP,
                             servicePathV,
                             uriParams,
                             xauthToken,

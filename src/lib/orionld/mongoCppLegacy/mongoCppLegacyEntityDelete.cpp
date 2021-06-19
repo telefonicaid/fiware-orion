@@ -22,12 +22,14 @@
 *
 * Author: Gabriel Quaresma
 */
+#include "mongo/client/dbclient.h"                                    // MongoDB C++ Client Legacy Driver
+
 #include "logMsg/logMsg.h"                                            // LM_*
 #include "logMsg/traceLevels.h"                                       // Lmt*
 
-#include "mongo/client/dbclient.h"                                    // MongoDB C++ Client Legacy Driver
+#include "orionld/common/orionldState.h"                              // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                                 // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                           // dbCollectionPathGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"        // Own interface
 
 
@@ -38,14 +40,7 @@
 //
 bool mongoCppLegacyEntityDelete(const char* entityId)
 {
-  char collectionPath[256];
   bool operationStatus;
-
-  if (dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities") == -1)
-  {
-    LM_E(("Internal Error (dbCollectionPathGet returned -1)"));
-    return false;
-  }
 
   //
   // Populate filter
@@ -57,7 +52,7 @@ bool mongoCppLegacyEntityDelete(const char* entityId)
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  connectionP->remove(collectionPath, query, true);
+  connectionP->remove(orionldState.tenantP->entities, query, true);
   operationStatus = (connectionP->isFailed() == true)? false : true;
 
   releaseMongoConnection(connectionP);

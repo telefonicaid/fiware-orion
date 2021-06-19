@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -51,7 +52,7 @@ std::string postUnsubscribeContext
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, orionldState.tenantP));
   TIMED_RENDER(answer = uncr.render());
 
   return answer;

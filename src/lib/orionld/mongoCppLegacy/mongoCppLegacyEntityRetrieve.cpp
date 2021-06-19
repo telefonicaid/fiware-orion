@@ -38,12 +38,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/common/orionldState.h"                         // orionldState
 
+#include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/numberToDate.h"                            // numberToDate
 #include "orionld/common/eqForDot.h"                                // eqForDot
 #include "orionld/common/performance.h"                             // REQUEST_PERFORMANCE
-#include "orionld/db/dbCollectionPathGet.h"                         // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
@@ -379,12 +379,8 @@ KjNode* mongoCppLegacyEntityRetrieve
   KjNode**     geoPropertyP
 )
 {
-  char    collectionPath[256];
   KjNode* attrTree  = NULL;
   KjNode* dbTree    = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
 
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
@@ -426,7 +422,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.dbStart);
 #endif
-  cursorP = connectionP->query(collectionPath, query, 0, 0, &retFieldsObj);
+  cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &retFieldsObj);
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.dbEnd);
 #endif

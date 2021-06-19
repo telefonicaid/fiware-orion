@@ -55,7 +55,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
 (
   UnsubscribeContextAvailabilityRequest*   requestP,
   UnsubscribeContextAvailabilityResponse*  responseP,
-  const std::string&                       tenant
+  OrionldTenant*                           tenantP
 )
 {
   bool        reqSemTaken;
@@ -91,7 +91,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  if (!collectionFindOne(tenantP->avSubscriptions, BSON("_id" << id), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
@@ -116,8 +116,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   // to findAndModify for this?
   //
 
-  std::string colName = getSubscribeContextAvailabilityCollectionName(tenant);
-  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  if (!collectionRemove(tenantP->avSubscriptions, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);

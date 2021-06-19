@@ -28,9 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"               // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -55,7 +56,7 @@ std::string postDiscoverContextAvailability
   DiscoverContextAvailabilityResponse*  dcarP = &parseDataP->dcars.res;
   std::string                           answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, ciP->tenant, ciP->uriParam, ciP->servicePathV));
+  TIMED_MONGO(ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, orionldState.tenantP, ciP->uriParam, ciP->servicePathV));
   TIMED_RENDER(answer = dcarP->render());
 
   return answer;

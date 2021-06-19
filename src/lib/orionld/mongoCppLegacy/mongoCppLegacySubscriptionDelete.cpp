@@ -22,12 +22,14 @@
 *
 * Author: Gabriel Quaresma
 */
+#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 
 
 
@@ -37,10 +39,7 @@
 //
 bool mongoCppLegacySubscriptionDelete(const char* subscriptionId)
 {
-  char collectionPath[256];
   bool operationOk;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "csubs");
 
   //
   // Populate filter
@@ -53,7 +52,7 @@ bool mongoCppLegacySubscriptionDelete(const char* subscriptionId)
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  connectionP->remove(collectionPath, query, true);
+  connectionP->remove(orionldState.tenantP->subscriptions, query, true);
   operationOk = (connectionP->isFailed() == true)? false : true;
 
   releaseMongoConnection(connectionP);

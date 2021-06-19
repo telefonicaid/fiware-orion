@@ -43,5 +43,7 @@ void mongoCppLegacyInit(const char* dbHost, const char* dbName)
   if (mongoCppLegacyTenantsGet() == false)
     LM_X(1, ("Unable to extract tenants from the database - fatal error"));
 
+  LM_TMP(("Calling mongoCppLegacyGeoIndexInit"));
   mongoCppLegacyGeoIndexInit();
+  LM_TMP(("Back from mongoCppLegacyGeoIndexInit"));
 }
