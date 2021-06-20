@@ -1,2 +1,3 @@
 * Issue #885  Batch Ops responds with a corrupted payload body if Accept: application/ld+json - fix respond with application/json
 * Issue #280  Performace: saving all DB collection paths ONCE in a tenant-struct instead of creating them before each and every use
+* Issue #892  Broker able to receive and act upon NGSI-LD notifications - very first implementation - needs further testing
