@@ -62,6 +62,7 @@ SET (SOURCES
     orionldPostTemporalEntities.cpp
     orionldPostContexts.cpp
     orionldDeleteContext.cpp
+    orionldPostNotify.cpp
 )
 
 # Include directories

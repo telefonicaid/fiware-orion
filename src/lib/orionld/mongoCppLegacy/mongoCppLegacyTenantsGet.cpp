@@ -74,24 +74,10 @@ bool mongoCppLegacyTenantsGet(void)
       mongo::BSONObj  db   = dbV[ix].Obj();
       char*           name = mongoCppLegacyDbStringFieldGet(&db, "name");
 
-      LM_TMP(("TENANT: Got a mongo database named '%s'", name));
       if (strncmp(name, dbName, dbNameLen) == 0)
       {
-        // The prefix matches, now EOS or '-'
-        LM_TMP(("TENANT: first letter after prefix is: '%c' (0x%x)", name[dbNameLen], name[dbNameLen]));
-        if (name[dbNameLen] == 0)  // the base
-        {
-          LM_TMP(("TENANT: it's the base: '%s'", name));
-        }
-        else if (name[dbNameLen] != '-')  // not a valid tenant (orionld, for example)
-        {
-          LM_TMP(("TENANT: it's not a DB for the broker (no hyphen after dbPrefix): '%s'", name));
-        }
-        else if (name[dbNameLen + 1] == 0)
-        {
-          LM_TMP(("TENANT: invalid database name (hyphen there but no tenant): '%s'", name));
-        }
-        else
+        // The prefix matches, now '-' + tenant
+        if ((name[dbNameLen] == '-') && (name[dbNameLen + 1] != 0))
         {
           char* tenantName = &name[dbNameLen + 1];
 

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include "orionld/serviceRoutines/orionldPostEntities.h"
+#include "orionld/serviceRoutines/orionldPostNotify.h"
 #include "orionld/serviceRoutines/orionldPostEntity.h"
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"
@@ -104,6 +105,7 @@ static OrionLdRestServiceSimplified postServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs",                orionldPostEntity           },
   { "/ngsi-ld/v1/entities",                        orionldPostEntities         },
+  { "/ngsi-ld/ex/v1/notify",                       orionldPostNotify           },
   { "/ngsi-ld/v1/entityOperations/create",         orionldPostBatchCreate      },
   { "/ngsi-ld/v1/entityOperations/upsert",         orionldPostBatchUpsert      },
   { "/ngsi-ld/v1/entityOperations/update",         orionldPostBatchUpdate      },
