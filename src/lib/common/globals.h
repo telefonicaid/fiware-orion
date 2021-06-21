@@ -232,8 +232,6 @@ extern unsigned long      fcMaxInterval;
 
 extern unsigned long      logInfoPayloadMaxSize;
 
-extern struct             mosquitto *mosq;  // FIXME PoC: probably not in this file
-
 
 /* ****************************************************************************
 *

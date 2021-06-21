@@ -1,5 +1,5 @@
-#ifndef MQTT_H
-#define MQTT_H
+#ifndef SRC_LIB_MQTT_MQTT_H_
+#define SRC_LIB_MQTT_MQTT_H_
 
 /*
 *
@@ -27,6 +27,7 @@
 */
 #include <mosquitto.h>
 
+#include <string>
 
 
 /* ****************************************************************************
@@ -43,7 +44,7 @@ extern unsigned short   mqttKeepAlivePeriod;
 *
 * mqttInit - 
 */
-extern void mqttInit 
+extern void mqttInit
 (
   const char*    _mqttHost,
   unsigned short _mqttPort,
@@ -66,4 +67,4 @@ extern int sendMqttNotification(const std::string& content);
 */
 extern void mqttCleanup(void);
 
-#endif
+#endif  // SRC_LIB_MQTT_MQTT_H_

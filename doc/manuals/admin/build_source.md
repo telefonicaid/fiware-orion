@@ -11,7 +11,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.61.1
 * openssl: 1.1.1g
 * libuuid: 2.32.1
-* libmosquitto
+* libmosquitto: 1.5.0 - FIXME PR: this version is old, try with newer ones
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -57,6 +57,7 @@ commands that require root privilege):
 
 * Install mosquitto from sources (config.mk file under mosquitto-1.5/ can be modified to fine tune the build)
 
+        # FIXME PR: this version is old, try with newer ones
         wget -4 http://mosquitto.org/files/source/mosquitto-1.5.tar.gz
         tar xvf mosquitto-1.5.tar.gz
         cd mosquitto-1.5
