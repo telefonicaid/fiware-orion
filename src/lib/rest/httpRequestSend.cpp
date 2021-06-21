@@ -38,8 +38,6 @@
 #include <iostream>
 #include <sstream>
 
-#include <mosquitto.h>    // FIXME PoC: to remove if mqtt functions are moved elsewere
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -54,6 +52,7 @@
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
+#include "mqtt/mqtt.h"
 
 
 
@@ -215,36 +214,6 @@ static int contentLenParse(char* s)
   return atoi(&contentLenP[offset]);  // ... and get the number
 }
 
-/* ****************************************************************************
-*
-* sendMqttNotification -
-*
-* FIXME PoC: this function should be moved to another module
-*
-* FIXME PoC: Pay attention to this comment about mosquitto_loop in mosquitto.h, just to check we
-* are doing thinks ok:
-*
-* * This calls select() to monitor the client network socket. If you want to
-* * integrate mosquitto client operation with your own select() call, use
-* * <mosquitto_socket>, <mosquitto_loop_read>, <mosquitto_loop_write> and
-* * <mosquitto_loop_misc>.
-*
-*/
-static int sendMqttNotification(const std::string& content)
-{
-  LM_W(("PoC: flow diverted to MQTT sending logic"));
-  const char* msg = content.c_str();
-
-  // FIXME PoC: unhardwire QoS, unhardwire retain
-  mosquitto_publish(mosq, NULL, "orion", (int) strlen(msg), msg, 0, false);
-
-  // FIXME: PoC unharwire timeout
-  mosquitto_loop(mosq, 0, 1);
-
-  LM_W(("PoC: MQTT notification sent"));
-
-  return 0;
-}
 
 
 /* ****************************************************************************

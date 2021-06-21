@@ -201,6 +201,7 @@ SET (ORION_LIBS
     logSummary
     lm
     pa
+    mqtt
 )
 
 SET (BOOST
@@ -313,6 +314,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
   ADD_SUBDIRECTORY(src/lib/logSummary)
+  ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

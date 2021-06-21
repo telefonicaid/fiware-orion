@@ -657,6 +657,34 @@ function brokerStop
 #
 # accumulatorStop - 
 #
+function mqttAccumulatorStop()
+{
+  port=$1
+
+  # If port is missing, we use the default LISTENER_PORT
+  if [ -z "$port" ]
+  then
+    port=${LISTENER_PORT}
+  fi
+
+  pid=$(cat /tmp/mqtt.accumulator.$port.pid 2> /dev/null)
+  if [ "$pid" != "" ]
+  then
+    kill -15 $pid 2> /dev/null
+    sleep .1
+    kill -2 $pid 2> /dev/null
+    sleep .1
+    kill -9 $pid 2> /dev/null
+    rm -f /tmp/mqtt.accumulator.$port.pid
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStop - 
+#
 function accumulatorStop()
 {
   port=$1
@@ -678,6 +706,69 @@ function accumulatorStop()
     rm -f /tmp/accumulator.$port.pid
   fi
 }
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttAccumulatorStart - 
+#
+function mqttAccumulatorStart()
+{
+  # FIXME P6: note that due to the way argument processing work, the arguments have to be
+  # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
+
+  if [ "$1" = "--pretty-print" ]
+  then
+    pretty="$1"
+    shift
+  fi
+
+  bindIp=$1
+  port=$2
+  topic=$3
+
+  # If port is missing, we use the default MQTT_PORT
+  if [ -z "$port" ]
+  then
+    port=$MQTT_PORT
+  fi
+
+  if [ -z "$bindIp" ]
+  then
+    bindIp=$MQTT_HOST
+  fi
+
+  if [ -z "$topic" ]
+  then
+    topic=$MQTT_TOPIC
+  fi
+
+  mqttAccumulatorStop $port
+
+  accumulator-mqtt.py --port $port --host $bindIp --topic $topic $pretty > /tmp/mqtt_accumulator_${port}_stdout 2> /tmp/mqtt_accumulator_${port}_stderr &
+  echo mqtt accumulator running as PID $$
+
+  # Wait until accumulator has started or we have waited a given maximum time
+  port_not_ok=1
+  typeset -i time
+  time=0
+
+  until [ $port_not_ok -eq 0 ]
+  do
+   if [ "$time" -eq "$MAXIMUM_WAIT" ]
+   then
+      echo "Unable to start listening mqtt client after waiting ${MAXIMUM_WAIT}"
+      exit 1
+   fi 
+   sleep 1
+
+   time=$time+1
+   nc -w 2 $bindIp $port &>/dev/null </dev/null
+   port_not_ok=$?
+  done
+}
+
 
 
 # ------------------------------------------------------------------------------
@@ -760,6 +851,18 @@ function accumulatorStart()
    nc -zv $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttAccumulatorDump
+#
+function mqttAccumulatorDump()
+{
+  # The dump message is not necessary but nice to have to emphasize intention
+  mosquitto_pub -h $bindIp -t dump_mqtt -m "dump"
 }
 
 
@@ -1279,3 +1382,6 @@ export -f dMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
+export -f mqttAccumulatorStart
+export -f mqttAccumulatorStop
+export -f mqttAccumulatorDump

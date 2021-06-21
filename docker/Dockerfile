@@ -67,6 +67,14 @@ RUN \
     make && \
     make install && \
     ldconfig && \
+    # Install mosquitto from source
+    curl -kOL4 http://mosquitto.org/files/source/mosquitto-1.5.tar.gz && \
+    tar xvf mosquitto-1.5.tar.gz && \
+    cd mosquitto-1.5.tar.gz && \
+    make && \
+    make install && \
+    echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf
+    ldconfig
     # Install mongodb driver from source
     cd /opt && \
     curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz && \

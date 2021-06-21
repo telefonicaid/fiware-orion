@@ -65,8 +65,6 @@
 #include <vector>
 #include <limits.h>
 
-#include <mosquitto.h>  // FIXME PoC: it would be not needed is mqttInit() is moved elsewere
-
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
 
@@ -106,6 +104,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
+#include "mqtt/mqtt.h"
 
 #include "contextBroker/orionRestServices.h"
 
@@ -196,7 +195,9 @@ double          fcGauge;
 unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
-struct          mosquitto *mosq;  // FIXME PoC: probably not in this file
+char            mqttHost[64];
+int             mqttPort;
+int             mqttKeepAlive;
 
 
 
@@ -264,6 +265,9 @@ struct          mosquitto *mosq;  // FIXME PoC: probably not in this file
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define MQTT_HOST_DESC         "MQTT broker hostname"
+#define MQTT_PORT_DESC         "MQTT broker port, default: 1883"
+#define MQTT_KEEP_ALIVE_DESC   "keep alive period for MQTT broker connection, default: 60"
 
 
 
@@ -349,6 +353,11 @@ PaArgument paArgs[] =
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
 
   { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,             NGSIV1_AUTOCAST              },
+
+  // FIXME PR: MQTT broker endpoint should be part of the notification information and not a CLI parameter
+  { "-mqttHost",                    mqttHost,               "MQTT_HOST",                PaString, PaOpt, _i "",                           PaNL,  PaNL,             MQTT_HOST_DESC               },
+  { "-mqttPort",                    &mqttPort,              "MQTT_PORT",                PaInt,    PaOpt, 1883,                            PaNL,  PaNL,             MQTT_PORT_DESC               },
+  { "-mqttKeepAlive",               &mqttKeepAlive,         "MQTT_KEEP_ALIVE",          PaInt,    PaOpt, 60,                              PaNL,  PaNL,             MQTT_KEEP_ALIVE_DESC         },
 
   PA_END_OF_ARGS
 };
@@ -569,6 +578,7 @@ void exitFunc(void)
 #endif
 
   metricsMgr.release();
+  mqttCleanup();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -633,38 +643,6 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
    {
       LM_W(("contextBroker started in insecure notifications mode (-insecureNotif)"));
    }
-}
-
-
-/* ****************************************************************************
-*
-* mqttInit -
-*
-* FIXME PoC: not sure if this is the best place for this library (vs. an independent module)
-*/
-void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
-{
-  LM_W(("PoC: in the publish callback"));
-}
-
-
-/* ****************************************************************************
-*
-* mqttInit -
-*
-* FIXME PoC: not sure if this is the best place for this library (vs. an independent module)
-* FIXME PoC: mosquitto_disconnect(mosq) mosquitto_destroy(mosq) should be done in the exit function, for clearness
-*/
-static void mqttInit(void)
-{
-  // Init library and connect to MQTT broker
-  mosquitto_lib_init();
-  mosq = mosquitto_new(NULL, true, NULL);
-  mosquitto_threaded_set(mosq, true);
-  mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
-
-  // FIXME PoC: unhardwire
-  mosquitto_connect(mosq, "localhost", 1883, 60);
 }
 
 
@@ -1152,13 +1130,18 @@ int main(int argC, char* argV[])
   alarmMgr.init(relogAlarms);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
-  mqttInit();
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
   // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
   // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
   SSL_library_init();
+
+  // Initialize MQTT Client
+  if (strlen(mqttHost) > 0)
+  {
+    mqttInit(mqttHost, mqttPort, mqttKeepAlive);
+  }
 
   // Startup libcurl
   if (curl_global_init(CURL_GLOBAL_SSL) != 0)

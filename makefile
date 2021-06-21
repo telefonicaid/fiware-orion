@@ -177,6 +177,10 @@ post_install_libs:
 	cp src/lib/parse/*.h /usr/local/include/contextBroker/parse
 	cp $(CMAKE_BUILD_TYPE)/src/lib/parse/libparse.a  /usr/local/lib
 
+	cd /usr/local/include/contextBroker  && rm -rf mqtt && mkdir -p mqtt
+	cp src/lib/mqtt/*.h /usr/local/include/contextBroker/mqtt         
+	cp $(CMAKE_BUILD_TYPE)/src/lib/mqtt/libmqtt.a  /usr/local/lib
+
 
 # Requires root access, i.e. use 'sudo make install_libs' to install
 install_libs: release
