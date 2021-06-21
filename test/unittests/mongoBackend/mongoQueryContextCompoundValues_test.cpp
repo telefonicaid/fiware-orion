@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -221,10 +222,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -285,10 +286,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -347,10 +348,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValue)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -414,10 +415,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValue)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -480,10 +481,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1Native)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -547,10 +548,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2Native)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E2", RES_CER(0).entityId.id);
-    EXPECT_EQ("T2", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E2", RES_CER(0).id);
+    EXPECT_EQ("T2", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -611,10 +612,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValueNative
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->valueType);
@@ -681,10 +682,10 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValueNative
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E4", RES_CER(0).entityId.id);
-    EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E4", RES_CER(0).id);
+    EXPECT_EQ("T4", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 0)->compoundValueP->valueType);

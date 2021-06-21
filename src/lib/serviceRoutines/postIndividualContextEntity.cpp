@@ -105,30 +105,30 @@ std::string postIndividualContextEntity
   //
 
   // 01.01. entityId::id
-  if ((entityIdFromPayload != "") && (entityIdFromURL != "") && (entityIdFromPayload != entityIdFromURL))
+  if ((!entityIdFromPayload.empty()) && (!entityIdFromURL.empty()) && (entityIdFromPayload != entityIdFromURL))
   {
     std::string error = "entityId::id differs in URL and payload";
 
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
-  entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
+  entityId = (!entityIdFromPayload.empty())? entityIdFromPayload : entityIdFromURL;
 
   // 01.02. entityId::type
-  if ((entityTypeFromPayload != "") && (entityTypeFromURL != "") && (entityTypeFromPayload != entityTypeFromURL))
+  if ((!entityTypeFromPayload.empty()) && (!entityTypeFromURL.empty()) && (entityTypeFromPayload != entityTypeFromURL))
   {
     std::string error = "entityId::type differs in URL and payload";
 
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
-  entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
+  entityType = (!entityTypeFromPayload.empty())? entityTypeFromPayload :entityTypeFromURL;
 
 
   // 01.03. entityId::isPattern
@@ -139,19 +139,19 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
 
   // 01.04. Entity::id must be present, somewhere ...
-  if (entityId == "")
+  if (entityId.empty())
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
 
@@ -173,7 +173,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
 
   response.release();
   parseDataP->upcr.res.release();

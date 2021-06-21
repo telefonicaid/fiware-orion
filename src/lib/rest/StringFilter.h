@@ -29,9 +29,9 @@
 #include <vector>
 #include <regex.h>
 
-#include "mongo/client/dbclient.h"
-
 #include "parse/CompoundValueNode.h"
+
+#include "mongoDriver/BSONObj.h"
 
 
 
@@ -238,7 +238,7 @@ class StringFilter
 {
 public:
   std::vector<StringFilterItem*>  filters;
-  std::vector<mongo::BSONObj>     mongoFilters;
+  std::vector<orion::BSONObj>     mongoFilters;
   StringFilterType                type;
 
   StringFilter(StringFilterType _type);

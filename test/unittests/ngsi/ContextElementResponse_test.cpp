@@ -45,9 +45,9 @@ TEST(ContextElementResponse, check)
    out = cer.check(V1, UpdateContext, "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
-   cer.contextElement.entityId.id         = "ID";
-   cer.contextElement.entityId.type       = "Type";
-   cer.contextElement.entityId.isPattern  = "false";
+   cer.entity.id         = "ID";
+   cer.entity.type       = "Type";
+   cer.entity.isPattern  = "false";
 
    out = cer.check(V1, UpdateContext, "", 0);
    EXPECT_STREQ("no code", out.c_str());
@@ -73,37 +73,17 @@ TEST(ContextElementResponse, render)
 
    utInit();
 
-   cer.contextElement.entityId.id         = "ID";
-   cer.contextElement.entityId.type       = "Type";
-   cer.contextElement.entityId.isPattern  = "false";
+   cer.entity.id         = "ID";
+   cer.entity.type       = "Type";
+   cer.entity.isPattern  = "false";
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(V1, false, UpdateContextElement, false);
+   std::vector<std::string> emptyV;
+
+   out = cer.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
-
-   utExit();
-}
-
-
-/* ****************************************************************************
-*
-* present -
-*/
-TEST(ContextElementResponse, present)
-{
-   ContextElementResponse cer;
-
-   utInit();
-
-   cer.contextElement.entityId.id         = "ID";
-   cer.contextElement.entityId.type       = "Type";
-   cer.contextElement.entityId.isPattern  = "false";
-
-   cer.statusCode.fill(SccOk, "details");
-
-   cer.present("", 0);
 
    utExit();
 }

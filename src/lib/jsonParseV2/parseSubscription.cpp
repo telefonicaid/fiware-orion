@@ -48,6 +48,7 @@
 #include "jsonParseV2/parseEntitiesVector.h"
 #include "jsonParseV2/parseStringVector.h"
 #include "jsonParseV2/parseSubscription.h"
+#include "jsonParseV2/parseExpression.h"
 
 
 
@@ -147,7 +148,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     const Value&  subject = document["subject"];
     std::string   r       = parseSubject(ciP, subsP, subject);
 
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -163,7 +164,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     const Value&  notification = document["notification"];
     std::string   r            = parseNotification(ciP, subsP, notification);
 
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -191,7 +192,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = parse8601Time(expires);
+      eT = (int64_t) parse8601Time(expires);
       if (eT == -1)
       {
         return badInput(ciP, "expires has an invalid format");
@@ -216,7 +217,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     std::string statusString = statusOpt.value;
 
-    if ((statusString != "active") && (statusString != "inactive"))
+    if ((statusString != "active") && (statusString != "inactive") && (statusString != "oneshot"))
     {
       return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_STATUS);
     }
@@ -291,7 +292,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     }
 
     r = parseNotifyConditionVector(ciP, subsP, condition);
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -453,7 +454,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpCustom qs");
 
-      if (r != "")
+      if (!r.empty())
       {
         return r;
       }
@@ -479,7 +480,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
                                       headers,
                                       "notification httpCustom headers");
 
-      if (r != "")
+      if (!r.empty())
       {
         return r;
       }
@@ -492,7 +493,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "http notification is missing");
   }
 
-
   // Attributes
   std::string errorString;
 
@@ -503,11 +503,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
   if (notification.HasMember("attrs"))
   {
-    if (parseStringVector(&subsP->notification.attributes, notification["attrs"], "attrs", true, &errorString) == false)
+    bool b = parseStringVector(&subsP->notification.attributes,
+                               notification["attrs"],
+                               "attrs",
+                               true,
+                               true,
+                               &errorString);
+
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }
-
     subsP->notification.blacklist = false;
     subsP->blacklistProvided      = true;
   }
@@ -516,6 +522,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (parseStringVector(&subsP->notification.attributes,
                           notification["exceptAttrs"],
                           "exceptAttrs",
+                          true,
                           true,
                           &errorString) == false)
     {
@@ -526,15 +533,35 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return badInput(ciP, "http notification has exceptAttrs is empty");
     }
-
     subsP->notification.blacklist = true;
     subsP->blacklistProvided      = true;
+  }
+  if (notification.HasMember("onlyChangedAttrs"))
+  {
+    Opt<bool> onlyChangedOpt = getBoolOpt(notification, "onlyChangedAttrs");
+    if (!onlyChangedOpt.ok())
+    {
+      return badInput(ciP, onlyChangedOpt.error);
+    }
+    else if (onlyChangedOpt.given)
+    {
+      bool onlyChangedBool = onlyChangedOpt.value;
+      subsP->onlyChangedProvided = true;
+      subsP->notification.onlyChanged = onlyChangedBool;
+    }
   }
 
   // metadata
   if (notification.HasMember("metadata"))
   {
-    if (parseStringVector(&subsP->notification.metadata, notification["metadata"], "metadata", true, &errorString) == false)
+    bool b = parseStringVector(&subsP->notification.metadata,
+                               notification["metadata"],
+                               "metadata",
+                               true,
+                               true,
+                               &errorString);
+
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }
@@ -590,8 +617,13 @@ static std::string parseNotifyConditionVector
   if (condition.HasMember("attrs"))
   {
     std::string errorString;
-
-    if (parseStringVector(&subsP->subject.condition.attributes, condition["attrs"], "attrs", true, &errorString) == false)
+    bool        b = parseStringVector(&subsP->subject.condition.attributes,
+                                      condition["attrs"],
+                                      "attrs",
+                                      true,
+                                      true,
+                                      &errorString);
+    if (b == false)
     {
       return badInput(ciP, errorString);
     }
@@ -599,170 +631,11 @@ static std::string parseNotifyConditionVector
 
   if (condition.HasMember("expression"))
   {
-    const Value& expression = condition["expression"];
+    std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
 
-    if (!expression.IsObject())
+    if (r != "OK")
     {
-      return badInput(ciP, "expression is not an object");
-    }
-
-    if (expression.ObjectEmpty())
-    {
-      return badInput(ciP, "expression is empty");
-    }
-
-    subsP->subject.condition.expression.isSet = true;
-
-    if (expression.HasMember("q"))
-    {
-      const Value& q = expression["q"];
-      std::string  qString;
-
-      if (!q.IsString())
-      {
-        return badInput(ciP, "q is not a string");
-      }
-
-      qString = q.GetString();
-      if (qString.empty())
-      {
-        return badInput(ciP, "q is empty");
-      }
-
-      subsP->subject.condition.expression.q = qString;
-
-      std::string  errorString;
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
-
-      scopeP->stringFilterP = new StringFilter(SftQ);
-      if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
-      {
-        delete scopeP->stringFilterP;
-        delete scopeP;
-
-        return badInput(ciP, errorString);
-      }
-
-      subsP->restriction.scopeVector.push_back(scopeP);
-    }
-
-    if (expression.HasMember("mq"))
-    {
-      const Value& mq = expression["mq"];
-      std::string  mqString;
-
-      if (!mq.IsString())
-      {
-        return badInput(ciP, "mq is not a string");
-      }
-
-      mqString = mq.GetString();
-      if (mqString.empty())
-      {
-        return badInput(ciP, "mq is empty");
-      }
-
-      subsP->subject.condition.expression.mq = mqString;
-
-      std::string  errorString;
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mqString);
-
-      scopeP->mdStringFilterP = new StringFilter(SftMq);
-      if (scopeP->mdStringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
-      {
-        delete scopeP->mdStringFilterP;
-        delete scopeP;
-
-        return badInput(ciP, errorString);
-      }
-
-      subsP->restriction.scopeVector.push_back(scopeP);
-    }
-
-    // geometry
-    int nGeoItems = 0;
-    {
-      Opt<std::string> geometryOpt = getStringOpt(expression, "geometry");
-
-      if (!geometryOpt.ok())
-      {
-        return badInput(ciP, geometryOpt.error);
-      }
-      else if (geometryOpt.given)
-      {
-        if (geometryOpt.value.empty())
-        {
-          return badInput(ciP, "geometry is empty");
-        }
-
-        subsP->subject.condition.expression.geometry = geometryOpt.value;
-        nGeoItems++;
-      }
-    }
-
-    // coords
-    {
-      Opt<std::string> coordsOpt = getStringOpt(expression, "coords");
-
-      if (!coordsOpt.ok())
-      {
-          return badInput(ciP, coordsOpt.error);
-      }
-      else if (coordsOpt.given)
-      {
-        if (coordsOpt.value.empty())
-        {
-          return badInput(ciP, "coords is empty");
-        }
-
-        subsP->subject.condition.expression.coords = coordsOpt.value;
-        nGeoItems++;
-      }
-    }
-
-    // georel
-    {
-      Opt<std::string> georelOpt = getStringOpt(expression, "georel");
-
-      if (!georelOpt.ok())
-      {
-        return badInput(ciP, georelOpt.error);
-      }
-
-      if (georelOpt.given)
-      {
-        if (georelOpt.value.empty())
-        {
-          return badInput(ciP, "georel is empty");
-        }
-
-        subsP->subject.condition.expression.georel = georelOpt.value;
-        nGeoItems++;
-      }
-    }
-
-    if ((nGeoItems > 0) && (nGeoItems != 3))
-    {
-      return badInput(ciP, ERROR_DESC_BAD_REQUEST_PARTIAL_GEOEXPRESSION);
-    }
-
-    //
-    // If geometry, coords and georel are filled, then attempt to create a filter scope
-    // with them
-    //
-    SubscriptionExpression subExpr = subsP->subject.condition.expression;
-
-    if ((subExpr.georel != "") && (subExpr.geometry != "") && (subExpr.coords != ""))
-    {
-      Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
-      std::string  err;
-
-      if (scopeP->fill(V2, subExpr.geometry, subExpr.coords, subExpr.georel, &err) != 0)
-      {
-        delete scopeP;
-        return badInput(ciP, "error parsing geo-query fields: " + err);
-      }
-      subsP->restriction.scopeVector.push_back(scopeP);
+      return badInput(ciP, r);
     }
   }
 

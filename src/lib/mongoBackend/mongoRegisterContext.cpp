@@ -25,8 +25,6 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
@@ -39,20 +37,13 @@
 #include "ngsi9/RegisterContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoRegisterContext.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -73,7 +64,7 @@ HttpStatusCode mongoRegisterContext
   bool         reqSemTaken;
 
   // FIXME P4: See issue #3078
-  std::string  sPath = (servicePath == "")? SERVICE_PATH_ROOT : servicePath;
+  std::string  sPath = (servicePath.empty())? SERVICE_PATH_ROOT : servicePath;
 
   reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 
@@ -87,34 +78,15 @@ HttpStatusCode mongoRegisterContext
   }
 
   /* It is not a new registration, so it must be an update */
-  BSONObj      reg;
-  std::string  err;
-  OID          id;
+  orion::BSONObj  reg;
+  std::string     err;
+  orion::OID      id = orion::OID(requestP->registrationId.get());
 
-  if (!safeGetRegId(requestP->registrationId, &id, &(responseP->errorCode)))
-  {
-    reqSemGive(__FUNCTION__, "ngsi9 register request (safeGetRegId fail)", reqSemTaken);
-    responseP->registrationId = requestP->registrationId;
-    ++noOfRegistrationUpdateErrors;
+  orion::BSONObjBuilder bob;
+  bob.append("_id", id);
+  bob.append(REG_SERVICE_PATH, sPath);
 
-    if (responseP->errorCode.code == SccContextElementNotFound)
-    {
-      // FIXME: doubt: invalid OID format?
-      std::string details = std::string("invalid OID format: '") + requestP->registrationId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
-    }
-    else  // SccReceiverInternalError
-    {
-      LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
-    }
-
-    return SccOk;
-  }
-
-  const std::string    colName  = getRegistrationsCollectionName(tenant);
-  const mongo::BSONObj bson     = BSON("_id" << id << REG_SERVICE_PATH << sPath);
-
-  if (!collectionFindOne(colName, bson, &reg, &err))
+  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_REGISTRATIONS, bob.obj(), &reg, &err) && (err != ""))
   {
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);

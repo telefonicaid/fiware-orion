@@ -49,32 +49,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            },
-            {
-              "name": "cm2",
-              "type": "string",
-              "value": "XXX"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
-        },
-        {
-          "name": "ID2",
-          "type": "string",
-          "value": "212"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"

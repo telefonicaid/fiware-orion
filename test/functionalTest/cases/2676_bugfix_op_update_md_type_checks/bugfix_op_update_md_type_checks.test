@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Update using md type with not plain ASCII and see error"
 echo "==========================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -68,7 +68,7 @@ echo
 echo "02. Update using empty md type and see error"
 echo "============================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -95,7 +95,7 @@ echo
 echo "03. Update using md type exceding length and see error"
 echo "======================================================"
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {
@@ -122,7 +122,7 @@ echo
 echo "04. Update using md type with forbidden chars and see error"
 echo "============================================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities":
   [
     {

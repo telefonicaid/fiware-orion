@@ -33,6 +33,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
@@ -85,9 +86,9 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 
 /* ****************************************************************************
 *
-* StatusCode::render -
+* StatusCode::toJsonV1 -
 */
-std::string StatusCode::render(bool comma, bool showKey)
+std::string StatusCode::toJsonV1(bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -109,9 +110,9 @@ std::string StatusCode::render(bool comma, bool showKey)
 
   out += startTag(showKey? keyName : "");
   out += valueTag("code", code, true);
-  out += valueTag("reasonPhrase", reasonPhrase, details != "");
+  out += valueTag("reasonPhrase", reasonPhrase, !details.empty());
 
-  if (details != "")
+  if (!details.empty())
   {
     out += valueTag("details", details, false);
   }
@@ -127,43 +128,12 @@ std::string StatusCode::render(bool comma, bool showKey)
 *
 * StatusCode::toJson -
 *
-* For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
+* For version 2 of the API, based on OrionError.
 */
-std::string StatusCode::toJson(bool isLastElement)
+std::string StatusCode::toJson(void)
 {
-  std::string  out  = "";
-
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
-
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
-
-  char codeV[STRING_SIZE_FOR_INT];
-
-  snprintf(codeV, sizeof(codeV), "%d", code);
-
-  out += "{";
-
-  out += std::string("\"code\":\"") + codeV + "\"";
-  
-  if (details != "")
-  {
-    out += ",\"details\":\"" + details + "\"";
-  }
-
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  OrionError oe(code, details, reasonPhrase);
+  return oe.smartRender(V2);
 }
 
 
@@ -243,34 +213,12 @@ std::string StatusCode::check(void)
     return "no code";
   }
 
-  if (reasonPhrase == "")
+  if (reasonPhrase.empty())
   {
     return "no reason phrase";
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* StatusCode::present -
-*/
-void StatusCode::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%s%s:", 
-		    indent.c_str(), 
-        keyName.c_str()));
-  LM_T(LmtPresent, ("%s  Code:            %d",   
-		    indent.c_str(), 
-		    code));
-  LM_T(LmtPresent, ("%s  ReasonPhrase:    '%s'", 
-		    indent.c_str(), 
-		    reasonPhrase.c_str()));
-  LM_T(LmtPresent, ("%s  Detail:          '%s'", 
-		    indent.c_str(), 
-		    details.c_str()));
 }
 
 

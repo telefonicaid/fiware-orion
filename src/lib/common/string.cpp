@@ -24,10 +24,10 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <string>
 #include <vector>
-#include <math.h>    // modf
+#include <algorithm>  // find
+#include <math.h>     // modf
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -162,7 +162,7 @@ bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort
 *
 * stringSplit - 
 */
-int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV)
+int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV, bool unique)
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
@@ -201,7 +201,11 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
   // 4. pick up all components
   for (int ix = 0; ix < components; ix++)
   {
-    outV.push_back(start);
+    // If unique is true, we need to ensure the element hasn't been added previousy in order to add it
+    if ((!unique) || (std::find(outV.begin(), outV.end(), std::string(start)) == outV.end()))
+    {
+      outV.push_back(start);
+    }
     start = &start[strlen(start) + 1];
   }
 
@@ -337,7 +341,7 @@ static bool hostnameIsValid(const char* hostname)
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
   /* Sanity check */
-  if (url == "")
+  if (url.empty())
   {
     return false;
   }
@@ -369,12 +373,12 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   //
   // Ensuring the host is present
   //
-  if ((urlTokens.size() < 3) || (urlTokens[2] == ""))
+  if ((urlTokens.size() < 3) || (urlTokens[2].empty()))
   {
     return false;
   }
 
-  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
+  if ((components < 3) || (components == 3 && urlTokens[2].empty()))
   {
     return false;
   }
@@ -389,7 +393,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     path += "/" + urlTokens[ix];
   }
 
-  if (path == "")
+  if (path.empty())
   {
     /* Minimum path is always "/" */
     path = "/";
@@ -432,7 +436,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     if (components == 2)
     {
       /* Sanity check (corresponding to http://xxxx:/path) */
-      if (hostTokens[1].length() == 0)
+      if (hostTokens[1].empty())
       {
         return false;
       }
@@ -752,6 +756,29 @@ double atoF(const char* string, std::string* errorMsg)
 
 /* ****************************************************************************
 *
+* atoUL -
+*/
+unsigned long atoUL(const char* string, std::string* errorMsg)
+{
+  // Initially I tryed with stroul() but it doesn't worked... so I'm using strol() plus
+  // explicity checking for positive number
+  char *ptr;
+  long value = strtol (string, &ptr, 0);
+  if (string == ptr)
+  {
+    *errorMsg = "parsing error";
+  }
+  if (value < 0)
+  {
+    *errorMsg = "negative number";
+  }
+  return (unsigned long) value;
+}
+
+
+
+/* ****************************************************************************
+*
 * strToLower - 
 */
 char* strToLower(char* to, const char* from, int toSize)
@@ -926,134 +953,111 @@ bool str2double(const char* s, double* dP)
 
 /* ****************************************************************************
 *
-* decimalDigits
-*
-* This function counts the number of decimal digits of a given float, to a maximum of
-* PRECISION_DIGITS. The algorithm is inspired in http://stackoverflow.com/a/1083316/1485926
-* but with a "cutting condition" needed due to float representation may have an infinite
-* number of decimals, e.g. 3.14 could be internally coded as 3.1399999.
-*
-* FIXME #2425: this function is not perfect and could be improved. For example,
-* considering the following
-*
-*   "A1":  42.9,
-*   "A2":  42.99,
-*   "A3":  42.999,
-*   "A4":  42.9999,
-*   "A5":  42.99999,
-*   "A6":  42.999999,
-*   "A7":  42.9999999,
-*   "A8":  42.99999999,
-*   "A9":  42.999999999,
-*   "A10": 42.9999999999,,
-*
-*   "A1":  42.1,
-*   "A2":  42.01,
-*   "A3":  42.001,
-*   "A4":  42.0001,
-*   "A5":  42.00001,
-*   "A6":  42.000001,
-*   "A7":  42.0000001,
-*   "A8":  42.00000001,
-*   "A9":  42.000000001,
-*   "A10": 42.0000000001,
-*
-* what we get is:
-*
-*   "A1":  42.9,
-*   "A2":  42.99,
-*   "A3":  42.999,
-*   "A4":  42.9999,
-*   "A5":  42.99999,
-*   "A6":  42.999999000, (fail)
-*   "A7":  42.999999900, (fail)
-*   "A8":  42.999999990, (fail)
-*   "A9":  42.999999999,
-*   "A10": 43.000000000, (fail, although probably not due to this function but the caller)
-*
-*   "A1":  42.1,
-*   "A2":  42.01,
-*   "A3":  42.001,
-*   "A4":  42.0001,
-*   "A5":  42.00001,
-*   "A6":  42.000001000, (fail)
-*   "A7":  42.000000100, (fail)
-*   "A8":  42.000000010, (fail)
-*   "A9":  42,           (fail)
-*   "A10": 42,
+* double2string
 *
 */
-unsigned int decimalDigits(double d)
+std::string double2string(double f)
 {
-  unsigned int digits = 0;
+  char  buf[STRING_SIZE_FOR_DOUBLE];
+  int bufSize = sizeof(buf);
 
-  double intPart;
-  double decimalPart = fabs(modf(d, &intPart));
+  long long  intPart   = (long long) f;
+  double     diff      = f - intPart;
+  bool       isInteger = false;
 
-  while (decimalPart > PRECISION)
+  // abs value for 'diff'
+  diff = (diff < 0)? -diff : diff;
+
+  if (diff > 0.9999999998)
   {
-    digits++;
-    decimalPart *= 10;
-    decimalPart = modf(decimalPart, &intPart);
-    if (fabs(1 - decimalPart ) < PRECISION)
-    {
-      // Using a greater threshold (e.g. 0.01) would cause rounding errors,
-      // e.g. 42.9999 -> 43. This can be easily checked with the
-      // cases/2176_not_print_spurious_decimals/one_to_nine_decimals.test test
-      // (try to use PRECISION * 10 and check how the test fails).
-      //
-      break;
-    }
+    intPart += 1;
+    isInteger = true;
+  }
+  else if (diff < 0.000000001)  // it is considered an integer
+  {
+    isInteger = true;
   }
 
-  if (digits > PRECISION_DIGITS)
+  if (isInteger)
   {
-    return PRECISION_DIGITS;
+    snprintf(buf, bufSize, "%lld", intPart);
   }
   else
   {
-    return digits;
-  }
-}
+    snprintf(buf, bufSize, "%.9f", f);
 
+    // Clear out any unwanted trailing zeroes
+    char* last = &buf[strlen(buf) - 1];
 
-/* ****************************************************************************
-*
-* toString
-*
-* Specialized version of the template for the double type
-*/
-template <> std::string toString(double f)
-{
-  std::ostringstream ss;
-
-  unsigned int digits = decimalDigits(f);
-  if (digits > 0)
-  {
-    ss << std::fixed << std::setprecision(digits);
+    while ((*last == '0') && (last != buf))
+    {
+      *last = 0;
+      --last;
+    }
   }
 
-  ss << f;
-
-  return ss.str();
+  return std::string(buf);
 }
+
 
 
 /*****************************************************************************
 *
 * isodate2str -
 *
-* FIXME P6: change implementation to use gmtime_r
-*
 */
-std::string isodate2str(long long timestamp)
+std::string isodate2str(double timestamp)
 {
   // 80 bytes is enough to store any ISO8601 string safely
   // We use gmtime() to get UTC strings, otherwise we would use localtime()
-  // Date pattern: 1970-04-26T17:46:40.00Z
-  char   buffer[80];
-  time_t rawtime = (time_t) timestamp;
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
+  // Date pattern: 1970-04-26T17:46:40.000Z
+
+  char    buffer[80];
+
+  //
+  // About the added microsecond in  **int millis = (micros + 1) / 1000;**
+  //
+  // Floating point numbers are often a problem for a CPU, giving funny rounding errors.
+  // We've seen that e.g. the number 12.60 is stored as 12.599999999 and as here we cut
+  // the number it ends up as 12.59, which is no good ...
+  //
+  // Two choices here, either call some rounding function, or use a trick.
+  // The trick is to add a microsecond (we're only interested in milliseconds) and then cut.
+  //
+  // Assuming we have nine decimals: 12.599999999, adding a microsecond to this gives 12.600000999:
+  //
+  //  12.599999999 + 0.000001 == 12.600000999
+  //
+  // After that we cut it at three decimals and end up with 12.600.
+  //
+  // If instead the rounding error would go on the upper side, i.e. 12.60 would be 12.6000000001, adding that microsecond
+  // doesn't change anything. All still work just fine.
+  //
+  // Better example: what if we wish to store 12.599?
+  // A typical rounding error on the "upper side" would then be 12.599000001, and again, adding that microsecond after
+  // cutting doesn't change a thing.
+  //
+  //
+  // So, the "trick algorithm" is as follows:
+  //
+  // 1. Get the integer part of "double timestamp" - this cuts all decimals, no rounding is done,
+  //    and store it in the variable 'seconds'
+  // 2. Store the decimals in 'ms', by extracting the integer part ('seconds') from 'timestamp'
+  // 3. Convert the decimals into microseconds, by multiplicating with one million (1000000) - in the variable 'micros'.
+  // 4. Add a microsecond and then divide by one thousand - cutting all decimals
+  //
+  time_t  seconds   = (time_t) timestamp;
+  double  ms        = timestamp - (double) seconds;
+  int     micros    = ms * 1000000;
+  int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
+
+  // Unused, but needed to fullfill gmtime_r() signature
+  struct tm  tmP;
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime_r(&seconds, &tmP));
+
+  char* eob = &buffer[strlen(buffer)];
+  sprintf(eob, ".%03dZ", millis);
   return std::string(buffer);
 }
 
@@ -1085,3 +1089,19 @@ void toLowercase(char* s)
 }
 
 
+
+/* ****************************************************************************
+*
+* offuscatePassword -
+*/
+std::string offuscatePassword(const std::string& uri, const std::string& pwd)
+{
+  if ((pwd.empty()) || (uri.find(pwd) ==  std::string::npos))
+  {
+    return uri;
+  }
+
+  std::string s(uri);  // replace cannot be called in const std::string&
+  s.replace(uri.find(pwd), pwd.length(), "******");
+  return s;
+}

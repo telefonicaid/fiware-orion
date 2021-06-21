@@ -43,14 +43,14 @@ class BatchQuery
 {
  public:
   Entities       entities;
-  StringList     attributeV;
+  StringList     attributeV;  // Deprecated
+  StringList     attrsV;
   ScopeVector    scopeV;
   StringList     metadataV;
 
   BatchQuery();
   ~BatchQuery();
 
-  void           present(const std::string& indent);
   void           release(void);
 };
 

@@ -65,7 +65,6 @@ payload='{
          "id": "E1"
       }
     ],
-
     "providingApplication": "http://XXXlocalhostXXX:'${CP1_PORT}'/v1"
     }
   ],
@@ -88,7 +87,6 @@ payload='{
          "id": "E1"
       }
     ],
-
     "providingApplication": "http://XXXlocalhostXXX:'${CP1_PORT}'/v1"
     }
   ],
@@ -108,7 +106,6 @@ payload='{
       "type": "T1"
     }
   ]
-
 }'
 orionCurl --url /v1/queryContext --payload "$payload" --json
 echo

@@ -279,7 +279,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -342,7 +342,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -396,7 +396,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -458,13 +458,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 806
+Content-Length: 622
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -542,7 +542,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Update entity attribute
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -559,7 +558,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -622,7 +621,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -677,7 +676,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [
@@ -725,13 +724,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 530
+Content-Length: 484
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {
     "data": [

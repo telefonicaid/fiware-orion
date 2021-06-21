@@ -25,7 +25,7 @@ mq as URI param for metadata in filters
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 --cache
 accumulatorStart --pretty-print
 
 --SHELL--
@@ -401,13 +401,13 @@ Date: REGEX(.*)
 05b. GET subscription to see 'mq' correctly rendered
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: 442
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
@@ -417,6 +417,8 @@ Date: REGEX(.*)
         },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -475,7 +477,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Modify E1/A1, setting A1/M1=13
 ==================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -491,7 +492,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -518,7 +519,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update subscription, without really changing anything
 =========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

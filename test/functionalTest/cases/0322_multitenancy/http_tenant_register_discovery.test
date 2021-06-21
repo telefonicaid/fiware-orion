@@ -46,8 +46,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature01",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -76,8 +75,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature02",
-          "type": "degree",
-          "isDomain": "false"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://localhost:1028/application"
@@ -153,7 +151,7 @@ Date: REGEX(.*)
 3. Discover entity E with HTTP-Tenant t_01
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,7 +162,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature01",
                         "type": "degree"
                     }
@@ -186,7 +183,7 @@ Date: REGEX(.*)
 4. Discover entity E with HTTP-Tenant t_02
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 233
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +194,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "temperature02",
                         "type": "degree"
                     }

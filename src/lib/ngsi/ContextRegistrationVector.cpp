@@ -47,9 +47,9 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::render -
+* ContextRegistrationVector::toJsonV1 -
 */
-std::string ContextRegistrationVector::render(bool comma)
+std::string ContextRegistrationVector::toJsonV1(bool comma)
 {
   std::string  out = "";
 
@@ -62,28 +62,12 @@ std::string ContextRegistrationVector::render(bool comma)
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ix != vec.size() - 1, true);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
   }
 
   out += endTag(comma, comma);
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationVector::present -
-*/
-void ContextRegistrationVector::present(const std::string& indent)
-{
-  LM_T(LmtPresent, ("%lu ContextRegistrations", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
 }
 
 

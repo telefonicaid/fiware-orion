@@ -47,6 +47,7 @@ std::string parseEntityObject
   ConnectionInfo*                        ciP,
   rapidjson::Value::ConstValueIterator&  valueP,
   Entity*                                eP,
+  bool                                   idPatternAllowed,
   bool                                   attrsAllowed
 )
 {
@@ -81,13 +82,17 @@ std::string parseEntityObject
 
       eP->id = iter->value.GetString();
 
-      if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
+      if (forbiddenIdChars(V2, eP->id.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
     }
     else if (name == "idPattern")
     {
+      if (idPatternAllowed == false)
+      {
+        return ERROR_NOTIMPLEMENTED;
+      }
       if (type != "String")
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN;
@@ -118,7 +123,7 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
-      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
+      if (forbiddenIdChars(V2, eP->type.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
@@ -164,5 +169,5 @@ std::string parseEntityObject
     }
   }
 
-  return eP->check(ciP->apiVersion, ciP->requestType);
+  return eP->check(V2, ciP->requestType);
 }

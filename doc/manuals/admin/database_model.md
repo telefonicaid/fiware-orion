@@ -4,7 +4,6 @@
 * [entities collection](#entities-collection)
 * [registrations collection](#registrations-collection)
 * [csubs collection](#csubs-collection)
-* [casubs collection](#casubs-collection)
 
 ## Introduction
 
@@ -57,34 +56,40 @@ Fields:
     -   **mdNames**: an array of strings. Its elements are the names of the
         metadata of the attribute. Here the "." to "="
         replacement is not done.
-    -   **creDate**: the timestamp corresponding to attribute creation
-        (as a consequence of append).
-    -   **modDate**: the timestamp corresponding to last
-        attribute update. It matches creDate if the attribute has not been
-        modified after creation.
+    -   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+        corresponding to attribute creation (as a consequence of append).
+    -   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+        corresponding to last attribute update. It matches creDate if the attribute has
+        not been modified after creation.
 -   **attrNames**: an array of strings. Its elements are the names of the
     attributes of the entity (without IDs). In this case, the "." to "="
     replacement is not done.
--   **creDate**: the timestamp corresponding
-    to entity creation date (as a consequence of append).
--   **modDate**: the timestamp corresponding to last entity update. Note
-    that it uses to be the same that a modDate corresponding to at least
-    one of the attributes (not always: it will not be the same if the
-    last update was a DELETE operation). It matches creDate if the
-    entity has not been modified after creation.
+-   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+    corresponding to entity creation date (as a consequence of append).
+-   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+    corresponding to last entity update. Note that it is usually the same as a
+    modDate corresponding to at least one of the attributes (not always: it will
+    not be the same if the last update was a DELETE operation). It matches creDate
+    if the entity has not been modified after creation.
 -   **location** (optional): geographic location of the entity, composed
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
         location in the attrs array
     -   **coords**: a GeoJSON representing the location of the entity. See
         below for more details.
--   **lastCorrelator**: value of the `Fiware-Correlator` header in the last
+-   **lastCorrelator**: value of the root correlator in the last
     update request on the entity. Used by the self-notification loop protection
-    logic.
+    logic. By *root correlator* we mean the value of the `Fiware-Correlator` request header
+    in the update request without any suffix. Eg. the root correlator
+    for `Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32`
+    is `f320136c-0192-11eb-a893-000c29df7908`.
+-   **expDate** (optional): expiration timestamp (as a Date object) for the
+    entity. Have a look to the [transient entities functionality](../user/transient_entities.md)
+    for more detail.  
 
 Regarding `location.coords` in can use several formats:
 
-* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+* Representing a point (the one used by geo:point):
 
 ```
 {
@@ -93,7 +98,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a line (the one used by NGSIv2 geo:line):
+* Representing a line (the one used by geo:line):
 
 ```
 {
@@ -102,7 +107,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+* Representing a polygon (the one used by geo:box and geo:polygon):
 
 ```
 {
@@ -136,8 +141,8 @@ Example document:
        "A1": {
            "type": "TA1",
            "value": "282",
-           "creDate" : 1389376081,
-           "modDate" : 1389376120,
+           "creDate" : 1389376081.8471954,
+           "modDate" : 1389376120.2154321,
            "md" : {
               "customMD1": {
                  "type" : "string",
@@ -153,19 +158,19 @@ Example document:
        "A2()ID101": {
            "type": "TA2",
            "value": "176",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
+           "creDate" : 1389376244.6651231,
+           "modDate" : 1389376244.6651231
        },
        "position": {
            "type": "location",
            "value": "40.418889, -3.691944",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
+           "creDate" : 1389376244.6651231,
+           "modDate" : 1389376244.6651231
        }
    },
    "attrNames": [ "A1", "A2", "position" ],
-   "creDate": 1389376081,
-   "modDate": 1389376244,
+   "creDate": 1389376081.8471954,
+   "modDate": 1389376244.6651231,
    "location": {
        "attrName": "position",
        "coords": {
@@ -180,7 +185,7 @@ Example document:
 
 ## registrations collection
 
-The *registrations* collection stores information about NGSI9
+The *registrations* collection stores information about
 registrations. Each document in the collection corresponds to a
 registration.
 
@@ -191,21 +196,18 @@ Fields:
     we ensure that registration IDs are unique and that queries by
     registration IDs will be very fast (as there is an automatic default
     index in \_id).
--   **format**: the format to use to send forwarded requests. The only accepted value for now
-    is **JSON** (meaning NGSIv1 format), although this
-    may change in the future (see [issue about NGSIv2-based forwarding](https://github.com/telefonicaid/fiware-orion/issues/3068)).
+-   **format**: the format to use to send forwarded requests.
+    For NGSIv1 format, use **JSON** as value for `format`.
+    For NGSIv2, as of today, only **normalized** format is supported.
 -   **servicePath**: related with [the service
     path](../user/service_path.md) functionality.
 -   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).
     The default status (i.e. if the document omits this field) is "active".
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
--   **expiration**: this is the timestamp for which the
-    registration expires. The expiration is calculated using the
-    duration parameter included in the registerContext operation
-    (basically, sum "now" and duration) and will be recalculated when a
-    registerContext for updating (i.e. using a not null registration ID
-    in the request) is received (see [programmers
-    guide](../user/duration.md)).
+-   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
+    registration expires.
+-   **fwdMode**: the forwarding mode supported by the provider, either: `all`, `query`, `update` or `none`.
+    If ommited (Orion versions previous to 2.6.0), `all` is assumed.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -214,8 +216,7 @@ Fields:
         reasons, **isPattern** may be `"true"` or `"false"` (text) while
         **isTypePattern** may be `true` or `false` (boolean).
     -   **attrs**: an array containing a list of attributes (optional).
-        The JSON for each attribute contains **name**, **type** and
-        **isDomain**.
+        The JSON for each attribute contains **name** and **type**.
     -   **providingApplication**: the URL of the providing application
         for this registration (mandatory)
 
@@ -225,6 +226,7 @@ Example document:
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
    "format": "JSON",
+   "fwdMode": "all",
    "expiration": 1360232760,
    "contextRegistration": [
        {
@@ -243,13 +245,11 @@ Example document:
            "attrs": [
                {
                    "name": "A1",
-                   "type": "TA1",
-                   "isDomain": "false"
+                   "type": "TA1"
                },
                {
                    "name": "A2",
-                  "type": "TA2",
-                   "isDomain": "true"
+                   "type": "TA2"
                }
            ],
            "providingApplication": "http://foo.bar/notif"
@@ -262,7 +262,7 @@ Example document:
 
 ## csubs collection
 
-The *csubs* collection stores information about NGSI10 subscriptions.
+The *csubs* collection stores information about context subscriptions.
 Each document in the collection corresponds to a subscription.
 
 Fields:
@@ -276,14 +276,10 @@ Fields:
     path](../user/service_path.md) functionality. This is the service path
     associated to the query "encapsulated" by the subscription. Default
     is `/#`.
--   **expiration**: this is the timestamp on which the
-    subscription expires. This is calculated using the duration
-    parameter included in the subscribeContext operation (basically, sum
-    "now" and duration) and will be recalculated when an
-    updateContextSubscription is received (see [programmers
-    guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
+-   **expiration**: this is the timestamp (as integer number, meaning seconds) on which the
+    subscription expires. For permanent subscriptions
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
--   **lastNotification**: the time when last notification was sent. This
+-   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
@@ -295,6 +291,9 @@ Fields:
 -   **blacklist**: a boolean field that specifies if `attrs` has to be interpreted
     as a whitelist (if `blacklist` is equal to `false` or doesn't exist) or a
     blacklist (if `blacklist` is equal to `true`).
+-   **onlyChanged**: a boolean field that specifies if only attributes that change has 
+    to be included in notifications (if onlyChanged is equal to true) or not (if 
+    onlyChanged is equal to false or doesn't exist).
 -   **metadata**: an array of metadata names (strings) (optional).
 -   **conditions**: a list of attributes that trigger notifications.
 -   **expression**: an expression used to evaluate if notifications has
@@ -303,7 +302,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
@@ -313,9 +312,14 @@ Fields:
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
--   **lastFailure**: the time when last notification failure occurred.
+-   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
--   **lastSuccess**: the time when last successful notification occurred.
+-   **lastFailureReason**: text describing the cause of the last failure.
+    Not present if the subscription has never failed.
+-   **lastSuccess**: the (as integer number, meaning seconds) time when last successful notification occurred.
+    Not present if the subscription has never provoked a successful notification.
+-   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
+    time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
 
 Example document:
@@ -349,64 +353,5 @@ Example document:
         "format" : "JSON",
         "status" : "active"
 }
-```
-[Top](#top)
-
-## casubs collection
-
-The *casubs* collection stores information about NGSI9 subscriptions.
-Each document in the collection corresponds to a subscription.
-
-Fields:
-
--   **\_id** is the subscription ID (the value that is provided to the
-    user to update and cancel the subscription). Given that we use \_id
-    for this, we ensure that subscription IDs are unique and that
-    queries by subscription IDs are very fast (as there is an automatic
-    default index in \_id).
--   **expiration**: this is the timestamp on which the subscription
-    will expire. It is calculated using the duration parameter included
-    in the subscribeContextAvailability operation (basically, sum "now"
-    and duration) and will be recalculated when an
-    updateContextAvailabilitySubscription is received (see [programmers
-    guide](../user/duration.md)).
--   **reference**: the URL to send notifications
--   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type** and **isPattern**.
--   **attrs**: an array of attribute names (strings) (optional).
--   **lastNotification**: timestamp corresponding to the last
-    notification sent associated to a given subscription.
--   **count**: the number of notifications sent associated to
-    the subscription.
--   **format**: the format to use to send notification, currently "JSON"
-    meaning JSON notifications in NGSIv1 format.
-
-Example document:
-
-```
- {
-   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
-   "expiration": 1360236300,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E5",
-           "type": "T5",
-           "isPattern": "false"
-       },
-       {
-           "id": "E6",
-           "type": "T6",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-       "A1",
-       "A2"
-   ],
-   "lastNotification" : 1381132312,
-   "count": 42,
-   "format": "JSON"
- }
 ```
 [Top](#top)

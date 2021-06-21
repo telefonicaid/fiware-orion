@@ -93,19 +93,18 @@ static void addContextProviderEntity
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->contextElement.entityId.id == enP->id) && (cerV[ix]->contextElement.entityId.type == enP->type))
+    if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
     {
-      cerV[ix]->contextElement.providingApplicationList.push_back(pa);
+      cerV[ix]->entity.providingApplicationList.push_back(pa);
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
 
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
-  ContextElementResponse* cerP            = new ContextElementResponse();
-  cerP->contextElement.entityId.id        = enP->id;
-  cerP->contextElement.entityId.type      = enP->type;
-  cerP->contextElement.entityId.isPattern = "false";
-  cerP->contextElement.providingApplicationList.push_back(pa);
+  ContextElementResponse* cerP = new ContextElementResponse();
+
+  cerP->entity.fill(enP->id, enP->type, enP->isPattern);
+  cerP->entity.providingApplicationList.push_back(pa);
 
   cerP->statusCode.fill(SccOk);
   cerV.push_back(cerP);
@@ -131,18 +130,20 @@ static void addContextProviderAttribute
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->contextElement.entityId.id != enP->id) || (cerV[ix]->contextElement.entityId.type != enP->type))
+    if ((cerV[ix]->entity.id != enP->id) || (cerV[ix]->entity.type != enP->type))
     {
      continue;
     }
 
-    for (unsigned int jx = 0; jx < cerV[ix]->contextElement.contextAttributeVector.size(); ++jx)
+    for (unsigned int jx = 0; jx < cerV[ix]->entity.attributeVector.size(); ++jx)
     {
-      std::string attrName = cerV[ix]->contextElement.contextAttributeVector[jx]->name;
+      std::string attrName = cerV[ix]->entity.attributeVector[jx]->name;
 
       if (attrName == craP->name)
       {
         /* In this case, the attribute has been already found in local database. CPr is unnecessary */
+
+        // FIXME PR: This breaks the test - the providerFormat is never set and the default value (currently V1) is still valid
         return;
       }
     }
@@ -151,8 +152,7 @@ static void addContextProviderAttribute
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
 
     caP->providingApplication = pa;
-    cerV[ix]->contextElement.contextAttributeVector.push_back(caP);
-
+    cerV[ix]->entity.attributeVector.push_back(caP);
     return;
   }
 
@@ -161,17 +161,13 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->contextElement.entityId.id        = enP->id;
-    cerP->contextElement.entityId.type      = enP->type;
-    cerP->contextElement.entityId.isPattern = "false";
-
+    cerP->entity.fill(enP->id, enP->type, enP->isPattern);
     cerP->statusCode.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
 
     caP->providingApplication = pa;
-    cerP->contextElement.contextAttributeVector.push_back(caP);
-
+    cerP->entity.attributeVector.push_back(caP);
     cerV.push_back(cerP);
   }
 }
@@ -225,8 +221,9 @@ static void addContextProviders
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
     ContextRegistration cr = crrV[ix]->contextRegistration;
+    cr.providingApplication.setRegId(crrV[ix]->regId);
 
-    /* In the case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
+    /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP))
     {
       continue;
@@ -284,7 +281,7 @@ static void processGenericEntities
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type == "" || isTrue(enP->isPattern))
+    if (enP->type.empty() || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
     }
@@ -295,14 +292,14 @@ static void processGenericEntities
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* mongoQueryContext -
 *
 * NOTE
 *   If the in/out-parameter countP is non-NULL then the number of matching entities
 *   must be returned in *countP.
 *
 *   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
-*   The old method was one-way, using the new method 
+*   The old method was one-way, using the new method
 */
 HttpStatusCode mongoQueryContext
 (
@@ -336,35 +333,10 @@ HttpStatusCode mongoQueryContext
   bool                         reqSemTaken;
   ContextElementResponseVector rawCerV;
 
-  //
-  // dateCreated and dateModified options are still supported although deprecated.
-  // Note that we check for attr list emptyness, as in that case the "*" needs
-  // to be added to print also user attributes
-  //
-  if (options[DATE_CREATED])
-  {
-    if (requestP->attributeList.size() == 0)
-    {
-      requestP->attributeList.push_back(ALL_ATTRS);
-    }
-
-    requestP->attributeList.push_back(DATE_CREATED);
-  }
-
-  if (options[DATE_MODIFIED])
-  {
-    if (requestP->attributeList.size() == 0)
-    {
-      requestP->attributeList.push_back(ALL_ATTRS);
-    }
-
-    requestP->attributeList.push_back(DATE_MODIFIED);
-  }
-
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
-                     requestP->metadataList,
                      requestP->restriction,
                      &rawCerV,
                      &err,
@@ -392,7 +364,7 @@ HttpStatusCode mongoQueryContext
   /* In the case of empty response, if only generic processing is needed */
   if (rawCerV.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -406,7 +378,7 @@ HttpStatusCode mongoQueryContext
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -418,12 +390,12 @@ HttpStatusCode mongoQueryContext
     crrV.release();
   }
 
-  /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
+  /* Second CPr lookup (in the case some elements still not being found): looking in E-<null> registrations */
   StringList attrNullList;
 
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, attrNullList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -435,12 +407,12 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
-   * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
+   * the list needs to be completed. Note that in the case of having this request someContextElementNotFound() is always false
    * so we efficient not invoking registrationQuery() too much times
    */
   if (requestP->attributeList.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -452,7 +424,7 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Prune "not found" CERs */
-  pruneContextElements(rawCerV, &responseP->contextElementResponseVector);
+  pruneContextElements(apiVersion, requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
 
   /* Pagination stuff */
   if (responseP->contextElementResponseVector.size() == 0)

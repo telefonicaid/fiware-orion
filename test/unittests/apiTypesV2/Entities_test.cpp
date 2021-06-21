@@ -29,33 +29,6 @@
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Entities, present)
-{
-  utInit();
-
-  Entity* enP    = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-
-  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
-  enP->attributeVector.push_back(caP);
-
-  Entities ens;
-  ens.vec.push_back(enP);
-  ens.oe.fill(SccNone, "Lorem ipsum", "FooError");
-
-  ens.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check
 */
 TEST(Entities, check)
@@ -80,8 +53,8 @@ TEST(Entities, check)
   Entities ens2;
   ens2.vec.push_back(enP);
 
-  EXPECT_EQ("OK", ens1.check(V1, EntitiesRequest));
-  EXPECT_EQ("No Entity ID", ens2.check(V1, EntitiesRequest));
+  EXPECT_EQ("OK", ens1.check(EntitiesRequest));
+  EXPECT_EQ("entity id length: 0, min length supported: 1", ens2.check(EntitiesRequest));
 
   utExit();
 }

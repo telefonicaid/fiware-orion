@@ -1,29 +1,42 @@
 # Deprecated functionality
 
 Deprecated features are features that Orion stills support but that are
-not mantained or evolved any longer. In particular:
+not maintained or evolved any longer. In particular:
 
 -   Bugs or issues related with deprecated features and not affecting
     any other feature are not addressed (they are closed in github.com
     as soon as they are spotted).
 -   Documentation on deprecated features is removed from the repository documentation.
     Documentation is still available in the documentation set associated to older versions
-    (either in the respository release branches or the pre-0.23.0 documentation in the FIWARE wiki).
+    (either in the repository release branches or the pre-0.23.0 documentation in the FIWARE wiki).
 -   Deprecated functionality is eventually removed from Orion. Thus you
     are strongly encouraged to change your implementations using Orion
     in order not rely on deprecated functionality.
 
 A list of deprecated features and the version in which they were deprecated follows:
 
-
-* Metadata ID is deprecated in Orion 1.13.0. On the one hand, this functionality is not compatible with the
+* Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0 (removed in Orion 2.3.0).
+* NGSIv1 API (along with related CLI parameters: `-strictNgsiv1Ids` and `-ngsiv1Autocast`) in Orion 2.0.0.
+  Use NGSIv2 API instead.
+    * Context availability subscriptions (AKA NGSI9 subscriptions), as part of NGSIv1, in Orion 2.0.0
+      (removed in Orion 2.6.0)
+* `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
+  which attributes to include in the response to the query) and unary attribute filter in `q` within
+  `expression` (to return only entities which have these attributes). Use them instead.
+* Usage of that is `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE` and `REPLACE` in `POST /v2/op/update` is
+  deprecated in Orion 1.14.0. Use `append`, `appendStrict`, `update`, `delete` and `replace` counterparts.
+* Metadata ID is deprecated in Orion 1.13.0 (removed in Orion 2.2.0). On the one hand, this functionality is not compatible with the
   NGSIv2 JSON representation format (attribute names are used as keys in a JSON object, so names cannot be
   duplicated). On the other hand, IDs can easily be implemented using prefixes/suffixes in attribute names,
   e.g. `temperature:ground` and `temperature:ceiling`. As a consecuence of this deprecation, the following
   operations are also deprecated:
-        * `GET /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-        * `PUT /v1/contextEntities/Room1/attributes/{attrName}/{id}`
-        * `DELETE /v1/contextEntities/Room1/attributes/{attrName}/{id}`
+	* `GET /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `GET /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `POST /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `PUT /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `PUT /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
+	* `DELETE /v1/contextEntities/{entityId}/attributes/{attrName}/{attrId}`
+	* `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * The usage of `options` URL parameter in order to include `dateCreated` and/or `dateModified`
   attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
@@ -53,7 +66,7 @@ Although you are encouraged to use always the newest Orion version, take into ac
 information in the case you want to use old versions:
 
 * Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/6/x86_64).
-* Code correponding to old releases (since Orion 0.8.1, the first one available as open source) is
+* Code corresponding to old releases (since Orion 0.8.1, the first one available as open source) is
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
 	* A tag, e.g. `0.23.0`. It points to the base version.
@@ -70,10 +83,15 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | Not yet defined                           | Not yet defined                 |
+| `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
+| `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
-| `id` metadata (and associated NGSIv1 operations)                           | 1.14.0                                    | Not yet defined                 |
+| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.5.2                                     | December 17th, 2020              |
+| Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
+| `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018             |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
 | CLI `--silent`                                                             | 0.28.0                                    | February 29th, 2016             |

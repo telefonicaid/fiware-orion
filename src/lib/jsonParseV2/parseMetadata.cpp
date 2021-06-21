@@ -98,12 +98,11 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       {
         compoundVector = (type == "Array")? true : false;
         mdP->valueType = orion::ValueTypeObject;  // Used both for Array and Object ...
-        std::string r  = parseMetadataCompoundValue(iter, mdP, NULL);
+        std::string r  = parseMetadataCompoundValue(iter, mdP, NULL, 0);
 
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json parse error in Metadata compound value");
-          return "json parse error in Metadata compound value";
+          return r;
         }
       }
       else
@@ -120,8 +119,8 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
     }
   }
 
-  // Is it a date?
-  if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
+  // Is it a (not null) date?
+  if (((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT)) && (mdP->valueType != orion::ValueTypeNull))
   {
     mdP->numberValue =  parse8601Time(mdP->stringValue);
 
@@ -160,7 +159,5 @@ std::string parseMetadata(const rapidjson::Value& val, Metadata* mdP)
     return "metadata must be a JSON object";
   }
 
-  s = parseMetadataObject(val, mdP);
-
-  return s;
+  return parseMetadataObject(val, mdP);
 }

@@ -33,8 +33,8 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseStringList.h"
-#include "jsonParseV2/parseScopeVector.h"
 #include "jsonParseV2/parseBatchUpdate.h"
+#include "orionTypes/UpdateActionType.h"
 
 
 
@@ -101,10 +101,19 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
     if (name == "entities")
     {
-      // param 4 for parseEntityVector(): attributes are allowed in payload
-      std::string r = parseEntityVector(ciP, iter, &burP->entities, true);
+      // param 4 to parseEntityVector(): idPattern is not allowed in batch updates
+      // param 5 for parseEntityVector(): attributes are allowed in payload
+      std::string r = parseEntityVector(ciP, iter, &burP->entities, false, true);
 
-      if (r != "OK")
+      if (r == "NotImplemented")
+      {
+        alarmMgr.badInput(clientIp, r);
+        oe.fill(SccNotImplemented, r, "NotImplemented");
+        ciP->httpStatusCode = SccNotImplemented;
+        r = oe.toJson();
+        return r;
+      }
+      else if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
@@ -115,15 +124,19 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     }
     else if (name == "actionType")
     {
-      burP->updateActionType.set(iter->value.GetString());
-      std::string err = burP->updateActionType.check();
-      if (err != "OK")
+      ActionType actionType;
+      if ((actionType = parseActionTypeV2(iter->value.GetString())) == ActionTypeUnknown)
       {
-        alarmMgr.badInput(clientIp, err);
-        oe.fill(SccBadRequest, err, "BadRequest");
+        std::string details = "invalid update action type: right ones are: "
+          "append, appendStric, delete, replace, update";
+
+        alarmMgr.badInput(clientIp, details);
+        oe.fill(SccBadRequest, details, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;
+
         return oe.toJson();
       }
+      burP->updateActionType = actionType;
     }
     else
     {

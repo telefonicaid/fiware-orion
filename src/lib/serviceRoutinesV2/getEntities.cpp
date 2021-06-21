@@ -36,6 +36,7 @@
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -61,6 +62,8 @@
 *   - geometry
 *   - coords
 *   - georel
+*   - attrs
+*   - metadata
 *   - options=keyValues
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN
@@ -92,7 +95,7 @@ std::string getEntities
   std::string  georel      = ciP->uriParam["georel"];
   std::string  out;
 
-  if ((idPattern != "") && (id != ""))
+  if ((!idPattern.empty()) && (!id.empty()))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", "BadRequest");
 
@@ -100,7 +103,7 @@ std::string getEntities
     ciP->httpStatusCode = oe.code;
     return answer;
   }
-  else if (id != "")
+  else if (!id.empty())
   {
     pattern = "";
 
@@ -124,12 +127,12 @@ std::string getEntities
       pattern += idsV[ix] + "$";
     }
   }
-  else if (idPattern != "")
+  else if (!idPattern.empty())
   {
     pattern   = idPattern;
   }
 
-  if ((typePattern != "") && (type != ""))
+  if ((!typePattern.empty()) && (!type.empty()))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
 
@@ -141,7 +144,7 @@ std::string getEntities
   //
   // Making sure geometry, georel and coords are not used individually
   //
-  if ((coords != "") && (geometry == ""))
+  if ((!coords.empty()) && (geometry.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
 
@@ -149,7 +152,7 @@ std::string getEntities
     ciP->httpStatusCode = oe.code;
     return out;
   }
-  else if ((geometry != "") && (coords == ""))
+  else if ((!geometry.empty()) && (coords.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
 
@@ -158,7 +161,7 @@ std::string getEntities
     return out;
   }
 
-  if ((georel != "") && (geometry == ""))
+  if ((!georel.empty()) && (geometry.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
 
@@ -175,7 +178,7 @@ std::string getEntities
   // - georel
   // - coords
   //
-  if (geometry != "")
+  if (!geometry.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
@@ -204,7 +207,7 @@ std::string getEntities
   // The plain q-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (q != "")
+  if (!q.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
@@ -233,7 +236,7 @@ std::string getEntities
   // The plain mq-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (mq != "")
+  if (!mq.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
     std::string  errorString;
@@ -268,7 +271,7 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (idPattern != "" || pattern == ".*");
+    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
     EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
 
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
@@ -299,28 +302,45 @@ std::string getEntities
     }
   }
 
+  // Get attrs and metadata filters from URL params
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
-  // 03. Render Entities response
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+  // 03. Check Internal Errors
+  if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
+  {
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
+  }
+  // 04. Render Entities response
+  else if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
     ciP->httpStatusCode = SccOk;
     answer = "[]";
   }
   else
   {
-    entities.fill(&parseDataP->qcrs.res);
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
 
-    if (entities.oe.code != SccNone)
+    if (oe.code != SccNone)
     {
-      TIMED_RENDER(answer = entities.oe.toJson());
-      ciP->httpStatusCode = entities.oe.code;
+      TIMED_RENDER(answer = oe.toJson());
+      ciP->httpStatusCode = oe.code;
     }
     else
     {
-      TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
+      // Filtering again attributes may seem redundant, but it will prevent
+      // that faulty CPrs inject attributes not requested by client
+      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                            parseDataP->qcr.res.attrsList.stringV,
+                                            false,
+                                            parseDataP->qcr.res.metadataList.stringV));
       ciP->httpStatusCode = SccOk;
     }
   }

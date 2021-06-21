@@ -47,7 +47,7 @@ payload='{
     "value": 1
   }
 }'
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S")
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
@@ -55,11 +55,12 @@ echo
 
 echo "02. GET E1/A1, see dateCreated == dateModified"
 echo "=============================================="
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo "=============================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 
 if [ "$dateCreated" != "$dateModified" ]
 then
@@ -89,7 +90,7 @@ payload='{
     }
   }
 }'
-T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S")
 orionCurl --url /v2/entities/E1/attrs --payload "$payload"
 echo
 echo
@@ -97,11 +98,12 @@ echo
 
 echo "04. GET E1/A1, check dateModified and dateCreated"
 echo "================================================="
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo "================================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 
 if [ "$dateCreated" != "$T_0" ]
 then
@@ -183,7 +185,7 @@ Date: REGEX(.*)
 02. GET E1/A1, see dateCreated == dateModified
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -200,7 +202,7 @@ Date: REGEX(.*)
 }
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +222,6 @@ Date: REGEX(.*)
 03. Update E1/A1
 ================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -229,7 +230,7 @@ Date: REGEX(.*)
 04. GET E1/A1, check dateModified and dateCreated
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -246,7 +247,7 @@ Date: REGEX(.*)
 }
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -277,7 +278,7 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 401
+Content-Length: 266
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -314,7 +315,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Update E1/A1
 ================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -324,13 +324,13 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 402
+Content-Length: 267
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

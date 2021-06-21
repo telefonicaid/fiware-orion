@@ -35,7 +35,8 @@
 
 // FIXME P5: the following could be not necessary if we optimize the valueBson() thing. See
 // the next FIXME P5 comment in this file
-#include "mongoBackend/safeMongo.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/location.h"
 
@@ -45,8 +46,6 @@
 *
 * USING
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
 using orion::CompoundValueNode;
 
 
@@ -109,16 +108,41 @@ static bool stringArray2coords
 static bool getGeoJson
 (
   const ContextAttribute*  caP,
-  BSONObjBuilder*          geoJson,
+  orion::BSONObjBuilder*   geoJson,
   std::string*             errDetail,
   ApiVersion               apiVersion
 )
 {
-  std::vector<double>  coordLat;
-  std::vector<double>  coordLong;
-  BSONArrayBuilder     ba;
+  std::vector<double>      coordLat;
+  std::vector<double>      coordLong;
+  orion::BSONArrayBuilder  ba;
 
-  if ((apiVersion == V1) || (caP->type == GEO_POINT))
+  if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
+      (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
+  {
+    // This corresponds to the legacy way in NGSIv1 based in metadata
+    // The block is the same that for GEO_POINT but it is clearer if we keep it separated
+
+    double  aLat;
+    double  aLong;
+
+    if (!string2coords(caP->stringValue, aLat, aLong))
+    {
+      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
+      return false;
+    }
+
+    geoJson->append("type", "Point");
+
+    orion::BSONArrayBuilder ba;
+    ba.append(aLong);
+    ba.append(aLat);
+    geoJson->append("coordinates", ba.arr());
+
+    return true;
+  }
+
+  if (caP->type == GEO_POINT)
   {
     double  aLat;
     double  aLong;
@@ -130,17 +154,21 @@ static bool getGeoJson
     }
 
     geoJson->append("type", "Point");
-    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+
+    orion::BSONArrayBuilder ba;
+    ba.append(aLong);
+    ba.append(aLat);
+    geoJson->append("coordinates", ba.arr());
 
     return true;
   }
 
   if (caP->type == GEO_JSON)
   {
-    // Attribute value has to be object in this case
-    if ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject()))
+    // If attribute value is not null, then it has to be object in this case
+    if ((caP->valueType != orion::ValueTypeNull) && ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject())))
     {
-      *errDetail = "geo:json needs an object as value";
+      *errDetail = "geo:json needs an object or null as value";
       return false;
     }
 
@@ -154,10 +182,10 @@ static bool getGeoJson
      * Note that valueBson() puts the BSON object in the "value" field of the builder passed
      * as argument.
      */
-    BSONObjBuilder bo;
+    orion::BSONObjBuilder bo;
 
-    // Autocast doesn't make sense in this context
-    caP->valueBson(bo, "", false);
+    // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+    caP->valueBson(bo, "", true, apiVersion == V1);
     geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
@@ -190,14 +218,37 @@ static bool getGeoJson
       return false;
     }
 
-    ba.append(BSON_ARRAY(minLon << minLat));
-    ba.append(BSON_ARRAY(minLon << maxLat));
-    ba.append(BSON_ARRAY(maxLon << maxLat));
-    ba.append(BSON_ARRAY(maxLon << minLat));
-    ba.append(BSON_ARRAY(minLon << minLat));
+    orion::BSONArrayBuilder ba1;
+    orion::BSONArrayBuilder ba2;
+    orion::BSONArrayBuilder ba3;
+    orion::BSONArrayBuilder ba4;
+    orion::BSONArrayBuilder ba5;
+
+    ba1.append(minLon);
+    ba1.append(minLat);
+
+    ba2.append(minLon);
+    ba2.append(maxLat);
+
+    ba3.append(maxLon);
+    ba3.append(maxLat);
+
+    ba4.append(maxLon);
+    ba4.append(minLat);
+
+    ba5.append(minLon);
+    ba5.append(minLat);
+
+    ba.append(ba1.arr());
+    ba.append(ba2.arr());
+    ba.append(ba3.arr());
+    ba.append(ba4.arr());
+    ba.append(ba5.arr());
 
     geoJson->append("type", "Polygon");
-    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
+    orion::BSONArrayBuilder baContainer;
+    baContainer.append(ba.arr());
+    geoJson->append("coordinates", baContainer.arr());
 
     return true;
   }
@@ -205,7 +256,11 @@ static bool getGeoJson
   // geo:line and geo:polygon (different from geo:box) both build the coords array in the same way
   for (unsigned int ix = 0; ix < coordLat.size(); ix++)
   {
-    ba.append(BSON_ARRAY(coordLong[ix] << coordLat[ix]));
+    orion::BSONArrayBuilder ba1;
+    ba1.append(coordLong[ix]);
+    ba1.append(coordLat[ix]);
+
+    ba.append(ba1.arr());
   }
 
   if (caP->type == GEO_LINE)
@@ -242,7 +297,9 @@ static bool getGeoJson
     }
 
     geoJson->append("type", "Polygon");
-    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
+    orion::BSONArrayBuilder baContainer;
+    baContainer.append(ba.arr());
+    geoJson->append("coordinates", baContainer.arr());
 
     return true;
   }
@@ -270,7 +327,7 @@ bool processLocationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
   std::string*                   locAttr,
-  BSONObjBuilder*                geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe
@@ -284,12 +341,12 @@ bool processLocationAtEntityCreation
 
     std::string location = caP->getLocation(apiVersion);
 
-    if (location.length() == 0)
+    if (location.empty())
     {
       continue;
     }
 
-    if (locAttr->length() > 0)
+    if (!locAttr->empty())
     {
       *errDetail = "You cannot use more than one geo location attribute "
                    "when creating an entity [see Orion user manual]";
@@ -326,27 +383,18 @@ bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
-  mongo::BSONObjBuilder*         geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
   std::string subErr;
-
-  //
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // note that with the current logic, the name of the attribute meaning location
-  // is preserved on a replace operation. By the moment, we can leave this as it is now
-  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-  // removed from the code)
-  //
   std::string locationString = targetAttr->getLocation(apiVersion);
 
   /* Check that location (if any) is using the correct coordinates string (it only
    * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
     oe->fill(SccBadRequest, *errDetail, "BadRequest");
@@ -357,7 +405,7 @@ bool processLocationAtUpdateAttribute
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (locationString.length() > 0)
+  if (!locationString.empty())
   {
     //
     // Case 1a:
@@ -378,20 +426,34 @@ bool processLocationAtUpdateAttribute
 
     //
     // Case 1b:
-    //   currently we have a loation but the attribute holding it is different from the target attribute -> error
+    //   currently we have a loation but the attribute holding it is different from the target attribute.
+    //   The behaviour is different depending on NGSI version
     //
     if (*currentLocAttrName != targetAttr->name)
     {
-      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-                   " when another one has been previously defined [" + *currentLocAttrName + "]";
+      if (apiVersion == V1)
+      {
+        *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                     " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-      oe->fill(SccRequestEntityTooLarge,
-               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-               "NoResourcesAvailable");
+        oe->fill(SccRequestEntityTooLarge,
+                 "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+                 "NoResourcesAvailable");
 
-      return false;
+        return false;
+      }
+      else
+      {
+        if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+        {
+          *errDetail = "error parsing location attribute: " + subErr;
+          oe->fill(SccBadRequest, *errDetail, "BadRequest");
+          return false;
+        }
+        *currentLocAttrName = targetAttr->name;
+        return true;
+      }
     }
-
     //
     // Case 1c:
     //   currently we have a location and the attribute holding it is the target attribute -> update the current location
@@ -412,7 +474,7 @@ bool processLocationAtUpdateAttribute
   //
   // Case 2:
   //   update *to* no-location and the attribute previously holding it is the same than the target attribute
-  //   The behaviour is differenet depending on NGSI version
+  //   The behaviour is different depending on NGSI version
   //
   else if (*currentLocAttrName == targetAttr->name)
   {
@@ -448,7 +510,7 @@ bool processLocationAtAppendAttribute
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
-  mongo::BSONObjBuilder*         geoJson,
+  orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   ApiVersion                     apiVersion,
   OrionError*                    oe
@@ -459,7 +521,7 @@ bool processLocationAtAppendAttribute
 
   /* Check that location (if any) is using the correct coordinates string (it only
      * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
     oe->fill(SccBadRequest, *errDetail, "BadRequest");
@@ -467,10 +529,10 @@ bool processLocationAtAppendAttribute
   }
 
   /* Case 1: append of new location attribute */
-  if (actualAppend && (locationString.length() > 0))
+  if (actualAppend && (!locationString.empty()))
   {
     /* Case 1a: there is a previous location attribute -> error */
-    if (currentLocAttrName->length() != 0)
+    if (!currentLocAttrName->empty())
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
@@ -494,10 +556,10 @@ bool processLocationAtAppendAttribute
     }
   }
   /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (locationString.length() > 0))
+  else if (!actualAppend && (!locationString.empty()))
   {
-    /* Case 2a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
+    /* Case 2a: there is a previous (not empty and with different name) location attribute -> error */
+    if ((!currentLocAttrName->empty()) && (*currentLocAttrName != targetAttr->name))
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
@@ -532,7 +594,7 @@ bool processLocationAtAppendAttribute
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+  else if (!actualAppend && (locationString.empty()) && (*currentLocAttrName == targetAttr->name))
   {
     *currentLocAttrName = "";
   }

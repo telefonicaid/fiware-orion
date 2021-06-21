@@ -49,9 +49,9 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::render -
+* ContextRegistration::toJsonV1 -
 */
-std::string ContextRegistration::render(bool comma, bool isInVector)
+std::string ContextRegistration::toJsonV1(bool comma, bool isInVector)
 {
   std::string out = "";
 
@@ -63,10 +63,9 @@ std::string ContextRegistration::render(bool comma, bool isInVector)
   //
 
   out += startTag(!isInVector? "contextRegistration" : "");
-  out += entityIdVector.render(true);
-  out += contextRegistrationAttributeVector.render(true);
-  out += registrationMetadataVector.render(true);
-  out += providingApplication.render(false);
+  out += entityIdVector.toJsonV1(true);
+  out += contextRegistrationAttributeVector.toJsonV1(true);
+  out += providingApplication.toJsonV1(false);
   out += endTag(comma);
 
   return out;
@@ -98,11 +97,6 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(apiVersion)) != "OK")
-  {
-    return res;
-  }
-
   if ((res = providingApplication.check()) != "OK")
   {
     return res;
@@ -120,37 +114,11 @@ std::string ContextRegistration::check
 
 /* ****************************************************************************
 *
-* ContextRegistration::present -
-*/
-void ContextRegistration::present(const std::string& indent, int ix)
-{
-  if (ix != -1)
-  {
-    LM_T(LmtPresent, ("%sContext Registration %d:\n", 
-		      indent.c_str(), 
-		      ix));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%scontext registration:\n", indent.c_str()));
-  }
-
-  entityIdVector.present(indent + "  ");
-  contextRegistrationAttributeVector.present(indent + "  ");
-  registrationMetadataVector.present("Registration", indent + "  ");
-  providingApplication.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistration::release -
 */
 void ContextRegistration::release(void)
 {
   entityIdVector.release();
   contextRegistrationAttributeVector.release();
-  registrationMetadataVector.release();
   providingApplication.release();
 }

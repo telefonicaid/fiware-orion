@@ -30,22 +30,22 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z
-# 02. Create entity E23 with birthdate 2016-02-23T10:00:00.00Z
-# 03. Create entity E22 with birthdate 2016-02-22T10:00:00.00Z
-# 04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing
-# 05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22
-# 06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24
-# 07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three
+# 01. Create entity E24 with birthdate 2016-02-24T10:00:00.000Z
+# 02. Create entity E23 with birthdate 2016-02-23T10:00:00.000Z
+# 03. Create entity E22 with birthdate 2016-02-22T10:00:00.000Z
+# 04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.000Z,2016-02-26T10:00:00.000Z, see nothing
+# 05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-26T10:00:00.000Z, see E22
+# 06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see E23 and E24
+# 07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see all three
 #
 
 
-echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z"
-echo "============================================================"
+echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.000Z"
+echo "============================================================="
 payload='{
   "id": "E24",
   "birthdate": {
-    "value": "2016-02-24T10:00:00.00Z",
+    "value": "2016-02-24T10:00:00.000Z",
     "type": "DateTime"
   }
 }'
@@ -54,12 +54,12 @@ echo
 echo
 
 
-echo "02. Create entity E23 with birthdate 2016-02-23T10:00:00.00Z"
-echo "============================================================"
+echo "02. Create entity E23 with birthdate 2016-02-23T10:00:00.000Z"
+echo "============================================================="
 payload='{
   "id": "E23",
   "birthdate": {
-    "value": "2016-02-23T10:00:00.00Z",
+    "value": "2016-02-23T10:00:00.000Z",
     "type": "DateTime"
   }
 }'
@@ -68,12 +68,12 @@ echo
 echo
 
 
-echo "03. Create entity E22 with birthdate 2016-02-22T10:00:00.00Z"
-echo "============================================================"
+echo "03. Create entity E22 with birthdate 2016-02-22T10:00:00.000Z"
+echo "============================================================="
 payload='{
   "id": "E22",
   "birthdate": {
-    "value": "2016-02-22T10:00:00.00Z",
+    "value": "2016-02-22T10:00:00.000Z",
     "type": "DateTime"
   }
 }'
@@ -83,37 +83,37 @@ echo
 
 
 
-echo "04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing"
-echo "===================================================================================================="
-orionCurl --url '/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z&options=keyValues'
+echo "04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.000Z,2016-02-26T10:00:00.000Z, see nothing"
+echo "======================================================================================================"
+orionCurl --url '/v2/entities?q=birthdate==2016-02-25T10:00:00.000Z,2016-02-26T10:00:00.000Z&options=keyValues'
 echo
 echo
 
 
-echo "05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22"
-echo "================================================================================================"
-orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z&options=keyValues'
+echo "05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-26T10:00:00.000Z, see E22"
+echo "=================================================================================================="
+orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.000Z,2016-02-26T10:00:00.000Z&options=keyValues'
 echo
 echo
 
 
-echo "06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24"
-echo "========================================================================================================"
-orionCurl --url '/v2/entities?q=birthdate==2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z&options=keyValues'
+echo "06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see E23 and E24"
+echo "=========================================================================================================="
+orionCurl --url '/v2/entities?q=birthdate==2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z&options=keyValues'
 echo
 echo
 
 
-echo "07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three"
-echo "=============================================================================================================================="
-orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z&options=keyValues'
+echo "07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see all three"
+echo "================================================================================================================================="
+orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.000Z,2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z&options=keyValues'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z
-============================================================
+01. Create entity E24 with birthdate 2016-02-24T10:00:00.000Z
+=============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E24?type=Thing
@@ -122,8 +122,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E23 with birthdate 2016-02-23T10:00:00.00Z
-============================================================
+02. Create entity E23 with birthdate 2016-02-23T10:00:00.000Z
+=============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E23?type=Thing
@@ -132,8 +132,8 @@ Date: REGEX(.*)
 
 
 
-03. Create entity E22 with birthdate 2016-02-22T10:00:00.00Z
-============================================================
+03. Create entity E22 with birthdate 2016-02-22T10:00:00.000Z
+=============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E22?type=Thing
@@ -142,8 +142,8 @@ Date: REGEX(.*)
 
 
 
-04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing
-====================================================================================================
+04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.000Z,2016-02-26T10:00:00.000Z, see nothing
+======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
@@ -153,66 +153,66 @@ Date: REGEX(.*)
 []
 
 
-05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22
-================================================================================================
+05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-26T10:00:00.000Z, see E22
+==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 68
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-22T10:00:00.00Z",
+        "birthdate": "2016-02-22T10:00:00.000Z",
         "id": "E22",
         "type": "Thing"
     }
 ]
 
 
-06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24
-========================================================================================================
+06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see E23 and E24
+==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 135
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-24T10:00:00.00Z",
+        "birthdate": "2016-02-24T10:00:00.000Z",
         "id": "E24",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-23T10:00:00.00Z",
+        "birthdate": "2016-02-23T10:00:00.000Z",
         "id": "E23",
         "type": "Thing"
     }
 ]
 
 
-07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three
-==============================================================================================================================
+07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see all three
+=================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 199
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-24T10:00:00.00Z",
+        "birthdate": "2016-02-24T10:00:00.000Z",
         "id": "E24",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-23T10:00:00.00Z",
+        "birthdate": "2016-02-23T10:00:00.000Z",
         "id": "E23",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-22T10:00:00.00Z",
+        "birthdate": "2016-02-22T10:00:00.000Z",
         "id": "E22",
         "type": "Thing"
     }

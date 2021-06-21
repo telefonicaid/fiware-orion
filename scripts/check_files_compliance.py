@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0|1] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -77,12 +77,12 @@ def check_file(file):
 
 
 def ignore(root, file):
-    # Files in the BUILD_* or .git directories are not processed
+    # Files in the BUILD_* or .git directories (including .github) are not processed
     if 'BUILD_' in root or '.git' in root:
         return True
 
     # PNG files in manuals o functionalTest are ignored
-    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and file.endswith('.png'):
+    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
@@ -107,6 +107,12 @@ def ignore(root, file):
 
     # Some files in docker/ directory are not processed
     if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
+        return True
+    if 'hooks' in root and file in ['build']:
+        return True
+
+    # Some file in CI are not processed
+    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo']:
         return True
 
     # Some files in test/acceptance/behave directory are not processed

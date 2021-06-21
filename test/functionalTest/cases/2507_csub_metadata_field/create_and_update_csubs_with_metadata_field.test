@@ -126,14 +126,14 @@ Date: REGEX(.*)
 02. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 308
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "expires": "2050-04-05T14:00:00.00Z",
+        "expires": "2050-04-05T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [],
@@ -143,7 +143,8 @@ Date: REGEX(.*)
             },
             "metadata": [
                 "foo"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -164,7 +165,6 @@ Date: REGEX(.*)
 03. Update subscription without touching metadata
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -173,14 +173,14 @@ Date: REGEX(.*)
 04. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 308
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "expires": "2060-04-05T14:00:00.00Z",
+        "expires": "2060-04-05T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [],
@@ -190,7 +190,8 @@ Date: REGEX(.*)
             },
             "metadata": [
                 "foo"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -211,7 +212,6 @@ Date: REGEX(.*)
 05. Update subscription with metadata: bar, ruu
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -220,14 +220,14 @@ Date: REGEX(.*)
 06. Get subscription and see metadata: bar, ruu
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 288
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "expires": "2060-04-05T14:00:00.00Z",
+        "expires": "2060-04-05T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [],
@@ -238,7 +238,8 @@ Date: REGEX(.*)
             "metadata": [
                 "bar",
                 "ruu"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {

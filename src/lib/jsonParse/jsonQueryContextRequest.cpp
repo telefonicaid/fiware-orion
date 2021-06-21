@@ -123,7 +123,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute name");
     reqDataP->errorString = "Empty attribute name";
@@ -170,7 +170,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   reqDataP->qcr.res.restriction.attributeExpression.set(value);
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute expression");
     reqDataP->errorString = "Empty attribute expression";
@@ -770,20 +770,4 @@ std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   return reqDataP->qcr.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
-}
-
-
-
-
-/* ****************************************************************************
-*
-* jsonQcrPresent -
-*/
-void jsonQcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtPresent))
-    return;
-
-  LM_T(LmtPresent, ("\n\n"));
-  reqDataP->qcr.res.present("");
 }

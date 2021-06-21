@@ -45,16 +45,14 @@ public:
 
   MetadataVector(void);
 
-  std::string     render(bool comma);
-  std::string     toJson(bool                             isLastElement,
-                         const std::vector<std::string>&  metadataFilter);
+  std::string     toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma);
+  std::string     toJson(const std::vector<Metadata*>& orderedMetadata);
   std::string     check(ApiVersion apiVersion);
 
-  void            present(const std::string& metadataType, const std::string& indent);
   void            push_back(Metadata* item);
   unsigned int    size(void) const;
   Metadata*       lookupByName(const std::string& _name);
-  void            release();
+  void            release(void);
   void            fill(MetadataVector* mV);
  
   

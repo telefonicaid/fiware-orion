@@ -46,12 +46,11 @@ typedef struct Throttling
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  std::string        render(bool comma);
+  std::string        toJsonV1(bool comma);
 
   std::string        check(void);
 
   int64_t            parse(void);
-  void               present(const std::string& indent);
 } Throttling;
 
 #endif  // SRC_LIB_NGSI_THROTTLING_H_

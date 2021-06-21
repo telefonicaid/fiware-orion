@@ -26,7 +26,7 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/MongoCommonSubscription.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -35,11 +35,11 @@
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
 
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/dbConstants.h"
+
 #include "mongoBackend/mongoCreateSubscription.h"
+#include "mongoDriver/connectionOperations.h"
 
 
 
@@ -47,8 +47,6 @@
 *
 * USING
 */
-using mongo::BSONObj;
-using mongo::BSONObjBuilder;
 using ngsiv2::Subscription;
 
 
@@ -105,8 +103,10 @@ static void insertInCache
                      sub.attrsFormat,
                      notificationDone,
                      lastNotification,
-                     lastFailure,
                      lastSuccess,
+                     lastFailure,
+                     -1,
+                     "",
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
@@ -114,7 +114,8 @@ static void insertInCache
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
-                     sub.notification.blacklist);
+                     sub.notification.blacklist,
+                     sub.notification.onlyChanged);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -137,17 +138,19 @@ std::string mongoCreateSubscription
   const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator
+  const std::string&               fiwareCorrelator,
+  const bool&                      skipInitialNotification,
+  ApiVersion                       apiVersion
 )
 {
   bool reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
-  BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
-  bool               notificationDone = false;
-  const std::string  subId            = setNewSubscriptionId(&b);
+  orion::BSONObjBuilder  b;
+  std::string            servicePath      = servicePathV[0].empty()  ? SERVICE_PATH_ALL : servicePathV[0];
+  bool                   notificationDone = false;
+  const std::string      subId            = setNewSubscriptionId(&b);
 
   // Build the BSON object to insert
   setExpiration(sub, &b);
@@ -160,8 +163,9 @@ std::string mongoCreateSubscription
   setAttrs(sub, &b);
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
+  setOnlyChanged(sub, &b);
 
-  std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
+  std::string status = sub.status.empty()?  STATUS_ACTIVE : sub.status;
 
   // We need to insert the csub in the cache before (potentially) sending the
   // initial notification (have a look to issue #2974 for details)
@@ -183,7 +187,9 @@ std::string mongoCreateSubscription
                            xauthToken,
                            fiwareCorrelator,
                            &b,
-                           &notificationDone);
+                           &notificationDone,
+                           skipInitialNotification,
+                           apiVersion);
 
   if (notificationDone)
   {
@@ -196,12 +202,12 @@ std::string mongoCreateSubscription
   setExpression(sub, &b);
   setFormat(sub, &b);
 
-  BSONObj doc = b.obj();
+  orion::BSONObj doc = b.obj();
 
   // Insert in DB
   std::string err;
 
-  if (!collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
+  if (!orion::collectionInsert(composeDatabaseName(tenant), COL_CSUBS, doc, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);

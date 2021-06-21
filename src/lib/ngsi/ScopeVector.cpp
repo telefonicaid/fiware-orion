@@ -39,9 +39,9 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render -
+* ScopeVector::toJsonV1 -
 */
-std::string ScopeVector::render(bool comma)
+std::string ScopeVector::toJsonV1(bool comma)
 {
   std::string out = "";
 
@@ -53,7 +53,7 @@ std::string ScopeVector::render(bool comma)
   out += startTag("scope", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(ix != vec.size() - 1);
+     out += vec[ix]->toJsonV1(ix != vec.size() - 1);
   }
   out += endTag(comma, true);
 
@@ -83,31 +83,6 @@ std::string ScopeVector::check(void)
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ScopeVector::present -
-*/
-void ScopeVector::present(const std::string& indent)
-{
-  if (vec.size() == 0)
-  {
-    LM_T(LmtPresent, ("%sNo scopes", indent.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%s%lu Scopes:", 
-		      indent.c_str(), 
-		      (uint64_t) vec.size()));
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
 }
 
 

@@ -38,8 +38,8 @@
 */
 static RestService badVerbV[] =
 {
-  { AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "", badVerbGetPutDeleteOnly },
-  { InvalidRequest,         0, {                                                          }, "", NULL                    }
+  { AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, badVerbGetPutDeleteOnly },
+  { InvalidRequest,         0, {                                                          }, NULL                    }
 };
 
 
@@ -53,6 +53,15 @@ TEST(badVerbGetPutDeleteOnly, ok)
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature/14",  "POST", "1.1");
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService =
+    {
+      VersionRequest,
+      6, { "ngsi10", "contextEntities", "entityId01", "attributes", "temperature", "14" },
+      NULL
+    };
+
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci);

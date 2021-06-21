@@ -31,25 +31,25 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Same steps than filter_datecreated.test but using dateCreated at attribute level
+# Same steps as filter_datecreated.test but using dateCreated at attribute level
 #
-# 01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_6
-# 02. At t_1: Create entity E1 (not notif)
-# 03. At t_3: Create entity E2 (notif)
-# 04. At t_4: Create entity E3 (notif)
-# 05. At t_5: Create entity E4 (notif)
-# 06. At t_7: Create entity E5 (not notif)
+# 01. At T_0: Create subscription with mq: A.dateCreated==T_3..T_10
+# 02. At T_1: Create entity E1 (not notif)
+# 03. At T_4: Create entity E2 (notif)
+# 04. At T_5: Create entity E3 (notif)
+# 05. At T_6: Create entity E4 (notif)
+# 06. At T_15: Create entity E5 (not notif)
 # 07. Get accumulator dump (3 notifications): E2, E3, E4
 #
-# Note we avoid to use t_2 and t_6 to create entities, as they are "edge" cases in the range limits
+# Note that we avoid using T_2 and T_6 for entity creation, as they are "edge" cases in the range limits.
 #
 
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
-T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="6seconds")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
+T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z"  --date="3seconds")
+T_10=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z" --date="10seconds")
 
-echo "01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_6"
-echo "================================================================"
+echo "01. At T_0: Create subscription with mq: A.dateCreated==T_3..T_10"
+echo "================================================================="
 payload='
 {
     "subject": {
@@ -62,7 +62,7 @@ payload='
         "condition": {
             "attrs": [ ],
             "expression": {
-               "mq": "A.dateCreated=='$T_2'..'$T_6'"
+               "mq": "A.dateCreated=='$T_3'..'$T_10'"
             }
          }
     },
@@ -78,9 +78,9 @@ echo
 echo
 
 
-echo "02. At t_1: Create entity E1 (not notif)"
+sleep 1  # Total slept: 1s
+echo "02. At T_1: Create entity E1 (not notif)"
 echo "========================================"
-sleep 1s
 payload='{
   "id": "E1",
   "type": "T",
@@ -91,9 +91,9 @@ echo
 echo
 
 
-echo "03. At t_3: Create entity E2 (notif)"
+sleep 3  # Total slept: 4s
+echo "03. At T_4: Create entity E2 (notif)"
 echo "===================================="
-sleep 2s
 payload='{
   "id": "E2",
   "type": "T",
@@ -104,9 +104,9 @@ echo
 echo
 
 
-echo "04. At t_4: Create entity E3 (notif)"
+sleep 1  # Total slept: 5s
+echo "04. At T_5: Create entity E3 (notif)"
 echo "===================================="
-sleep 1s
 payload='{
   "id": "E3",
   "type": "T",
@@ -117,9 +117,9 @@ echo
 echo
 
 
-echo "05. At t_5: Create entity E4 (notif)"
+sleep 1  # Total slept: 6s
+echo "05. At T_6: Create entity E4 (notif)"
 echo "===================================="
-sleep 1s
 payload='{
   "id": "E4",
   "type": "T",
@@ -130,9 +130,9 @@ echo
 echo
 
 
-echo "06. At t_7: Create entity E5 (not notif)"
-echo "========================================"
-sleep 2s
+sleep 9  # Total slept: 15s
+echo "06. At T_15: Create entity E5 (not notif)"
+echo "========================================="
 payload='{
   "id": "E5",
   "type": "T",
@@ -151,8 +151,8 @@ echo
 
 
 --REGEXPECT--
-01. At t_0: Create subscription with mq: A.dateCreated==t_2..t_6
-================================================================
+01. At T_0: Create subscription with mq: A.dateCreated==T_3..T_10
+=================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 
 
 
-02. At t_1: Create entity E1 (not notif)
+02. At T_1: Create entity E1 (not notif)
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 
 
 
-03. At t_3: Create entity E2 (notif)
+03. At T_4: Create entity E2 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -181,7 +181,7 @@ Date: REGEX(.*)
 
 
 
-04. At t_4: Create entity E3 (notif)
+04. At T_5: Create entity E3 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 
 
 
-05. At t_5: Create entity E4 (notif)
+05. At T_6: Create entity E4 (notif)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -201,8 +201,8 @@ Date: REGEX(.*)
 
 
 
-06. At t_7: Create entity E5 (not notif)
-========================================
+06. At T_15: Create entity E5 (not notif)
+=========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E5?type=T
@@ -221,7 +221,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -246,7 +246,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -271,7 +271,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

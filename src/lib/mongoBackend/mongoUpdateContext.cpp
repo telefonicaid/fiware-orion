@@ -38,9 +38,63 @@
 #include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
 
+#include "ngsiNotify/QueueNotifier.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/mongoUpdateContext.h"
+
+
+
+/* ****************************************************************************
+*
+* flowControlAwait -
+*/
+static void flowControlAwait(unsigned int q0, unsigned int notifSent)
+{
+  unsigned int pass = 0;
+  unsigned int accumulatedDelay = 0;
+
+  // target may range from q0 (for fcGauge = 1) to q0 + notifSent (for fcGauge = 0)
+  unsigned int target = q0 + (1 - fcGauge) * notifSent;
+  LM_T(LmtNotifier, ("flow control target is %d", target));
+
+#ifdef UNIT_TEST
+  // not used in test (and the QueueNotifier class cause build problems)
+  unsigned int qi = 0;
+#else
+  // get current size of the queue
+  unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
+#endif
+  LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
+                     pass, accumulatedDelay, qi));
+
+  // FIXME P4: we should check in each pass that the connection with the client is still
+  // active or break in negative case. Not sure how to do this... we have a
+  // ciP->connection object (a MDH_Connection) which hopefully could be used to check
+  // this. However libmicrohttpd library documentation is not very clear on this.
+  // Maybe the MHD_get_connection_info() function can be used for this.
+  // This is not a big issue as it's unrare the client cuts the connection (thus the P4)
+  // but it may happen...
+  while (qi > target)
+  {
+    pass++;
+    usleep(fcStepDelay * 1000);
+    accumulatedDelay += fcStepDelay;
+
+#ifndef UNIT_TEST
+    qi = ((QueueNotifier*) getNotifier())->queueSize();
+#endif
+    LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
+                       pass, accumulatedDelay, qi));
+
+    if (accumulatedDelay > fcMaxInterval)
+    {
+      LM_T(LmtNotifier, ("flow control algorithm interrupted due to maxInterval"));
+      break;
+    }
+  }
+}
 
 
 
@@ -58,13 +112,26 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    xauthToken,
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
+  const bool&                           forcedUpdate,
   ApiVersion                            apiVersion,
-  Ngsiv2Flavour                         ngsiv2Flavour
+  Ngsiv2Flavour                         ngsiv2Flavour,
+  bool                                  flowControl
 )
 {
   bool reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
+
+  // Initial size of notification queue (could be used by flow control algorithm)
+  unsigned int q0 = 0;
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+#ifndef UNIT_TEST
+    q0 = ((QueueNotifier*) getNotifier())->queueSize();
+#endif
+    LM_T(LmtNotifier, ("notification queue size before processing update: %d", q0));
+  }
+  unsigned int notifSent = 0;
 
   /* Check that the service path vector has only one element, returning error otherwise */
   if (servicePathV.size() > 1)
@@ -81,20 +148,24 @@ HttpStatusCode mongoUpdateContext
   else
   {
     /* Process each ContextElement */
-    for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < requestP->entityVector.size(); ++ix)
     {
-      processContextElement(requestP->contextElementVector[ix],
-                            responseP,
-                            requestP->updateActionType.get(),
-                            tenant,
-                            servicePathV,
-                            uriParams,
-                            xauthToken,
-                            fiwareCorrelator,
-                            ngsiV2AttrsFormat,
-                            apiVersion,
-                            ngsiv2Flavour);
+      notifSent += processContextElement(requestP->entityVector[ix],
+                                         responseP,
+                                         requestP->updateActionType,
+                                         tenant,
+                                         servicePathV,
+                                         uriParams,
+                                         xauthToken,
+                                         fiwareCorrelator,
+                                         ngsiV2AttrsFormat,
+                                         forcedUpdate,
+                                         notifSent,
+                                         apiVersion,
+                                         ngsiv2Flavour);
     }
+
+    LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));
 
     /* Note that although individual processContextElements() invocations return ConnectionError, this
        error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
@@ -104,5 +175,13 @@ HttpStatusCode mongoUpdateContext
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+
+  if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
+  {
+    LM_T(LmtNotifier, ("start notification flow control algorithm"));
+    flowControlAwait(q0, notifSent);
+    LM_T(LmtNotifier, ("end notification flow control algorithm"));
+  }
+
   return SccOk;
 }

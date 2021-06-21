@@ -50,6 +50,7 @@ style_check src/lib/logSummary
 style_check src/lib/jsonParseV2
 style_check src/lib/apiTypesV2
 style_check src/lib/mongoBackend
+style_check src/lib/mongoDriver
 style_check src/lib/logMsg
 style_check src/lib/parseArgs
 style_check src/lib/cache
@@ -134,18 +135,14 @@ style_check test/unittests/serviceRoutines
 #
 # o jsonParse/jsonAppendContextElementRequest.cpp                            (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonDiscoverContextAvailabilityRequest.cpp                     (haderding/remove_ngsiv1_indent: 1 call to check())
-# o jsonParse/jsonNotifyContextAvailabilityRequest.cpp                       (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonNotifyContextRequest.cpp                                   (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonQueryContextRequest.cpp                                    (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonQueryContextResponse.cpp                                   (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonRegisterContextRequest.cpp                                 (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonRegisterProviderRequest.cpp                                (haderding/remove_ngsiv1_indent: 1 call to check())
-# o jsonParse/jsonSubscribeContextAvailabilityRequest.cpp                    (haderding/remove_ngsiv1_indent: 2 calls to check()) 
 # o jsonParse/jsonSubscribeContextRequest.cpp                                (haderding/remove_ngsiv1_indent: 2 calls to check()) 
-# o jsonParse/jsonUnsubscribeContextAvailabilityRequest.cpp                  (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonUnsubscribeContextRequest.cpp                              (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonUpdateContextAttributeRequest.cpp                          (haderding/remove_ngsiv1_indent: 1 call to check())
-# o jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.cpp           (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonUpdateContextElementRequest.cpp                            (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonUpdateContextRequest.cpp                                   (haderding/remove_ngsiv1_indent: 1 call to check())
 # o jsonParse/jsonUpdateContextResponse.cpp                                  (haderding/remove_ngsiv1_indent: 1 call to check())
@@ -255,29 +252,12 @@ style_check test/unittests/serviceRoutines
 # o ngsi9/DiscoverContextAvailabilityRequest.h                               (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi9/DiscoverContextAvailabilityResponse.cpp                            (haderding/remove_ngsiv1_indent: 6 lines)
 # o ngsi9/DiscoverContextAvailabilityResponse.h                              (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi9/NotifyContextAvailabilityRequest.cpp                               (haderding/remove_ngsiv1_indent: 9 lines)
-# o ngsi9/NotifyContextAvailabilityRequest.h                                 (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi9/NotifyContextAvailabilityResponse.cpp                              (haderding/remove_ngsiv1_indent: 5 lines)
-# o ngsi9/NotifyContextAvailabilityResponse.h                                (haderding/remove_ngsiv1_indent: 1 line)
 # o ngsi9/RegisterContextRequest.cpp                                         (haderding/remove_ngsiv1_indent: 11 lines)
 # o ngsi9/RegisterContextRequest.h                                           (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi9/RegisterContextResponse.cpp                                        (haderding/remove_ngsiv1_indent: 10 lines)
 # o ngsi9/RegisterContextResponse.h                                          (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi9/SubscribeContextAvailabilityRequest.cpp                            (haderding/remove_ngsiv1_indent: 16 lines)
-# o ngsi9/SubscribeContextAvailabilityRequest.h                              (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi9/SubscribeContextAvailabilityResponse.cpp                           (haderding/remove_ngsiv1_indent: 6 lines)
-# o ngsi9/SubscribeContextAvailabilityResponse.h                             (haderding/remove_ngsiv1_indent: 1 line)
-# o ngsi9/UnsubscribeContextAvailabilityRequest.cpp                          (haderding/remove_ngsiv1_indent: 3 lines)
-# o ngsi9/UnsubscribeContextAvailabilityRequest.h                            (haderding/remove_ngsiv1_indent: 1 line)
-# o ngsi9/UnsubscribeContextAvailabilityResponse.cpp                         (haderding/remove_ngsiv1_indent: 5 lines)
-# o ngsi9/UnsubscribeContextAvailabilityResponse.h                           (haderding/remove_ngsiv1_indent: 1 line)
-# o ngsi9/UpdateContextAvailabilitySubscriptionRequest.cpp                   (haderding/remove_ngsiv1_indent: 15 lines)
-# o ngsi9/UpdateContextAvailabilitySubscriptionRequest.h                     (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi9/UpdateContextAvailabilitySubscriptionResponse.cpp                  (haderding/remove_ngsiv1_indent: 12 lines)
-# o ngsi9/UpdateContextAvailabilitySubscriptionResponse.h                    (haderding/remove_ngsiv1_indent: 2 lines)
 #
 # o ngsiNotify/Notifier.cpp                                                  (haderding/remove_ngsiv1_indent: 3 includes, 
-#                                                                                                             30 lines in sendNotifyContextAvailabilityRequest(),
 #                                                                                                             35 lines in buildSenderParams())
 #
 # o orionTypes/EntityType.cpp                                                (haderding/remove_ngsiv1_indent: 13 lines)
@@ -326,15 +306,11 @@ style_check test/unittests/serviceRoutines
 # o serviceRoutines/postIndividualContextEntityAttribute.cpp                 (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.cpp    (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postNotifyContext.cpp                                    (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/postNotifyContextAvailability.cpp                        (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
 # o serviceRoutines/postQueryContext.cpp                                     (haderding/remove_ngsiv1_indent: 3 includes, 2 TIMED_RENDER, 35 lines in queryForward())
 # o serviceRoutines/postRegisterContext.cpp                                  (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
 # o serviceRoutines/postSubscribeContext.cpp                                 (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/postSubscribeContextAvailability.cpp                     (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postUnsubscribeContext.cpp                               (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/postUnsubscribeContextAvailability.cpp                   (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postUpdateContext.cpp                                    (haderding/remove_ngsiv1_indent: 3 includes, 5 TIMED_RENDER, 35 lines in updateForward)
-# o serviceRoutines/postUpdateContextAvailabilitySubscription.cpp            (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postUpdateContextSubscription.cpp                        (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/putAllEntitiesWithTypeAndId.cpp                          (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
 # o serviceRoutines/putAttributeValueInstance.cpp                            (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
@@ -408,11 +384,6 @@ style_check test/unittests/serviceRoutines
 # o unittests/ngsi9/NotifyContextAvailabilityResponse_test.cpp               (haderding/remove_ngsiv1_indent: 1 render()
 # o unittests/ngsi9/RegisterContextRequest_test.cpp                          (haderding/remove_ngsiv1_indent: 1 render()
 # o unittests/ngsi9/RegisterContextResponse_test.cpp                         (haderding/remove_ngsiv1_indent: 4 render(), 1 check())
-# o unittests/ngsi9/SubscribeContextAvailabilityResponse_test.cpp            (haderding/remove_ngsiv1_indent: 4 render()
-# o unittests/ngsi9/UnsubscribeContextAvailabilityRequest_test.cpp           (haderding/remove_ngsiv1_indent: 1 check())
-# o unittests/ngsi9/UnsubscribeContextAvailabilityResponse_test.cpp          (haderding/remove_ngsiv1_indent: 2 render()
-# o unittests/ngsi9/UpdateContextAvailabilitySubscriptionRequest_test.cpp    (haderding/remove_ngsiv1_indent: 1 render(), 3 check())
-# o unittests/ngsi9/UpdateContextAvailabilitySubscriptionResponse_test.cpp   (haderding/remove_ngsiv1_indent: 4 render()
 #
 # o unittests/parse/CompoundValueNode_test.cpp                               (haderding/remove_ngsiv1_indent: 2 render()
 # o unittests/parse/compoundValue_test.cpp                                   (haderding/remove_ngsiv1_indent: 1 render()

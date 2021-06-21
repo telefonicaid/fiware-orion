@@ -35,18 +35,6 @@ orionCurl --url "/v1/registry/contextEntities/entity01/attributes/attr01"
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/entity01/attributes/attr01"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -82,7 +70,7 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 210
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -93,7 +81,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "attr01",
                         "type": ""
                     }

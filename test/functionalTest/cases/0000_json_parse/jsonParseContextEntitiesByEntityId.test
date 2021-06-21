@@ -32,18 +32,6 @@ brokerStart CB
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1110"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "XXX"
-    }
-  ],
   "duration" : "PT1H",
   "providingApplication" : "http://kz.tid.es/abc"
 }'
@@ -69,18 +57,6 @@ orionCurl --url "$url" --payload "${payload}"
 echo "3: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1111"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "YYY"
-    }
-  ],
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc2",
   "registrationId" : "'$REG_ID'"
@@ -116,18 +92,6 @@ orionCurl --url "/v1/registry/contextEntities/ENTITY_ID" -X "DELETE"
 echo "8: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
-  "metadatas" : [
-    {
-      "name" : "ID",
-      "type" : "string",
-      "value" : "1111"
-    },
-    {
-      "name" : "cm2",
-      "type" : "string",
-      "value" : "YYY"
-    }
-  ],
   "duration" : "PT2H",
   "providingApplication" : "http://kz.tid.es/abc2"
 }'

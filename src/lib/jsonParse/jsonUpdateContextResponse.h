@@ -62,12 +62,4 @@ extern void jsonUpcrsRelease(ParseData* reqDataP);
 */
 extern std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonUpcrsPresent - 
-*/
-extern void jsonUpcrsPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTRESPONSE_H_

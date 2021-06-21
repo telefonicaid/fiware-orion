@@ -71,7 +71,7 @@ payload='{
     "type": "nothing",
     "metadata": {
       "meta_timestamp": {
-        "value": "2017-06-15T07:21:24.00Z",
+        "value": "2017-06-15T07:21:24.000Z",
         "type": "DateTime"
       }
     },
@@ -103,7 +103,7 @@ echo
 
 echo "02. Get entity matching DateTime"
 echo "================================"
-orionCurl --url '/v2/entities?mq=timestamp.meta_timestamp>=2017-06-15T07:21:24.00Z'
+orionCurl --url '/v2/entities?mq=timestamp.meta_timestamp>=2017-06-15T07:21:24.000Z'
 echo
 echo
 
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 02. Get entity matching DateTime
 ================================
 HTTP/1.1 200 OK
-Content-Length: 673
+Content-Length: 674
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,7 +165,7 @@ Date: REGEX(.*)
             "metadata": {
                 "meta_timestamp": {
                     "type": "DateTime",
-                    "value": "2017-06-15T07:21:24.00Z"
+                    "value": "2017-06-15T07:21:24.000Z"
                 }
             },
             "type": "nothing",

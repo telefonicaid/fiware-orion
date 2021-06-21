@@ -90,20 +90,21 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 428
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -132,4 +133,3 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

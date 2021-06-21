@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "rest/ConnectionInfo.h"
 
@@ -40,12 +39,9 @@
 */
 typedef struct UpdateContextElementRequest
 {
-  AttributeDomainName        attributeDomainName;        // Optional
   ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
 
-  std::string  render(ApiVersion apiVersion, bool asJsonObject, RequestType requestType);
-  void         present(const std::string&  indent);
+  std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release(void);
   std::string  check(ApiVersion          apiVersion,
                      bool                asJsonObject,

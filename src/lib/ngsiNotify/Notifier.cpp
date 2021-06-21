@@ -64,27 +64,29 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest
 (
-    NotifyContextRequest*            ncrP,
+    NotifyContextRequest&            ncr,
     const ngsiv2::HttpInfo&          httpInfo,
     const std::string&               tenant,
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
+    unsigned int                     correlatorCounter,
     RenderFormat                     renderFormat,
-    const std::vector<std::string>&  attrsOrder,
-    const std::vector<std::string>&  metadataFilter,
-    bool                             blackList
+    const std::vector<std::string>&  attrsFilter,
+    bool                             blacklist,
+    const std::vector<std::string>&  metadataFilter
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
                                                                           httpInfo,
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
+                                                                          correlatorCounter,
                                                                           renderFormat,
-                                                                          attrsOrder,
-                                                                          metadataFilter,
-                                                                          blackList);
+                                                                          attrsFilter,
+                                                                          blacklist,
+                                                                          metadataFilter);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
   {
@@ -108,77 +110,6 @@ void Notifier::sendNotifyContextRequest
 
 /* ****************************************************************************
 *
-* Notifier::sendNotifyContextAvailabilityRequest -
-*
-* FIXME: this method is very similar to sendNotifyContextRequest and probably
-* they could be refactored in the future to have a common part using a parent
-* class for both types of notifications and using it as first argument
-*/
-void Notifier::sendNotifyContextAvailabilityRequest
-(
-  NotifyContextAvailabilityRequest*  ncar,
-  const std::string&                 url,
-  const std::string&                 tenant,
-  const std::string&                 fiwareCorrelator,
-  RenderFormat                       renderFormat
-)
-{
-    /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render();
-
-    /* Parse URL */
-    std::string  host;
-    int          port;
-    std::string  uriPath;
-    std::string  protocol;
-
-    if (!parseUrl(url, host, port, uriPath, protocol))
-    {
-      std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
-      alarmMgr.badInput(clientIp, details);
-
-      return;
-    }
-
-    /* Set Content-Type */
-    std::string content_type = "application/json";
-
-    /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-    pthread_t            tid;
-    SenderThreadParams*  params = new SenderThreadParams();
-
-    params->ip               = host;
-    params->port             = port;
-    params->protocol         = protocol;
-    params->verb             = "POST";
-    params->tenant           = tenant;
-    params->resource         = uriPath;
-    params->content_type     = content_type;
-    params->content          = payload;
-    params->mimeType         = JSON;
-    params->fiwareCorrelator = fiwareCorrelator;
-    params->renderFormat     = renderFormatToString(renderFormat);
-    params->registration     = true;
-
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
-
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>;
-    paramsV->push_back(params);
-
-    int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
-    if (ret != 0)
-    {
-      LM_E(("Runtime Error (error creating thread: %d)", ret));
-      return;
-    }
-    pthread_detach(tid);
-}
-
-
-
-
-/* ****************************************************************************
-*
 * buildSenderParamsCustom -
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
@@ -189,8 +120,10 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   tenant,
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
+    unsigned int                         correlatorCounter,
     RenderFormat                         renderFormat,
-    const std::vector<std::string>&      attrsOrder,
+    const std::vector<std::string>&      attrsFilter,
+    bool                                 blacklist,
     const std::vector<std::string>&      metadataFilter
 )
 {
@@ -207,7 +140,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     std::string                         mimeType;
     std::map<std::string, std::string>  qs;
     std::map<std::string, std::string>  headers;
-    const ContextElement&               ce      = cv[ix]->contextElement;
+    Entity&                             en      = cv[ix]->entity;
 
     //
     // 1. Verb/Method
@@ -223,7 +156,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 2. URL
     //
-    if (macroSubstitute(&url, httpInfo.url, ce) == false)
+    if (macroSubstitute(&url, httpInfo.url, en) == false)
     {
       // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
@@ -233,12 +166,14 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.payload == "")
+    if (httpInfo.payload.empty())
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
 
-      cer.contextElement  = ce;
+      cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+      cer.entity.attributeVector.push_back(en.attributeVector);
+
       cer.statusCode.code = SccOk;
 
       ncr.subscriptionId  = subscriptionId;
@@ -246,18 +181,18 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if (renderFormat == NGSI_V1_LEGACY)
       {
-        payload = ncr.render(V1, false);
+        payload = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
       }
       else
       {
-        payload  = ncr.toJson(renderFormat, attrsOrder, metadataFilter);
+        payload  = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
       }
 
       mimeType = "application/json";
     }
     else
     {
-      if (macroSubstitute(&payload, httpInfo.payload, ce) == false)
+      if (macroSubstitute(&payload, httpInfo.payload, en) == false)
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
@@ -279,13 +214,13 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
       }
 
-      if ((value == "") || (key == ""))
+      if ((value.empty()) || (key.empty()))
       {
         // To avoid e.g '?a=&b=&c='
         continue;
@@ -302,13 +237,13 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, ce) == false) || (macroSubstitute(&value, it->second, ce) == false))
+      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector
       }
 
-      if (key == "")
+      if (key.empty())
       {
         // To avoid empty header name
         continue;
@@ -358,22 +293,35 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
     params->verb             = method;
     params->tenant           = tenant;
-    params->servicePath      = ce.entityId.servicePath;
+    params->servicePath      = en.servicePath;
     params->xauthToken       = xauthToken;
     params->resource         = uri;
     params->content_type     = mimeType;
     params->content          = payload;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
   }
@@ -389,15 +337,16 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 */
 std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 (
-  NotifyContextRequest*            ncrP,
+  NotifyContextRequest&            ncr,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsOrder,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             blackList
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
 )
 {
     ConnectionInfo                    ci;
@@ -427,14 +376,16 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (httpInfo.custom && !disableCusNotif)
     {
-      return buildSenderParamsCustom(ncrP->subscriptionId,
-                                     ncrP->contextElementResponseVector,
+      return buildSenderParamsCustom(ncr.subscriptionId,
+                                     ncr.contextElementResponseVector,
                                      httpInfo,
                                      tenant,
                                      xauthToken,
                                      fiwareCorrelator,
+                                     correlatorCounter,
                                      renderFormat,
-                                     attrsOrder,
+                                     attrsFilter,
+                                     blacklist,
                                      metadataFilter);
     }
 
@@ -447,11 +398,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string spathList;
     bool        atLeastOneNotDefault = false;
 
-    for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ++ix)
+    for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size(); ++ix)
     {
-      EntityId* eP = &ncrP->contextElementResponseVector[ix]->contextElement.entityId;
+      Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
 
-      if (spathList != "")
+      if (!spathList.empty())
       {
         spathList += ",";
       }
@@ -479,11 +430,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      payloadString = ncr.toJsonV1(asJsonObject, attrsFilter, blacklist, metadataFilter);
     }
     else
     {
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
     }
 
     /* Parse URL */
@@ -504,6 +455,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
@@ -516,9 +468,21 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->content          = payloadString;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
-    params->subscriptionId   = ncrP->subscriptionId.get();
+    params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
     return paramsV;

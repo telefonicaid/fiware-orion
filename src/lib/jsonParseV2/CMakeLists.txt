@@ -34,7 +34,6 @@ SET (SOURCES
     parseEntityVector.cpp
     parseEntitiesVector.cpp
     parseEntityObject.cpp
-    parseScopeVector.cpp
     parseStringList.cpp
     parseScope.cpp
     parseBatchUpdate.cpp
@@ -44,6 +43,8 @@ SET (SOURCES
     badInput.cpp
     parseStringVector.cpp
     parseNotification.cpp
+    parseExpression.cpp
+    parseEntitiesResponse.cpp
 )
 
 SET (HEADERS
@@ -60,7 +61,6 @@ SET (HEADERS
     parseEntityVector.h
     parseEntitiesVector.h
     parseEntityObject.h
-    parseScopeVector.h
     parseScope.h
     parseStringList.h
     parseBatchUpdate.h
@@ -70,6 +70,8 @@ SET (HEADERS
     parseStringVector.h
     badInput.h
     parseNotification.h
+    parseExpression.h
+    parseEntitiesResponse.h
 )
 
 

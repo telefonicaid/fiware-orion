@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -75,7 +75,9 @@ def diff_files(input_file, ref_file):
         if m is not  None:
             # We build the regex, concatenating preamble,
             # regex expression itself and the last part
-            regex = escape(m.group(1)) + m.group(2) + escape(m.group(3))
+            # The ending '$' is to avoid "false matching"
+            # when some text exist after the REGEX(...)
+            regex = escape(m.group(1)) + m.group(2) + escape(m.group(3)) + '$'
 
             if not re.match(regex, input_line):
                 validation_error(input_line, ref_line)

@@ -37,13 +37,13 @@
 */
 TEST(ContextRegistrationAttribute, render)
 {
-  ContextRegistrationAttribute  cra("name", "type", "false");
+  ContextRegistrationAttribute  cra("name", "type");
   std::string                   out;
   const char*                   outfile1 = "ngsi.contextRegistrationAttribute.render.middle.json";
 
   utInit();
 
-  out = cra.render(false);
+  out = cra.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

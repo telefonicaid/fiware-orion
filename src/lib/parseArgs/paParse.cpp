@@ -485,13 +485,36 @@ int paParse
   if (paProgName == NULL) /* hasn't been set with paConfig */
   {
     progNameCopy = strdup(argV[0]);
+
     progName     = strdup(paProgNameSet(argV[0], level, pid, extra));
+    if (progName == NULL)
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
+
     paProgName   = strdup(progName);
+    if (paProgName == NULL)
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
   }
   else
   {
     progNameCopy = strdup(paProgName);
     progName     = strdup(paProgName);
+    if ((progNameCopy == NULL) || (progName == NULL))
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
   }
 
 

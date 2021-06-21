@@ -1,0 +1,428 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Incorrect location processing fix
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Note we don't typically use direct creation of entities in DB, but in this case
+# in order to reproduce precicesly the situation that causes issue #3706 we are doing that way
+# in steps 1
+#
+# 01. Create entity directly in DB
+# 02. Update the entity as described in #3706 and check we don't get 413 error
+# 03. Get entity and check location has been updated to [-4,41]
+#
+
+echo "01. Create entity directly in DB"
+echo "================================"
+doc='{
+  "_id": {
+    "id": "ES0021000001111111AA",
+    "type": "SupplyPoint",
+    "servicePath": "/energia"
+  },
+  "attrNames": ["TimeInstant", "period", "seasonId", "name", "supplier", "address", "areaServed", "dateMaxPowerConsumption", "distributor", "electricityRateName", "energyConsumed", "invoiceNumber", "location", "maxPowerConsumption", "maximumPowerAvailableP1", "reactiveEnergyConsumed", "reactiveEnergyConsumedQ1", "reactiveEnergyConsumedQ2", "reactiveEnergyConsumedQ3", "reactiveEnergyConsumedQ4", "cif", "maximumPowerAvailableP2", "maximumPowerAvailableP3", "maximumPowerAvailableP4", "maximumPowerAvailableP5", "maximumPowerAvailableP6"],
+  "attrs": {
+    "TimeInstant": {
+      "value": 1599206400,
+      "type": "DateTime",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599206401
+    },
+    "period": {
+      "type": "Number",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "60",
+      "mdNames": []
+    },
+    "seasonId": {
+      "value": 1,
+      "type": "Number",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599143883
+    },
+    "name": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "Punto de suministro 1",
+      "mdNames": []
+    },
+    "supplier": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "Acme",
+      "mdNames": []
+    },
+    "address": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "Avenida de España, 2",
+      "mdNames": []
+    },
+    "areaServed": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "Ayuntamiento de Invernalia",
+      "mdNames": []
+    },
+    "dateMaxPowerConsumption": {
+      "value": 1601237698,
+      "type": "DateTime",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599144602
+    },
+    "distributor": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "i-DE",
+      "mdNames": []
+    },
+    "electricityRateName": {
+      "type": "Text",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "2.0A",
+      "mdNames": []
+    },
+    "energyConsumed": {
+      "value": 0.9163858596629744,
+      "type": "Number",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599206401
+    },
+    "invoiceNumber": {
+      "value": 3191227030215627,
+      "type": "Number",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599144602
+    },
+    "location": {
+      "value": {
+        "type": "Point",
+        "coordinates": [-3.643898967, 40.543613027]
+      },
+      "type": "StructuredValue",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1603273111.6492305
+    },
+    "maxPowerConsumption": {
+      "value": 1.0115844994877388,
+      "type": "Number",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599144602
+    },
+    "maximumPowerAvailableP1": {
+      "value": "5",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1603263879.509865
+    },
+    "reactiveEnergyConsumed": {
+      "value": 0.3122130027578168,
+      "type": "Number",
+      "mdNames": [],
+      "creDate": 1599057349,
+      "modDate": 1599206401
+    },
+    "reactiveEnergyConsumedQ1": {
+      "type": "Number",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "0",
+      "mdNames": []
+    },
+    "reactiveEnergyConsumedQ2": {
+      "type": "Number",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "0",
+      "mdNames": []
+    },
+    "reactiveEnergyConsumedQ3": {
+      "type": "Number",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "0",
+      "mdNames": []
+    },
+    "reactiveEnergyConsumedQ4": {
+      "type": "Number",
+      "creDate": 1599057349,
+      "modDate": 1599057349,
+      "value": "0",
+      "mdNames": []
+    },
+    "cif": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5097947,
+      "modDate": 1603263879.5097947
+    },
+    "maximumPowerAvailableP2": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5098703,
+      "modDate": 1603263879.5098703
+    },
+    "maximumPowerAvailableP3": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5098755,
+      "modDate": 1603263879.5098755
+    },
+    "maximumPowerAvailableP4": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5098822,
+      "modDate": 1603263879.5098822
+    },
+    "maximumPowerAvailableP5": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5098858,
+      "modDate": 1603263879.5098858
+    },
+    "maximumPowerAvailableP6": {
+      "value": "",
+      "type": "Text",
+      "mdNames": [],
+      "creDate": 1603263879.5098898,
+      "modDate": 1603263879.5098898
+    }
+  },
+  "creDate": 1599057349,
+  "modDate": 1603273111.6493506,
+  "lastCorrelator": "2e7b6c36-1381-11eb-a1f0-0242ac110013"
+}'
+# FIXME P3: not sure why mongCmd() doesn't work this time... maybe $doc is too long?
+#mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
+echo "db.entities.insert($doc)" | mongo mongodb://localhost:27017/${CB_DB_NAME} | tail -n 2 | head -n 1
+echo
+echo
+
+
+echo "02. Update the entity as described in #3706 and check we don't get 413 error"
+echo "============================================================================"
+payload='{"areaServed":{"value":"Ayuntamiento de Invernalia"},"name":{"value":"Punto de suministro 1"},"address":{"value":"Avenida de España, 2"},"location":{"value":{"type":"Point","coordinates":[-4,41]},"type":"geo:json"},"electricityRateName":{"value":"2.0A"},"maximumPowerAvailableP1":{"value":"5"},"maximumPowerAvailableP2":{"value":""},"maximumPowerAvailableP3":{"value":""},"maximumPowerAvailableP4":{"value":""},"maximumPowerAvailableP5":{"value":""},"maximumPowerAvailableP6":{"value":""},"distributor":{"value":"i-DE"},"supplier":{"value":"Acme"}}'
+orionCurl --url '/v2/entities/ES0021000001111111AA/attrs' --servicePath /energia --payload "${payload}"
+echo
+echo
+
+
+echo "03. Get entity and check location has been set to [-4,41]"
+echo "========================================================="
+orionCurl --url '/v2/entities/ES0021000001111111AA/attrs'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity directly in DB
+================================
+WriteResult({ "nInserted" : 1 })
+
+
+02. Update the entity as described in #3706 and check we don't get 413 error
+============================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get entity and check location has been set to [-4,41]
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 1807
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "TimeInstant": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2020-09-04T08:00:00.000Z"
+    },
+    "address": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Avenida de Espa\u00f1a, 2"
+    },
+    "areaServed": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Ayuntamiento de Invernalia"
+    },
+    "cif": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "dateMaxPowerConsumption": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2020-09-27T20:14:58.000Z"
+    },
+    "distributor": {
+        "metadata": {},
+        "type": "Text",
+        "value": "i-DE"
+    },
+    "electricityRateName": {
+        "metadata": {},
+        "type": "Text",
+        "value": "2.0A"
+    },
+    "energyConsumed": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0.91638586
+    },
+    "invoiceNumber": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3191227030215627
+    },
+    "location": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                -4,
+                41
+            ],
+            "type": "Point"
+        }
+    },
+    "maxPowerConsumption": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1.011584499
+    },
+    "maximumPowerAvailableP1": {
+        "metadata": {},
+        "type": "Text",
+        "value": "5"
+    },
+    "maximumPowerAvailableP2": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "maximumPowerAvailableP3": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "maximumPowerAvailableP4": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "maximumPowerAvailableP5": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "maximumPowerAvailableP6": {
+        "metadata": {},
+        "type": "Text",
+        "value": ""
+    },
+    "name": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Punto de suministro 1"
+    },
+    "period": {
+        "metadata": {},
+        "type": "Number",
+        "value": "60"
+    },
+    "reactiveEnergyConsumed": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0.312213003
+    },
+    "reactiveEnergyConsumedQ1": {
+        "metadata": {},
+        "type": "Number",
+        "value": "0"
+    },
+    "reactiveEnergyConsumedQ2": {
+        "metadata": {},
+        "type": "Number",
+        "value": "0"
+    },
+    "reactiveEnergyConsumedQ3": {
+        "metadata": {},
+        "type": "Number",
+        "value": "0"
+    },
+    "reactiveEnergyConsumedQ4": {
+        "metadata": {},
+        "type": "Number",
+        "value": "0"
+    },
+    "seasonId": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "supplier": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Acme"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -36,10 +36,6 @@
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
-#include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -136,26 +132,12 @@ struct QueryContextData
 */
 struct QueryContextResponseData
 {
-  QueryContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  QueryContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL) {}
   QueryContextResponse     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-  Metadata*                domainMetadataP;
-};
 
-
-
-/* ****************************************************************************
-*
-* SubscribeContextAvailabilityData - 
-*/
-struct SubscribeContextAvailabilityData
-{
-  SubscribeContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
-  SubscribeContextAvailabilityRequest  res;
-  EntityId*                            entityIdP;
-  Scope*                               scopeP;
 };
 
 
@@ -180,17 +162,6 @@ struct SubscribeContextData
 
 /* ****************************************************************************
 *
-* UnsubscribeContextAvailabilityData -
-*/
-typedef struct UnsubscribeContextAvailabilityData
-{
-  UnsubscribeContextAvailabilityRequest        res;
-} UnsubscribeContextAvailabilityData;
-
-
-
-/* ****************************************************************************
-*
 * UnsubscribeContextData -
 */
 typedef struct UnsubscribeContextData
@@ -206,43 +177,11 @@ typedef struct UnsubscribeContextData
 */
 struct NotifyContextData
 {
-  NotifyContextData(): cerP(NULL), attributeP(NULL), attributeMetadataP(NULL), domainMetadataP(NULL) {}
+  NotifyContextData(): cerP(NULL), attributeP(NULL), attributeMetadataP(NULL) {}
   NotifyContextRequest     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                attributeMetadataP;
-  Metadata*                domainMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityData -
-*/
-struct NotifyContextAvailabilityData
-{
-  NotifyContextAvailabilityData(): crrP(NULL), entityIdP(NULL), craP(NULL), attributeMetadataP(NULL), regMetadataP(NULL) {}
-  NotifyContextAvailabilityRequest     res;
-  ContextRegistrationResponse*         crrP;
-  EntityId*                            entityIdP;
-  ContextRegistrationAttribute*        craP;
-  Metadata*                            attributeMetadataP;
-  Metadata*                            regMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextAvailabilitySubscriptionData -
-*/
-struct UpdateContextAvailabilitySubscriptionData
-{
-  UpdateContextAvailabilitySubscriptionData(): entityIdP(NULL), scopeP(NULL) {}
-  UpdateContextAvailabilitySubscriptionRequest  res;
-  EntityId*                                     entityIdP;
-  Scope*                                        scopeP;
 };
 
 
@@ -253,13 +192,12 @@ struct UpdateContextAvailabilitySubscriptionData
 */
 struct UpdateContextData
 {
-  UpdateContextData(): ceP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL), domainMetadataP(NULL) {}
+  UpdateContextData(): eP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL) {}
   UpdateContextRequest   res;
-  ContextElement*        ceP;
+  Entity*                eP;
   EntityId*              entityIdP;
   ContextAttribute*      attributeP;
   Metadata*              contextMetadataP;
-  Metadata*              domainMetadataP;
 };
 
 
@@ -270,12 +208,11 @@ struct UpdateContextData
 */
 struct UpdateContextResponseData
 {
-  UpdateContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  UpdateContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL) {}
   UpdateContextResponse    res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-  Metadata*                domainMetadataP;
 };
 
 
@@ -328,11 +265,10 @@ struct UpdateContextElementData
 */
 struct AppendContextElementData
 {
-  AppendContextElementData(): attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
+  AppendContextElementData(): attributeP(NULL), metadataP(NULL) {}
   AppendContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
-  Metadata*                    domainMetadataP;
 };
 
 
@@ -417,9 +353,6 @@ typedef struct ParseData
   ContextAttribute*                           lastContextAttribute;
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
-  SubscribeContextAvailabilityData            scar;
-  UnsubscribeContextAvailabilityData          ucar;
-  UpdateContextAvailabilitySubscriptionData   ucas;
 
   QueryContextData                            qcr;
   SubscribeContextData                        scr;
@@ -427,7 +360,6 @@ typedef struct ParseData
   UpdateContextData                           upcr;
   UpdateContextSubscriptionData               ucsr;
   NotifyContextData                           ncr;
-  NotifyContextAvailabilityData               ncar;
 
   RegisterProviderRequestData                 rpr;
   UpdateContextElementData                    ucer;

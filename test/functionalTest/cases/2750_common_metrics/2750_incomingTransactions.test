@@ -106,7 +106,7 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 5 Incoming Transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1308
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,7 +185,7 @@ Date: REGEX(.*)
             }
         },
         "sum": {
-            "incomingTransactionResponseSize": 10,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 5,
             "serviceTime": REGEX(.*)
         }

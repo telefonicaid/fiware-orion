@@ -32,21 +32,15 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
-#include "mongoBackend/safeMongo.h"
 #include "cache/subCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -73,7 +67,7 @@ HttpStatusCode mongoUnsubscribeContext
    */
   responseP->subscriptionId = requestP->subscriptionId;
 
-  if (responseP->subscriptionId.get() == "")
+  if (responseP->subscriptionId.get().empty())
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
     responseP->statusCode.fill(SccContextElementNotFound);
@@ -84,31 +78,13 @@ HttpStatusCode mongoUnsubscribeContext
   }
 
   /* Look for document */
-  BSONObj sub;
-  OID     id;
+  orion::BSONObj sub;
+  orion::OID     id = orion::OID(requestP->subscriptionId.get());
 
-  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
-  {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+  orion::BSONObjBuilder bobId;
+  bobId.append("_id", id);
 
-    if (responseP->statusCode.code == SccContextElementNotFound)
-    {
-      // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
-      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
-
-      responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-      alarmMgr.badInput(clientIp, details);
-    }
-    else  // SccReceiverInternalError
-    {
-      responseP->oe.fill(SccReceiverInternalError, responseP->statusCode.details, "InternalError");
-      LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
-    }
-
-    return SccOk;
-  }
-
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bobId.obj(), &sub, &err) && (err != ""))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -122,8 +98,7 @@ HttpStatusCode mongoUnsubscribeContext
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
 
-    responseP->statusCode.fill(SccContextElementNotFound,
-                               std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
+    responseP->statusCode.fill(SccContextElementNotFound);
     responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
 
     return SccOk;
@@ -135,9 +110,11 @@ HttpStatusCode mongoUnsubscribeContext
   // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
   // to findAndModify for this?
   //
-  std::string colName = getSubscribeContextCollectionName(tenant);
 
-  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  orion::BSONObjBuilder bobId2;
+  bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
+
+  if (!orion::collectionRemove(composeDatabaseName(tenant), COL_CSUBS, bobId2.obj(), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 

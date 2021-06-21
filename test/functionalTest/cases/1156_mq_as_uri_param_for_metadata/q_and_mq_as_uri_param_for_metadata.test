@@ -398,7 +398,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Modify the subscription to have q=A1 AND mq=A1.M1
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -479,7 +478,6 @@ Date: REGEX(.*)
 11b. Update E3, setting M1 to A1
 ================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -513,13 +511,13 @@ Date: REGEX(.*)
 ============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 194
+Content-Length: 161
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -527,10 +525,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "Number", 
-                        "value": 3
-                    }, 
-                    "M2": {
                         "type": "Number", 
                         "value": 3
                     }

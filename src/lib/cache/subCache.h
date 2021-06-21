@@ -29,8 +29,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
@@ -83,7 +81,6 @@ struct EntityInfo
 
   bool          match(const std::string& idPattern, const std::string& type);
   void          release(void);
-  void          present(const std::string& prefix);
 };
 
 
@@ -109,9 +106,12 @@ struct CachedSubscription
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
+  bool                        onlyChanged;
   ngsiv2::HttpInfo            httpInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
+  std::string                 lastFailureReason;
+  int64_t                     lastSuccessCode;
   struct CachedSubscription*  next;
 };
 
@@ -179,22 +179,6 @@ extern int subCacheItems(void);
 
 /* ****************************************************************************
 *
-* subCacheEntryPresent -
-*/
-extern void subCacheEntryPresent(CachedSubscription* cSubP);
-
-
-
-/* ****************************************************************************
-*
-* subCachePresent - 
-*/
-extern void subCachePresent(const char* title);
-
-
-
-/* ****************************************************************************
-*
 * subCacheItemInsert -
 */
 extern void subCacheItemInsert
@@ -214,6 +198,8 @@ extern void subCacheItemInsert
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
+  int64_t                            lastSuccessCode,
+  const std::string&                 lastFailureReason,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -221,7 +207,8 @@ extern void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist
+  bool                               blacklist,
+  bool                               onlyChanged
 );
 
 
@@ -333,13 +320,15 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subCacheItemNotificationErrorStatus - 
+* subNotificationErrorStatus -
 */
-extern void subCacheItemNotificationErrorStatus
+extern void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors
+  int                 errors,
+  long long           statusCode,
+  const std::string&  failureReason
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

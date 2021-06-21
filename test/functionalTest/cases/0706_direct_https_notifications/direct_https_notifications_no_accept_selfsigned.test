@@ -83,10 +83,19 @@ echo
 
 # Note the REGEX(\S+) in the REGEXPECT part for step 4. This is due to that the log message is slightly different
 # depending on the libcurl version, some versions (newer ones) use "given" while other (older versions) use "known"
+#
+# The grep "notification failure" step is due to the error message also appear in update DB messages in noCache case
+# so we need to make the filter narrower
 
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
-grep "(curl_easy_perform failed: Peer certificate cannot be authenticated" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print $2 }' | awk -F ")" '{ print $1 }'
+
+LINE1=$(grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | grep "notification failure" | awk -F 'notification failure for queue worker: ' '{print $2}')
+LINE2=$(grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | grep "notification failure" | awk -F 'notification failure for sender-thread: ' '{print $2}')
+
+# Depending CB_THREADPOOL=ON|OFF, either LINE1 or LINE2 has the text we are looking for but not both at the same time
+echo $LINE1$LINE2
+
 echo
 echo
 
@@ -118,7 +127,7 @@ Date: REGEX(.*)
 
 04. Look in the CB log for the warning about cert not accepted
 ==============================================================
- failed: Peer certificate cannot be authenticated with REGEX(\S+) CA certificates
+Peer certificate cannot be authenticated with given CA certificates
 
 
 --TEARDOWN--

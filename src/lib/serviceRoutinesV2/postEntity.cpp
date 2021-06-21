@@ -63,7 +63,7 @@ std::string postEntity
 )
 {
   Entity*        eP  = &parseDataP->ent.res;
-  std::string    op  = ciP->uriParam["op"];
+  ActionType     op;
   Ngsiv2Flavour  flavor;
 
   eP->id   = compV[2];
@@ -78,12 +78,12 @@ std::string postEntity
 
   if (ciP->uriParamOptions["append"] == true)  // pure-append
   {
-    op     = "APPEND_STRICT";
+    op     = ActionTypeAppendStrict;
     flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
-    op     = "APPEND";  // append or update
+    op     = ActionTypeAppend;  // append or update
     flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
 

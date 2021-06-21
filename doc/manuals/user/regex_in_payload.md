@@ -1,25 +1,9 @@
 # Using regular expressions in payloads
 
-In some operations (both in NGSIv1 and NGSIv2) regular expressions can be used, as shown below. The
+In some operations regular expressions can be used, as shown below. The
 set of supported regular expressions is POSIX Extended (see details [here](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)).
 
-NGSIv1 example:
-
-```
-POST /v1/queryContext
-
-{
-  "entities": [
-    {
-      "type": "Sensor",
-      "isPattern": "true",
-      "id": ".*"
-    }
-  ]
-}
-```
-
-NGSIv2 example:
+Example:
 
 ```
 POST /v2/op/query
@@ -38,21 +22,7 @@ The regular expression language allows the usage of backslash (`\`). For example
 strings containing SENSOR followed by two digits. However, note that `\` is a special character in JSON,
 which, according to [the JSON specification](http://www.json.org), needs to be encoded as `\\`.
 
-```
-POST /v1/queryContext
-
-{
-  "entities": [
-    {
-      "type": "Sensor",
-      "isPattern": "true",
-      "id": "SENSOR\\d{2}"
-    }
-  ]
-}
-```
-
-NGSIv2 example:
+Example:
 
 ```
 POST /v2/op/query

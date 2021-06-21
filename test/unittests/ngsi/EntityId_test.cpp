@@ -40,27 +40,9 @@ TEST(EntityId, render)
 
   utInit();
 
-  out = eId.render(false);
+  out = eId.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(EntityId, present)
-{
-  EntityId     eId;
-
-  utInit();
-
-  eId.present("", -1);
-  eId.present("", 0);
 
   utExit();
 }

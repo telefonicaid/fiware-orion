@@ -37,7 +37,7 @@ brokerStart CB
 echo "01. Update with empty entities list"
 echo "==================================="
 payload='{
-  "actionType": "APPEND",
+  "actionType": "append",
   "entities": [ ]
 }'
 orionCurl --url /v2/op/update --payload "$payload"

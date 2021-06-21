@@ -237,7 +237,7 @@ Date: REGEX(.*)
     "ids": "REGEX(.*)",
     "inserts": 1,
     "items": 1,
-    "refresh": REGEX((0|1)),
+    "refresh": REGEX((0|1|2)),
     "removes": 0,
     "updates": 0
 }
@@ -306,7 +306,6 @@ Date: REGEX(.*)
 09. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -315,7 +314,6 @@ Date: REGEX(.*)
 10. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -324,7 +322,6 @@ Date: REGEX(.*)
 11. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -342,7 +339,7 @@ Date: REGEX(.*)
     "ids": "REGEX(.*)",
     "inserts": REGEX((2|3|4)),
     "items": 1,
-    "refresh": REGEX((0|2|3)),
+    "refresh": REGEX((0|2|3|4)),
     "removes": 1,
     "updates": 1
 }
@@ -391,7 +388,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -425,7 +422,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -459,7 +456,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [

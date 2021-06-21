@@ -44,6 +44,8 @@
 
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
 
+#include "logMsg/traceLevels.h"
+
 
 /******************************************************************************
 *
@@ -53,6 +55,9 @@ extern int             inSigHandler;
 extern char*           progName;
 extern __thread char   transactionId[64];
 extern __thread char   correlatorId[64];
+
+// comes from -logLineMaxSize at the end (default 32 * 1024)
+extern unsigned long   logLineMaxSize;
 
 
 
@@ -1822,68 +1827,26 @@ inline void lmTransactionReset()
 *
 * lmTransactionStart -
 */
-inline void lmTransactionStart(const char* keyword, const char* schema, const char* ip, int port, const char* path)
+inline void lmTransactionStart(
+  const char* keyword,
+  const char* schema,
+  const char* ip,
+  int port,
+  const char* path,
+  const char* _service,
+  const char* _subService,
+  const char* _fromIp
+)
 {
   transactionIdSet();
 
-  snprintf(service,    sizeof(service),    "pending");
-  snprintf(subService, sizeof(subService), "pending");
-  snprintf(fromIp,     sizeof(fromIp),     "pending");
-  LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
-}
+  const char* __service    = strlen(_service)    == 0? "<none>" : _service;
+  const char* __subService = strlen(_subService) == 0? "<none>" : _subService;
 
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetService -
-*/
-inline void lmTransactionSetService(const char* _service)
-{
-  if (strlen(_service) != 0)
-  {
-    snprintf(service, sizeof(service), "%s", _service);
-  }
-  else
-  {
-    snprintf(service, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetSubservice -
-*/
-inline void lmTransactionSetSubservice(const char* _subService)
-{
-  if (strlen(_subService) != 0)
-  {
-    snprintf(subService, sizeof(service), "%s", _subService);
-  }
-  else
-  {
-    snprintf(subService, sizeof(service), "%s", "<default>");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* lmTransactionSetFrom -
-*/
-inline void lmTransactionSetFrom(const char* _fromIp)
-{
-  if (strlen(_fromIp) != 0)
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
-  }
-  else
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
-  }
+  strncpy(service,    __service,    sizeof(service));
+  strncpy(subService, __subService, sizeof(subService));
+  strncpy(fromIp,     _fromIp,      sizeof(fromIp));
+  LM_T(LmtOldInfo, ("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
 
 
@@ -1901,7 +1864,7 @@ inline void lmTransactionSetFrom(const char* _fromIp)
 inline void lmTransactionStart_URL(const char* url)
 {
   transactionIdSet();
-  LM_I(("Starting transaction from %s", url));
+  LM_T(LmtOldInfo, ("Starting transaction from %s", url));
 }
 #endif
 
@@ -1913,7 +1876,7 @@ inline void lmTransactionStart_URL(const char* url)
 */
 inline void lmTransactionEnd()
 {
-  LM_I(("Transaction ended"));
+  LM_T(LmtOldInfo, ("Transaction ended"));
   lmTransactionReset();
 }
 

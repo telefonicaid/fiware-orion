@@ -42,6 +42,7 @@ extern bool parseStringVector
   const rapidjson::Value&    jsonVector,
   const std::string&         fieldName,
   bool                       emptyStringNotAllowed,
+  bool                       unique,
   std::string*               errorStringP
 );
 

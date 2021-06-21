@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "gmock/gmock.h"
-#include "mongo/client/dbclient.h"
 
 #include "common/globals.h"
 #include "common/RenderFormat.h"
@@ -37,6 +36,9 @@
 #include "apiTypesV2/HttpInfo.h"
 
 
+
+#if 0
+// FIXME #3775: pending on mongo unit test re-enabling
 
 /* ****************************************************************************
 *
@@ -201,6 +203,7 @@ class DBClientCursorMock: public mongo::DBClientCursor
       return mongo::DBClientCursor::next();
     }
 };
+#endif
 
 
 
@@ -223,43 +226,39 @@ class NotifierMock : public Notifier
      */
   }
 
-  MOCK_METHOD9(sendNotifyContextRequest, void(NotifyContextRequest*            ncr,
+  MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
                                               const ngsiv2::HttpInfo&          httpInfo,
                                               const std::string&               tenant,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
+                                              unsigned int                     correlatorCounter,
                                               RenderFormat                     renderFormat,
                                               const std::vector<std::string>&  attrsFilter,
-                                              const std::vector<std::string>&  metadataFilter,
-                                              bool                             blacklist));
-
-    MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest*  ncar,
-                                                            const std::string&                 url,
-                                                            const std::string&                 tenant,
-                                                            const std::string&                 fiwareCorrelator,
-                                                            RenderFormat                       renderFormat));
+                                              bool                             blacklist,
+                                              const std::vector<std::string>&  metadataFilter));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest*            ncr,
+    void parent_sendNotifyContextRequest(NotifyContextRequest&            ncr,
                                          const ngsiv2::HttpInfo&          httpInfo,
                                          const std::string&               tenant,
                                          const std::string&               xauthToken,
                                          const std::string&               fiwareCorrelator,
+                                         unsigned int                     correlatorCounter,
                                          RenderFormat                     renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
-                                         const std::vector<std::string>&  metadataFilter,
-                                         bool                             blacklist = false)
+                                         bool                             blacklist,
+                                         const std::vector<std::string>&  metadataFilter)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter, blacklist);
-    }
-
-    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest*  ncar,
-                                                     const std::string&                 url,
-                                                     const std::string&                 tenant,
-                                                     const std::string&                 fiwareCorrelator,
-                                                     RenderFormat                       renderFormat)
-    {
-      Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, renderFormat);
+      Notifier::sendNotifyContextRequest(ncr,
+                                         httpInfo,
+                                         tenant,
+                                         xauthToken,
+                                         fiwareCorrelator,
+                                         correlatorCounter,
+                                         renderFormat,
+                                         attrsFilter,
+                                         blacklist,
+                                         metadataFilter);
     }
 };
 
@@ -284,10 +283,10 @@ class TimerMock : public Timer
       .WillByDefault(::testing::Invoke(this, &TimerMock::parent_getCurrentTime));
   }
 
-  MOCK_METHOD0(getCurrentTime, int(void));
+  MOCK_METHOD0(getCurrentTime, double(void));
 
   /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-  int parent_getCurrentTime(void)
+  double parent_getCurrentTime(void)
   {
     return Timer::getCurrentTime();
   }
@@ -300,7 +299,7 @@ class TimerMock : public Timer
  * Eq() matcher. FIXME */
 MATCHER_P(MatchNcr, expected, "")
 {
-  return matchNotifyContextRequest(expected, arg);
+  return matchNotifyContextRequest(expected, &arg);
 }
 
 

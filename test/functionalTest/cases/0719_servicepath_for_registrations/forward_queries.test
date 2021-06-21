@@ -207,8 +207,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -236,8 +235,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -265,8 +263,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -294,8 +291,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -323,8 +319,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -352,8 +347,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"

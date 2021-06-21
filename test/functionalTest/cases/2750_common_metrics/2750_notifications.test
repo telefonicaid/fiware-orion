@@ -73,6 +73,7 @@ orionCurl --url /v2/entities --payload "$payload" --servicePath /SP
 echo
 echo
 
+valgrindSleep 1
 
 echo "03. Ask for metrics, see 1 outgoing transaction"
 echo "==============================================="
@@ -133,7 +134,7 @@ Date: REGEX(.*)
 03. Ask for metrics, see 1 outgoing transaction
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 698
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +198,7 @@ Date: REGEX(.*)
 06. Ask for metrics, see 2 outgoing transaction of which 1 failed
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 1110
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,14 +216,14 @@ Date: REGEX(.*)
                     "serviceTime": REGEX(.*)
                 },
                 "SP/get/metrics": {
-                    "incomingTransactionResponseSize": 698,
+                    "incomingTransactionResponseSize": REGEX(\d+),
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
             },
             "sum": {
                 "incomingTransactionRequestSize": 227,
-                "incomingTransactionResponseSize": 698,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 4,
                 "outgoingTransactionErrors": 1,
                 "outgoingTransactionRequestSize": 248,
@@ -242,14 +243,14 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             },
             "SP/get/metrics": {
-                "incomingTransactionResponseSize": 698,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
         },
         "sum": {
             "incomingTransactionRequestSize": 227,
-            "incomingTransactionResponseSize": 698,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 4,
             "outgoingTransactionErrors": 1,
             "outgoingTransactionRequestSize": 248,

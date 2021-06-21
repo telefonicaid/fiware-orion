@@ -52,7 +52,7 @@ TEST(UpdateContextElementResponse, render_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "details");
 
-  out = ucer.render(V1, false, UpdateContext);
+  out = ucer.toJsonV1(false, UpdateContext);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

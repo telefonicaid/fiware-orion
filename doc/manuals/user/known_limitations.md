@@ -2,11 +2,8 @@
 
 ## Request maximum size
 
-The current maximum request size in Orion Context Broker is 1 MB. This
-limit should suffice the most of the use cases and, at the same time,
-avoids denial of service due to too large requests. If you don't take
-this limitation into account, you will get messages such the following
-ones:
+Orion Context Broker has a default maximum request size of 1 MB. If you don't take
+this limitation into account, you will get messages such the following ones:
 
 ```
 {
@@ -29,17 +26,20 @@ Or, if you are sending a huge request, this one:
 carefully" text. Developers of the HTTP library in which Orion Context
 Broker is based seem to be funny guys :) :)
 
-If you find this 1MB limit too coarse, send us an email so we can
-consider your feedback in future releases.
+If this 1 MB limit doesn't work for you, you can change it using the [CLI option](../admin/cli.md) `-inReqPayloadMaxSize`.
+However, before doing this please have a look at [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Notification maximum size
 
-Notification maximum size is set to 8MB. Larger notifications will not be sent by context broker and you
-will get the following trace in the log file:
+Notification maximum size (including HTTP request line, headers and payload) is set to 8MB by default.
+Larger notifications will not be sent by the context broker and you will get the following trace in the log file:
 
     HTTP request to send is too large: N bytes
 
 where N is the number of bytes of the too large notification.
+
+You can change this limit by starting the broker with the [CLI option](../admin/cli.md) `-outReqMsgMaxSize`.
+However, before doing this please have a look at [performance considerations](../admin/perf_tuning.md#payload-and-message-size-and-performance).
 
 ## Content-Length header is required
 
@@ -50,25 +50,30 @@ Required" response. This is due to the way the underlying HTTP library
 mailing
 list](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html).
 
-## Entity fields length limitation
+## Subscription cache limitation
 
-Due to limitations at MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
+Orion Context Broker uses a subscription cache (actually, a bad name, given it is more a mem map than a cache ;) to speed up
+subscription triggering. That cache consumes RAM space and if you are using an abnormally high number of subscriptions, Orion
+may crash due to memory outage. It would be extremely rare to have that situation in a real usage case (we have been able to
+reproduce the situation only in a laboratory setup) but, if happens, then disable cache usage with the `-noCache` CLI switch.
 
-    length(id) + length(type) + length(servicePath) + 10 < 1024
+As a reference, in our lab tests in a machine with Orion 1.13.0 running with 4 GB RAM, Orion crashed when the number 
+of subscriptions got higher than 211.000 subscriptions.
 
-Otherwise, we will get an error at entity creation time.
+There is [an issue in the repository](https://github.com/telefonicaid/fiware-orion/issues/2780) about improvements related with this.
 
-## Duration format
+## Maximum nesting level
 
-[ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations) may adopt several formats. The following
-constrains applies to the one that Orion supports in the NGSIv1 API (NGSIv2 doesn't uses ISO801 durations):
+There is a maximum nesting level for compound attributes and metadata values. This limit is 50 levels.
+If you try to create or update an attribute/metadata with a value overpassing this limit you will get a
+400 Bad Request error with this payload:
 
-* P[n]Y[n]M[n]DT[n]H[n]M[n]S is supported (P[n]W format is not supported)
-* Decimal fractions are supported for seconds (S), but not in other elements.
+```
+{
+   "description": "attribute or metadata value has overpassed maximum nesting limit: 50",
+   "error": "ParseError"
+}
+```
 
-## Entity fields size limitation
-
-Due to underlying DB limitations (see details [here](https://github.com/telefonicaid/fiware-orion/issues/1289)),
-the combined size (sum) of entity id, entity type and entity service path cannot exceed 1014 characters (this is not a typo, 
-it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attempt to overpass the limit you will get
-a 400 BadRequest "Too long entity id/type/servicePath combination" error.
+Note that other systems dealing with JSON also use to have this kind of limit (for instance,
+[the limit in MongoDB](https://docs.mongodb.com/manual/reference/limits/#Nested-Depth-for-BSON-Documents)).

@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,10 +35,13 @@
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationGet.h"
+
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -48,9 +49,9 @@
 *
 * setRegistrationId -
 */
-static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setRegistrationId(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
-  regP->id = getFieldF(r, "_id").OID().toString();
+  regP->id = getFieldF(r, "_id").OID();
 }
 
 
@@ -59,7 +60,7 @@ static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& 
 *
 * setDescription -
 */
-static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setDescription(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
   if (r.hasField(REG_DESCRIPTION))
   {
@@ -79,15 +80,11 @@ static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * setProvider -
 */
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode forwardingMode, const orion::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
-  //
-  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
-  // into account for them).
-  //
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
+  regP->provider.supportedForwardingMode = forwardingMode;
 
   std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
   if (format == "JSON")
@@ -96,7 +93,7 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
   }
   else
   {
-    // FIXME #3068: to be implemented once we define NGSIv2 based forwarding
+    regP->provider.legacyForwardingMode = false;
   }
 }
 
@@ -106,14 +103,14 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * setEntities -
 */
-static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void setEntities(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 {
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
+  std::vector<orion::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
   {
     ngsiv2::EntID    entity;
-    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
+    orion::BSONObj   ce = dbEntityV[ix].embeddedObject();
 
     if (ce.hasField(REG_ENTITY_ISPATTERN))
     {
@@ -161,16 +158,16 @@ static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 *
 * setAttributes -
 */
-static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void setAttributes(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 {
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
+  std::vector<orion::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
   {
-    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
+    orion::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
     std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
 
-    if (attrName != "")
+    if (!attrName.empty())
     {
       regP->dataProvided.attributes.push_back(attrName);
     }
@@ -188,23 +185,27 @@ static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 * possible in V2 and we cannot respond to the request using the current implementation of V2.
 * This function will be changed to work in a different way once issue #3044 is dealt with.
 */
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
+static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r, bool arrayAllowed)
 {
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+  std::vector<orion::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
   if (crV.size() > 1)
   {
     return false;
   }
 
+  // Get the forwarding mode to be used later in setProvider()
+  ngsiv2::ForwardingMode forwardingMode =
+      ngsiv2::stringToForwardingMode(r.hasField(REG_FORWARDING_MODE)? getStringField(r, REG_FORWARDING_MODE) : "all");
+
   //
   // Extract the first (and only) CR from the contextRegistration vector
   //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
+  orion::BSONObj cr0 = crV[0].embeddedObject();
 
   setEntities(regP, cr0);
   setAttributes(regP, cr0);
-  setProvider(regP, cr0);
+  setProvider(regP, forwardingMode, cr0);
 
   return true;
 }
@@ -215,9 +216,9 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
 *
 * setExpires -
 */
-static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setExpires(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntFieldF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLongF(r, REG_EXPIRATION) : -1;
 }
 
 
@@ -226,7 +227,7 @@ static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * setStatus -
 */
-static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setStatus(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
   regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
 }
@@ -248,29 +249,24 @@ void mongoRegistrationGet
 {
   bool         reqSemTaken = false;
   std::string  err;
-  mongo::OID   oid;
-  StatusCode   sc;
-
-  if (safeGetRegId(regId, &oid, &sc) == false)
-  {
-    oeP->fill(sc);
-    return;
-  }
+  orion::OID   oid = orion::OID(regId);
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Registration"));
 
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q;
+  orion::DBCursor  cursor;
+  orion::BSONObj   q;
 
-  q = BSON("_id" << oid);
+  orion::BSONObjBuilder bob;
+  bob.append("_id", oid);
+  q = bob.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, q, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
@@ -279,17 +275,9 @@ void mongoRegistrationGet
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (moreSafe(cursor))
+  orion::BSONObj r;
+  if (cursor.next(&r))
   {
-    mongo::BSONObj r;
-    if (!nextSafeOrErrorF(cursor, &r, &err))
-    {
-      releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
-      return;
-    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     //
@@ -300,7 +288,7 @@ void mongoRegistrationGet
 
     if (setDataProvided(regP, r, false) == false)
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
@@ -309,19 +297,10 @@ void mongoRegistrationGet
 
     setExpires(regP, r);
     setStatus(regP, r);
-
-    if (moreSafe(cursor))  // Can only be one ...
-    {
-      releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      oeP->fill(SccConflict, "");
-      return;
-    }
   }
   else
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     LM_T(LmtMongo, ("registration not found: '%s'", regId.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_REGISTRATION, ERROR_NOT_FOUND);
@@ -329,7 +308,7 @@ void mongoRegistrationGet
     return;
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
 
   oeP->fill(SccOk, "");
@@ -354,7 +333,7 @@ void mongoRegistrationsGet
 {
   bool         reqSemTaken = false;
   std::string  err;
-  mongo::OID   oid;
+  orion::OID   oid;
   StatusCode   sc;
   std::string  servicePath = (servicePathV.size() == 0)? "/#" : servicePathV[0];  // FIXME P4: see #3100
 
@@ -362,22 +341,25 @@ void mongoRegistrationsGet
 
   LM_T(LmtMongo, ("Mongo Get Registrations"));
 
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::Query                          q;
+  orion::DBCursor  cursor;
+  orion::BSONObj   q;
 
   // FIXME P6: This here is a bug ... See #3099 for more info
   if (!servicePath.empty() && (servicePath != "/#"))
   {
-    q = BSON(REG_SERVICE_PATH << servicePathV[0]);
+    orion::BSONObjBuilder bob;
+    bob.append(REG_SERVICE_PATH, servicePathV[0]);
+    q = bob.obj();
   }
 
-  q.sort(BSON("_id" << 1));
+  orion::BSONObjBuilder bSort;
+  bSort.append("_id", 1);
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, countP, &err))
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, q, bSort.obj(), limit, offset, &cursor, countP, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
@@ -387,16 +369,10 @@ void mongoRegistrationsGet
 
   /* Process query result */
   int docs = 0;
-  while (moreSafe(cursor))
+  orion::BSONObj        r;
+  while (cursor.next(&r))
   {
-    mongo::BSONObj        r;
     ngsiv2::Registration  reg;
-
-    if (!nextSafeOrErrorF(cursor, &r, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      continue;
-    }
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ++docs;
@@ -409,7 +385,7 @@ void mongoRegistrationsGet
 
     if (setDataProvided(&reg, r, false) == false)
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
       reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
@@ -422,7 +398,7 @@ void mongoRegistrationsGet
     regV->push_back(reg);
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
 
   oeP->fill(SccOk, "");

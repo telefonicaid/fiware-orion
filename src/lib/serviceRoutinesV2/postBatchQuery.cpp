@@ -37,6 +37,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 
 
 
@@ -67,38 +68,31 @@ std::string postBatchQuery
   Entities              entities;
   std::string           answer;
 
-  //
-  // This request does not support (it ignores) the URI parameter 'metadata'.
-  // Instead the metadata filter comes inside the payload.
-  // To pass the metadata filter to the rendering function, the same mechanism as for URI param is used here.
-  // This is a little bit ugly as we 'fool' the render method to believe that the filter came via URI param.
-  // However, the implementation is cleaner and no more code is needed for this, just to set the
-  // URI param with the value of the metadata filter from the payload.
-  //
-  ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();
+  // To be used later in the render stage
+  StringList filterAttrs = bqP->attrsV;
 
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
 
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
-  if (ciP->httpStatusCode != SccOk)
-  {
-    parseDataP->qcr.res.release();
-    return answer;
-  }
+  // Whichever the case, 200 OK is always returned (in the case of fail with CPr 200 OK [] may be returned)
+  // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
+  // the client as errors
+  ciP->httpStatusCode = SccOk;
 
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
-    ciP->httpStatusCode = SccOk;
     answer = "[]";
   }
   else
   {
-    entities.fill(&parseDataP->qcrs.res);
+    OrionError oe;
+    entities.fill(parseDataP->qcrs.res, &oe);
 
-    TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
+    TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                          filterAttrs.stringV, false, qcrP->metadataList.stringV));
   }
 
   // 04. Cleanup and return result

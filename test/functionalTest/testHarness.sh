@@ -33,9 +33,7 @@ echo $testStartTime > /tmp/brokerStartCounter
 #
 # DISABLED - funct tests that are disabled, for some reason
 #
-DISABLED=('test/functionalTest/cases/1156_qfilters_and_compounds/qfilters_and_compounds_equals_null.test' \
-          'test/functionalTest/cases/0000_bad_requests/exit.test' \
-          'test/functionalTest/cases/2207_not_spurious_decimals_in_custom_notifications/not_spurious_decimals_in_custom_notifications.test' \
+DISABLED=('test/functionalTest/cases/0000_bad_requests/exit.test' \
           'test/functionalTest/cases/0917_queryContext_behaves_differently/query_with_and_without_forwarding.test' \
           'test/functionalTest/cases/0000_ipv6_support/ipv4_only.test' \
           'test/functionalTest/cases/0000_ipv6_support/ipv6_only.test' \
@@ -132,7 +130,8 @@ function usage()
   echo "$empty [--keep (don't remove output files)]"
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
-  echo "$empty [--fromIx <index of test where to start>]"
+  echo "$empty [--fromIx <index of test where to start (inclusive)>]"
+  echo "$empty [--toIx <index of test where to end (inclusive)>]"
   echo "$empty [--ixList <list of test indexes>]"
   echo "$empty [--skipList <list of indexes of test cases to be skipped>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
@@ -140,10 +139,25 @@ function usage()
   echo "$empty [--noCache (force broker to be started with the option --noCache)]"
   echo "$empty [--cache (force broker to be started without the option --noCache)]"
   echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
+  echo "$empty [--xbroker (use external brokers, i.e. this script will *not* start any brokers, including context providers)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
+  echo ""
+  echo "Env Vars:"
+  echo "CB_MAX_TRIES:             The number of tries before giving up on a failing test case"
+  echo "CB_SKIP_LIST:             Default value for option --skipList"
+  echo "CB_SKIP_FUNC_TESTS:       List of names of func tests to skip"
+  echo "CB_NO_CACHE:              Start the broker without subscription cache (if set to 'ON')"
+  echo "CB_THREADPOOL:            Start the broker without thread pool (if set to 'OFF')"
+  echo "CB_DIFF_TOOL:             To view diff of failing tests with diff/tkdiff/meld/... (e.g. export CB_DIFF_TOOL=tkdiff)"
+  echo "CB_WITH_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo ""
+  echo "FT_FROM_IX: alternative to commandline parameter  'fromIx', index of test where to start (inclusive) "
+  echo "FT_TO_IX: alternative to commandline parameter  'toIx', index of test where to end (inclusive)"
+  echo
+  echo "Please note that, if using CB_WITH_EXTERNAL_BROKER (or --xbroker, which is the same), only a single test case should be run."
   echo
   exit $1
 }
@@ -224,6 +238,7 @@ vMsg "$ME, in directory $SCRIPT_HOME"
 # Argument parsing
 #
 typeset -i fromIx
+typeset -i toIx
 verbose=off
 dryrun=off
 keep=off
@@ -236,9 +251,11 @@ dirGiven=no
 filterGiven=no
 showDuration=on
 fromIx=0
+toIx=0
 ixList=""
 noCache=""
 threadpool=ON
+xbroker=off
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -252,12 +269,14 @@ do
   elif [ "$1" == "--match" ];        then match="$2"; shift;
   elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
   elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
+  elif [ "$1" == "--toIx" ];         then toIx=$2; shift;
   elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
   elif [ "$1" == "--skipList" ];     then skipList=$2; shift;
   elif [ "$1" == "--no-duration" ];  then showDuration=off;
   elif [ "$1" == "--noCache" ];      then noCache=ON;
   elif [ "$1" == "--cache" ];        then noCache=OFF;
   elif [ "$1" == "--noThreadpool" ]; then threadpool=OFF;
+  elif [ "$1" == "--xbroker" ];      then xbroker=ON;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -272,8 +291,6 @@ do
 done
 
 vMsg "options parsed"
-
-
 
 # -----------------------------------------------------------------------------
 #
@@ -296,6 +313,28 @@ then
   export CB_THREADPOOL=$threadpool
 fi
 
+# -----------------------------------------------------------------------------
+#
+# Check if fromIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
+then
+  fromIx=$FT_FROM_IX
+fi
+
+# -----------------------------------------------------------------------------
+#
+# Check if toIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
+then
+  toIx=$FT_TO_IX
+fi
+
+echo "Run tests $fromIx to $toIx"
+
 # ------------------------------------------------------------------------------
 #
 # Check unmatching --dir and 'parameter that is a directory' AND
@@ -305,6 +344,7 @@ fi
 # 2. Else, it must be a file, or a filter.
 #    If the 
 #
+singleFile=No
 if [ "$dirOrFile" != "" ]
 then
   vMsg dirOrFile: $dirOrFile
@@ -328,6 +368,7 @@ then
       exit 1
     fi
 
+    singleFile=Yes
     #
     # If just a filename is given, keep the directory as is.
     # If a whole path is given, use the directory-part as directory and the file-part as filter
@@ -342,10 +383,30 @@ then
     then
       dir=$(dirname $dirOrFile)
       testFilter=$(basename $dirOrFile)
+
+      # Last dir + test file ?
+      if [ -d test/functionalTest/cases/$dirPart ]
+      then
+          dirOrFile=test/functionalTest/cases/$dirPart
+      fi
     else
       testFilter=$(basename $dirOrFile)
     fi
   fi
+fi
+
+#
+# The option of running against an external broker "--xbroker" only works (for now, at least) with a single test case.
+# Strange things may happen (due to the state inside the broker) if more that one test case are launched.
+# This check avoid this situation.
+#
+# If in the future we want to be able to run more than one test case against an external broker, we'd need to make sure
+# that each test case undoes all internal state inside the external broker. E.g. delete subscriptions, entities, etc.
+#
+if [ "$singleFile" == "No" ] && [ "$xbroker" == "ON" ]
+then
+    echo "External broker can only be used with individual test cases"
+    exit 1
 fi
 
 vMsg directory: $dir
@@ -359,6 +420,18 @@ vMsg "Script in $SCRIPT_HOME"
 # Other global variables
 #
 toBeStopped=false
+
+
+
+# ------------------------------------------------------------------------------
+#
+# xbroker - if this CLI is set, then the broker is not to be started as part of
+#           the test suite - another broker is assumed to be running already
+#
+if [ "$xbroker" == "ON" ]
+then
+    export CB_WITH_EXTERNAL_BROKER=ON
+fi
 
 
 
@@ -377,7 +450,7 @@ then
   elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]
   then
     # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
-    # Note that the script home in this case is test/functionaTest
+    # Note that the script home in this case is test/functionalTest
     vMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
     source $SCRIPT_HOME/../../scripts/testEnv.sh
   else
@@ -409,6 +482,7 @@ fi
 # Preparations - cd to the test directory
 #
 dMsg Functional Tests Starting ...
+
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile
@@ -418,7 +492,6 @@ then
 else
   cd $dir
 fi
-
 
 echo "Orion Functional tests starting" > /tmp/orionFuncTestLog
 date >> /tmp/orionFuncTestLog
@@ -883,6 +956,11 @@ do
     continue;
   fi
 
+  if [ $toIx != 0 ] && [ $testNo -gt $toIx ]
+  then
+    continue;
+  fi
+
   #
   # Disabled test?
   #
@@ -900,6 +978,18 @@ do
     if [ "$hit" == "" ]
     then
       # Test case not found in ix-list, so it is not executed
+      continue
+    fi
+  fi
+
+  if [ "$CB_SKIP_FUNC_TESTS" != "" ]
+  then
+    hit=$(echo ' '$CB_SKIP_FUNC_TESTS' ' | grep ' '$testFile' ')
+    if [ "$hit" != "" ]
+    then
+      # Test case found in skip-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
       continue
     fi
   fi

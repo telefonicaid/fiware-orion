@@ -60,7 +60,7 @@ Duration::Duration()
 */
 std::string Duration::check(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "OK";
   }
@@ -109,7 +109,7 @@ std::string Duration::get(void)
 */
 bool Duration::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -136,29 +136,11 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::present
+* Duration::toJsonV1 -
 */
-void Duration::present(const std::string& indent)
+std::string Duration::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sDuration: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Duration\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Duration::render -
-*/
-std::string Duration::render(bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

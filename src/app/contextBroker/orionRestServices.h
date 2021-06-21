@@ -33,7 +33,7 @@
 *
 * ORION_REST_SERVICE_END - End marker for the Rest Service array
 */
-#define ORION_REST_SERVICE_END  { InvalidRequest,  0, {}, "", NULL }
+#define ORION_REST_SERVICE_END  { InvalidRequest,  0, {}, NULL }
 
 
 
@@ -50,8 +50,6 @@ extern void orionRestServicesInit
    unsigned int        _connectionMemory,
    unsigned int        _maxConnections,
    unsigned int        _mhdThreadPoolSize,
-   const std::string&  _rushHost,
-   unsigned short      _rushPort,
    const char*         _allowedOrigin,
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,

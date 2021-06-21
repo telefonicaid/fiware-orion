@@ -39,20 +39,20 @@
 */
 static RestService getV[] =
 {
-  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { InvalidRequest,    0, {              }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics" }, statisticsTreat      },
+  { InvalidRequest,    0, {              }, NULL                 }
 };
 
 static RestService deleteV[] =
 {
-  { StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { InvalidRequest,    0, {              }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics" }, statisticsTreat      },
+  { InvalidRequest,    0, {              }, NULL                 }
 };
 
 static RestService badVerbV[] =
 {
-  { StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
-  { InvalidRequest,    0, {              }, "", NULL                 }
+  { StatisticsRequest, 1, { "statistics" }, badVerbGetDeleteOnly },
+  { InvalidRequest,    0, {              }, NULL                 }
 };
 
 
@@ -66,6 +66,10 @@ TEST(badVerbGetDeleteOnly, ok)
   ConnectionInfo  ci("/statistics",  "PUT", "1.1");
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService = { StatisticsRequest, 1, { "statistics" }, NULL };
+
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
   out = orion::requestServe(&ci);

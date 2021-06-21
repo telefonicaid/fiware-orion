@@ -92,7 +92,7 @@ static bool entityIdMatch(EntityId* e1, EntityId* e2)
     return false;
   }
 
-  if ((e2->type != "") && (e1->type != e2->type))
+  if ((!e2->type.empty()) && (e1->type != e2->type))
   {
     return false;
   }
@@ -133,37 +133,4 @@ void QueryContextRequestVector::release(void)
   }
 
   vec.clear();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequestVector::present -
-*/
-void QueryContextRequestVector::present(void)
-{
-  LM_T(LmtPresent, ("Presenting QueryContextRequestVector of %d QueryContextRequests", vec.size()));
-  for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
-  {
-    LM_T(LmtPresent,("QueryContextRequest %d:", qcrIx));
-    LM_T(LmtPresent,("  Context Provider:   %s", vec[qcrIx]->contextProvider.c_str()));
-
-    for (unsigned int eIx = 0; eIx < vec[qcrIx]->entityIdVector.size(); ++eIx)
-    {
-      EntityId* eP = vec[qcrIx]->entityIdVector[eIx];
-
-      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }",
-                        eIx, eP->id.c_str(),
-                        eP->type.c_str(),
-                        eP->isPattern.c_str()));
-    }
-
-    for (unsigned int aIx = 0; aIx < vec[qcrIx]->attributeList.size(); ++aIx)
-    {
-      LM_T(LmtPresent, ("  attribute %02d: %s",
-                        aIx,
-                        vec[qcrIx]->attributeList[aIx].c_str()));
-    }
-  }
 }

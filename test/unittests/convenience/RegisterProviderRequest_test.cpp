@@ -45,11 +45,11 @@
 */
 TEST(RegisterProviderRequest, json_ok)
 {
+  // FIXME P2: gap in outFile
   ParseData       reqData;
   const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.valid.json";
   const char*     inFile2  = "ngsi9.registerProviderRequest.ok.valid.json";
-  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.valid.json";
-  const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.json";
+  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.valid.json";  
   const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.json";
   const char*     outFile4 = "ngsi9.registerProviderRequestRendered.ok.valid.json";
   std::string     result;
@@ -62,19 +62,11 @@ TEST(RegisterProviderRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile1)) << "Error getting test data from '" << inFile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
 
-  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  rendered = reqData.rpr.res.render();
+  rendered = reqData.rpr.res.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-
-  // 2. Destroying metadata to provoke an error
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-
-  reqData.rpr.res.metadataVector[0]->name = "";
-  checked = reqData.rpr.res.check(V1, DiscoverContextAvailability, "");
-  EXPECT_STREQ(expectedBuf, checked.c_str());
 
 
   // 3. sending a 'predetected error' to the check function
@@ -83,15 +75,13 @@ TEST(RegisterProviderRequest, json_ok)
   checked   = reqData.rpr.res.check(V1, DiscoverContextAvailability, "forced predetectedError");
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
-  // Just for coverage
-  reqData.rpr.res.release();
 
   // 4. Second file
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile2)) << "Error getting test data from '" << inFile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
 
-  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, NULL);
   EXPECT_EQ("OK", result);
-  rendered = reqData.rpr.res.render();
+  rendered = reqData.rpr.res.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 }

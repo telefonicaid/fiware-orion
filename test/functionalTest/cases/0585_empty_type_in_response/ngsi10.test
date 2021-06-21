@@ -33,12 +33,10 @@ brokerStart CB
 # 01. Update/APPEND an entity with type Room and id Room, Attribute temperature
 # 02. Query with convop GET /v1/contextEntities/Room
 # 03. Query with convop GET /v1/contextEntities/Room/attributes/temperature
-# 04. Query with convop GET /v1/contextEntities/Room/attributes/temperature/ID
-# 05. Query with convop GET /v1/contextEntities/type/Room/id/Room
-# 06. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature
-# 07. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup
-# 08. Query with convop GET /v1/contextEntityTypes/Room
-# 09. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature
+# 04. Query with convop GET /v1/contextEntities/type/Room/id/Room
+# 05. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature
+# 06. Query with convop GET /v1/contextEntityTypes/Room
+# 07. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature
 #
 
 echo "01. Update/APPEND an entity with type Room and id Room, Attribute temperature"
@@ -86,41 +84,28 @@ echo
 echo
 
 
-echo "04. Query with convop GET /v1/contextEntities/Room/attributes/temperature/ID"
-echo "============================================================================"
-orionCurl --url /v1/contextEntities/Room/attributes/temperature/backup
-echo
-echo
-
-echo "05. Query with convop GET /v1/contextEntities/type/Room/id/Room"
+echo "04. Query with convop GET /v1/contextEntities/type/Room/id/Room"
 echo "==============================================================="
 orionCurl --url /v1/contextEntities/type/Room/id/Room
 echo
 echo
 
 
-echo "06. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature"
+echo "05. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature"
 echo "======================================================================================"
 orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature
 echo
 echo
 
 
-echo "07. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup"
-echo "============================================================================================="
-orionCurl --url /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup
-echo
-echo
-
-
-echo "08. Query with convop GET /v1/contextEntityTypes/Room"
+echo "06. Query with convop GET /v1/contextEntityTypes/Room"
 echo "====================================================="
 orionCurl --url /v1/contextEntityTypes/Room
 echo
 echo
 
 
-echo "09. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature"
+echo "07. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature"
 echo "============================================================================"
 orionCurl --url /v1/contextEntityTypes/Room/attributes/temperature
 echo
@@ -232,37 +217,7 @@ Date: REGEX(.*)
 }
 
 
-04. Query with convop GET /v1/contextEntities/Room/attributes/temperature/ID
-============================================================================
-HTTP/1.1 200 OK
-Content-Length: 177
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        {
-            "metadatas": [
-                {
-                    "name": "ID", 
-                    "type": "string", 
-                    "value": "backup"
-                }
-            ], 
-            "name": "temperature", 
-            "type": "degree", 
-            "value": "20"
-        }
-    ], 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-05. Query with convop GET /v1/contextEntities/type/Room/id/Room
+04. Query with convop GET /v1/contextEntities/type/Room/id/Room
 ===============================================================
 HTTP/1.1 200 OK
 Content-Length: 242
@@ -297,7 +252,7 @@ Date: REGEX(.*)
 }
 
 
-06. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature
+05. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature
 ======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 177
@@ -327,37 +282,7 @@ Date: REGEX(.*)
 }
 
 
-07. Query with convop GET /v1/contextEntities/type/Room/id/Room/attributes/temperature/backup
-=============================================================================================
-HTTP/1.1 200 OK
-Content-Length: 177
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        {
-            "metadatas": [
-                {
-                    "name": "ID", 
-                    "type": "string", 
-                    "value": "backup"
-                }
-            ], 
-            "name": "temperature", 
-            "type": "degree", 
-            "value": "20"
-        }
-    ], 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-08. Query with convop GET /v1/contextEntityTypes/Room
+06. Query with convop GET /v1/contextEntityTypes/Room
 =====================================================
 HTTP/1.1 200 OK
 Content-Length: 265
@@ -396,7 +321,7 @@ Date: REGEX(.*)
 }
 
 
-09. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature
+07. Query with convop GET /v1/contextEntityTypes/Room/attributes/temperature
 ============================================================================
 HTTP/1.1 200 OK
 Content-Length: 265

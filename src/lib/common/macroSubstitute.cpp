@@ -25,10 +25,10 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "ngsi/ContextElement.h"
 
 #include "common/string.h"
 #include "common/limits.h"
+#include "common/globals.h"
 #include "common/macroSubstitute.h"
 
 
@@ -51,7 +51,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
-      *valueP = toString(vec[ix]->numberValue);
+      *valueP = double2string(vec[ix]->numberValue);
     }
     else if (vec[ix]->valueType == orion::ValueTypeBoolean)
     {
@@ -70,19 +70,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     {
       if (vec[ix]->compoundValueP)
       {
-        if (vec[ix]->compoundValueP->valueType == orion::ValueTypeVector)
-        {
-          *valueP = "[" + vec[ix]->compoundValueP->toJson(true, true) + "]";
-        }
-        else if (vec[ix]->compoundValueP->valueType == orion::ValueTypeObject)
-        {
-          *valueP = "{" + vec[ix]->compoundValueP->toJson(true, true) + "}";
-        }
-        else
-        {
-          LM_E(("Runtime Error (attribute is of object type but its compound is of invalid type)"));
-          *valueP = "";
-        }
+        *valueP = vec[ix]->compoundValueP->toJson();
       }
       else
       {
@@ -129,12 +117,12 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const ContextElement& ce)
+bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 {
   // Initial size check: is the string to convert too big?
   //
-  // If the string to convert is bigger than the maximum allowed buffer size (MAX_DYN_MSG_SIZE),
-  // then there is an important probability that the resulting string after substitution is also > MAX_DYN_MSG_SIZE.
+  // If the string to convert is bigger than the maximum allowed buffer size (outReqMsgMaxSize),
+  // then there is an important probability that the resulting string after substitution is also > outReqMsgMaxSize.
   //
   // This check avoids to copy 8MB to later only throw it away and return an error
   // That is the advantage.
@@ -146,7 +134,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
   //
   // We assume that this second case is more than rare
   //
-  if (from.size() > MAX_DYN_MSG_SIZE)
+  if (from.size() > outReqMsgMaxSize)
   {
     LM_W(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
@@ -181,7 +169,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
     macroStart = from.find("${", macroEnd + 1);
   }
 
-  // Calculate resulting size (if > MAX_DYN_MSG_SIZE, then reject)
+  // Calculate resulting size (if > outReqMsgMaxSize, then reject)
   unsigned long  toReduce = 0;
   unsigned long  toAdd    = 0;
 
@@ -195,22 +183,22 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      toAdd += ce.entityId.id.length() * times;
+      toAdd += en.id.length() * times;
     }
     else if (macroName == "type")
     {
-      toAdd += ce.entityId.type.length() * times;
+      toAdd += en.type.length() * times;
     }
     else
     {
       std::string value;
 
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
       toAdd += value.length() * times;
     }
   }
 
-  if (from.length() + toAdd - toReduce > MAX_DYN_MSG_SIZE)
+  if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
     LM_W(("Runtime Error (too large final string, after substitution)"));
     *to = "";
@@ -229,15 +217,15 @@ bool macroSubstitute(std::string* to, const std::string& from, const ContextElem
 
     if (macroName == "id")
     {
-      value = ce.entityId.id;
+      value = en.id;
     }
     else if (macroName == "type")
     {
-      value = ce.entityId.type;
+      value = en.type;
     }
     else
     {
-      attributeValue(&value, ce.contextAttributeVector.vec, macroName.c_str());
+      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
     }
 
     // We have to do the replace operation as many times as macro occurrences

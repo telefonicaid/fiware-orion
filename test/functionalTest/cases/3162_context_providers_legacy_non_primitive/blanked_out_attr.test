@@ -1,0 +1,366 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Blanked Out Attribute
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
+
+--SHELL--
+
+#
+# 
+# 01. Create entity with geodata and string object
+# 02. Check entity in CB
+# 03. Get entity from mongodb
+# 04. Register CP1 for Entity in step 01
+# 05. Check entity in CB
+# 06. Get entity from mongodb
+#
+
+echo "01. Create entity with geodata and string object"
+echo "================================================"
+payload='{
+"actionType": "append",
+  "entities": [
+    {
+      "id":"urn:ngsi-ld:Store:004",
+      "type":"Store",
+      "address": {
+        "type":"PostalAddress",
+        "value": {
+          "streetAddress":"Panoramastrasse 1A",
+          "addressRegion":"Berlin",
+          "addressLocality":"Mitte",
+          "postalCode":"10178"
+        }
+      },
+      "location": {
+        "type":"geo:json",
+        "value": {
+          "type":"Point",
+          "coordinates": [13.4094,52.5208]
+        }
+      },
+      "name": {
+        "type":"Text",
+        "value":"Tower Troddelmarkt"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. Check entity in CB"
+echo "======================"
+orionCurl --url /v2/entities/urn:ngsi-ld:Store:004
+echo
+echo
+
+
+echo "03. Get entity from mongodb"
+echo "==========================="
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+echo $m | python -mjson.tool
+echo
+echo
+
+
+echo "04. Register CP1 for Entity in step 01"
+echo "======================================"
+payload='{
+  "description": "Relative Humidity Context Source",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "urn:ngsi-ld:Store:004",
+        "type": "Store"
+      }
+    ],
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost':$CP1_PORT'/v2"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Check entity in CB"
+echo "======================"
+orionCurl --url /v2/entities/urn:ngsi-ld:Store:004
+echo
+echo
+
+
+echo "06. Get entity from mongodb"
+echo "==========================="
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+echo $m | python -mjson.tool
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with geodata and string object
+================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Check entity in CB
+======================
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "address": {
+        "metadata": {},
+        "type": "PostalAddress",
+        "value": {
+            "addressLocality": "Mitte",
+            "addressRegion": "Berlin",
+            "postalCode": "10178",
+            "streetAddress": "Panoramastrasse 1A"
+        }
+    },
+    "id": "urn:ngsi-ld:Store:004",
+    "location": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                13.4094,
+                52.5208
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Tower Troddelmarkt"
+    },
+    "type": "Store"
+}
+
+
+03. Get entity from mongodb
+===========================
+{
+    "_id": {
+        "id": "urn:ngsi-ld:Store:004",
+        "servicePath": "/",
+        "type": "Store"
+    },
+    "attrNames": [
+        "address",
+        "location",
+        "name"
+    ],
+    "attrs": {
+        "address": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "PostalAddress",
+            "value": {
+                "addressLocality": "Mitte",
+                "addressRegion": "Berlin",
+                "postalCode": "10178",
+                "streetAddress": "Panoramastrasse 1A"
+            }
+        },
+        "location": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    13.4094,
+                    52.5208
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "Text",
+            "value": "Tower Troddelmarkt"
+        }
+    },
+    "creDate": REGEX([0-9]+\.[0-9]+),
+    "lastCorrelator": "REGEX([0-9a-f\-]{36})",
+    "location": {
+        "attrName": "location",
+        "coords": {
+            "coordinates": [
+                13.4094,
+                52.5208
+            ],
+            "type": "Point"
+        }
+    },
+    "modDate": REGEX([0-9]+\.[0-9]+)
+}
+
+
+04. Register CP1 for Entity in step 01
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Check entity in CB
+======================
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "address": {
+        "metadata": {},
+        "type": "PostalAddress",
+        "value": {
+            "addressLocality": "Mitte",
+            "addressRegion": "Berlin",
+            "postalCode": "10178",
+            "streetAddress": "Panoramastrasse 1A"
+        }
+    },
+    "id": "urn:ngsi-ld:Store:004",
+    "location": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                13.4094,
+                52.5208
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "metadata": {},
+        "type": "Text",
+        "value": "Tower Troddelmarkt"
+    },
+    "type": "Store"
+}
+
+
+06. Get entity from mongodb
+===========================
+{
+    "_id": {
+        "id": "urn:ngsi-ld:Store:004",
+        "servicePath": "/",
+        "type": "Store"
+    },
+    "attrNames": [
+        "address",
+        "location",
+        "name"
+    ],
+    "attrs": {
+        "address": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "PostalAddress",
+            "value": {
+                "addressLocality": "Mitte",
+                "addressRegion": "Berlin",
+                "postalCode": "10178",
+                "streetAddress": "Panoramastrasse 1A"
+            }
+        },
+        "location": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    13.4094,
+                    52.5208
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "creDate": REGEX([0-9]+\.[0-9]+),
+            "mdNames": [],
+            "modDate": REGEX([0-9]+\.[0-9]+),
+            "type": "Text",
+            "value": "Tower Troddelmarkt"
+        }
+    },
+    "creDate": REGEX([0-9]+\.[0-9]+),
+    "lastCorrelator": "REGEX([0-9a-f\-]{36})",
+    "location": {
+        "attrName": "location",
+        "coords": {
+            "coordinates": [
+                13.4094,
+                52.5208
+            ],
+            "type": "Point"
+        }
+    },
+    "modDate": REGEX([0-9]+\.[0-9]+)
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

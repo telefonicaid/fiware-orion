@@ -42,7 +42,6 @@ ContextRegistrationAttribute::ContextRegistrationAttribute()
 {
   name     = "";
   type     = "";
-  isDomain = "";
 }
 
 
@@ -54,35 +53,24 @@ ContextRegistrationAttribute::ContextRegistrationAttribute()
 ContextRegistrationAttribute::ContextRegistrationAttribute
 (
   const std::string&  _name,
-  const std::string&  _type,
-  const std::string&  _isDomain
+  const std::string&  _type
 )
 {
   name      = _name;
-  type      = _type;
-  isDomain  = _isDomain;
+  type      = _type;  
 }
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::render -
+* ContextRegistrationAttribute::toJsonV1 -
 */
-std::string ContextRegistrationAttribute::render(bool comma)
+std::string ContextRegistrationAttribute::toJsonV1(bool comma)
 {
   std::string out = "";
 
-  //
-  // About JSON commas:
-  // The field isDomain is mandatory, so all field before that will
-  // have the comma set to true for the render methods.
-  // The only doubt here is whether isDomain should have the comma or not,
-  // that depends on whether the metadataVector is empty or not.
-  //
   out += startTag();
-  out += valueTag("name",     name, true);
-  out += valueTag("type",     type, true);
-  out += valueTag("isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(false);
+  out += valueTag("name", name, true);
+  out += valueTag("type", type, false);
   out += endTag(comma);
 
   return out;
@@ -97,61 +85,11 @@ std::string ContextRegistrationAttribute::render(bool comma)
 std::string ContextRegistrationAttribute::check(ApiVersion apiVersion)
 {
 
-  if (name == "")
+  if (name.empty())
   {
     return "missing name for registration attribute";
-  }
-
-  if (isDomain == "")
-  {
-    return "missing isDomain value for registration attribute";
-  }
-
-  if (!isTrue(isDomain) && !isFalse(isDomain))
-  {
-    return std::string("invalid isDomain value for registration attribute: /") + isDomain + "/";
-  }
-
-  std::string res;
-  if ((res = metadataVector.check(apiVersion)) != "OK")
-  {
-    return res;
   }
 
   return "OK";
 }
 
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttribute::present -
-*/
-void ContextRegistrationAttribute::present(int ix, const std::string& indent)
-{
-  LM_T(LmtPresent, ("%sAttribute %d:\n",    
-		    indent.c_str(), 
-		    ix));
-  LM_T(LmtPresent, ("%s  Name:       %s\n", 
-		    indent.c_str(), 
-		    name.c_str()));
-  LM_T(LmtPresent, ("%s  Type:       %s\n", 
-		    indent.c_str(), 
-		    type.c_str()));
-  LM_T(LmtPresent, ("%s  isDomain:   %s\n", 
-		    indent.c_str(), 
-		    isDomain.c_str()));
-
-  metadataVector.present("Attribute", indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttribute::release -
-*/
-void ContextRegistrationAttribute::release(void)
-{
-  metadataVector.release();
-}

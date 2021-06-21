@@ -34,12 +34,12 @@ accumulatorStart --pretty-print
 # Same steps than filter_datemodified.test but using dateModified at attribute level
 #
 # 01. Create entity E1
-# 02. At t_0: Create subscription with mq: A.dateModified>t_2
-# 03. At t_1: modify entity E1 (not notif)
-# 04. At t_2: modify entity E1 (not notif)
-# 05. At t_3: modify entity E1 (notif)
-# 06. At t_4: modify entity E1 (notif)
-# 07. Get accumulator dump (2 notifications), for t_3 and t_4
+# 02. At T_0: Create subscription with mq: A.dateModified>T_4
+# 03. At T_1: modify entity E1 (not notif)
+# 04. At T_2: modify entity E1 (not notif)
+# 05. At T_5: modify entity E1 (notif)
+# 06. At T_6: modify entity E1 (notif)
+# 07. Get accumulator dump (2 notifications), for T_5 and T_6
 #
 
 echo "01. Create entity E1"
@@ -54,11 +54,11 @@ echo
 echo
 
 
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z" --date="4seconds")
 
 
-echo "02. At t_0: Create subscription with mq: dateModified>t_2"
+echo "02. At T_0: Create subscription with mq: dateModified>T_4"
 echo "========================================================="
 payload='
 {
@@ -72,7 +72,7 @@ payload='
         "condition": {
             "attrs": [ ],
             "expression": {
-               "mq": "A.dateModified>'$T_2'"
+               "mq": "A.dateModified>'$T_4'"
             }
          }
     },
@@ -88,51 +88,51 @@ echo
 echo
 
 
-echo "03. At t_1: modify entity E1 (not notif)"
+sleep 1  # Total slept: 1s
+echo "03. At T_1: modify entity E1 (not notif)"
 echo "========================================"
-sleep 1s
 payload='{
-  "A": "t_1"
+  "A": "T_1"
 }'
 orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
 
-echo "04. At t_2: modify entity E1 (not notif)"
+sleep 1  # Total slept: 2s
+echo "04. At T_2: modify entity E1 (not notif)"
 echo "========================================"
-sleep 1s
 payload='{
-  "A": "t_2"
+  "A": "T_2"
 }'
 orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
 
-echo "05. At t_3: modify entity E1 (notif)"
+sleep 3  # Total slept: 5s
+echo "05. At T_5: modify entity E1 (notif)"
 echo "===================================="
-sleep 1s
 payload='{
-  "A": "t_3"
+  "A": "T_5"
 }'
 orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
 
-echo "06. At t_4: modify entity E1 (notif)"
+sleep 1  # Total slept: 6s
+echo "06. At T_6: modify entity E1 (notif)"
 echo "===================================="
-sleep 1s
 payload='{
-  "A": "t_4"
+  "A": "T_6"
 }'
 orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
 echo
 echo
 
 
-echo "07. Get accumulator dump (2 notifications), for t_3 and t_4"
+echo "07. Get accumulator dump (2 notifications), for T_5 and T_6"
 echo "==========================================================="
 accumulatorDump
 echo
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 
 
 
-02. At t_0: Create subscription with mq: dateModified>t_2
+02. At T_0: Create subscription with mq: dateModified>T_4
 =========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -160,43 +160,39 @@ Date: REGEX(.*)
 
 
 
-03. At t_1: modify entity E1 (not notif)
+03. At T_1: modify entity E1 (not notif)
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-04. At t_2: modify entity E1 (not notif)
+04. At T_2: modify entity E1 (not notif)
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. At t_3: modify entity E1 (notif)
+05. At T_5: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. At t_4: modify entity E1 (notif)
+06. At T_6: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-07. Get accumulator dump (2 notifications), for t_3 and t_4
+07. Get accumulator dump (2 notifications), for T_5 and T_6
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -206,7 +202,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -214,7 +210,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A": {
                 "metadata": {},
                 "type": "Text",
-                "value": "t_3"
+                "value": "T_5"
             },
             "id": "E1",
             "type": "T"
@@ -231,7 +227,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -239,7 +235,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A": {
                 "metadata": {},
                 "type": "Text",
-                "value": "t_4"
+                "value": "T_6"
             },
             "id": "E1",
             "type": "T"

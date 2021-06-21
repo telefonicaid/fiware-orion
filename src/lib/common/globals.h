@@ -71,14 +71,6 @@
 
 /* ****************************************************************************
 *
-* metadata ID separator
-*/
-#define MD_ID_SEPARATOR "()"
-
-
-
-/* ****************************************************************************
-*
 * Default Types for entities, attributes and metadata
 */
 #define DEFAULT_ENTITY_TYPE       "Thing"
@@ -88,6 +80,7 @@
 #define DEFAULT_ATTR_ARRAY_TYPE   "StructuredValue"
 #define DEFAULT_ATTR_OBJECT_TYPE  "StructuredValue"
 #define DEFAULT_ATTR_NULL_TYPE    "None"
+#define TEXT_UNRESTRICTED_TYPE    "TextUnrestricted"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
 #define NUMBER_TYPE_ALT           "Quantity"
@@ -96,11 +89,12 @@
 
 /* ****************************************************************************
 *
-* virtual attributes
+* NGSIv2 builtin attributes
 */
-#define DATE_CREATED   "dateCreated"
-#define DATE_MODIFIED  "dateModified"
-#define ALL_ATTRS      "*"
+#define DATE_CREATED    "dateCreated"
+#define DATE_MODIFIED   "dateModified"
+#define DATE_EXPIRES    "dateExpires"
+#define ALL_ATTRS       "*"
 
 
 
@@ -119,15 +113,19 @@
 *
 * Values for the URI param 'options'
 */
-#define OPT_COUNT           "count"
-#define OPT_APPEND          "append"
-#define OPT_NORMALIZED      "normalized"
-#define OPT_VALUES          "values"
-#define OPT_KEY_VALUES      "keyValues"
-#define OPT_UNIQUE_VALUES   "unique"
-#define OPT_DATE_CREATED    DATE_CREATED
-#define OPT_DATE_MODIFIED   DATE_MODIFIED
-#define OPT_NO_ATTR_DETAIL  "noAttrDetail"
+#define OPT_COUNT                       "count"
+#define OPT_FLOW_CONTROL                "flowControl"
+#define OPT_APPEND                      "append"
+#define OPT_NORMALIZED                  "normalized"
+#define OPT_VALUES                      "values"
+#define OPT_KEY_VALUES                  "keyValues"
+#define OPT_UNIQUE_VALUES               "unique"
+#define OPT_DATE_CREATED                DATE_CREATED
+#define OPT_DATE_MODIFIED               DATE_MODIFIED
+#define OPT_NO_ATTR_DETAIL              "noAttrDetail"
+#define OPT_UPSERT                      "upsert"
+#define OPT_SKIPINITALNOTIFICATION      "skipInitialNotification"
+#define OPT_FORCEDUPDATE                "forcedUpdate"
 
 
 
@@ -210,6 +208,7 @@ extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
 extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
+extern char               notifFlowControl[];
 extern bool               noCache;
 extern bool               simulatedNotification;
 
@@ -223,9 +222,17 @@ extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
 extern bool               ngsiv1Autocast;
+extern unsigned long long inReqPayloadMaxSize;
+extern unsigned long long outReqMsgMaxSize;
+
+extern bool               fcEnabled;
+extern double             fcGauge;
+extern unsigned long      fcStepDelay;
+extern unsigned long      fcMaxInterval;
+
+extern unsigned long      logInfoPayloadMaxSize;
 
 extern struct             mosquitto *mosq;  // FIXME PoC: probably not in this file
-
 
 
 /* ****************************************************************************
@@ -275,7 +282,7 @@ extern void setTimer(Timer* t);
 *
 * getCurrentTime - 
 */ 
-extern int getCurrentTime(void);
+extern double getCurrentTime(void);
 
 
 
@@ -305,7 +312,7 @@ extern int64_t parse8601(const std::string& s);
 * This is common code for Duration and Throttling (at least)
 *
 */
-extern int64_t parse8601Time(const std::string& s);
+extern double parse8601Time(const std::string& s);
 
 
 
@@ -325,6 +332,17 @@ extern int transactionIdGet(bool readonly = true);
 
 /* ****************************************************************************
 *
+* transactionIdGetAsString -
+*
+* Different from transactionIdGet(), this function returns the full transID,
+* not only the integer counter
+*/
+extern char* transactionIdGetAsString(void);
+
+
+
+/* ****************************************************************************
+*
 * transactionIdSet - set the transaction ID
 *
 * To ensure a unique identifier of the transaction, the startTime down to milliseconds
@@ -338,6 +356,24 @@ extern int transactionIdGet(bool readonly = true);
 *
 */
 extern void transactionIdSet(void);
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - set the transaction ID string
+*
+*/
+extern void transactionIdSet(const char* transId);
+
+
+
+/* ****************************************************************************
+*
+* correlationIdGet -
+*
+*/
+extern  char* correlationIdGet(void);
 
 
 

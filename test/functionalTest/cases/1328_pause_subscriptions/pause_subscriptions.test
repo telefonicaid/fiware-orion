@@ -242,7 +242,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID1 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 428
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,7 +255,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -284,7 +285,6 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID1 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -293,7 +293,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID1 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 430
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,7 +306,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "inactive",
     "subject": {
@@ -345,7 +346,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 453
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -361,7 +362,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "inactive",
     "subject": {
@@ -390,7 +392,6 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions/ID2 to change status to "active"
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -399,7 +400,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID2 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -415,7 +416,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -444,7 +446,6 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions/ID2 to change expiration time to make it to expire
 ==============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -453,7 +454,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -469,7 +470,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -498,7 +500,6 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID2 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -507,7 +508,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -523,7 +524,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -552,7 +554,6 @@ Date: REGEX(.*)
 13. PATCH /v2/subscriptions/ID2 to change expiration time to make it to un-expire
 =================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -561,7 +562,7 @@ Date: REGEX(.*)
 14. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 453
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -577,7 +578,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "inactive",
     "subject": {

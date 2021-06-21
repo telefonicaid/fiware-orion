@@ -144,7 +144,17 @@ Date: REGEX(.*)
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)
+  "machine" : "REGEX(.*)",
+  "doc" : "REGEX(.*)",
+  "libversions": {
+     "boost": "REGEX(.*)",
+     "libcurl": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
+     "openssl": "REGEX(.*)",
+     "rapidjson": "REGEX(.*)",
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
+  }
 }
 }
 
@@ -164,7 +174,17 @@ Date: REGEX(.*)
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)
+  "machine" : "REGEX(.*)",
+  "doc" : "REGEX(.*)",
+  "libversions": {
+     "boost": "REGEX(.*)",
+     "libcurl": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
+     "openssl": "REGEX(.*)",
+     "rapidjson": "REGEX(.*)",
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
+  }
 }
 }
 
@@ -236,7 +256,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: ::1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "contextResponses": [
@@ -271,7 +291,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "contextResponses": [

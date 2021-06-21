@@ -68,7 +68,7 @@ payload='{
   "id": "E1",
   "type": "T1",
   "birthdate": {
-    "value": "2050-04-05T14:00:00.00Z",
+    "value": "2050-04-05T14:00:00.123Z",
     "type": "DateTime"
   }
 }'
@@ -108,7 +108,7 @@ echo "07. Update entity with right date"
 echo "================================="
 payload='{
   "birthdate": {
-    "value": "2018-12-03T13:21:42.00Z",
+    "value": "2018-12-03T13:21:42.456Z",
     "type": "DateTime"
   }
 }'
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 04. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 103
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2050-04-05T14:00:00.00Z"
+        "value": "2050-04-05T14:00:00.123Z"
     },
     "id": "E1",
     "type": "T1"
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 06. Check entity hasn't been modified
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 103
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -208,7 +208,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2050-04-05T14:00:00.00Z"
+        "value": "2050-04-05T14:00:00.123Z"
     },
     "id": "E1",
     "type": "T1"
@@ -218,7 +218,6 @@ Date: REGEX(.*)
 07. Update entity with right date
 =================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -227,7 +226,7 @@ Date: REGEX(.*)
 08. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 103
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +235,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2018-12-03T13:21:42.00Z"
+        "value": "2018-12-03T13:21:42.456Z"
     },
     "id": "E1",
     "type": "T1"

@@ -1,0 +1,272 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check right status transitions in subscription from fail to active
+
+--SHELL-INIT--
+
+dbInit CB
+brokerStart CB 0 IPv4
+
+--SHELL--
+
+#
+# 01. Create sub
+# 02. Get subscription (no last* field)
+# 03. Create entity  (triggering notification)
+# 04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
+# 05. Start endpoint
+# 06. Update entity (triggering notification)
+# 07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
+#
+
+echo "01. Create sub"
+echo "=============="
+payload='{
+  "description": "The sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme200"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get subscription (no last* field)"
+echo "====================================="
+orionCurl --url /v2/subscriptions/$SUB_ID1
+echo
+echo
+
+
+echo "03. Create entity  (triggering notification)"
+echo "============================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server"
+echo "======================================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID1
+echo
+echo
+
+
+# We introduced some ward period. Not only for letting accumulator server to start but also to
+# ensure updates/notifications are not too close. Otherwise, they can be too close
+# so lastFailure == lastSuccess and the CB logic represents this as status: active.
+# lastFailure/lastSuccess precission is 1 second, so that's the time we wait
+
+echo "05. Start endpoint"
+echo "=================="
+accumulatorStart --pretty-print | grep -v "Connection to"
+sleep 1
+echo
+echo
+
+
+echo "06. Update entity (triggering notification)"
+echo "==========================================="
+payload='{
+  "A": 2
+}'
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)"
+echo "================================================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub
+==============
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get subscription (no last* field)
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 277
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme200"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Create entity  (triggering notification)
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 427
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme200"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "failed",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Start endpoint
+==================
+accumulator running as PID REGEX(\d+)
+
+
+06. Update entity (triggering notification)
+===========================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 490
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme200"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

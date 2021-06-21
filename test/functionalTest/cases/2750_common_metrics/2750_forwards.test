@@ -205,7 +205,6 @@ Date: REGEX(.*)
 05. Update E1 in CB, update is forwarded and it works
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -214,7 +213,7 @@ Date: REGEX(.*)
 06. Ask for metrics, see 3 outgoing transactions
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1122
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,7 +236,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 1,
                 "incomingTransactionRequestSize": 164,
-                "incomingTransactionResponseSize": 230,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 4,
                 "outgoingTransactionRequestSize": 254,
                 "outgoingTransactionResponseSize": 449,
@@ -262,7 +261,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 1,
             "incomingTransactionRequestSize": 164,
-            "incomingTransactionResponseSize": 230,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 4,
             "outgoingTransactionRequestSize": 254,
             "outgoingTransactionResponseSize": 449,
@@ -304,7 +303,7 @@ Date: REGEX(.*)
 09. Ask for metrics, see 1 error in outgoing transactions
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1908
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -334,7 +333,7 @@ Date: REGEX(.*)
                     "serviceTime": REGEX(.*)
                 },
                 "root-subserv": {
-                    "incomingTransactionResponseSize": 1122,
+                    "incomingTransactionResponseSize": REGEX(\d+),
                     "incomingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -342,7 +341,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionErrors": 2,
                 "incomingTransactionRequestSize": 304,
-                "incomingTransactionResponseSize": 1511,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 7,
                 "outgoingTransactionErrors": 1,
                 "outgoingTransactionRequestSize": 310,
@@ -375,7 +374,7 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             },
             "root-subserv": {
-                "incomingTransactionResponseSize": 1122,
+                "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -383,7 +382,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionErrors": 2,
             "incomingTransactionRequestSize": 304,
-            "incomingTransactionResponseSize": 1511,
+            "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 7,
             "outgoingTransactionErrors": 1,
             "outgoingTransactionRequestSize": 310,

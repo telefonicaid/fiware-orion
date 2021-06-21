@@ -69,13 +69,6 @@ echo
 echo "02. POST /v1/registry/contextEntities/type/T1/id/E1"
 echo "==================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X2"
-    }
-  ],
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part02"
 }'
@@ -104,13 +97,6 @@ echo
 echo "04. Modify registration"
 echo "======================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X4"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part04",
   "registrationId": "'$REG_ID'"
@@ -139,13 +125,6 @@ echo
 echo "06. POST /v1/registry/contextEntities/type/T1/id/E2?!exist=entity::type, and see it fail"
 echo "========================================================================================"
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X6"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part06"
 }'
@@ -157,13 +136,6 @@ echo
 echo "07. POST /v1/registry/contextEntities/type/T1/id/E2?exist=entity::type, and see it work"
 echo "======================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X7"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part07"
 }'
@@ -175,13 +147,6 @@ echo
 echo "08. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T2, and see it fail"
 echo "===================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X8"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part08"
 }'
@@ -193,13 +158,6 @@ echo
 echo "09. POST /v1/registry/contextEntities/type/T1/id/E2?entity::type=T1, and see it work"
 echo "===================================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X9"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part09"
 }'
@@ -211,13 +169,6 @@ echo
 echo "10. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s1"
 echo "===================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X10"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part10"
 }'
@@ -229,13 +180,6 @@ echo
 echo "11. POST /v1/registry/contextEntities/type/T1/id/E2, servicePath /s2"
 echo "===================================================================="
 payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X11"
-    }
-  ],
   "duration": "PT2H",
   "providingApplication": "http://kz.tid.es/part11"
 }'

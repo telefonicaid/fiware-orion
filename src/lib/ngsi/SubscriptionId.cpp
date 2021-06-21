@@ -65,7 +65,7 @@ std::string SubscriptionId::check(void)
 {
   std::string out = "OK";
 
-  if (string != "")
+  if (!string.empty())
   {
     out = idCheck(string);
   }
@@ -81,7 +81,7 @@ std::string SubscriptionId::check(void)
 */
 bool SubscriptionId::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -121,73 +121,15 @@ const char* SubscriptionId::c_str(void) const
 
 /* ****************************************************************************
 *
-* SubscriptionId::present -
+* SubscriptionId::toJsonV1 -
 */
-void SubscriptionId::present(const std::string& indent)
-{
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sSubscriptionId: %s\n", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo SubscriptionId\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscriptionId::toJson -
-*/
-std::string SubscriptionId::toJson(RequestType container, bool comma)
+std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 {
   std::string xString = string;
 
-  if (xString == "")
+  if (xString.empty())
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
-        (container == UnsubscribeContext)                              ||
-        (container == RtUnsubscribeContextResponse)                    ||
-        (container == NotifyContext)                                   ||
-        (container == RtSubscribeResponse)                             ||
-        (container == RtSubscribeError))
-    {
-      // subscriptionId is Mandatory
-      xString = "000000000000000000000000";
-    }
-    else
-    {
-      return "";  // subscriptionId is Optional
-    }
-  }
-
-  return xString;
-}
-
-
-/* ****************************************************************************
-*
-* SubscriptionId::render -
-*/
-std::string SubscriptionId::render(RequestType container, bool comma)
-{
-  std::string xString = string;
-
-  if (xString == "")
-  {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||
@@ -226,13 +168,9 @@ void SubscriptionId::release(void)
 */
 bool SubscriptionId::rendered(RequestType container)
 {
-  if ((string == "") || (string == "000000000000000000000000"))
+  if ((string.empty()) || (string == "000000000000000000000000"))
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||

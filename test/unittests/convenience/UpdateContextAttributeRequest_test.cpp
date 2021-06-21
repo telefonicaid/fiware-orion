@@ -51,7 +51,7 @@ TEST(UpdateContextAttributeRequest, render_json)
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(V1);
+  out = ucar.toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -98,22 +98,6 @@ TEST(UpdateContextAttributeRequest, check_json)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - just exercise the code
-*/
-TEST(UpdateContextAttributeRequest, present)
-{
-  UpdateContextAttributeRequest  ucar;
-  Metadata                       mdata("name", "type", "value");
-
-  ucar.metadataVector.push_back(&mdata);
-
-  ucar.present("");
 }
 
 

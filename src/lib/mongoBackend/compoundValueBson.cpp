@@ -25,8 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
+#include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -38,18 +37,13 @@
 
 /* ****************************************************************************
 *
-* namespaces - 
-*/
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
-
-
-
-/* ****************************************************************************
-*
 * compoundValueBson (for arrays) -
+*
+* strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
+* strings are converted to numbers (strings are not allowed in GeoJSON)
+*
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONArrayBuilder& b)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool strings2numbers)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -57,7 +51,15 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
 
     if (child->valueType == orion::ValueTypeString)
     {
-      b.append(child->stringValue);
+      if ((strings2numbers) && (str2double(child->stringValue.c_str(), &child->numberValue)))
+      {
+        b.append(child->numberValue);
+      }
+      else
+      {
+        // Fails in str2double() means that values is not an actual number, so we do nothing and leave it as it is
+        b.append(child->stringValue);
+      }
     }
     else if (child->valueType == orion::ValueTypeNumber)
     {
@@ -73,16 +75,16 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeVector)
     {
-      BSONArrayBuilder ba;
+      orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba);
+      compoundValueBson(child->childV, ba, strings2numbers);
       b.append(ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
-      BSONObjBuilder bo;
+      orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo);
+      compoundValueBson(child->childV, bo, strings2numbers);
       b.append(bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
@@ -101,17 +103,28 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
 /* ****************************************************************************
 *
 * compoundValueBson (for objects) -
+*
+* strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
+* strings are converted to numbers (strings are not allowed in GeoJSON)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONObjBuilder& b)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool strings2numbers)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode*  child         = children[ix];
-    std::string                effectiveName = dbDotEncode(child->name);
+    std::string                effectiveName = dbEncode(child->name);
 
     if (child->valueType == orion::ValueTypeString)
     {
-      b.append(effectiveName, child->stringValue);
+      if ((strings2numbers) && (str2double(child->stringValue.c_str(), &child->numberValue)))
+      {
+        b.append(effectiveName, child->numberValue);
+      }
+      else
+      {
+        // Fails in str2double() means that values is not an actual number, so we do nothing and leave it as it is
+        b.append(effectiveName, child->stringValue);
+      }
     }
     else if (child->valueType == orion::ValueTypeNumber)
     {
@@ -127,16 +140,16 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeVector)
     {
-      BSONArrayBuilder ba;
+      orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba);
+      compoundValueBson(child->childV, ba, strings2numbers);
       b.append(effectiveName, ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
-      BSONObjBuilder bo;
+      orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo);
+      compoundValueBson(child->childV, bo, strings2numbers);
       b.append(effectiveName, bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)

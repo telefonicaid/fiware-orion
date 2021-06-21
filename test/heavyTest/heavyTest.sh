@@ -419,24 +419,7 @@ do
   
   partTest 1   dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discovery"                                   "/NGSI9/discoverContextAvailability" "NO PATTERN"
   partTest 99  dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  partTest 400 dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  
-  partTest 1   scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscription"                    "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 99  scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 200 scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  
-  partTest 1   ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdate"              "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 99  ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 200 ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  
-  partTest 1   ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 99  ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 200 ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  
-  partTest 1   ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 99  ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 200 ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  
+  partTest 400 dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN" 
   
   
   # -----------------------------------------------------------------------------

@@ -536,7 +536,6 @@ Date: REGEX(.*)
 01c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -546,13 +545,13 @@ Date: REGEX(.*)
 =======================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 260
+Content-Length: 193
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -576,13 +575,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 260
+Content-Length: 193
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -629,7 +628,6 @@ Date: REGEX(.*)
 02c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -639,13 +637,13 @@ Date: REGEX(.*)
 ========================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 262
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -669,13 +667,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 262
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -722,7 +720,6 @@ Date: REGEX(.*)
 03c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -732,13 +729,13 @@ Date: REGEX(.*)
 ========================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 398
+Content-Length: 263
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -766,13 +763,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 398
+Content-Length: 263
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -823,7 +820,6 @@ Date: REGEX(.*)
 04c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -833,13 +829,13 @@ Date: REGEX(.*)
 =============================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 465
+Content-Length: 330
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -875,13 +871,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 467
+Content-Length: 332
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -940,7 +936,6 @@ Date: REGEX(.*)
 05c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -950,13 +945,13 @@ Date: REGEX(.*)
 =========================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 431
+Content-Length: 296
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -988,13 +983,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 432
+Content-Length: 297
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -1049,7 +1044,6 @@ Date: REGEX(.*)
 06c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -1065,7 +1059,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -1095,7 +1089,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

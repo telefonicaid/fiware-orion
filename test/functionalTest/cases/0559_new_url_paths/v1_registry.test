@@ -80,75 +80,7 @@ echo
 echo
 
 
-echo "3. POST /v1/registry/subscribeContextAvailability"
-echo "================================================="
-payload='{
-  "entities": [
-    {
-      "type": "T",
-      "isPattern": "false",
-      "id": "EI"
-    }
-  ],
-  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-  "duration": "PT5H"
-}'
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}"
-SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
-echo
-echo
-
-
-echo "3. NOP /v1/registry/subscribeContextAvailability"
-echo "================================================"
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "${payload}" -X NOP
-echo
-echo
-
-
-echo "4. POST /v1/registry/updateContextAvailabilitySubscription"
-echo "=========================================================="
-payload='{
-  "entities": [
-    {
-      "type": "T",
-      "isPattern": "false",
-      "id": "EI"
-    }
-  ],
-  "duration": "PT5H",
-  "subscriptionId": "'$SUB_ID'"
-}'
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload"
-echo
-echo
-
-
-echo "4. NOP /v1/registry/updateContextAvailabilitySubscription"
-echo "========================================================="
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload" -X NOP
-echo
-echo
-
-
-echo "5. POST /v1/registry/unsubscribeContextAvailability"
-echo "==================================================="
-payload='{
-  "subscriptionId": "'$SUB_ID'"
-}'
-orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}"
-echo
-echo
-
-
-echo "5. NOP /v1/registry/unsubscribeContextAvailability"
-echo "=================================================="
-orionCurl --url /v1/registry/unsubscribeContextAvailability --payload "${payload}" -X NOP
-echo
-echo
-
-
-echo "6. POST /v1/registry/contextEntities/E"
+echo "3. POST /v1/registry/contextEntities/E"
 echo "======================================"
 payload='{
   "duration": "PT1H",
@@ -159,21 +91,21 @@ echo
 echo
 
 
-echo "6. GET /v1/registry/contextEntities/E"
+echo "3. GET /v1/registry/contextEntities/E"
 echo "====================================="
 orionCurl --url /v1/registry/contextEntities/E
 echo
 echo
 
 
-echo "6. NOP /v1/registry/contextEntities/E"
+echo "3. NOP /v1/registry/contextEntities/E"
 echo "====================================="
 orionCurl --url /v1/registry/contextEntities/E --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "7. POST /v1/registry/contextEntities/F/attributes"
+echo "4. POST /v1/registry/contextEntities/F/attributes"
 echo "================================================="
 payload='{
   "duration": "PT1H",
@@ -184,21 +116,21 @@ echo
 echo
 
 
-echo "7. GET /v1/registry/contextEntities/F/attributes"
+echo "4. GET /v1/registry/contextEntities/F/attributes"
 echo "================================================"
 orionCurl --url /v1/registry/contextEntities/F/attributes
 echo
 echo
 
 
-echo "7. NOP /v1/registry/contextEntities/F/attributes"
+echo "4. NOP /v1/registry/contextEntities/F/attributes"
 echo "================================================"
 orionCurl --url /v1/registry/contextEntities/F/attributes --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "8. POST /v1/registry/contextEntities/G/attributes/A"
+echo "5. POST /v1/registry/contextEntities/G/attributes/A"
 echo "==================================================="
 payload='{
   "duration": "PT1H",
@@ -209,21 +141,21 @@ echo
 echo
 
 
-echo "8. GET /v1/registry/contextEntities/G/attributes/A"
+echo "5. GET /v1/registry/contextEntities/G/attributes/A"
 echo "=================================================="
 orionCurl --url /v1/registry/contextEntities/G/attributes/A
 echo
 echo
 
 
-echo "8. NOP /v1/registry/contextEntities/G/attributes/A"
+echo "5. NOP /v1/registry/contextEntities/G/attributes/A"
 echo "=================================================="
 orionCurl --url /v1/registry/contextEntities/G/attributes/A --payload "$payload" -X NOP
 echo
 echo
 
 
-echo "9. POST /v1/registry/contextEntityTypes/S"
+echo "6. POST /v1/registry/contextEntityTypes/S"
 echo "========================================="
 payload='{
   "providingApplication": "http://kz.tid.es/abc"
@@ -233,22 +165,22 @@ echo
 echo
 
 
-echo "9. GET /v1/registry/contextEntityTypes/S"
+echo "6. GET /v1/registry/contextEntityTypes/S"
 echo "========================================"
 orionCurl --url /v1/registry/contextEntityTypes/S
 echo
 echo
 
 
-echo "9. NOP /v1/registry/contextEntityTypes/S"
+echo "6. NOP /v1/registry/contextEntityTypes/S"
 echo "========================================"
 orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "10. POST /v1/registry/contextEntityTypes/U/attributes"
-echo "====================================================="
+echo "7. POST /v1/registry/contextEntityTypes/U/attributes"
+echo "===================================================="
 payload='{
   "providingApplication": "http://kz.tid.es/abc"
 }'
@@ -257,22 +189,22 @@ echo
 echo
 
 
-echo "10. GET /v1/registry/contextEntityTypes/U/attributes"
-echo "===================================================="
+echo "7. GET /v1/registry/contextEntityTypes/U/attributes"
+echo "==================================================="
 orionCurl --url /v1/registry/contextEntityTypes/U/attributes
 echo
 echo
 
 
-echo "10. NOP /v1/registry/contextEntityTypes/U/attributes"
-echo "===================================================="
+echo "7. NOP /v1/registry/contextEntityTypes/U/attributes"
+echo "==================================================="
 orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "11. POST /v1/registry/contextEntityTypes/V/attributes/A"
-echo "======================================================="
+echo "8. POST /v1/registry/contextEntityTypes/V/attributes/A"
+echo "======================================================"
 payload='{
   "providingApplication": "http://kz.tid.es/abc",
   "duration": "PT1H"
@@ -282,80 +214,16 @@ echo
 echo
 
 
-echo "11. GET /v1/registry/contextEntityTypes/V/attributes/A"
-echo "======================================================"
+echo "8. GET /v1/registry/contextEntityTypes/V/attributes/A"
+echo "====================================================="
 orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A
 echo
 echo
 
 
-echo "11. NOP /v1/registry/contextEntityTypes/V/attributes/A"
-echo "======================================================"
-orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}" -X NOP
-echo
-echo
-
-
-echo "12. POST /v1/registry/contextAvailabilitySubscriptions"
-echo "======================================================"
-payload='{
-  "entities": [
-    {
-      "type": "T",
-      "isPattern": "false",
-      "id": "CCC"
-    }
-  ],
-  "attributes": [
-    "temperature"
-  ],
-  "reference": "http://10.1.1.1:80/test/interfaceNotification",
-  "duration": "PT1M"
-}'
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}"
-SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
-echo
-echo
-
-
-echo "12. NOP /v1/registry/contextAvailabilitySubscriptions"
+echo "8. NOP /v1/registry/contextEntityTypes/V/attributes/A"
 echo "====================================================="
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "${payload}" -X NOP
-echo
-echo
-
-
-echo "13. PUT /v1/registry/contextAvailabilitySubscriptions/SUB_ID"
-echo "============================================================"
-payload='{
-  "entities": [
-    {
-      "type": "Room",
-      "isPattern": "false",
-      "id": "ConferenceRoom"
-    }
-  ],
-  "attributes": [
-    "temperature"
-  ],
-  "duration": "P1Y",
-  "subscriptionId" : "'$SUB_ID'"
-}'
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID --payload "$payload" -X PUT
-echo
-echo
-
-
-echo "13. DELETE /v1/registry/contextAvailabilitySubscriptions/SUB_ID"
-echo "==============================================================="
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X DELETE
-echo
-echo
-
-
-echo "13. NOP /v1/registry/contextAvailabilitySubscriptions/SUB_ID"
-echo "============================================================"
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID -X NOP
+orionCurl --url /v1/registry/contextEntityTypes/V/attributes/A --payload "${payload}" -X NOP
 echo
 echo
 
@@ -421,82 +289,7 @@ Date: REGEX(.*)
 
 
 
-3. POST /v1/registry/subscribeContextAvailability
-=================================================
-HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "PT5H",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-3. NOP /v1/registry/subscribeContextAvailability
-================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-4. POST /v1/registry/updateContextAvailabilitySubscription
-==========================================================
-HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "PT5H",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-4. NOP /v1/registry/updateContextAvailabilitySubscription
-=========================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-5. POST /v1/registry/unsubscribeContextAvailability
-===================================================
-HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    },
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-5. NOP /v1/registry/unsubscribeContextAvailability
-==================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-6. POST /v1/registry/contextEntities/E
+3. POST /v1/registry/contextEntities/E
 ======================================
 HTTP/1.1 200 OK
 Content-Length: 63
@@ -510,7 +303,7 @@ Date: REGEX(.*)
 }
 
 
-6. GET /v1/registry/contextEntities/E
+3. GET /v1/registry/contextEntities/E
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 160
@@ -536,7 +329,7 @@ Date: REGEX(.*)
 }
 
 
-6. NOP /v1/registry/contextEntities/E
+3. NOP /v1/registry/contextEntities/E
 =====================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -546,7 +339,7 @@ Date: REGEX(.*)
 
 
 
-7. POST /v1/registry/contextEntities/F/attributes
+4. POST /v1/registry/contextEntities/F/attributes
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 63
@@ -560,7 +353,7 @@ Date: REGEX(.*)
 }
 
 
-7. GET /v1/registry/contextEntities/F/attributes
+4. GET /v1/registry/contextEntities/F/attributes
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 160
@@ -586,7 +379,7 @@ Date: REGEX(.*)
 }
 
 
-7. NOP /v1/registry/contextEntities/F/attributes
+4. NOP /v1/registry/contextEntities/F/attributes
 ================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -596,7 +389,7 @@ Date: REGEX(.*)
 
 
 
-8. POST /v1/registry/contextEntities/G/attributes/A
+5. POST /v1/registry/contextEntities/G/attributes/A
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 63
@@ -610,10 +403,10 @@ Date: REGEX(.*)
 }
 
 
-8. GET /v1/registry/contextEntities/G/attributes/A
+5. GET /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -624,7 +417,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }
@@ -643,7 +435,7 @@ Date: REGEX(.*)
 }
 
 
-8. NOP /v1/registry/contextEntities/G/attributes/A
+5. NOP /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -653,7 +445,7 @@ Date: REGEX(.*)
 
 
 
-9. POST /v1/registry/contextEntityTypes/S
+6. POST /v1/registry/contextEntityTypes/S
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 64
@@ -667,7 +459,7 @@ Date: REGEX(.*)
 }
 
 
-9. GET /v1/registry/contextEntityTypes/S
+6. GET /v1/registry/contextEntityTypes/S
 ========================================
 HTTP/1.1 200 OK
 Content-Length: 160
@@ -693,7 +485,7 @@ Date: REGEX(.*)
 }
 
 
-9. NOP /v1/registry/contextEntityTypes/S
+6. NOP /v1/registry/contextEntityTypes/S
 ========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -703,8 +495,8 @@ Date: REGEX(.*)
 
 
 
-10. POST /v1/registry/contextEntityTypes/U/attributes
-=====================================================
+7. POST /v1/registry/contextEntityTypes/U/attributes
+====================================================
 HTTP/1.1 200 OK
 Content-Length: 64
 Content-Type: application/json
@@ -717,8 +509,8 @@ Date: REGEX(.*)
 }
 
 
-10. GET /v1/registry/contextEntityTypes/U/attributes
-====================================================
+7. GET /v1/registry/contextEntityTypes/U/attributes
+===================================================
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
@@ -743,8 +535,8 @@ Date: REGEX(.*)
 }
 
 
-10. NOP /v1/registry/contextEntityTypes/U/attributes
-====================================================
+7. NOP /v1/registry/contextEntityTypes/U/attributes
+===================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET
@@ -753,8 +545,8 @@ Date: REGEX(.*)
 
 
 
-11. POST /v1/registry/contextEntityTypes/V/attributes/A
-=======================================================
+8. POST /v1/registry/contextEntityTypes/V/attributes/A
+======================================================
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
@@ -767,10 +559,10 @@ Date: REGEX(.*)
 }
 
 
-11. GET /v1/registry/contextEntityTypes/V/attributes/A
-======================================================
+8. GET /v1/registry/contextEntityTypes/V/attributes/A
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 198
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -781,7 +573,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
                         "name": "A",
                         "type": ""
                     }
@@ -800,76 +591,11 @@ Date: REGEX(.*)
 }
 
 
-11. NOP /v1/registry/contextEntityTypes/V/attributes/A
-======================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-12. POST /v1/registry/contextAvailabilitySubscriptions
-======================================================
-HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "PT1M",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-12. NOP /v1/registry/contextAvailabilitySubscriptions
+8. NOP /v1/registry/contextEntityTypes/V/attributes/A
 =====================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-13. PUT /v1/registry/contextAvailabilitySubscriptions/SUB_ID
-============================================================
-HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "duration": "P1Y",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-13. DELETE /v1/registry/contextAvailabilitySubscriptions/SUB_ID
-===============================================================
-HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    },
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-13. NOP /v1/registry/contextAvailabilitySubscriptions/SUB_ID
-============================================================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: PUT, DELETE
+Allow: POST, GET
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

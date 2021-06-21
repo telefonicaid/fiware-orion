@@ -129,8 +129,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "T1",
-        "isDomain": "false"
+        "type": "T1"
       }
     ],
     "providingApplication": "http://localhost:'$CP1_PORT'/v1"
@@ -157,8 +156,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "T1",
-        "isDomain": "false"
+        "type": "T1"
       }
     ],
     "providingApplication": "http://localhost:'$CP2_PORT'/v1"
@@ -185,8 +183,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "T1",
-        "isDomain": "false"
+        "type": "T1"
       }
     ],
     "providingApplication": "http://localhost:'$CP3_PORT'/v1"

@@ -35,12 +35,16 @@
 #include "common/defaultValues.h"
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "openssl/opensslv.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rapidjson/rapidjson.h"
 #include "serviceRoutines/versionTreat.h"
 
-
+#include <boost/version.hpp>
+#include <mongoc/mongoc.h>
+#include <bson/bson.h>
 
 /* ****************************************************************************
 *
@@ -48,7 +52,37 @@
 */
 static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
+/* ****************************************************************************
+*  
+* libVersions -
+*/
+std::string libVersions(void)
+{
+  // libuuid should also be included here, but we haven't found fo sar any way
+  // of getting its version without hardcoding it. If somebody knows how to
+  // get it, please tell us about :)
 
+  std::string  total  = "\"libversions\": {\n";
+  std::string  boost  = "     \"boost\": ";
+  std::string  curl   = "     \"libcurl\": ";
+  std::string  mhd    = "     \"libmicrohttpd\": ";
+  std::string  ssl    = "     \"openssl\": ";
+  std::string  rjson  = "     \"rapidjson\": ";
+  std::string  mongo  = "     \"mongoc\": ";
+  std::string  bson   = "     \"bson\": ";
+
+  char*        curlVersion = curl_version();
+
+  total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
+  total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
+  total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
+  total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
+  total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
+  total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
+  total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";
+
+  return total;
+}
 
 /* ****************************************************************************
 *
@@ -83,7 +117,7 @@ std::string versionTreat
 {
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
-    ciP->httpHeader.push_back(ACCESS_CONTROL_ALLOW_ORIGIN);
+    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
     // If any origin is allowed, the header is always sent with the value "*"
     if (strcmp(corsOrigin, "__ALL") == 0)
     {
@@ -94,7 +128,7 @@ std::string versionTreat
     {
       ciP->httpHeaderValue.push_back(corsOrigin);
     }
-    ciP->httpHeader.push_back(ACCESS_CONTROL_EXPOSE_HEADERS);
+    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_EXPOSE_HEADERS);
     ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
   }
   
@@ -116,7 +150,9 @@ std::string versionTreat
   out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
-  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
+  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
+  out += "  }\n";
   out += "}\n";
   out += "}\n";
 

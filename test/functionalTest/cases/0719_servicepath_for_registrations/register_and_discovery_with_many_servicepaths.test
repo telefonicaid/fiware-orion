@@ -55,8 +55,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -83,8 +82,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -111,8 +109,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -139,8 +136,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -167,8 +163,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -334,7 +329,7 @@ Date: REGEX(.*)
 05. Discovery of E.*/A1 with service path /a1/e1,/a1/e2,/a1/e3,/a1/e4
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 818
+Content-Length: 742
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -345,7 +340,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -364,7 +358,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -383,7 +376,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -402,7 +394,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -424,7 +415,7 @@ Date: REGEX(.*)
 06. Discovery of E.*/A1 with service path /a1/e1,/a1/e2,/a1/e3
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 622
+Content-Length: 565
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -435,7 +426,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -454,7 +444,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -473,7 +462,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -495,7 +483,7 @@ Date: REGEX(.*)
 07. Discovery of E.*/A1 with service path /a1/e1,/a1/e2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 388
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -506,7 +494,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -525,7 +512,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }
@@ -547,7 +533,7 @@ Date: REGEX(.*)
 08. Discovery of E.*/A1 with service path /a1/e1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: 211
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -558,7 +544,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": "string"
                     }

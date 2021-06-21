@@ -1,0 +1,2294 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Types with a lot of types
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/types and get an empty list
+# 02. Create 200 records with a different type
+# 03. GET /v2/types and get a list of 200 records
+#
+
+echo "01. GET /v2/types and get an empty list"
+echo "======================================="
+orionCurl --url /v2/types
+echo
+echo
+
+
+echo "02. Create 200 records with a different type"
+echo "============================================"
+payload='{"actionType":"APPEND","entities":[{"type":"Room1","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room2","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room3","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room4","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room5","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room6","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room7","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room8","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room9","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room10","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room11","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room12","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room13","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room14","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room15","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room16","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room17","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room18","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room19","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room20","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room21","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room22","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room23","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room24","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room25","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room26","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room27","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room28","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room29","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room30","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room31","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room32","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room33","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room34","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room35","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room36","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room37","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room38","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room39","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room40","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room41","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room42","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room43","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room44","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room45","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room46","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room47","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room48","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room49","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room50","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room51","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room52","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room53","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room54","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room55","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room56","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room57","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room58","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room59","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room60","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room61","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room62","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room63","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room64","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room65","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room66","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room67","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room68","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room69","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room70","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room71","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room72","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room73","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room74","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room75","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room76","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room77","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room78","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room79","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room80","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room81","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room82","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room83","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room84","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room85","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room86","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room87","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room88","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room89","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room90","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room91","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room92","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room93","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room94","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room95","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room96","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room97","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room98","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room99","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room100","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room101","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room102","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room103","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room104","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room105","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room106","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room107","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room108","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room109","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room110","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room111","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room112","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room113","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room114","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room115","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room116","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room117","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room118","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room119","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room120","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room121","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room122","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room123","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room124","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room125","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room126","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room127","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room128","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room129","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room130","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room131","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room132","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room133","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room134","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room135","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room136","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room137","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room138","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room139","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room140","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room141","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room142","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room143","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room144","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room145","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room146","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room147","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room148","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room149","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room150","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room151","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room152","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room153","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room154","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room155","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room156","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room157","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room158","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room159","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room160","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room161","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room162","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room163","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room164","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room165","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room166","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room167","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room168","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room169","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room170","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room171","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room172","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room173","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room174","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room175","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room176","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room177","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room178","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room179","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room180","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room181","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room182","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room183","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room184","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room185","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room186","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room187","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room188","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room189","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room190","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room191","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room192","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room193","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room194","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room195","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room196","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room197","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room198","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room199","A1":{"type":"String","value":"s"},"id":"RoomA"},{"type":"Room200","A1":{"type":"String","value":"s"},"id":"RoomA"}]}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/types and get a list of 200 records"
+echo "=========================================="
+orionCurl --url '/v2/types?limit=200&orderBy=type'
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/types and get an empty list
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Create 200 records with a different type
+============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/types and get a list of 200 records
+==========================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room1"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room10"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room100"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room101"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room102"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room103"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room104"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room105"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room106"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room107"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room108"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room109"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room11"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room110"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room111"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room112"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room113"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room114"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room115"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room116"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room117"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room118"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room119"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room12"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room120"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room121"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room122"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room123"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room124"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room125"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room126"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room127"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room128"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room129"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room13"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room130"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room131"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room132"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room133"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room134"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room135"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room136"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room137"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room138"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room139"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room14"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room140"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room141"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room142"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room143"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room144"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room145"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room146"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room147"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room148"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room149"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room15"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room150"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room151"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room152"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room153"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room154"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room155"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room156"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room157"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room158"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room159"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room16"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room160"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room161"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room162"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room163"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room164"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room165"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room166"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room167"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room168"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room169"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room17"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room170"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room171"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room172"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room173"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room174"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room175"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room176"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room177"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room178"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room179"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room18"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room180"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room181"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room182"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room183"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room184"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room185"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room186"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room187"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room188"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room189"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room19"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room190"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room191"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room192"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room193"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room194"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room195"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room196"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room197"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room198"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room199"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room2"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room20"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room200"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room21"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room22"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room23"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room24"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room25"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room26"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room27"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room28"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room29"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room3"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room30"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room31"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room32"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room33"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room34"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room35"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room36"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room37"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room38"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room39"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room4"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room40"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room41"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room42"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room43"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room44"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room45"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room46"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room47"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room48"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room49"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room5"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room50"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room51"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room52"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room53"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room54"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room55"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room56"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room57"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room58"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room59"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room6"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room60"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room61"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room62"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room63"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room64"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room65"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room66"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room67"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room68"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room69"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room7"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room70"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room71"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room72"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room73"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room74"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room75"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room76"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room77"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room78"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room79"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room8"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room80"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room81"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room82"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room83"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room84"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room85"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room86"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room87"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room88"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room89"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room9"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room90"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room91"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room92"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room93"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room94"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room95"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room96"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room97"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room98"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "Room99"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -32,6 +32,7 @@
 #include "apiTypesV2/Registration.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 #include "mongoBackend/mongoRegistrationGet.h"  // FIXME P0: Two external functions in the same module ...
@@ -82,8 +83,8 @@ std::string getRegistrations
 
   if ((ciP->uriParamOptions["count"]))
   {
-    ciP->httpHeader.push_back("Fiware-Total-Count");
-    ciP->httpHeaderValue.push_back(toString(count));
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(double2string(count));
   }
 
   TIMED_RENDER(out = vectorToJson(registrationV));

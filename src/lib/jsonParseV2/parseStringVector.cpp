@@ -24,6 +24,8 @@
 */
 #include <string>
 #include <vector>
+#include <algorithm>
+#include "parse/forbiddenChars.h"
 
 #include "rapidjson/document.h"
 
@@ -41,6 +43,7 @@ bool parseStringVector
   const rapidjson::Value&    jsonVector,
   const std::string&         fieldName,
   bool                       emptyStringNotAllowed,
+  bool                       unique,
   std::string*               errorStringP
 )
 {
@@ -66,13 +69,23 @@ bool parseStringVector
 
     std::string value = iter->GetString();
 
-    if ((emptyStringNotAllowed == true) && (value == ""))
+    if (forbiddenIdCharsV2(value.c_str()))
+    {
+      *errorStringP = "forbidden characters in attribute name";
+       return false;
+    }
+
+    if ((emptyStringNotAllowed == true) && (value.empty()))
     {
       *errorStringP = "empty string found in string vector /" + fieldName + "/";
       return false;
     }
 
-    sVecP->push_back(value);
+    // If unique is true, we need to ensure the element hasn't been added previousy in order to add it
+    if ((!unique) || (std::find(sVecP->begin(), sVecP->end(), value) == sVecP->end()))
+    {
+      sVecP->push_back(value);
+    }
   }
 
   return true;

@@ -250,13 +250,13 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -266,7 +266,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -295,7 +296,6 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions (subject)
 =====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -304,13 +304,13 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 480
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -320,7 +320,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -351,7 +352,6 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions (notification)
 ==========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -360,13 +360,13 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 477
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -376,7 +376,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -407,7 +408,6 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions (expires)
 =====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -416,13 +416,13 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 452
+Content-Length: 478
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "1982-06-14T17:15:00.00Z",
+    "expires": "1982-06-14T17:15:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -432,7 +432,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -477,13 +478,13 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 452
+Content-Length: 478
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "1982-06-14T17:15:00.00Z",
+    "expires": "1982-06-14T17:15:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -493,7 +494,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "https://veryfaraway:4321"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -524,7 +526,6 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID (whole)
 ======================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -533,13 +534,13 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -549,7 +550,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

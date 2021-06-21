@@ -47,7 +47,7 @@ typedef struct DiscoverContextAvailabilityResponse
   ~DiscoverContextAvailabilityResponse();
   DiscoverContextAvailabilityResponse(StatusCode& _errorCode);
 
-  std::string  render(void);
+  std::string  toJsonV1(void);
   void         release(void);
 } DiscoverContextAvailabilityResponse;
 

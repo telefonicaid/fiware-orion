@@ -142,7 +142,7 @@ Date: REGEX(.*)
 02. Discover E1/A1
 ==================
 HTTP/1.1 200 OK
-Content-Length: 223
+Content-Length: 204
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -153,7 +153,6 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
                         "name": "A1", 
                         "type": ""
                     }

@@ -40,22 +40,22 @@
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::render -
+* RegisterContextRequest::toJsonV1 -
 */
-std::string RegisterContextRequest::render(void)
+std::string RegisterContextRequest::toJsonV1(void)
 {
   std::string  out                                 = "";
-  bool         durationRendered                    = duration.get() != "";
-  bool         registrationIdRendered              = registrationId.get() != "";
+  bool         durationRendered                    = !duration.get().empty();
+  bool         registrationIdRendered              = !registrationId.get().empty();
   bool         commaAfterRegistrationId            = false; // Last element
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
   out += startTag();
 
-  out += contextRegistrationVector.render(      commaAfterContextRegistrationVector);
-  out += duration.render(                       commaAfterDuration);
-  out += registrationId.render(RegisterContext, commaAfterRegistrationId);
+  out += contextRegistrationVector.toJsonV1(      commaAfterContextRegistrationVector);
+  out += duration.toJsonV1(                       commaAfterDuration);
+  out += registrationId.toJsonV1(RegisterContext, commaAfterRegistrationId);
 
   out += endTag(false);
 
@@ -73,7 +73,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
   RegisterContextResponse  response(this);
   std::string              res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     alarmMgr.badInput(clientIp, predetectedError);
     response.errorCode.fill(SccBadRequest, predetectedError);
@@ -95,7 +95,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     return "OK";
   }
 
-  return response.render();
+  return response.toJsonV1();
 }
 
 
@@ -125,15 +125,14 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   duration       = rpr.duration;
   registrationId = rpr.registrationId;
 
-  crP->registrationMetadataVector.fill((MetadataVector*) &rpr.metadataVector);
   crP->providingApplication = rpr.providingApplication;
 
   crP->entityIdVector.push_back(entityIdP);
   crP->entityIdVectorPresent = true;
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "", "false");
+    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
 
     crP->contextRegistrationAttributeVector.push_back(attributeP);
   }

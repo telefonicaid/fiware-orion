@@ -97,24 +97,24 @@ std::string deleteAllEntitiesWithTypeAndId
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = response.render(false, false));
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     return answer;
   }
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", "", "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", "", ActionTypeDelete);
 
 
   // 04. Call Standard Operation
@@ -126,7 +126,7 @@ std::string deleteAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIMED_RENDER(answer = response.render(false, false));
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
 
   parseDataP->upcr.res.release();
   response.release();

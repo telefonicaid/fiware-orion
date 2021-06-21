@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. Make sure it was correctly created
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -108,7 +108,8 @@ Date: REGEX(.*)
             "attrsFormat": "legacy",
             "http": {
                 "url": "http://localhost:1028/accumulate"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {

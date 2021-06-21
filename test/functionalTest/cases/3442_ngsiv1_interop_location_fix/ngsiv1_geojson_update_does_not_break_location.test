@@ -1,0 +1,285 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check update NGSIv1 geo:json doesn't break location at DB
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with geo:point in NGSIv2
+# 02. Update entity with geo:json with NGSIv1 (APPEND)
+# 03. Check location field is not broken in database
+# 04. Update entity with geo:json with NGSIv1 (UPDATE)
+# 05. Check location field is not broken in database
+#
+
+echo "01. Create entity with geo:point in NGSIv2"
+echo "=========================================="
+payload='{
+  "type": "T",
+  "id": "E",
+  "location": {
+    "value": "1.1, -2.2",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Update entity with geo:json with NGSIv1 (APPEND)"
+echo "===================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "E",
+    "isPattern": "false",
+    "id": "E1",
+    "attributes": [
+    {
+      "name": "position",
+      "type": "geo:json",
+      "value": {
+        "type": "Point",
+        "coordinates": [ -3.3, 4.4 ]
+      }
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" -X POST
+echo
+echo
+
+
+echo "03. Check location field is not broken in database"
+echo "=================================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python -mjson.tool
+echo
+echo
+
+
+echo "04. Update entity with geo:json with NGSIv1 (UPDATE)"
+echo "===================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "E",
+    "isPattern": "false",
+    "id": "E1",
+    "attributes": [
+    {
+      "name": "position",
+      "type": "geo:json",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 5.5, -6.6 ]
+      }
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" -X POST
+echo
+echo
+
+
+echo "05. Check location field is not broken in database"
+echo "=================================================="
+mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python -mjson.tool
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create entity with geo:point in NGSIv2
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Update entity with geo:json with NGSIv1 (APPEND)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 196
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "geo:json",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Check location field is not broken in database
+==================================================
+{
+    "_id": {
+        "id": "E1",
+        "servicePath": "/",
+        "type": "E"
+    },
+    "attrNames": [
+        "position"
+    ],
+    "attrs": {
+        "position": {
+            "creDate": REGEX(\d+\.\d+),
+            "mdNames": [],
+            "modDate": REGEX(\d+\.\d+),
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    "-3.3",
+                    "4.4"
+                ],
+                "type": "Point"
+            }
+        }
+    },
+    "creDate": REGEX(\d+\.\d+),
+    "lastCorrelator": "REGEX(.*)",
+    "location": {
+        "attrName": "position",
+        "coords": {
+            "coordinates": [
+                -3.3,
+                4.4
+            ],
+            "type": "Point"
+        }
+    },
+    "modDate": REGEX(\d+\.\d+)
+}
+
+
+04. Update entity with geo:json with NGSIv1 (UPDATE)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 196
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "geo:json",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "E"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Check location field is not broken in database
+==================================================
+{
+    "_id": {
+        "id": "E1",
+        "servicePath": "/",
+        "type": "E"
+    },
+    "attrNames": [
+        "position"
+    ],
+    "attrs": {
+        "position": {
+            "creDate": REGEX(\d+\.\d+),
+            "mdNames": [],
+            "modDate": REGEX(\d+\.\d+),
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    "5.5",
+                    "-6.6"
+                ],
+                "type": "Point"
+            }
+        }
+    },
+    "creDate": REGEX(\d+\.\d+),
+    "lastCorrelator": "REGEX(.*)",
+    "location": {
+        "attrName": "position",
+        "coords": {
+            "coordinates": [
+                5.5,
+                -6.6
+            ],
+            "type": "Point"
+        }
+    },
+    "modDate": REGEX(\d+\.\d+)
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

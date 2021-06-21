@@ -37,11 +37,7 @@ const char* requestType(RequestType rt)
   case NoRequest:                                   return "NoRequest";
   case RegisterContext:                             return "RegisterContextRequest";
   case RegisterResponse:                            return "RegisterContextResponse";
-  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";
-  case SubscribeContextAvailability:                return "SubscribeContextAvailabilityRequest";
-  case UpdateContextAvailabilitySubscription:       return "UpdateContextAvailabilitySubscriptionRequest";
-  case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailabilityRequest";
-  case NotifyContextAvailability:                   return "NotifyContextAvailabilityRequest";
+  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";   
   case QueryContext:                                return "QueryContextRequest";
   case RtQueryContextResponse:                      return "QueryContextResponse";
   case SubscribeContext:                            return "SubscribeContextRequest";
@@ -58,7 +54,6 @@ const char* requestType(RequestType rt)
   case ContextEntityTypes:                          return "ContextEntityTypes";
   case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
   case ContextEntityTypeAttribute:                  return "ContextEntityTypeAttribute";
-  case Ngsi9SubscriptionsConvOp:                    return "Ngsi9SubscriptionsConvOp";
 
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
@@ -84,9 +79,6 @@ const char* requestType(RequestType rt)
   case LeakRequest:                                 return "Leak";
   case InvalidRequest:                              return "InvalidRequest";
 
-  case RtSubscribeContextAvailabilityResponse:           return "SubscribeContextAvailabilityResponse";
-  case RtUpdateContextAvailabilitySubscriptionResponse:  return "UpdateContextAvailabilitySubscriptionResponse";
-  case RtUnsubscribeContextAvailabilityResponse:         return "UnsubscribeContextAvailabilityResponse";
   case RtUnsubscribeContextResponse:                     return "UnsubscribeContextResponse";
   case RtSubscribeResponse:                              return "SubscribeResponse";
   case RtSubscribeError:                                 return "SubscribeError";

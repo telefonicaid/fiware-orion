@@ -34,21 +34,21 @@ brokerStart CB
 # to cover all the posibilities detailed at partial_datetime_creation.test. However, we
 # think that with a couple of them is enough
 #
-# 01. Creating entity E1 at 2016-09-30T22:48:51.00Z
-# 02. Creating entity E2 at 2016-10-01T01:23:45.00Z
+# 01. Creating entity E1 at 2016-09-30T22:48:51.000Z
+# 02. Creating entity E2 at 2016-10-01T01:23:45.000Z
 # 03. Get entities after 2016-10-01, get E2
 # 04. Get entities before 2016-10-01, get E1
 # 05. Get entities after 2016-10-01T0000Z, get E2
 # 06. Get entities before 2016-10-01T0000Z, get E1
 #
 
-echo "01. Creating entity E1 at 2016-09-30T22:48:51.00Z"
-echo "================================================="
+echo "01. Creating entity E1 at 2016-09-30T22:48:51.000Z"
+echo "=================================================="
 payload='{
   "id": "E1",
   "type": "T",
   "D": {
-    "value": "2016-09-30T22:48:51.00Z",
+    "value": "2016-09-30T22:48:51.000Z",
     "type": "DateTime"
   }
 }'
@@ -57,13 +57,13 @@ echo
 echo
 
 
-echo "02. Creating entity E2 at 2016-10-01T01:23:45.00Z"
-echo "================================================="
+echo "02. Creating entity E2 at 2016-10-01T01:23:45.000Z"
+echo "=================================================="
 payload='{
   "id": "E2",
   "type": "T",
   "D": {
-    "value": "2016-10-01T01:23:45.00Z",
+    "value": "2016-10-01T01:23:45.000Z",
     "type": "DateTime"
   }
 }'
@@ -101,8 +101,8 @@ echo
 
 
 --REGEXPECT--
-01. Creating entity E1 at 2016-09-30T22:48:51.00Z
-=================================================
+01. Creating entity E1 at 2016-09-30T22:48:51.000Z
+==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -111,8 +111,8 @@ Date: REGEX(.*)
 
 
 
-02. Creating entity E2 at 2016-10-01T01:23:45.00Z
-=================================================
+02. Creating entity E2 at 2016-10-01T01:23:45.000Z
+==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
@@ -124,7 +124,7 @@ Date: REGEX(.*)
 03. Get entities after 2016-10-01, get E2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,7 +134,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-10-01T01:23:45.00Z"
+            "value": "2016-10-01T01:23:45.000Z"
         },
         "id": "E2",
         "type": "T"
@@ -145,7 +145,7 @@ Date: REGEX(.*)
 04. Get entities before 2016-10-01, get E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -155,7 +155,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-09-30T22:48:51.00Z"
+            "value": "2016-09-30T22:48:51.000Z"
         },
         "id": "E1",
         "type": "T"
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 05. Get entities after 2016-10-01T0000Z, get E2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -176,7 +176,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-10-01T01:23:45.00Z"
+            "value": "2016-10-01T01:23:45.000Z"
         },
         "id": "E2",
         "type": "T"
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 06. Get entities before 2016-10-01T0000Z, get E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-09-30T22:48:51.00Z"
+            "value": "2016-09-30T22:48:51.000Z"
         },
         "id": "E1",
         "type": "T"

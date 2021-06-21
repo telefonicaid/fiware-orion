@@ -159,13 +159,13 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (and get keyValues)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 308
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -174,7 +174,8 @@ Date: REGEX(.*)
         "attrsFormat": "keyValues",
         "http": {
             "url": "http://localhost:1045/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -195,7 +196,6 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID (without attrsFormat)
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -204,13 +204,13 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (and get normalized)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 283
+Content-Length: 309
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -219,7 +219,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1045/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -240,7 +241,6 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions/ID (attrsFormat = values)
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -249,13 +249,13 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (and get values)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 305
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -264,7 +264,8 @@ Date: REGEX(.*)
         "attrsFormat": "values",
         "http": {
             "url": "http://localhost:1045/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -285,3 +286,4 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+

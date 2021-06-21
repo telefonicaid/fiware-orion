@@ -50,11 +50,10 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 
 /* ****************************************************************************
 *
-* AppendContextElementResponse::render - 
+* AppendContextElementResponse::toJsonV1 -
 */
-std::string AppendContextElementResponse::render
+std::string AppendContextElementResponse::toJsonV1
 (
-  ApiVersion   apiVersion,
   bool         asJsonObject,
   RequestType  requestType
 )
@@ -65,16 +64,16 @@ std::string AppendContextElementResponse::render
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(false);
+    out += errorCode.toJsonV1(false);
   }
   else
   {
-    if (entity.id != "")
+    if (!entity.id.empty())
     {
-      out += entity.render(true);
+      out += entity.toJsonV1(true);
     }
 
-    out += contextAttributeResponseVector.render(apiVersion, asJsonObject, requestType);
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
   out += endTag();
@@ -98,7 +97,7 @@ std::string AppendContextElementResponse::check
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
@@ -111,7 +110,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(apiVersion, asJsonObject, requestType);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -144,9 +143,9 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
     
-    entity.fill(&cerP->contextElement.entityId);
+    entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
   }
   else
   {
@@ -188,11 +187,11 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   }
 
   // Now, if the external error code is 404 and 'details' is empty - add the name of the incoming entity::id as details
-  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details == ""))
+  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details.empty()))
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
 }

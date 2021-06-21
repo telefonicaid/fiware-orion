@@ -209,8 +209,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -238,8 +237,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
@@ -267,8 +265,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
@@ -296,8 +293,7 @@ payload='{
     "attributes": [
       {
         "name": "A1",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
@@ -325,8 +321,7 @@ payload='{
     "attributes": [
       {
         "name": "A2",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
@@ -354,8 +349,7 @@ payload='{
     "attributes": [
       {
         "name": "A3",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
@@ -383,8 +377,7 @@ payload='{
     "attributes": [
       {
         "name": "A4",
-        "type": "string",
-        "isDomain": "false"
+        "type": "string"
       }
     ],
     "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
@@ -423,7 +416,7 @@ echo
 echo "15. Update/UPDATE All seven attributes plus a few not found"
 echo "==========================================================="
 payload='{
-  "actionType": "UPDATE",
+  "actionType": "update",
   "entities": [
     {
       "type": "T1",
@@ -863,13 +856,13 @@ Date: REGEX(.*)
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
 HTTP/1.1 404 Not Found
-Content-Length: 110
+Content-Length: 127
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Attributes that were not updated: { E1-T1 : [A5], E2-T1 : [A5, A4] }",
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A5], E2-T1 : [A5, A4] }",
     "error": "PartialUpdate"
 }
 

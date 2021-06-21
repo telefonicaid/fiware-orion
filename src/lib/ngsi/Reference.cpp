@@ -41,9 +41,9 @@
 */
 std::string Reference::check(RequestType requestType)
 {
-  if (string == "")
+  if (string.empty())
   {
-    if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
+    if (requestType == SubscribeContext)
     {
       return "Empty Reference";
     }
@@ -71,7 +71,7 @@ std::string Reference::check(RequestType requestType)
 */
 bool Reference::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -100,31 +100,11 @@ std::string Reference::get(void)
 
 /* ****************************************************************************
 *
-* Reference::present -
+* Reference::toJsonV1 -
 */
-void Reference::present(const std::string& indent)
+std::string Reference::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_T(LmtPresent, ("%sReference: %s", 
-		      indent.c_str(), 
-		      string.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNo Reference", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Reference::render -
-*/
-std::string Reference::render(bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

@@ -105,7 +105,7 @@
 *
 * MetricsManager -
 *
-* FIXME PR: summary of things to improve
+* FIXME P6: summary of things to improve
 *
 * 08. Empty services (no tenant given) to receive some default service name.
 * 09. What to do with default SP ("/")?

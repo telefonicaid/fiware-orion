@@ -30,6 +30,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
+#include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
 
@@ -40,6 +41,10 @@
 /* ****************************************************************************
 *
 * postSubscriptions -
+*
+* URI parameters -
+*   - skipInitialNotification 
+*
 */
 extern std::string postSubscriptions
 (
@@ -51,6 +56,7 @@ extern std::string postSubscriptions
 {
   SubscribeContextResponse  scr;
   std::string               answer = "";
+  bool skipInitialNotification = ciP->uriParamOptions[OPT_SKIPINITALNOTIFICATION];
 
   if (ciP->servicePathV.size() > 1)
   {
@@ -76,7 +82,9 @@ extern std::string postSubscriptions
                           ciP->tenant,
                           ciP->servicePathV,
                           ciP->httpHeaders.xauthToken,
-                          ciP->httpHeaders.correlator));
+                          ciP->httpHeaders.correlator,
+                          skipInitialNotification,
+                          ciP->apiVersion));
 
   // Check potential error
   if (beError.code != SccNone)
@@ -87,7 +95,7 @@ extern std::string postSubscriptions
   else
   {
     std::string location = "/v2/subscriptions/" + subsID;
-    ciP->httpHeader.push_back("Location");
+    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
     ciP->httpStatusCode = SccCreated;

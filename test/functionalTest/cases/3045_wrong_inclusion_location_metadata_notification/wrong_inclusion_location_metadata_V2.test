@@ -1,0 +1,368 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check "location" metadata is not wrongly included in NGSIv2 notifications
+triggered by a NGSIV2 subscription creation, update or attribute update 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E with type T
+# 02. Create NGSIv2 subscription for E
+# 03. Trigger notification by updating value of "name" attribute (in NGSIv2)
+# 04. Trigger notification by updating the subscription itself (in NGSIv2)
+# 05. See NGSIv2 notifications and make sure "location" metadata is not included
+#
+
+echo "01. Create E with type: T"
+echo "========================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "name":{
+    "value": "SD3",
+    "type": "Text"
+  },
+  "perimeter": {
+    "type":"geo:json",
+    "value":{
+    "type": "Polygon",
+    "coordinates": [
+                    [
+                        [-13.806454999999991,33.46727800000001,0],
+                        [-13.806707999999981,33.46723400000001,0],
+                        [-13.806863999999999,33.46720599999997,0],
+                        [-13.807017000000008,33.46719100000001,0],
+                        [-13.806454999999991,33.46727800000001,0]
+                    ]
+                ]
+        }
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create NGSIv2 subscription for E"
+echo "===================================="
+payload='{
+  "description": "A subscription to get info about E",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": [
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [     
+    ]
+  } 
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Trigger notification by updating value of name attribute (in NGSIV2)"
+echo "========================================================================"
+payload='{
+  "value": "SD1"
+}'
+orionCurl --url /v2/entities/E/attrs/name --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "04. Trigger notification by updating the subscription itself (in NGSIV2)"
+echo "========================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": [
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID  --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. See NGSIv2 notifications and make sure location metadata is not included"
+echo "============================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E with type: T
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create NGSIv2 subscription for E
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Trigger notification by updating value of name attribute (in NGSIV2)
+========================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Trigger notification by updating the subscription itself (in NGSIV2)
+========================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. See NGSIv2 notifications and make sure location metadata is not included
+============================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 343
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "E", 
+            "name": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "SD3"
+            }, 
+            "perimeter": {
+                "metadata": {}, 
+                "type": "geo:json", 
+                "value": {
+                    "coordinates": [
+                        [
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ], 
+                            [
+                                -13.806708, 
+                                33.467234, 
+                                0
+                            ], 
+                            [
+                                -13.806864, 
+                                33.467206, 
+                                0
+                            ], 
+                            [
+                                -13.807017, 
+                                33.467191, 
+                                0
+                            ], 
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ]
+                        ]
+                    ], 
+                    "type": "Polygon"
+                }
+            }, 
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 343
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "E", 
+            "name": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "SD1"
+            }, 
+            "perimeter": {
+                "metadata": {}, 
+                "type": "geo:json", 
+                "value": {
+                    "coordinates": [
+                        [
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ], 
+                            [
+                                -13.806708, 
+                                33.467234, 
+                                0
+                            ], 
+                            [
+                                -13.806864, 
+                                33.467206, 
+                                0
+                            ], 
+                            [
+                                -13.807017, 
+                                33.467191, 
+                                0
+                            ], 
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ]
+                        ]
+                    ], 
+                    "type": "Polygon"
+                }
+            }, 
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 343
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "E", 
+            "name": {
+                "metadata": {}, 
+                "type": "Text", 
+                "value": "SD1"
+            }, 
+            "perimeter": {
+                "metadata": {}, 
+                "type": "geo:json", 
+                "value": {
+                    "coordinates": [
+                        [
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ], 
+                            [
+                                -13.806708, 
+                                33.467234, 
+                                0
+                            ], 
+                            [
+                                -13.806864, 
+                                33.467206, 
+                                0
+                            ], 
+                            [
+                                -13.807017, 
+                                33.467191, 
+                                0
+                            ], 
+                            [
+                                -13.806455, 
+                                33.467278, 
+                                0
+                            ]
+                        ]
+                    ], 
+                    "type": "Polygon"
+                }
+            }, 
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

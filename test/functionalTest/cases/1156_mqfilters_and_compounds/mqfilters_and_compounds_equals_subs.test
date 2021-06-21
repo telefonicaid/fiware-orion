@@ -63,14 +63,19 @@ echo "==========================================================================
 payload='{
   "id": "E1",
   "A1": {
-    "value": {
-      "i": 10,
-      "f": 3.14,
-      "s": "test_string",
-      "T": true,
-      "F": false,
-      "N": null,
-      "D": "2016-07-22T10:42:42.00Z"
+    "value": "not important",
+    "metadata": {
+      "M1": {
+        "value": {
+          "i": 10,
+          "f": 3.14,
+          "s": "test_string",
+          "T": true,
+          "F": false,
+          "N": null,
+          "D": "2016-07-22T10:42:42.000Z"
+        }
+      }
     }
   },
   "A2": { "value": 22 }
@@ -92,7 +97,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.i==10"
+               "mq": "A1.M1.i==10"
             }
          }
     },
@@ -127,7 +132,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.s!=test_strin"
+               "mq": "A1.M1.s!=test_strin"
             }
          }
     },
@@ -162,7 +167,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.f:3.14"
+               "mq": "A1.M1.f:3.14"
             }
          }
     },
@@ -197,7 +202,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.T:true"
+               "mq": "A1.M1.T:true"
             }
          }
     },
@@ -232,7 +237,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.i:9..10"
+               "mq": "A1.M1.i:9..10"
             }
          }
     },
@@ -267,7 +272,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.f==3.14,3.15"
+               "mq": "A1.M1.f==3.14,3.15"
             }
          }
     },
@@ -302,7 +307,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.s:fest_string..test_string"
+               "mq": "A1.M1.s:fest_string..test_string"
             }
          }
     },
@@ -337,7 +342,7 @@ payload='{
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "A1.s:fest_string,uest_string,test_string"
+               "mq": "A1.M1.s:fest_string,uest_string,test_string"
             }
          }
     },
@@ -364,17 +369,22 @@ echo "18. Modify E1/A1 - provoke 8 notifications"
 echo "=========================================="
 payload='{
   "A1": {
-    "value": {
-      "i": 10,
-      "f": 3.14,
-      "s": "test_string",
-      "T": true,
-      "F": false,
-      "N": null,
-      "D": "2017-07-22T10:42:42.00Z"
+    "value": "not important",
+    "metadata": {
+      "M1": {
+        "value": {
+          "i": 10,
+          "f": 3.14,
+          "s": "test_string",
+          "T": true,
+          "F": false,
+          "N": null,
+          "D": "2016-07-22T10:42:42.000Z"
+        }
+      }
     }
   },
-  "A2": { "value": 23 }    
+  "A2": { "value": 23 }
 }'
 orionCurl --url /v2/entities/E1/attrs --payload "${payload}" -X PUT
 echo
@@ -414,7 +424,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -426,24 +436,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -466,7 +481,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -478,24 +493,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -518,7 +538,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -530,24 +550,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -570,7 +595,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -582,24 +607,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -622,7 +652,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -634,24 +664,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -674,7 +709,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -686,24 +721,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -726,7 +766,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -738,24 +778,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -778,7 +823,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -790,24 +835,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2016-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 22
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -819,7 +869,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 18. Modify E1/A1 - provoke 8 notifications
 ==========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -829,36 +878,41 @@ Date: REGEX(.*)
 ===================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -867,36 +921,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -905,36 +964,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -943,36 +1007,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -981,36 +1050,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -1019,36 +1093,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -1057,36 +1136,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -1095,36 +1179,41 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 277
+Content-Length: 322
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
-                "value": {
-                    "D": "2017-07-22T10:42:42.00Z", 
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
-                    "f": 3.14REGEX([01]*), 
-                    "i": 10, 
-                    "s": "test_string"
-                }
-            }, 
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "D": "2016-07-22T10:42:42.000Z",
+                            "F": false,
+                            "N": null,
+                            "T": true,
+                            "f": 3.14,
+                            "i": 10,
+                            "s": "test_string"
+                        }
+                    }
+                },
+                "type": "Text",
+                "value": "not important"
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

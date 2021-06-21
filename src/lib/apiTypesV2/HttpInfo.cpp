@@ -25,23 +25,16 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
 #include "logMsg/logMsg.h"
-
 #include "common/JsonHelper.h"
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
+
 #include "apiTypesV2/HttpInfo.h"
 
+#include "mongoBackend/dbConstants.h"
 
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::BSONElement;
-
+#include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONElement.h"
+#include "mongoDriver/safeMongo.h"
 
 
 namespace ngsiv2
@@ -72,13 +65,13 @@ HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(fa
 */
 std::string HttpInfo::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
   jh.addString("url", this->url);
 
   if (custom)
   {
-    if (this->payload != "")
+    if (!this->payload.empty())
     {
       jh.addString("payload", this->payload);
     }
@@ -108,7 +101,7 @@ std::string HttpInfo::toJson()
 *
 * HttpInfo::fill -
 */
-void HttpInfo::fill(const BSONObj& bo)
+void HttpInfo::fill(const orion::BSONObj& bo)
 {
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
@@ -122,30 +115,22 @@ void HttpInfo::fill(const BSONObj& bo)
       this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));
     }
 
+    // FIXME P10: toStringMap could raise exception if array elements are not strings
+    // (the parsing stage should avoid the case, but better to be protetec with a catch statement)
     // qs
     if (bo.hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(bo, CSUB_QS);
-
-      for (BSONObj::iterator i = qs.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-
-        this->qs[e.fieldName()] = e.String();
-      }
+      orion::BSONObj qs = getObjectFieldF(bo, CSUB_QS);
+      qs.toStringMap(&this->qs);
     }
 
+    // FIXME P10: toStringMap could raise exception if array elements are not strings
+    // (the parsing stage should avoid the case, but better to be protetec with a catch statement)
     // headers
     if (bo.hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
-
-      for (BSONObj::iterator i = headers.begin(); i.more();)
-      {
-        BSONElement e = i.next();
-
-        this->headers[e.fieldName()] = e.String();
-      }
+      orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
+      headers.toStringMap(&this->headers);
     }
   }
 }

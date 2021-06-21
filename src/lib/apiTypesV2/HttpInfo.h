@@ -28,8 +28,9 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
+
+#include "mongoDriver/BSONObj.h"
 
 
 
@@ -52,7 +53,7 @@ struct HttpInfo
   explicit HttpInfo(const std::string& _url);
 
   std::string  toJson();
-  void         fill(const mongo::BSONObj& bo);
+  void         fill(const orion::BSONObj& bo);
 };
 }
 

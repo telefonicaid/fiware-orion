@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/EntityId.h"
@@ -64,7 +65,7 @@ using ::testing::Return;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 /* ****************************************************************************
 *
@@ -77,10 +78,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * - updateWrongIdNoHex
 *
 * - MongoDbFindOneFail
-*
-* - NotifyContextAvailability1
-* - NotifyContextAvailability2
-* - NotifyContextAvailability3
 *
 */
 
@@ -107,21 +104,21 @@ static void prepareDatabase(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr2 = BSON("providingApplication" << "http://cr1.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1")));
 
   BSONObj cr3 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+                       BSON("name" << "A1" << "type" << "TA1")));
 
   BSONObjBuilder reg1;
 
@@ -138,24 +135,8 @@ static void prepareDatabase(void)
                         "contextRegistration" << BSON_ARRAY(cr2 << cr3) <<
                         "servicePath" << "/"));
 
-  /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
-                      "expiration" << 1879048191 <<
-                      "reference" << "http://notify1.me" <<
-                      "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                      "attrs" << BSONArray());
-
-  BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
-                      "expiration" << 1879048191 <<
-                      "reference" << "http://notify2.me" <<
-                      "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                      "attrs" << BSON_ARRAY("A1"));
-
   connection->insert(REGISTRATIONS_COLL, reg1.obj());
   connection->insert(REGISTRATIONS_COLL, reg2.obj());
-
-  connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
-  connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
 }
 
 
@@ -174,7 +155,7 @@ TEST(mongoRegisterContext_update, updateCase1)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra("A1", "TA1", "true");
+  ContextRegistrationAttribute cra("A1", "TA1");
   ContextRegistration cr;
   cr.entityIdVector.push_back(&en);
   cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -223,7 +204,6 @@ TEST(mongoRegisterContext_update, updateCase1)
   attr0 = attrs[0].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
   /* reg #2 (untouched) */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -246,7 +226,6 @@ TEST(mongoRegisterContext_update, updateCase1)
   attr0 = attrs[0].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
   contextRegistration = contextRegistrationV[1].embeddedObject();
 
@@ -262,7 +241,6 @@ TEST(mongoRegisterContext_update, updateCase1)
   attr0 = attrs[0].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -289,7 +267,7 @@ TEST(mongoRegisterContext_update, updateCase2)
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
-    ContextRegistrationAttribute cra("A1", "TA1", "true");
+    ContextRegistrationAttribute cra("A1", "TA1");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en);
     cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -339,13 +317,10 @@ TEST(mongoRegisterContext_update, updateCase2)
     attr2 = attrs[2].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(attr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(attr1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(attr1, "isDomain"));
     EXPECT_STREQ("A3", C_STR_FIELD(attr2, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(attr2, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -368,7 +343,6 @@ TEST(mongoRegisterContext_update, updateCase2)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -395,7 +369,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
-    ContextRegistrationAttribute cra("A1", "TA1", "true");
+    ContextRegistrationAttribute cra("A1", "TA1");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en);
     cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -445,13 +419,10 @@ TEST(mongoRegisterContext_update, updateNotFound)
     attr2 = attrs[2].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(attr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(attr1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(attr1, "isDomain"));
     EXPECT_STREQ("A3", C_STR_FIELD(attr2, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(attr2, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -474,7 +445,6 @@ TEST(mongoRegisterContext_update, updateNotFound)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
@@ -490,7 +460,6 @@ TEST(mongoRegisterContext_update, updateNotFound)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -517,7 +486,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
-    ContextRegistrationAttribute cra("A1", "TA1", "true");
+    ContextRegistrationAttribute cra("A1", "TA1");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en);
     cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -567,13 +536,10 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     attr2 = attrs[2].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(attr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(attr1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(attr1, "isDomain"));
     EXPECT_STREQ("A3", C_STR_FIELD(attr2, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(attr2, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -596,7 +562,6 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
@@ -612,7 +577,6 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -641,7 +605,7 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
-    ContextRegistrationAttribute cra("A1", "TA1", "true");
+    ContextRegistrationAttribute cra("A1", "TA1");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en);
     cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -691,13 +655,10 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     attr2 = attrs[2].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(attr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(attr1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(attr1, "isDomain"));
     EXPECT_STREQ("A3", C_STR_FIELD(attr2, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(attr2, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -720,7 +681,6 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
@@ -736,7 +696,6 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -771,7 +730,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
-    ContextRegistrationAttribute cra("A1", "TA1", "true");
+    ContextRegistrationAttribute cra("A1", "TA1");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en);
     cr.contextRegistrationAttributeVector.push_back(&cra);
@@ -839,13 +798,10 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     attr2 = attrs[2].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(attr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(attr1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(attr1, "isDomain"));
     EXPECT_STREQ("A3", C_STR_FIELD(attr2, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(attr2, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 (untouched) */
     reg = connectionDb->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -868,7 +824,6 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
 
@@ -884,228 +839,6 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     attr0 = attrs[0].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
     utExit();
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability1 -
-*/
-TEST(mongoRegisterContext_update, NotifyContextAvailability1)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  utInit(false, true);  // TimerMock only - NOT NotifierMock
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest  expectedNcar;
-  EntityId                          mockEn1("E5", "T5", "false");
-  ContextRegistrationResponse       crr;
-
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(0);
-  setNotifier(notifierMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.registrationId.set("51307b66f481db11bf860001");
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ("51307b66f481db11bf860001", res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability2 -
-*/
-TEST(mongoRegisterContext_update, NotifyContextAvailability2)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  utInit(false, true);  // TimerMock only - NOT NotifierMock
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar1, expectedNcar2;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A1", "TA1", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar1.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar1.subscriptionId.set("51307b66f481db11bf860010");
-
-  expectedNcar2.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar2.subscriptionId.set("51307b66f481db11bf860020");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  setNotifier(notifierMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A1", "TA1", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.registrationId.set("51307b66f481db11bf860001");
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ("51307b66f481db11bf860001", res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-
-  utExit();
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability3 -
-*/
-TEST(mongoRegisterContext_update, NotifyContextAvailability3)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  utInit(false, true);  // TimerMock only - NOT NotifierMock
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A2", "TA2", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(0);
-
-  setNotifier(notifierMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A2", "TA2", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.registrationId.set("51307b66f481db11bf860001");
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ("51307b66f481db11bf860001", res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-
-  utExit();
 }

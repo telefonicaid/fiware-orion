@@ -33,66 +33,34 @@
 
 /* ****************************************************************************
 *
-* basePart, idPart -
-*
-* Helper functions for entityQuery to split the attribute name string into part,
-* e.g. "A1()ID1" into "A1" and "ID1"
-*/
-inline std::string basePart(std::string name)
-{
-  /* Search for "()" */
-  std::size_t pos = name.find(MD_ID_SEPARATOR);
-
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just 'name' */
-    return name;
-  }
-
-  /* If found, return substring */
-  return name.substr(0, pos);
-}
-
-
-
-/* ****************************************************************************
-*
-* idPart - 
-*/
-inline std::string idPart(std::string name)
-{
-  /* Search for "()" */
-  std::size_t pos = name.find(MD_ID_SEPARATOR);
-
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just "" */
-    return "";
-  }
-
-  /* If found, return substring */
-  return name.substr(pos + 2, name.length());
-}
-
-
-
-/* ****************************************************************************
-*
 * ESC decoded/encoded
 */
 #define ESCAPE_1_DECODED  '.'
 #define ESCAPE_1_ENCODED  '='
 
 
+#define ESCAPE_2_DECODED  '$'
+#define ESCAPE_2_ENCODED  '>'
+
+// From https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Restrictions-on-Field-Names
+//
+// "Until support is added in the query language, the use of $ and . in field names is not recommended
+// and is not supported by the official MongoDB drivers.
+//
+// Note that both = and > are forbidden chars in CB (see https://fiware-orion.readthedocs.io/en/master/user/forbidden_characters/index.html)
+// so they are safe, as they cannot appear in any part of the CB API
+
 
 /* ****************************************************************************
 *
-* dbDotEncode -
+* dbEncode -
 */
-inline std::string dbDotEncode(const std::string& _s)
+inline std::string dbEncode(const std::string& _s)
 {
   std::string s(_s);   // replace cannot be used in const std::string&
+
   std::replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  std::replace(s.begin(), s.end(), ESCAPE_2_DECODED, ESCAPE_2_ENCODED);
 
   return s;
 }
@@ -101,13 +69,14 @@ inline std::string dbDotEncode(const std::string& _s)
 
 /* ****************************************************************************
 *
-* dbDotDecode -
+* dbDecode -
 */
-inline std::string dbDotDecode(const std::string& _s)
+inline std::string dbDecode(const std::string& _s)
 {
   std::string s(_s);   // replace cannot be used in const std::string&
 
   std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  std::replace(s.begin(), s.end(), ESCAPE_2_ENCODED, ESCAPE_2_DECODED);
 
   return s;
 }

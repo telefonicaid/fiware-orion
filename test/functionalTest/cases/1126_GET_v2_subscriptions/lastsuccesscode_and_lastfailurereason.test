@@ -1,0 +1,823 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check lastSuccessCode and lastFailureReason fields
+
+--SHELL-INIT--
+
+# CB runs with timeout (2 seconds)
+
+dbInit CB
+brokerStart CB 0 IPv4 -httpTimeout 2000
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+#
+# 01. Create sub1 for 200 endpoint
+# 02. Create sub2 for 400 endpoint
+# 03. Create sub3 for 404 endpoint
+# 04. Create sub4 for 500 endpoint
+# 05. Create sub5 for timeout endpoint
+# 06. Create sub6 for wrong port endpoint
+# 07. Create sub7 for host not found endpoint
+# 08. Create sub8 for wrong IP endpoint
+# 09. Create entity (triggering all subscriptions)
+# 10. Get sub1 see status: active, lastSuccessCode: 200
+# 11. Get sub2 see status: active, lastSuccessCode: 400
+# 12. Get sub3 see status: active, lastSuccessCode: 404
+# 13. Get sub4 see status: active, lastSuccessCode: 500
+# 14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
+# 15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
+# 16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
+# 17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
+#
+
+echo "01. Create sub1 for 200 endpoint"
+echo "================================"
+payload='{
+  "description": "Test 200 reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme200"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create sub2 for 400 endpoint"
+echo "================================"
+payload='{
+  "description": "Test 400 reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E2",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme400"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Create sub3 for 404 endpoint"
+echo "================================"
+payload='{
+  "description": "Test 404 reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E3",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme404"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "04. Create sub4 for 500 endpoint"
+echo "================================"
+payload='{
+  "description": "Test 500 reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E4",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme500"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID4=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "05. Create sub5 for timeout endpoint"
+echo "===================================="
+payload='{
+  "description": "Test timeout reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E5",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/givemeDelay"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID5=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "06. Create sub6 for wrong port endpoint"
+echo "======================================="
+payload='{
+  "description": "Test wrong port reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E6",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:6699/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID6=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "07. Create sub7 for host not found"
+echo "=================================="
+payload='{
+  "description": "Test host not found reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E7",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://foo.bar.bar.com:1028/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID7=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+
+echo "08. Create sub1 for wrong IP endpoint"
+echo "====================================="
+payload='{
+  "description": "Test wrong IP reponses",
+  "subject": {
+    "entities": [
+      {
+        "id": "E8",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://12.34.76.85:9999/giveme200"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+SUB_ID8=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "09. Create entities (triggering all notifications)"
+echo "=================================================="
+
+# We use a 0.2 ward as it seems accumulator-server.py has load problems otherwise
+
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E4",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E5",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E6",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E7",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+sleep 0.2
+
+payload='{
+  "id": "E8",
+  "type": "T",
+  "A": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+
+# Wait for 1.5 x timeout
+sleep 3s
+
+
+echo "10. Get sub1 see status: active, lastSuccessCode: 200"
+echo "====================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID1
+echo
+echo
+
+
+echo "11. Get sub2 see status: active, lastSuccessCode: 400"
+echo "====================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID2
+echo
+echo
+
+
+echo "12. Get sub3 see status: active, lastSuccessCode: 404"
+echo "====================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID3
+echo
+echo
+
+
+echo "13. Get sub4 see status: active, lastSuccessCode: 500"
+echo "====================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID4
+echo
+echo
+
+
+echo "14. Get sub5 see status: failed, lastFailureReason: Timeout was reached"
+echo "======================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID5
+echo
+echo
+
+
+echo "15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID6
+echo
+echo
+
+
+echo "16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID7
+echo
+echo
+
+
+echo "17. Get sub8 see status: failed, lastFailureReason: Timeout was reached"
+echo "======================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID8
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub1 for 200 endpoint
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create sub2 for 400 endpoint
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create sub3 for 404 endpoint
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create sub4 for 500 endpoint
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create sub5 for timeout endpoint
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create sub6 for wrong port endpoint
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create sub7 for host not found
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Create sub1 for wrong IP endpoint
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Create entities (triggering all notifications)
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E7?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E8?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+10. Get sub1 see status: active, lastSuccessCode: 200
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test 200 reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme200"
+        },
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11. Get sub2 see status: active, lastSuccessCode: 400
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test 400 reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme400"
+        },
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 400,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E2",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+12. Get sub3 see status: active, lastSuccessCode: 404
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test 404 reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme404"
+        },
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 404,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E3",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+13. Get sub4 see status: active, lastSuccessCode: 500
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test 500 reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/giveme500"
+        },
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 500,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E4",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 436
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test timeout reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/givemeDelay"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Timeout was reached",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "failed",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E5",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 441
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test wrong port reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:6699/notify"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "failed",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E6",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 451
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test host not found reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://foo.bar.bar.com:1028/notify"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Couldn't resolve host name",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "failed",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E7",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 437
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Test wrong IP reponses",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://12.34.76.85:9999/giveme200"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Timeout was reached",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "failed",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E8",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

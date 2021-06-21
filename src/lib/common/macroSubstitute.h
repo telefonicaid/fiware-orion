@@ -27,14 +27,12 @@
 */
 #include <string>
 
-#include "ngsi/ContextElement.h"
-
-
+#include "apiTypesV2/Entity.h"
 
 /* ****************************************************************************
 *
 * macroSubstitute - 
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, const ContextElement& ce);
+extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

@@ -61,22 +61,22 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 
 /* ****************************************************************************
 *
-* NotifyCondition::render -
+* NotifyCondition::toJsonV1 -
 */
-std::string NotifyCondition::render(bool notLastInVector)
+std::string NotifyCondition::toJsonV1(bool notLastInVector)
 {
   std::string out = "";
 
   bool condValueListRendered   = condValueList.size() != 0;
-  bool restrictionRendered     = restriction.get() != "";
+  bool restrictionRendered     = !restriction.get().empty();
   bool commaAfterRestriction   = false;  // last element
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
   out += startTag();
   out += valueTag("type", type, commaAfterType);
-  out += condValueList.render(commaAfterCondValueList);
-  out += restriction.render(commaAfterRestriction);
+  out += condValueList.toJsonV1(commaAfterCondValueList);
+  out += restriction.toJsonV1(commaAfterRestriction);
   out += endTag();
 
   return out;
@@ -99,7 +99,7 @@ std::string NotifyCondition::check
 {
   std::string res;
 
-  if (type == "")
+  if (type.empty())
   {
     return "empty type for NotifyCondition";
   }
@@ -122,35 +122,6 @@ std::string NotifyCondition::check
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyCondition::present -
-*/
-void NotifyCondition::present(const std::string& indent, int ix)
-{
-  std::string indent2 = indent + "  ";
-
-  if (ix == -1)
-  {
-    LM_T(LmtPresent, ("%sNotify Condition:", 
-		      indent2.c_str()));
-  }
-  else
-  {
-    LM_T(LmtPresent, ("%sNotify Condition %d:", 
-		      indent2.c_str(), 
-		      ix));
-  }
-
-  LM_T(LmtPresent, ("%stype: %s", 
-		    indent2.c_str(), 
-		    type.c_str()));
-  condValueList.present(indent2);
-  restriction.present(indent2);
 }
 
 

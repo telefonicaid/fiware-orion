@@ -68,7 +68,7 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& predete
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
@@ -85,20 +85,7 @@ std::string DiscoverContextAvailabilityRequest::check(const std::string& predete
   else
     return "OK";
 
-  return response.render();
-}
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityRequest::present -
-*/
-void DiscoverContextAvailabilityRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent);
-   attributeList.present(indent);
-   restriction.present(indent);
+  return response.toJsonV1();
 }
 
 
@@ -164,7 +151,7 @@ void DiscoverContextAvailabilityRequest::fill
     restriction.scopeVector.push_back(scopeP);
   }
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     attributeList.push_back(attributeName);
   }

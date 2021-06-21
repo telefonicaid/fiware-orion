@@ -97,7 +97,7 @@ payload='{
     },
     "attrs": [ "A", "B", "C" ],
     "attrsFormat": "legacy",
-    "metadata": [ "previousValue", "actionType" ]
+    "metadata": [ "actionType", "previousValue" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -346,7 +346,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. Update B:20
 ===============
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -356,12 +355,12 @@ Date: REGEX(.*)
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 453
+Content-Length: 452
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -415,7 +414,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. Update B:20, C:30
 =====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -425,12 +423,12 @@ Date: REGEX(.*)
 ======================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 574
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -496,7 +494,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. Update A:1, D:40
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -506,12 +503,12 @@ Date: REGEX(.*)
 =====================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 454
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -565,7 +562,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Update A:10, D:41
 =====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -575,12 +571,12 @@ Date: REGEX(.*)
 ======================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 455
+Content-Length: 454
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -650,7 +646,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -714,7 +710,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 14. Update subscription conditions (to re-trigger initial notification)
 =======================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

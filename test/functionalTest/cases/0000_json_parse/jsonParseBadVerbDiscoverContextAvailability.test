@@ -25,11 +25,17 @@ JSON Parse BadVerb DiscoverContextAvailability
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
-echo "+++++ Starting +++++++++++++++"
-url="/v1/registry/registerContext"
+
+#
+# 01. Registering ConferenceRoom/Room, attr temperature
+# 02. Discover context availability using the verb 'BAD_VERB'
+#
+
+echo "01. Registering ConferenceRoom/Room, attr temperature"
+echo "====================================================="
 payload='{
   "contextRegistrations": [
     {
@@ -48,22 +54,7 @@ payload='{
       "attributes": [
         {
           "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
+          "type": "degree"
         }
       ],
       "providingApplication": "http://192.168.100.1:70/application"
@@ -71,11 +62,13 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url /v1/registry/registerContext --payload "$payload"
+echo
+echo
 
-echo "+++++ Registration Done +++++++++++++++"
 
-url="/v1/registry/discoverContextAvailability"
+echo "02. Discover context availability using the verb 'BAD_VERB'"
+echo "==========================================================="
 payload='{
   "entities": [
     {
@@ -107,11 +100,14 @@ payload='{
     ]
   }
 }'
-orionCurl --url "$url" -X "BAD_VERB" --payload "${payload}"
+orionCurl --url /v1/registry/discoverContextAvailability -X "BAD_VERB" --payload "${payload}"
+echo
+echo
 
-echo "+++++ Discovery Done +++++++++++++++"
+
 --REGEXPECT--
-+++++ Starting +++++++++++++++
+01. Registering ConferenceRoom/Room, attr temperature
+=====================================================
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
@@ -122,14 +118,18 @@ Date: REGEX(.*)
     "duration": "PT1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-+++++ Registration Done +++++++++++++++
+
+
+02. Discover context availability using the verb 'BAD_VERB'
+===========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-+++++ Discovery Done +++++++++++++++
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

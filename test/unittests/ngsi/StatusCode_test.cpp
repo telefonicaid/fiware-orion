@@ -44,7 +44,7 @@ TEST(StatusCode, render)
 
   utInit();
 
-  out = sc2.render(false);
+  out = sc2.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -110,21 +110,5 @@ TEST(StatusCode, check)
   out = sc.check();
   EXPECT_STREQ("OK", out.c_str());
 
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(StatusCode, present)
-{
-  StatusCode    sc(SccOk, "");
-  std::string   out;
-
-  utInit();
-  sc.present("");
   utExit();
 }
