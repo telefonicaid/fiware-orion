@@ -58,7 +58,7 @@ commands that require root privilege):
 * Install mosquitto from sources (config.mk file under mosquitto-1.5/ can be modified to fine tune the build)
 
         # FIXME PR: this version is old, try with newer ones
-        wget -4 http://mosquitto.org/files/source/mosquitto-1.5.tar.gz
+        wget http://mosquitto.org/files/source/mosquitto-1.5.tar.gz
         tar xvf mosquitto-1.5.tar.gz
         cd mosquitto-1.5
         make

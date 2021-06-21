@@ -95,14 +95,13 @@ echo "INSTALL: gmock" \
 && make \
 && make install
 
-# FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
-# which the same procedure described in "Build from source" documentation
-#  echo "INSTALL: mosquitto" \
-#  && curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
-#  && cd /opt/mosquitto-1.5 \
-#  && make \
-#  && make install
-#  && rm -Rf /opt/mosquitto-1.5 (this one moved to the end)
+# FIXME PR: this version is old, try with newer ones
+echo "INSTALL: mosquitto" \
+&& curl -kL http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-1.5.tar.gz \
+&& make \
+&& make install \
+&& echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf
 
 ldconfig
 
@@ -112,4 +111,6 @@ yum -y remove \
 && rm -Rf /opt/mongo-c-driver-1.17.4 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.70 \
+# FIXME PR: this version is old, try with newer ones
+&& rm -Rf /opt/mosquitto-1.5 \
 && rm -Rf /opt/gmock-1.5.0
