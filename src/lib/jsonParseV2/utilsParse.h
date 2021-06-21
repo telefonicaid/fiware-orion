@@ -95,4 +95,12 @@ Opt<int64_t> getInt64Must(const rapidjson::Value& parent, const char* field, con
 */
 Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, const std::string& description = "");
 
+
+/* *****************************************************************************
+*
+* isNull - check if a given rapidjson node is null
+*/
+bool isNull(const rapidjson::Value& parent, const char* field);
+
+
 #endif  // SRC_LIB_JSONPARSEV2_UTILSPARSE_H_

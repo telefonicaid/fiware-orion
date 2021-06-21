@@ -131,12 +131,3 @@ The semantics of the notification request are the same than `POST /v2/entities?o
 So, if the entity exists, is upated. If the entities doesn't exist, it is created. Thus,
 federation doesn't provide exact mirroring: if the entity is deleted in
 first Context Broker the entity will not be deleted in the second Context Broker.
-
-Note that Orion Context Broker could send an [initial notification](initial_notification.md)
-when the federation subscription is done. In some cases, this initial notification could be
-unprocessable by the receiver Context Broker. In particular, we have found cases in which
-the initial notification includes more elements in the service path headers than the legally
-allowed (see [documentation about service path](service_path.md)), thus generating a
-`"too many service paths - a maximum of ten service paths is allowed"` error. However, note
-that only this initial notification is ignored, regular notifications after it doesn't have
-this problems and are correctly processed by the receiving Context Broker.

@@ -57,9 +57,7 @@ std::string postUpdateContextSubscription
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,
                                                                    ciP->tenant,
-                                                                   ciP->httpHeaders.xauthToken,
-                                                                   ciP->servicePathV,
-                                                                   ciP->httpHeaders.correlator));
+                                                                   ciP->servicePathV));
 
   TIMED_RENDER(answer = ucsr.toJsonV1());
 

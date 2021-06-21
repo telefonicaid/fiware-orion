@@ -49,9 +49,13 @@ static const char* validOptions[] =
   OPT_DATE_MODIFIED,
   OPT_NO_ATTR_DETAIL,
   OPT_UPSERT,
-  OPT_SKIPINITALNOTIFICATION,
   OPT_FORCEDUPDATE,
-  OPT_FLOW_CONTROL
+  OPT_FLOW_CONTROL,
+  OPT_SKIPFORWARDING,
+
+  // FIXME P3: initial notification feature was removed in CB 3.2.0, but we leave this
+  // here for a while, so existing clients using options=skipInitialNotification don't break
+  OPT_SKIPINITALNOTIFICATION
 };
 
 
@@ -62,6 +66,13 @@ static const char* validOptions[] =
 */
 static bool isValidOption(std::string item)
 {
+  // FIXME P3: initial notification feature was removed in CB 3.2.0, but we leave this
+  // here for a while, so existing clients using options=skipInitialNotification don't break
+  if (item == OPT_SKIPINITALNOTIFICATION)
+  {
+    LM_W(("skipInitialNotification is no longer supported, please avoid using it"));
+  }
+
   for (unsigned int ix = 0; ix < sizeof(validOptions) / sizeof(validOptions[0]); ++ix)
   {
     if (item == validOptions[ix])

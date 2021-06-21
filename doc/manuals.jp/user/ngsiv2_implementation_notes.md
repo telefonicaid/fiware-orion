@@ -14,13 +14,14 @@
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
-* [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
+* [`skipForwarding` オプション](#skipforwarding-option)
 * [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
@@ -272,27 +273,23 @@ NGISv2 仕様 "Ordering Results" セクションから :
 
 [Top](#top)
 
-<a name="initial-notifications"></a>
-## 初期通知
-
-NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、Orion は、また、サブスクリプションの作成/更新時時に初期通知を送信することがあります。
-
-初期通知は、新しい URI パラメータオプション `skipInitialNotification`
-を使用して設定できます。
-例えば、`POST /v2/subscriptions?options=skipInitialNotification` または、
-`PATCH /v2/subscriptions/{subId}?options=skipInitialNotification` です。
-
-[初期通知](initial_notification.md) について、ドキュメントで詳細を
-確認してください。
-
-[トップ](#top)
-
 <a name="oneshot-subscriptions"></a>
 ## Oneshot サブスクリプション
 
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[トップ](#top)
+
+<a name="custom-notifications-without-payload"></a>
+## ペイロードなしのカスタム通知
+
+カスタム通知の `httpCustom` フィールド内で `payload` が `null` に設定されている場合、そのサブスクリプションに
+関連付けられた通知にはペイロードが含まれません (つまり、conten-length 0 の通知)。
+
+これは、`payload` を `""` に設定したり、フィールドを省略したりすることと同じではないことに注意してください。
+その場合、通知は NGSIv2 正規化形式を使用して送信されます。
 
 [トップ](#top)
 
@@ -395,6 +392,18 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
+
+[Top](#top)
+
+<a name="skipforwarding-option"></a>
+## `skipForwarding` オプション
+
+CPrs への転送をスキップするために、クエリで `skipForwarding` オプションを使用できます (例:
+`GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
+されます。
+
+`skipForwarding` を転送しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)
 

@@ -98,6 +98,8 @@ typedef enum TraceLevels
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
+  LmtNotificationRequestPayload,
+  LmtNotificationResponsePayload,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,
@@ -126,6 +128,7 @@ typedef enum TraceLevels
   LmtSoftError,
   LmtNotImplemented,
   LmtCurlContext,
+  LmtThreadpool,
 
   LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 

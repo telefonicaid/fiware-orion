@@ -31,35 +31,17 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Create entity E with atributes A and B
-# 02. Create subscription with attrs: A, A, A (triggers notif)
+# 01. Create subscription with attrs: A, A, A
+# 02. Create entity E with atributes A and B (triggers notif)
 # 03. Update attribute A in entity (triggers notif)
-# 04. Update subscription (triggeres notif)
-# 05. Dump accumulator and see three notification, each one with A only one time
+# 04. Update subscription
+# 05. Update (forced) attribute A in entity (triggers notif)
+# 06. Dump accumulator and see three notification, each one with A only one time
 #
 
 
-echo "01. Create entity E with atributes A and B"
-echo "=========================================="
-payload='{
-  "id": "E",
-  "type": "T",
-  "A":{
-    "type": "Number",
-    "value": 1
-  },
-  "B":{
-    "type": "Number",
-    "value" : 2
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create subscription with attrs: A, A, A (triggers notif)"
-echo "============================================================"
+echo "01. Create subscription with attrs: A, A, A"
+echo "==========================================="
 payload='{
   "subject": {
     "entities": [
@@ -85,6 +67,25 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
+echo "02. Create entity E with atributes A and B (triggers notif)"
+echo "==========================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A":{
+    "type": "Number",
+    "value": 1
+  },
+  "B":{
+    "type": "Number",
+    "value" : 2
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
 echo "03. Update attribute A in entity (triggers notif)"
 echo "================================================="
 payload='{
@@ -98,8 +99,8 @@ echo
 echo
 
 
-echo "04. Update subscription (triggeres notif)"
-echo "========================================="
+echo "04. Update subscription"
+echo "======================="
 payload='{
   "subject": {
     "entities": [
@@ -123,7 +124,20 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see three notification, each one with A only one time"
+echo "05. Update (forced) attribute A in entity (triggers notif)"
+echo "=========================================================="
+payload='{
+  "A":{
+    "type": "Number",
+    "value": 2
+  }
+}'
+orionCurl --url /v2/entities/E/attrs?options=forcedUpdate -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator and see three notification, each one with A only one time"
 echo "=============================================================================="
 accumulatorDump
 echo
@@ -131,21 +145,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with atributes A and B
-==========================================
+01. Create subscription with attrs: A, A, A
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create subscription with attrs: A, A, A (triggers notif)
-============================================================
+02. Create entity E with atributes A and B (triggers notif)
+===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -159,15 +173,23 @@ Date: REGEX(.*)
 
 
 
-04. Update subscription (triggeres notif)
-=========================================
+04. Update subscription
+=======================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Dump accumulator and see three notification, each one with A only one time
+05. Update (forced) attribute A in entity (triggers notif)
+==========================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump accumulator and see three notification, each one with A only one time
 ==============================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -177,7 +199,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}=======================================
 POST http://localhost:REGEX(\d+)/notify
@@ -199,7 +221,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E","type":"T","A":{"type":"Number","value":2,"metadata":{}}}]}=======================================
 

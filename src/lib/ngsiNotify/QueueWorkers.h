@@ -33,9 +33,11 @@ class QueueWorkers
 public:
   QueueWorkers(SyncQOverflow<std::vector<SenderThreadParams*>*> *pQ, int numThreads): pQueue(pQ), numberOfThreads(numThreads) {}
   int start();
+  int stop();
 private:
     SyncQOverflow<std::vector<SenderThreadParams*>*> *pQueue;
     int numberOfThreads;
+    std::vector<pthread_t> threadIds;
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H_

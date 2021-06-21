@@ -653,8 +653,7 @@ curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json
       "temperature"
     ]
   },
-  "expires": "2040-01-01T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2040-01-01T14:00:00.00Z"
 }
 EOF
 ```
@@ -681,6 +680,7 @@ Let's examine in detail the different elements included in the payload:
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
 -   You can also have permanent subscriptions. Just omit the `expires` field.
+    If this field is omitted subscription is permanent (until subscription gets removed).
 -   The `condition` element defines the "trigger" for the subscription. The
     `attrs` field contains a list of attribute names. These names define the
     "triggering attributes", i.e. attributes that upon creation/change
@@ -709,17 +709,6 @@ Let's examine in detail the different elements included in the payload:
     not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the
     [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
--   The throttling element is used to specify a minimum
-    inter-notification arrival time. So, setting throttling to 5 seconds
-    as in the example above, makes a notification not to be sent
-    if a previous notification was sent less than 5 seconds earlier, no
-    matter how many actual changes take place in that period. This is to give the
-    notification receptor a means to protect itself against context producers
-    that update attribute values too frequently. In multi-CB configurations, take
-    into account that the last-notification measure is local to each CB node. Although
-    each node periodically synchronizes with the database in order to get potentially newer
-    values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that
-    a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request uses 201 Created as HTTP response code.
 In addition, it contains a `Location header` which holds the subscription ID: a
@@ -734,6 +723,14 @@ Write it down because you will need it later in this tutorial.
 < Fiware-Correlator: 9ac7bbba-2268-11e6-aaf0-d48564c29d20
 < Date: Wed, 25 May 2016 11:05:35 GMT
 ```
+
+Now that subscription has been created you can trigger it with any change in Room1
+pressure. For instance, let's do the following update:
+
+```
+curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 802
+```
+
 
 Let's have a look now at accumulator-server.py. We will see one notification (and 
 just one for the moment, no matter how long you wait), similar to this one:
@@ -771,14 +768,8 @@ actual data for the entities. Note that the entity representation
 format is the same as the one used by the responses to the
 `GET /v2/entities` operation.
 
-You may wonder why accumulator-server.py is getting this message if you
-don't actually do any update. This is due to the *initial notification*,
-which details are described [here](initial_notification.md).
-
 Now, do the following exercise, based on what you know from [update
-entity](#update-entity): perform the following four updates in sequence, letting
-pass more than 5 seconds between updates (to avoid losing
-notifications due to throttling):
+entity](#update-entity): perform the following four updates in sequence:
 
 -   update Room1 temperature to 27: nothing happens, as temperature is
     not the triggering attribute
@@ -793,10 +784,6 @@ notifications due to throttling):
     URI option. Details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
-
-Next, try to check how throttling is enforced. Update Room1 pressure
-fast, without letting pass 5 seconds and you will see that no second
-notification arrives to accumulator-server.py.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
 provides the whole list and [pagination](pagination.md) may be needed if the

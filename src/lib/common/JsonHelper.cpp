@@ -74,7 +74,7 @@ std::string toJsonString(const std::string& input)
        * correspond to UTF-8 multi-byte characters */
       if (ch >= 0 && ch <= 0x1F)
       {
-        static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
+        static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         ss += "\\u00";
         ss += intToHex[(ch & 0xF0) >> 4];
@@ -261,6 +261,17 @@ void JsonObjectHelper::addDate(const std::string& key, double timestamp)
 void JsonObjectHelper::addBool(const std::string& key, bool b)
 {
   addRaw(key, b? "true" : "false");
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonObjectHelper::addNull -
+*/
+void JsonObjectHelper::addNull(const std::string& key)
+{
+  addRaw(key, "null");
 }
 
 

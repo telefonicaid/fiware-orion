@@ -31,112 +31,22 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1, with attr A1=1, having metadata M1=1
-# 02. Create entity E2, with attr A1=1, having metadata M1=2
-# 03. Create entity E3, with attr A1=1, having metadata M2=3
-# 04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
-# 05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
-# 06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
-# 07. Create a subscription with q=A1==1 AND mq=A1.M1==2
+# 01. Create a subscription with q=A1==1 AND mq=A1.M1==2
+# 02. Create entity E1, with attr A1=1, having metadata M1=1
+# 03. Create entity E2, with attr A1=1, having metadata M1=2
+# 04. Create entity E3, with attr A1=1, having metadata M2=3
+# 05. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
+# 06. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
+# 07. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
 # 08. Dump accumulator, see E2, then reset accumulator
 # 09. Modify the subscription to have q=A1 AND mq=A1.M1
-# 10. Dump accumulator, see E1 and E2, then reset accumulator
-# 11a. GET E3, just to check the value/type of its A1 attribute
-# 11b. Update E3, setting M1 to A1
-# 11c. GET E3, just to check the value/type of its A1 attribute
-# 12. Dump accumulator, see E3
+# 10. GET E3, just to check the value/type of its A1 attribute
+# 11. Update E3, setting M1 to A1
+# 12. GET E3, just to check the value/type of its A1 attribute
+# 13. Dump accumulator, see E3
 #
 
-echo "01. Create entity E1, with attr A1=1, having metadata M1=1"
-echo "=========================================================="
-payload='{
-  "id": "E1",
-  "A1": {
-    "value": 1,
-    "metadata": {
-      "M1": {
-        "value": 1
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create entity E2, with attr A1=1, having metadata M1=2"
-echo "=========================================================="
-payload='{
-  "id": "E2",
-  "A1": {
-    "value": 1,
-    "metadata": {
-      "M1": {
-        "value": 2
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Create entity E3, with attr A1=1, having metadata M2=3"
-echo "=========================================================="
-payload='{
-  "id": "E3",
-  "A1": {
-    "value": 1,
-    "metadata": {
-      "M2": {
-        "value": 3
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)"
-echo "======================================================================================="
-payload='{
-  "id": "E4",
-  "A1": {
-    "value": 2,
-    "metadata": {
-      "M2": {
-        "value": 2
-      },
-      "M3": {
-        "value": 3
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2"
-echo "========================================================="
-orionCurl --url '/v2/entities?q=A1==1&mq=A1.M1==2'
-echo
-echo
-
-
-echo "06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2"
-echo "=========================================================="
-orionCurl --url '/v2/entities?q=A1&mq=A1.M1'
-echo
-echo
-
-
-echo "07. Create a subscription with q=A1==1 AND mq=A1.M1==2"
+echo "01. Create a subscription with q=A1==1 AND mq=A1.M1==2"
 echo "======================================================"
 payload='
 {
@@ -163,6 +73,95 @@ payload='
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create entity E1, with attr A1=1, having metadata M1=1"
+echo "=========================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M1": {
+        "value": 1
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2, with attr A1=1, having metadata M1=2"
+echo "=========================================================="
+payload='{
+  "id": "E2",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M1": {
+        "value": 2
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E3, with attr A1=1, having metadata M2=3"
+echo "=========================================================="
+payload='{
+  "id": "E3",
+  "A1": {
+    "value": 1,
+    "metadata": {
+      "M2": {
+        "value": 3
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)"
+echo "======================================================================================="
+payload='{
+  "id": "E4",
+  "A1": {
+    "value": 2,
+    "metadata": {
+      "M2": {
+        "value": 2
+      },
+      "M3": {
+        "value": 3
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2"
+echo "========================================================="
+orionCurl --url '/v2/entities?q=A1==1&mq=A1.M1==2'
+echo
+echo
+
+
+echo "07. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2"
+echo "=========================================================="
+orionCurl --url '/v2/entities?q=A1&mq=A1.M1'
 echo
 echo
 
@@ -198,23 +197,15 @@ echo
 echo
 
 
-echo "10. Dump accumulator, see E1 and E2, then reset accumulator"
-echo "==========================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "11a. GET E3, just to check the value/type of its A1 attribute"
-echo "============================================================="
+echo "10. GET E3, just to check the value/type of its A1 attribute"
+echo "============================================================"
 orionCurl --url /v2/entities/E3
 echo
 echo
 
 
-echo "11b. Update E3, setting M1 to A1"
-echo "================================"
+echo "11. Update E3, setting M1 to A1"
+echo "==============================="
 payload='{
   "A1": {
     "metadata": {
@@ -229,14 +220,14 @@ echo
 echo
 
 
-echo "11c. GET E3, just to check the value/type of its A1 attribute"
-echo "============================================================="
+echo "12. GET E3, just to check the value/type of its A1 attribute"
+echo "============================================================"
 orionCurl --url /v2/entities/E3
 echo
 echo
 
 
-echo "12. Dump accumulator, see E3"
+echo "13. Dump accumulator, see E3"
 echo "============================"
 accumulatorDump
 accumulatorReset
@@ -245,7 +236,17 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1, with attr A1=1, having metadata M1=1
+01. Create a subscription with q=A1==1 AND mq=A1.M1==2
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1, with attr A1=1, having metadata M1=1
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -255,7 +256,7 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E2, with attr A1=1, having metadata M1=2
+03. Create entity E2, with attr A1=1, having metadata M1=2
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -265,7 +266,7 @@ Date: REGEX(.*)
 
 
 
-03. Create entity E3, with attr A1=1, having metadata M2=3
+04. Create entity E3, with attr A1=1, having metadata M2=3
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -275,7 +276,7 @@ Date: REGEX(.*)
 
 
 
-04. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
+05. Create entity E4, with attr A1=2, having metadata M2=2 and M3=3 (never to be found)
 =======================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -285,7 +286,7 @@ Date: REGEX(.*)
 
 
 
-05. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
+06. GET entities matching q=A1==1 AND mq=A1.M1==2, see E2
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 107
@@ -311,7 +312,7 @@ Date: REGEX(.*)
 ]
 
 
-06. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
+07. GET entities matching q=A1 AND mq=A1.M1, see E1 and E2
 ==========================================================
 HTTP/1.1 200 OK
 Content-Length: 213
@@ -351,16 +352,6 @@ Date: REGEX(.*)
 ]
 
 
-07. Create a subscription with q=A1==1 AND mq=A1.M1==2
-======================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
 08. Dump accumulator, see E2, then reset accumulator
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
@@ -371,7 +362,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -403,56 +394,8 @@ Date: REGEX(.*)
 
 
 
-10. Dump accumulator, see E1 and E2, then reset accumulator
-===========================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 266
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 1
-                    }
-                }, 
-                "type": "Number", 
-                "value": 1
-            }, 
-            "id": "E1", 
-            "type": "Thing"
-        }, 
-        {
-            "A1": {
-                "metadata": {
-                    "M1": {
-                        "type": "Number", 
-                        "value": 2
-                    }
-                }, 
-                "type": "Number", 
-                "value": 1
-            }, 
-            "id": "E2", 
-            "type": "Thing"
-        }
-    ], 
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-11a. GET E3, just to check the value/type of its A1 attribute
-=============================================================
+10. GET E3, just to check the value/type of its A1 attribute
+============================================================
 HTTP/1.1 200 OK
 Content-Length: 105
 Content-Type: application/json
@@ -475,16 +418,16 @@ Date: REGEX(.*)
 }
 
 
-11b. Update E3, setting M1 to A1
-================================
+11. Update E3, setting M1 to A1
+===============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-11c. GET E3, just to check the value/type of its A1 attribute
-=============================================================
+12. GET E3, just to check the value/type of its A1 attribute
+============================================================
 HTTP/1.1 200 OK
 Content-Length: 106
 Content-Type: application/json
@@ -507,7 +450,7 @@ Date: REGEX(.*)
 }
 
 
-12. Dump accumulator, see E3
+13. Dump accumulator, see E3
 ============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

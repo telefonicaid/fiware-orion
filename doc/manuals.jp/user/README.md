@@ -20,7 +20,6 @@
   * [Context broker のフェデレーション](federation.md) (Context broker federation)
   * [禁止されている文字](forbidden_characters.md) (Forbidden characters)
   * [ペイロードでの正規表現の使用](regex_in_payload.md) (Using regular expressions in payloads)
-  * [初期通知](initial_notification.md) (Initial notification)
   * [Onseshot サブスクリプション](oneshot_subscription.md)
   * [セキュリティの考慮事項](security.md) (Security considerations)
   * [Docker](docker.md)
