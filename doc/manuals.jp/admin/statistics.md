@@ -35,32 +35,49 @@ Orion Context broker は、`GET /statistics` と `GET /cache/statistics` を介�
 
 ### カウンタ・ブロック
 
-カウンタ・ブロックは、特定のリクエスト型が受信された、または通知が送信された、時間のカウンタに関する情報を提供します。たとえば、次のようになります :
+カウンタ・ブロックは、特定のリクエスト型が受信された、または通知が送信された、時間のカウンタに関する情報を提供します。
+たとえば、次のようになります :
 
 ```
 {
   ...
-  "counters" : {
-    "jsonRequests" : 75916,
-    "queries" : 3698,
-    "updates" : 2416,
-    "subscriptions" : 138,
-    "registrationRequest": 11,
-    "registrations": 41,
-    "unsubscriptions" : 6,
-    "notificationsReceived" : 216936,
-    "notificationsSent" : 579542,
-    "individualContextEntity" : 360,
-    "allContextEntitiesRequests" : 3,
-    "versionRequests" : 1109,
-    "statisticsRequests" : 13,
-    "invalidRequests" : 2
+  "counters": {
+    "invalidRequests": 2,
+    "jsonRequests": 4,
+    "noPayloadRequests": 250,
+    "notificationsSent": 4,
+    "requests": {
+      "entities": {
+        "GET": 231
+      },
+      "entity": {
+        "GET": 2,
+        "PATCH": 1,
+        "POST": 3
+      },
+      "entityTypes": {
+        "GET": 1
+      },
+      "metrics": {
+        "GET": 2
+      },
+      "statistics": {
+        "GET": 9
+      },
+      "subscription": {
+        "GET": 1
+      },
+      "subscriptions": {
+        "GET": 2
+      }
+    },
+    "versionRequests": 0
   },
   ...
 }
 ```
 
-特定のリクエスト型が受信されなかった場合、対応するカウンタは表示されません。
+特定のリクエスト型または verb (動詞) が受信されなかった場合、対応するカウンタは表示されません。
 
 ### SemWait ブロック
 
@@ -159,6 +176,8 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
 * `timeInQueue` : キュー内で待機している通知の蓄積時間です
 * `size` : キューの現在のサイズです
 
+[サービスごとの予約済みキュー/プール](perf_tuning.md#notification-modes-and-performance)を使用する場合、このセクションの
+情報は、サービスごとのキュー/プールとデフォルトのキュー/ワーカーの合計であることに注意してください。
 
 ## GET /cache/statistics
 

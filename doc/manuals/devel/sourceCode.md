@@ -18,7 +18,7 @@
 * [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
-* [src/lib/ngsiNotify/](#srclibngsinotify) (NGSIv1 notifications)
+* [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
@@ -448,13 +448,9 @@ When an entity is created or modified or when a subscription is created or modif
 [**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of the external library [libcurl](https://curl.haxx.se/libcurl/).
 Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`. Another important aspect of this library is that the notifications are sent by separate threads, using a thread pool if desired.
 
-We have subscriptions both for *context entities* and for *availability registrations* and thus, there are two types of notifications. Context entity subscriptions are by far more important (registration subscriptions are barely used at all) and the thread pool for notifications is used for context entity subscriptions only.
-
-### Context entities notifications
-
 Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads await new items in the notification queue and when an item becomes present, it is taken from the queue and processed, sending the notification in question. If the thread pool is not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient", which gives this behaviour). More information on notification modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
-The invoking function in the case of notification due to attribute update/creation is `processOnChangeConditionForUpdateContext()` (see the diagram [MD-01](mongoBackend.md#flow-md-01)) and the invoking function in the case of notification due to subscription creation/update (what is called "initial notification" is `processOnChangeConditionForUpdateContext()` (see the diagram [MD-03](mongoBackend.md#flow-md-03)).
+This module is always invoked from `processOnChangeConditionForUpdateContext()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
 The following two images demonstrate the program flow for context entity notifications without and with thread pool.
 
@@ -474,9 +470,12 @@ _NF-01: Notification on entity-attribute Update/Creation without thread pool_
 _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
 * A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
-* The vector is pushed onto the Notification Message Queue and control is returned to mongoBackend (step 2). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
-* One of the worker threads in the thread pool pops an item from the message queue (step 3). This is done using SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
-* The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* A `ServiceQueue` is selected depending the service associated to the notification. If no queue exists for the service
+  associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
+  `ServiceQueue` is used to put the notification in the right queue (step 2).
+* The vector is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
+* One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using `SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
+* The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 ## src/lib/alarmMgr/

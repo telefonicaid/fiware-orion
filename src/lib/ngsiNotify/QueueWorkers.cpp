@@ -66,6 +66,40 @@ int QueueWorkers::start()
       LM_E(("Internal Error (pthread_create: %s)", strerror(errno)));
       return rc;
     }
+    threadIds.push_back(tid);
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueueWorkers::stop() -
+*/
+int QueueWorkers::stop()
+{
+  // Put in the queue as many kill messages as threads we have
+  for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
+  {
+    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+
+    SenderThreadParams*  params = new SenderThreadParams();
+    params->type = QUEUE_MSG_KILL;
+    paramsV->push_back(params);
+
+    if (!pQueue->try_push(paramsV, true))
+    {
+      LM_E(("Runtime Error (thread kill message cannot be sent due to push in queue failed)"));
+    }
+  }
+
+  // Next, wait for every thread termination
+  for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
+  {
+    pthread_join(threadIds[ix], NULL);
+    LM_T(LmtThreadpool, ("Thread %x joined", threadIds[ix]));
   }
 
   return 0;
@@ -94,6 +128,20 @@ static void* workerFunc(void* pSyncQ)
   for (;;)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
+
+    // The "protocol" to signal thread termination is to find a kill msg in the first
+    // element of the paramsV vector (note that by construction in QueueWorkers::stop()
+    // this vector will have only one item in this case)
+    if ((paramsV->size() == 1) && ((*paramsV)[0]->type == QUEUE_MSG_KILL))
+    {
+      LM_T(LmtThreadpool, ("Thread %x receiving termination signal...", pthread_self()));
+
+      delete (*paramsV)[0];
+      delete paramsV;
+      curl_easy_cleanup((CURL*) curl);
+
+      pthread_exit(NULL);
+    }
 
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
@@ -163,7 +211,7 @@ static void* workerFunc(void* pSyncQ)
         //
         if (r == 0)
         {
-          statisticsUpdate(NotifyContextSent, params->mimeType);
+          __sync_fetch_and_add(&noOfNotificationsSent, 1);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
 

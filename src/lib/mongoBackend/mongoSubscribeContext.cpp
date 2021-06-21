@@ -45,17 +45,14 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV,
-  const std::string&                   fiwareCorrelator
+  const std::vector<std::string>&      servicePathV
 )
 {
   OrionError            oe;
   ngsiv2::Subscription  sub;
-  bool skipInitialNotification = false;
 
   requestP->toNgsiv2Subscription(&sub);
-  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV, xauthToken, fiwareCorrelator, skipInitialNotification, V1);
+  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV);
 
   if (!subId.empty())
   {

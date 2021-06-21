@@ -31,34 +31,13 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create entity with unrestricted text
-# 02. Get the entity and see the unrestricted text
-# 03. Subscribe accumulator to the entity
+# 01. Subscribe accumulator to the entity
+# 02. Create entity with unrestricted text
+# 03. Get the entity and see the unrestricted text
 # 04. Dump and see the unrestricted text
 #
 
-echo '01. Create entity with unrestricted text'
-echo '========================================'
-payload='{
-  "id": "E",
-  "type": "T",
-  "description": {
-   "type": "TextUnrestricted",
-   "value": "I'"'"'m a description (and I'"'"'m using forbidden chars)"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo '02. Get the entity and see the unrestricted text'
-echo '================================================'
-orionCurl --url /v2/entities
-echo
-echo
-
-echo '03. Subscribe accumulator to the entity'
+echo '01. Subscribe accumulator to the entity'
 echo '======================================='
 payload='{
   "subject": {
@@ -80,6 +59,28 @@ echo
 echo
 
 
+echo '02. Create entity with unrestricted text'
+echo '========================================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "description": {
+   "type": "TextUnrestricted",
+   "value": "I'"'"'m a description (and I'"'"'m using forbidden chars)"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '03. Get the entity and see the unrestricted text'
+echo '================================================'
+orionCurl --url /v2/entities
+echo
+echo
+
+
 echo '04. Dump and see the unrestricted text'
 echo '======================================'
 accumulatorDump
@@ -89,7 +90,17 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with unrestricted text
+01. Subscribe accumulator to the entity
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity with unrestricted text
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -99,7 +110,7 @@ Date: REGEX(.*)
 
 
 
-02. Get the entity and see the unrestricted text
+03. Get the entity and see the unrestricted text
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 139
@@ -120,16 +131,6 @@ Date: REGEX(.*)
 ]
 
 
-03. Subscribe accumulator to the entity
-=======================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
 04. Dump and see the unrestricted text
 ======================================
 POST http://localhost:REGEX(\d+)/notify
@@ -140,7 +141,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

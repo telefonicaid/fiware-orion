@@ -190,6 +190,8 @@ static bool updateForward
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
+  std::string         url;
+  char                portV[STRING_SIZE_FOR_INT];
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -202,6 +204,9 @@ static bool updateForward
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
+  snprintf(portV, sizeof(portV), "%d", port);
+  url = ip + ":" + portV + resource;
 
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
@@ -226,9 +231,14 @@ static bool updateForward
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
+    alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
   }
-
+  else
+  {
+    alarmMgr.forwardingErrorReset(url);
+  }
+  
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
   //
@@ -258,7 +268,7 @@ static bool updateForward
       // This is really an internal error in the Context Provider
       // It is not in the orion broker though, so 404 is returned
       //
-      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      LM_W(("Forwarding Error (context provider response to UpdateContext is empty)"));
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
@@ -335,7 +345,7 @@ static bool updateForward
       return true;
     }
 
-    LM_W(("Other Error (unexpected response from context provider: %s)", out.c_str()));
+    LM_W(("Forwarding Error (unexpected response from context provider: %s)", out.c_str()));
     upcrsP->errorCode.fill(SccReceiverInternalError);
     return false;
   }

@@ -153,9 +153,18 @@ Date: REGEX(.*)
 {
     "counters": {
         "jsonRequests": 1,
-        "registrationRequest": 2,
-        "registrationsRequest": 1,
-        "statisticsRequests": 1,
+        "noPayloadRequests": 3,
+        "requests": {
+            "registration": {
+                "GET": 2
+            },
+            "registrations": {
+                "POST": 1
+            },
+            "statistics": {
+                "GET": 1
+            }
+        },
         "versionRequests": 0
     },
     "measuring_interval_in_secs": REGEX(\d+),

@@ -72,7 +72,7 @@ fi
 
 %pre
 getent group %{owner} >/dev/null || groupadd -r %{owner}
-getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /opt/orion -s /bin/bash -c 'Orion account' %{owner}
+getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /home/orion -s /bin/bash -c 'Orion account' %{owner}
 # Backup previous sysconfig file (if any)
 DATE=$(date "+%Y-%m-%d")
 if [ -f "/etc/sysconfig/%{name}" ]; then
@@ -193,6 +193,23 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Jun 09 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.1.0-1
+- Add: skipForwarding option in queries to avoid request forwarding to Context Provider (#3851)
+- Add: per-service reserved queues/pools to threadpool notification mode (#3843) (experimental feature)
+- Add: support to null in DateTime attributes and metadata (#3533)
+- Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
+- Add: new alarm (id number 6) for forwarding errors (#1794)
+- Add: null as allowed value for httpCustom.notification.payload to avoid sending payloads in custom notification (#3272)
+- Add: statistic counter re-worked, based in NGSIv2 requests (#3805)
+- Add: counter for requests without payload in statistics (#1400)
+- Add: debug tracelevels for notifications payload request/response in logs (#2895)
+- Fix: use "Forwarding Error" instead of "Other Error" in WARN traces (#1794)
+- Fix: potential crash (although under very rare situations) in log trace code 
+- Fix: support attributes and metadata starting with dollar sign ($) (#3841)
+- Fix: avoid duplicating forwarded query requests to CPrs in some cases (this may cause illegal JSON with duplicated attribute keys in the response to clients at the end)
+- Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
+- Deprecated: initial notification upon subscription creation or update (along with skipInitialNotification option)
+
 * Mon Apr 12 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.0.0-1
 - Reference distribution changed from RHEL/CentOS 7 to RHEL/CentOS 8 (#3764)
 - Reference MongoDB version changed from 3.6 to 4.4

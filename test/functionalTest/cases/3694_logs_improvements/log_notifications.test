@@ -31,31 +31,16 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create E entity
-# 02. Create subscription SUB1 for E (to the accumulator)
-# 03. Create subscription SUB2 for E (to nowhere)
+# 01. Create subscription SUB1 for E (to the accumulator)
+# 02. Create subscription SUB2 for E (to nowhere)
+# 03. Create E entity (triggering 2 notifications)
 # 04. POST /v2/op/update updating twice E (triggering 4 notifications)
 # 05. Check notification logs (sorted by url)
-# 06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)
+# 06. Check notification correlators (two blocks, corresponding to each update)
 #
 
-echo "01. Create E entity"
-echo "==================="
-payload='
-{
-   "id":"E",
-   "type":"T",
-   "A1":{
-      "value":"foo",
-      "type":"Text"
-   }
-}'
-orionCurl --url '/v2/entities' --payload "$payload"
-echo
-echo
 
-
-echo "02. Create subscription SUB1 for E (to the accumulator)"
+echo "01. Create subscription SUB1 for E (to the accumulator)"
 echo "======================================================="
 payload='
 {
@@ -77,7 +62,7 @@ echo
 echo
 
 
-echo "03. Create subscription SUB2 for E (to nowhere)"
+echo "02. Create subscription SUB2 for E (to nowhere)"
 echo "==============================================="
 payload='
 {
@@ -95,6 +80,22 @@ payload='
     }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E entity (triggering 2 notifications)"
+echo "================================================"
+payload='
+{
+   "id":"E",
+   "type":"T",
+   "A1":{
+      "value":"foo",
+      "type":"Text"
+   }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
 echo
 echo
 
@@ -141,25 +142,15 @@ echo
 echo
 
 
-echo "06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)"
-echo "======================================================================================================================================="
+echo "06. Check notification correlators (two blocks, corresponding to each update)"
+echo "============================================================================="
 cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $3}' | sort
 echo
 echo
 
 
 --REGEXPECT--
-01. Create E entity
-===================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Create subscription SUB1 for E (to the accumulator)
+01. Create subscription SUB1 for E (to the accumulator)
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -169,11 +160,21 @@ Date: REGEX(.*)
 
 
 
-03. Create subscription SUB2 for E (to nowhere)
+02. Create subscription SUB2 for E (to nowhere)
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E entity (triggering 2 notifications)
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -197,10 +198,10 @@ POST localhost:9997/notify, response code: 200
 POST localhost:9997/notify, response code: 200
 
 
-06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)
-=======================================================================================================================================
- corr=REGEX([0-9a-f\-]{36})
- corr=REGEX([0-9a-f\-]{36})
+06. Check notification correlators (two blocks, corresponding to each update)
+=============================================================================
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=1
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=2
  corr=REGEX([0-9a-f\-]{36}); cbnotif=1
  corr=REGEX([0-9a-f\-]{36}); cbnotif=2
  corr=REGEX([0-9a-f\-]{36}); cbnotif=3

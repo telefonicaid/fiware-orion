@@ -14,13 +14,14 @@
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [Custom notifications without payload](#custom-notifications-without-payload)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
+* [`skipForwarding` option](#skipforwarding-option)
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -305,22 +306,21 @@ From lowest to highest:
 
 [Top](#top)
 
-## Initial notifications
-
-The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
-corresponding to a given subscription, based on updates to the entities covered by the subscription.
-Apart from that kind of regular notifications, Orion may send also an initial notification at
-subscription creation/update time.
-
-Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification` or `PATCH /v2/subscriptions/{subId}?options=skipInitialNotification`
-
-Check details in the document about [initial notifications](initial_notification.md)
-
-[Top](#top)
-
 ## Oneshot subscriptions
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
+
+[Top](#top)
+
+## Custom notifications without payload
+
+If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
+associated to that subscription will not include any payload (i.e. content-length 0 notifications).
+
+Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
+the notification will be sent using the NGSIv2 normalized format.
+
+[Top](#top)
 
 ## Notify only attributes that change
 
@@ -421,6 +421,16 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
+
+[Top](#top)
+
+## `skipForwarding` option
+
+You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
+forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
+
+Note that in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
+just use an update request with append/creation semantics).
 
 [Top](#top)
 
