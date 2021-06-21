@@ -114,7 +114,7 @@ echo "INSTALL: gmock" \
 # FIXME PR: this version is old, try with newer ones
 echo "INSTALL: mosquitto" \
 && curl -kL http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
-&& cd /opt/mosquitto-1.5.tar.gz \
+&& cd /opt/mosquitto-1.5 \
 && make \
 && make install \
 && echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf
