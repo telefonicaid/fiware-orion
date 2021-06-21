@@ -32,6 +32,15 @@ brokerStart CB 0-255 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
 mqttAccumulatorStart --pretty-print ${MQTT_HOST} ${MQTT_PORT} orion
 
 --SHELL--
+
+#
+# 01. POST /v2/entities, creating E1/T1
+# 02. Subscribe to E1 on condition A2
+# 03. Update entity attribute A1 to trigger notification
+# 04. Dump accumulator to see notification
+#
+
+
 echo "01. POST /v2/entities, creating E1/T1"
 echo "====================================="
 payload='{
@@ -49,6 +58,7 @@ payload='{
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
+
 
 echo "02. Subscribe to E1 on condition A2"
 echo "==================================="
@@ -82,6 +92,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+
 echo "03. Update entity attribute A1 to trigger notification"
 echo "======================================================"
 payload='{
@@ -97,6 +108,14 @@ payload='{
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
 echo
 echo
+
+
+echo "# 04. Dump accumulator to see notification"
+echo "=========================================="
+mqttAccumulatorDump
+echo
+echo
+
 
 --REGEXPECT--
 01. POST /v2/entities, creating E1/T1
@@ -129,5 +148,6 @@ Date: REGEX(.*)
 
 
 --TEARDOWN--
+mqttAccumulatorStop
 brokerStop CB
 dbDrop CB

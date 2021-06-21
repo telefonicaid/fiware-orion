@@ -28,7 +28,6 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
 
 /* ****************************************************************************

@@ -30,7 +30,6 @@
 
 #include "common/JsonHelper.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/MqttInfo.h"
 
 

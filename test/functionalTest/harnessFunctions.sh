@@ -655,7 +655,7 @@ function brokerStop
 
 # ------------------------------------------------------------------------------
 #
-# accumulatorStop - 
+# mqttAccumulatorStop -
 #
 function mqttAccumulatorStop()
 {
