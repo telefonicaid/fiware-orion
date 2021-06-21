@@ -108,6 +108,7 @@ install_debug: debug
 
 install_scripts:
 	cp scripts/accumulator-server.py $(INSTALL_DIR)/bin 
+	cp scripts/accumulator-mqtt.py $(INSTALL_DIR)/bin
 	cp scripts/managedb/garbage-collector.py $(INSTALL_DIR)/bin
 
 install_coverage: prepare_coverage
