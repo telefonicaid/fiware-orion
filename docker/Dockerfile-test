@@ -2,7 +2,7 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
 
-RUN  apt-get install -y lcov
+RUN  apt-get install -y lcov mongodb-org
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
