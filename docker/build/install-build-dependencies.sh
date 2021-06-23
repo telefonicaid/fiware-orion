@@ -23,13 +23,13 @@
 set -e
 
 BUILD_DEPS=(
- 'libboost-all-dev' \
  'libcurl4-openssl-dev' \
  'libgcrypt-dev' \
  'libgnutls28-dev' \
  'libsasl2-dev' \
  'libssl-dev' \
  'uuid-dev' \
+ 'libmongoclient-dev'
 )
 
 BUILD_TOOLS=(
@@ -44,8 +44,7 @@ BUILD_TOOLS=(
  'gcc' \
  'git' \
  'gnupg' \
- 'make' \
- 'scons' \
+ 'make'
 )
 
 apt-get -y install -f --no-install-recommends \

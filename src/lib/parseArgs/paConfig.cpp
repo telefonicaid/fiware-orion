@@ -671,7 +671,7 @@ int paConfig(const char* item, const void* value, const void* value2)
   }
   else if (strcmp(item, "silent mode") == 0)
   {
-    strncpy(paLogLevel, "ERROR", sizeof(paLogLevel));
+    strncpy(paLogLevel, "ERROR", sizeof(paLogLevel) - 1);
   }
   else if (strcmp(item, "valid log level strings") == 0)
   {
@@ -941,7 +941,7 @@ int paConfigActions(bool preTreat)
 
     if (paSilent)
     {
-      strncpy(paLogLevel, "ERROR", sizeof(paLogLevel));
+      strncpy(paLogLevel, "ERROR", sizeof(paLogLevel) - 1);
     }
 
     if (paLogLevel[0] != 0)

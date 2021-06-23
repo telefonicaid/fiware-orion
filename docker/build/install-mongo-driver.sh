@@ -24,6 +24,11 @@
 set -e
 
 echo
+
+apt-get -y install wget
+wget http://ftp.de.debian.org/debian/pool/main/s/scons/scons_2.5.1-1_all.deb
+apt -y --allow-downgrades install ./scons_2.5.1-1_all.deb
+
 echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT_FOLDER}/mongo-cxx-driver
 cd ${ROOT_FOLDER}/mongo-cxx-driver

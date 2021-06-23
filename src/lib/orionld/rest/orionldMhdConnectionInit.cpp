@@ -168,7 +168,7 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
   else
   {
     ciP->port = 0;
-    strncpy(clientIp, "IP unknown", sizeof(clientIp));
+    strncpy(clientIp, "IP unknown", sizeof(clientIp) - 1);
   }
 }
 

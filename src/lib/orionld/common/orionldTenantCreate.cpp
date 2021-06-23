@@ -61,13 +61,13 @@ OrionldTenant* orionldTenantCreate(const char* tenantName)
   if (tenantP == NULL)
     LM_RE(NULL, ("Out of memory"));
 
-  snprintf(tenantP->tenant,          sizeof(tenantP->mongoDbName),   "%s",                  tenantName);
-  snprintf(tenantP->mongoDbName,     sizeof(tenantP->mongoDbName),   "%s-%s",               dbName, tenantName);
-  snprintf(tenantP->entities,        sizeof(tenantP->entities),      "%s-%s.entities",      dbName, tenantName);
-  snprintf(tenantP->subscriptions,   sizeof(tenantP->subscriptions), "%s-%s.csubs",         dbName, tenantName);
-  snprintf(tenantP->avSubscriptions, sizeof(tenantP->subscriptions), "%s-%s.casubs",        dbName, tenantName);
-  snprintf(tenantP->registrations,   sizeof(tenantP->registrations), "%s-%s.registrations", dbName, tenantName);
-  snprintf(tenantP->troeDbName,      sizeof(tenantP->troeDbName),    "%s_%s",               dbName, tenantName);
+  snprintf(tenantP->tenant,          sizeof(tenantP->tenant) - 1,          "%s",                  tenantName);
+  snprintf(tenantP->mongoDbName,     sizeof(tenantP->mongoDbName) - 1,     "%s-%s",               dbName, tenantName);
+  snprintf(tenantP->entities,        sizeof(tenantP->entities) - 1,        "%s-%s.entities",      dbName, tenantName);
+  snprintf(tenantP->subscriptions,   sizeof(tenantP->subscriptions) - 1,   "%s-%s.csubs",         dbName, tenantName);
+  snprintf(tenantP->avSubscriptions, sizeof(tenantP->avSubscriptions) - 1, "%s-%s.casubs",        dbName, tenantName);
+  snprintf(tenantP->registrations,   sizeof(tenantP->registrations) - 1,   "%s-%s.registrations", dbName, tenantName);
+  snprintf(tenantP->troeDbName,      sizeof(tenantP->troeDbName) - 1,      "%s_%s",               dbName, tenantName);
 
   // Add new tenant to tenant list
   tenantP->next = tenantList;  // It's OK if the tenant list is empty (tenantList == NULL)

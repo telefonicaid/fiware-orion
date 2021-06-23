@@ -52,7 +52,7 @@
 */
 extern int             inSigHandler;
 extern char*           progName;
-extern __thread char   transactionId[64];
+extern __thread char   transactionId[66];
 extern __thread char   correlatorId[64];
 
 

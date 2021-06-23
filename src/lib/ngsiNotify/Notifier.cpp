@@ -182,7 +182,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->renderFormat     = renderFormatToString(renderFormat);
     params->registration     = true;
 
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId) - 1);
 
     std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>;
     paramsV->push_back(params);
@@ -616,11 +616,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->mqttPassword[0] = 0;
 
     if (httpInfo.mqtt.version[0] != 0)
-      strncpy(params->mqttVersion, httpInfo.mqtt.version, sizeof(params->mqttVersion));
+      strncpy(params->mqttVersion, httpInfo.mqtt.version, sizeof(params->mqttVersion) - 1);
     if (httpInfo.mqtt.username[0] != 0)
-      strncpy(params->mqttUserName, httpInfo.mqtt.username, sizeof(params->mqttUserName));
+      strncpy(params->mqttUserName, httpInfo.mqtt.username, sizeof(params->mqttUserName) - 1);
     if (httpInfo.mqtt.password[0] != 0)
-      strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword));
+      strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword) - 1);
 #else
     params->mimeType         = JSON;
 #endif

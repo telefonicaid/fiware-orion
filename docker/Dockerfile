@@ -1,4 +1,4 @@
-FROM fiware/orion-ld-base AS build-stage
+FROM base-image:latest AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 ARG DEBUG=false
@@ -14,7 +14,7 @@ RUN  if [ "$DEBUG" = "true" ] ; then make debug install ; else make release inst
 
 RUN strip /usr/bin/orionld
 
-FROM debian:stretch-slim
+FROM ubuntu:20.04
 
 RUN mkdir -p /var/{log,run}/orionld
 

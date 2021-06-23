@@ -154,8 +154,8 @@ void HttpInfo::fill(const BSONObj* boP)
       const char*  value = be.String().c_str();
       KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));  // FIXME: what about initial cache fill?
 
-      strncpy(kvP->key,   key,   sizeof(kvP->key));
-      strncpy(kvP->value, value, sizeof(kvP->value));
+      strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
+      strncpy(kvP->value, value, sizeof(kvP->value) - 1);
 
       notifierInfo.push_back(kvP);
     }
@@ -223,10 +223,10 @@ void HttpInfo::fill(const BSONObj* boP)
       return;
     }
 
-    if (mqttUser     != NULL) strncpy(this->mqtt.username, mqttUser,     sizeof(this->mqtt.username));
-    if (mqttPassword != NULL) strncpy(this->mqtt.password, mqttPassword, sizeof(this->mqtt.password));
-    if (mqttHost     != NULL) strncpy(this->mqtt.host,     mqttHost,     sizeof(this->mqtt.host));
-    if (mqttTopic    != NULL) strncpy(this->mqtt.topic,    mqttTopic,    sizeof(this->mqtt.topic));
+    if (mqttUser     != NULL) strncpy(this->mqtt.username, mqttUser,     sizeof(this->mqtt.username) - 1);
+    if (mqttPassword != NULL) strncpy(this->mqtt.password, mqttPassword, sizeof(this->mqtt.password) - 1);
+    if (mqttHost     != NULL) strncpy(this->mqtt.host,     mqttHost,     sizeof(this->mqtt.host) - 1);
+    if (mqttTopic    != NULL) strncpy(this->mqtt.topic,    mqttTopic,    sizeof(this->mqtt.topic) - 1);
 
     this->mqtt.mqtts = mqtts;
     this->mqtt.port  = mqttPort;

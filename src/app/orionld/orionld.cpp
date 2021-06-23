@@ -876,7 +876,7 @@ int main(int argC, char* argV[])
   // If trace levels are set, turn set logLevel to DEBUG, so that the trace messages will actually pass through
   //
   if (paIsSet(argC, argV, paArgs, "-t"))
-    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel));
+    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");

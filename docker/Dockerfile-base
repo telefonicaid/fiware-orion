@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM ubuntu:20.04
 
 ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
@@ -10,9 +10,9 @@ RUN mkdir /tmp/build
 
 COPY ./docker/build/ /tmp/build/
 
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
 RUN /tmp/build/install-build-dependencies.sh
 RUN /tmp/build/install-postgres-client.sh
-RUN /tmp/build/install-mongo-driver.sh
 RUN /tmp/build/install-mongoc-driver.sh
 RUN /tmp/build/install-rapid-json.sh
 RUN /tmp/build/install-lib-microhttp.sh

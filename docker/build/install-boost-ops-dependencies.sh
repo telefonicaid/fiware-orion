@@ -24,7 +24,7 @@
 set -e
 
 OPS_DEPS_CORE=(
-  'libcurl3' \
+  'libcurl4' \
   'libssl1.1' \
   'ca-certificates' \
 )
@@ -36,13 +36,17 @@ OPS_DEPS_BOOST=(
 )
 
 apt-get -y update
+apt-get -y install -f --no-install-recommends 'libboost1.67-dev'
 
-apt-get -y install -f --no-install-recommends 'libboost-all-dev'
+BOOST_VERSION=1.67-dev
 
-BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)
 echo
 echo -e "\e[1;32m Builder: installing boost ops deps \e[0m"
-for i in ${OPS_DEPS_BOOST[@]}; do TO_INSTALL="${TO_INSTALL} ${i}${BOOST_VER}"; done
+for i in ${OPS_DEPS_BOOST[@]}
+do
+    TO_INSTALL="${TO_INSTALL} ${i}${BOOST_VERSION}"
+done
+
 apt-get install -y ${TO_INSTALL[@]}
 
 echo

@@ -231,7 +231,10 @@ do                                                \
                                                   \
   if ((type != 'T') && (type != 'X'))             \
   {                                               \
-    strncpy(xin, "   ", sizeof(xin));             \
+    xin[0] = ' ';                                 \
+    xin[1] = ' ';                                 \
+    xin[2] = ' ';                                 \
+    xin[3] = 0;                                   \
   }                                               \
   else                                            \
   {                                               \
@@ -340,7 +343,7 @@ typedef struct Line
 int             inSigHandler                      = 0;
 char*           progName;                         /* needed for messages (and by lmLib) */
 char            progNameV[512];                   /* where to store progName            */
-__thread char   transactionId[64]                 = "N/A";
+__thread char   transactionId[66]                 = "N/A";
 __thread char   correlatorId[64]                  = "N/A";
 __thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
 __thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
@@ -928,7 +931,7 @@ static char* dateGet(int index, char* line, int lineSize)
     char secs[32];
 
     snprintf(secs, sizeof(secs), "%ds", (int) secondsNow);
-    strncpy(line, secs, lineSize);
+    strncpy(line, secs, lineSize - 1);
   }
   else if (strcmp(fds[index].timeFormat, "DIFF") == 0)
   {
@@ -985,7 +988,7 @@ static char* timeGet(int index, char* line, int lineSize)
     char secs[32];
 
     snprintf(secs, sizeof(secs), "%ds", (int) secondsNow);
-    strncpy(line, secs, lineSize);
+    strncpy(line, secs, lineSize - 1);
   }
   else
   {
@@ -1202,7 +1205,7 @@ static char* lmLineFix
   }
   else
   {
-    strncpy(xin, "\n", sizeof(xin));
+    strncpy(xin, "\n", sizeof(xin) - 1);
   }
 
   strncat(line, xin, lineLen - strlen(line) - 1);
@@ -1292,7 +1295,7 @@ static void asciiToLeft
   {
     if (buffer[i] == 0x25)
     {
-      strncpy(tmp, ".", sizeof(tmp));
+      strncpy(tmp, ".", sizeof(tmp) - 1);
     }
     else if (isprint((int) buffer[i]))
     {
@@ -1300,7 +1303,7 @@ static void asciiToLeft
     }
     else
     {
-      strncpy(tmp, ".", sizeof(tmp));
+      strncpy(tmp, ".", sizeof(tmp) - 1);
     }
 
     strncat(line, tmp, lineLen - strlen(line) - 1);
@@ -1789,9 +1792,9 @@ LmStatus lmFormat(int index, char* f)
   STRING_CHECK(f, F_LEN);
 
   if (strcmp(f, "DEF") == 0)
-    strncpy(fds[index].format, FORMAT_DEF, sizeof(fds[index].format));
+    strncpy(fds[index].format, FORMAT_DEF, sizeof(fds[index].format) - 1);
   else
-    strncpy(fds[index].format, f, sizeof(fds[index].format));
+    strncpy(fds[index].format, f, sizeof(fds[index].format) - 1);
 
   return LmsOk;
 }
@@ -1810,11 +1813,11 @@ LmStatus lmTimeFormat(int index, char* f)
 
   if (strcmp(f, "DEF") == 0)
   {
-    strncpy(fds[index].timeFormat, TIME_FORMAT_DEF, sizeof(fds[index].timeFormat));
+    strncpy(fds[index].timeFormat, TIME_FORMAT_DEF, sizeof(fds[index].timeFormat) - 1);
   }
   else
   {
-    strncpy(fds[index].timeFormat, f, sizeof(fds[index].timeFormat));
+    strncpy(fds[index].timeFormat, f, sizeof(fds[index].timeFormat) - 1);
   }
 
   return LmsOk;
@@ -1835,7 +1838,7 @@ LmStatus lmGetInfo(int index, char* info)
   INDEX_CHECK(index);
   NOT_OCC_CHECK(index);
 
-  strncpy(info, fds[index].info, 80);
+  strncpy(info, fds[index].info, 79);
 
   return LmsOk;
 }
@@ -1878,20 +1881,20 @@ LmStatus lmTraceAtEnd(int index, char* start, char* end)
   {
     if (strcmp(start, "DEF") == 0)
     {
-      strncpy(fds[index].tMarkStart, TMS_DEF, sizeof(fds[index].tMarkStart));
+      strncpy(fds[index].tMarkStart, TMS_DEF, sizeof(fds[index].tMarkStart) - 1);
     }
     else
     {
-      strncpy(fds[index].tMarkStart, start, sizeof(fds[index].tMarkStart));
+      strncpy(fds[index].tMarkStart, start, sizeof(fds[index].tMarkStart) - 1);
     }
 
     if (strcmp(end, "DEF") == 0)
     {
-      strncpy(fds[index].tMarkEnd, TME_DEF, sizeof(fds[index].tMarkEnd));
+      strncpy(fds[index].tMarkEnd, TME_DEF, sizeof(fds[index].tMarkEnd) - 1);
     }
     else
     {
-      strncpy(fds[index].tMarkEnd, end, sizeof(fds[index].tMarkEnd));
+      strncpy(fds[index].tMarkEnd, end, sizeof(fds[index].tMarkEnd) - 1);
     }
 
     fds[index].traceShow  = true;
@@ -1911,7 +1914,7 @@ LmStatus lmAux(char* a)
   INIT_CHECK();
   STRING_CHECK(a, AUX_LEN);
 
-  strncpy(aux, a, sizeof(aux));
+  strncpy(aux, a, sizeof(aux) - 1);
   auxOn = true;
 
   return LmsOk;
@@ -2108,23 +2111,23 @@ LmStatus lmFdRegister
   fds[index].state = Occupied;
   if (strcmp(format, "DEF") == 0)
   {
-    strncpy(fds[index].format, FORMAT_DEF, sizeof(fds[index].format));
+    strncpy(fds[index].format, FORMAT_DEF, sizeof(fds[index].format) - 1);
   }
   else
   {
-    strncpy(fds[index].format, format, sizeof(fds[index].format));
+    strncpy(fds[index].format, format, sizeof(fds[index].format) - 1);
   }
 
   if (strcmp(timeFormat, "DEF") == 0)
   {
-    strncpy(fds[index].timeFormat, TIME_FORMAT_DEF, sizeof(fds[index].timeFormat));
+    strncpy(fds[index].timeFormat, TIME_FORMAT_DEF, sizeof(fds[index].timeFormat) - 1);
   }
   else
   {
-    strncpy(fds[index].timeFormat, timeFormat, sizeof(fds[index].timeFormat));
+    strncpy(fds[index].timeFormat, timeFormat, sizeof(fds[index].timeFormat) - 1);
   }
 
-  strncpy(fds[index].info, info, sizeof(fds[index].info));
+  strncpy(fds[index].info, info, sizeof(fds[index].info) - 1);
 
   if (indexP)
   {
@@ -3493,14 +3496,14 @@ void lmAddMsgBuf
 *
 * lmPrintMsgBuf -
 */
-void lmPrintMsgBuf()
+void lmPrintMsgBuf(void)
 {
-  struct logMsg *logP;
+  struct logMsg* logP;
 
   while (logMsgs)
   {
     logP = logMsgs;
-    strncpy(transactionId, logP->transactionId, sizeof(transactionId));
+    strncpy(transactionId, logP->transactionId, sizeof(transactionId) - 1);
     lmOut(logP->msg, logP->type, logP->file, logP->line, (char*) logP->func, logP->tLev, logP->stre, false);
     logMsgs = logP->next;
     ::free(logP);

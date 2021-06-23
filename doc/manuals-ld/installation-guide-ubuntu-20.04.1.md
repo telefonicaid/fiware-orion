@@ -121,7 +121,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -134,7 +134,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -151,7 +151,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -166,7 +166,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.5
+git checkout release/0.8.1
 make install
 ```
 
@@ -179,7 +179,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -223,6 +223,52 @@ sudo systemctl start mosquitto
 # [ If you prefer to use another MQTT broker, that's fine too. But, bear in mind that only mosquitto has been tested ]
 sudo systemctl enable mosquitto
 ```
+
+
+### Postgres 12
+
+Add the postgres repo
+```bash
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+```
+
+#### Install Postgres
+```bash
+sudo apt update
+sudo apt -y install postgresql-12 postgresql-client-12
+sudo apt install postgis postgresql-12-postgis-3
+sudo apt-get install postgresql-12-postgis-3-scripts
+```
+
+Add Postgres development libraries
+```bash
+sudo apt-get install libpq-dev
+```
+
+Add timescale db and posgis
+```bash
+sudo add-apt-repository ppa:timescale/timescaledb-ppa
+sudo apt-get update
+sudo apt install timescaledb-postgresql-12
+```
+
+Command for checking postgres
+```bash
+systemctl status postgresql.service
+systemctl status postgresql@12-main.service 
+systemctl is-enabled postgresql
+```
+
+Edit postgresql.conf
+```bash
+sudo nano /etc/postgresql/12/main/postgresql.conf
+```
+Add this line at then end of the file and save it
+```bash
+shared_preload_libraries = 'timescaledb'
+```
+That's it - no need to send any signals nor restart anything.
 
 
 ## Source code of Orion-LD
