@@ -48,6 +48,7 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
           file: docker/Dockerfile
+          no-cache: true
 
       - name: Deploy new global instance based on the new release
         uses: fjogeleit/http-request-action@master
