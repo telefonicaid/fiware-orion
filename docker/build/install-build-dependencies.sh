@@ -23,6 +23,7 @@
 set -e
 
 BUILD_DEPS=(
+ 'libz-dev' \
  'libcurl4-openssl-dev' \
  'libgcrypt-dev' \
  'libgnutls28-dev' \
