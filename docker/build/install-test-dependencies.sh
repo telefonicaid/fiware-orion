@@ -33,7 +33,7 @@ TEST_TOOLS=(
 )
 
 echo -e "\e[1;32m Builder: installing gmock \e[0m"
-apt-get -y install libgtest-dev google-mock
+apt-get -y install libgtest-dev libgmock-dev google-mock
 # install gtest lib
 cd /usr/src/googletest/googletest
 cmake CMakeLists.txt
