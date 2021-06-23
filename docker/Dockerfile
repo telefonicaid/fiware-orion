@@ -1,4 +1,4 @@
-FROM base-image:latest AS build-stage
+FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 ARG DEBUG=false
