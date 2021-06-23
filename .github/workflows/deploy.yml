@@ -40,6 +40,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
             ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile
+          no-cache: true
 
   deploy-debug:
 
@@ -70,3 +71,4 @@ jobs:
             DEBUG=true
           tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_DEBUG }}
           file: docker/Dockerfile
+          no-cache: true
