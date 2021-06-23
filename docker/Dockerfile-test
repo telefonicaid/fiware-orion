@@ -10,6 +10,14 @@ RUN  echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mo
 RUN  apt-get update
 RUN  apt-get install -y mongodb-org
 
+RUN  apt-get install -y python2
+RUN  ln -s /usr/bin/python2 /usr/bin/python
+RUN  apt-get install -y python-openssl
+RUN  pip2.7 install Flask
+
+RUN  apt-get install -y netcat
+RUN  apt-get install -y bc
+
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
 
