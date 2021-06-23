@@ -194,7 +194,7 @@ add_definitions(-DUNIT_TEST)
 # Executable declaration
 # ------------------------------------------------------------
 
-ADD_EXECUTABLE(unitTest ${SOURCES} ${HEADERS})
+ADD_EXECUTABLE(unitTest ${SOURCES})
 
 MESSAGE("unitTest distro: '${DISTRO}'")
 
