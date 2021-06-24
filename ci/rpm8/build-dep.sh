@@ -80,6 +80,7 @@ echo "INSTALL: python special dependencies" \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==1.0.2 \
 && pip install pyOpenSSL==19.0.0 \
+&& pip install paho-mqtt==1.5.1 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
