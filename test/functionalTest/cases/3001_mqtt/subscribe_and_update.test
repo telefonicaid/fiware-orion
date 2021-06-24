@@ -29,7 +29,7 @@ dbInit CB
 
 # Using default MQTT configuration in testEnv.sh
 brokerStart CB 0-255 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
-mqttAccumulatorStart --pretty-print ${MQTT_HOST} ${MQTT_PORT} orion
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic orion
 
 --SHELL--
 
@@ -110,9 +110,9 @@ echo
 echo
 
 
-echo "# 04. Dump accumulator to see notification"
-echo "=========================================="
-mqttAccumulatorDump
+echo "04. Dump accumulator to see notification"
+echo "========================================"
+accumulatorDump
 echo
 echo
 
@@ -141,13 +141,32 @@ Date: REGEX(.*)
 03. Update entity attribute A1 to trigger notification
 ======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
+04. Dump accumulator to see notification
+========================================
+MQTT message at topic orion:
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Float",
+                "value": 23
+            },
+            "id": "E1",
+            "type": "T1"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]*)"
+}
+=======================================
+
+
 --TEARDOWN--
-mqttAccumulatorStop
+accumulatorStop
 brokerStop CB
 dbDrop CB
