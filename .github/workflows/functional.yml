@@ -47,7 +47,7 @@ jobs:
         ports:
           - 5432:5432
       mongodb:
-        image: mongo:4.0
+        image: mongo:4.4
         ports:
           - 27017:27017
     strategy:
