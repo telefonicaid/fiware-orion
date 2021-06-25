@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_MQTTINFO_H
-#define SRC_LIB_APITYPESV2_MQTTINFO_H
+#ifndef SRC_LIB_APITYPESV2_MQTTINFO_H_
+#define SRC_LIB_APITYPESV2_MQTTINFO_H_
 
 /*
 *
@@ -28,7 +28,6 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
 
 /* ****************************************************************************
@@ -39,7 +38,6 @@
 
 namespace ngsiv2
 {
-
 /* ****************************************************************************
 *
 * MqttInfo - 
@@ -50,12 +48,11 @@ struct MqttInfo
   bool                                custom;
 
   MqttInfo();
-  MqttInfo(const std::string& _topic);
+  explicit MqttInfo(const std::string& _topic);
 
   std::string  toJson();
   void         fill(const mongo::BSONObj& bo);
 };
-
 }
 
-#endif  // SRC_LIB_APITYPESV2_MQTTINFO_H
+#endif  // SRC_LIB_APITYPESV2_MQTTINFO_H_

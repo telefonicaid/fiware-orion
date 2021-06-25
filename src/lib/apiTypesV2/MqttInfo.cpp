@@ -30,14 +30,12 @@
 
 #include "common/JsonHelper.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "apiTypesV2/MqttInfo.h"
 
 
 
 namespace ngsiv2
 {
-
 /* ****************************************************************************
 *
 * MqttInfo::MqttInfo - 
@@ -70,7 +68,7 @@ std::string MqttInfo::toJson()
 
   if (custom)
   {
-    // FIXME: Planned for second MQTT PR
+    // FIXME PR: Planned for a next PR
   }
 
   return jh.str();
@@ -89,8 +87,7 @@ void MqttInfo::fill(const BSONObj& bo)
 
   if (this->custom)
   {
-    // FIXME: Planned for second MQTT PR
+    // FIXME PR: Planned for a next PR
   }
 }
-
 }

@@ -24,6 +24,8 @@
 */
 #include <mosquitto.h>
 
+#include <string>
+
 #include "logMsg/logMsg.h"
 #include "mqtt/mqtt.h"
 
@@ -47,8 +49,8 @@ unsigned short   mqttKeepAlivePeriod;
 */
 void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
-  /* FIXME: We don't assign message ids to the published notifications and therefore we have 
-   * no way to tell which notification a callback log belongs to. - Planned for second MQTT PR. */
+  /* FIXME PR: We don't assign message ids to the published notifications and therefore we have
+   * no way to tell which notification a callback log belongs to. - Planned for a next PR. */
   LM_I(("MQTT notification successfully published on %s:%d", mqttHostname, mqttPortNumber));
 }
 
@@ -59,7 +61,8 @@ void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 * mqttInit -
 *
 */
-void mqttInit (
+void mqttInit
+(
   const char*    _mqttHost,
   unsigned short _mqttPort,
   unsigned short _mqttKeepAlive
@@ -70,7 +73,7 @@ void mqttInit (
   mqttKeepAlivePeriod = _mqttKeepAlive;
 
   LM_I(("Initializing MQTT client."));
-  
+
   mosquitto_lib_init();
   mosq = mosquitto_new(NULL, true, NULL);
   if (mosq == NULL)
@@ -87,7 +90,7 @@ void mqttInit (
   {
     LM_X(2, ("Fatal Error (Could not connect to MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
   }
-  
+
   LM_I(("Successfully connected to MQTT Broker."));
 
   // Starts the client loop in its own thread. The client loop processes the network traffic
@@ -105,13 +108,14 @@ int sendMqttNotification(const std::string& content)
 {
   const char* msg = content.c_str();
 
-  // FIXME: unhardwire QoS, retain and topic - Planned for second MQTT PR
+  // FIXME PR: unhardwire QoS, retain and topic - Planned for a next PR
   int resultCode = mosquitto_publish(mosq, NULL, "orion", (int) strlen(msg), msg, 0, false);
   if (resultCode != MOSQ_ERR_SUCCESS)
   {
     LM_E(("Failed to send MQTT notification (%d): %s", resultCode, mosquitto_strerror(resultCode)));
   }
-  else {
+  else
+  {
     LM_I(("MQTT notification sent to %s:%d", mqttHostname, mqttPortNumber));
   }
 
@@ -129,7 +133,7 @@ void mqttCleanup(void)
 {
   LM_I(("Disconnecting from MQTT Broker"));
   int resultCode = mosquitto_disconnect(mosq);
-  if (resultCode != MOSQ_ERR_SUCCESS) 
+  if (resultCode != MOSQ_ERR_SUCCESS)
   {
     LM_W(("Could not disconnect from MQTT Broker (%d): %s", resultCode, mosquitto_strerror(resultCode)));
   }

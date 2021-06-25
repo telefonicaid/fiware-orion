@@ -262,7 +262,7 @@ int httpRequestSendWithCurl
    long                                       timeoutInMilliseconds
 )
 {
-  // FIXME PoC: this is a kind of "interpection hack". It should be done in a clearner way
+  // FIXME PR: this is a kind of "interpection hack". It should be done in a clearner way
   if (_protocol == "mqtt:")
   {
     return sendMqttNotification(content);
