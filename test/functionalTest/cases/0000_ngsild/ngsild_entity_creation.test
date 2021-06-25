@@ -49,6 +49,9 @@ brokerStart CB 212-249
 # 14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
 # 15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
 #
+# 16. Create an entity with an expanded entity type, containing a '#' sign
+# 17. GET the E16 entity - see the entity type expanded
+#
 
 echo "01. POST /ngsi-ld/v1/entities, with a non-object payload - see error"
 echo "===================================================================="
@@ -278,6 +281,28 @@ echo
 echo
 
 
+echo "16. Create an entity with an expanded entity type, containing a '#' sign"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Person:0001",
+  "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person",
+  "name": {
+    "type": "Property",
+    "value": "test0001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "17. GET the E16 entity - see the entity type expanded"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 ====================================================================
@@ -467,6 +492,33 @@ Date: REGEX(.*)
     "detail": "Entity:type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Create an entity with an expanded entity type, containing a '#' sign
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
+Date: REGEX(.*)
+
+
+
+17. GET the E16 entity - see the entity type expanded
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:Person:0001",
+    "name": {
+        "type": "Property",
+        "value": "test0001"
+    },
+    "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
 }
 
 
