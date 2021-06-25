@@ -35,13 +35,13 @@
 //
 typedef struct OrionldTenant
 {
-  char                   tenant[50];           // Empty if no tenant is used
-  char                   mongoDbName[64];      // dbPrefix + "-" + tenant.                     E.g. "orion-openiot"
-  char                   entities[80];         // mongo entities collection path.              E.g. "orion-openiot.entities"
-  char                   subscriptions[80];    // mongo subscriptions collection path.         E.g. "orion-openiot.csubs"
-  char                   avSubscriptions[80];  // mongo reg subscriptions collection path.     E.g. "orion-openiot.casubs"
-  char                   registrations[80];    // mongo registrations collection path.         E.g. "orion-openiot.registrations"
-  char                   troeDbName[64];       // TRoE database name                           E.g. "orion_openiot"
+  char                   tenant[52];           // Empty if no tenant is used
+  char                   mongoDbName[66];      // dbPrefix + "-" + tenant.                     E.g. "orion-openiot"
+  char                   entities[88];         // mongo entities collection path.              E.g. "orion-openiot.entities"
+  char                   subscriptions[88];    // mongo subscriptions collection path.         E.g. "orion-openiot.csubs"
+  char                   avSubscriptions[88];  // mongo reg subscriptions collection path.     E.g. "orion-openiot.casubs"
+  char                   registrations[88];    // mongo registrations collection path.         E.g. "orion-openiot.registrations"
+  char                   troeDbName[72];       // TRoE database name                           E.g. "orion_openiot"
   struct OrionldTenant*  next;                 // Pointer to the next one in the linked list
 } OrionldTenant;
 

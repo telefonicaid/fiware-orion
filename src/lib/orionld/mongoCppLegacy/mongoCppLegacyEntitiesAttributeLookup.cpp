@@ -84,7 +84,7 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
   //
   mongo::BSONObjBuilder fields;
 
-  fields.append("_id.id",  1);
+  fields.append("_id",     1);
   fields.append(attrPath,  1);
 
   // semTake()
@@ -106,14 +106,12 @@ KjNode* mongoCppLegacyEntitiesAttributeLookup(char** entityArray, int entitiesIn
 
     KjNode* entityP = dbDataToKjTree(&bsonObj, false, &title, &details);
     if (entityP == NULL)
-      LM_E(("%s: %s", title, details));
+      LM_E(("dbDataToKjTree error: %s: %s", title, details));
     else
       kjChildAdd(kjTree, entityP);
   }
 
   releaseMongoConnection(connectionP);
-
-  // semGive()
 
   //
   // Change "value" to "object" for all attributes that are "Relationship".
