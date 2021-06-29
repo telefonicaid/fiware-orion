@@ -345,7 +345,7 @@ char*           progName;                         /* needed for messages (and by
 char            progNameV[512];                   /* where to store progName            */
 __thread char   transactionId[66]                 = "N/A";
 __thread char   correlatorId[64]                  = "N/A";
-__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   service[54]                       = "N/A";
 __thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
 __thread char   fromIp[IP_LENGTH_MAX + 1]         = "N/A";
 
