@@ -9,7 +9,7 @@ COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
 
-RUN  make release install
+RUN  make debug install
 
 RUN strip /usr/bin/orionld
 
@@ -23,6 +23,11 @@ COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/bin/ /usr/bin/
 
-ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+ADD ./docker/debug/gdbinit gdbinit
+
+RUN apt-get update
+RUN apt-get -y install gdb
+
+ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
 EXPOSE 1026
