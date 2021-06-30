@@ -56,108 +56,6 @@ int ssAccept(int listenFd)
 
 // -----------------------------------------------------------------------------
 //
-// ssRead - read a buffer from a socket
-//
-static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
-{
-  int nb = 0;
-
-  while (nb < dataLen)
-  {
-    int sz = read(fd, &dataP[nb], dataLen - nb);
-    if (sz == -1)
-      LM_RE(-1, ("error reading from Socket Service connection: %s", strerror(errno)));
-    else if (sz == 0)
-    {
-      *connectionClosedP = true;
-      return -1;
-    }
-    nb += sz;
-  }
-
-  dataP[nb] = 0;
-
-  return nb;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ssWrite -
-//
-static void ssWrite(int fd, const char* data, int dataLen)
-{
-  int nb = write(fd, data, dataLen);
-
-  if (nb == -1)
-    LM_E(("Internal Error (unable to write to socket service client: %s)", strerror(errno)));
-  else if (nb != dataLen)
-    LM_E(("Internal Error (written only %d bytes out of %d to socket service client)", nb, dataLen));
-}
-
-
-#if 0
-// -----------------------------------------------------------------------------
-//
-// ssGetEntity -
-//
-static void ssGetEntity(char* entityId)
-{
-  int     responseLen;
-  KjNode* responseTree = dbEntityRetrieve(entityId,
-                                          NULL,   // attrs
-                                          false,  // attrMandatory
-                                          false,  // sysAttrs
-                                          false,  // keyValues
-                                          NULL);  // datasetId
-
-  int   responseSize = kjFastRenderSize(responseTree);
-  char* response     = (char*) malloc(responseSize);
-
-  if (response == NULL)
-    response = (char*) "Out of memory";
-  else
-    kjFastRender(responseTree, response);
-
-  responseLen = strlen(response);
-  ssWrite(fd, response, responseLen);
-}
-#endif
-
-
-// -----------------------------------------------------------------------------
-//
-// ssTreat -
-//
-static void ssTreat(int fd, SsHeader* headerP, char* dataP)
-{
-  LM_TMP(("SS: headerP->msgCode == %d", headerP->msgCode));
-  switch (headerP->msgCode)
-  {
-  case SsPing:
-    LM_TMP(("SS: Hot a ping - responding with a Pong"));
-    ssWrite(fd, "pong", 4);
-    break;
-
-  case SsGetEntity:
-#if 0
-    ssGetEntity(dataP);
-#else
-    ssWrite(fd, "GET Entity Is Not Implemented", 30);
-#endif
-    break;
-
-  default:
-    LM_E(("SS: unknown message code 0x%x", headerP->msgCode));
-    ssWrite(fd, "unknown message code", 20);
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // socketServiceRun -
 //
 // For now, one single connection is served at a time
@@ -165,11 +63,6 @@ static void ssTreat(int fd, SsHeader* headerP, char* dataP)
 void socketServiceRun(int listenFd)
 {
   int            fd      = -1;
-  unsigned int   dataLen = 16 * 1024;  // If more is needed, realloc is used
-  char*          dataP   = (char*) malloc(dataLen + 1);
-
-  if (dataP == NULL)
-    LM_RVE(("error allocating Socket Service buffer of %d bytes: %s", dataLen, strerror(errno)));
 
   while (1)
   {
@@ -194,7 +87,9 @@ void socketServiceRun(int listenFd)
     if ((fds == -1) && (errno != EINTR))
       LM_RVE(("select error for socket service: %s", strerror(errno)));
 
-    if (FD_ISSET(listenFd, &rFds))
+    if (fds == 0)
+      LM_TMP(("SS: timeout"));
+    else if (FD_ISSET(listenFd, &rFds))
     {
       fd = ssAccept(listenFd);
       if (fd == -1)
@@ -203,73 +98,21 @@ void socketServiceRun(int listenFd)
     }
     else if (FD_ISSET(fd, &rFds))
     {
-      SsHeader  header;
-      bool      connectionClosed = false;
-
+      LM_TMP(("SS: Reading from socket-service - obly connection-closed are permitted"));
       //
-      // Read the message header
+      // Make sure it's just a "connection closed"
       //
-      int nb;
-      LM_TMP(("SS: Reading socket-service header"));
-      if ((nb = ssRead(fd, (char*) &header, sizeof(header), &connectionClosed)) == -1)
-      {
-        if (connectionClosed)
-        {
-          LM_TMP(("SS: The socket-service connection was closed"));
-          close(fd);
-          fd = -1;
-          continue;  // back to 'while (1)'
-        }
+      int  nb;
+      char buf[16];
 
-        LM_RVE(("Error reading SS header from Socket Service header: %s", strerror(errno)));
-      }
+      nb = read(fd, buf, sizeof(buf));
 
-      LM_TMP(("SS: Read %d bytes of socket-service header", nb));
-      LM_TMP(("SS: dataLen: %d", header.dataLen));
-      //
-      // Is the data buffer big enough?
-      // If not, reallocate
-      //
-      if (header.dataLen >= dataLen)
-      {
-        if (header.dataLen > 2 * 1024 * 1024)
-        {
-          LM_E(("datalen > 2MB - too much! Not allowed"));
-          close(fd);
-          fd = -1;
-          continue;  // back to 'while (1)'
-        }
+      if (nb != 0)
+        LM_X(1, ("A message was sent over the socket service - the broker is not ready for that"));
 
-        LM_TMP(("SS: dataLen > allocated buffer - reallocating"));
-        free(dataP);
-        dataLen = header.dataLen;
-        dataP   = (char*) malloc(dataLen + 1);
-
-        if (dataP == NULL)
-          LM_RVE(("error allocating Socket Service buffer of %d bytes: %s", dataLen, strerror(errno)));
-      }
-
-      //
-      // Read the data
-      //
-      LM_TMP(("SS: Reading the data"));
-      if (ssRead(fd, dataP, header.dataLen, &connectionClosed) == -1)
-      {
-        if (connectionClosed)
-        {
-          close(fd);
-          fd = -1;
-          continue;  // back to 'while (1)'
-        }
-
-        LM_RVE(("Error reading SS body from Socket Service header: %s", strerror(errno)));
-      }
-
-      //
-      // Treat the request
-      //
-      LM_TMP(("SS: Got the entire request - treating it"));
-      ssTreat(fd, &header, dataP);
+      LM_TMP(("SS: The socket-service connection was closed"));
+      close(fd);
+      fd = -1;
     }
   }
 }
