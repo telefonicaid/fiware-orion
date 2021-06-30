@@ -63,7 +63,8 @@ int ssAccept(int listenFd)
 //
 void socketServiceRun(int listenFd)
 {
-  int connectionFd = -1;
+  int connectionFd     = -1;
+  bool cameFromTimeout = false;
 
   while (1)
   {
@@ -75,16 +76,20 @@ void socketServiceRun(int listenFd)
     pollFd.events  = POLLIN;
     pollFd.revents = 0;
 
-    LM_TMP(("SS: Waiting on %s", (connectionFd != -1)? "connected socket" : "listen socket"));
+    if (cameFromTimeout	== false)
+      LM_TMP(("SS: Waiting on %s", (connectionFd != -1)? "connected socket" : "listen socket"));
     rs = poll(&pollFd, 1, 5000);
 
+    cameFromTimeout = false;
     if (rs == -1)
     {
       if (errno != EINTR)
         LM_RVE(("poll error for socket service: %s", strerror(errno)));
     }
     else if (rs == 0)
-      LM_TMP(("SS: timeout"));
+    {
+      cameFromTimeout = true;;
+    }
     else if (rs == 1)
     {
       if (fd == listenFd)
@@ -96,7 +101,7 @@ void socketServiceRun(int listenFd)
       }
       else
       {
-        LM_TMP(("SS: Reading from socket-service - only connection-closed are permitted"));
+        LM_TMP(("SS: Reading from socket-service - only connection-closed is permitted"));
         //
         // Make sure it's just a "connection closed"
         //
