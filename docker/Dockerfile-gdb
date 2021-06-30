@@ -1,0 +1,9 @@
+ARG BASE_VERSION=latest
+FROM fiware/orion-ld:${BASE_VERSION}
+
+RUN apt-get update
+RUN apt-get -y install gdb
+
+ENTRYPOINT ["gdb", "-ex", "r", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+
+EXPOSE 1026
