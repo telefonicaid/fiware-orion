@@ -19,7 +19,10 @@ sudo aptitude install python-openssl
 
 3. Install **Flask**:
 ```bash
-pip2.7 install Flask
+wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+python2.7 get-pip.py
+pip install Flask
+pip install paho-mqtt
 ```
 
 That should be all for the accumulator python script.
@@ -49,12 +52,13 @@ Test it by launching:
 test/functionalTest/testHarness.sh
 ```
 
-There are over 1250 test cases (each with a number of steps), so, it will take a while.
-Orion-LD has inherited the functional test suite from `orion` and added some 250 test cases only for NGSI-LD.
-If you want to run only the NGSi-LD test cases, run the suite with the `-ld` option:
+There are over 1500 test cases (each with a number of steps), so, it will take a while.
+Orion-LD has inherited the functional test suite from `orion` and added some 450 test cases only for NGSI-LD.
+If you want to run only the NGSi-LD test cases, run the suite with the `-ld`, or/and the `-troe` option:
 
 ```bash
 test/functionalTest/testHarness.sh -ld
+test/functionalTest/testHarness.sh -troe
 ```
 
 There are lots of command line options for the test suite; use the `-u` option to see all of them.
