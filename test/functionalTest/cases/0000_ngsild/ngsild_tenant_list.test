@@ -30,6 +30,7 @@ dbInit CB t1
 dbInit CB tn1
 dbInit CB tn2
 dbInit CB tn3
+dbResetAll
 brokerStart CB 0-255 IPv4 -multiservice
 
 --SHELL--
