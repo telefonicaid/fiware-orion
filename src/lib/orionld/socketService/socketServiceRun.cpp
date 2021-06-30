@@ -76,7 +76,7 @@ void socketServiceRun(int listenFd)
     pollFd.events  = POLLIN;
     pollFd.revents = 0;
 
-    if (cameFromTimeout	== false)
+    if (cameFromTimeout == false)
       LM_TMP(("SS: Waiting on %s", (connectionFd != -1)? "connected socket" : "listen socket"));
     rs = poll(&pollFd, 1, 5000);
 
