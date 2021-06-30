@@ -87,9 +87,7 @@ void socketServiceRun(int listenFd)
         LM_RVE(("poll error for socket service: %s", strerror(errno)));
     }
     else if (rs == 0)
-    {
-      cameFromTimeout = true;;
-    }
+      cameFromTimeout = true;
     else if (rs == 1)
     {
       if (fd == listenFd)
