@@ -26,14 +26,15 @@ Ignoring service header when not running in multiservice mode
 --SHELL-INIT--
 dbInit CB
 dbInit ${CB_DB_NAME}-foo
+dbInit ${CB_DB_NAME}-openiot
 dbResetAll
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
+echo "show dbs" | mongo $CB_MONGO_HOST:$CB_MONGO_PORT | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 brokerStart CB 0-255 IPV4
 
 --SHELL--
-echo "1. Create an entity using foo as tenant"
-echo "======================================="
+echo "01. Create an entity using foo as tenant"
+echo "========================================"
 url="/v1/updateContext"
 payload='{
   "contextElements": [
@@ -42,11 +43,11 @@ payload='{
     "isPattern": "false",
     "id": "E",
     "attributes": [
-    {
-      "name": "att",
-      "type": "compound",
-      "value": "03"
-    }
+      {
+        "name": "att",
+        "type": "compound",
+        "value": "03"
+      }
     ]
   }
   ],
@@ -56,21 +57,26 @@ orionCurl --url "$url" --payload "$payload" --tenant "foo"
 echo
 echo
 
-echo "2. Check that the number of orion databases is just 1"
-echo "====================================================="
-# In this case mongoCmd helper is not used, due to we don't have
-# a particular database for mongo command and the output could be
-# multiline in a general case
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | wc -l
-echo "show dbs" | mongo | grep ${CB_DB_NAME}-foo | wc -l
-# Next line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
-# in order to help us to detect where the ftest-ftest-ftest-... problem is. It could happen that
-# after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure...
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
+
+echo "02. Check that the number of orion databases is just 1"
+echo "======================================================"
+#
+# In this case mongoCmd helper is not used, as we don't have
+# a particular database for the mongo command and the output could be multiline in a general case
+#
+echo "show dbs" | mongo $CB_MONGO_HOST:$CB_MONGO_PORT | grep ${CB_DB_NAME} | wc -l
+echo "show dbs" | mongo $CB_MONGO_HOST:$CB_MONGO_PORT | grep ${CB_DB_NAME}-foo | wc -l
+
+#
+# The nextcoming line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
+# in order to help us detect where the ftest-ftest-ftest-... problem is. It could happen that
+# after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure ...
+#
+echo "show dbs" | mongo $CB_MONGO_HOST:$CB_MONGO_PORT | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 --REGEXPECT--
-1. Create an entity using foo as tenant
-=======================================
+01. Create an entity using foo as tenant
+========================================
 HTTP/1.1 200 OK
 Content-Length: 193
 Content-Type: application/json
@@ -101,8 +107,8 @@ Date: REGEX(.*)
 }
 
 
-2. Check that the number of orion databases is just 1
-=====================================================
+02. Check that the number of orion databases is just 1
+======================================================
 1
 0
 ftest
@@ -113,3 +119,6 @@ dbDrop CB
 
 # The following drop is in case the test failed and two databases were actually created
 dbDrop ${CB_DB_NAME}-foo
+
+# And this one ...
+dbInit ${CB_DB_NAME}-openiot
