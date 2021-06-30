@@ -132,9 +132,11 @@ static void ssGetEntity(char* entityId)
 //
 static void ssTreat(int fd, SsHeader* headerP, char* dataP)
 {
+  LM_TMP(("SS: headerP->msgCode == %d", headerP->msgCode));
   switch (headerP->msgCode)
   {
   case SsPing:
+    LM_TMP(("SS: Hot a ping - responding with a Pong"));
     ssWrite(fd, "pong", 4);
     break;
 
@@ -197,6 +199,7 @@ void socketServiceRun(int listenFd)
       fd = ssAccept(listenFd);
       if (fd == -1)
         LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
+      LM_TMP(("SS: Accepted a connection for socket-service"));
     }
     else if (FD_ISSET(fd, &rFds))
     {
@@ -206,10 +209,13 @@ void socketServiceRun(int listenFd)
       //
       // Read the message header
       //
-      if (ssRead(fd, (char*) &header, sizeof(header), &connectionClosed) == -1)
+      int nb;
+      LM_TMP(("SS: Reading socket-service header"));
+      if ((nb = ssRead(fd, (char*) &header, sizeof(header), &connectionClosed)) == -1)
       {
         if (connectionClosed)
         {
+          LM_TMP(("SS: The socket-service connection was closed"));
           close(fd);
           fd = -1;
           continue;  // back to 'while (1)'
@@ -218,12 +224,23 @@ void socketServiceRun(int listenFd)
         LM_RVE(("Error reading SS header from Socket Service header: %s", strerror(errno)));
       }
 
+      LM_TMP(("SS: Read %d bytes of socket-service header", nb));
+      LM_TMP(("SS: dataLen: %d", header.dataLen));
       //
       // Is the data buffer big enough?
       // If not, reallocate
       //
       if (header.dataLen >= dataLen)
       {
+        if (header.dataLen > 2 * 1024 * 1024)
+        {
+          LM_E(("datalen > 2MB - too much! Not allowed"));
+          close(fd);
+          fd = -1;
+          continue;  // back to 'while (1)'
+        }
+
+        LM_TMP(("SS: dataLen > allocated buffer - reallocating"));
         free(dataP);
         dataLen = header.dataLen;
         dataP   = (char*) malloc(dataLen + 1);
@@ -235,6 +252,7 @@ void socketServiceRun(int listenFd)
       //
       // Read the data
       //
+      LM_TMP(("SS: Reading the data"));
       if (ssRead(fd, dataP, header.dataLen, &connectionClosed) == -1)
       {
         if (connectionClosed)
@@ -250,6 +268,7 @@ void socketServiceRun(int listenFd)
       //
       // Treat the request
       //
+      LM_TMP(("SS: Got the entire request - treating it"));
       ssTreat(fd, &header, dataP);
     }
   }
