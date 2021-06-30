@@ -23,9 +23,11 @@ COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/bin/ /usr/bin/
 
+ADD ./docker/debug/gdbinit gdbinit
+
 RUN apt-get update
 RUN apt-get -y install gdb
 
-ENTRYPOINT ["gdb", "-ex", "r", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
 EXPOSE 1026

@@ -1,9 +1,11 @@
 ARG BASE_VERSION=latest
 FROM fiware/orion-ld:${BASE_VERSION}
 
+ADD ./docker/debug/gdbinit gdbinit
+
 RUN apt-get update
 RUN apt-get -y install gdb
 
-ENTRYPOINT ["gdb", "-ex", "r", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
 EXPOSE 1026
