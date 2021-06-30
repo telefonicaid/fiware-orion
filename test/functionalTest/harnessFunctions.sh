@@ -1299,15 +1299,15 @@ function orionCurl()
   if [ "$_xtra"        != "" ]; then  command=${command}' '${_xtra};        fi
 
   command=${command}' --header "Expect:"'
-  command=${command}' -s -S --dump-header /tmp/httpHeaders.out'
+  command=${command}' -k -s -S --dump-header /tmp/httpHeaders.out'
   logMsg command: $command
 
 
   #
   # Execute the command
   #
-  logMsg Executing the curl-command
-  eval $command > /tmp/orionCurl.response 2> /dev/null
+  logMsg Executing the curl-command: $command
+  eval $command > /tmp/orionCurl.response 2> /tmp/curl-stderr
   _response=$(cat /tmp/orionCurl.response)
 
   if [ ! -f /tmp/httpHeaders.out ]

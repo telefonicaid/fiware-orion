@@ -1363,7 +1363,7 @@ extern bool lmAssertAtExit;
 extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
-extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
+extern __thread char   service[54];
 extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
 extern __thread char   fromIp[IP_LENGTH_MAX + 1];
 
