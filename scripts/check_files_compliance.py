@@ -159,7 +159,7 @@ def ignore(root, file):
         return True
 
     # Some files in docker/ directory are not processed
-    if 'docker' in root and file in ['Dockerfile', 'Dockerfile-base', 'Dockerfile-test', 'docker-compose.yml']:
+    if 'docker' in root and file in ['Dockerfile', 'Dockerfile-base', 'Dockerfile-test', 'Dockerfile-debug', 'Dockerfile-gdb', 'gdbinit', 'docker-compose.yml']:
         return True
 
     # Some files in test/acceptance/behave directory are not processed
