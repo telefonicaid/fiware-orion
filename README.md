@@ -58,7 +58,7 @@ If you instead want to use a more stable image, the latest beta release (as of J
 [0.8.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/0.8.0)
 
 ```console
-docker run fiware/orion-ld:0.7.0
+docker run fiware/orion-ld:0.8.0
 ```
 
 Please check [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for newer releases.
@@ -72,7 +72,7 @@ If you are not sharing your data across systems and have no need of linked data 
 version of **NGSI** - **NGSI-v2** is sufficient please use the original unforked
 [Orion](https://github.com/telefonicaid/fiware-orion) instead.
 
-This component is currenrtly a beta release but already passing most of the
+This component is currently a beta release but already passing most of the
 [NGSI-LD test suite](https://github.com/FIWARE/NGSI-LD_TestSuite)
 
 Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples). See
