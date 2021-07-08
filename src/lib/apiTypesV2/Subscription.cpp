@@ -84,7 +84,6 @@ std::string Subscription::toJson(void)
   {
     jh.addString("status", "failed");
   }
-
   else
   {
     jh.addString("status", this->status);
@@ -102,7 +101,6 @@ std::string Subscription::toJson(void)
   {
     jh.addString("status", "inactive");
   }
-
 
   return jh.str();
 }
