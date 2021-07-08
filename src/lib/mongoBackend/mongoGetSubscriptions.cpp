@@ -161,6 +161,8 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
+  nP->maxLimit          = r.hasField(CSUB_MAXLIMIT)?         getIntOrLongFieldAsLongF(r, CSUB_MAXLIMIT)         : -1;
+  nP->counter           = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
@@ -197,6 +199,18 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       }
 
       subP->notification.timesSent += cSubP->count;
+    }
+
+    if (cSubP->lastFailure != 0)
+    {
+     if (nP->counter < nP->maxLimit)
+     {
+       nP->counter = nP->counter +1;
+     }
+    }
+    else
+    {
+      nP->counter = -1;
     }
 
     if (cSubP->lastFailure > subP->notification.lastFailure)

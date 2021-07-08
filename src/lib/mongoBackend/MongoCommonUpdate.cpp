@@ -1980,6 +1980,34 @@ static unsigned int processSubscriptions
         cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
+    else
+    {
+      orion::BSONObj  subOrig;
+      int     maxLimit=0;
+      int     counter=0;
+      if (subOrig.hasField(CSUB_MAXLIMIT))
+      {
+        maxLimit = getIntFieldF(subOrig, CSUB_MAXLIMIT);
+      }
+      if (subOrig.hasField(CSUB_COUNTER))
+      {
+        counter = getIntFieldF(subOrig, CSUB_COUNTER);
+      }
+      if (counter > maxLimit)
+      {
+        orion::BSONObjBuilder bobSet;
+
+        bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+        orion::BSONObjBuilder bobUpdate;
+        bobUpdate.append("$set", bobSet.obj());
+
+        orion::BSONObjBuilder bobQuery;
+        bobQuery.append("_id", orion::OID(mapSubId));
+
+        orion::BSONObj  query = bobQuery.obj();
+	orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
+       }
+     }
   }
 
   releaseTriggeredSubscriptions(&subs);
