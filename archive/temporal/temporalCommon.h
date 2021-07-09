@@ -25,7 +25,7 @@
 *
 * Author: Chandra Challagonda
 */
-#include <postgresql/libpq-fe.h>                                 // Postgres
+#include </usr/pgsql-12/include/libpq-fe.h>                                 // Postgres
 
 extern "C"
 {

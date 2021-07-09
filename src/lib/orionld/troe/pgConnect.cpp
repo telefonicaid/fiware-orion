@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // Postgres
+#include </usr/pgsql-12/include/libpq-fe.h>                               // Postgres
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*

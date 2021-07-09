@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <postgresql/libpq-fe.h>                               // Postgres
+#include </usr/pgsql-12/include/libpq-fe.h>                               // Postgres
 #include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
 #include <boost/version.hpp>                                   // BOOST_LIB_VERSION
 #include <microhttpd.h>                                        // MHD_VERSION (returns a number)

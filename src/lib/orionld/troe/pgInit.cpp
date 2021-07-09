@@ -24,7 +24,7 @@
 */
 #include <stdio.h>                                             // popen, fgets
 #include <semaphore.h>                                         // sem_init, sem_take, ...
-#include <postgresql/libpq-fe.h>                               // PGconn
+#include </usr/pgsql-12/include/libpq-fe.h>                               // PGconn
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
