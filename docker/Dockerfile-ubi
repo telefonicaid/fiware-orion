@@ -13,16 +13,20 @@ RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 RUN make release install
 
 RUN strip /usr/bin/orionld
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 
-FROM registry.access.redhat.com/ubi8/ubi:8.4
+#FROM registry.access.redhat.com/ubi8/ubi:8.4
 
 RUN mkdir -p /var/{log,run}/orionld
 
-COPY --from=build-stage /etc/ssl/ /etc/ssl/
-COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
-COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
-COPY --from=build-stage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
-COPY --from=build-stage /usr/bin/ /usr/bin/
+#COPY --from=build-stage /etc/ssl/ /etc/ssl/
+#COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
+#COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
+#COPY --from=build-stage /usr/lib /usr/lib
+#COPY --from=build-stage /usr/bin/ /usr/bin/
+#COPY --from=build-stage /usr/lib64/ /usr/lib64/
+#COPY --from=build-stage /usr/local/lib64/ /usr/local/lib64/
+#COPY --from=build-stage /opt/paho.mqtt.c/build/output /opt/paho.mqtt.c/build/output
 
 ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
