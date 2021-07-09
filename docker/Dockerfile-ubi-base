@@ -1,0 +1,18 @@
+FROM registry.access.redhat.com/ubi8/ubi:8.4
+
+ENV ROOT_FOLDER='/opt'
+ENV PAHO_VERSION='v1.3.1'
+
+RUN mkdir /tmp/build
+
+COPY ./docker/build-ubi/ /tmp/build/
+
+RUN /tmp/build/install-build-dependencies.sh
+RUN /tmp/build/install-paho-client.sh
+RUN /tmp/build/install-k-libs.sh
+RUN /tmp/build/install-mongo-driver.sh
+RUN /tmp/build/install-mongoc-driver.sh
+RUN /tmp/build/install-postgres-client.sh
+RUN /tmp/build/install-rapid-json.sh
+RUN /tmp/build/install-lib-microhttp.sh
+RUN /tmp/build/install-test-dependencies.sh
