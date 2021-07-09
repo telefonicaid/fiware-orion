@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_
-#define SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_PQHEADER_H_
+#define SRC_LIB_ORIONLD_COMMON_PQHEADER_H_
 
 /*
 *
@@ -25,19 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/pqHeader.h"                           // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PgConnection -
+// RedHat UBI distro gets (for some reason I cannot understand) the postgres driver
+// installed directly under /usr.
+// Can't match that with other distros, not without passing the complete path to the include directory
+// to the preprocessor (/usr/pgsql-12/include/, or /usr/include/postgres)
 //
-typedef struct PgConnection
-{
-  bool    busy;          // In use or free
-  PGconn* connectionP;   // the postgres connection
-  int     uses;          // Number of times the connection has been used
-} PgConnection;
+#ifdef REDHAT_UBI
+#include "/usr/pgsql-12/include/libpq-fe.h"
+#else
+#include <postgresql/libpq-fe.h>
+#endif
 
-#endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTION_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_PQHEADER_H_

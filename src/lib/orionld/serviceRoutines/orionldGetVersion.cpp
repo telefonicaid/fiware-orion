@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include </usr/pgsql-12/include/libpq-fe.h>                               // Postgres
 #include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
 #include <boost/version.hpp>                                   // BOOST_LIB_VERSION
 #include <microhttpd.h>                                        // MHD_VERSION (returns a number)
@@ -44,12 +43,14 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "serviceRoutines/versionTreat.h"                      // versionGet
 #include "cache/subCache.h"                                    // subCacheItems
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet

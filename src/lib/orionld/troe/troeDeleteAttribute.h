@@ -25,8 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include </usr/pgsql-12/include/libpq-fe.h>                               // For Postgres
-
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 

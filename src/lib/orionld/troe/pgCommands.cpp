@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include </usr/pgsql-12/include/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/PgConnection.h"                         // PgConnection
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
