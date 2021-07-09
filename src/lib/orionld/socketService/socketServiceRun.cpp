@@ -25,6 +25,7 @@
 #include <unistd.h>                                          // read, write
 #include <errno.h>                                           // errno
 #include <string.h>                                          // strerror
+#include <poll.h>                                            // poll
 #include <netinet/in.h>                                      // sockaddr_in
 
 #include "logMsg/logMsg.h"                                   // LM_*
@@ -62,57 +63,59 @@ int ssAccept(int listenFd)
 //
 void socketServiceRun(int listenFd)
 {
-  int            fd      = -1;
+  int connectionFd     = -1;
+  bool cameFromTimeout = false;
 
   while (1)
   {
-    int             fds;
-    int             fdMax;
-    fd_set          rFds;
-    struct timeval  tv = { 5, 0 };
+    int            fd = (connectionFd != -1)? connectionFd : listenFd;
+    int            rs;
+    struct pollfd  pollFd;
 
-    FD_ZERO(&rFds);
-    if (fd != -1)
+    pollFd.fd      = fd;
+    pollFd.events  = POLLIN;
+    pollFd.revents = 0;
+
+    if (cameFromTimeout == false)
+      LM_TMP(("SS: Waiting on %s", (connectionFd != -1)? "connected socket" : "listen socket"));
+    rs = poll(&pollFd, 1, 5000);
+
+    cameFromTimeout = false;
+    if (rs == -1)
     {
-      FD_SET(fd, &rFds);
-      fdMax = fd;
+      if (errno != EINTR)
+        LM_RVE(("poll error for socket service: %s", strerror(errno)));
     }
-    else
+    else if (rs == 0)
+      cameFromTimeout = true;
+    else if (rs == 1)
     {
-      FD_SET(listenFd, &rFds);
-      fdMax = listenFd;
-    }
+      if (fd == listenFd)
+      {
+        connectionFd = ssAccept(listenFd);
+        if (fd == -1)
+          LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
+        LM_TMP(("SS: Accepted a connection for socket-service"));
+      }
+      else
+      {
+        LM_TMP(("SS: Reading from socket-service - only connection-closed is permitted"));
+        //
+        // Make sure it's just a "connection closed"
+        //
+        int  nb;
+        char buf[16];
 
-    fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
-    if ((fds == -1) && (errno != EINTR))
-      LM_RVE(("select error for socket service: %s", strerror(errno)));
+        nb = read(connectionFd, buf, sizeof(buf));
 
-    if (fds == 0)
-      LM_TMP(("SS: timeout"));
-    else if (FD_ISSET(listenFd, &rFds))
-    {
-      fd = ssAccept(listenFd);
-      if (fd == -1)
-        LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
-      LM_TMP(("SS: Accepted a connection for socket-service"));
-    }
-    else if (FD_ISSET(fd, &rFds))
-    {
-      LM_TMP(("SS: Reading from socket-service - obly connection-closed are permitted"));
-      //
-      // Make sure it's just a "connection closed"
-      //
-      int  nb;
-      char buf[16];
+        if (nb != 0)
+          LM_W(("SS: A message was sent over the socket service - the broker is not ready for that - closing connection"));
+        else
+          LM_TMP(("SS: The socket-service connection was closed"));
 
-      nb = read(fd, buf, sizeof(buf));
-
-      if (nb != 0)
-        LM_X(1, ("A message was sent over the socket service - the broker is not ready for that"));
-
-      LM_TMP(("SS: The socket-service connection was closed"));
-      close(fd);
-      fd = -1;
+        close(connectionFd);
+        connectionFd = -1;
+      }
     }
   }
 }
