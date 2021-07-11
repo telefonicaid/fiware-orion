@@ -78,44 +78,9 @@ echo
 echo
 
 
-echo "2.3. Creating the payload body file with $attributes attributes for Apache benchmarking tool in step 7"
-echo "========================================================================================"
-typeset -i aNo
-aNo=0
-echo '{'                                  > /tmp/body.json
-
-while [ $aNo -le $attributes ]
-do
-  attrName='attr_'$aNo
-  attr='"'$attrName'":  {
-    "type": "Property",
-    "value": '$aNo',
-    "P1": {
-      "type": "Property",
-      "value": '$aNo'
-    },
-    "R1": {
-      "type": "Relationship",
-      "object": "urn:E1:R1:step1"
-    }
-  }'
-
-  if [ $aNo != $attributes ]
-  then
-    attr=${attr},
-  fi
-  
-  echo "$attr" >> /tmp/body.json
-  aNo=$aNo+1
-done
-echo "}" >> /tmp/body.json
-echo
-echo
-
-
-echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests requests overwriting the entity"
+echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests requests retrieving an entity"
 echo "============================================================================================================================="
-ab -c $threads -d -n $requests -T application/json -p /tmp/body.json -m POST  http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
+ab -c $threads -d -n $requests -T application/json "http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E10"
 r=$?
 echo
 echo
