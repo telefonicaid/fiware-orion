@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - docker/**
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: fiware/orion-ld-base:latest
@@ -17,7 +18,6 @@ jobs:
   deploy:
 
     runs-on: ubuntu-18.04
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
@@ -45,7 +45,6 @@ jobs:
   deploy-ubi:
 
     runs-on: ubuntu-18.04
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
