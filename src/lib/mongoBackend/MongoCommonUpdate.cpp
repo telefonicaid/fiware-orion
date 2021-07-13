@@ -3795,7 +3795,7 @@ void processContextElement
 )
 {
   /* Check preconditions */
-  if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
+  if ((orionldState.apiVersion != NGSI_LD_V1) && (contextElementPreconditionsCheck(ceP, responseP, action, apiVersion) == false))
   {
     return;  // Error already in responseP
   }
