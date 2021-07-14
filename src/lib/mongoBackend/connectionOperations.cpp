@@ -93,7 +93,7 @@ bool collectionQuery
 
   try
   {
-    *cursor = connection->query(col, q, 0,0,0, QueryOption_SlaveOk);
+    *cursor = connection->query(col, q, 0, 0, 0, QueryOption_SlaveOk);
 
     // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
     // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
