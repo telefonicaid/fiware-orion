@@ -40,7 +40,7 @@ jobs:
         with:
           push: true
           tags: ${{ env.IMAGE_NAME }}
-          file: docker/Dockerfile-
+          file: docker/Dockerfile-base
 
   deploy-ubi:
 
