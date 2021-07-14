@@ -61,6 +61,7 @@
 #ifdef ORIONLD
 extern "C"
 {
+#include "kbase/kTime.h"                                       // kTimeGet, kTimeDiff
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
@@ -408,7 +409,30 @@ DBClientBase* getMongoConnection(void)
 #ifdef UNIT_TEST
   return connection;
 #else
+
+#ifdef REQUEST_PERFORMANCE
+  DBClientBase*     connectionP;
+  struct timespec   start;
+  struct timespec   end;
+  struct timespec   diff;
+  float             fDiff;
+
+  kTimeGet(&start);
+  connectionP = mongoPoolConnectionGet();
+  kTimeGet(&end);
+
+  //
+  // Accumulate
+  //
+  ++timestamps.getMongoConnectionCalls;
+
+  kTimeDiff(&start, &end, &diff, &fDiff);
+
+  timestamps.mongoConnectAccumulated += fDiff;
+  return connectionP;
+#else
   return mongoPoolConnectionGet();
+#endif
 #endif
 }
 

@@ -92,12 +92,12 @@ echo
 01. Create a subscription with an @context that doesn't exist
 =============================================================
 HTTP/1.1 503 Service Unavailable
-Content-Length:
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "http://not-a-context/ngsi-context.jsonld",
+    "detail": "http://fiware.github.io/NGSI-LD_TestSuite/ldContext/not-a-context.jsonld",
     "title": "Unable to download context",
     "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
 }
@@ -107,7 +107,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
 Date: REGEX(.*)
 
 

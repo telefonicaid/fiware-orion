@@ -340,6 +340,8 @@ typedef struct Timestamps
   struct timespec troeEnd;                // End of            TRoE processing
   struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
   struct timespec requestCompletedStart;  // Start of          Request Completed
+  double          mongoConnectAccumulated;
+  int             getMongoConnectionCalls;
 } Timestamps;
 
 extern __thread Timestamps timestamps;

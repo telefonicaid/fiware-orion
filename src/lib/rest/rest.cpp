@@ -34,7 +34,7 @@
 
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
 #include "kalloc/kaBufferReset.h"                                // kaBufferReset
 #include "kjson/kjFree.h"                                        // kjFree
 }
@@ -848,12 +848,13 @@ static void requestCompleted
 
   struct timespec  all;
   struct timespec  mongo;
-  float            allF;
   float            mongoF;
+  float            allF;
 
   kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
   kTimeDiff(&timestamps.dbStart,  &timestamps.dbEnd,  &mongo, &mongoF);
   LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+  LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", timestamps.mongoConnectAccumulated, timestamps.getMongoConnectionCalls));
 #endif
 }
 
@@ -1080,7 +1081,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     // This was previously an LM_T trace, but we have "promoted" it to INFO due to
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
-    LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
 

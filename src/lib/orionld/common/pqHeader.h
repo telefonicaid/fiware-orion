@@ -35,10 +35,10 @@
 // Can't match that with other distros, not without passing the complete path to the include directory
 // to the preprocessor (/usr/pgsql-12/include/, or /usr/include/postgres)
 //
-#ifdef REDHAT_UBI
-#include "/usr/pgsql-12/include/libpq-fe.h"
-#else
+#ifndef REDHAT_UBI
 #include <postgresql/libpq-fe.h>
+#else
+#include "/usr/pgsql-12/include/libpq-fe.h"
 #endif
 
 #endif  // SRC_LIB_ORIONLD_COMMON_PQHEADER_H_
