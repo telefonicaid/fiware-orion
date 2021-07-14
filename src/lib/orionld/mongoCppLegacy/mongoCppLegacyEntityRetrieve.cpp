@@ -422,7 +422,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.dbStart);
 #endif
-  cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &retFieldsObj);
+  cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &retFieldsObj, 1 << 2);
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.dbEnd);
 #endif
