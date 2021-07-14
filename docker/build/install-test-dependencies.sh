@@ -27,24 +27,23 @@ TEST_TOOLS=(
  'bc' \
  'nano' \
  'netcat' \
- 'python3-pip' \
+ 'python-pip' \
  'gridsite-clients' \
  'valgrind' \
 )
 
 echo -e "\e[1;32m Builder: installing gmock \e[0m"
-apt-get -y install libgtest-dev libgmock-dev google-mock
+apt-get -y install libgtest-dev google-mock
 # install gtest lib
 cd /usr/src/googletest/googletest
 cmake CMakeLists.txt
 make
-cp lib/*.a /usr/lib
-
+cp *.a /usr/lib
 # install gmock lib
 cd /usr/src/googletest/googlemock
 cmake CMakeLists.txt
 make
-cp lib/*.a /usr/lib
+cp *.a /usr/lib
 
 echo
 echo -e "\e[1;32m Builder: installing  tools and dependencies \e[0m"
