@@ -3101,10 +3101,10 @@ static unsigned int updateEntity
   notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
   notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
 
-  // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
-  // in addition, the request was sent due to a custom notification
+  // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity
+  // (for any kind of request, not only forged by custom notification, e.g. CEP rule)
   bool loopDetected = false;
-  if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
+  if (r.hasField(ENT_LAST_CORRELATOR))
   {
     loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
   }
