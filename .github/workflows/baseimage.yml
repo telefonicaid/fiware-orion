@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - docker/**
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: fiware/orion-ld-base:latest
