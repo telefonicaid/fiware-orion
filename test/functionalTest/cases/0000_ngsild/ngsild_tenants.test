@@ -27,6 +27,7 @@ Tenant test
 export BROKER=orionld
 dbInit CB
 dbInit CB tn1
+dbResetAll
 brokerStart CB 0-255 IPv4 -multiservice
 
 --SHELL--
