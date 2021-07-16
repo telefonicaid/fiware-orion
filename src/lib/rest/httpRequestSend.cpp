@@ -257,7 +257,8 @@ int httpRequestSendWithCurl
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
@@ -449,6 +450,7 @@ int httpRequestSendWithCurl
     httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
+
   // Extra headers
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
   {
@@ -508,6 +510,15 @@ int httpRequestSendWithCurl
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
   }
+
+  // Is there a subscription ID to be added as an HTTP header?
+  if ((subscriptionId != NULL) && (*subscriptionId != 0))
+  {
+    LM_TMP(("SUBID: subscriptionId: %s", subscriptionId));
+    url += std::string("?subscriptionId=") + subscriptionId;
+  }
+  else
+    LM_TMP(("SUBID: none"));
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -630,7 +641,8 @@ int httpRequestSend
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   struct curl_context  cc;
@@ -674,7 +686,8 @@ int httpRequestSend
                                      outP,
                                      extraHeaders,
                                      acceptFormat,
-                                     timeoutInMilliseconds);
+                                     timeoutInMilliseconds,
+                                     subscriptionId);
 
   release_curl_context(&cc);
   return response;

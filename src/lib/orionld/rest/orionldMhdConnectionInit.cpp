@@ -429,7 +429,12 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
   else if (SCOMPARE7(key, 's', 'p', 'a', 'c', 'e', 's', 0))
   {
     orionldState.uriParams.spaces = atoi(value);
-    orionldState.uriParams.mask |= ORIONLD_URIPARAM_SPACES;
+    orionldState.uriParams.mask  |= ORIONLD_URIPARAM_SPACES;
+  }
+  else if (SCOMPARE15(key, 's', 'u', 'b', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 'I', 'd', 0))
+  {
+    orionldState.uriParams.subscriptionId  = (char*) value;
+    orionldState.uriParams.mask           |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
   }
   else
   {

@@ -83,6 +83,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
 #include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
+#include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
 
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
@@ -245,6 +246,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;  // Tenant will be created if necessary
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+  }
+  else if (serviceP->serviceRoutine == orionldPostNotify)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
   }
   else if (serviceP->serviceRoutine == orionldGetEntities)
   {
