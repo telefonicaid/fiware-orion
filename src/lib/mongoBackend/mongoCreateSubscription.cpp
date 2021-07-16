@@ -89,6 +89,7 @@ static void insertInCache
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,
+                     sub.notification.mqttInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
                      sub.notification.metadata,
