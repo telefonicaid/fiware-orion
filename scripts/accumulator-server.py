@@ -20,6 +20,12 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+# MQTT functionality based in old accumulator-mqtt.py script, by Burak
+
+# Requires paho-mqtt module:
+#
+# paho-mqtt==1.5.1
+
 from __future__ import division   # need for seconds calculation (could be removed with Python 2.7)
 __author__ = 'fermin'
 
@@ -52,6 +58,7 @@ import atexit
 import string
 import signal
 import json
+import paho.mqtt.client as mqtt
 
 def usage_and_exit(msg):
     """
@@ -78,6 +85,9 @@ def usage():
     print 'Parameters:'
     print "  --host <host>: host to use database to use (default is '0.0.0.0')"
     print "  --port <port>: port to use (default is 1028)"
+    print "  --mqttHost <host>: mqtt broker host to use (if not defined MQTT listening is not enabled)"
+    print "  --mqttPort <port>: mqtt broker port to use (default is 1883)"
+    print "  --mqttTopic <topic>: mqtt topic to use (default is accumulate_mqtt)"
     print "  --url <server url>: server URL to use (default is /accumulate)"
     print "  --pretty-print: pretty print mode"
     print "  --https: start in https"
@@ -94,6 +104,9 @@ def all_done():
 # Default arguments
 port       = 1028
 host       = '0.0.0.0'
+mqtt_host  = None
+mqtt_port  = 1883
+mqtt_topic = 'accumulate_mqtt'
 server_url = '/accumulate'
 verbose    = 0
 pretty     = False
@@ -102,7 +115,7 @@ key_file   = None
 cert_file  = None
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
+    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'mqttHost=', 'mqttPort=', 'mqttTopic=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
@@ -110,15 +123,24 @@ for opt, arg in opts:
     if opt == '-u':
         usage()
         sys.exit(0)
+    elif opt == '--mqttHost':
+        mqtt_host = arg
     elif opt == '--host':
         host = arg
     elif opt == '--url':
         server_url = arg
+    elif opt == '--mqttTopic':
+        mqtt_topic = arg
     elif opt == '--port':
         try:
             port = int(arg)
         except ValueError:
             usage_and_exit('port parameter must be an integer')
+    elif opt == '--mqttPort':
+        try:
+            mqtt_port = int(arg)
+        except ValueError:
+            usage_and_exit('mqttPort parameter must be an integer')
     elif opt == '-v':
         verbose = 1
     elif opt == '--pretty-print':
@@ -141,6 +163,9 @@ if verbose:
     print "verbose mode is on"
     print "port: " + str(port)
     print "host: " + str(host)
+    print "mqtt_port: " + str(mqtt_port)
+    print "mqtt_host: " + str(mqtt_host)
+    print "mqtt_topic: " + str(mqtt_topic)
     print "server_url: " + str(server_url)
     print "pretty: " + str(pretty)
     print "https: " + str(https)
@@ -233,7 +258,7 @@ def dict_raise_on_duplicates(ordered_pairs):
 
 def record_request(request):
     """
-    Common function used by serveral route methods to save request content
+    Common function used by several route methods to save request content
 
     :param request: the request to save
     """
@@ -412,7 +437,72 @@ ac = ''
 t0 = ''
 times = []
 
+# The callback for when the client receives a CONNACK response from the MQTT broker
+def on_connect(client, userdata, flags, rc):
+    print("MQTT broker connected with result code " + str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe(mqtt_topic)
+
+# The callback for when a PUBLISH message is received from the MQTT broker
+def on_message(client, userdata, msg):
+
+    global ac, t0, times
+    s = ''
+
+    if (msg.topic == mqtt_topic):
+        # FIXME: this is common code in record_request(). Unify.
+        # First notification? Then, set reference datetime. Otherwise, add the
+        # timedelta to the list
+        if (t0 == ''):
+            t0 = datetime.now()
+            times.append(0)
+        else:
+            delta = datetime.now() - t0
+            # Python 2.7 could use delta.total_seconds(), but we use this formula
+            # for backward compatibility with Python 2.6
+            t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+            times.append(trunc(round(t)))
+
+        s += 'MQTT message at topic ' + msg.topic + ':'
+        s += '\n'
+        if pretty == True:
+            raw = json.loads(str(msg.payload))
+            s += json.dumps(raw, indent=4, sort_keys=True)
+            s +='\n'
+        else:
+            s += str(msg.payload)
+
+        # Separator
+        s += '=======================================\n'
+
+        # Accumulate
+        ac += s
+
+        if verbose:
+            print s
+
+ac = ''
+t0 = ''
+times = []
+
 if __name__ == '__main__':
+
+    if mqtt_host is not None:
+        # Initialize the MQTT Client and set callback methods
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
+
+        client.connect(mqtt_host, mqtt_port, 60)
+
+        # Enable the processing of MQTT network traffic, dispatches callbacks and
+        # handles reconnecting.
+        # Other loop*() functions are available that give a threaded interface and a
+        # manual interface.
+        client.loop_start()
+
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)

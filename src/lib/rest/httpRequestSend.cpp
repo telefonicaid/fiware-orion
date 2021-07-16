@@ -52,6 +52,7 @@
 #include "rest/rest.h"
 #include "rest/curlSem.h"
 #include "serviceRoutines/versionTreat.h"
+#include "mqtt/mqtt.h"
 
 
 
@@ -261,6 +262,12 @@ int httpRequestSendWithCurl
    long                                       timeoutInMilliseconds
 )
 {
+  // FIXME PR: this is a kind of "interpection hack". It should be done in a clearner way
+  if (_protocol == "mqtt:")
+  {
+    return sendMqttNotification(content);
+  }
+
   char                            portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long       callNo             = 0;
   std::string                     ip                 = _ip;
