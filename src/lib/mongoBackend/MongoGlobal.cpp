@@ -2185,7 +2185,7 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 *
 * subToEntityIdVector -
 *
-* Extract the entity ID vector from a BSON document (in the format of the csubs/casub
+* Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
 */
 EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
@@ -2317,7 +2317,7 @@ void subToNotifyList
 *
 * subToAttributeList -
 *
-* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* Extract the attribute list from a BSON document (in the format of the csubs
 * collection)
 */
 StringList subToAttributeList
@@ -2359,7 +2359,7 @@ StringList subToAttributeList
 *
 * subToAttributeList -
 *
-* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* Extract the attribute list from a BSON document (in the format of the csubs
 * collection)
 */
 StringList subToAttributeList(const orion::BSONObj& sub)
