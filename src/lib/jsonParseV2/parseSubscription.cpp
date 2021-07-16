@@ -316,14 +316,27 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "notification is not an object");
   }
 
-  // Callback
-  if (notification.HasMember("http") && notification.HasMember("httpCustom"))
+  // Check we have only one type
+  int n = 0;
+  if (notification.HasMember("http"))        n++;
+  if (notification.HasMember("httpCustom"))  n++;
+  if (notification.HasMember("mqtt"))        n++;
+  if (notification.HasMember("mqttCustom"))  n++;
+  if (n > 0)
   {
-    return badInput(ciP, "notification has http and httpCustom");
+    return badInput(ciP, "only of of http, httpCustom, mqtt or mqttCustom");
   }
-  else if (notification.HasMember("http"))
+  else if (n == 0)
+  {
+    return badInput(ciP, "http, httpCustom, mqtt or mqttCustom is missing");
+  }
+
+  // Callback
+  if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
+
+    subsP->notification.type = ngsiv2::HttpNotification;
 
     if (!http.IsObject())
     {
@@ -356,6 +369,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   else if (notification.HasMember("httpCustom"))
   {
     const Value& httpCustom = notification["httpCustom"];
+
+    subsP->notification.type = ngsiv2::HttpNotification;
 
     if (!httpCustom.IsObject())
     {
@@ -499,9 +514,83 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     subsP->notification.httpInfo.custom = true;
   }
-  else  // missing callback field
+  else if (notification.HasMember("mqtt"))
   {
-    return badInput(ciP, "http notification is missing");
+    subsP->notification.type = ngsiv2::MqttNotification;
+
+    const Value& mqtt = notification["mqtt"];
+
+    if (!mqtt.IsObject())
+    {
+      return badInput(ciP, "mqtt notification is not an object");
+    }
+
+    // endpoint
+    Opt<std::string> endpointOpt = getStringMust(mqtt, "endpoint", "endpoint mqtt notification");
+
+    if (!endpointOpt.ok())
+    {
+      return badInput(ciP, endpointOpt.error);
+    }
+    if (!endpointOpt.given)
+    {
+      return badInput(ciP, "mandatory mqtt field /endpoint/");
+    }
+
+    if (forbiddenChars(endpointOpt.value.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in mqtt field /endpoint/");
+    }
+    // FIXME PR: check endpoint format, i.e. "host:port"
+    subsP->notification.mqttInfo.endpoint = endpointOpt.value;
+
+    // topic
+    Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
+
+    if (!topicOpt.ok())
+    {
+      return badInput(ciP, topicOpt.error);
+    }
+    if (!endpointOpt.given)
+    {
+      return badInput(ciP, "mandatory mqtt field /topic/");
+    }
+
+    if (forbiddenChars(topicOpt.value.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in mqtt field /topic/");
+    }
+    // FIXME PR: check endpoint format, i.e. "A/B/C/D". Is there any well-known regex for this?
+    subsP->notification.mqttInfo.topic = topicOpt.value;
+
+    // qos
+    Opt<int64_t> qosOpt = getInt64Opt(mqtt, "qos");
+    if (!qosOpt.ok())
+    {
+      return badInput(ciP, qosOpt.error);
+    }
+    if (qosOpt.given)
+    {
+      subsP->notification.mqttInfo.qos = qosOpt.value;
+    }
+    else
+    {
+      subsP->notification.mqttInfo.qos = 0;
+    }
+
+  }
+  else if (notification.HasMember("mqttCustom"))
+  {
+    subsP->notification.type = ngsiv2::MqttNotification;
+
+    const Value& mqttCustom = notification["mqttCustom"];
+
+    if (!mqttCustom.IsObject())
+    {
+      return badInput(ciP, "mqttCustom notification is not an object");
+    }
+
+    // FIXME PR: not sure if this should be kept as a separate if-branch or unified with "mqtt"
   }
 
   // Attributes
