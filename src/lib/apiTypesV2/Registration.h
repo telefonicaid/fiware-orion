@@ -43,6 +43,8 @@ class ForwardingInformation
   long long    lastFailure;
   long long    lastSuccess;
   long long    timesSent;
+  long long    counter;
+  long long    maxLimit;
   long long    lastForwarding;
 
   ForwardingInformation();

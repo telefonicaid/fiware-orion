@@ -97,6 +97,11 @@ std::string Subscription::toJson(void)
     jh.addNumber("throttling", this->throttling);
   }
 
+  if (this->notification.counter > this->notification.maxLimit)
+  {
+    jh.addString("status", "inactive");
+  }
+
   return jh.str();
 }
 
@@ -116,6 +121,16 @@ std::string Notification::toJson(const std::string& attrsFormat)
   if (this->timesSent > 0)
   {
     jh.addNumber("timesSent", this->timesSent);
+  }
+
+  if (this->counter > 0)
+  {
+    jh.addNumber("counter", this->counter);
+  }
+
+  if (this->maxLimit > 0)
+  {
+    jh.addNumber("maxLimit", this->maxLimit);
   }
 
   if (this->lastNotification > 0)
