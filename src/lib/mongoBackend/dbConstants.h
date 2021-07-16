@@ -128,6 +128,9 @@
 #define CASUB_COUNT                  "count"
 #define CASUB_FORMAT                 "format"
 
+#define CSUB_MQTTTOPIC               "topic"
+#define CSUB_MQTTQOS                 "qos"
+
 
 
 /* ****************************************************************************

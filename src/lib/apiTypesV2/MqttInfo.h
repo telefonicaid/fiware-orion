@@ -28,13 +28,7 @@
 #include <string>
 #include <map>
 
-#include "rest/Verb.h"
-
-/* ****************************************************************************
-*
-* EMPTY_TOPIC - 
-*/
-#define EMPTY_TOPIC ""
+#include "mongoDriver/BSONObj.h"
 
 namespace ngsiv2
 {
@@ -44,14 +38,19 @@ namespace ngsiv2
 */
 struct MqttInfo
 {
-  std::string                         topic;
-  bool                                custom;
+  std::string   endpoint;
+  std::string   topic;
+  unsigned int  qos;  // 0, 1 or 2
+
+  bool          custom;
+  std::string   payload;
+  bool          includePayload;
 
   MqttInfo();
-  explicit MqttInfo(const std::string& _topic);
+  explicit MqttInfo(const std::string& _endpoint);
 
   std::string  toJson();
-  void         fill(const mongo::BSONObj& bo);
+  void         fill(const orion::BSONObj& bo);
 };
 }
 

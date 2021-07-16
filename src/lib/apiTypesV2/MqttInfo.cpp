@@ -23,15 +23,15 @@
 * Author: Burak Karaboga
 */
 #include <string>
-#include <map>
 
-#include "mongo/client/dbclient.h"
 #include "logMsg/logMsg.h"
-
 #include "common/JsonHelper.h"
-#include "mongoBackend/dbConstants.h"
+
 #include "apiTypesV2/MqttInfo.h"
 
+#include "mongoBackend/dbConstants.h"
+
+#include "mongoDriver/safeMongo.h"
 
 
 namespace ngsiv2
@@ -40,7 +40,7 @@ namespace ngsiv2
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo() : topic(EMPTY_TOPIC), custom(false)
+MqttInfo::MqttInfo() : qos(0), custom(false), includePayload(true)
 {
 }
 
@@ -50,7 +50,7 @@ MqttInfo::MqttInfo() : topic(EMPTY_TOPIC), custom(false)
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo(const std::string& _topic) : topic(_topic), custom(false)
+MqttInfo::MqttInfo(const std::string& _endpoint) : endpoint(_endpoint), qos(0), custom(false), includePayload(true)
 {
 }
 
@@ -62,13 +62,22 @@ MqttInfo::MqttInfo(const std::string& _topic) : topic(_topic), custom(false)
 */
 std::string MqttInfo::toJson()
 {
-  JsonHelper jh;
+  JsonObjectHelper jh;
 
+  jh.addString("endpoint", this->endpoint);
   jh.addString("topic", this->topic);
+  jh.addNumber("qos", (long long) this->qos);
 
   if (custom)
   {
-    // FIXME PR: Planned for a next PR
+    if (!this->includePayload)
+    {
+      jh.addNull("payload");
+    }
+    else if (!this->payload.empty())
+    {
+      jh.addString("payload", this->payload);
+    }
   }
 
   return jh.str();
@@ -80,14 +89,34 @@ std::string MqttInfo::toJson()
 *
 * MqttInfo::fill -
 */
-void MqttInfo::fill(const BSONObj& bo)
+void MqttInfo::fill(const orion::BSONObj& bo)
 {
-  this->topic  = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : DEFAULT_MQTT_TOPIC;
-  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
+  this->endpoint = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->topic    = bo.hasField(CSUB_MQTTTOPIC)? getStringFieldF(bo, CSUB_MQTTTOPIC) : "";
+  this->qos      = bo.hasField(CSUB_MQTTQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
+  this->custom   = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
   if (this->custom)
   {
-    // FIXME PR: Planned for a next PR
+    if (bo.hasField(CSUB_PAYLOAD))
+    {
+      if (getFieldF(bo, CSUB_PAYLOAD).isNull())
+      {
+        // We initialize also this->payload in this case, although its value is irrelevant
+        this->payload = "";
+        this->includePayload = false;
+      }
+      else
+      {
+        this->payload = getStringFieldF(bo, CSUB_PAYLOAD);
+        this->includePayload = true;
+      }
+    }
+    else
+    {
+      this->payload = "";
+      this->includePayload = true;
+    }
   }
 }
 }
