@@ -136,7 +136,7 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_DETAILS              (1 << 21)
 #define ORIONLD_URIPARAM_PRETTYPRINT          (1 << 22)
 #define ORIONLD_URIPARAM_SPACES               (1 << 23)
-
+#define ORIONLD_URIPARAM_SUBSCRIPTION_ID      (1 << 24)
 
 
 // -----------------------------------------------------------------------------
