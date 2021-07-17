@@ -41,16 +41,13 @@
 //
 OrionldTenant* orionldTenantGet(const char* tenantName)
 {
-  LM_TMP(("Does the tenant '%s' already exist?", tenantName));
   OrionldTenant* tenantP = orionldTenantLookup(tenantName);
-  LM_TMP(("tenantP == %p", tenantP));
+
   if (tenantP != NULL)
   {
     tenantCache = tenantP;  // No need to semaphore-protect tenantCache
     return tenantP;
   }
-
-  LM_TMP(("tenant '%s' must be created", tenantName));
 
   //
   // The tenant doesn't exist - it needs to be created:
@@ -62,23 +59,15 @@ OrionldTenant* orionldTenantGet(const char* tenantName)
   //   - Post the tenantSem
   //   - return the newly created tenant (either it was created here or elsewhere!)
   //
-  LM_TMP(("Waiting on tenantSem"));
   sem_wait(&tenantSem);
-  LM_TMP(("Looking up the tenant again - this time with semaphore taken - does it still n ot exist?"));
+
   tenantP = orionldTenantLookup(tenantName);
-  LM_TMP(("tenantP == %p", tenantP));
 
   if (tenantP == NULL)  // Second lookup - this time sem-protected
-  {
-    LM_TMP(("Tenant '%s' not found - creating it", tenantName));
     tenantP = orionldTenantCreate(tenantName);
-  }
-  else
-    LM_TMP(("Tenant '%s' found in the second try", tenantName));
 
   tenantCache = tenantP;  // No real need to semaphore-protect tenantCache, but hey, it comes practically for free! :)
 
-  LM_TMP(("Posting tenantSem"));
   sem_post(&tenantSem);
 
   return tenantP;

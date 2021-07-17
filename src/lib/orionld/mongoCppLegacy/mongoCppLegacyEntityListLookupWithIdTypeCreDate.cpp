@@ -99,7 +99,6 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
 
   try
   {
-    LM_TMP(("TENANT: Querying collection '%s'", orionldState.tenantP->entities));
     cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &fieldsToReturn);
   }
   catch (...)
