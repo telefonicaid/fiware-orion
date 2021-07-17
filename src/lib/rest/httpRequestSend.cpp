@@ -41,6 +41,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                  // orionldState
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
@@ -512,7 +513,7 @@ int httpRequestSendWithCurl
   }
 
   // Is there a subscription ID to be added as an HTTP header?
-  if ((subscriptionId != NULL) && (*subscriptionId != 0))
+  if ((orionldState.apiVersion == NGSI_LD_V1) && (subscriptionId != NULL) && (*subscriptionId != 0))
   {
     LM_TMP(("SUBID: subscriptionId: %s", subscriptionId));
     url += std::string("?subscriptionId=") + subscriptionId;
