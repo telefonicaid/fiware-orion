@@ -154,9 +154,7 @@ static void* workerFunc(void* pSyncQ)
       }
       else // Send HTTP notification
       {
-        std::string  out;
-
-        LM_TMP(("SUBID: Sending notification, sub.id: '%s'", params->subscriptionId.c_str()));
+        std::string out;
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,
@@ -175,7 +173,7 @@ static void* workerFunc(void* pSyncQ)
                                     params->extraHeaders,
                                     "",
                                     -1,
-                                    params->subscriptionId.c_str());
+                                    params->subscriptionId.c_str());  // Subscription ID as URL param
       }
 
       if (params->toFree != NULL)

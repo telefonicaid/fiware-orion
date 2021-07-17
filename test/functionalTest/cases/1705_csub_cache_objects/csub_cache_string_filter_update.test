@@ -192,7 +192,7 @@ Date: REGEX(.*)
 
 04. See notification of E1 in accumulator
 =========================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -239,7 +239,7 @@ Date: REGEX(.*)
 
 07. See no new notification in accumulator (only E1)
 ====================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -278,7 +278,7 @@ Date: REGEX(.*)
 
 09. See two notifications in accumulator (E1 and E4)
 ====================================================
-POST http://localhost:9997/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -303,7 +303,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:9997/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

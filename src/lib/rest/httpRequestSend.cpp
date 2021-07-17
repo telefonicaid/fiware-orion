@@ -273,6 +273,8 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
+  LM_TMP(("Resource: '%s'", resource.c_str()));
+
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
   if (metricsMgr.isOn())
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
@@ -513,10 +515,16 @@ int httpRequestSendWithCurl
   }
 
   // Is there a subscription ID to be added as an HTTP header?
-  if ((orionldState.apiVersion == NGSI_LD_V1) && (subscriptionId != NULL) && (*subscriptionId != 0))
+  if ((subscriptionId != NULL) && (*subscriptionId != 0))
   {
+    const char* qMark = strchr(resource.c_str(), '?');  // '?' already present?
+
     LM_TMP(("SUBID: subscriptionId: %s", subscriptionId));
-    url += std::string("?subscriptionId=") + subscriptionId;
+
+    if (qMark == NULL)
+      url += std::string("?subscriptionId=") + subscriptionId;
+    else
+      url += std::string("&subscriptionId=") + subscriptionId;
   }
   else
     LM_TMP(("SUBID: none"));

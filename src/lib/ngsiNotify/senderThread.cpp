@@ -85,7 +85,7 @@ void* startSenderThread(void* p)
                           params->extraHeaders,
                           "",
                           -1,
-                          params->subscriptionId.c_str());
+                          params->subscriptionId.c_str());  // Subscription ID as URL param
 
       if (params->toFree != NULL)
       {

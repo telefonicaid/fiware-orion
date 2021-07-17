@@ -226,7 +226,7 @@ Date: REGEX(.*)
 
 07. Dump accumulator and see 7 notifications (one first one multi-entity)
 =========================================================================
-POST http://127.0.0.1:REGEX(\d+)/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 272
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -269,7 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -294,7 +294,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 126
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -319,7 +319,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -344,7 +344,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-PUT http://127.0.0.1:REGEX(\d+)/notify?a1=true&type=T1&id=E1
+PUT http://127.0.0.1:9997/notify?a1=true&subscriptionId=REGEX(.*)&type=T1&id=E1
 Fiware-Servicepath: /
 Entity-Id: E1
 Content-Length: 36
@@ -363,7 +363,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "A3": ""
 }
 =======================================
-PUT http://127.0.0.1:REGEX(\d+)/notify?a2=null&type=T2&id=E1
+PUT http://127.0.0.1:9997/notify?subscriptionId=REGEX(.*)&type=T2&id=E1
 Fiware-Servicepath: /
 Entity-Id: E1
 Content-Length: 36
@@ -383,7 +383,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 #SORT_START
-PUT http://127.0.0.1:REGEX(\d+)/notify?a3=3&type=T3&id=E1
+PUT http://127.0.0.1:9997/notify?a3=3&type=T3&id=E1&subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
 Entity-Id: E1
