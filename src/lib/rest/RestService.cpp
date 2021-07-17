@@ -604,7 +604,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   // underscores and alphanumeric characters.
   //
   std::string result;
-  LM_TMP(("TENANT: orionldState.tenantName == '%s'", orionldState.tenantName));
   if ((orionldState.tenantName != NULL) && ((result = tenantCheck(orionldState.tenantName)) != "OK"))
   {
     OrionError  oe(SccBadRequest, result);

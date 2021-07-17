@@ -58,15 +58,12 @@ void mongoCppLegacyGeoIndexInit(void)
 
   while (tenantP != NULL)
   {
-    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
     tenantP = tenantP->next;
   }
 
   tenantP = &tenant0;
   while (tenantP != NULL)
   {
-    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
-
     // Foreach ENTITY (only attrs)
     mongo::BSONObjBuilder  dbFields;
 
@@ -119,17 +116,11 @@ void mongoCppLegacyGeoIndexInit(void)
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
           if (dbGeoIndexLookup(tenantP->tenant, attrP->name) == NULL)
-          {
-            LM_TMP(("TENANT: Calling mongoCppLegacyGeoIndexCreate for database '%s'", tenantP->mongoDbName));
             mongoCppLegacyGeoIndexCreate(tenantP, attrP->name);
-            LM_TMP(("TENANT: Back from mongoCppLegacyGeoIndexCreate"));
-          }
         }
       }
     }
 
     tenantP = tenantP->next;
   }
-
-  LM_TMP(("TENANT: Done"));
 }
