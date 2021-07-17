@@ -186,10 +186,10 @@ echo
 
 echo "09. Check that the order is the following: sub1, sub2, sub3, sub1"
 echo "================================================================="
-notif1=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 1)
-notif2=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 2 | tail -n 1)
-notif3=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 3 | tail -n 1)
-notif4=$(accumulatorDump | grep subscriptionId | awk -F\" '{print $4}'| head -n 4 | tail -n 1)
+notif1=$(accumulatorDump | grep '"subscriptionId"' | awk -F\" '{print $4}'| head -n 1)
+notif2=$(accumulatorDump | grep '"subscriptionId"' | awk -F\" '{print $4}'| head -n 2 | tail -n 1)
+notif3=$(accumulatorDump | grep '"subscriptionId"' | awk -F\" '{print $4}'| head -n 3 | tail -n 1)
+notif4=$(accumulatorDump | grep '"subscriptionId"' | awk -F\" '{print $4}'| head -n 4 | tail -n 1)
 
 if [ "$notif1" == "$subId1" ]
 then
@@ -291,7 +291,7 @@ Date: REGEX(.*)
 
 08. Dump accumulator: see four
 ==============================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -316,7 +316,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -341,7 +341,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -366,7 +366,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

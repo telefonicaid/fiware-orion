@@ -135,6 +135,7 @@ typedef struct OrionldUriParams
   uint32_t  mask;
   bool      prettyPrint;
   int       spaces;
+  char*     subscriptionId;
 } OrionldUriParams;
 
 

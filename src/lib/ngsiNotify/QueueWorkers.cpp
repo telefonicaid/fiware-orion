@@ -105,8 +105,9 @@ static void* workerFunc(void* pSyncQ)
       struct timespec     now;
       struct timespec     howlong;
       size_t              estimatedQSize;
-
       SenderThreadParams* params = (*paramsV)[ix];
+
+      LM_TMP(("SUBID: Got subid '%s'", params->subscriptionId.c_str()));
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);
@@ -149,11 +150,11 @@ static void* workerFunc(void* pSyncQ)
                              params->mqttVersion,
                              params->xauthToken.c_str(),
                              params->extraHeaders);
+        // FIXME: +subscriptionId
       }
       else // Send HTTP notification
       {
-        std::string  out;
-
+        std::string out;
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,
@@ -169,7 +170,10 @@ static void* workerFunc(void* pSyncQ)
                                     params->renderFormat,
                                     NOTIFICATION_WAIT_MODE,
                                     &out,
-                                    params->extraHeaders);
+                                    params->extraHeaders,
+                                    "",
+                                    -1,
+                                    params->subscriptionId.c_str());  // Subscription ID as URL param
       }
 
       if (params->toFree != NULL)

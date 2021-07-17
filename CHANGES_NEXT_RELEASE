@@ -2,4 +2,4 @@
 * Issue #280  Performace: saving all DB collection paths ONCE in a tenant-struct instead of creating them before each and every use
 * Issue #892  Broker able to receive and act upon NGSI-LD notifications - very first implementation - needs further testing
 * Issue #897  Fixed a bug in the forwarding mechanism
-* Issue #280  Notifications now carry a URL parameter, "subscriptionId" - the id of the sub that the notification "belongs to"
+* Issue #280  Added an URL param 'subscriptionId' to notifications - for ACL in notifications
