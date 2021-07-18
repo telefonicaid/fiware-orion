@@ -43,7 +43,7 @@ extern "C"
 #include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/numberToDate.h"                            // numberToDate
 #include "orionld/common/eqForDot.h"                                // eqForDot
-#include "orionld/common/performance.h"                             // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                             // PERFORMANCE
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
@@ -419,13 +419,9 @@ KjNode* mongoCppLegacyEntityRetrieve
   //
   // Querying mongo and retrieving the results
   //
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbStart);
-#endif
+  PERFORMANCE(dbStart);
   cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &retFieldsObj, 1 << 2);
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbEnd);
-#endif
+  PERFORMANCE(dbEnd);
 
   while (cursorP->more())
   {

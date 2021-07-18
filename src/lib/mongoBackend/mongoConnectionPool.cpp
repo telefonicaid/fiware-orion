@@ -170,7 +170,6 @@ static DBClientBase* mongoConnect
     std::vector<HostAndPort> rplSetHosts;
     for (int ix = 0; ix < components; ix++)
     {
-      LM_TMP(("MONGO: rplSet host <%s>", hostTokens[ix].c_str()));
       rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
     }
 
@@ -193,10 +192,6 @@ static DBClientBase* mongoConnect
         LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
-      }
-      else
-      {
-        LM_TMP(("Try %d connecting to mongo failed", tryNo));
       }
 
       usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis

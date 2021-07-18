@@ -25,7 +25,10 @@
 *
 * Author: Ken Zangelin
 */
-
+extern "C"
+{
+#include "kbase/kTime.h"                                         // kTimeGet
+}
 
 
 // ----------------------------------------------------------------------------
@@ -33,5 +36,51 @@
 // REQUEST_PERFORMANCE
 //
 #define REQUEST_PERFORMANCE 1
+
+#ifdef REQUEST_PERFORMANCE
+
+// -----------------------------------------------------------------------------
+//
+// PERFORMANCE -
+//
+#define PERFORMANCE(timeField)            \
+do {                                      \
+  kTimeGet(&timestamps.timeField);        \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PERFORMANCE_BEGIN -
+//
+#define PERFORMANCE_BEGIN(ix, desc)       \
+do {                                      \
+  timestamps.srDesc[ix] = (char*) desc;   \
+  kTimeGet(&timestamps.srStart[ix]);      \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PERFORMANCE_END -
+//
+// Possibility to change the description, in case the measure ends in a different path (error)
+//
+#define PERFORMANCE_END(ix, desc)         \
+do {                                      \
+  kTimeGet(&timestamps.srEnd[ix]);        \
+  if (desc != NULL)                       \
+    timestamps.srDesc[ix] = (char*) desc; \
+} while (0)
+
+#else
+
+#define	PERFORMANCE(timeField)
+#define PERFORMANCE_BEGIN(ix, desc)
+#define PERFORMANCE_END(ix, desc)
+
+#endif
 
 #endif  // SRC_LIB_ORIONLD_COMMON_PERFORMANCE_H_

@@ -524,7 +524,7 @@ MHD_Result orionldMhdConnectionInit
   // At most, commented out
   //
 #ifndef REQUEST_PERFORMANCE
-  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
+  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 #endif
 
   //

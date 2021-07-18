@@ -50,7 +50,7 @@ extern "C"
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
@@ -461,9 +461,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if ((countP != NULL) && (orionldState.uriParams.limit == 0))
     orionldState.onlyCount = true;
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbStart);
-#endif
+  PERFORMANCE(mongoBackendStart);
 
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
@@ -473,9 +471,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                                   ciP->uriParamOptions,
                                                   countP,
                                                   ciP->apiVersion);
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbEnd);
-#endif
+  PERFORMANCE(mongoBackendEnd);
 
   //
   // Transform QueryContextResponse to KJ-Tree

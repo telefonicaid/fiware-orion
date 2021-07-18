@@ -46,7 +46,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

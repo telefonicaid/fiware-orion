@@ -70,6 +70,7 @@ extern "C"
 #include "orionld/common/orionldTenantGet.h"                   // orionldTenantGet
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
@@ -433,6 +434,7 @@ DBClientBase* getMongoConnection(void)
 #else
   return mongoPoolConnectionGet();
 #endif
+
 #endif
 }
 
@@ -1201,6 +1203,8 @@ bool entitiesQuery
   ApiVersion                       apiVersion
 )
 {
+  PERFORMANCE_BEGIN(1, "entitiesQuery, part 1");
+
   /* Query structure is as follows
    *
    * {
@@ -1258,10 +1262,9 @@ bool entitiesQuery
     finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
   }
 
-#ifdef ORIONLD
   if (orionldState.qMongoFilterP != NULL)
     finalQuery.appendElements(*orionldState.qMongoFilterP);
-#endif
+
   /* Part 5: scopes */
   std::vector<BSONObj>  filters;
   unsigned int          geoScopes = 0;
@@ -1361,10 +1364,14 @@ bool entitiesQuery
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 
+  PERFORMANCE_END(1, NULL);
+  PERFORMANCE_BEGIN(2, "entitiesQuery, part 2");
+
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
   // LM_TMP(("***** WARNING: DESTRUCTIVE ***** - finalQuery: %s", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
-  Query                          query(finalQuery.obj());
+
+  Query  query(finalQuery.obj());
 
   if (sortOrderList == "")
   {
@@ -1408,6 +1415,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
+  query.readPref(mongo::ReadPreference_PrimaryPreferred, mongo::BSONArray());
   if (!collectionRangedQuery(connection, tenantP->entities, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
@@ -1415,6 +1423,9 @@ bool entitiesQuery
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  PERFORMANCE_END(2, NULL);
+  PERFORMANCE_BEGIN(3, "entitiesQuery, part 3");
 
   /* Process query result */
   unsigned int docs = 0;
@@ -1429,7 +1440,9 @@ bool entitiesQuery
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
+      PERFORMANCE_BEGIN(4, "entitiesQuery, nextSafe");
       r = cursor->nextSafe();
+      PERFORMANCE_END(4, NULL);
     }
     catch (const AssertionException &e)
     {
@@ -1502,13 +1515,17 @@ bool entitiesQuery
       return false;
     }
 
+    PERFORMANCE_BEGIN(5, "entitiesQuery, part 5");
     alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+
+    PERFORMANCE_BEGIN(8, "entitiesQuery, part 8");
     ContextElementResponse*  cer = new ContextElementResponse(&r, attrL, includeEmpty, apiVersion);
+    PERFORMANCE_END(8, NULL);
 
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
@@ -1524,6 +1541,7 @@ bool entitiesQuery
         continue;
       }
 
+      PERFORMANCE_BEGIN(6, "entitiesQuery, 6: for");
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
         if (attrName == cer->contextElement.contextAttributeVector[jx]->name)
@@ -1538,13 +1556,16 @@ bool entitiesQuery
         ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
         cer->contextElement.contextAttributeVector.push_back(caP);
       }
+      PERFORMANCE_END(6, NULL);
     }
-
+    PERFORMANCE_END(5, NULL);
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
 
  release:
+  PERFORMANCE_END(3, NULL);
+  PERFORMANCE_BEGIN(7, "entitiesQuery, part 7");
   releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
@@ -1556,6 +1577,7 @@ bool entitiesQuery
     if (*limitReached)
     {
       LM_T(LmtMongo, ("entities limit reached"));
+      PERFORMANCE_END(7, "entitiesQuery, limits");
       return true;
     }
   }
@@ -1607,6 +1629,8 @@ bool entitiesQuery
       }
     }
   }
+
+  PERFORMANCE_END(7, NULL);
 
   return true;
 }
@@ -1900,6 +1924,7 @@ bool registrationsQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
+  query.readPref(mongo::ReadPreference_PrimaryPreferred, mongo::BSONArray());
   if (!collectionRangedQuery(connection, tenantP->registrations, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);

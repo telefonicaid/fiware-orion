@@ -61,7 +61,7 @@ extern "C"
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
@@ -296,13 +296,9 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   // Parse the payload
   //
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.parseStart);
-#endif
+  PERFORMANCE(parseStart);
   orionldState.requestTree = kjParse(orionldState.kjsonP, ciP->payload);
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.parseEnd);
-#endif
+  PERFORMANCE(parseEnd);
 
   //
   // Parse Error?
@@ -842,15 +838,9 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Call the SERVICE ROUTINE
   //
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.serviceRoutineStart);
-#endif
-
+  PERFORMANCE(serviceRoutineStart);
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
-
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.serviceRoutineEnd);
-#endif
+  PERFORMANCE(serviceRoutineEnd);
 
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -953,9 +943,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // FIXME: Smarter allocation !!!
     //
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.renderStart);
-#endif
+    PERFORMANCE(renderStart);
 
     if ((orionldState.acceptGeojson == true) && (serviceRoutineResult == true))
     {
@@ -1003,9 +991,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     else
       kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
 
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.renderEnd);
-#endif
+    PERFORMANCE(renderEnd);
   }
 
   //
@@ -1014,18 +1000,14 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   ciP->httpStatusCode = (HttpStatusCode) orionldState.httpStatusCode;
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.restReplyStart);
-#endif
+  PERFORMANCE(restReplyStart);
 
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
     restReply(ciP, "");
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.restReplyEnd);
-#endif
+  PERFORMANCE(restReplyEnd);
 
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
@@ -1047,9 +1029,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
 
-#ifdef REQUEST_PERFORMANCE
-        kTimeGet(&timestamps.troeStart);
-#endif
+        PERFORMANCE(troeStart);
 
         //
         // If the incoming request an empty array/object, then don't call the TRoE routine
@@ -1057,9 +1037,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if ((orionldState.verb == DELETE) || ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL)))
           orionldState.serviceP->troeRoutine(ciP);
 
-#ifdef REQUEST_PERFORMANCE
-        kTimeGet(&timestamps.troeEnd);
-#endif
+        PERFORMANCE(troeEnd);
       }
     }
   }
@@ -1069,9 +1047,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   orionldStateRelease();
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.requestPartEnd);
-#endif
+  PERFORMANCE(requestPartEnd);
 
   return MHD_YES;
 }

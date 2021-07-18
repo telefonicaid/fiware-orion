@@ -30,6 +30,7 @@
 
 #include "orionld/types/OrionldTenant.h"
 #include "orionld/common/orionldState.h"
+#include "orionld/common/performance.h"
 
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
@@ -154,6 +155,8 @@ bool collectionRangedQuery
   std::string*                    err
 )
 {
+  PERFORMANCE(dbStart);
+
   if (connection == NULL)
   {
     LM_E(("Fatal Error (null DB connection)"));
@@ -216,6 +219,9 @@ bool collectionRangedQuery
   }
 
   alarmMgr.dbErrorReset();
+
+  PERFORMANCE(dbEnd);
+
   return true;
 }
 

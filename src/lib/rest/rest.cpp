@@ -77,7 +77,7 @@ extern "C"
 #include "rest/rest.h"
 
 
-#ifdef REQUEST_PERFORMANCE
+
 // -----------------------------------------------------------------------------
 //
 // TIME_REPORT -
@@ -88,10 +88,9 @@ extern "C"
   float           diffF;                                 \
                                                          \
   kTimeDiff(&start, &end, &diff, &diffF);                \
-  if (diffF > 0)                                         \
-    LM_TMP(("TPUT: %s %f", text, diffF));                \
+  LM_TMP(("TPUT: %s %f", text, diffF));                  \
 }
-#endif
+
 
 
 
@@ -712,9 +711,7 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.requestCompletedStart);
-#endif
+  PERFORMANCE(requestCompletedStart);
 
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   const char*      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
@@ -722,15 +719,9 @@ static void requestCompleted
 
   if (orionldState.notify == true)
   {
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.notifStart);
-#endif
-
+    PERFORMANCE(notifStart);
     orionldNotify();
-
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.notifEnd);
-#endif
+    PERFORMANCE(notifEnd);
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -831,12 +822,11 @@ static void requestCompleted
   *con_cls = NULL;
 
 #ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.reqEnd);
+  PERFORMANCE(reqEnd);
 
   TIME_REPORT(timestamps.reqStart,            timestamps.serviceRoutineStart,    "Before Service Routine:    ");
   TIME_REPORT(timestamps.serviceRoutineStart, timestamps.serviceRoutineEnd,      "During Service Routine:    ");
   TIME_REPORT(timestamps.serviceRoutineEnd,   timestamps.reqEnd,                 "After Service Routine:     ");
-  TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting Mongo:            ");
   TIME_REPORT(timestamps.parseStart,          timestamps.parseEnd,               "Payload Parse:             ");
   TIME_REPORT(timestamps.renderStart,         timestamps.renderEnd,              "Rendering Response:        ");
   TIME_REPORT(timestamps.restReplyStart,      timestamps.restReplyEnd,           "Sending Response:          ");
@@ -845,6 +835,15 @@ static void requestCompleted
   TIME_REPORT(timestamps.reqStart,            timestamps.reqEnd,                 "Entire request:            ");
   TIME_REPORT(timestamps.troeStart,           timestamps.troeEnd,                "TRoE Processing:           ");
   TIME_REPORT(timestamps.requestPartEnd,      timestamps.requestCompletedStart,  "MHD Delay (send response): ");
+
+  TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting DB:               ");
+  TIME_REPORT(timestamps.mongoBackendStart,   timestamps.mongoBackendEnd,        "Awaiting MongoBackend:     ");
+
+  for (int ix = 0; ix < 50; ix++)
+  {
+    if (timestamps.srDesc[ix] != NULL)
+      TIME_REPORT(timestamps.srStart[ix], timestamps.srEnd[ix], timestamps.srDesc[ix]);
+  }
 
   struct timespec  all;
   struct timespec  mongo;

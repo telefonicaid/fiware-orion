@@ -29,6 +29,7 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjClone.h"                                       // kjClone
@@ -47,6 +48,7 @@ extern "C"
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -459,6 +461,8 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     ucr.updateActionType = ActionTypeAppend;
 
+    PERFORMANCE(dbStart);
+
     if (attrNameIx > 0)
       dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
@@ -472,6 +476,8 @@ bool orionldPostEntity(ConnectionInfo* ciP)
                                 ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
                                 ciP->apiVersion,
                                 NGSIV2_NO_FLAVOUR);
+
+    PERFORMANCE(dbEnd);
 
     if (status != SccOk)
       LM_E(("mongoUpdateContext: %d", status));

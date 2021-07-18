@@ -307,11 +307,11 @@ typedef struct OrionldConnectionState
 
 
 
+#ifdef REQUEST_PERFORMANCE
 // -----------------------------------------------------------------------------
 //
 // Timestamps - timestamps for performance tests
 //
-#ifdef REQUEST_PERFORMANCE
 typedef struct Timestamps
 {
   struct timespec reqStart;               // Start of          Request
@@ -320,6 +320,8 @@ typedef struct Timestamps
   struct timespec parseEnd;               // End of            Request Payload body JSON parse
   struct timespec serviceRoutineStart;    // Start of          Service Routine
   struct timespec serviceRoutineEnd;      // End of            Service Routine
+  struct timespec mongoBackendStart;      // Start of          Mongo Backend Command
+  struct timespec mongoBackendEnd;        // End of            Mongo Backend Command
   struct timespec dbStart;                // Start of    Main  DB query/update
   struct timespec dbEnd;                  // End of      Main  DB query/update
   struct timespec extraDbStart;           // Start of "extra"  DB query, e.g. query before an update
@@ -340,14 +342,15 @@ typedef struct Timestamps
   struct timespec troeEnd;                // End of            TRoE processing
   struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
   struct timespec requestCompletedStart;  // Start of          Request Completed
+  struct timespec srStart[50];            // Start of          Service Routine Sample
+  struct timespec srEnd[50];              // End of            Service Routine Sample
+  char*           srDesc[50];             // Description for   Service Routine Sample
   double          mongoConnectAccumulated;
   int             getMongoConnectionCalls;
 } Timestamps;
 
 extern __thread Timestamps timestamps;
-
 #endif
-
 
 
 // -----------------------------------------------------------------------------
