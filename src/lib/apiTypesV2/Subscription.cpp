@@ -161,11 +161,11 @@ std::string Notification::toJson(const std::string& attrsFormat)
   {
     if (this->mqttInfo.custom)
     {
-      jh.addRaw("mqttCustom", this->httpInfo.toJson());
+      jh.addRaw("mqttCustom", this->mqttInfo.toJson());
     }
     else
     {
-      jh.addRaw("mqtt", this->httpInfo.toJson());
+      jh.addRaw("mqtt", this->mqttInfo.toJson());
     }
   }
 

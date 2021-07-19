@@ -145,7 +145,7 @@ std::string mongoCreateSubscription
 
   // Build the BSON object to insert
   setExpiration(sub, &b);
-  setHttpInfo(sub, &b);
+  setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
   setServicePath(servicePath, &b);
   setDescription(sub, &b);

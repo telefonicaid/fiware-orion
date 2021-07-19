@@ -1,0 +1,193 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT Subcription basic crud errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create mqtt sub with default qos
+# 02. Create mqtt sub with explicit qos
+# 03. Get subs
+#
+# FIXME PR: same tests for mqttCustom (maybe in separate file, for simplicity)
+#
+
+echo "01. Create mqtt sub with default qos"
+echo "===================================="
+payload='{
+  "description": "MQTT sub default QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create mqtt sub with explicit qos"
+echo "====================================="
+payload='{
+  "description": "MQTT sub explicit QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif",
+      "qos": 2
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Get subs"
+echo "============"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create mqtt sub with default qos
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create mqtt sub with explicit qos
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get subs
+============
+HTTP/1.1 200 OK
+Content-Length: 632
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "MQTT sub default QoS",
+        "id": "REGEX([0-9a-f]*)",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqtt": {
+                "endpoint": "localhost:1883",
+                "qos": 0,
+                "topic": "/orion/notif"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub explicit QoS",
+        "id": "REGEX([0-9a-f]*)",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqtt": {
+                "endpoint": "localhost:1883",
+                "qos": 2,
+                "topic": "/orion/notif"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
