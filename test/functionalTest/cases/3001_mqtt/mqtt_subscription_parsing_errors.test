@@ -1,0 +1,485 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT Subcription parsing errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subs with missing notification type, see error
+# 02. Create subs with more than one notification type, see error
+# 03. Create sub with mqtt not being an object, see error
+# 04. Create mqtt sub without endpoint, see error
+# 05. Create mqtt sub with endpoint not being a string, see error
+# 06. Create mqtt sub with wrongly formated endpoint, see error
+# 07. Create mqtt sub without topic, see error
+# 08. Create mqtt sub with topic not being a string, see error
+# 09. Create mqtt sub with wrongly formated topic, see error
+# 10. Create mqtt sub with qos not being a number, see error
+# 11. Create mqtt sub with qos being a negative number, see error
+# 12. Create mqtt sub with qos greater than 2, see error
+#
+# FIXME PR: same tests for mqttCustom (maybe in separate file, for simplicity)
+#
+
+
+echo "01. Create subs with missing notification type, see error"
+echo "========================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subs with more than one notification type, see error"
+echo "==============================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "mqtt://localhost"
+    },
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create sub with mqtt not being an object, see error"
+echo "======================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": "foo",
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+echo "04. Create mqtt sub without endpoint, see error"
+echo "==============================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "topic": "/orion/notif",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create mqtt sub with endpoint not being a string, see error"
+echo "==============================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": 1234,
+      "topic": "/orion/notif",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create mqtt sub with wrongly formated endpoint, see error"
+echo "============================================================="
+#FIXME PR: TBD
+echo
+echo
+
+
+echo "07. Create mqtt sub without topic, see error"
+echo "============================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1833",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create mqtt sub with topic not being a string, see error"
+echo "============================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": 1234,
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "09. Create mqtt sub with wrongly formated topic, see error"
+echo "=========================================================="
+#FIXME PR: TBD
+echo
+echo
+
+echo "10. Create mqtt sub with qos not being a number, see error"
+echo "=========================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif",
+      "qos": "foo"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "11. Create mqtt sub with qos being a negative number, see error"
+echo "==============================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif",
+      "qos": -1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "12. Create mqtt sub with qos greater than 2, see error"
+echo "======================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "endpoint": "localhost:1883",
+      "topic": "/orion/notif",
+      "qos": 3
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subs with missing notification type, see error
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 86
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "http, httpCustom, mqtt or mqttCustom is missing",
+    "error": "BadRequest"
+}
+
+
+02. Create subs with more than one notification type, see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 87
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "only one of http, httpCustom, mqtt or mqttCustom",
+    "error": "BadRequest"
+}
+
+
+03. Create sub with mqtt not being an object, see error
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "mqtt notification is not an object",
+    "error": "BadRequest"
+}
+
+
+04. Create mqtt sub without endpoint, see error
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "endpoint mqtt notification is missing",
+    "error": "BadRequest"
+}
+
+
+05. Create mqtt sub with endpoint not being a string, see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 81
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "endpoint mqtt notification is not a string",
+    "error": "BadRequest"
+}
+
+
+06. Create mqtt sub with wrongly formated endpoint, see error
+=============================================================
+
+
+07. Create mqtt sub without topic, see error
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "topic mqtt notification is missing",
+    "error": "BadRequest"
+}
+
+
+08. Create mqtt sub with topic not being a string, see error
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "topic mqtt notification is not a string",
+    "error": "BadRequest"
+}
+
+
+09. Create mqtt sub with wrongly formated topic, see error
+==========================================================
+
+
+10. Create mqtt sub with qos not being a number, see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "qos is not an int",
+    "error": "BadRequest"
+}
+
+
+11. Create mqtt sub with qos being a negative number, see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "mqtt qos field must be an integer in the 0 to 2 range",
+    "error": "BadRequest"
+}
+
+
+12. Create mqtt sub with qos greater than 2, see error
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "mqtt qos field must be an integer in the 0 to 2 range",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

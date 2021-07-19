@@ -571,7 +571,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
     if (qosOpt.given)
     {
-      subsP->notification.mqttInfo.qos = qosOpt.value;
+      if ((qosOpt.value < 0) || (qosOpt.value > 2))
+      {
+        return badInput(ciP, "mqtt qos field must be an integer in the 0 to 2 range");
+      }
+      else
+      {
+        subsP->notification.mqttInfo.qos = qosOpt.value;
+      }
     }
     else
     {
