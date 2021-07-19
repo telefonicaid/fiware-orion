@@ -215,6 +215,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            forwarding;
+bool            notifyOnNoChange;
 bool            idIndex;
 bool            noswap;
 
@@ -290,6 +291,7 @@ bool            noswap;
 #define FORWARDING_DESC        "turn on forwarding"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
+#define NOTIFY_ON_NOCHANGE_DESC  "no notification when no modification has been done"
 
 
 
@@ -363,6 +365,7 @@ PaArgument paArgs[] =
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
+  { "-notifyOnNoChange",      &notifyOnNoChange,        "NOTIFY_ON_NOCHANGE",        PaBool,    PaOpt,  false,           false,  true,             NOTIFY_ON_NOCHANGE_DESC  },
 
   PA_END_OF_ARGS
 };

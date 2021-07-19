@@ -3,3 +3,4 @@
 * Issue #892  Broker able to receive and act upon NGSI-LD notifications - very first implementation - needs further testing
 * Issue #897  Fixed a bug in the forwarding mechanism
 * Issue #280  Added an URL param 'subscriptionId' to notifications - for ACL in notifications
+* Issue #907  CLI param '-notifyOnNoChange' for "No notification when no actual modification has been done"

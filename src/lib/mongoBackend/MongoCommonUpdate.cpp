@@ -631,7 +631,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     // For NGSI-LD, we want ALL updates to give notifications, even if nothing changed.
     // At least for now ...
     //
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if ((orionldState.apiVersion == NGSI_LD_V1) && (notifyOnNoChange == false))
       actualUpdate = true;
     else
     {

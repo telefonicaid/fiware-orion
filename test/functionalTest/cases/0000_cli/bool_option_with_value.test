@@ -99,5 +99,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-troePwd' <password for troe database db server>]
                 [option '-troePoolSize' <size of the connection pool for TRoE Postgres database connections>]
                 [option '-forwarding' (turn on forwarding)]
+                [option '-notifyOnNoChange' (no notification when no modification has been done)]
 
 --TEARDOWN--

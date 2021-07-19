@@ -391,6 +391,7 @@ extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
+extern bool              notifyOnNoChange;         // From orionld.cpp
 
 
 
