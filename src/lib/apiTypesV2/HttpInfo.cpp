@@ -51,16 +51,6 @@ HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true)
 
 /* ****************************************************************************
 *
-* HttpInfo::HttpInfo - 
-*/
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), includePayload(true)
-{
-}
-
-
-
-/* ****************************************************************************
-*
 * HttpInfo::toJson -
 */
 std::string HttpInfo::toJson()

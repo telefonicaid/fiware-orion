@@ -51,7 +51,6 @@ struct HttpInfo
   bool                                includePayload;
 
   HttpInfo();
-  explicit HttpInfo(const std::string& _url);
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
