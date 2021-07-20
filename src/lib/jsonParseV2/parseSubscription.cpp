@@ -584,7 +584,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       subsP->notification.mqttInfo.qos = 0;
     }
-
   }
   else if (notification.HasMember("mqttCustom"))
   {
