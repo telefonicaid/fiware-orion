@@ -372,13 +372,13 @@ Date: REGEX(.*)
 05. Create subscription for E1 without http-part nor template part - see error
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 67
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "http notification is missing",
+    "description": "http, httpCustom, mqtt or mqttCustom is missing",
     "error": "BadRequest"
 }
 
@@ -386,13 +386,13 @@ Date: REGEX(.*)
 06. Create subscription for E1 with both http-part and template part - see error
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "notification has http and httpCustom",
+    "description": "only one of http, httpCustom, mqtt or mqttCustom",
     "error": "BadRequest"
 }
 
