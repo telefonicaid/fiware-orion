@@ -97,6 +97,7 @@ OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
 char              pgPortString[16];
+char              mongoServerVersion[32];
 
 
 //
