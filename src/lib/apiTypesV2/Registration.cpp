@@ -36,7 +36,7 @@ namespace ngsiv2
 *
 * ForwardingInformation::ForwardingInformation -
 */
-ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), timesSent(0), counter(0), maxLimit(0), lastForwarding(0)
+ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), timesSent(0), lastForwarding(0)
 {
 }
 
@@ -141,7 +141,6 @@ std::string ForwardingInformation::toJson()
 
   jh.addNumber("timesSent", timesSent);
 
-  jh.addNumber("counter", counter);
 
   if (lastSuccess > 0)
   {
@@ -156,11 +155,6 @@ std::string ForwardingInformation::toJson()
   if (lastForwarding > 0)
   {
     jh.addDate("lastForwarding", lastForwarding);
-  }
-
-  if (maxLimit > 0)
-  {
-    jh.addDate("maxLimit", maxLimit);
   }
 
   return jh.str();

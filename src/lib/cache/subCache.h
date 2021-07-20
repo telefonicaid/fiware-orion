@@ -98,6 +98,8 @@ struct CachedSubscription
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
+  int64_t                     failsCounter;
+  int64_t                     maxFailsLimit;
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
@@ -192,6 +194,8 @@ extern void subCacheItemInsert
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
+  int64_t                             failsCounter,
+  int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
   int64_t                            lastNotificationTime,

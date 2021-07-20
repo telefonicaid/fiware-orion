@@ -95,6 +95,8 @@ static void insertInCache
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
+                     sub.failsCounter,
+                     sub.maxFailsLimit,
                      sub.throttling,
                      sub.attrsFormat,
                      0,

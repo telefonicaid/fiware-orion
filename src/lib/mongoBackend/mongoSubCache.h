@@ -87,6 +87,7 @@ extern void mongoSubCountersUpdate
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
+  long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
   long long           lastSuccess,

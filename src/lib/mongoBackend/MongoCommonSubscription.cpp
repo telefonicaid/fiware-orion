@@ -168,6 +168,18 @@ void setThrottling(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setMaxfailsLimit -
+*/
+void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_MAXFAILSLIMIT, sub.maxFailsLimit);
+  LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", sub.maxFailsLimit));
+}
+
+
+
+/* ****************************************************************************
+*
 * setServicePath -
 */
 void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)

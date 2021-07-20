@@ -33,13 +33,19 @@
 #include "common/limits.h"
 #include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
+#include "cache/subCache.h"
+#include "mongoDriver/connectionOperations.h"
 
 #include "cache/subCache.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueWorkers.h"
-
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoBackend/MongoCommonUpdate.h"
+#include "mongoBackend/dbConstants.h"
+#include "ngsi/MaxFailsLimit.h"
 
 
 /* ****************************************************************************
@@ -186,6 +192,7 @@ static void* workerFunc(void* pSyncQ)
       else // we'll send the notification
       {
         int          r;
+        CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
 
         r =  httpRequestSendWithCurl(curl,
                                      params->from,
@@ -214,6 +221,7 @@ static void* workerFunc(void* pSyncQ)
           __sync_fetch_and_add(&noOfNotificationsSent, 1);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
+          cSubP->failsCounter = 0;
 
           if (params->registration == false)
           {
@@ -224,6 +232,22 @@ static void* workerFunc(void* pSyncQ)
         {
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
+
+          cSubP->failsCounter = cSubP->failsCounter + 1;
+
+          if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+          {
+             orion::BSONObjBuilder bobSet1;
+             bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
+             orion::BSONObjBuilder bobUpdate;
+             bobUpdate.append("$set", bobSet1.obj());
+             orion::BSONObj         query;
+             std::string err;
+
+             orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+             cSubP->status = STATUS_INACTIVE;
+             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
+          }
 
           if (params->registration == false)
           {

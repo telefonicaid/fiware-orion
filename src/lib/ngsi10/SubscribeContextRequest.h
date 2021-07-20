@@ -34,6 +34,7 @@
 #include "ngsi/Duration.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/Reference.h"
+#include "ngsi/MaxFailsLimit.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Throttling.h"
 #include "rest/EntityTypeInfo.h"
@@ -54,6 +55,7 @@ typedef struct SubscribeContextRequest
   Restriction            restriction;            // Optional
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
+  MaxFailsLimit          maxFailsLimit;          // Optional
 
   /* The number of restrictions */
   int                    restrictions;

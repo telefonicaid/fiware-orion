@@ -124,5 +124,6 @@ void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* 
   subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that part
   subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
   subUp->throttlingProvided   = !throttling.isEmpty();
+  subUp->maxFailsLimitProvided   = !maxFailsLimit.isEmpty();
 
 }

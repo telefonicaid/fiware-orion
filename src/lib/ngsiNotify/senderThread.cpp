@@ -31,6 +31,17 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/MongoCommonUpdate.h"
+#include "cache/subCache.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoBackend/MongoCommonUpdate.h"
+#include "apiTypesV2/Subscription.h"
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoBackend/mongoSubCache.h"
+#include "ngsi/MaxFailsLimit.h"
+
 
 /* ****************************************************************************
 *
@@ -65,6 +76,8 @@ void* startSenderThread(void* p)
     std::string  out;
     LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
+    CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+
     if (!simulatedNotification)
     {
       int          r;
@@ -92,6 +105,7 @@ void* startSenderThread(void* p)
       {
         __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
+        cSubP->failsCounter = 0;
 
         if (params->registration == false)
         {
@@ -101,6 +115,21 @@ void* startSenderThread(void* p)
       else
       {
         alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+        cSubP->failsCounter = cSubP->failsCounter + 1;
+
+        if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+        {
+           orion::BSONObjBuilder bobSet1;
+           bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
+           orion::BSONObjBuilder bobUpdate;
+           bobUpdate.append("$set", bobSet1.obj());
+           orion::BSONObj         query;
+           std::string err;
+
+           orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+           cSubP->status = STATUS_INACTIVE;
+           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
+        }
 
         if (params->registration == false)
         {

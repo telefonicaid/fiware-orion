@@ -97,11 +97,6 @@ std::string Subscription::toJson(void)
     jh.addNumber("throttling", this->throttling);
   }
 
-  if (this->notification.counter > this->notification.maxLimit)
-  {
-    jh.addString("status", "inactive");
-  }
-
   return jh.str();
 }
 
@@ -123,14 +118,9 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("timesSent", this->timesSent);
   }
 
-  if (this->counter > 0)
+  if ((this->failsCounter> 0) && (this->maxFailsLimit> 0))
   {
-    jh.addNumber("counter", this->counter);
-  }
-
-  if (this->maxLimit > 0)
-  {
-    jh.addNumber("maxLimit", this->maxLimit);
+    jh.addNumber("failsCounter", this->failsCounter);
   }
 
   if (this->lastNotification > 0)
@@ -194,6 +184,17 @@ std::string Notification::toJson(const std::string& attrsFormat)
   {
     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
   }
+
+  if (this->maxFailsLimit > 0)
+  {
+    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
+
+  if (this->failsCounter > 0)
+  {
+    jh.addNumber("failsCounter", this->failsCounter);
+  }
+
 
   return jh.str();
 }

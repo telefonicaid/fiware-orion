@@ -323,6 +323,8 @@ Fields:
 -   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
     time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
+-   **maxFailsLimit**: An optional field used to specify the maximum limit of connection attempts, so when that number of failing notifications is reached, then the subscription passes automatically to inactive state.
+-   **failsCounter**: the number of failing notifications associated to the subscription.
 
 Example document:
 

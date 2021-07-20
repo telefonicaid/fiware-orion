@@ -94,8 +94,8 @@
 #define CSUB_EXPR_GEOREL             "georel"
 
 #define CSUB_THROTTLING              "throttling"
-#define CSUB_COUNTER                 "counter"
-#define CSUB_MAXLIMIT                "maxLimit"
+#define CSUB_MAXFAILSLIMIT           "maxFailsLimit"
+#define CSUB_FAILSCOUNTER            "failsCounter"
 #define CSUB_ENTITIES                "entities"
 #define CSUB_ATTRS                   "attrs"
 #define CSUB_METADATA                "metadata"

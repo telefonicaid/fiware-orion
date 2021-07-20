@@ -49,8 +49,8 @@ struct Notification
   bool                     blacklist;
   bool                     onlyChanged;
   long long                timesSent;
-  long long                counter;
-  long long                maxLimit;
+  long long                failsCounter;
+  long long                maxFailsLimit;
   long long                lastNotification;
   HttpInfo                 httpInfo;
   int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
@@ -65,8 +65,8 @@ struct Notification
     blacklist(false),
     onlyChanged(false),
     timesSent(0),
-    counter(0),
-    maxLimit(0),
+    failsCounter(0),
+    maxFailsLimit(0),
     lastNotification(-1),
     httpInfo(),
     lastFailure(-1),
@@ -117,9 +117,9 @@ struct Subscription
   long long     expires;
   std::string   status;
   Notification  notification;
+  long long     maxFailsLimit;
+  long long     failsCounter;
   long long     throttling;
-  long long     counter;
-  long long     maxLimit;
   RenderFormat  attrsFormat;
   Restriction   restriction;
   std::string   toJson();
