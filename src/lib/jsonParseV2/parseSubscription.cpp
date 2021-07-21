@@ -588,6 +588,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return badInput(ciP, "mandatory mqtt field /topic/");
     }
+    if (topicOpt.value.empty())
+    {
+      return badInput(ciP, "empty mqtt field /topic/");
+    }
 
     if (forbiddenChars(topicOpt.value.c_str()))
     {

@@ -39,7 +39,7 @@ brokerStart CB
 # 07. Create mqtt sub with mqtt url with path, see error
 # 08. Create mqtt sub without topic, see error
 # 09. Create mqtt sub with topic not being a string, see error
-# 10. Create mqtt sub with wrongly formated topic, see error
+# 10. Create mqtt sub with empty topic, see error
 # 11. Create mqtt sub with qos not being a number, see error
 # 12. Create mqtt sub with qos being a negative number, see error
 # 13. Create mqtt sub with qos greater than 2, see error
@@ -293,11 +293,33 @@ echo
 echo
 
 
-echo "10. Create mqtt sub with wrongly formated topic, see error"
-echo "=========================================================="
-#FIXME PR: TBD
+echo "10. Create mqtt sub with empty topic, see error"
+echo "==============================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
+
 
 echo "11. Create mqtt sub with qos not being a number, see error"
 echo "=========================================================="
@@ -562,8 +584,18 @@ Date: REGEX(.*)
 }
 
 
-10. Create mqtt sub with wrongly formated topic, see error
-==========================================================
+10. Create mqtt sub with empty topic, see error
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty mqtt field /topic/",
+    "error": "BadRequest"
+}
 
 
 11. Create mqtt sub with qos not being a number, see error

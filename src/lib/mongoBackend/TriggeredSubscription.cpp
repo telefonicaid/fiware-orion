@@ -43,6 +43,7 @@ TriggeredSubscription::TriggeredSubscription
   long long                _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
+  const ngsiv2::MqttInfo&  _mqttInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant
@@ -52,6 +53,7 @@ TriggeredSubscription::TriggeredSubscription
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
   httpInfo(_httpInfo),
+  mqttInfo(_mqttInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
@@ -73,6 +75,7 @@ TriggeredSubscription::TriggeredSubscription
 (
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
+  const ngsiv2::MqttInfo&  _mqttInfo,
   const StringList&        _attrL
 )
 :
@@ -80,6 +83,7 @@ TriggeredSubscription::TriggeredSubscription
   lastNotification(-1),
   renderFormat(_renderFormat),
   httpInfo(_httpInfo),
+  mqttInfo(_mqttInfo),
   attrL(_attrL),
   cacheSubId(""),
   tenant(""),

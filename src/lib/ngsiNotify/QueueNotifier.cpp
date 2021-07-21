@@ -125,7 +125,7 @@ size_t QueueNotifier::queueSize(const std::string& service)
 void QueueNotifier::sendNotifyContextRequest
 (
   NotifyContextRequest&            ncr,
-  const ngsiv2::HttpInfo&          httpInfo,
+  const ngsiv2::Notification&      notification,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -137,7 +137,7 @@ void QueueNotifier::sendNotifyContextRequest
 )
 {
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
-                                                                          httpInfo,
+                                                                          notification,
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
