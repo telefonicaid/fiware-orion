@@ -128,7 +128,7 @@ Date: REGEX(.*)
 
 {
     "detail": "Subscription::notification",
-    "title": "Mandatory Field Missing",
+    "title": "Mandatory field missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
