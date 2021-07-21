@@ -51,7 +51,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "endpoint": "localhost:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "/orion/notif"
     },
     "attrs": [
@@ -78,7 +78,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "endpoint": "localhost:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "/orion/notif",
       "qos": 2
     },
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 03. Get subs
 ============
 HTTP/1.1 200 OK
-Content-Length: 632
+Content-Length: 636
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,9 +138,9 @@ Date: REGEX(.*)
             ],
             "attrsFormat": "normalized",
             "mqtt": {
-                "endpoint": "localhost:1883",
                 "qos": 0,
-                "topic": "/orion/notif"
+                "topic": "/orion/notif",
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },
@@ -166,9 +166,9 @@ Date: REGEX(.*)
             ],
             "attrsFormat": "normalized",
             "mqtt": {
-                "endpoint": "localhost:1883",
                 "qos": 2,
-                "topic": "/orion/notif"
+                "topic": "/orion/notif",
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },

@@ -166,12 +166,12 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
   }
   else  // MqttNotification
   {
-    b->append(CSUB_REFERENCE, sub.notification.mqttInfo.endpoint);
+    b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
     b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
     b->append(CSUB_MQTTQOS,   (int) sub.notification.mqttInfo.qos);
     b->append(CSUB_CUSTOM,    sub.notification.mqttInfo.custom);
 
-    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.mqttInfo.endpoint.c_str()));
+    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.mqttInfo.url.c_str()));
     LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
     LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));

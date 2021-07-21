@@ -357,9 +357,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
-      if (!validUrl(urlOpt.value))
+      std::string  host;
+      int          port;
+      std::string  path;
+      std::string  protocol;
+      if (!parseUrl(urlOpt.value, host, port, path, protocol))
       {
         return badInput(ciP, "Invalid URL parsing notification url");
+      }
+      if (protocol == "mqtt:")
+      {
+        return badInput(ciP, "mqtt URL cannot be used in http notifications");
       }
 
       subsP->notification.httpInfo.url    = urlOpt.value;
@@ -399,9 +407,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       //
       if (strstr(urlOpt.value.c_str(), "${") == NULL)
       {
-        if (!validUrl(urlOpt.value))
+        std::string  host;
+        int          port;
+        std::string  path;
+        std::string  protocol;
+        if (!parseUrl(urlOpt.value, host, port, path, protocol))
         {
           return badInput(ciP, "invalid custom /url/");
+        }
+        if (protocol == "mqtt:")
+        {
+          return badInput(ciP, "mqtt URL cannot be used in http notifications");
         }
       }
 
@@ -525,24 +541,41 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return badInput(ciP, "mqtt notification is not an object");
     }
 
-    // endpoint
-    Opt<std::string> endpointOpt = getStringMust(mqtt, "endpoint", "endpoint mqtt notification");
+    // url
+    Opt<std::string> urlOpt = getStringMust(mqtt, "url", "url mqtt notification");
 
-    if (!endpointOpt.ok())
+    if (!urlOpt.ok())
     {
-      return badInput(ciP, endpointOpt.error);
+      return badInput(ciP, urlOpt.error);
     }
-    if (!endpointOpt.given)
+    if (!urlOpt.given)
     {
-      return badInput(ciP, "mandatory mqtt field /endpoint/");
+      return badInput(ciP, "mandatory mqtt field /url/");
     }
 
-    if (forbiddenChars(endpointOpt.value.c_str()))
+    if (forbiddenChars(urlOpt.value.c_str()))
     {
-      return badInput(ciP, "forbidden characters in mqtt field /endpoint/");
+      return badInput(ciP, "forbidden characters in mqtt field /url/");
     }
-    // FIXME PR: check endpoint format, i.e. "host:port"
-    subsP->notification.mqttInfo.endpoint = endpointOpt.value;
+
+    std::string  host;
+    int          port;
+    std::string  path;
+    std::string  protocol;
+    if (!parseUrl(urlOpt.value, host, port, path, protocol))
+    {
+      return badInput(ciP, "invalid mqtt /url/");
+    }
+    if (protocol != "mqtt:")
+    {
+      return badInput(ciP, "http or https URL cannot be used in mqtt notifications");
+    }
+    if (path != "/")
+    {
+      return badInput(ciP, "path cannot be used in mqtt url, use topic instead");
+    }
+
+    subsP->notification.mqttInfo.url = urlOpt.value;
 
     // topic
     Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
@@ -551,7 +584,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return badInput(ciP, topicOpt.error);
     }
-    if (!endpointOpt.given)
+    if (!topicOpt.given)
     {
       return badInput(ciP, "mandatory mqtt field /topic/");
     }
@@ -597,6 +630,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // FIXME PR: not sure if this should be kept as a separate if-branch or unified with "mqtt"
+    // url and qos are per-connection, so they don't accept customization. Use common function
   }
 
   // Attributes

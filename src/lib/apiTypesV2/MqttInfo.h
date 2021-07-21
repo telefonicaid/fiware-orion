@@ -38,7 +38,7 @@ namespace ngsiv2
 */
 struct MqttInfo
 {
-  std::string   endpoint;
+  std::string   url;
   std::string   topic;
   unsigned int  qos;  // 0, 1 or 2
 
