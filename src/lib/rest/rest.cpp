@@ -644,11 +644,13 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   }
   else if (strcasecmp(key, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
-  else if (strcasecmp(key, HTTP_X_AUTH_TOKEN) == 0)
+  else if (strcasecmp(key, "X-Auth-Token") == 0)
   {
     orionldState.xauthHeader    = (char*) value;
     headerP->xauthToken         = value;
   }
+  else if (strcasecmp(key, "Authorization") == 0)
+    orionldState.authorizationHeader = (char*) value;
   else if (strcasecmp(key, HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
   else if (strcasecmp(key, HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
   else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
