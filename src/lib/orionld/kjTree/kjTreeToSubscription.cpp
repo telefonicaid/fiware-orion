@@ -344,7 +344,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   if (notificationP == NULL)
   {
     LM_E(("Notification Parameters missing in Subscription"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory Field Missing", "Subscription::notification");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification");
     return false;
   }
 

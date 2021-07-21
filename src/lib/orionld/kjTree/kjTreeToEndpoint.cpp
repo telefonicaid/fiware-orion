@@ -274,7 +274,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint::uri");
     return false;
   }
 
