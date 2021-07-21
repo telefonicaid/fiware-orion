@@ -201,6 +201,7 @@ typedef struct OrionldConnectionState
   bool                    noLinkHeader;
   char*                   preferHeader;
   char*                   xauthHeader;
+  char*                   authorizationHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;

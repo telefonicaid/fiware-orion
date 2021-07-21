@@ -6,3 +6,4 @@
 * Issue #907  CLI param '-noNotifyFalseUpdate' for "no notification when no actual modification has been done"
 * Issue #280  Added mongo server version to NGSI-LD version output + better order in the output 
 * Issue #890  Added check for presence of notification::endpoint when creating subscriptions
+* Issue #899  Authorization HTTP header supported for forwarding
