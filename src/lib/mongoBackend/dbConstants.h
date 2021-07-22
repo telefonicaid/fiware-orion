@@ -41,7 +41,7 @@
 /* ***************************************************************************
 *
 * Constant strings for field names in collection (first characters
-* are the code name: REG_, ENT_, CSUB_ and CASUB_)
+* are the code name: REG_, ENT_ and CSUB_)
 */
 #define REG_CONTEXT_REGISTRATION     "contextRegistration"
 #define REG_PROVIDING_APPLICATION    "providingApplication"
@@ -116,17 +116,6 @@
 #define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"
 #define CSUB_LASTSUCCESSCODE         "lastSuccessCode"
-
-#define CASUB_EXPIRATION             "expiration"
-#define CASUB_REFERENCE              "reference"
-#define CASUB_ENTITIES               "entities"
-#define CASUB_ATTRS                  "attrs"
-#define CASUB_ENTITY_ID              "id"
-#define CASUB_ENTITY_TYPE            "type"
-#define CASUB_ENTITY_ISPATTERN       "isPattern"
-#define CASUB_LASTNOTIFICATION       "lastNotification"
-#define CASUB_COUNT                  "count"
-#define CASUB_FORMAT                 "format"
 
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"
