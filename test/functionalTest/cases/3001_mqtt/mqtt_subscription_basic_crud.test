@@ -102,7 +102,7 @@ echo
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]*)
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -112,7 +112,7 @@ Date: REGEX(.*)
 =====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]*)
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 [
     {
         "description": "MQTT sub default QoS",
-        "id": "REGEX([0-9a-f]*)",
+        "id": "REGEX([0-9a-f\-]{24})",
         "notification": {
             "attrs": [
                 "A1"
@@ -157,7 +157,7 @@ Date: REGEX(.*)
     },
     {
         "description": "MQTT sub explicit QoS",
-        "id": "REGEX([0-9a-f]*)",
+        "id": "REGEX([0-9a-f\-]{24})",
         "notification": {
             "attrs": [
                 "A1"
