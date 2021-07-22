@@ -478,7 +478,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   if (notification.HasMember("mqttCustom"))  n++;
   if (n > 1)
   {
-    return badInput(ciP, "only one of http, httpCustom, mqtt or mqttCustom");
+    return badInput(ciP, "only one of http, httpCustom, mqtt or mqttCustom is allowed");
   }
   else if (n == 0)
   {

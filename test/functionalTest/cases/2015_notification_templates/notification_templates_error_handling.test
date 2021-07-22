@@ -386,13 +386,13 @@ Date: REGEX(.*)
 06. Create subscription for E1 with both http-part and template part - see error
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 87
+Content-Length: 98
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "only one of http, httpCustom, mqtt or mqttCustom",
+    "description": "only one of http, httpCustom, mqtt or mqttCustom is allowed",
     "error": "BadRequest"
 }
 
