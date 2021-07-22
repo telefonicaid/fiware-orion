@@ -362,7 +362,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   //
   // Ensuring the scheme is present
-  // FIXME PR: adding mqtt to the supported protocol list. Not sure if this is the best alternative...
+  // Note that although mqtt:// is not officially supported it is used de facto (see for instance https://github.com/mqtt/mqtt.org/wiki/URI-Scheme)
   //
   if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
   {

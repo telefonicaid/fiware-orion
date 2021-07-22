@@ -78,8 +78,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "mqtt://localhost"
+    "mqtt": {
+      "url": "mqtt://localhost",
+      "topic": "orion"
     },
     "attrs": [
       "A1"
@@ -132,7 +133,7 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]*)
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -161,7 +162,7 @@ MQTT message at topic orion:
             "type": "T1"
         }
     ],
-    "subscriptionId": "REGEX([0-9a-f]*)"
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
 }
 =======================================
 
