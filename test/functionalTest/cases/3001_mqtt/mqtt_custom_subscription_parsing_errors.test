@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-MQTT subcription parsing errors
+MQTT custom subcription parsing errors
 
 --SHELL-INIT--
 dbInit CB
@@ -32,18 +32,18 @@ brokerStart CB
 #
 # 01. Create subs with missing notification type, see error
 # 02. Create subs with more than one notification type, see error
-# 03. Create sub with mqtt not being an object, see error
-# 04. Create mqtt sub without url, see error
-# 05. Create mqtt sub with url not being a string, see error
-# 06. Create mqtt sub with http url, see error
-# 07. Create mqtt sub with mqtt url with path, see error
-# 08. Create mqtt sub without topic, see error
-# 09. Create mqtt sub with topic not being a string, see error
-# 10. Create mqtt sub with empty topic, see error
-# 11. Create mqtt sub with qos not being a number, see error
-# 12. Create mqtt sub with qos being a negative number, see error
-# 13. Create mqtt sub with qos greater than 2, see error
-# 14. Create http sub with mqtt url, see error
+# 03. Create sub with mqttCustom not being an object, see error
+# 04. Create mqttCustom sub without url, see error
+# 05. Create mqttCustom sub with url not being a string, see error
+# 06. Create mqttCustom sub with http url, see error
+# 07. Create mqttCustom sub with mqtt url with path, see error
+# 08. Create mqttCustom sub without topic, see error
+# 09. Create mqttCustom sub with topic not being a string, see error
+# 10. Create mqttCustom sub with empty topic, see error
+# 11. Create mqttCustom sub with qos not being a number, see error
+# 12. Create mqttCustom sub with qos being a negative number, see error
+# 13. Create mqttCustom sub with qos greater than 2, see error
+# 14. Create httpCustom sub with mqtt url, see error
 #
 
 
@@ -86,7 +86,7 @@ payload='{
     "http": {
       "url": "mqtt://localhost"
     },
-    "mqtt": {
+    "mqttCustom": {
       "url": "localhost:1883",
       "topic": "/orion/notif",
       "qos": 1
@@ -101,8 +101,8 @@ echo
 echo
 
 
-echo "03. Create sub with mqtt not being an object, see error"
-echo "======================================================="
+echo "03. Create sub with mqttCustom not being an object, see error"
+echo "============================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -114,7 +114,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": "foo",
+    "mqttCustom": "foo",
     "attrs": [
       "A1"
     ]
@@ -124,8 +124,8 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-echo "04. Create mqtt sub without url, see error"
-echo "=========================================="
+echo "04. Create mqttCustom sub without url, see error"
+echo "================================================"
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -137,7 +137,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "topic": "/orion/notif",
       "qos": 1
     },
@@ -151,8 +151,8 @@ echo
 echo
 
 
-echo "05. Create mqtt sub with url not being a string, see error"
-echo "=========================================================="
+echo "05. Create mqttCustom sub with url not being a string, see error"
+echo "================================================================"
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -164,7 +164,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": 1234,
       "topic": "/orion/notif",
       "qos": 1
@@ -179,8 +179,8 @@ echo
 echo
 
 
-echo "06. Create mqtt sub with http url, see error"
-echo "============================================"
+echo "06. Create mqttCustom sub with http url, see error"
+echo "=================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -192,7 +192,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "http://localhost:9999",
       "topic": "/orion/notif",
       "qos": 1
@@ -207,8 +207,8 @@ echo
 echo
 
 
-echo "07. Create mqtt sub with mqtt url with path, see error"
-echo "======================================================"
+echo "07. Create mqttCustom sub with mqtt url with path, see error"
+echo "============================================================"
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -220,7 +220,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883/path/not/valid",
       "topic": "/orion/notif",
       "qos": 1
@@ -235,8 +235,8 @@ echo
 echo
 
 
-echo "08. Create mqtt sub without topic, see error"
-echo "============================================"
+echo "08. Create mqttCustom sub without topic, see error"
+echo "=================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -248,7 +248,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1833",
       "qos": 1
     },
@@ -262,8 +262,8 @@ echo
 echo
 
 
-echo "09. Create mqtt sub with topic not being a string, see error"
-echo "============================================================"
+echo "09. Create mqttCustom sub with topic not being a string, see error"
+echo "=================================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -275,7 +275,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
       "topic": 1234,
       "qos": 1
@@ -290,8 +290,8 @@ echo
 echo
 
 
-echo "10. Create mqtt sub with empty topic, see error"
-echo "==============================================="
+echo "10. Create mqttCustom sub with empty topic, see error"
+echo "====================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -303,7 +303,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
       "topic": "",
       "qos": 1
@@ -318,8 +318,8 @@ echo
 echo
 
 
-echo "11. Create mqtt sub with qos not being a number, see error"
-echo "=========================================================="
+echo "11. Create mqttCustom sub with qos not being a number, see error"
+echo "================================================================"
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -331,7 +331,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
       "topic": "/orion/notif",
       "qos": "foo"
@@ -346,8 +346,8 @@ echo
 echo
 
 
-echo "12. Create mqtt sub with qos being a negative number, see error"
-echo "==============================================================="
+echo "12. Create mqttCustom sub with qos being a negative number, see error"
+echo "====================================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -359,7 +359,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
       "topic": "/orion/notif",
       "qos": -1
@@ -374,8 +374,8 @@ echo
 echo
 
 
-echo "13. Create mqtt sub with qos greater than 2, see error"
-echo "======================================================"
+echo "13. Create mqttCustom sub with qos greater than 2, see error"
+echo "============================================================"
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -387,7 +387,7 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
       "topic": "/orion/notif",
       "qos": 3
@@ -402,8 +402,8 @@ echo
 echo
 
 
-echo "14. Create http sub with mqtt url, see error"
-echo "============================================"
+echo "14. Create httpCustom sub with mqtt url, see error"
+echo "=================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -415,7 +415,7 @@ payload='{
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "mqtt://localhost:1883"
     },
     "attrs": [
@@ -457,22 +457,22 @@ Date: REGEX(.*)
 }
 
 
-03. Create sub with mqtt not being an object, see error
-=======================================================
+03. Create sub with mqttCustom not being an object, see error
+=============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "mqtt notification is not an object",
+    "description": "mqttCustom notification is not an object",
     "error": "BadRequest"
 }
 
 
-04. Create mqtt sub without url, see error
-==========================================
+04. Create mqttCustom sub without url, see error
+================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
@@ -485,8 +485,8 @@ Date: REGEX(.*)
 }
 
 
-05. Create mqtt sub with url not being a string, see error
-==========================================================
+05. Create mqttCustom sub with url not being a string, see error
+================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
@@ -499,8 +499,8 @@ Date: REGEX(.*)
 }
 
 
-06. Create mqtt sub with http url, see error
-============================================
+06. Create mqttCustom sub with http url, see error
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 93
 Content-Type: application/json
@@ -513,8 +513,8 @@ Date: REGEX(.*)
 }
 
 
-07. Create mqtt sub with mqtt url with path, see error
-======================================================
+07. Create mqttCustom sub with mqtt url with path, see error
+============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 89
 Content-Type: application/json
@@ -527,8 +527,8 @@ Date: REGEX(.*)
 }
 
 
-08. Create mqtt sub without topic, see error
-============================================
+08. Create mqttCustom sub without topic, see error
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
@@ -541,8 +541,8 @@ Date: REGEX(.*)
 }
 
 
-09. Create mqtt sub with topic not being a string, see error
-============================================================
+09. Create mqttCustom sub with topic not being a string, see error
+==================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 78
 Content-Type: application/json
@@ -555,8 +555,8 @@ Date: REGEX(.*)
 }
 
 
-10. Create mqtt sub with empty topic, see error
-===============================================
+10. Create mqttCustom sub with empty topic, see error
+=====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
@@ -569,8 +569,8 @@ Date: REGEX(.*)
 }
 
 
-11. Create mqtt sub with qos not being a number, see error
-==========================================================
+11. Create mqttCustom sub with qos not being a number, see error
+================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 56
 Content-Type: application/json
@@ -583,8 +583,8 @@ Date: REGEX(.*)
 }
 
 
-12. Create mqtt sub with qos being a negative number, see error
-===============================================================
+12. Create mqttCustom sub with qos being a negative number, see error
+=====================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
 Content-Type: application/json
@@ -597,8 +597,8 @@ Date: REGEX(.*)
 }
 
 
-13. Create mqtt sub with qos greater than 2, see error
-======================================================
+13. Create mqttCustom sub with qos greater than 2, see error
+============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
 Content-Type: application/json
@@ -611,8 +611,8 @@ Date: REGEX(.*)
 }
 
 
-14. Create http sub with mqtt url, see error
-============================================
+14. Create httpCustom sub with mqtt url, see error
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json

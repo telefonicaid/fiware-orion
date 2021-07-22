@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-MQTT subcription update cases
+MQTT custom subcription update cases
 
 --SHELL-INIT--
 dbInit CB
@@ -30,20 +30,22 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create mqtt sub url=mqtt:///localhost:1883, topic=/orion, qos=2
-# 02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
+# 01. Create mqttCustom sub url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
+# 02. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
 # 03. Update sub element different to notification
-# 04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
-# 05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos
-# 06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
+# 04. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
+# 05. Update sub with mqttCustom url=mqtt://localhost:1884, topic=/cb/${d}, payload=null no-qos
+# 06. Get sub, see mqttCustom mqtt://localhost:1884, topic=/cb/${d}, payload=null, qos=0
 # 07. Update sub to http sub
 # 08. Get sub, see http element
-# 09. Update sub to mqtt url=mqtt://localhost:1885, topic=/orionbk, qos=1
-# 10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
+# 09. Update sub to mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
+# 10. Get sub, see mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
+# 11. Update sub to mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
+# 12. Get sub, see mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
 #
 
-echo "01. Create mqtt sub url=mqtt://localhost:1883, topic=/orion, qos=2"
-echo "=================================================================="
+echo '01. Create mqttCustom sub url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2'
+echo "=============================================================================================="
 payload='{
   "description": "Original sub",
   "subject": {
@@ -55,9 +57,10 @@ payload='{
     ]
   },
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1883",
-      "topic": "/orion",
+      "topic": "/orion/${d}",
+      "payload": "t:${t}",
       "qos": 2
     }
   }
@@ -70,8 +73,8 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2"
-echo "==============================================================="
+echo '02. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2'
+echo "================================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
@@ -87,20 +90,21 @@ echo
 echo
 
 
-echo "04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2"
-echo "==============================================================="
+echo '04. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2'
+echo "================================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos"
-echo "================================================================"
+echo '05. Update sub with mqttCustom url=mqtt://localhost:1884, topic=/cb/${d}, payload=null no-qos'
+echo "============================================================================================="
 payload='{
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1884",
-      "topic": "/cb"
+      "topic": "/cb/${d}",
+      "payload": null
     }
   }
 }'
@@ -109,8 +113,8 @@ echo
 echo
 
 
-echo "06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0"
-echo "============================================================"
+echo '06. Get sub, see mqttCustom mqtt://localhost:1884, topic=/cb/${d}, payload=null, qos=0'
+echo "======================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
@@ -137,13 +141,13 @@ echo
 echo
 
 
-echo "09. Update sub to mqtt url=mqtt://localhost:1885, topic=/orionbk, qos=1"
-echo "======================================================================="
+echo '09. Update sub to mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1'
+echo "=============================================================================================="
 payload='{
   "notification": {
-    "mqtt": {
+    "mqttCustom": {
       "url": "mqtt://localhost:1885",
-      "topic": "/orionbk",
+      "topic": "/orionbk/${d}",
       "qos": 1
     }
   }
@@ -153,16 +157,39 @@ echo
 echo
 
 
-echo "10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1"
-echo "================================================================="
+echo '10. Get sub, see mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1'
+echo "============================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo '11. Update sub to mqtt url=mqtt://localhost:1887, topic=/orion, qos=2'
+echo "====================================================================="
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1887",
+      "topic": "/orion",
+      "qos": 2
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '12. Get sub, see mqtt url=mqtt://localhost:1887, topic=/orion, qos=2'
+echo "===================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
 --REGEXPECT--
-01. Create mqtt sub url=mqtt://localhost:1883, topic=/orion, qos=2
-==================================================================
+01. Create mqttCustom sub url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
+==============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]*)
@@ -171,10 +198,10 @@ Date: REGEX(.*)
 
 
 
-02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
-===============================================================
+02. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
+================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,9 +212,10 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "mqtt": {
+        "mqttCustom": {
+            "payload": "t:${t}",
             "qos": 2,
-            "topic": "/orion",
+            "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
         "onlyChangedAttrs": false
@@ -215,10 +243,10 @@ Date: REGEX(.*)
 
 
 
-04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
-===============================================================
+04. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
+================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,9 +257,10 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "mqtt": {
+        "mqttCustom": {
+            "payload": "t:${t}",
             "qos": 2,
-            "topic": "/orion",
+            "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
         "onlyChangedAttrs": false
@@ -251,18 +280,18 @@ Date: REGEX(.*)
 }
 
 
-05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos
-================================================================
+05. Update sub with mqttCustom url=mqtt://localhost:1884, topic=/cb/${d}, payload=null no-qos
+=============================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
-============================================================
+06. Get sub, see mqttCustom mqtt://localhost:1884, topic=/cb/${d}, payload=null, qos=0
+======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 321
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -273,9 +302,10 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "mqtt": {
+        "mqttCustom": {
+            "payload": null,
             "qos": 0,
-            "topic": "/cb",
+            "topic": "/cb/${d}",
             "url": "mqtt://localhost:1884"
         },
         "onlyChangedAttrs": false
@@ -337,18 +367,62 @@ Date: REGEX(.*)
 }
 
 
-09. Update sub to mqtt url=mqtt://localhost:1885, topic=/orionbk, qos=1
-=======================================================================
+09. Update sub to mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
+==============================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
-=================================================================
+10. Get sub, see mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
+=============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 311
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]*)",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "mqttCustom": {
+            "qos": 1,
+            "topic": "/orionbk/${d}",
+            "url": "mqtt://localhost:1885"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+11. Update sub to mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
+=====================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Get sub, see mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -360,9 +434,9 @@ Date: REGEX(.*)
         "attrs": [],
         "attrsFormat": "normalized",
         "mqtt": {
-            "qos": 1,
-            "topic": "/orionbk",
-            "url": "mqtt://localhost:1885"
+            "qos": 2,
+            "topic": "/orion",
+            "url": "mqtt://localhost:1887"
         },
         "onlyChangedAttrs": false
     },

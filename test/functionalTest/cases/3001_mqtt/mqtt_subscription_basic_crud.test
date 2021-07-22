@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-MQTT Subcription basic crud errors
+MQTT subcription basic crud errors
 
 --SHELL-INIT--
 dbInit CB
@@ -33,8 +33,6 @@ brokerStart CB
 # 01. Create mqtt sub with default qos
 # 02. Create mqtt sub with explicit qos
 # 03. Get subs
-#
-# FIXME PR: same tests for mqttCustom (maybe in separate file, for simplicity)
 #
 
 echo "01. Create mqtt sub with default qos"

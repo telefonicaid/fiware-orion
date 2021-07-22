@@ -305,10 +305,164 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* parseCustomPayload -
+*
+* Both for HTTP and MQTT notifications
+*/
+static std::string parseCustomPayload(ConnectionInfo* ciP, std::string* payload, bool* includePayload, const Value& holder)
+{
+  if (isNull(holder, "payload"))
+  {
+    *includePayload = false;
+
+    // We initialize also payload in this case, although its value is irrelevant
+    *payload = "";
+  }
+  else
+  {
+    Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
+
+    if (!payloadOpt.ok())
+    {
+      return badInput(ciP, payloadOpt.error);
+    }
+
+    if (forbiddenChars(payloadOpt.value.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in custom /payload/");
+    }
+
+    *includePayload = true;
+    *payload = payloadOpt.value;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttUrl -
+*/
+static std::string parseMqttUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<std::string> urlOpt = getStringMust(mqtt, "url", "url mqtt notification");
+
+  if (!urlOpt.ok())
+  {
+    return badInput(ciP, urlOpt.error);
+  }
+  if (!urlOpt.given)
+  {
+    return badInput(ciP, "mandatory mqtt field /url/");
+  }
+
+  if (forbiddenChars(urlOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt field /url/");
+  }
+
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+  if (!parseUrl(urlOpt.value, host, port, path, protocol))
+  {
+    return badInput(ciP, "invalid mqtt /url/");
+  }
+  if (protocol != "mqtt:")
+  {
+    return badInput(ciP, "http or https URL cannot be used in mqtt notifications");
+  }
+  if (path != "/")
+  {
+    return badInput(ciP, "path cannot be used in mqtt url, use topic instead");
+  }
+
+  subsP->notification.mqttInfo.url = urlOpt.value;
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttQoS -
+*/
+static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<int64_t> qosOpt = getInt64Opt(mqtt, "qos");
+  if (!qosOpt.ok())
+  {
+    return badInput(ciP, qosOpt.error);
+  }
+  if (qosOpt.given)
+  {
+    if ((qosOpt.value < 0) || (qosOpt.value > 2))
+    {
+      return badInput(ciP, "mqtt qos field must be an integer in the 0 to 2 range");
+    }
+    else
+    {
+      subsP->notification.mqttInfo.qos = qosOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.mqttInfo.qos = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttTopic -
+*/
+static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
+
+  if (!topicOpt.ok())
+  {
+    return badInput(ciP, topicOpt.error);
+  }
+  if (!topicOpt.given)
+  {
+    return badInput(ciP, "mandatory mqtt field /topic/");
+  }
+
+  // Any other checking appart from empty-ness in the topic? Not sure
+  // but from the MQTT spec I'd say that any string is valid...
+  if (topicOpt.value.empty())
+  {
+    return badInput(ciP, "empty mqtt field /topic/");
+  }
+
+  if (forbiddenChars(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt field /topic/");
+  }
+
+  subsP->notification.mqttInfo.topic = topicOpt.value;
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
+  std::string r;
+
   subsP->notificationProvided = true;
 
   if (!notification.IsObject())
@@ -452,31 +606,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
+    r = parseCustomPayload(ciP, &subsP->notification.httpInfo.payload, &subsP->notification.httpInfo.includePayload, httpCustom);
+    if (!r.empty())
     {
-      if (isNull(httpCustom, "payload"))
-      {
-        subsP->notification.httpInfo.includePayload = false;
-
-        // We initialize also httpInfo.payload in this case, although its value is irrelevant
-        subsP->notification.httpInfo.payload = "";
-      }
-      else
-      {
-        Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
-
-        if (!payloadOpt.ok())
-        {
-          return badInput(ciP, payloadOpt.error);
-        }
-
-        if (forbiddenChars(payloadOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in custom /payload/");
-        }
-
-        subsP->notification.httpInfo.includePayload = true;
-        subsP->notification.httpInfo.payload = payloadOpt.value;
-      }
+      return r;
     }
 
     // qs
@@ -542,85 +675,27 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // url
-    Opt<std::string> urlOpt = getStringMust(mqtt, "url", "url mqtt notification");
-
-    if (!urlOpt.ok())
+    r = parseMqttUrl(ciP, subsP, mqtt);
+    if (!r.empty())
     {
-      return badInput(ciP, urlOpt.error);
+      return r;
     }
-    if (!urlOpt.given)
-    {
-      return badInput(ciP, "mandatory mqtt field /url/");
-    }
-
-    if (forbiddenChars(urlOpt.value.c_str()))
-    {
-      return badInput(ciP, "forbidden characters in mqtt field /url/");
-    }
-
-    std::string  host;
-    int          port;
-    std::string  path;
-    std::string  protocol;
-    if (!parseUrl(urlOpt.value, host, port, path, protocol))
-    {
-      return badInput(ciP, "invalid mqtt /url/");
-    }
-    if (protocol != "mqtt:")
-    {
-      return badInput(ciP, "http or https URL cannot be used in mqtt notifications");
-    }
-    if (path != "/")
-    {
-      return badInput(ciP, "path cannot be used in mqtt url, use topic instead");
-    }
-
-    subsP->notification.mqttInfo.url = urlOpt.value;
-
-    // topic
-    Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
-
-    if (!topicOpt.ok())
-    {
-      return badInput(ciP, topicOpt.error);
-    }
-    if (!topicOpt.given)
-    {
-      return badInput(ciP, "mandatory mqtt field /topic/");
-    }
-    if (topicOpt.value.empty())
-    {
-      return badInput(ciP, "empty mqtt field /topic/");
-    }
-
-    if (forbiddenChars(topicOpt.value.c_str()))
-    {
-      return badInput(ciP, "forbidden characters in mqtt field /topic/");
-    }
-    // FIXME PR: check endpoint format, i.e. "A/B/C/D". Is there any well-known regex for this?
-    subsP->notification.mqttInfo.topic = topicOpt.value;
 
     // qos
-    Opt<int64_t> qosOpt = getInt64Opt(mqtt, "qos");
-    if (!qosOpt.ok())
+    r = parseMqttQoS(ciP, subsP, mqtt);
+    if (!r.empty())
     {
-      return badInput(ciP, qosOpt.error);
+      return r;
     }
-    if (qosOpt.given)
+
+    // topic
+    r = parseMqttTopic(ciP, subsP, mqtt);
+    if (!r.empty())
     {
-      if ((qosOpt.value < 0) || (qosOpt.value > 2))
-      {
-        return badInput(ciP, "mqtt qos field must be an integer in the 0 to 2 range");
-      }
-      else
-      {
-        subsP->notification.mqttInfo.qos = qosOpt.value;
-      }
+      return r;
     }
-    else
-    {
-      subsP->notification.mqttInfo.qos = 0;
-    }
+
+    subsP->notification.mqttInfo.custom = false;
   }
   else if (notification.HasMember("mqttCustom"))
   {
@@ -633,8 +708,35 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return badInput(ciP, "mqttCustom notification is not an object");
     }
 
-    // FIXME PR: not sure if this should be kept as a separate if-branch or unified with "mqtt"
-    // url and qos are per-connection, so they don't accept customization. Use common function
+    // url (same as in not custom mqtt)
+    r = parseMqttUrl(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // qos (same as in not custom mqtt)
+    r = parseMqttQoS(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // topic (same as in not custom mqtt)
+    r = parseMqttTopic(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // payload
+    r = parseCustomPayload(ciP, &subsP->notification.mqttInfo.payload, &subsP->notification.mqttInfo.includePayload, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    subsP->notification.mqttInfo.custom = true;
   }
 
   // Attributes

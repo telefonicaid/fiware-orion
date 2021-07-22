@@ -140,7 +140,16 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 */
 static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
-  // FIXME PR: TODO
+  if (!mqttInfo.includePayload)
+  {
+    b->appendNull(CSUB_PAYLOAD);
+    LM_T(LmtMongo, ("Subscription payload: null"));
+  }
+  else if (!mqttInfo.payload.empty())
+  {
+    b->append(CSUB_PAYLOAD, mqttInfo.payload);
+    LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+  }
 }
 
 
