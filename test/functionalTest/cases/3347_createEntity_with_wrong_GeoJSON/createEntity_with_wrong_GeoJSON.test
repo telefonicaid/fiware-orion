@@ -142,13 +142,13 @@ Date: REGEX(.*)
 03. Create entity with WRONG GeoJSON1
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 52
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Bad Request",
+    "description": "Wrong GeoJson",
     "error": "BadRequest"
 }
 
@@ -156,13 +156,13 @@ Date: REGEX(.*)
 04. Create entity with WRONG GeoJSON2
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 52
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Bad Request",
+    "description": "Wrong GeoJson",
     "error": "BadRequest"
 }
 

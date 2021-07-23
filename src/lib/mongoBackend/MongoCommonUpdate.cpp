@@ -2798,7 +2798,7 @@ static bool createEntity
       }
       else if (errDetail->find("Can't extract geo keys") != std::string::npos)
       {
-        oeP->fill(SccBadRequest, "Bad Request", "BadRequest");
+        oeP->fill(SccBadRequest, "Wrong GeoJson", "BadRequest");
       }
       else
       {
