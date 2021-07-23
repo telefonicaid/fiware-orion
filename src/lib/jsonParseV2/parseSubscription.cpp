@@ -425,6 +425,7 @@ static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 */
 static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
 {
+  // FIXME PR: check topic doesn't contain # or + (add new steps to ftest)
   Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
 
   if (!topicOpt.ok())

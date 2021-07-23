@@ -31,6 +31,7 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
+#include "mqtt/mqtt.h"
 
 /* ****************************************************************************
 *
@@ -51,7 +52,7 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
@@ -59,7 +60,8 @@ void* startSenderThread(void* p)
                        params->servicePath.c_str(),
                        params->xauthToken.c_str(),
                        params->resource.c_str(),
-                       params->content_type.c_str()));
+                       params->content_type.c_str(),
+                       params->qos));
 
     long long    statusCode = -1;
     std::string  out;
@@ -67,26 +69,37 @@ void* startSenderThread(void* p)
 
     if (!simulatedNotification)
     {
-      int          r;
+      int  r;
 
-      r = httpRequestSend(params->from,
-                          params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant,
-                          params->servicePath,
-                          params->xauthToken,
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          params->fiwareCorrelator,
-                          params->renderFormat,
-                          &out,
-                          &statusCode,
-                          params->extraHeaders);
+      if (params->protocol == "mqtt:")
+      {
+        sendMqttNotification(params->content, params->resource, params->qos);
 
-      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
+        // In MQTT notifications we don't have any response, so we always assume they are ok
+        // FIXME PR: can it be done asynchronously in mqttOnPublishCallback?
+        r = 0;
+      }
+      else
+      {
+        r = httpRequestSend(params->from,
+                            params->ip,
+                            params->port,
+                            params->protocol,
+                            params->verb,
+                            params->tenant,
+                            params->servicePath,
+                            params->xauthToken,
+                            params->resource,
+                            params->content_type,
+                            params->content,
+                            params->fiwareCorrelator,
+                            params->renderFormat,
+                            &out,
+                            &statusCode,
+                            params->extraHeaders);
+
+        LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
+      }
 
       if (r == 0)
       {

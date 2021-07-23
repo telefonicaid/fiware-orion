@@ -136,6 +136,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     std::string                         method;
     std::string                         url;
     std::string                         payload;
+    std::string                         topic;
     std::string                         mimeType;
     std::map<std::string, std::string>  qs;
     std::map<std::string, std::string>  headers;
@@ -314,6 +315,16 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       }
     }
 
+    // 8. Topic (only in the case of MQTT notifications)
+    if (notification.type == ngsiv2::MqttNotification)
+    {
+      if (macroSubstitute(&topic, notification.mqttInfo.topic, en) == false)
+      {
+        // Warning already logged in macroSubstitute()
+        return paramsV;  // empty vector
+      }
+    }
+
     SenderThreadParams*  params = new SenderThreadParams();
 
     params->type             = QUEUE_MSG_NOTIF;
@@ -325,7 +336,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->tenant           = tenant;
     params->servicePath      = en.servicePath;
     params->xauthToken       = xauthToken;
-    params->resource         = uri;
+    params->resource         = notification.type == ngsiv2::HttpNotification? uri : topic;
     params->content_type     = mimeType;
     params->content          = payload;
     params->mimeType         = JSON;
@@ -333,6 +344,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->extraHeaders     = headers;
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
+    params->qos              = notification.mqttInfo.qos; // unexpecified in case of HTTP notifications
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
@@ -472,13 +484,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->tenant           = tenant;
     params->servicePath      = spath;
     params->xauthToken       = xauthToken;
-    params->resource         = uriPath;
+    params->resource         = notification.type == ngsiv2::HttpNotification? uriPath : notification.mqttInfo.topic;
     params->content_type     = content_type;
     params->content          = payloadString;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
+    params->qos              = notification.mqttInfo.qos; // unexpecified in case of HTTP notifications
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
