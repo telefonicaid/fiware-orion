@@ -519,13 +519,8 @@ MHD_Result orionldMhdConnectionInit
 {
   ++requestNo;
 
-  //
-  // This call to LM_K should not be removed.
-  // At most, commented out
-  //
-#ifndef REQUEST_PERFORMANCE
-  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
-#endif
+  if (requestNo % 1000 == 0)
+    LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 1. Prepare connectionInfo

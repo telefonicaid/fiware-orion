@@ -46,6 +46,7 @@
 #include "orionld/serviceRoutines/orionldGetContext.h"
 #include "orionld/serviceRoutines/orionldGetContexts.h"
 #include "orionld/serviceRoutines/orionldGetVersion.h"
+#include "orionld/serviceRoutines/orionldGetPing.h"
 #include "orionld/serviceRoutines/orionldNotImplemented.h"
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"
@@ -75,6 +76,7 @@
 //
 static OrionLdRestServiceSimplified getServiceV[] =
 {
+  { "/ngsi-ld/ex/v1/ping",                 orionldGetPing             },
   { "/ngsi-ld/v1/entities/*",              orionldGetEntity           },
   { "/ngsi-ld/v1/entities",                orionldGetEntities         },
   { "/ngsi-ld/v1/types/*",                 orionldGetEntityType       },
@@ -87,11 +89,11 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations    },
   { "/ngsi-ld/v1/jsonldContexts/*",        orionldGetContext          },
   { "/ngsi-ld/v1/jsonldContexts",          orionldGetContexts         },
+  { "/ngsi-ld/v1/temporal/entities/*",     orionldGetTemporalEntity   },
+  { "/ngsi-ld/v1/temporal/entities",       orionldGetTemporalEntities },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion          },
   { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants          },
   { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes        },
-  { "/ngsi-ld/v1/temporal/entities/*",     orionldGetTemporalEntity   },
-  { "/ngsi-ld/v1/temporal/entities",       orionldGetTemporalEntities }
 };
 static const int getServices = (sizeof(getServiceV) / sizeof(getServiceV[0]));
 

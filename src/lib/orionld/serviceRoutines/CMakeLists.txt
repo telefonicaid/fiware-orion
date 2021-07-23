@@ -63,6 +63,7 @@ SET (SOURCES
     orionldPostContexts.cpp
     orionldDeleteContext.cpp
     orionldPostNotify.cpp
+    orionldGetPing.cpp
 )
 
 # Include directories

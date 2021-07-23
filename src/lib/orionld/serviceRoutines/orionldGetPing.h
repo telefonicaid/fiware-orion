@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETVERSION_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETVERSION_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETPING_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETPING_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetVersion -
+// orionldGetPing -
 //
-extern bool orionldGetVersion(ConnectionInfo* ciP);
+extern bool orionldGetPing(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETVERSION_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETPING_H_
