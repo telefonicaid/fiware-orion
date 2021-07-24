@@ -85,6 +85,4 @@ r=$?
 echo
 echo
 
-
-rm -f /tmp/body.json
 exit $r

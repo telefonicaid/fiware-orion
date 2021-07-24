@@ -33,7 +33,7 @@ attributes=$4
 
 echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests for /speed"
 echo "==============================================================================================================="
-ab -c $threads -d -n $requests -T application/json http://localhost:1026/speed
+ab -c $threads -d -n $requests -T application/json http://localhost:1026/ngsi-ld/ex/v1/ping
 r=$?
 echo
 echo

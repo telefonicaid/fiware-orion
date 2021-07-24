@@ -28,11 +28,12 @@
 requests=$1
 threads=$2
 entities=$3
+attributes=$4
+batchEntities=$5
 
 
-
-echo "2.1. Creating $entities entities E1-E$entities, with attributes P1 and R1"
-echo "============================================================"
+echo "2.1. Creating $batchEntities entities E1-E$batchEntities, with attributes P1 and R1"
+echo "================================================================="
 
 typeset -i eNo
 eNo=1
@@ -40,7 +41,7 @@ eNo=1
 rm -f /tmp/httpHeaders
 rm -f /tmp/httpHeaders.out
 
-while [ $eNo -le $entities ]
+while [ $eNo -le $batchEntities ]
 do
   eId=$(printf "urn:ngsi-ld:entities:E%d" $eNo)
   eNo=$eNo+1
@@ -85,7 +86,7 @@ echo "2.3. Creating the payload body file for Apache benchmarking tool in step 2
 echo "============================================================================"
 echo "[" > /tmp/body.json
 eNo=0
-while [ $eNo -le $entities ]
+while [ $eNo -le $batchEntities ]
 do
   eId=$(printf "urn:ngsi-ld:entities:E%d" $eNo)
 
@@ -102,7 +103,7 @@ do
     }
   }'
 
-  if [ $eNo -lt $entities ]
+  if [ $eNo -lt $batchEntities ]
   then
     payload=${payload},    
   fi
@@ -115,13 +116,11 @@ echo
 echo
 
 
-echo "2.4. Running Apache HTTP server benchmarking tool (ab) to batch-update the $entities entities"
+echo "2.4. Running Apache HTTP server benchmarking tool (ab) to batch-update the $batchEntities entities"
 echo "======================================================================================="
 ab -c $threads -d -n $requests -T application/json -p /tmp/body.json   http://localhost:1026/ngsi-ld/v1/entityOperations/update 
 r=$?
 echo
 echo
 
-
-rm /tmp/body.json
 exit $r

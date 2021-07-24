@@ -44,9 +44,10 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
-  echo "$empty [--attributes|-a (number of attributes for the entities in the test - default: 1000)]"
+  echo "$empty [--attributes|-a (number of attributes for the entities in the test - default: 2)]"
   echo "$empty [--maxmem|-m (max RAM (in bytes) for the broker - default: 6000000000 (6 gigabytes))]"
   echo "$empty [--entities|-e (number of entities to create before the 'real' test starts - default: 200)]"
+  echo "$empty [--batchEntities|-be (number of entities in batch operations - default: 2)]"
   echo "$empty [--threads|-t (number of threads for the load test - default: 10)]"
   echo "$empty [--requests|-r (total number of requests for the load test - default: 10000)]"
   echo "$empty <test case> (path to the file to be executed in this stress test)"
@@ -60,9 +61,10 @@ function usage()
 # Parse options
 #
 verbose=off
-attributes=1000
+attributes=2
 brokerMaxMem=6000000000
 entities=200
+batchEntities=2
 threads=10
 requests=10000
 testCase=/X
@@ -70,11 +72,12 @@ while [ "$#" != 0 ]
 do
     if   [ "$1" == "-u" ];             then usage;
     elif [ "$1" == "-v" ];             then verbose=on;
-    elif [ "$1" == "--attributes" ] || [ "$1" == "-a" ]; then attributes="$2";   shift;
-    elif [ "$1" == "--maxmem" ]     || [ "$1" == "-m" ]; then brokerMaxMem="$2"; shift;
-    elif [ "$1" == "--entities" ]   || [ "$1" == "-e" ]; then entities="$2";     shift;
-    elif [ "$1" == "--threads" ]    || [ "$1" == "-t" ]; then threads="$2";      shift;
-    elif [ "$1" == "--requests" ]   || [ "$1" == "-r" ]; then requests="$2";     shift;
+    elif [ "$1" == "--attributes" ]    || [ "$1" == "-a"  ]; then attributes="$2";     shift;
+    elif [ "$1" == "--maxmem" ]        || [ "$1" == "-m"  ]; then brokerMaxMem="$2";   shift;
+    elif [ "$1" == "--entities" ]      || [ "$1" == "-e"  ]; then entities="$2";       shift;
+    elif [ "$1" == "--batchEntities" ] || [ "$1" == "-be" ]; then batchEntities="$2";  shift;
+    elif [ "$1" == "--threads" ]       || [ "$1" == "-t"  ]; then threads="$2";        shift;
+    elif [ "$1" == "--requests" ]      || [ "$1" == "-r"  ]; then requests="$2";       shift;
     else
         if [ $testCase != "/X" ]
         then
@@ -113,7 +116,7 @@ fi
 
 
 #
-# All OK - let the stre3ss commence!
+# All OK - let the stress commence!
 #
 
 
@@ -130,8 +133,16 @@ scripts/dbReset.sh orion
 echo
 echo
 
+echo "1.3. Test Numbers"
+echo "================="
+echo "Threads:          $threads"
+echo "Requests:         $requests"
+echo "Entities:         $entities"
+echo "Batch Entities:   $batchEntities"
+echo "Attributes:       $attributes"
 
-echo "1.3. Please start Orion-LD, on port 1026, and press <CR>"
+
+echo "1.4. Please start Orion-LD, on port 1026, and press <CR>"
 echo "========================================================"
 echo "E.g.:"
 echo "* valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=test/valgrind/suppressions.supp orionld -fg -noswap"
@@ -166,7 +177,7 @@ echo "1.5. Launching the test case $testCase"
 echo "============================================================="
 echo
 echo
-$testCase $requests $threads $entities $attributes
+$testCase $requests $threads $entities $attributes $batchEntities
 r=$?
 
 

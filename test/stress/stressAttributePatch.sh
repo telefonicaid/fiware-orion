@@ -31,7 +31,7 @@ attributes=$4
 
 
 echo "2.1. Creating $entities entities E1-E$entities, with attributes P1 and R1"
-echo "======================================================================"
+echo "========================================================================="
 typeset -i eNo
 eNo=1
 
@@ -92,6 +92,4 @@ r=$?
 echo
 echo
 
-
-rm -f /tmp/body.json
 exit $r

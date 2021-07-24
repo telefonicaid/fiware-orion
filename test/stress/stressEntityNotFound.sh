@@ -78,9 +78,9 @@ echo
 echo
 
 
-echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests requests overwriting the entity"
+echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests requests retrieving an entity"
 echo "============================================================================================================================="
-ab -c $threads -d -n $requests -T application/json "http://localhost:1026/ngsi-ld/v1/entities?type=T&limit=5"
+ab -c $threads -d -n $requests -T application/json "http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:entities:F1"
 r=$?
 echo
 echo

@@ -56,12 +56,6 @@ void mongoCppLegacyGeoIndexInit(void)
   OrionldTenant* tenantP = &tenant0;  // tenant0->next == tenantList :)
   tenant0.next = tenantList;          // Better safe than sorry!
 
-  while (tenantP != NULL)
-  {
-    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
-    tenantP = tenantP->next;
-  }
-
   tenantP = &tenant0;
   while (tenantP != NULL)
   {
@@ -119,17 +113,11 @@ void mongoCppLegacyGeoIndexInit(void)
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
           if (dbGeoIndexLookup(tenantP->tenant, attrP->name) == NULL)
-          {
-            LM_TMP(("TENANT: Calling mongoCppLegacyGeoIndexCreate for database '%s'", tenantP->mongoDbName));
             mongoCppLegacyGeoIndexCreate(tenantP, attrP->name);
-            LM_TMP(("TENANT: Back from mongoCppLegacyGeoIndexCreate"));
-          }
         }
       }
     }
 
     tenantP = tenantP->next;
   }
-
-  LM_TMP(("TENANT: Done"));
 }
