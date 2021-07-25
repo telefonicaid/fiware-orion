@@ -245,7 +245,7 @@ Date: REGEX(.*)
 08. Same same, but Accept: application/ld+json
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 313
+Content-Length: 240
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
