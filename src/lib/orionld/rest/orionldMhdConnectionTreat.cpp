@@ -558,14 +558,22 @@ static void contextToPayload(void)
   //
   if (orionldState.responseTree->type == KjObject)
   {
-    orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
-    orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
+    KjNode* contextNode = kjLookup(orionldState.responseTree, "@context");
+
+    if (contextNode == NULL)  // Not present - must add it
+    {
+      orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
+      orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
+    }
   }
   else if (orionldState.responseTree->type == KjArray)
   {
     for (KjNode* rTreeItemP = orionldState.responseTree->value.firstChildP; rTreeItemP != NULL; rTreeItemP = rTreeItemP->next)
     {
-      KjNode* contextNode;
+      KjNode* contextNode = kjLookup(rTreeItemP, "@context");
+
+      if (contextNode != NULL)  // @context already present in payload
+        continue;
 
       if (orionldState.payloadContextNode == NULL)
       {
