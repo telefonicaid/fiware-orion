@@ -390,7 +390,10 @@ int httpRequestSendWithCurl
   // ----- Tenant
   if ((tenant != NULL) && (tenant[0] != 0))
   {
-    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    if (subscriptionId == NULL)  // NGSIv2 subscription
+      httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    else
+      httpHeaderAdd(&headers, "NGSILD-Tenant", tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path

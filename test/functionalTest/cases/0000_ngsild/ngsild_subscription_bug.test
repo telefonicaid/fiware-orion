@@ -116,7 +116,7 @@ Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(.*)
 Accept: application/json
 Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Fiware-Service: openiot
+Ngsild-Tenant: openiot
 Content-Type: application/json; charset=utf-8
 
 {

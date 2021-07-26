@@ -116,7 +116,7 @@ Date: REGEX(.*)
 
 03. Dump accumulator to ensure the broker correctly decodes the encoded chars in the custom payload
 ===================================================================================================
-POST http://127.0.0.1:9997/notify?qs2=a1&qs1=1&subscriptionId=REGEX(.*)
+POST http://127.0.0.1:9997/notify?qs2=a1&qs1=1
 Fiware-Servicepath: /
 Content-Length: 33
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

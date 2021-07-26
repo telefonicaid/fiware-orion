@@ -291,7 +291,7 @@ Date: REGEX(.*)
 
 08. Dump accumulator: see four
 ==============================
-POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -316,7 +316,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -341,7 +341,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -366,7 +366,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
