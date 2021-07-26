@@ -102,12 +102,17 @@ static void* workerFunc(void* pSyncQ)
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
-      struct timespec     now;
-      struct timespec     howlong;
-      size_t              estimatedQSize;
-      SenderThreadParams* params = (*paramsV)[ix];
+      struct timespec      now;
+      struct timespec      howlong;
+      size_t               estimatedQSize;
+      SenderThreadParams*  params             = (*paramsV)[ix];
+      char*                subscriptionId     = (char*) params->subscriptionId.c_str();
+      const char*          tenant             = params->tenant.c_str();
+      bool                 ngsildSubscription = false;
+      CachedSubscription*  subP               = subCacheItemLookup(tenant, subscriptionId);
 
-      LM_TMP(("SUBID: Got subid '%s'", params->subscriptionId.c_str()));
+      if ((subP != NULL) && (subP->ldContext != ""))
+        ngsildSubscription = true;
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);
@@ -155,6 +160,10 @@ static void* workerFunc(void* pSyncQ)
       else // Send HTTP notification
       {
         std::string out;
+
+        if (ngsildSubscription == false)
+          subscriptionId = NULL;
+
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,
@@ -173,7 +182,7 @@ static void* workerFunc(void* pSyncQ)
                                     params->extraHeaders,
                                     "",
                                     -1,
-                                    params->subscriptionId.c_str());  // Subscription ID as URL param
+                                    subscriptionId);  // Subscription ID as URL param
       }
 
       if (params->toFree != NULL)
