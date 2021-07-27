@@ -41,7 +41,7 @@ extern void logInfoNotification
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
-  int  rc
+  int          rc
 );
 
 
