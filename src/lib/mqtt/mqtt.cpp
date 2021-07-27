@@ -94,7 +94,7 @@ void mqttInit
 
   // Starts the client loop in its own thread. The client loop processes the network traffic.
   // According to documentation (https://mosquitto.org/api/files/mosquitto-h.html#mosquitto_threaded_set):
-  // "When using mosquitto_loop_start, this [mosquitto_threaded_set ]is set automatically."
+  // "When using mosquitto_loop_start, this [mosquitto_threaded_set] is set automatically."
   mosquitto_loop_start(mosq);
 }
 
