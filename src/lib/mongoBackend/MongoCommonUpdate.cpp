@@ -2806,6 +2806,10 @@ static bool createEntity
       {
         oeP->fill(SccInvalidModification, "Already Exists", "Unprocessable");
       }
+      else if (errDetail->find("Can't extract geo keys") != std::string::npos)
+      {
+        oeP->fill(SccBadRequest, "Wrong GeoJson", "BadRequest");
+      }
       else
       {
         oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
