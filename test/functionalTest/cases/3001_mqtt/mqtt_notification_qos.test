@@ -254,5 +254,5 @@ MQTT notification sent to localhost:1883 on topic sub2 with qos 2 with id 3
 
 --TEARDOWN--
 accumulatorStop
-#brokerStop CB
+brokerStop CB
 dbDrop CB

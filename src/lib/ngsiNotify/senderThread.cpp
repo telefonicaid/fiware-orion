@@ -84,7 +84,8 @@ void* startSenderThread(void* p)
         sendMqttNotification(params->content, params->resource, params->qos);
 
         // In MQTT notifications we don't have any response, so we always assume they are ok
-        // FIXME PR: can it be done asynchronously in mqttOnPublishCallback?
+        // When publish is sucessfull mqttOnPublishCallback is called (by the moment we are not doing nothing
+        // there, just printing in DEBUG log level)
         r = 0;
       }
       else

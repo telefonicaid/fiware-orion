@@ -49,8 +49,7 @@ unsigned short   mqttKeepAlivePeriod;
 */
 void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
-  /* FIXME PR: We don't assign message ids to the published notifications and therefore we have
-   * no way to tell which notification a callback log belongs to. - Planned for a next PR. */
+  /* mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level */
   LM_T(LmtMqttNotif, ("MQTT notification successfully published on %s:%d with id %d", mqttHostname, mqttPortNumber, mid));
 }
 
@@ -72,7 +71,7 @@ void mqttInit
   mqttPortNumber = _mqttPort;
   mqttKeepAlivePeriod = _mqttKeepAlive;
 
-  LM_T(LmtMqttNotif, ("Initializing MQTT client."));
+  LM_T(LmtMqttNotif, ("Initializing MQTT client"));
 
   mosquitto_lib_init();
   mosq = mosquitto_new(NULL, true, NULL);
@@ -91,7 +90,7 @@ void mqttInit
     LM_X(2, ("Fatal Error (Could not connect to MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
   }
 
-  LM_T(LmtMqttNotif, ("Successfully connected to MQTT Broker."));
+  LM_T(LmtMqttNotif, ("Successfully connected to MQTT Broker"));
 
   // Starts the client loop in its own thread. The client loop processes the network traffic.
   // According to documentation (https://mosquitto.org/api/files/mosquitto-h.html#mosquitto_threaded_set):
