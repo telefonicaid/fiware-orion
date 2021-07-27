@@ -1,0 +1,233 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+#   General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT custoom notification tests
+
+--SHELL-INIT--
+dbInit CB
+
+# tracelevel 163 is the one for MQTT notification logs
+brokerStart CB 163 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+
+--SHELL--
+
+#
+# 01. Create MQTT custom sub for entity E with topic sub/{$id} payload A:{$A}
+# 02. Create entity E1 with A=1
+# 03. Create entity E2 with A=2
+# 04. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:1, 1 MQTT sub/E2 A:2
+# 05. Update E1 with A=10
+# 06. Update E2 with A=20
+# 07. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:10, 1 MQTT sub/E2 A:20
+#
+
+echo '01. Create MQTT custom sub for entity E with topic sub/${id} payload A:${A}'
+echo "==========================================================================="
+payload='{
+  "description": "MQTT sub",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub/${id}",
+      "payload": "{ %22A%22: %22${A}%22 }"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with A=1"
+echo "============================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 with A=2"
+echo "============================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": {
+    "value": 2,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of MQTT notifications
+# due to the lock in accumulator-server.py?
+sleep 0.5s
+
+
+echo "04. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:1, 1 MQTT sub/E2 A:2"
+echo "==========================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. Update entity E1 with A=10"
+echo "=============================="
+payload='{
+  "A": {
+    "value": 10,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "06. Update entity E2 with A=20"
+echo "=============================="
+payload='{
+  "A": {
+    "value": 20,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs --payload "$payload"
+echo
+echo
+
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of MQTT notifications
+# due to the lock in accumulator-server.py?
+sleep 0.5s
+
+
+echo "07. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:10, 1 MQTT sub/E2 A:20"
+echo "============================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create MQTT custom sub for entity E with topic sub/${id} payload A:${A}
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 with A=1
+=============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E2 with A=2
+=============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:1, 1 MQTT sub/E2 A:2
+===========================================================================
+MQTT message at topic sub/E1:
+{
+    "A": "1"
+}
+=======================================
+MQTT message at topic sub/E2:
+{
+    "A": "2"
+}
+=======================================
+
+
+05. Update entity E1 with A=10
+==============================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update entity E2 with A=20
+==============================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:10, 1 MQTT sub/E2 A:20
+=============================================================================
+MQTT message at topic sub/E1:
+{
+    "A": "10"
+}
+=======================================
+MQTT message at topic sub/E2:
+{
+    "A": "20"
+}
+=======================================
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

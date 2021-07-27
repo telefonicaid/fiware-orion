@@ -57,7 +57,7 @@ extern void mqttInit
 *
 * sendMqttNotification -
 */
-extern int sendMqttNotification(const std::string& content);
+extern int sendMqttNotification(const std::string& content, const std::string& topic, unsigned int qos);
 
 
 

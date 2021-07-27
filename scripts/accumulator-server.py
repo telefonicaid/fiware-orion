@@ -59,6 +59,7 @@ import string
 import signal
 import json
 import paho.mqtt.client as mqtt
+import threading
 
 def usage_and_exit(msg):
     """
@@ -436,6 +437,7 @@ def getPid():
 ac = ''
 t0 = ''
 times = []
+lock = threading.Lock()
 
 # The callback for when the client receives a CONNACK response from the MQTT broker
 def on_connect(client, userdata, flags, rc):
@@ -448,40 +450,44 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the MQTT broker
 def on_message(client, userdata, msg):
 
-    global ac, t0, times
+    global ac, t0, times, lock
+
+    lock.acquire()
+
     s = ''
 
-    if (msg.topic == mqtt_topic):
-        # FIXME: this is common code in record_request(). Unify.
-        # First notification? Then, set reference datetime. Otherwise, add the
-        # timedelta to the list
-        if (t0 == ''):
-            t0 = datetime.now()
-            times.append(0)
-        else:
-            delta = datetime.now() - t0
-            # Python 2.7 could use delta.total_seconds(), but we use this formula
-            # for backward compatibility with Python 2.6
-            t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
-            times.append(trunc(round(t)))
+    # FIXME: this is common code in record_request(). Unify.
+    # First notification? Then, set reference datetime. Otherwise, add the
+    # timedelta to the list
+    if (t0 == ''):
+        t0 = datetime.now()
+        times.append(0)
+    else:
+        delta = datetime.now() - t0
+        # Python 2.7 could use delta.total_seconds(), but we use this formula
+        # for backward compatibility with Python 2.6
+        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+        times.append(trunc(round(t)))
 
-        s += 'MQTT message at topic ' + msg.topic + ':'
-        s += '\n'
-        if pretty == True:
-            raw = json.loads(str(msg.payload))
-            s += json.dumps(raw, indent=4, sort_keys=True)
-            s +='\n'
-        else:
-            s += str(msg.payload)
+    s += 'MQTT message at topic ' + msg.topic + ':'
+    s += '\n'
+    if pretty == True:
+        raw = json.loads(str(msg.payload))
+        s += json.dumps(raw, indent=4, sort_keys=True)
+        s +='\n'
+    else:
+        s += str(msg.payload)
 
-        # Separator
-        s += '=======================================\n'
+    # Separator
+    s += '=======================================\n'
 
-        # Accumulate
-        ac += s
+    # Accumulate
+    ac += s
 
-        if verbose:
-            print s
+    if verbose:
+        print s
+
+    lock.release()
 
 ac = ''
 t0 = ''
