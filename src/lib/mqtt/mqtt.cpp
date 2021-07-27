@@ -51,7 +51,7 @@ void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
   /* FIXME PR: We don't assign message ids to the published notifications and therefore we have
    * no way to tell which notification a callback log belongs to. - Planned for a next PR. */
-  LM_T(LmtMqttNotif, ("MQTT notification successfully published on %s:%d", mqttHostname, mqttPortNumber));
+  LM_T(LmtMqttNotif, ("MQTT notification successfully published on %s:%d with id %d", mqttHostname, mqttPortNumber, mid));
 }
 
 
@@ -110,14 +110,16 @@ int sendMqttNotification(const std::string& content, const std::string& topic, u
 {
   const char* msg = content.c_str();
 
-  int resultCode = mosquitto_publish(mosq, NULL, topic.c_str(), (int) strlen(msg), msg, qos, false);
+  int id;
+
+  int resultCode = mosquitto_publish(mosq, &id, topic.c_str(), (int) strlen(msg), msg, qos, false);
   if (resultCode != MOSQ_ERR_SUCCESS)
   {
     LM_E(("Failed to send MQTT notification (%d): %s", resultCode, mosquitto_strerror(resultCode)));
   }
   else
   {
-    LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d", mqttHostname, mqttPortNumber, topic.c_str(), qos));
+    LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d with id %d", mqttHostname, mqttPortNumber, topic.c_str(), qos, id));
   }
 
   return 0;

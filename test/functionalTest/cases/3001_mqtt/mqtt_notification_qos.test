@@ -247,9 +247,9 @@ MQTT message at topic sub2:
 
 06. Check log and see a trace for each qos possibility
 ======================================================
-MQTT notification sent to localhost:1883 on topic sub0 with qos 0
-MQTT notification sent to localhost:1883 on topic sub1 with qos 1
-MQTT notification sent to localhost:1883 on topic sub2 with qos 2
+MQTT notification sent to localhost:1883 on topic sub0 with qos 0 with id 1
+MQTT notification sent to localhost:1883 on topic sub1 with qos 1 with id 2
+MQTT notification sent to localhost:1883 on topic sub2 with qos 2 with id 3
 
 
 --TEARDOWN--

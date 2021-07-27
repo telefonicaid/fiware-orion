@@ -172,10 +172,12 @@ static void* workerFunc(void* pSyncQ)
                          params->qos));
 
       char                portV[STRING_SIZE_FOR_INT];
+      std::string         endpoint;
       std::string         url;
 
       snprintf(portV, sizeof(portV), "%d", params->port);
-      url = params->ip + ":" + portV + params->resource;
+      endpoint = params->ip + ":" + portV;
+      url = endpoint + params->resource;
 
       long long    statusCode = -1;
       std::string  out;
@@ -191,6 +193,12 @@ static void* workerFunc(void* pSyncQ)
 
         if (params->protocol == "mqtt:")
         {
+          // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
+          std::string protocol = params->protocol + "//";
+          correlatorIdSet(params->fiwareCorrelator.c_str());
+          lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
+                             params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
+
           sendMqttNotification(params->content, params->resource, params->qos);
 
           // In MQTT notifications we don't have any response, so we always assume they are ok
@@ -248,11 +256,11 @@ static void* workerFunc(void* pSyncQ)
       // Add notificacion result summary in log INFO level
       if (statusCode != -1)
       {
-        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
+        logInfoNotification(params->subscriptionId.c_str(), params->protocol.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), statusCode);
       }
       else
       {
-        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
+        logInfoNotification(params->subscriptionId.c_str(), params->protocol.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), out.c_str());
       }
 
       // End transaction
