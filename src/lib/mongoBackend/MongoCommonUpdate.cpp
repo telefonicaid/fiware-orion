@@ -2278,8 +2278,8 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
-
+      details = "one or more of the attributes in the request do not exist: [" + targetAttr->getName() + "]";
+      oe->fill(SccInvalidModification, details, "Unprocessable");
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
     }
