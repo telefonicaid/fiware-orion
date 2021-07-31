@@ -37,6 +37,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
 #include "orionld/troe/troe.h"                                   // TroeMode
@@ -92,13 +93,11 @@ int               dbNameLen;
 char*             coreContextUrl           = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
 char              orionldHostName[128];
 int               orionldHostNameLen       = -1;
-char*             tenantV[100];
-unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
-sem_t             tenantSem;
 char              pgPortString[16];
+char              mongoServerVersion[32];
 
 
 //
@@ -134,7 +133,6 @@ void orionldStateInit(void)
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
-  orionldState.tenant                  = (char*) "";  // FIXME: not NULL due to std::string ... ?
   orionldState.servicePath             = (char*) "";
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);

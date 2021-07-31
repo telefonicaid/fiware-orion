@@ -27,7 +27,7 @@ Batch Upsert Crash - for request with context in both payload and Link header
 export BROKER=orionld
 dbInit CB
 dbInit CB smartmaas001
-brokerStart CB
+brokerStart CB 0 IPv4 -multiservice
 
 --SHELL--
 
@@ -194,6 +194,7 @@ Date: REGEX(.*)
     "microhttpd version": "REGEX(.*)",
     "mongoc version": "1.17.5",
     "mongocpp version": "REGEX((1.1.2|1.1.3))",
+    "mongodb server version": "REGEX(.*)",
     "openssl version": "REGEX(.*)",
     "rapidjson version": "REGEX(.*)"
 }

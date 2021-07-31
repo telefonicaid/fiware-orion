@@ -149,13 +149,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dateObserved",
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/airQualityLevel",
+		"https://uri.fiware.org/ns/data-models#dateObserved",
+		"https://uri.fiware.org/ns/data-models#airQualityLevel",
 		"https://uri.etsi.org/ngsi-ld/default-context/CO_Level",
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/refPointOfInterest"
+		"https://uri.fiware.org/ns/data-models#refPointOfInterest"
 	],
 	"attrs" : {
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/dateObserved" : {
+		"https://uri=fiware=org/ns/data-models#dateObserved" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -165,7 +165,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/airQualityLevel" : {
+		"https://uri=fiware=org/ns/data-models#airQualityLevel" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -179,7 +179,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "unhealthy",
 			"mdNames" : [ ]
 		},
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/refPointOfInterest" : {
+		"https://uri=fiware=org/ns/data-models#refPointOfInterest" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 04. GET the entity, see the updated values
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 515
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -214,18 +214,18 @@ Date: REGEX(.*)
         "type": "Property",
         "value": "unhealthy"
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/airQualityLevel": {
+    "https://uri.fiware.org/ns/data-models#airQualityLevel": {
         "type": "Property",
         "value": "BAD"
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dateObserved": {
+    "https://uri.fiware.org/ns/data-models#dateObserved": {
         "type": "Property",
         "value": {
             "@type": "DateTime",
             "@value": "2018-08-12T12:00:00Z"
         }
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/refPointOfInterest": {
+    "https://uri.fiware.org/ns/data-models#refPointOfInterest": {
         "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict",
         "type": "Relationship"
     },

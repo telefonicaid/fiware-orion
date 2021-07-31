@@ -41,6 +41,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                  // orionldState
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
@@ -245,7 +246,7 @@ int httpRequestSendWithCurl
    unsigned short                             port,
    const std::string&                         _protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
    const std::string&                         xauthToken,
    const std::string&                         resource,
@@ -257,7 +258,8 @@ int httpRequestSendWithCurl
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
@@ -270,6 +272,8 @@ int httpRequestSendWithCurl
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+  LM_TMP(("Resource: '%s'", resource.c_str()));
 
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
   if (metricsMgr.isOn())
@@ -384,10 +388,12 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if ((tenant != NULL) && (tenant[0] != 0))
   {
-    std::string fiwareServiceHeaderValue = tenant;
-    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    if (subscriptionId == NULL)  // NGSIv2 subscription
+      httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    else
+      httpHeaderAdd(&headers, "NGSILD-Tenant", tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
@@ -450,6 +456,7 @@ int httpRequestSendWithCurl
     httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
+
   // Extra headers
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
   {
@@ -509,6 +516,21 @@ int httpRequestSendWithCurl
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
   }
+
+  // Is there a subscription ID to be added as an HTTP header?
+  if ((subscriptionId != NULL) && (*subscriptionId != 0))
+  {
+    const char* qMark = strchr(resource.c_str(), '?');  // '?' already present?
+
+    LM_TMP(("SUBID: subscriptionId: %s", subscriptionId));
+
+    if (qMark == NULL)
+      url += std::string("?subscriptionId=") + subscriptionId;
+    else
+      url += std::string("&subscriptionId=") + subscriptionId;
+  }
+  else
+    LM_TMP(("SUBID: none"));
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -619,7 +641,7 @@ int httpRequestSend
    unsigned short                             port,
    const std::string&                         protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
    const std::string&                         xauthToken,
    const std::string&                         resource,
@@ -631,7 +653,8 @@ int httpRequestSend
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   struct curl_context  cc;
@@ -675,7 +698,8 @@ int httpRequestSend
                                      outP,
                                      extraHeaders,
                                      acceptFormat,
-                                     timeoutInMilliseconds);
+                                     timeoutInMilliseconds,
+                                     subscriptionId);
 
   release_curl_context(&cc);
   return response;

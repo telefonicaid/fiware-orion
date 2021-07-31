@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -71,7 +73,7 @@ std::string getRegistrations
   int                                limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
   long long                          count  = 0;
 
-  TIMED_MONGO(mongoRegistrationsGet(&registrationV, ciP->tenant, ciP->servicePathV, offset, limit, &count, &oe));
+  TIMED_MONGO(mongoRegistrationsGet(&registrationV, orionldState.tenantP, ciP->servicePathV, offset, limit, &count, &oe));
 
   if (oe.code != SccOk)
   {

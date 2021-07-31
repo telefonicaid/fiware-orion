@@ -27,9 +27,9 @@
 #include "logMsg/logMsg.h"                                        // LM_*
 #include "logMsg/traceLevels.h"                                   // Lmt*
 
+#include "orionld/types/OrionldTenant.h"                          // OrionldTenant
 #include "mongoBackend/connectionOperations.h"                    // collectionCreateIndex
 
-#include "orionld/db/dbCollectionPathGet.h"                       // dbCollectionPathGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyIdIndexCreate.h"   // Own interface
 
 
@@ -38,16 +38,13 @@
 //
 // mongoCppLegacyIdIndexCreate -
 //
-bool mongoCppLegacyIdIndexCreate(const char* tenant)
+bool mongoCppLegacyIdIndexCreate(OrionldTenant* tenantP)
 {
   std::string err;
 
-  char collectionPath[256];
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
-  if (collectionCreateIndex(collectionPath, BSON("_id.id" << 1), false, &err) == false)
+  if (collectionCreateIndex(tenantP->entities, BSON("_id.id" << 1), false, &err) == false)
   {
-    LM_E(("Database Error (error creating entity id (_id.id) index for tenant '%s')", tenant));
+    LM_E(("Database Error (error creating entity id (_id.id) index for tenant '%s')", tenantP->tenant));
     return false;
   }
 

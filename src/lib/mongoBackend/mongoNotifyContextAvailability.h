@@ -29,6 +29,8 @@
 #include <vector>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
 
@@ -44,7 +46,7 @@ extern HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityResponse*   responseP,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   fiwareCorrelator = "no correlator",
-  const std::string&                   tenant           = "",
+  OrionldTenant*                       tenantP          = NULL,
   const std::string&                   servicePath      = ""
 );
 

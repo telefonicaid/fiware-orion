@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
@@ -153,7 +155,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
-  std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = "application/json";
   std::string     out;
@@ -166,7 +167,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       port,
                       protocol,
                       verb,
-                      tenant,
+                      orionldState.tenantP->tenant,
                       servicePath,
                       ciP->httpHeaders.xauthToken,
                       resource,
@@ -494,7 +495,7 @@ std::string postUpdateContext
   HttpStatusCode httpStatusCode;
   TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP,
                                                   upcrsP,
-                                                  ciP->tenant.c_str(),
+                                                  orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   ciP->uriParam,
                                                   ciP->httpHeaders.xauthToken.c_str(),

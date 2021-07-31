@@ -267,7 +267,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
     orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                      &mongoResponse,
-                                                     orionldState.tenant,
+                                                     orionldState.tenantP,
                                                      ciP->servicePathV,
                                                      ciP->uriParam,
                                                      ciP->httpHeaders.xauthToken.c_str(),

@@ -64,9 +64,12 @@ extern "C"
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/common/orionldTenantGet.h"                   // orionldTenantGet
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
@@ -105,9 +108,6 @@ using ngsiv2::EntID;
 * Globals
 */
 static std::string          dbPrefix;
-static std::string          entitiesCollectionName;
-static std::string          registrationsCollectionName;
-static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
@@ -244,10 +244,6 @@ void mongoInit
   }
 
   setDbPrefix(dbName);
-  setEntitiesCollectionName(COL_ENTITIES);
-  setRegistrationsCollectionName(COL_REGISTRATIONS);
-  setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
 
   //
   // Note that index creation operation is idempotent.
@@ -257,10 +253,10 @@ void mongoInit
   //
 
   if (idIndex == true)
-    ensureIdIndex("");
+    ensureIdIndex(&tenant0);
 
-  ensureLocationIndex("");
-  ensureDateExpirationIndex("");
+  ensureLocationIndex(&tenant0);
+  ensureDateExpirationIndex(&tenant0);
 
   if (mtenant)
   {
@@ -271,14 +267,15 @@ void mongoInit
 
     for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
     {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      std::string     orionDb     = orionDbs[ix];
+      std::string     tenantName  = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      OrionldTenant*  tenantP     = orionldTenantGet(tenantName.c_str());
 
       if (idIndex == true)
-        ensureIdIndex(tenant);
+        ensureIdIndex(tenantP);
 
-      ensureLocationIndex(tenant);
-      ensureDateExpirationIndex(tenant);
+      ensureLocationIndex(tenantP);
+      ensureDateExpirationIndex(tenantP);
     }
   }
 }
@@ -504,173 +501,10 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     std::string  prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName, strlen(prefix.c_str())) == 0)
-    {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName));
       dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName));
-    }
   }
 
   return true;
-}
-
-
-
-/* ***************************************************************************
-*
-* tenantFromDb -
-*
-* Given a database name as an argument (e.g. orion-myservice1) it returns the
-* corresponding tenant name as result (myservice1) or "" if the string doesn't
-* start with the database prefix
-*/
-std::string tenantFromDb(const std::string& database)
-{
-  std::string r;
-  std::string prefix  = dbPrefix + "-";
-
-  if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
-  {
-    char tenant[SERVICE_NAME_MAX_LEN];
-
-    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant) - 1);
-    r = std::string(tenant);
-  }
-  else
-  {
-    r = "";
-  }
-
-  LM_T(LmtMongo, ("DB -> tenant: <%s> -> <%s>", database.c_str(), r.c_str()));
-  return r;
-}
-
-
-
-/* ***************************************************************************
-*
-* setEntitiesCollectionName -
-*/
-void setEntitiesCollectionName(const std::string& name)
-{
-  entitiesCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-void setRegistrationsCollectionName(const std::string& name)
-{
-  registrationsCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-void setSubscribeContextCollectionName(const std::string& name)
-{
-  subscribeContextCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setSubscribeContextAvailabilityCollectionName -
-*/
-void setSubscribeContextAvailabilityCollectionName(const std::string& name)
-{
-  subscribeContextAvailabilityCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* composeCollectionName -
-*
-* Common helper function for composing collection names
-*/
-static std::string composeCollectionName(const std::string& tenant, const std::string& colName)
-{
-  return composeDatabaseName(tenant) + "." + colName;
-}
-
-
-
-/* ***************************************************************************
-*
-* composeDatabaseName -
-*
-* Common helper function for composing database names
-*/
-std::string composeDatabaseName(const std::string& tenant)
-{
-  std::string result;
-
-  if (!multitenant || (tenant == ""))
-  {
-    result = dbPrefix;
-  }
-  else
-  {
-    /* Note that we can not use "." as database delimiter. A database cannot contain this
-     * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
-    result = dbPrefix + "-" + tenant;
-  }
-
-  LM_T(LmtBug, ("database name composed: '%s'", result.c_str()));
-  return result;
-}
-
-
-
-/* ***************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-std::string getEntitiesCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, entitiesCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-std::string getRegistrationsCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, registrationsCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-std::string getSubscribeContextCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 
@@ -714,10 +548,10 @@ bool mongoExpirationCapable(void)
 *
 * ensureIdIndex -
 */
-void ensureIdIndex(const std::string& tenant)
+void ensureIdIndex(OrionldTenant* tenantP)
 {
   std::string err;
-  collectionCreateIndex(getEntitiesCollectionName(tenant), BSON("_id.id" << 1), false, &err);
+  collectionCreateIndex(tenantP->entities, BSON("_id.id" << 1), false, &err);
 }
 
 
@@ -726,7 +560,7 @@ void ensureIdIndex(const std::string& tenant)
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(const std::string& tenant)
+void ensureLocationIndex(OrionldTenant* tenantP)
 {
   /* Ensure index for entity locations, in the case of using 2.4 */
   if (mongoLocationCapable())
@@ -734,8 +568,8 @@ void ensureLocationIndex(const std::string& tenant)
     std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << "2dsphere"), false, &err);
-    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    collectionCreateIndex(tenantP->entities, BSON(index << "2dsphere"), false, &err);
+    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -745,7 +579,7 @@ void ensureLocationIndex(const std::string& tenant)
  *
  * ensureDateExpirationIndex -
  */
-void ensureDateExpirationIndex(const std::string& tenant)
+void ensureDateExpirationIndex(OrionldTenant* tenantP)
 {
   /* Ensure index for entity expiration, in the case of using 2.4 */
   if (mongoExpirationCapable())
@@ -753,8 +587,8 @@ void ensureDateExpirationIndex(const std::string& tenant)
     std::string index = ENT_EXPIRATION;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << 1), true, &err);
-    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    collectionCreateIndex(tenantP->entities, BSON(index << 1), true, &err);
+    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -1333,7 +1167,7 @@ bool entitiesQuery
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
@@ -1353,6 +1187,9 @@ bool entitiesQuery
    *  }
    *
    */
+
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
 
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
@@ -1502,7 +1339,7 @@ bool entitiesQuery
 
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
-  // LM_TMP(("Q: finalQuery: %s (DESTRUCTIVE)", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
+  // LM_TMP(("***** WARNING: DESTRUCTIVE ***** - finalQuery: %s", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
   Query                          query(finalQuery.obj());
 
   if (sortOrderList == "")
@@ -1547,7 +1384,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  if (!collectionRangedQuery(connection, tenantP->entities, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1935,7 +1772,7 @@ bool registrationsQuery
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,
@@ -2038,9 +1875,8 @@ bool registrationsQuery
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  std::string   colName    = getRegistrationsCollectionName(tenant);
 
-  if (!collectionRangedQuery(connection, colName, query, limit, offset, &cursor, countP, err))
+  if (!collectionRangedQuery(connection, tenantP->registrations, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2251,7 +2087,7 @@ static bool processOnChangeConditionForSubscription
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
@@ -2275,13 +2111,13 @@ static bool processOnChangeConditionForSubscription
 
   metadataList.fill(metadataV);
 
-  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -2298,7 +2134,7 @@ static bool processOnChangeConditionForSubscription
   {
     if (rawCerV.size() == 0)
     {
-      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
       {
         ncr.contextElementResponseVector.release();
         rawCerV.release();
@@ -2352,7 +2188,7 @@ static bool processOnChangeConditionForSubscription
        * Note that in this case we do a query for all the attributes, not restricted to attrV */
       ContextElementResponseVector  allCerV;
 
-      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenantP, servicePathV))
       {
 #ifdef WORKAROUND_2994
         delayedReleaseAdd(rawCerV);
@@ -2380,7 +2216,7 @@ static bool processOnChangeConditionForSubscription
         /* Send notification */
         getNotifier()->sendNotifyContextRequest(&ncr,
                                                 notifyHttpInfo,
-                                                tenant,
+                                                tenantP->tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
                                                 renderFormat,
@@ -2399,7 +2235,7 @@ static bool processOnChangeConditionForSubscription
     {
       getNotifier()->sendNotifyContextRequest(&ncr,
                                               notifyHttpInfo,
-                                              tenant,
+                                              tenantP->tenant,
                                               xauthToken,
                                               fiwareCorrelator,
                                               renderFormat,
@@ -2433,7 +2269,7 @@ static BSONArray processConditionVector
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
@@ -2467,7 +2303,7 @@ static BSONArray processConditionVector
                                                     subId,
                                                     httpInfo,
                                                     renderFormat,
-                                                    tenant,
+                                                    tenantP,
                                                     xauthToken,
                                                     servicePathV,
                                                     resP,
@@ -2507,7 +2343,7 @@ BSONArray processConditionVector
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
@@ -2534,7 +2370,7 @@ BSONArray processConditionVector
                                          httpInfo,
                                          notificationDone,
                                          renderFormat,
-                                         tenant,
+                                         tenantP,
                                          xauthToken,
                                          servicePathV,
                                          resP,
@@ -2555,7 +2391,7 @@ BSONArray processConditionVector
 *
 * mongoUpdateCasubNewNotification -
 */
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant)
+static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, OrionldTenant* tenantP)
 {
   LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
@@ -2564,7 +2400,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
   BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << orionldState.requestTime) <<
                             "$inc" << BSON(CASUB_COUNT << 1));
 
-  collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);
+  collectionUpdate(tenantP->avSubscriptions, query, update, false, err);
 
   return SccOk;
 }
@@ -2595,7 +2431,7 @@ bool processAvailabilitySubscription
   const std::string&    subId,
   const std::string&    notifyUrl,
   RenderFormat          renderFormat,
-  const std::string&    tenant,
+  OrionldTenant*        tenantP,
   const std::string&    fiwareCorrelator
 )
 {
@@ -2604,7 +2440,7 @@ bool processAvailabilitySubscription
   std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
   servicePathV.push_back("");                      // While this gets implemented, "" default is used.
 
-  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
+  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenantP, servicePathV))
   {
     ncar.contextRegistrationResponseVector.release();
     return false;
@@ -2615,11 +2451,11 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenantP->tenant, fiwareCorrelator, renderFormat);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */
-    if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk)
+    if (mongoUpdateCasubNewNotification(subId, &err, tenantP) != SccOk)
     {
       return false;
     }

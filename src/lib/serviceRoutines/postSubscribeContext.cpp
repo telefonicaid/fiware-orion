@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/limits.h"
@@ -82,7 +84,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, orionldState.tenantP, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = scr.render());
 
   parseDataP->scr.res.release();

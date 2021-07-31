@@ -28,9 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                           // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -57,7 +58,7 @@ std::string postNotifyContext
 
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
                                                        &ncr,
-                                                       ciP->tenant,
+                                                       orionldState.tenantP,
                                                        ciP->httpHeaders.xauthToken,
                                                        ciP->servicePathV,
                                                        ciP->httpHeaders.correlator,

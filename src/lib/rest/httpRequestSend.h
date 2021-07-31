@@ -61,7 +61,7 @@ extern int httpRequestSend
   unsigned short                             port,
   const std::string&                         protocol,
   const std::string&                         verb,
-  const std::string&                         tenant,
+  const char*                                tenant,
   const std::string&                         servicePath,
   const std::string&                         xauthToken,
   const std::string&                         resource,
@@ -73,7 +73,8 @@ extern int httpRequestSend
   std::string*                               outP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
-  long                                       timeoutInMilliseconds = -1
+  long                                       timeoutInMilliseconds = -1,
+  const char*                                subscriptionId        = NULL
 );
 
 
@@ -89,7 +90,7 @@ extern int httpRequestSendWithCurl
   unsigned short                             port,
   const std::string&                         protocol,
   const std::string&                         verb,
-  const std::string&                         tenant,
+  const char*                                tenant,
   const std::string&                         servicePath,
   const std::string&                         xauthToken,
   const std::string&                         resource,
@@ -101,7 +102,8 @@ extern int httpRequestSendWithCurl
   std::string*                               outP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
-  long                                       timeoutInMilliseconds = -1
+  long                                       timeoutInMilliseconds = -1,
+  const char*                                subscriptionId        = NULL
 );
 
 #endif  // SRC_LIB_REST_HTTPREQUESTSEND_H_

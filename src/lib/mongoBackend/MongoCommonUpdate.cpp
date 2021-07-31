@@ -57,11 +57,13 @@ extern "C"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
 
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
 #include "orionld/types/AttributeType.h"                           // AttributeType
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/isSpecialSubAttribute.h"                  // isSpecialSubAttribute
 #include "orionld/common/dotForEq.h"                               // dotForEq
 #include "orionld/common/eqForDot.h"                               // eqForDot
+#include "orionld/common/tenantList.h"                             // tenant0
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
@@ -653,7 +655,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     // For NGSI-LD, we want ALL updates to give notifications, even if nothing changed.
     // At least for now ...
     //
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if ((orionldState.apiVersion == NGSI_LD_V1) && (noNotifyFalseUpdate == false))
       actualUpdate = true;
     else
     {
@@ -1200,7 +1202,7 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
-  std::string                                    tenant,
+  OrionldTenant*                                 tenantP,
   const std::vector<std::string>&                servicePathV
 )
 {
@@ -1208,7 +1210,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
+  subCacheMatch(tenantP->tenant, servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1256,7 +1258,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->httpInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                           orionldState.tenantP);
     subP->blacklist = cSubP->blacklist;
     subP->metadata  = cSubP->metadata;
 
@@ -1466,7 +1468,6 @@ static void fill_idPtypeP
 /* ****************************************************************************
 *
 * addTriggeredSubscriptions_noCache
-*
 */
 static bool addTriggeredSubscriptions_noCache
 (
@@ -1475,7 +1476,7 @@ static bool addTriggeredSubscriptions_noCache
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
-  const std::string&                             tenant,
+  OrionldTenant*                                 tenantP,
   const std::vector<std::string>&                servicePathV
 )
 {
@@ -1540,16 +1541,13 @@ static bool addTriggeredSubscriptions_noCache
   /* Composing final query */
   bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP));
 
-  std::string                    collection  = getSubscribeContextCollectionName(tenant);
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    errorString;
-
-  // LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), bgP->query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (collectionQuery(connection, collection, bgP->query, &cursor, &errorString) != true)
+  if (collectionQuery(connection, tenantP->subscriptions, bgP->query, &cursor, &errorString) != true)
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection);
@@ -1624,7 +1622,7 @@ static bool addTriggeredSubscriptions_noCache
                                                                httpInfo,
                                                                subToAttributeList(&sub),
                                                                "",
-                                                               "");
+                                                               &tenant0);
 
       trigs->blacklist = getBoolFieldF(&sub, CSUB_BLACKLIST);
 
@@ -1724,7 +1722,6 @@ static bool addTriggeredSubscriptions_noCache
 /* ****************************************************************************
 *
 * addTriggeredSubscriptions -
-*
 */
 static bool addTriggeredSubscriptions
 (
@@ -1733,7 +1730,7 @@ static bool addTriggeredSubscriptions
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
-  std::string                                    tenant,
+  OrionldTenant*                                 tenantP,
   const std::vector<std::string>&                servicePathV
 )
 {
@@ -1741,11 +1738,11 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenantP, servicePathV);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenantP, servicePathV);
   }
 }
 
@@ -1766,7 +1763,7 @@ static bool processOnChangeConditionForUpdateContext
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
   RenderFormat                     renderFormat,
-  std::string                      tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
@@ -1823,7 +1820,7 @@ static bool processOnChangeConditionForUpdateContext
   ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(&ncr,
                                           httpInfo,
-                                          tenant,
+                                          tenantP->tenant,
                                           xauthToken,
                                           fiwareCorrelator,
                                           renderFormat,
@@ -2076,7 +2073,7 @@ static bool processSubscriptions
   std::map<std::string, TriggeredSubscription*>& subs,
   ContextElementResponse*                        notifyCerP,
   std::string*                                   err,
-  const std::string&                             tenant,
+  OrionldTenant*                                 tenantP,
   const std::string&                             xauthToken,
   const std::string&                             fiwareCorrelator
 )
@@ -2161,7 +2158,7 @@ static bool processSubscriptions
       BSONObj      query   = BSON(keyId << id << keyType << type << keySp << sp << keyLoc << areaFilter);
 
       unsigned long long n;
-      if (!collectionCount(getEntitiesCollectionName(tenant), query, &n, &filterErr))
+      if (!collectionCount(tenantP->entities, query, &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;
@@ -2215,7 +2212,7 @@ static bool processSubscriptions
                                                                 tSubP->metadata,
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
-                                                                tenant,
+                                                                tenantP,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 tSubP->attrL.stringV,
@@ -2234,7 +2231,7 @@ static bool processSubscriptions
                               BSON(CSUB_LASTNOTIFICATION << orionldState.requestTime) <<
                               "$inc" << BSON(CSUB_COUNT << (long long) 1));
 
-        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+        ret = collectionUpdate(tenantP->subscriptions, query, update, false, err);
       }
 
 
@@ -2245,7 +2242,7 @@ static bool processSubscriptions
       {
         cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
 
-        CachedSubscription*  cSubP = subCacheItemLookup(tSubP->tenant.c_str(), tSubP->cacheSubId.c_str());
+        CachedSubscription*  cSubP = subCacheItemLookup(tSubP->tenantP->tenant, tSubP->cacheSubId.c_str());
 
         if (cSubP != NULL)
         {
@@ -2255,7 +2252,7 @@ static bool processSubscriptions
         else
         {
           LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
-                tSubP->cacheSubId.c_str(), tSubP->tenant.c_str()));
+                tSubP->cacheSubId.c_str(), tSubP->tenantP->tenant));
         }
 
         cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
@@ -2825,7 +2822,7 @@ static bool processContextAttributeVector
   BSONObjBuilder*                                 geoJson,
   mongo::Date_t*                                  dateExpiration,
   bool*                                           dateExpirationInPayload,
-  std::string                                     tenant,
+  OrionldTenant*                                  tenantP,
   const std::vector<std::string>&                 servicePathV,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
@@ -2970,7 +2967,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenantP, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2999,7 +2996,7 @@ static bool createEntity
   const ContextAttributeVector&    attrsV,
   double                           now,
   std::string*                     errDetail,
-  std::string                      tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
@@ -3011,12 +3008,12 @@ static bool createEntity
    * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
 
   if (orionldState.apiVersion != NGSI_LD_V1)
-    ensureLocationIndex(tenant);
+    ensureLocationIndex(tenantP);
 
   if (idIndex == true)
-    ensureIdIndex(tenant);
+    ensureIdIndex(tenantP);
 
-  ensureDateExpirationIndex(tenant);
+  ensureDateExpirationIndex(tenantP);
 
   if (!legalIdUsage(attrsV))
   {
@@ -3178,7 +3175,7 @@ static bool createEntity
   }
 
 
-  if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
+  if (!collectionInsert(tenantP->entities, insertedDoc.obj(), errDetail))
   {
     LM_E(("Internal Error (%s)", errDetail->c_str()));
     oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
@@ -3199,7 +3196,7 @@ static bool removeEntity
   const std::string&       entityId,
   const std::string&       entityType,
   ContextElementResponse*  cerP,
-  const std::string&       tenant,
+  OrionldTenant*           tenantP,
   const std::string&       servicePath,
   OrionError*              oe
 )
@@ -3229,7 +3226,7 @@ static bool removeEntity
   }
 
   std::string err;
-  if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
+  if (!collectionRemove(tenantP->entities, bob.obj(), &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3248,7 +3245,7 @@ static bool removeEntity
 */
 static void searchContextProviders
 (
-  const std::string&              tenant,
+  OrionldTenant*                  tenantP,
   const std::vector<std::string>& servicePathV,
   EntityId&                       en,
   ContextAttributeVector&         caV,
@@ -3270,7 +3267,7 @@ static void searchContextProviders
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrL, &crrV, &err, tenantP, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -3292,7 +3289,7 @@ static void searchContextProviders
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -3347,7 +3344,7 @@ static void updateEntity
 (
   const BSONObj*                  bobP,
   ActionType                      action,
-  const std::string&              tenant,
+  OrionldTenant*                  tenantP,
   const std::vector<std::string>& servicePathV,
   const std::string&              xauthToken,
   ContextElement*                 ceP,
@@ -3381,7 +3378,7 @@ static void updateEntity
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
   if ((action == ActionTypeDelete) && (ceP->contextAttributeVector.size() == 0))
   {
-    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
+    removeEntity(entityId, entityType, cerP, tenantP, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
     return;
   }
@@ -3492,7 +3489,7 @@ static void updateEntity
                                      &geoJson,
                                      &currentDateExpiration,
                                      &dateExpirationInPayload,
-                                     tenant,
+                                     tenantP,
                                      servicePathV,
                                      apiVersion,
                                      loopDetected,
@@ -3513,7 +3510,7 @@ static void updateEntity
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
     // in only one place
     //
-    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+    searchContextProviders(tenantP, servicePathV, *enP, ceP->contextAttributeVector, cerP);
 
     if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
     {
@@ -3660,7 +3657,7 @@ static void updateEntity
   query.append(servicePathString, fillQueryServicePath(servicePathV));
 
   std::string err;
-  if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
+  if (!collectionUpdate(tenantP->entities, query.obj(), updatedEntityObj, false, &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3677,7 +3674,7 @@ static void updateEntity
 
   /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
    * previous addTriggeredSubscriptions() invocations */
-  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken, fiwareCorrelator);
+  processSubscriptions(subsToNotify, notifyCerP, &err, tenantP, xauthToken, fiwareCorrelator);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3695,7 +3692,7 @@ static void updateEntity
    * add the corresponding ContextElementResponse to the global response
    */
   if ((orionldState.apiVersion != NGSI_LD_V1) && ((action == ActionTypeUpdate) || (action == ActionTypeReplace)))
-    searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+    searchContextProviders(tenantP, servicePathV, *enP, ceP->contextAttributeVector, cerP);
 
   // StatusCode may be set already (if so, we keep the existing value)
 
@@ -3824,7 +3821,7 @@ void processContextElement
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
   ActionType                           action,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
@@ -3879,7 +3876,7 @@ void processContextElement
     unsigned long long entitiesNumber;
     std::string        err;
 
-    if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
+    if (!collectionCount(tenantP->entities, query, &entitiesNumber, &err))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
       responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3918,7 +3915,7 @@ void processContextElement
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->entities, query, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -3986,7 +3983,7 @@ void processContextElement
   {
     updateEntity(&results[ix],
                  action,
-                 tenant,
+                 tenantP,
                  servicePathV,
                  xauthToken,
                  ceP,
@@ -4033,7 +4030,7 @@ void processContextElement
       if (orionldState.apiVersion != NGSI_LD_V1)
       {
         /* In the case of UPDATE or REPLACE we look for context providers */
-        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+        searchContextProviders(tenantP, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
       }
@@ -4067,7 +4064,7 @@ void processContextElement
       std::string  errReason;
       std::string  errDetail;
 
-      if (!createEntity(enP, ceP->contextAttributeVector, orionldState.requestTime, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
+      if (!createEntity(enP, ceP->contextAttributeVector, orionldState.requestTime, &errDetail, tenantP, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
         LM_E(("Internal Error (createEntity failed)"));
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
@@ -4091,7 +4088,7 @@ void processContextElement
                                        attrNames,
                                        subsToNotify,
                                        err,
-                                       tenant,
+                                       tenantP,
                                        servicePathV))
         {
           releaseTriggeredSubscriptions(&subsToNotify);
@@ -4123,7 +4120,7 @@ void processContextElement
         }
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
-        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
+        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenantP, xauthToken, fiwareCorrelator);
 
         notifyCerP->release();
         delete notifyCerP;

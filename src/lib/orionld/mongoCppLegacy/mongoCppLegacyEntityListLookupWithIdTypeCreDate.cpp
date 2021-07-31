@@ -40,7 +40,6 @@ extern "C"
 #include "mongoBackend/MongoGlobal.h"                                    // getMongoConnection, releaseMongoConnection, ...
 #include "mongoBackend/safeMongo.h"                                      // getStringFieldF, ...
 #include "orionld/common/orionldState.h"                                 // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbCollectionPathGet.h"                              // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                                  // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbNumberFieldGet.h"       // mongoCppLegacyDbNumberFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"       // mongoCppLegacyDbStringFieldGet
@@ -62,14 +61,6 @@ extern "C"
 //
 KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, bool attrNames)
 {
-  char collectionPath[256];
-
-  if (dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities") == -1)
-  {
-    LM_E(("Internal Error (dbCollectionPathGet returned -1)"));
-    return NULL;
-  }
-
   // Build the filter for the query
   mongo::BSONObjBuilder    filter;
   mongo::BSONObjBuilder    inObj;
@@ -108,7 +99,7 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
 
   try
   {
-    cursorP = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+    cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &fieldsToReturn);
   }
   catch (...)
   {

@@ -50,11 +50,11 @@ payload='[
     "location": {
       "type": "GeoProperty",
       "value": {
-        "type": "Point",
         "coordinates": [
           13.431112,
           52.294125
-        ]
+        ],
+        "type": "Point"
       },
       "observedAt": "2020-04-06T20:40:02.260Z"
     },
@@ -112,7 +112,7 @@ echo
 
 echo "02. GET the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -193,7 +193,7 @@ echo
 
 echo "04. GET the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -215,47 +215,46 @@ Date: REGEX(.*)
 02. GET the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 758
+Content-Length: 547
 Content-Type: application/json
 Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
-    "type": "GtfsStation",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008012713:MS",
-      "urn:ngsi-ld:GtfsStop:300000005271:MS",
-      "urn:ngsi-ld:GtfsStop:300000005273:MS"
-    ],
-    "name": "Rangsdorf, Bahnhof",
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        13.431112,
-        52.294125
-      ]
+    {
+        "hasStop": [
+            "urn:ngsi-ld:GtfsStop:000008012713:MS",
+            "urn:ngsi-ld:GtfsStop:300000005271:MS",
+            "urn:ngsi-ld:GtfsStop:300000005273:MS"
+        ],
+        "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+        "location": {
+            "coordinates": [
+                13.431112,
+                52.294125
+            ],
+            "type": "Point"
+        },
+        "name": "Rangsdorf, Bahnhof",
+        "type": "GtfsStation"
+    },
+    {
+        "hasStop": [
+            "urn:ngsi-ld:GtfsStop:000008010205:MS",
+            "urn:ngsi-ld:GtfsStop:000008098205:MS"
+        ],
+        "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+        "location": {
+            "coordinates": [
+                12.381321,
+                51.344817
+            ],
+            "type": "Point"
+        },
+        "name": "Leipzig, Hauptbahnhof",
+        "type": "GtfsStation"
     }
-  },
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
-    "type": "GtfsStation",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008010205:MS",
-      "urn:ngsi-ld:GtfsStop:000008098205:MS"
-    ],
-    "name": "Leipzig, Hauptbahnhof",
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        12.381321,
-        51.344817
-      ]
-    }
-  }
 ]
-
 
 
 03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)
@@ -277,63 +276,62 @@ Date: REGEX(.*)
 04. GET the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 1117
+Content-Length: 805
 Content-Type: application/json
 Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
-    "type": "GtfsStation",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008010205:MS",
-      "urn:ngsi-ld:GtfsStop:000008098205:MS"
-    ],
-    "name": "Leipzig, Hauptbahnhof",
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        12.381321,
-        51.344817
-      ]
+    {
+        "hasStop": [
+            "urn:ngsi-ld:GtfsStop:000008010205:MS",
+            "urn:ngsi-ld:GtfsStop:000008098205:MS"
+        ],
+        "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+        "location": {
+            "coordinates": [
+                12.381321,
+                51.344817
+            ],
+            "type": "Point"
+        },
+        "name": "Leipzig, Hauptbahnhof",
+        "type": "GtfsStation"
+    },
+    {
+        "hasStop": [
+            "urn:ngsi-ld:GtfsStop:000008012713:MS",
+            "urn:ngsi-ld:GtfsStop:300000005271:MS",
+            "urn:ngsi-ld:GtfsStop:300000005273:MS"
+        ],
+        "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+        "location": {
+            "coordinates": [
+                13.431112,
+                52.294125
+            ],
+            "type": "Point"
+        },
+        "name": "Rangsdorf, Bahnhof II",
+        "type": "GtfsStation"
+    },
+    {
+        "hasStop": [
+            "urn:ngsi-ld:GtfsStop:000008010205:MS",
+            "urn:ngsi-ld:GtfsStop:000008098205:MS"
+        ],
+        "id": "urn:ngsi-ld:GtfsStation:900000550091:MS",
+        "location": {
+            "coordinates": [
+                12.381321,
+                51.344817
+            ],
+            "type": "Point"
+        },
+        "name": "Leipzig, Hauptbahnhof",
+        "type": "GtfsStation"
     }
-  },
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
-    "type": "GtfsStation",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008012713:MS",
-      "urn:ngsi-ld:GtfsStop:300000005271:MS",
-      "urn:ngsi-ld:GtfsStop:300000005273:MS"
-    ],
-    "name": "Rangsdorf, Bahnhof II",
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        13.431112,
-        52.294125
-      ]
-    }
-  },
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000550091:MS",
-    "type": "GtfsStation",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008010205:MS",
-      "urn:ngsi-ld:GtfsStop:000008098205:MS"
-    ],
-    "name": "Leipzig, Hauptbahnhof",
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        12.381321,
-        51.344817
-      ]
-    }
-  }
 ]
-
 
 
 --TEARDOWN--

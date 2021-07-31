@@ -29,6 +29,8 @@
 #include <vector>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -43,7 +45,7 @@ extern HttpStatusCode mongoUpdateContext
 (
   UpdateContextRequest*                 requestP,
   UpdateContextResponse*                responseP,
-  const char*                           tenant,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const char*                           xauthToken,

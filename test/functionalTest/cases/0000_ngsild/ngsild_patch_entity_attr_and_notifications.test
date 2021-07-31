@@ -141,7 +141,7 @@ Date: REGEX(.*)
 
 04. Dump accumulator - see one notification
 ===========================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
 Content-Length: 254
 User-Agent: REGEX(.*)
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 
 06. Dump accumulator - see two notifications
 ============================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
 Content-Length: 254
 User-Agent: REGEX(.*)
@@ -206,7 +206,7 @@ Content-Type: application/json; charset=utf-8
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
 Content-Length: 254
 User-Agent: REGEX(.*)

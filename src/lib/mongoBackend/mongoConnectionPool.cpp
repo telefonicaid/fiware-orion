@@ -30,6 +30,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"               // mongoServerVersion
+
 #include "common/clockFunctions.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
@@ -269,7 +271,9 @@ static DBClientBase* mongoConnect
   BSONObj     result;
   std::string extra;
   runCollectionCommand(connection, "admin", BSON("buildinfo" << 1), &result, &err);
+
   std::string versionString = std::string(getStringFieldF(&result, "version"));
+  strncpy(mongoServerVersion, versionString.c_str(), sizeof(mongoServerVersion));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));

@@ -33,9 +33,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"   // Own interface
 
@@ -47,11 +48,7 @@ extern "C"
 //
 KjNode* mongoCppLegacyEntityLookup(const char* entityId)
 {
-  char    collectionPath[256];
   KjNode* kjTree = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
 
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
@@ -65,7 +62,7 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(queryBuilder.obj());
 
-  cursorP = connectionP->query(collectionPath, query);
+  cursorP = connectionP->query(orionldState.tenantP->entities, query);
 
   //
   // FIXME: Should not be a while-loop! Only ONE entity!!

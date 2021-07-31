@@ -193,7 +193,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
     char*                 details;
 
     // mongoGetLdSubscription takes the req semaphore
-    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &orionldState.httpStatusCode, &details) == true)
+    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenantP, &orionldState.httpStatusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);
       orionldState.httpStatusCode = SccConflict;
@@ -206,7 +206,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   subId = mongoCreateSubscription(sub,
                                   &oError,
-                                  orionldState.tenant,
+                                  orionldState.tenantP,
                                   ciP->servicePathV,
                                   ciP->httpHeaders.xauthToken,
                                   ciP->httpHeaders.correlator,

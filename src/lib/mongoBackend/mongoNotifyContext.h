@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
@@ -41,7 +43,7 @@ extern HttpStatusCode mongoNotifyContext
 (
   NotifyContextRequest*            requestP,
   NotifyContextResponse*           responseP,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const std::string&               fiwareCorrelator,

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
-#define SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTNOTIFY_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTNOTIFY_H_
 
 /*
 *
@@ -25,13 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "rest/ConnectionInfo.h"           // ConnectionInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// mongoAttributeExists -
+// orionldPostNotify -
 //
-extern bool mongoAttributeExists(const char* entityId, const char* attributeName, const char* tenant);
+extern bool orionldPostNotify(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOATTRIBUTEEXISTS_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTNOTIFY_H_

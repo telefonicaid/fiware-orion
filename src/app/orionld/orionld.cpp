@@ -109,7 +109,9 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
+#include "orionld/common/orionldTenantInit.h"                 // orionldTenantInit
 #include "orionld/common/orionldState.h"                      // orionldStateRelease, kalloc, ...
+#include "orionld/common/tenantList.h"                        // tenantList, tenant0
 #include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
@@ -213,6 +215,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            forwarding;
+bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
 
@@ -288,6 +291,7 @@ bool            noswap;
 #define FORWARDING_DESC        "turn on forwarding"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
+#define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
 
 
 
@@ -305,7 +309,7 @@ PaArgument paArgs[] =
   { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
   { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                  },
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC             },
-  { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            PaNL,   PaNL,             PORT_DESC                },
+  { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            1024,   65535,            PORT_DESC                },
   { "-pidpath",               pidPath,                  "PID_PATH",                  PaString,  PaOpt,  PIDPATH,         PaNL,   PaNL,             PIDPATH_DESC             },
   { "-dbhost",                dbHost,                   "MONGO_HOST",                PaString,  PaOpt,  LOCALHOST,       PaNL,   PaNL,             DBHOST_DESC              },
   { "-rplSet",                rplSet,                   "MONGO_REPLICA_SET",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC              },
@@ -361,6 +365,7 @@ PaArgument paArgs[] =
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
+  { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
 
   PA_END_OF_ARGS
 };
@@ -535,8 +540,13 @@ void exitFunc(void)
   orionldContextCacheRelease();
 
   // Free the tenant list
-  for (unsigned int ix = 0; ix < tenants; ix++)
-    free(tenantV[ix]);
+  OrionldTenant* tenantP = tenantList;
+  while (tenantP != NULL)
+  {
+    OrionldTenant* next = tenantP->next;
+    free(tenantP);
+    tenantP = next;
+  }
 
   // Disconnect from all MQTT brokers and free the connections
   mqttRelease();
@@ -937,6 +947,11 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+
+  //
+  // Initialize Tenant list
+  //
+  orionldTenantInit();
 
   mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);

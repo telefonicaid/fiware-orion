@@ -126,7 +126,7 @@ bool orionldPostTemporalEntities(ConnectionInfo* ciP)
   //
   int httpStatusCode = 201;
 
-  if (mongoEntityExists(entityId, orionldState.tenant) == true)
+  if (mongoEntityExists(entityId, orionldState.tenantP) == true)
     httpStatusCode = 204;
 
   //

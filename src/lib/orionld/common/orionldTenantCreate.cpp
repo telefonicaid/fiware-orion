@@ -32,8 +32,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/orionldState.h"                       // tenantV, tenants
+#include "orionld/db/dbConfiguration.h"                        // dbIdIndexCreate
 #include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/tenantList.h"                         // tenantList
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 
@@ -42,16 +45,43 @@ extern "C"
 //
 // orionldTenantCreate
 //
-void orionldTenantCreate(char* tenant)
+// This function, except for the init phase, is running with the tenant semaphore taken
+// (when called from orionldTenantGet)
+//
+OrionldTenant* orionldTenantCreate(const char* tenantName)
 {
-  if (tenants >= K_VEC_SIZE(tenantV))
-    LM_X(1, ("Too many tenants in the system - increase the size of tenantV and recompile!"));
+  if ((tenantName == NULL) || (tenantName[0] == 0))
+  {
+    LM_W(("TENANT: Attempt to create the default tenant! (tenantName at %p)", tenantName));
+    return &tenant0;
+  }
 
-  tenantV[tenants++] = strdup(tenant);
+  OrionldTenant* tenantP = (OrionldTenant*) malloc(sizeof(OrionldTenant));
 
+  if (tenantP == NULL)
+    LM_RE(NULL, ("Out of memory"));
+
+  snprintf(tenantP->tenant,          sizeof(tenantP->mongoDbName),   "%s",                  tenantName);
+  snprintf(tenantP->mongoDbName,     sizeof(tenantP->mongoDbName),   "%s-%s",               dbName, tenantName);
+  snprintf(tenantP->entities,        sizeof(tenantP->entities),      "%s-%s.entities",      dbName, tenantName);
+  snprintf(tenantP->subscriptions,   sizeof(tenantP->subscriptions), "%s-%s.csubs",         dbName, tenantName);
+  snprintf(tenantP->avSubscriptions, sizeof(tenantP->subscriptions), "%s-%s.casubs",        dbName, tenantName);
+  snprintf(tenantP->registrations,   sizeof(tenantP->registrations), "%s-%s.registrations", dbName, tenantName);
+  snprintf(tenantP->troeDbName,      sizeof(tenantP->troeDbName),    "%s_%s",               dbName, tenantName);
+
+  // Add new tenant to tenant list
+  tenantP->next = tenantList;  // It's OK if the tenant list is empty (tenantList == NULL)
+  tenantList    = tenantP;
+
+  if (idIndex == true)
+    dbIdIndexCreate(tenantP);
+
+  // if TRoE is on, need to create the DB in postgres
   if (troe)
   {
-    if (pgDatabasePrepare(orionldState.troeDbName) != true)
-      LM_E(("Database Error (unable to prepare a new TRoE database for tenant '%s')", orionldState.troeDbName));
+    if (pgDatabasePrepare(tenantP->troeDbName) != true)
+      LM_E(("Database Error (unable to prepare a new TRoE database for tenant '%s')", orionldState.tenantP->troeDbName));
   }
+
+  return tenantP;
 }

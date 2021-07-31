@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"    // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "orionTypes/EntityTypeResponse.h"
@@ -72,7 +73,7 @@ std::string getAttributesForEntityType
   //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
   //   The parameter is only used for NGSIv2.
   //
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, true, ciP->apiVersion));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, orionldState.tenantP, ciP->servicePathV, ciP->uriParam, true, ciP->apiVersion));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP->apiVersion,

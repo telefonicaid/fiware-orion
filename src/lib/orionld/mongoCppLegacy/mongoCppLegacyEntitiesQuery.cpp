@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/qTreeToBsonObj.h"                       // qTreeToBsonObj
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"  // Own interface
@@ -490,7 +489,6 @@ static void geoqFilter(mongo::BSONObjBuilder* queryBuilderP, KjNode* geoqP)
 //
 KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP)
 {
-  char                   collectionPath[256];
   mongo::BSONObjBuilder  queryBuilder;
   char*                  title;
   char*                  detail;
@@ -517,8 +515,6 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(queryBuilder.obj());
 
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
   //
   // Count asked for ?
   //
@@ -526,7 +522,7 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
   {
     try
     {
-      *countP = connectionP->count(collectionPath, query);
+      *countP = connectionP->count(orionldState.tenantP->entities, query);
     }
     catch (const std::exception &e)
     {
@@ -537,14 +533,14 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
   }
 
   //
-  // Performing the Query to the database
+  // Performing the Query in the database
   //
   if (limit != 0)
   {
     // Sort according to creDate
     query.sort("creDate", 1);
 
-    cursorP = connectionP->query(collectionPath, query, limit, offset);
+    cursorP = connectionP->query(orionldState.tenantP->entities, query, limit, offset);
 
     try
     {

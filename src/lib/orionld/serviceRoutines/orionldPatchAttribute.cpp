@@ -45,6 +45,7 @@ extern "C"
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
@@ -56,7 +57,6 @@ extern "C"
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
-#include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
@@ -424,10 +424,10 @@ static bool orionldForwardPatchAttribute
   OrionldHttpHeader headerV[5];
   int               header = 0;
 
-  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+  if (orionldState.tenantP != &tenant0)
   {
     headerV[header].type  = HttpHeaderTenant;
-    headerV[header].value = orionldState.tenant;
+    headerV[header].value = orionldState.tenantP->tenant;
     ++header;
   }
   if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
@@ -846,7 +846,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   ucr.updateActionType        = ActionTypeUpdate;
   orionldState.httpStatusCode = mongoUpdateContext(&ucr,
                                                    &mongoResponse,
-                                                   orionldState.tenant,
+                                                   orionldState.tenantP,
                                                    ciP->servicePathV,
                                                    ciP->uriParam,
                                                    ciP->httpHeaders.xauthToken.c_str(),

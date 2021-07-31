@@ -87,7 +87,6 @@ public:
   std::string                version;
   std::string                charset;
   std::string                tenantFromHttpHeader;
-  std::string                tenant;
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;

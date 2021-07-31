@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "rest/ConnectionInfo.h"
@@ -63,7 +65,7 @@ std::string deleteSubscription
   // 'Fill In' UnsubscribeContextRequest
   parseDataP->uncr.res.subscriptionId.set(subscriptionId);
 
-  TIMED_MONGO(mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_MONGO(mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, orionldState.tenantP));
 
   // Check for potential error
   std::string  answer = "";

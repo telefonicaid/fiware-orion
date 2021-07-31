@@ -29,6 +29,10 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
@@ -66,11 +70,14 @@ HttpStatusCode mongoRegisterContext
   RegisterContextResponse*             responseP,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   fiwareCorrelator,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::string&                   servicePath
 )
 {
   bool         reqSemTaken;
+
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
 
   // FIXME P4: See issue #3078
   std::string  sPath = (servicePath == "")? SERVICE_PATH_ROOT : servicePath;
@@ -80,7 +87,7 @@ HttpStatusCode mongoRegisterContext
   /* Check if new registration */
   if (requestP->registrationId.isEmpty())
   {
-    HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON", fiwareCorrelator);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenantP, sPath, "JSON", fiwareCorrelator);
 
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
@@ -111,10 +118,9 @@ HttpStatusCode mongoRegisterContext
     return SccOk;
   }
 
-  const std::string    colName  = getRegistrationsCollectionName(tenant);
-  const mongo::BSONObj bson     = BSON("_id" << id << REG_SERVICE_PATH << sPath);
+  const mongo::BSONObj bson = BSON("_id" << id << REG_SERVICE_PATH << sPath);
 
-  if (!collectionFindOne(colName, bson, &reg, &err))
+  if (!collectionFindOne(tenantP->registrations, bson, &reg, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -134,7 +140,7 @@ HttpStatusCode mongoRegisterContext
     return SccOk;
   }
 
-  HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON", fiwareCorrelator);
+  HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenantP, sPath, "JSON", fiwareCorrelator);
   reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
   return result;
 }

@@ -28,6 +28,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "common/string.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -309,7 +311,7 @@ HttpStatusCode mongoQueryContext
 (
   QueryContextRequest*                 requestP,
   QueryContextResponse*                responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   std::map<std::string, bool>&         options,
@@ -321,6 +323,11 @@ HttpStatusCode mongoQueryContext
   int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
 
   std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
+
+  if (orionldState.uriParams.limit != 0)
+    limit = orionldState.uriParams.limit;
+  if (orionldState.uriParams.offset != 0)
+    offset = orionldState.uriParams.offset;
 
   LM_T(LmtMongo, ("QueryContext Request"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
@@ -370,7 +377,7 @@ HttpStatusCode mongoQueryContext
                      &rawCerV,
                      &err,
                      true,
-                     tenant,
+                     tenantP,
                      servicePathV,
                      offset,
                      limit,
@@ -398,7 +405,7 @@ HttpStatusCode mongoQueryContext
     /* In the case of empty response, if only generic processing is needed */
     if (rawCerV.size() == 0)
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -412,7 +419,7 @@ HttpStatusCode mongoQueryContext
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
     if (someContextElementNotFound(rawCerV))
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -429,7 +436,7 @@ HttpStatusCode mongoQueryContext
 
     if (someContextElementNotFound(rawCerV))
     {
-      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -446,7 +453,7 @@ HttpStatusCode mongoQueryContext
      */
     if (requestP->attributeList.size() == 0)
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {

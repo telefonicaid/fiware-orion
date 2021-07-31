@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "orionld/types/OrionldTenant.h"                // OrionldTenant
+#include "orionld/common/tenantList.h"                  // tenant0
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -41,7 +44,7 @@ extern HttpStatusCode mongoUnsubscribeContext
 (
   UnsubscribeContextRequest*   requestP,
   UnsubscribeContextResponse*  responseP,
-  const std::string&           tenant = ""
+  OrionldTenant*               tenantP = &tenant0
 );
 
 
@@ -53,10 +56,10 @@ extern HttpStatusCode mongoUnsubscribeContext
 */
 extern bool mongoDeleteLdSubscription
 (
-  const char*  subId,
-  const char*  tenant,
-  int*         statusCodeP,
-  char**       details
+  const char*     subId,
+  OrionldTenant*  tenantP,
+  int*            statusCodeP,
+  char**          details
 );
 #endif  // ORIONLD
 

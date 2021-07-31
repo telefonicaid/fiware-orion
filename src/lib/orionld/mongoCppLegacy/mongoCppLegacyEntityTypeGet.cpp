@@ -36,7 +36,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypeGet.h"  // Own interface
@@ -73,6 +72,7 @@ extern "C"
 static bool kjAttributesWithTypeExtract(KjNode* kjTree, KjNode* entityP)
 {
   KjNode* attrsP = kjLookup(kjTree, "attrs");
+
   if (attrsP == NULL)
     return false;
 
@@ -149,11 +149,6 @@ static bool kjAttributesWithTypeExtract(KjNode* kjTree, KjNode* entityP)
 //
 KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* typeLongName, int* noOfEntitiesP)
 {
-  char collectionPath[256];
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
-
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
   //
@@ -171,7 +166,7 @@ KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* type
   mongo::Query                          query(queryBuilder.obj());
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
   mongo::BSONObj                        fieldsToReturn = dbFields.obj();
-  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &fieldsToReturn);
   KjNode*                               outArray       = kjArray(orionldState.kjsonP, NULL);
   int                                   entities       = 0;
 
@@ -197,6 +192,8 @@ KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* type
   }
 
   *noOfEntitiesP = entities;
+
+  releaseMongoConnection(connectionP);
 
   return outArray;
 }

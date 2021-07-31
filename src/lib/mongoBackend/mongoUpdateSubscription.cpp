@@ -28,6 +28,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+
 #include "common/defaultValues.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
@@ -283,7 +286,7 @@ static void setCondsAndInitialNotifyNgsiv1
   const std::string&               status,
   const std::string&               url,
   RenderFormat                     attrsFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -343,7 +346,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             ngsiv2::HttpInfo(url),
                                             notificationDone,
                                             attrsFormat,
-                                            tenant,
+                                            tenantP,
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),
@@ -366,7 +369,7 @@ static void setCondsAndInitialNotify
 (
   const SubscriptionUpdate&        subUp,
   const BSONObj*                   subOrigP,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
@@ -439,7 +442,7 @@ static void setCondsAndInitialNotify
                                      status,
                                      httpInfo.url,
                                      attrsFormat,
-                                     tenant,
+                                     tenantP,
                                      servicePathV,
                                      xauthToken,
                                      fiwareCorrelator,
@@ -456,7 +459,7 @@ static void setCondsAndInitialNotify
                                httpInfo,
                                blacklist,
                                attrsFormat,
-                               tenant,
+                               tenantP,
                                servicePathV,
                                xauthToken,
                                fiwareCorrelator,
@@ -704,7 +707,7 @@ void updateInCache
 (
   const BSONObj&             doc,
   const SubscriptionUpdate&  subUp,
-  const std::string&         tenant,
+  OrionldTenant*             tenantP,
   double                     lastNotification,
   double                     lastFailure,
   double                     lastSuccess
@@ -768,7 +771,7 @@ void updateInCache
   //
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
-  CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  CachedSubscription* subCacheP        = subCacheItemLookup(tenantP->tenant, subUp.id.c_str());
   char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
   std::string         q;
   std::string         mq;
@@ -795,7 +798,7 @@ void updateInCache
   }
 
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+  int mscInsert = mongoSubCacheItemInsert(tenantP->tenant,
                                           doc,
                                           subUp.id.c_str(),
                                           servicePathCache,
@@ -842,7 +845,7 @@ std::string mongoUpdateSubscription
 (
   const SubscriptionUpdate&        subUp,
   OrionError*                      oe,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator
@@ -880,7 +883,7 @@ std::string mongoUpdateSubscription
   }
 
   std::string err;
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &subOrig, &err))
+  if (!collectionFindOne(tenantP->subscriptions, BSON("_id" << id), &subOrig, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
@@ -907,7 +910,7 @@ std::string mongoUpdateSubscription
 
   if (!noCache)
   {
-    subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+    subCacheP = subCacheItemLookup(tenantP->tenant, subUp.id.c_str());
   }
 
   setExpiration(subUp, subOrig, &b);
@@ -923,7 +926,7 @@ std::string mongoUpdateSubscription
 
   setCondsAndInitialNotify(subUp,
                            &subOrig,
-                           tenant,
+                           tenantP,
                            servicePathV,
                            xauthToken,
                            fiwareCorrelator,
@@ -967,10 +970,9 @@ std::string mongoUpdateSubscription
   BSONObj doc = b.obj();
 
   // Update in DB
-  std::string  colName = getSubscribeContextCollectionName(tenant);
   BSONObj      bson    = BSON("_id" << OID(subUp.id));
 
-  if (!collectionUpdate(colName, bson, doc, false, &err))
+  if (!collectionUpdate(tenantP->subscriptions, bson, doc, false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
@@ -981,7 +983,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification, lastFailure, lastSuccess);
+    updateInCache(doc, subUp, tenantP, lastNotification, lastFailure, lastSuccess);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

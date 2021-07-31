@@ -30,6 +30,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoRegisterContext.h"
@@ -187,7 +189,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams, "", "/");
+  ms = mongoRegisterContext(&req, &res, uriParams, "no correlator", &tenant0, "/");
   EXPECT_EQ(200, ms);
 
   /* Check that every involved collection at MongoDB is as expected */

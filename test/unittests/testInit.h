@@ -65,10 +65,22 @@ extern const char* C_STR_FIELD(mongo::BSONObj bob, std::string f);
 *
 * setupDatabase -
 *
-* This function (which is called before every test) cleans the database and set
+* This function (which is called before every test) cleans the database and sets
 * collection names
 */
 extern void setupDatabase(void);
+
+
+
+//
+// There functions replace those that were removed inside mongoBackend
+// in the PR that fixed the "collection name compose problem", June 2021
+//
+extern void setDbPrefix(const char* prefix);
+extern void setRegistrationsCollectionName(const char* colName);
+extern void setEntitiesCollectionName(const char* colName);
+extern void setSubscribeContextCollectionName(const char* colName);
+extern void setSubscribeContextAvailabilityCollectionName(const char* colName);
 
 
 

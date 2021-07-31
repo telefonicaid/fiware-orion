@@ -22,11 +22,10 @@
 *
 * Author: Orion dev team
 */
-
-#include "serviceRoutinesV2/getSubscription.h"
-
 #include <string>
 #include <vector>
+
+#include "orionld/common/orionldState.h"        // orionldState
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -39,6 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "common/idCheck.h"
+#include "serviceRoutinesV2/getSubscription.h"
 
 
 
@@ -70,7 +70,7 @@ std::string getSubscription
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, orionldState.tenantP));
 
   if (oe.code != SccOk)
   {

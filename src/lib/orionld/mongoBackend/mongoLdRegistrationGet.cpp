@@ -35,6 +35,8 @@
 #include "mongoBackend/connectionOperations.h"                 // collectionQuery
 #include "mongoBackend/safeMongo.h"                            // moreSafe
 #include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLdRelationshipV, mongoSetLdPropertyV, ...
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // Own interface
 
@@ -48,7 +50,7 @@ bool mongoLdRegistrationGet
 (
   ngsiv2::Registration*  regP,
   const char*            regId,
-  const char*            tenant,
+  OrionldTenant*         tenantP,
   int*                   statusCodeP,
   char**                 detailP
 )
@@ -66,7 +68,7 @@ bool mongoLdRegistrationGet
   //
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), query, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->registrations, query, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

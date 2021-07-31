@@ -45,7 +45,6 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                             // orionldState
-#include "orionld/common/orionldTenantInit.h"                        // orionldTenantInit
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -84,6 +83,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
 #include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
+#include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
 
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
@@ -247,6 +247,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
   }
+  else if (serviceP->serviceRoutine == orionldPostNotify)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
+  }
   else if (serviceP->serviceRoutine == orionldGetEntities)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
@@ -367,15 +371,18 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
-    serviceP->options  = 0;  // Tenant will be created if necessary
+    serviceP->options    = 0;  // Tenant will be created if necessary
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
   {
-    serviceP->options  = 0;  // Tenant will be created if necessary
+    serviceP->options    = 0;  // Tenant will be created if necessary
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
@@ -569,10 +576,6 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   mqttConnectionInit();
 
-  //
-  // Initialize Tenant list
-  //
-  orionldTenantInit();
 
   //
   // Initialize checks for incoming payloads

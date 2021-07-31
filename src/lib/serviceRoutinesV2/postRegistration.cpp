@@ -27,6 +27,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"            // orionldState
 #include "common/defaultValues.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -88,7 +89,7 @@ std::string postRegistration
     return answer;
   }
 
-  TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, ciP->tenant, servicePath, &regId, &oe));
+  TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, orionldState.tenantP, servicePath, &regId, &oe));
   ciP->httpStatusCode = oe.code;
 
   if (oe.code != SccOk)

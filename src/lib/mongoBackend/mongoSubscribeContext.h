@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -42,7 +44,7 @@ extern HttpStatusCode mongoSubscribeContext
 (
   SubscribeContextRequest*         requestP,
   SubscribeContextResponse*        responseP,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   const std::string&               fiwareCorrelator = "no correlator"

@@ -49,11 +49,13 @@ SET (SOURCES
     orionldTenantInit.cpp
     orionldTenantLookup.cpp
     orionldTenantCreate.cpp
+    orionldTenantGet.cpp
     attributeUpdated.cpp
     attributeNotUpdated.cpp
     isSpecialSubAttribute.cpp
     duplicatedInstances.cpp
     troeIgnored.cpp
+    tenantList.cpp
 )
 
 # Include directories

@@ -147,12 +147,17 @@ read X
 echo "1.4. Enter the PID of the broker, and press <CR>"
 echo "================================================"
 ps aux | grep orionld | grep -v grep | grep -v 'emacs ' | grep -v 'gdb '
-echo -n	"<Enter the PID of the broker + CR> "
+echo -n	"<Enter the PID of the broker + CR ('0' for no RAM-limit)> "
 
 read PID
-echo Orion-LD: process ID $PID
-prlimit --pid $PID --as=$brokerMaxMem  # 6 gigabytes, by default
-echo "Limited the RAM usage of the broker to $brokerMaxMem bytes"
+if [ "$PID" == "0" ]
+then
+  echo ""
+else
+  echo Orion-LD: process ID $PID
+  prlimit --pid $PID --as=$brokerMaxMem  # 6 gigabytes, by default
+  echo "Limited the RAM usage of the broker to $brokerMaxMem bytes"
+fi
 echo
 echo
 

@@ -27,10 +27,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldTenant.h"
+
 #include "common/sem.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
@@ -58,7 +59,7 @@ HttpStatusCode mongoUnsubscribeContext
 (
   UnsubscribeContextRequest*   requestP,
   UnsubscribeContextResponse*  responseP,
-  const std::string&           tenant
+  OrionldTenant*               tenantP
 )
 {
   bool         reqSemTaken;
@@ -108,7 +109,7 @@ HttpStatusCode mongoUnsubscribeContext
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  if (!collectionFindOne(tenantP->subscriptions, BSON("_id" << id), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -135,9 +136,7 @@ HttpStatusCode mongoUnsubscribeContext
   // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
   // to findAndModify for this?
   //
-  std::string colName = getSubscribeContextCollectionName(tenant);
-
-  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  if (!collectionRemove(tenantP->subscriptions, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -152,11 +151,11 @@ HttpStatusCode mongoUnsubscribeContext
   //
   LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
                      requestP->subscriptionId.get().c_str(),
-                     tenant.c_str()));
+                     tenantP->tenant));
 
   cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, requestP->subscriptionId.get().c_str());
 
   if (cSubP != NULL)
   {
@@ -179,10 +178,10 @@ HttpStatusCode mongoUnsubscribeContext
 */
 bool mongoDeleteLdSubscription
 (
-  const char*  subId,
-  const char*  tenant,
-  int*         httpStatusCodeP,
-  char**       details
+  const char*     subId,
+  OrionldTenant*  tenantP,
+  int*            httpStatusCodeP,
+  char**          details
 )
 {
   bool         reqSemTaken;
@@ -191,7 +190,7 @@ bool mongoDeleteLdSubscription
   reqSemTake(__FUNCTION__, "ngsi-ld unsubscribe request", SemWriteOp, &reqSemTaken);
 
   BSONObj sub;
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << subId), &sub, &err))
+  if (!collectionFindOne(tenantP->subscriptions, BSON("_id" << subId), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -218,9 +217,7 @@ bool mongoDeleteLdSubscription
   // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
   // to findAndModify for this?
   //
-  std::string colName = getSubscribeContextCollectionName(tenant);
-
-  if (!collectionRemove(colName, BSON("_id" << subId), &err))
+  if (!collectionRemove(tenantP->subscriptions, BSON("_id" << subId), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -233,11 +230,11 @@ bool mongoDeleteLdSubscription
   //
   // Removing subscription from mongo subscription cache
   //
-  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", subId, tenant));
+  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", subId, tenantP->tenant));
 
   cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-  CachedSubscription* cSubP = subCacheItemLookup(tenant, subId);
+  CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subId);
   if (cSubP != NULL)
     subCacheItemRemove(cSubP);
 

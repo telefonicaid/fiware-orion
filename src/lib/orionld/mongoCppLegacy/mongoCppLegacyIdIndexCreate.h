@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldTenant.h"                          // OrionldTenant
 
 
 
@@ -32,6 +33,6 @@
 //
 // mongoCppLegacyIdIndexCreate -
 //
-extern bool mongoCppLegacyIdIndexCreate(const char* tenant);
+extern bool mongoCppLegacyIdIndexCreate(OrionldTenant* tenantP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYIDINDEXCREATE_H_

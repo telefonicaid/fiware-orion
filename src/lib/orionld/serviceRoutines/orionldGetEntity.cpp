@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
@@ -195,6 +196,9 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
         attrsV[attrs++] = uriParamAttrV[ix];
     }
 
+    if (attrs == 0)
+      return NULL;
+
     attrsToAlias(orionldState.contextP, attrsV, attrs);
     kStringArrayJoin(newUriParamAttrsString, attrsV, attrs, ",");
   }
@@ -231,6 +235,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
   }
 
+
   //
   // Sending the Forwarded request
   //
@@ -249,10 +254,10 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   OrionldHttpHeader headerV[5];
   int               header = 0;
 
-  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+  if (orionldState.tenantP != &tenant0)
   {
     headerV[header].type  = HttpHeaderTenant;
-    headerV[header].value = orionldState.tenant;
+    headerV[header].value = orionldState.tenantP->tenant;
     ++header;
   }
 
@@ -304,7 +309,6 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
     KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, attrsV, attrs);
     if (partTree == NULL)
     {
-      LM_E(("Internal Error (forwarded request failed)"));
       continue;
     }
 
@@ -433,7 +437,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   orionldState.httpStatusCode = mongoQueryContext(&request,
                                                   &response,
-                                                  orionldState.tenant,
+                                                  orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   ciP->uriParam,
                                                   ciP->uriParamOptions,

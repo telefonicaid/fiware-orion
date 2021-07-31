@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                               // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postUnsubscribeContextAvailability.h"
@@ -51,7 +52,7 @@ std::string postUnsubscribeContextAvailability
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant));
+  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, orionldState.tenantP));
   TIMED_RENDER(answer = ucar.render());
 
   return answer;

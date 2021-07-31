@@ -125,7 +125,7 @@ static void responseTreat(OrionldNotificationInfo* niP, char* buf, int bufLen)
 
 // -----------------------------------------------------------------------------
 //
-// orionldNotify -
+// orionldNotify - SHOULD BE MOVED to another directory/library
 //
 // This function assumes that the vector orionldState.notificationInfo is
 // correctly filled in.
