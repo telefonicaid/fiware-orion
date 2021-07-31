@@ -34,6 +34,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                          // KjNode, kjValueType
 #include "kjson/kjLookup.h"                                        // kjLookup
+#include "kjson/kjRender.h"                                        // kjFastRender
 }
 
 #include "logMsg/logMsg.h"
@@ -62,6 +63,8 @@ extern "C"
 #include "orionld/common/dotForEq.h"                               // dotForEq
 #include "orionld/common/eqForDot.h"                               // eqForDot
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
+#include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -462,6 +465,27 @@ static void appendMetadata
 
 
 
+bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* oldValueAsBsonP)
+{
+  char*    details;
+  char*    title        = (char*) "no title";
+  KjNode*  newValueTree = kjTreeFromCompoundValue(newValueP, NULL, false, &details);
+  KjNode*  oldValueTree = mongoCppLegacyDataToKjTree(oldValueAsBsonP, false, &title, &details);
+
+  if ((newValueTree == NULL) || (oldValueTree == NULL))
+    LM_RE(true, ("%s: %s", title, details));
+
+  char buf[1024];
+  kjFastRender(newValueTree, buf);
+  LM_TMP(("CDIF: New Value: %s", buf));
+  kjFastRender(oldValueTree, buf);
+  LM_TMP(("CDIF: OLD Value: %s", buf));
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * mergeAttrInfo -
@@ -648,7 +672,20 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     // has really changed its value (many levels have to be traversed). Until we can develop the
     // matching logic, we consider actualUpdate always true.
     //
-    actualUpdate = true;
+
+    const char*     attrType = getStringFieldF(&attr, ENT_ATTRS_TYPE);
+    mongo::BSONObj  value;
+
+    getObjectFieldF(&value, &attr, "value");
+    
+    if ((caP->type != "") && (strcmp(attrType, caP->type.c_str()) != 0))
+      actualUpdate = true;
+    else if (mdNew.nFields() != mdSize)
+      actualUpdate = true;
+    else if (!equalMetadata(&md, &mdNew))
+      actualUpdate = true;
+    else if (compoundValueDiffers(caP->compoundValueP, &value) == true)
+      actualUpdate = true;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
