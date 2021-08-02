@@ -27,7 +27,7 @@ MQTT notification tests
 dbInit CB
 
 # tracelevel 163 is the one for MQTT notification logs
-brokerStart CB 163 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
+brokerStart CB 163 IPV4
 accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
 
 --SHELL--

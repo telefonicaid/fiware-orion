@@ -40,7 +40,6 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueWorkers.h"
-//#include "mqtt/mqtt.h"
 
 
 

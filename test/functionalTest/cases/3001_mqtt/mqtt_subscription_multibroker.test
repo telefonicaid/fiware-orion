@@ -27,7 +27,7 @@ MQTT subscription multibroker
 dbInit CB
 
 # tracelevel 163 is the one for MQTT notification logs
-brokerStart CB 163 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
+brokerStart CB 163 IPV4
 
 
 --SHELL--

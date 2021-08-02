@@ -32,7 +32,6 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
-//#include "mqtt/mqtt.h"
 
 /* ****************************************************************************
 *

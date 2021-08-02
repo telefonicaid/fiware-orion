@@ -106,7 +106,6 @@
 #include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
-//#include "mqtt/mqtt.h"
 
 #include "contextBroker/orionRestServices.h"
 
@@ -201,10 +200,6 @@ bool            fcEnabled;
 double          fcGauge;
 unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
-
-char            mqttHost[64];
-int             mqttPort;
-int             mqttKeepAlive;
 
 
 
@@ -359,11 +354,6 @@ PaArgument paArgs[] =
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
 
   { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,             NGSIV1_AUTOCAST              },
-
-  // FIXME PR: MQTT broker endpoint should be part of the notification information and not a CLI parameter
-  { "-mqttHost",                    mqttHost,               "MQTT_HOST",                PaString, PaOpt, _i "",                           PaNL,  PaNL,             MQTT_HOST_DESC               },
-  { "-mqttPort",                    &mqttPort,              "MQTT_PORT",                PaInt,    PaOpt, 1883,                            PaNL,  PaNL,             MQTT_PORT_DESC               },
-  { "-mqttKeepAlive",               &mqttKeepAlive,         "MQTT_KEEP_ALIVE",          PaInt,    PaOpt, 60,                              PaNL,  PaNL,             MQTT_KEEP_ALIVE_DESC         },
 
   PA_END_OF_ARGS
 };
@@ -1196,14 +1186,6 @@ int main(int argC, char* argV[])
   // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
   // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
   SSL_library_init();
-
-#if 0
-  // Initialize MQTT Client
-  if (strlen(mqttHost) > 0)
-  {
-    mqttInit(mqttHost, mqttPort, mqttKeepAlive);
-  }
-#endif
 
   // Startup libcurl
   if (curl_global_init(CURL_GLOBAL_SSL) != 0)

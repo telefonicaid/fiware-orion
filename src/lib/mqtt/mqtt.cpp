@@ -27,7 +27,6 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "mqtt/mqtt.h"
 
 
 /* ****************************************************************************

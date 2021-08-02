@@ -21,13 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    #mqtt.cpp
     MqttConnectionManager.cpp
     mqttMgr.cpp
 )
 
 SET (HEADERS
-    #mqtt.h
     MqttConnectionManager.h
     mqttMgr.h
 )

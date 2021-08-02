@@ -134,9 +134,6 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-disableMetrics' (turn off the 'metrics' feature)]                         ORION_DISABLE_METRICS              FALSE /FALSE/
                                [option '-insecureNotif' (allow HTTPS notifications to peers which certificate c]   ORION_INSECURE_NOTIF               FALSE /FALSE/
                                [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSI]   ORION_NGSIV1_AUTOCAST              FALSE /FALSE/
-                               [option '-mqttHost' <MQTT broker hostname>]                                         ORION_MQTT_HOST                    '' /''/
-                               [option '-mqttPort' <MQTT broker port, default: 1883>]                              ORION_MQTT_PORT                    1883 /1883/
-                               [option '-mqttKeepAlive' <keep alive period for MQTT broker connection, default:]   ORION_MQTT_KEEP_ALIVE              60 /60/
 
 
 
