@@ -63,8 +63,6 @@ class AlarmManager
 
   int  init(bool logAlreadyRaisedAlarms);
 
-  void         semTake(void);
-  void         semGive(void);
   const char*  semGet(void);
 
   void notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways);
@@ -92,6 +90,8 @@ class AlarmManager
 
  private:
   int  semInit(void);
+  void semTake(void);
+  void semGive(void);
 };
 
 #endif  // SRC_LIB_ALARMMGR_ALARMMANAGER_H_
