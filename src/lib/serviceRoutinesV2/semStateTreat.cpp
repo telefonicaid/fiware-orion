@@ -93,6 +93,7 @@ std::string semStateTreat
   jh.addRaw("timeStat",            semRender(timeStatSemGet()));
   jh.addRaw("logMsg",              semRender(lmSemGet()));
   jh.addRaw("alarmMgr",            semRender(alarmMgr.semGet()));
+  // FIXME PR: MqttConnectionManager. Also in management_api.md
   jh.addRaw("metricsMgr",          semRender(metricsMgr.semStateGet()));
   jh.addRaw("connectionContext",   semRender(connectionSubContextSemGet()));
   jh.addRaw("connectionEndpoints", semRender(connectionSubContextSemGet()));

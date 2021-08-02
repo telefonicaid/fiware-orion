@@ -103,9 +103,10 @@
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
-#include "mqtt/mqtt.h"
+//#include "mqtt/mqtt.h"
 
 #include "contextBroker/orionRestServices.h"
 
@@ -585,7 +586,7 @@ void exitFunc(void)
     }
   }
 
-  mqttCleanup();
+  mqttMgr.release();
   
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1186,6 +1187,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
+  mqttMgr.init();
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
@@ -1195,11 +1197,13 @@ int main(int argC, char* argV[])
   // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
   SSL_library_init();
 
+#if 0
   // Initialize MQTT Client
   if (strlen(mqttHost) > 0)
   {
     mqttInit(mqttHost, mqttPort, mqttKeepAlive);
   }
+#endif
 
   // Startup libcurl
   if (curl_global_init(CURL_GLOBAL_SSL) != 0)

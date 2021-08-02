@@ -28,10 +28,11 @@
 #include "common/globals.h"
 #include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
-#include "mqtt/mqtt.h"
+//#include "mqtt/mqtt.h"
 
 /* ****************************************************************************
 *
@@ -81,7 +82,7 @@ void* startSenderThread(void* p)
         lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                            params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
-        sendMqttNotification(params->content, params->resource, params->qos);
+        mqttMgr.sendMqttNotification(params->ip, params->port, params->content, params->resource, params->qos);
 
         // In MQTT notifications we don't have any response, so we always assume they are ok
         // When publish is sucessfull mqttOnPublishCallback is called (by the moment we are not doing nothing

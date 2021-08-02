@@ -79,7 +79,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost",
+      "url": "mqtt://localhost:1883",
       "topic": "orion"
     },
     "attrs": [

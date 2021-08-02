@@ -30,7 +30,6 @@
 #include "mqtt/mqtt.h"
 
 
-
 /* ****************************************************************************
 *
 * Globals
@@ -41,7 +40,7 @@ unsigned short   mqttPortNumber;
 unsigned short   mqttKeepAlivePeriod;
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * mqttOnPublishCallback -
@@ -52,6 +51,7 @@ void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
   /* mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level */
   LM_T(LmtMqttNotif, ("MQTT notification successfully published on %s:%d with id %d", mqttHostname, mqttPortNumber, mid));
 }
+#endif
 
 
 
@@ -80,7 +80,7 @@ void mqttInit
     LM_X(1, ("Fatal Error (Could not create Mosquitto client instance.)"));
   }
 
-  mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
+  //mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
 
   LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s:%d", _mqttHost, _mqttPort));
 

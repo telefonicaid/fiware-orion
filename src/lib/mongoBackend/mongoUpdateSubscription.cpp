@@ -34,6 +34,7 @@
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
 #include "cache/subCache.h"
 
 #include "mongoBackend/MongoGlobal.h"  // processConditionVector
@@ -89,6 +90,11 @@ static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BS
 {
   if (subUp.notificationProvided)
   {
+    // In the case original subscription was MQTT, disconnect the old one before creating the new
+    if (subOrig.hasField(CSUB_MQTTTOPIC))
+    {
+      mqttMgr.disconnect(getStringFieldF(subOrig, CSUB_REFERENCE));
+    }
     setNotificationInfo(subUp, b);
   }
   else
