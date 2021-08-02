@@ -56,7 +56,7 @@ class MqttConnectionManager
   std::map<std::string, MqttConnection>  connections;
   sem_t                                  sem;
 
-public:
+ public:
   MqttConnectionManager();
 
   int  init(void);
@@ -76,5 +76,5 @@ public:
   int  semInit(void);
 };
 
-#endif // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
+#endif  // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
 

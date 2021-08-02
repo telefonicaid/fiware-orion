@@ -80,7 +80,7 @@ void mqttInit
     LM_X(1, ("Fatal Error (Could not create Mosquitto client instance.)"));
   }
 
-  //mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
+  // mosquitto_publish_callback_set(mosq, mqttOnPublishCallback);
 
   LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s:%d", _mqttHost, _mqttPort));
 

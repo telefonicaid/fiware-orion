@@ -188,6 +188,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
 
     // Create conection to MQTT broker
+    // FIXME PR: what about the csubs created out-of-band by the cache refresh logic?
     mqttMgr.connect(sub.notification.mqttInfo.url);
 
     if (sub.notification.mqttInfo.custom)

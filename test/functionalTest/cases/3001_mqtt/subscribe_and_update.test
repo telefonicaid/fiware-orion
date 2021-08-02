@@ -85,9 +85,7 @@ payload='{
     "attrs": [
       "A1"
     ]
-  },
-  "expires": "2040-01-01T14:00:00.00Z",
-  "throttling": 1
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo

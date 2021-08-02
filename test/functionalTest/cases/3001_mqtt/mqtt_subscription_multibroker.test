@@ -1,0 +1,317 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT subscription multibroker
+
+--SHELL-INIT--
+dbInit CB
+
+# tracelevel 163 is the one for MQTT notification logs
+brokerStart CB 163 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
+
+
+--SHELL--
+
+#
+# 01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)
+# 02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)
+# 03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)
+# 04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)
+# 05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)
+# 06. Update sub3 to HTTP subscription (1883:1, 1884: 2)
+# 07. Remove sub1 (1883: 0, 1884: 2)
+# 08. Remove sub2 (1883: 0, 1883: 1)
+# 09. Remove sub4 (1883: 0, 1883: 0)
+# 10. Get logs to check the complete sequence
+#
+
+echo "01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)"
+echo "========================================================="
+payload='{
+  "description": "sub1",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/sub1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)"
+echo "========================================================="
+payload='{
+  "description": "sub2",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/sub2"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB2_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)"
+echo "========================================================="
+payload='{
+  "description": "sub3",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1884",
+      "topic": "/sub3"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB3_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)"
+echo "========================================================="
+payload='{
+  "description": "sub4",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1884",
+      "topic": "/sub4"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB4_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)"
+echo "========================================================="
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1884",
+      "topic": "/sub2"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB2_ID" --payload "$payload"
+echo
+echo
+
+
+echo "06. Update sub3 to HTTP subscription (1883:1, 1884: 2)"
+echo "======================================================"
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:9999"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB3_ID" --payload "$payload"
+echo
+echo
+
+
+echo "07. Remove sub1 (1883: 0, 1884: 2)"
+echo "=================================="
+orionCurl -X DELETE --url "/v2/subscriptions/$SUB1_ID"
+echo
+echo
+
+
+echo "08. Remove sub2 (1883: 0, 1883: 1)"
+echo "=================================="
+orionCurl -X DELETE --url "/v2/subscriptions/$SUB2_ID"
+echo
+echo
+
+
+echo "09. Remove sub4 (1883: 0, 1883: 0)"
+echo "=================================="
+orionCurl -X DELETE --url "/v2/subscriptions/$SUB4_ID"
+echo
+echo
+
+
+echo "10. Get logs to check the complete sequence"
+echo "==========================================="
+cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)
+=========================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update sub3 to HTTP subscription (1883:1, 1884: 2)
+======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Remove sub1 (1883: 0, 1884: 2)
+==================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Remove sub2 (1883: 0, 1883: 1)
+==================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Remove sub4 (1883: 0, 1883: 0)
+==================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Get logs to check the complete sequence
+===========================================
+Initializing MQTT library
+New MQTT broker connection for localhost:1883
+Connecting to MQTT Broker at localhost:1883
+Successfully connected to MQTT Broker
+Existing MQTT broker connection for localhost:1883 (counter is now: 2)
+New MQTT broker connection for localhost:1884
+Connecting to MQTT Broker at localhost:1884
+Successfully connected to MQTT Broker
+Existing MQTT broker connection for localhost:1884 (counter is now: 2)
+MQTT broker connection for localhost:1883 yet in use (counter is now: 1)
+Existing MQTT broker connection for localhost:1884 (counter is now: 3)
+MQTT broker connection for localhost:1884 yet in use (counter is now: 2)
+Disconnecting from MQTT Broker at localhost:1883
+Successfully disconnected from MQTT Broker
+MQTT broker connection for localhost:1884 yet in use (counter is now: 1)
+Disconnecting from MQTT Broker at localhost:1884
+Successfully disconnected from MQTT Broker
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

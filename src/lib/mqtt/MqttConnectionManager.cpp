@@ -26,6 +26,7 @@
 #include "mqtt/MqttConnectionManager.h"
 
 #include <mosquitto.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "common/string.h"
@@ -272,7 +273,7 @@ void MqttConnectionManager::disconnect(const std::string& host, int port)
     if (c.counter == 0)
     {
       // Not used anymore: destroy it
-      LM_T(LmtMqttNotif, ("Disconecting from MQTT Broker at %s:%d", host, port));
+      LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s:%d", host.c_str(), port));
       int resultCode = mosquitto_disconnect(c.mosq);
       if (resultCode != MOSQ_ERR_SUCCESS)
       {

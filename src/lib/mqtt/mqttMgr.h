@@ -36,5 +36,5 @@
 */
 extern MqttConnectionManager mqttMgr;
 
-#endif // SRC_LIB_MQTT_MQTTMGR_H_
+#endif  // SRC_LIB_MQTT_MQTTMGR_H_
 
