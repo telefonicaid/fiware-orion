@@ -167,7 +167,7 @@ echo
 00. Try to delete an attribute with TWO service-paths
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
