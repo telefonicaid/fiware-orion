@@ -173,9 +173,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "more than one service path in context update request", 
-    "reasonPhrase": "Bad Request"
+    "orionError": {
+        "code": "400",
+        "details": "more than one servicepath is not allowed in DELETE operation",
+        "reasonPhrase": "Bad Request"
+    }
 }
 
 
