@@ -134,6 +134,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-disableMetrics' (turn off the 'metrics' feature)]                         ORION_DISABLE_METRICS              FALSE /FALSE/
                                [option '-insecureNotif' (allow HTTPS notifications to peers which certificate c]   ORION_INSECURE_NOTIF               FALSE /FALSE/
                                [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSI]   ORION_NGSIV1_AUTOCAST              FALSE /FALSE/
+                               [option '-mqttMaxAge' <max time (in seconds) that an unused MQTT connection is k]   ORION_MQTT_MAX_AGE                 3600 /3600/
 
 
 

@@ -303,7 +303,7 @@ The other three parameters (`-reqTimeout`, `-maxConnections` and `-connectionMem
 Orion is a multithread process. With default starting parameters and in idle state (i.e. no load),
 Orion consumes 4 threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
 * Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
@@ -342,7 +342,7 @@ There are two pools that can be configured independently:
 
 Using both parameters, in any situation (either idle or busy) Orion consumes a fixed number of threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
 * `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
