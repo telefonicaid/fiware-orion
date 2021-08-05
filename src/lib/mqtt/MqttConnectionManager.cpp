@@ -188,8 +188,9 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
      MqttConnection c;
 
      // We use userdata to store the endpoint associated to the connection, to be used later at mqttOnPublishCallback()
-     c.userdata = (char*) malloc(strlen(endpoint.c_str()) + 1);
-     strncpy(c.userdata, endpoint.c_str(), strlen(endpoint.c_str()) + 1);
+     // 100 should suffice for any well educated endpoint string...
+     c.userdata = (char*) malloc(100);
+     strncpy(c.userdata, endpoint.c_str(), 100);
 
      c.mosq = mosquitto_new(NULL, true, c.userdata);
      if (c.mosq == NULL)
