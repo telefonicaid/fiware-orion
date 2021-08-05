@@ -101,7 +101,7 @@ void MqttConnectionManager::release(void)
   LM_T(LmtMqttNotif, ("Cleanup MQTT conections"));
 
   // Using a negative value ensures that all connections are cleaned out
-  cleanup(-1);
+  cleanup(-1, true);
 
   mosquitto_lib_cleanup();
 }
@@ -430,11 +430,14 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
 *
 * MqttConnectionManager::cleanup -
 */
-void MqttConnectionManager::cleanup(double maxAge)
+void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
 {
   LM_T(LmtMqttNotif, ("Checking MQTT connections age"));
 
-  semTake();
+  if (!ignoreSems)
+  {
+    semTake();
+  }
 
   std::vector<std::string> toErase;
 
@@ -471,5 +474,8 @@ void MqttConnectionManager::cleanup(double maxAge)
     connections.erase(toErase[ix]);
   }
 
-  semGive();
+  if (!ignoreSems)
+  {
+    semGive();
+  }
 }

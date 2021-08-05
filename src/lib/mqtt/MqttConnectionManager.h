@@ -72,7 +72,7 @@ class MqttConnectionManager
   void disconnect(const std::string& host, int port);
   */
   int sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos);
-  void cleanup(double maxAge);
+  void cleanup(double maxAge, bool ignoreSems = false);
 
  private:
   int  semInit(void);
