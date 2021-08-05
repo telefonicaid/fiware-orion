@@ -65,12 +65,6 @@ class MqttConnectionManager
 
   const char*  semGet(void);
 
-  /*
-  void connect(const std::string& url);
-  void connect(const std::string& host, int port);
-  void disconnect(const std::string& url);
-  void disconnect(const std::string& host, int port);
-  */
   int sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos);
   void cleanup(double maxAge, bool ignoreSems = false);
 

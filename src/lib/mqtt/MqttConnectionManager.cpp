@@ -28,6 +28,7 @@
 #include <mosquitto.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
@@ -169,161 +170,6 @@ void MqttConnectionManager::semGive(void)
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* MqttConnectionManager::connect -
-*/
-void MqttConnectionManager::connect(const std::string& host, int port)
-{
-  std::string endpoint = getEndpoint(host, port);
-
-  semTake();
-  if (connections.find(endpoint) == connections.end())
-  {
-    // Doesn't exist: create connection
-    LM_T(LmtMqttNotif, ("New MQTT broker connection for %s:%d", host.c_str(), port));
-
-    MqttConnection c;
-    c.counter = 1;
-
-    c.mosq = mosquitto_new(NULL, true, NULL);
-    if (c.mosq == NULL)
-    {
-      LM_E(("Runtime Error (could not create mosquitto client instance for %s:%d", host.c_str(), port));
-      semGive();
-      return;
-    }
-
-    mosquitto_publish_callback_set(c.mosq, mqttOnPublishCallback);
-
-    LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s:%d", host.c_str(), port));
-
-    int resultCode = mosquitto_connect(c.mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
-    if (resultCode != MOSQ_ERR_SUCCESS)
-    {
-      LM_E(("Runtime Error (could not connect to MQTT Broker %s:%d (%d): %s)", host.c_str(), port, resultCode, mosquitto_strerror(resultCode)));
-      mosquitto_destroy(c.mosq);
-      semGive();
-      return;
-    }
-
-    LM_T(LmtMqttNotif, ("Successfully connected to MQTT Broker"));
-
-    // Starts the client loop in its own thread. The client loop processes the network traffic.
-    // According to documentation (https://mosquitto.org/api/files/mosquitto-h.html#mosquitto_threaded_set):
-    // "When using mosquitto_loop_start, this [mosquitto_threaded_set] is set automatically."
-    mosquitto_loop_start(c.mosq);
-
-    connections[endpoint] = c;
-  }
-  else
-  {
-    // Exist: increase the counter
-    connections[endpoint].counter++;
-
-    LM_T(LmtMqttNotif, ("Existing MQTT broker connection for %s:%d (counter is now: %d)", host.c_str(), port, connections[endpoint].counter));
-  }
-
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* MqttConnectionManager::connect -
-*
-*/
-void MqttConnectionManager::connect(const std::string& url)
-{
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
-
-  if (!parseUrl(url, host, port, path, protocol))
-  {
-    LM_E(("Runtime Error (malformed URL: '%s')", url.c_str()));
-  }
-  else
-  {
-    connect(host, port);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* MqttConnectionManager::disconnect -
-*/
-void MqttConnectionManager::disconnect(const std::string& host, int port)
-{
-  std::string endpoint = getEndpoint(host, port);
-
-  semTake();
-  if (connections.find(endpoint) == connections.end())
-  {
-    // Doesn't exist: this is an error situation
-    LM_E(("Runtime Error (MQTT broker connection for %s:%d doesn't exist)", host.c_str(), port));
-  }
-  else
-  {
-    connections[endpoint].counter--;
-
-    MqttConnection c = connections[endpoint];
-
-    if (c.counter == 0)
-    {
-      // Not used anymore: destroy it
-      LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s:%d", host.c_str(), port));
-      int resultCode = mosquitto_disconnect(c.mosq);
-      if (resultCode != MOSQ_ERR_SUCCESS)
-      {
-        LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
-      }
-      else
-      {
-        LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker"));
-      }
-      mosquitto_loop_stop(c.mosq, false);
-      mosquitto_destroy(c.mosq);
-    }
-    else
-    {
-      // Yet in use
-      LM_T(LmtMqttNotif, ("MQTT broker connection for %s:%d yet in use (counter is now: %d)", host.c_str(), port, c.counter));
-    }
-  }
-
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* MqttConnectionManager::disconnect -
-*
-*/
-void MqttConnectionManager::disconnect(const std::string& url)
-{
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
-
-  if (!parseUrl(url, host, port, path, protocol))
-  {
-    LM_E(("Runtime Error (malformed URL: '%s')", url.c_str()));
-  }
-  else
-  {
-    disconnect(host, port);
-  }
-}
-#endif
 
 /* ****************************************************************************
 *
@@ -441,7 +287,7 @@ void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
 
   std::vector<std::string> toErase;
 
-  for(std::map<std::string, MqttConnection>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  for (std::map<std::string, MqttConnection>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
     std::string endpoint = iter->first;
     MqttConnection c     = iter->second;
