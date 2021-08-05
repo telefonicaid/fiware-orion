@@ -39,6 +39,7 @@
 #include "rest/uriParamNames.h"
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "mongoDriver/mongoConnectionPool.h"
 
@@ -93,7 +94,7 @@ std::string semStateTreat
   jh.addRaw("timeStat",            semRender(timeStatSemGet()));
   jh.addRaw("logMsg",              semRender(lmSemGet()));
   jh.addRaw("alarmMgr",            semRender(alarmMgr.semGet()));
-  // FIXME PR: MqttConnectionManager. Also in management_api.md
+  jh.addRaw("mqttMgr",             semRender(mqttMgr.semGet()));  // FIXME PR: also in management_api.md
   jh.addRaw("metricsMgr",          semRender(metricsMgr.semStateGet()));
   jh.addRaw("connectionContext",   semRender(connectionSubContextSemGet()));
   jh.addRaw("connectionEndpoints", semRender(connectionSubContextSemGet()));

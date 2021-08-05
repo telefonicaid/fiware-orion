@@ -27,33 +27,33 @@ MQTT subscription multibroker
 dbInit CB
 
 # tracelevel 163 is the one for MQTT notification logs
-brokerStart CB 163 IPV4
-
+brokerStart CB 163 IPV4 -mqttMaxAge 3
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
 
 --SHELL--
 
 #
-# 01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)
-# 02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)
-# 03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)
-# 04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)
-# 05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)
-# 06. Update sub3 to HTTP subscription (1883:1, 1884: 2)
-# 07. Remove sub1 (1883: 0, 1884: 2)
-# 08. Remove sub2 (1883: 0, 1883: 1)
-# 09. Remove sub4 (1883: 0, 1883: 0)
-# 10. Get logs to check the complete sequence
+# 01. Create MQTT sub1 at localhost:1883 (1)
+# 02. Create MQTT sub2 at localhost:1883 (2)
+# 03. Create MQTT sub3 at localhost:1884 (1)
+# 04. Create MQTT sub4 at localhost:1884 (2)
+# 05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
+# 06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
+# 07. Sleep 3 seconds, get logs and see localhost:1883 connection went away
+# 08. Sleep 3 seconds, get logs and see localhost:1884 connection went away
+# 09. Update entity E1883 to re-create connections to localhost:1883
+# 10. Dump accumulator for localhost:1883 and see 4 notifications
 #
 
-echo "01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)"
-echo "========================================================="
+echo "01. Create MQTT sub1 at localhost:1883 (1)"
+echo "=========================================="
 payload='{
   "description": "sub1",
   "subject": {
     "entities": [
       {
-        "id": "E1",
-        "type": "T1"
+        "id": "E1883",
+        "type": "T"
       }
     ]
   },
@@ -69,18 +69,15 @@ echo
 echo
 
 
-SUB1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
-echo "02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)"
-echo "========================================================="
+echo "02. Create MQTT sub1 at localhost:1883 (2)"
+echo "=========================================="
 payload='{
   "description": "sub2",
   "subject": {
     "entities": [
       {
-        "id": "E1",
-        "type": "T1"
+        "id": "E1883",
+        "type": "T"
       }
     ]
   },
@@ -96,18 +93,15 @@ echo
 echo
 
 
-SUB2_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
-echo "03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)"
-echo "========================================================="
+echo "03. Create MQTT sub1 at localhost:1884 (1)"
+echo "=========================================="
 payload='{
   "description": "sub3",
   "subject": {
     "entities": [
       {
-        "id": "E1",
-        "type": "T1"
+        "id": "E1884",
+        "type": "T"
       }
     ]
   },
@@ -123,18 +117,15 @@ echo
 echo
 
 
-SUB3_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
-echo "04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)"
-echo "========================================================="
+echo "04. Create MQTT sub1 at localhost:1884 (2)"
+echo "=========================================="
 payload='{
   "description": "sub4",
   "subject": {
     "entities": [
       {
-        "id": "E1",
-        "type": "T1"
+        "id": "E1884",
+        "type": "T"
       }
     ]
   },
@@ -150,69 +141,82 @@ echo
 echo
 
 
-SUB4_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
-echo "05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)"
-echo "========================================================="
+echo "05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)"
+echo "============================================================================================"
 payload='{
-  "notification": {
-    "mqtt": {
-      "url": "mqtt://localhost:1884",
-      "topic": "/sub2"
-    }
+  "id": "E1883",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
   }
 }'
-orionCurl -X PATCH --url "/v2/subscriptions/$SUB2_ID" --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "06. Update sub3 to HTTP subscription (1883:1, 1884: 2)"
-echo "======================================================"
+echo "06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)"
+echo "=================================================================================================================="
 payload='{
-  "notification": {
-    "http": {
-      "url": "http://localhost:9999"
-    }
+  "id": "E1884",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
   }
 }'
-orionCurl -X PATCH --url "/v2/subscriptions/$SUB3_ID" --payload "$payload"
+sleep 3s
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "07. Remove sub1 (1883: 0, 1884: 2)"
-echo "=================================="
-orionCurl -X DELETE --url "/v2/subscriptions/$SUB1_ID"
-echo
-echo
-
-
-echo "08. Remove sub2 (1883: 0, 1883: 1)"
-echo "=================================="
-orionCurl -X DELETE --url "/v2/subscriptions/$SUB2_ID"
-echo
-echo
-
-
-echo "09. Remove sub4 (1883: 0, 1883: 0)"
-echo "=================================="
-orionCurl -X DELETE --url "/v2/subscriptions/$SUB4_ID"
-echo
-echo
-
-
-echo "10. Get logs to check the complete sequence"
-echo "==========================================="
+echo "07. Sleep 3 seconds, get logs and see localhost:1883 connection went away"
+echo "========================================================================="
+sleep 3s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
 echo
 echo
 
 
+echo "08. Sleep 3 seconds, get logs and see localhost:1884 connection went away"
+echo "========================================================================="
+sleep 3s
+cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "09. Update entity E1883 to re-create connections to localhost:1883"
+echo "=================================================================="
+payload='{
+  "A": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E1883/attrs --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of MQTT notifications
+# due to the lock in accumulator-server.py?
+sleep 0.5s
+
+
+echo "10. Dump accumulator for localhost:1883 and see 4 notifications"
+echo "==============================================================="
+accumulatorDump
+echo
+echo
+
+
 --REGEXPECT--
-01. Create MQTT sub1 at localhost:1883 (1883: 1, 1884: 0)
-=========================================================
+01. Create MQTT sub1 at localhost:1883 (1)
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
@@ -221,8 +225,8 @@ Date: REGEX(.*)
 
 
 
-02. Create MQTT sub2 at localhost:1883 (1883: 2, 1884: 0)
-=========================================================
+02. Create MQTT sub1 at localhost:1883 (2)
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
@@ -231,8 +235,8 @@ Date: REGEX(.*)
 
 
 
-03. Create MQTT sub3 at localhost:1884 (1883: 2, 1884: 1)
-=========================================================
+03. Create MQTT sub1 at localhost:1884 (1)
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
@@ -241,8 +245,8 @@ Date: REGEX(.*)
 
 
 
-04. Create MQTT sub4 at localhost:1884 (1883: 2, 1884: 2)
-=========================================================
+04. Create MQTT sub1 at localhost:1884 (2)
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
@@ -251,67 +255,159 @@ Date: REGEX(.*)
 
 
 
-05. Update MQTT sub2 to localhost:1884 (1883: 1, 1884: 3)
-=========================================================
-HTTP/1.1 204 No Content
+05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1883?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Update sub3 to HTTP subscription (1883:1, 1884: 2)
-======================================================
-HTTP/1.1 204 No Content
+06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
+==================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1884?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-07. Remove sub1 (1883: 0, 1884: 2)
-==================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-08. Remove sub2 (1883: 0, 1883: 1)
-==================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-09. Remove sub4 (1883: 0, 1883: 0)
-==================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-10. Get logs to check the complete sequence
-===========================================
+07. Sleep 3 seconds, get logs and see localhost:1883 connection went away
+=========================================================================
 Initializing MQTT library
 New MQTT broker connection for localhost:1883
 Connecting to MQTT Broker at localhost:1883
-Successfully connected to MQTT Broker
-Existing MQTT broker connection for localhost:1883 (counter is now: 2)
+Successfully connected to MQTT Broker at localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
+MQTT notification successfully published at localhost:1883 with id 1
+MQTT notification successfully published at localhost:1883 with id 2
+Checking MQTT connections age
 New MQTT broker connection for localhost:1884
 Connecting to MQTT Broker at localhost:1884
-Successfully connected to MQTT Broker
-Existing MQTT broker connection for localhost:1884 (counter is now: 2)
-MQTT broker connection for localhost:1883 yet in use (counter is now: 1)
-Existing MQTT broker connection for localhost:1884 (counter is now: 3)
-MQTT broker connection for localhost:1884 yet in use (counter is now: 2)
+Successfully connected to MQTT Broker at localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
+MQTT notification successfully published at localhost:1884 with id 1
+MQTT notification successfully published at localhost:1884 with id 2
+Checking MQTT connections age
+MQTT connection localhost:1883 too old REGEX(.*)
 Disconnecting from MQTT Broker at localhost:1883
-Successfully disconnected from MQTT Broker
-MQTT broker connection for localhost:1884 yet in use (counter is now: 1)
+Successfully disconnected from MQTT Broker at localhost:1883
+
+
+08. Sleep 3 seconds, get logs and see localhost:1884 connection went away
+=========================================================================
+Initializing MQTT library
+New MQTT broker connection for localhost:1883
+Connecting to MQTT Broker at localhost:1883
+Successfully connected to MQTT Broker at localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
+MQTT notification successfully published at localhost:1883 with id 1
+MQTT notification successfully published at localhost:1883 with id 2
+Checking MQTT connections age
+New MQTT broker connection for localhost:1884
+Connecting to MQTT Broker at localhost:1884
+Successfully connected to MQTT Broker at localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
+MQTT notification successfully published at localhost:1884 with id 1
+MQTT notification successfully published at localhost:1884 with id 2
+Checking MQTT connections age
+MQTT connection localhost:1883 too old REGEX(.*)
+Disconnecting from MQTT Broker at localhost:1883
+Successfully disconnected from MQTT Broker at localhost:1883
+Checking MQTT connections age
+MQTT connection localhost:1884 too old REGEX(.*)
 Disconnecting from MQTT Broker at localhost:1884
-Successfully disconnected from MQTT Broker
+Successfully disconnected from MQTT Broker at localhost:1884
+
+
+09. Update entity E1883 to re-create connections to localhost:1883
+==================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Dump accumulator for localhost:1883 and see 4 notifications
+===============================================================
+MQTT message at topic /sub1:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E1883",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+MQTT message at topic /sub2:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E1883",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+MQTT message at topic /sub1:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "id": "E1883",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+MQTT message at topic /sub2:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "id": "E1883",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
 
 
 --TEARDOWN--
+accumulatorStop
 brokerStop CB
 dbDrop CB

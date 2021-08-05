@@ -30,7 +30,6 @@
 #include "common/sem.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-#include "mqtt/mqttMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
@@ -105,13 +104,13 @@ HttpStatusCode mongoUnsubscribeContext
     return SccOk;
   }
 
-  // In the case subscription was MQTT, disconnect it
-  if (sub.hasField(CSUB_MQTTTOPIC))
-  {
-    mqttMgr.disconnect(getStringFieldF(sub, CSUB_REFERENCE));
-  }
-
   /* Remove document in MongoDB */
+
+  //
+  // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
+  // to findAndModify for this?
+  //
+
   orion::BSONObjBuilder bobId2;
   bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
 

@@ -27,9 +27,10 @@
 
 #include <mosquitto.h>
 #include <string>
+#include <vector>
 
 #include "logMsg/logMsg.h"
-#include "common/string.h"
+#include "common/globals.h"
 
 
 
@@ -62,7 +63,7 @@ inline std::string getEndpoint(const std::string& host, int port)
 void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
   /* mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level */
-  LM_T(LmtMqttNotif, ("MQTT notification successfully published with id %d", mid));
+  LM_T(LmtMqttNotif, ("MQTT notification successfully published at %s with id %d", (char*)userdata, mid));
 }
 
 
@@ -98,7 +99,10 @@ int MqttConnectionManager::init(void)
 void MqttConnectionManager::release(void)
 {
   LM_T(LmtMqttNotif, ("Cleanup MQTT conections"));
-  // FIXME PR: release every connection
+
+  // Using a negative value ensures that all connections are cleaned out
+  cleanup(-1);
+
   mosquitto_lib_cleanup();
 }
 
@@ -165,7 +169,7 @@ void MqttConnectionManager::semGive(void)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * MqttConnectionManager::connect -
@@ -319,6 +323,72 @@ void MqttConnectionManager::disconnect(const std::string& url)
     disconnect(host, port);
   }
 }
+#endif
+
+/* ****************************************************************************
+*
+* MqttConnectionManager::getConnection -
+*/
+MqttConnection MqttConnectionManager::getConnection(const std::string& host, int port)
+{
+  std::string endpoint = getEndpoint(host, port);
+
+  semTake();
+  if (connections.find(endpoint) == connections.end())
+  {
+    // Doesn't exists: create it
+     LM_T(LmtMqttNotif, ("New MQTT broker connection for %s", endpoint.c_str()));
+
+     MqttConnection c;
+
+     // We use userdata to store the endpoint associated to the connection, to be used later at mqttOnPublishCallback()
+     c.userdata = (char*) malloc(strlen(endpoint.c_str()) + 1);
+     strncpy(c.userdata, endpoint.c_str(), strlen(endpoint.c_str()) + 1);
+
+     c.mosq = mosquitto_new(NULL, true, c.userdata);
+     if (c.mosq == NULL)
+     {
+       LM_E(("Runtime Error (could not create mosquitto client instance for %s)", endpoint.c_str()));
+       semGive();
+       return c;
+     }
+
+     mosquitto_publish_callback_set(c.mosq, mqttOnPublishCallback);
+
+     LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s", endpoint.c_str()));
+
+     int resultCode = mosquitto_connect(c.mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
+     if (resultCode != MOSQ_ERR_SUCCESS)
+     {
+       LM_E(("Runtime Error (could not connect to MQTT Broker %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
+       mosquitto_destroy(c.mosq);
+       c.mosq = NULL;
+       semGive();
+       return c;
+     }
+
+     LM_T(LmtMqttNotif, ("Successfully connected to MQTT Broker at %s", endpoint.c_str()));
+
+     // Starts the client loop in its own thread. The client loop processes the network traffic.
+     // According to documentation (https://mosquitto.org/api/files/mosquitto-h.html#mosquitto_threaded_set):
+     // "When using mosquitto_loop_start, this [mosquitto_threaded_set] is set automatically."
+     mosquitto_loop_start(c.mosq);
+
+     c.lastTime = getCurrentTime();
+     connections[endpoint] = c;
+
+     semGive();
+     return c;
+  }
+  else
+  {
+    // Already exists: update the time counter
+    LM_T(LmtMqttNotif, ("Existing MQTT broker connection for %s", endpoint.c_str()));
+    connections[endpoint].lastTime = getCurrentTime();
+    semGive();
+    return connections[endpoint];
+  }
+}
 
 
 
@@ -328,16 +398,14 @@ void MqttConnectionManager::disconnect(const std::string& url)
 */
 int MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos)
 {
-  std::string endpoint = getEndpoint(host, port);
+  MqttConnection c = getConnection(host, port);
+  mosquitto* mosq = c.mosq;
 
-  if (connections.find(endpoint) == connections.end())
+  if (mosq == NULL)
   {
-    // Doesn't exist: this is an error situation
-    LM_E(("Runtime Error (MQTT broker connection for %s:%d doesn't exist)", host.c_str(), port));
-    return 1;
+    // No need of log traces here: the getConnection() method would already print them
+    return -1;
   }
-
-  mosquitto* mosq = connections[endpoint].mosq;
 
   const char* msg = content.c_str();
 
@@ -350,8 +418,58 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
   }
   else
   {
-    LM_T(LmtMqttNotif, ("MQTT notification sent to %s on topic %s with qos %d with id %d", endpoint.c_str(), topic.c_str(), qos, id));
+    LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d with id %d", host.c_str(), port, topic.c_str(), qos, id));
   }
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* MqttConnectionManager::cleanup -
+*/
+void MqttConnectionManager::cleanup(double maxAge)
+{
+  LM_T(LmtMqttNotif, ("Checking MQTT connections age"));
+
+  semTake();
+
+  std::vector<std::string> toErase;
+
+  for(std::map<std::string, MqttConnection>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  {
+    std::string endpoint = iter->first;
+    MqttConnection c     = iter->second;
+    double age = getCurrentTime() - c.lastTime;
+    if (age > maxAge)
+    {
+      LM_T(LmtMqttNotif, ("MQTT connection %s too old (age: %f, maxAge: %f), removing it", endpoint.c_str(), age, maxAge));
+
+      toErase.push_back(endpoint);
+
+      LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
+      int resultCode = mosquitto_disconnect(c.mosq);
+      if (resultCode != MOSQ_ERR_SUCCESS)
+      {
+        LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
+      }
+      else
+      {
+        LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker at %s", endpoint.c_str()));
+      }
+      mosquitto_loop_stop(c.mosq, false);
+      mosquitto_destroy(c.mosq);
+
+      free(c.userdata);
+    }
+  }
+
+  for (unsigned int ix = 0; ix < toErase.size(); ix++)
+  {
+    connections.erase(toErase[ix]);
+  }
+
+  semGive();
 }

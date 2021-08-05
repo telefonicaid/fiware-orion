@@ -41,7 +41,8 @@
 typedef struct MqttConnection
 {
   struct mosquitto*  mosq;
-  unsigned int       counter;
+  char*              userdata;
+  double             lastTime;
 } MqttConnection;
 
 
@@ -62,18 +63,23 @@ class MqttConnectionManager
   int  init(void);
   void release(void);
 
-  void         semTake(void);
-  void         semGive(void);
   const char*  semGet(void);
 
+  /*
   void connect(const std::string& url);
   void connect(const std::string& host, int port);
   void disconnect(const std::string& url);
   void disconnect(const std::string& host, int port);
+  */
   int sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos);
+  void cleanup(double maxAge);
 
  private:
   int  semInit(void);
+  void semTake(void);
+  void semGive(void);
+
+  MqttConnection getConnection(const std::string& host, int port);
 };
 
 #endif  // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_

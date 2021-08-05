@@ -201,6 +201,8 @@ double          fcGauge;
 unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
+int             mqttMaxAge;
+
 
 
 /* ****************************************************************************
@@ -266,9 +268,7 @@ unsigned long   fcMaxInterval;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
-#define MQTT_HOST_DESC         "MQTT broker hostname"
-#define MQTT_PORT_DESC         "MQTT broker port, default: 1883"
-#define MQTT_KEEP_ALIVE_DESC   "keep alive period for MQTT broker connection, default: 60"
+#define MQTT_MAX_AGE_DESC      "max time (in seconds) that an unused MQTT connection is kept, default: 3600"
 
 
 
@@ -354,6 +354,8 @@ PaArgument paArgs[] =
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
 
   { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,             NGSIV1_AUTOCAST              },
+
+  { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 3600,                            PaNL,  PaNL,             MQTT_MAX_AGE_DESC            },
 
   PA_END_OF_ARGS
 };
@@ -1275,6 +1277,11 @@ int main(int argC, char* argV[])
 
   while (1)
   {
-    sleep(60);
+    // At the present moment, this is the only one periodic process we need to do
+    // If some other is introduced in the future, this part should be adapted.
+    // Note that the cache refresch process runs in its own thread (as it can be
+    // disabled with the -noCache switch)
+    sleep(mqttMaxAge);
+    mqttMgr.cleanup(mqttMaxAge);
   }
 }
