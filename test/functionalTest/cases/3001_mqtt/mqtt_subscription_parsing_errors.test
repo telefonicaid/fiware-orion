@@ -40,10 +40,12 @@ brokerStart CB
 # 08. Create mqtt sub without topic, see error
 # 09. Create mqtt sub with topic not being a string, see error
 # 10. Create mqtt sub with empty topic, see error
-# 11. Create mqtt sub with qos not being a number, see error
-# 12. Create mqtt sub with qos being a negative number, see error
-# 13. Create mqtt sub with qos greater than 2, see error
-# 14. Create http sub with mqtt url, see error
+# 11. Create mqtt sub with topic with #, see error
+# 12. Create mqtt sub with topic with +, see error
+# 13. Create mqtt sub with qos not being a number, see error
+# 14. Create mqtt sub with qos being a negative number, see error
+# 15. Create mqtt sub with qos greater than 2, see error
+# 16. Create http sub with mqtt url, see error
 #
 
 
@@ -318,7 +320,64 @@ echo
 echo
 
 
-echo "11. Create mqtt sub with qos not being a number, see error"
+
+echo "11. Create mqtt sub with topic with #, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/sub#",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "12. Create mqtt sub with topic with +, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/sub+",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "13. Create mqtt sub with qos not being a number, see error"
 echo "=========================================================="
 payload='{
   "description": "Test subscription",
@@ -346,7 +405,7 @@ echo
 echo
 
 
-echo "12. Create mqtt sub with qos being a negative number, see error"
+echo "14. Create mqtt sub with qos being a negative number, see error"
 echo "==============================================================="
 payload='{
   "description": "Test subscription",
@@ -374,7 +433,7 @@ echo
 echo
 
 
-echo "13. Create mqtt sub with qos greater than 2, see error"
+echo "15. Create mqtt sub with qos greater than 2, see error"
 echo "======================================================"
 payload='{
   "description": "Test subscription",
@@ -402,7 +461,7 @@ echo
 echo
 
 
-echo "14. Create http sub with mqtt url, see error"
+echo "16. Create http sub with mqtt url, see error"
 echo "============================================"
 payload='{
   "description": "Test subscription",
@@ -569,7 +628,35 @@ Date: REGEX(.*)
 }
 
 
-11. Create mqtt sub with qos not being a number, see error
+11. Create mqtt sub with topic with #, see error
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "+ and # are not allowed in mqtt field /topic/",
+    "error": "BadRequest"
+}
+
+
+12. Create mqtt sub with topic with +, see error
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "+ and # are not allowed in mqtt field /topic/",
+    "error": "BadRequest"
+}
+
+
+13. Create mqtt sub with qos not being a number, see error
 ==========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 56
@@ -583,7 +670,7 @@ Date: REGEX(.*)
 }
 
 
-12. Create mqtt sub with qos being a negative number, see error
+14. Create mqtt sub with qos being a negative number, see error
 ===============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
@@ -597,7 +684,7 @@ Date: REGEX(.*)
 }
 
 
-13. Create mqtt sub with qos greater than 2, see error
+15. Create mqtt sub with qos greater than 2, see error
 ======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
@@ -611,7 +698,7 @@ Date: REGEX(.*)
 }
 
 
-14. Create http sub with mqtt url, see error
+16. Create http sub with mqtt url, see error
 ============================================
 HTTP/1.1 400 Bad Request
 Content-Length: 84
