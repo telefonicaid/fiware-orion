@@ -11,7 +11,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.61.1
 * openssl: 1.1.1g
 * libuuid: 2.32.1
-* libmosquitto: 1.5.0 - FIXME PR: this version is old, try with newer ones
+* libmosquitto: 2.0.11
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -55,13 +55,13 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (config.mk file under mosquitto-1.5/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON setting, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
 
-        # FIXME PR: this version is old, try with newer ones
-        wget http://mosquitto.org/files/source/mosquitto-1.5.tar.gz
-        tar xvf mosquitto-1.5.tar.gz
-        cd mosquitto-1.5
+        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
+        tar xvf mosquitto-2.0.11.tar.gz
+        cd mosquitto-2.0.11
         make
+        sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/mosquitto.conf # tell runtime loader to look into /usr/local/lib
         sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib

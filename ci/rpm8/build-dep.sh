@@ -112,22 +112,21 @@ echo "INSTALL: gmock" \
 && make \
 && make install
 
-# FIXME PR: this version is old, try with newer ones
 echo "INSTALL: mosquitto" \
-&& curl -kL http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
-&& cd /opt/mosquitto-1.5 \
+&& curl -kL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-2.0.11 \
+&& sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
 && make \
 && make install \
 && echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf
 
 ldconfig
 
-# FIXME PR: mosquitto version is old, try with newer ones
 yum -y remove \
 && yum -y clean all \
 && rm -rf /var/cache/yum \
 && rm -Rf /opt/mongo-c-driver-1.17.4 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.70 \
-&& rm -Rf /opt/mosquitto-1.5 \
+&& rm -Rf /opt/mosquitto-2.0.11 \
 && rm -Rf /opt/gmock-1.5.0

@@ -83,11 +83,11 @@ RUN \
     make install && \
     ldconfig && \
     # Install mosquitto from source
-    # FIXME PR: this version is old, try with newer ones
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-1.5.tar.gz && \
-    tar xvf mosquitto-1.5.tar.gz && \
-    cd mosquitto-1.5 && \
+    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz && \
+    tar xvf mosquitto-2.0.11.tar.gz && \
+    cd mosquitto-2.0.11 && \
+    sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     make && \
     make install && \
     echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf && \
