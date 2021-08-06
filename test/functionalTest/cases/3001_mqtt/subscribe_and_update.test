@@ -19,7 +19,6 @@
 # iot_support at tid dot es
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
-# FIXME PR: this .test is planned to be improved and finalized in following PRs as a part of the work for #3001"
 
 --NAME--
 MQTT Notifications
