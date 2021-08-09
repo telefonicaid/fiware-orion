@@ -88,9 +88,10 @@ RUN \
     tar xvf mosquitto-2.0.11.tar.gz && \
     cd mosquitto-2.0.11 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
+    sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
+    sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
     make && \
     make install && \
-    echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf && \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
