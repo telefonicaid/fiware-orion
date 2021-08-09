@@ -127,9 +127,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           # FIXME PR: this version is old, try with newer ones
-           /opt/mosquitto-1.5.tar.gz \
-           /opt/mosquitto-1.5 \
+           /opt/mosquitto-2.0.11.tar.gz \
+           /opt/mosquitto-2.0.11 \
            /opt/mongo-c-driver-1.17.4.tar.gz \
            /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \
