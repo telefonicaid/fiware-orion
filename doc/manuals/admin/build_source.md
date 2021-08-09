@@ -59,9 +59,9 @@ commands that require root privilege):
 
         wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
         tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11
-        make
+        cd mosquitto-2.0.11        
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
+        make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/mosquitto.conf # tell runtime loader to look into /usr/local/lib
         sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib
