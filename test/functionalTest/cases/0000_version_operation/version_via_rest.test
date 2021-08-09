@@ -63,6 +63,7 @@ Date: REGEX(.*)
      "boost": "REGEX(.*)",
      "libcurl": "REGEX(.*)",
      "libmicrohttpd": "REGEX(.*)",
+     "libmosquitto": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
      "mongoc": "REGEX(.*)",
