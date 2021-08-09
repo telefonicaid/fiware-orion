@@ -59,7 +59,7 @@ commands that require root privilege):
 
         wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
         tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11        
+        cd mosquitto-2.0.11
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
