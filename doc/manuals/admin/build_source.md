@@ -55,7 +55,7 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON setting, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
 
         wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
         tar xvf mosquitto-2.0.11.tar.gz

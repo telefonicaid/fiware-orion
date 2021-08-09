@@ -92,8 +92,8 @@ Date: REGEX(.*)
   "libversions": {
      "boost": "REGEX(.*)",
      "libcurl": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
      "libmosquitto": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
      "mongoc": "REGEX(.*)",
@@ -128,8 +128,8 @@ Date: REGEX(.*)
   "libversions": {
      "boost": "REGEX(.*)",
      "libcurl": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
      "libmosquitto": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
      "mongoc": "REGEX(.*)",
@@ -162,8 +162,8 @@ Date: REGEX(.*)
   "libversions": {
      "boost": "REGEX(.*)",
      "libcurl": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
      "libmosquitto": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
      "mongoc": "REGEX(.*)",
