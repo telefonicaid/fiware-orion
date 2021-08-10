@@ -711,11 +711,20 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 1;
   }
 
-  if (ciP->verb == PATCH && ciP->servicePathV.size() > 1)
+  if (ciP->servicePathV.size() > 1)
   {
-    OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
-    return 1;
+    if (ciP->verb == PATCH)
+    {
+      OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 1;
+    }
+    if (ciP->verb == DELETE)
+    {
+      OrionError oe(SccBadRequest, "more than one servicepath is not allowed in DELETE operation");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 1;
+    }
   }
 
   components = stringSplit(servicePath, '/', compV);
@@ -751,6 +760,12 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (ciP->verb == PATCH)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in patch update request");
+        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+        return 3;
+      }
+      else if (ciP->verb == DELETE)
+      {
+        OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in DELETE operation");
         ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
         return 3;
       }
