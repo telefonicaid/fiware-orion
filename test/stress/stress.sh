@@ -145,11 +145,11 @@ echo "Attributes:       $attributes"
 echo "1.4. Please start Orion-LD, on port 1026, and press <CR>"
 echo "========================================================"
 echo "E.g.:"
-echo "* valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=test/valgrind/suppressions.supp orionld -fg -noswap"
-echo "* gdb --args orionld -fg -noswap"
-echo "* orionld -fg -noswap"
+echo "* valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=test/valgrind/suppressions.supp orionld -fg -idIndex -noswap"
+echo "* gdb --args orionld -fg -idIndex -noswap"
+echo "* orionld -fg -idIndex -noswap"
 echo
-echo "Also, in case the stress test case ($testCase) uses any tenants other than the default one, perhaps dbReset.sh should be used?"
+echo "Also, in case the stress test case ($testCase) uses any tenants other than the default one, then dbReset.sh should be used?"
 echo
 echo -n "<Press CR once the broker is up and running> "
 read X
