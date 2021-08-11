@@ -77,7 +77,7 @@ do {                                      \
 
 #else
 
-#define	PERFORMANCE(timeField)
+#define PERFORMANCE(timeField)
 #define PERFORMANCE_BEGIN(ix, desc)
 #define PERFORMANCE_END(ix, desc)
 
