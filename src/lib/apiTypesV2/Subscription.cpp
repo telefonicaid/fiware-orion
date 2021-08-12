@@ -185,16 +185,15 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
   }
 
-  if (this->maxFailsLimit > 0)
-  {
-    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
-  }
-
   if (this->failsCounter > 0)
   {
     jh.addNumber("failsCounter", this->failsCounter);
   }
 
+  if (this->maxFailsLimit > 0)
+  {
+    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
 
   return jh.str();
 }

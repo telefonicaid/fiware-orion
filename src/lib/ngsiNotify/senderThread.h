@@ -54,6 +54,8 @@ typedef struct SenderThreadParams
   std::string                        protocol;
   std::string                        verb;
   std::string                        tenant;
+  long long                          maxFailsLimit;
+  long long                          failsCounter;
   std::string                        servicePath;
   std::string                        xauthToken;
   std::string                        resource;

@@ -1,0 +1,746 @@
+diff --git a/src/lib/apiTypesV2/Subscription.cpp b/src/lib/apiTypesV2/Subscription.cpp
+index 584a3e5..6d39e6d 100644
+--- a/src/lib/apiTypesV2/Subscription.cpp
++++ b/src/lib/apiTypesV2/Subscription.cpp
+@@ -185,16 +185,15 @@ std::string Notification::toJson(const std::string& attrsFormat)
+     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
+   }
+ 
+-  if (this->maxFailsLimit > 0)
+-  {
+-    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+-  }
+-
+   if (this->failsCounter > 0)
+   {
+     jh.addNumber("failsCounter", this->failsCounter);
+   }
+ 
++  if (this->maxFailsLimit > 0)
++  {
++    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
++  }
+ 
+   return jh.str();
+ }
+diff --git a/src/lib/mongoBackend/MongoCommonSubscription.cpp b/src/lib/mongoBackend/MongoCommonSubscription.cpp
+index 529221c..2a266eb 100644
+--- a/src/lib/mongoBackend/MongoCommonSubscription.cpp
++++ b/src/lib/mongoBackend/MongoCommonSubscription.cpp
+@@ -177,6 +177,16 @@ void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
+ }
+ 
+ 
++/* ****************************************************************************
++ * *
++ * * setFailsCounter -
++ * */
++void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b)
++{
++  b->append(CSUB_FAILSCOUNTER, failsCounter);
++  LM_T(LmtMongo, ("Subscription failsCounter: %lu", failsCounter));
++}
++
+ 
+ /* ****************************************************************************
+ *
+diff --git a/src/lib/mongoBackend/MongoCommonSubscription.h b/src/lib/mongoBackend/MongoCommonSubscription.h
+index 9cadda3..667e895 100644
+--- a/src/lib/mongoBackend/MongoCommonSubscription.h
++++ b/src/lib/mongoBackend/MongoCommonSubscription.h
+@@ -73,6 +73,14 @@ extern void setThrottling(const ngsiv2::Subscription& sub, orion::BSONObjBuilder
+ extern void setMaxFailsLimit(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+ 
+ 
++
++/* ****************************************************************************
++ * *
++ * * setFailsCounter -
++ * */
++extern void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b);
++
++
+ /* ****************************************************************************
+ *
+ * setServicePath -
+diff --git a/src/lib/mongoBackend/MongoCommonUpdate.cpp b/src/lib/mongoBackend/MongoCommonUpdate.cpp
+index a3fd978..0c0ef45 100644
+--- a/src/lib/mongoBackend/MongoCommonUpdate.cpp
++++ b/src/lib/mongoBackend/MongoCommonUpdate.cpp
+@@ -1089,6 +1089,8 @@ static bool addTriggeredSubscriptions_withCache
+     }
+ 
+     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
++                                                           cSubP->maxFailsLimit,
++                                                           cSubP->failsCounter,
+                                                            (long long) cSubP->lastNotificationTime,
+                                                            cSubP->renderFormat,
+                                                            cSubP->httpInfo,
+@@ -1109,6 +1111,11 @@ static bool addTriggeredSubscriptions_withCache
+ 
+     std::string errorString;
+ 
++    if(cSubP->failsCounter)
++    {
++      LM_T(LmtSubCache, ("anjali11 NOT csub ignored: %lu", cSubP->failsCounter));
++    } 
++
+     if (!subP->stringFilterSet(&cSubP->expression.stringFilter, &errorString))
+     {
+       LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
+@@ -1507,6 +1514,8 @@ static bool addTriggeredSubscriptions_noCache
+       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
+       //
+       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
++      long long         maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?       getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)       : -1;
++      long long         failsCounter         = sub.hasField(CSUB_FAILSCOUNTER)?       getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)       : 0;
+       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+@@ -1526,6 +1535,8 @@ static bool addTriggeredSubscriptions_noCache
+       TriggeredSubscription* trigs = new TriggeredSubscription
+         (
+           throttling,
++          maxFailsLimit,
++          failsCounter,
+           lastNotification,
+           renderFormat,
+           httpInfo,
+@@ -1681,6 +1692,8 @@ static bool processOnChangeConditionForUpdateContext
+   std::string                      subId,
+   RenderFormat                     renderFormat,
+   std::string                      tenant,
++  long long                        maxFailsLimit,
++  long long                        failsCounter,
+   const std::string&               xauthToken,
+   const std::string&               fiwareCorrelator,
+   unsigned int                     correlatorCounter,
+@@ -1744,6 +1757,8 @@ static bool processOnChangeConditionForUpdateContext
+   getNotifier()->sendNotifyContextRequest(ncr,
+                                           httpInfo,
+                                           tenant,
++                                          maxFailsLimit,
++                                          failsCounter,
+                                           xauthToken,
+                                           fiwareCorrelator,
+                                           correlatorCounter,
+@@ -1874,6 +1889,7 @@ static unsigned int processSubscriptions
+ 
+     /* Send notification */
+     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
++     LM_T(LmtSubCache, ("anjali11 NOT ignored: %lu", tSubP->failsCounter));
+ 
+     bool  notificationSent;
+ 
+@@ -1883,6 +1899,8 @@ static unsigned int processSubscriptions
+                                                                 mapSubId,
+                                                                 tSubP->renderFormat,
+                                                                 tenant,
++                                                                tSubP->maxFailsLimit,
++                                                                tSubP->failsCounter,
+                                                                 xauthToken,
+                                                                 fiwareCorrelator,
+                                                                 notifStartCounter + notifSent + 1,
+@@ -1970,6 +1988,10 @@ static unsigned int processSubscriptions
+ 
+           LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'",
+                              cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
++
++          //fails
++          LM_T(LmtSubCache, ("anjali11 set lastNotificationTime to %lu and count to %lu",
++                             cSubP->lastNotificationTime, cSubP->failsCounter));
+         }
+         else
+         {
+diff --git a/src/lib/mongoBackend/TriggeredSubscription.cpp b/src/lib/mongoBackend/TriggeredSubscription.cpp
+index e64c315..8c03d35 100644
+--- a/src/lib/mongoBackend/TriggeredSubscription.cpp
++++ b/src/lib/mongoBackend/TriggeredSubscription.cpp
+@@ -40,6 +40,8 @@
+ TriggeredSubscription::TriggeredSubscription
+ (
+   long long                _throttling,
++  long long                _maxFailsLimit,
++  long long                _failsCounter,
+   long long                _lastNotification,
+   RenderFormat             _renderFormat,
+   const ngsiv2::HttpInfo&  _httpInfo,
+@@ -49,6 +51,8 @@ TriggeredSubscription::TriggeredSubscription
+ )
+ :
+   throttling(_throttling),
++  maxFailsLimit(_maxFailsLimit),
++  failsCounter(_failsCounter),
+   lastNotification(_lastNotification),
+   renderFormat(_renderFormat),
+   httpInfo(_httpInfo),
+@@ -77,6 +81,8 @@ TriggeredSubscription::TriggeredSubscription
+ )
+ :
+   throttling(-1),
++  maxFailsLimit(-1),
++  failsCounter(-1),
+   lastNotification(-1),
+   renderFormat(_renderFormat),
+   httpInfo(_httpInfo),
+diff --git a/src/lib/mongoBackend/TriggeredSubscription.h b/src/lib/mongoBackend/TriggeredSubscription.h
+index f0671e6..12cb00d 100644
+--- a/src/lib/mongoBackend/TriggeredSubscription.h
++++ b/src/lib/mongoBackend/TriggeredSubscription.h
+@@ -53,6 +53,8 @@ class TriggeredSubscription
+ {
+  public:
+   long long                 throttling;
++  long long                 maxFailsLimit;
++  long long                 failsCounter;
+   long long                 lastNotification;
+   RenderFormat              renderFormat;
+   ngsiv2::HttpInfo          httpInfo;
+@@ -72,6 +74,8 @@ class TriggeredSubscription
+   }                        expression;      // Only used by NGSIv2 subscription
+ 
+   TriggeredSubscription(long long                _throttling,
++                        long long                _maxFailsLimit,
++                        long long                _failsCounter,
+                         long long                _lastNotification,
+                         RenderFormat             _renderFormat,
+                         const ngsiv2::HttpInfo&  _httpInfo,
+diff --git a/src/lib/mongoBackend/mongoCreateSubscription.cpp b/src/lib/mongoBackend/mongoCreateSubscription.cpp
+index 68ec8ca..f4659f0 100644
+--- a/src/lib/mongoBackend/mongoCreateSubscription.cpp
++++ b/src/lib/mongoBackend/mongoCreateSubscription.cpp
+@@ -148,6 +148,8 @@ std::string mongoCreateSubscription
+   setExpiration(sub, &b);
+   setHttpInfo(sub, &b);
+   setThrottling(sub, &b);
++  setMaxFailsLimit(sub, &b);
++  //setFailsCounter(sub, &b);
+   setServicePath(servicePath, &b);
+   setDescription(sub, &b);
+   setStatus(sub, &b);
+diff --git a/src/lib/mongoBackend/mongoSubCache.cpp b/src/lib/mongoBackend/mongoSubCache.cpp
+index 4c82b33..5c7e450 100644
+--- a/src/lib/mongoBackend/mongoSubCache.cpp
++++ b/src/lib/mongoBackend/mongoSubCache.cpp
+@@ -107,6 +107,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
+   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+   cSubP->renderFormat          = renderFormat;
+   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
++  cSubP->maxFailsLimit            = sub.hasField(CSUB_MAXFAILSLIMIT)?       getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)       : -1;
+   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
+   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
+@@ -360,6 +361,7 @@ int mongoSubCacheItemInsert
+   cSubP->servicePath           = strdup(servicePath);
+   cSubP->renderFormat          = renderFormat;
+   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
++  cSubP->maxFailsLimit            = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
+   cSubP->expirationTime        = expirationTime;
+   cSubP->lastNotificationTime  = lastNotificationTime;
+   cSubP->count                 = 0;
+diff --git a/src/lib/mongoBackend/mongoUpdateSubscription.cpp b/src/lib/mongoBackend/mongoUpdateSubscription.cpp
+index f84ae69..6f9a0cf 100644
+--- a/src/lib/mongoBackend/mongoUpdateSubscription.cpp
++++ b/src/lib/mongoBackend/mongoUpdateSubscription.cpp
+@@ -162,6 +162,43 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
+ }
+ 
+ 
++/* ****************************************************************************
++ * *
++ * * setMaxFailsLimit -
++ * */
++static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
++{
++  if (subUp.maxFailsLimitProvided)
++  {
++    setMaxFailsLimit(subUp, b);
++  }
++  else
++  {
++    if (subOrig.hasField(CSUB_MAXFAILSLIMIT))
++    {
++      long long maxFailsLimit = getIntOrLongFieldAsLongF(subOrig, CSUB_MAXFAILSLIMIT);
++
++      b->append(CSUB_MAXFAILSLIMIT, maxFailsLimit);
++      LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", maxFailsLimit));
++    }
++  }
++}
++
++
++/* ****************************************************************************
++ * *
++ * * setFailsCount -
++ * */
++static void setFailsCounter(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
++{
++  if (subOrig.hasField(CSUB_FAILSCOUNTER))
++  {
++    long long failsCounter = getIntOrLongFieldAsLongF(subOrig, CSUB_FAILSCOUNTER);
++    setFailsCounter(failsCounter, b);
++  }
++}
++
++
+ 
+ /* ****************************************************************************
+ *
+@@ -816,6 +853,8 @@ std::string mongoUpdateSubscription
+   setExpiration(subUp, subOrig, &b);
+   setHttpInfo(subUp, subOrig, &b);
+   setThrottling(subUp, subOrig, &b);
++  setMaxFailsLimit(subUp, subOrig, &b);
++//  setFailsCounter(subOrig, &b);
+   setServicePath(servicePath, &b);
+   setDescription(subUp, subOrig, &b);
+   setStatus(subUp, subOrig, &b);
+@@ -828,6 +867,7 @@ std::string mongoUpdateSubscription
+   setConds(subUp, subOrig, &b);
+ 
+   setCount(subOrig, &b);
++  setFailsCounter(subOrig, &b);
+ 
+   setExpression(subUp, subOrig, &b);
+   setFormat(subUp, subOrig, &b);
+diff --git a/src/lib/ngsiNotify/Notifier.cpp b/src/lib/ngsiNotify/Notifier.cpp
+index aefeb23..5f1abd3 100644
+--- a/src/lib/ngsiNotify/Notifier.cpp
++++ b/src/lib/ngsiNotify/Notifier.cpp
+@@ -67,6 +67,8 @@ void Notifier::sendNotifyContextRequest
+     NotifyContextRequest&            ncr,
+     const ngsiv2::HttpInfo&          httpInfo,
+     const std::string&               tenant,
++    long long                        maxFailsLimit,
++    long long                        failsCounter,
+     const std::string&               xauthToken,
+     const std::string&               fiwareCorrelator,
+     unsigned int                     correlatorCounter,
+@@ -80,6 +82,8 @@ void Notifier::sendNotifyContextRequest
+   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
+                                                                           httpInfo,
+                                                                           tenant,
++                                                                          maxFailsLimit,
++                                                                          failsCounter,
+                                                                           xauthToken,
+                                                                           fiwareCorrelator,
+                                                                           correlatorCounter,
+@@ -118,6 +122,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
+     const ContextElementResponseVector&  cv,
+     const ngsiv2::HttpInfo&              httpInfo,
+     const std::string&                   tenant,
++    long long                            maxFailsLimit,
++    long long                        failsCounter,
+     const std::string&                   xauthToken,
+     const std::string&                   fiwareCorrelator,
+     unsigned int                         correlatorCounter,
+@@ -304,6 +310,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
+     params->protocol         = protocol;
+     params->verb             = method;
+     params->tenant           = tenant;
++    params->maxFailsLimit    = maxFailsLimit;
++    params->failsCounter     = failsCounter;
+     params->servicePath      = en.servicePath;
+     params->xauthToken       = xauthToken;
+     params->resource         = uri;
+@@ -336,6 +344,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
+   NotifyContextRequest&            ncr,
+   const ngsiv2::HttpInfo&          httpInfo,
+   const std::string&               tenant,
++  long long                        maxFailsLimit,
++  long long                        failsCounter,
+   const std::string&               xauthToken,
+   const std::string&               fiwareCorrelator,
+   unsigned int                     correlatorCounter,
+@@ -376,6 +386,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
+                                      ncr.contextElementResponseVector,
+                                      httpInfo,
+                                      tenant,
++                                     maxFailsLimit,
++                                     failsCounter,
+                                      xauthToken,
+                                      fiwareCorrelator,
+                                      correlatorCounter,
+@@ -440,6 +452,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
+     params->protocol         = protocol;
+     params->verb             = verbName(verb);
+     params->tenant           = tenant;
++    params->maxFailsLimit    = maxFailsLimit;
++    params->failsCounter     = failsCounter;
+     params->servicePath      = spath;
+     params->xauthToken       = xauthToken;
+     params->resource         = uriPath;
+diff --git a/src/lib/ngsiNotify/Notifier.h b/src/lib/ngsiNotify/Notifier.h
+index fb3325d..907da0f 100644
+--- a/src/lib/ngsiNotify/Notifier.h
++++ b/src/lib/ngsiNotify/Notifier.h
+@@ -48,6 +48,8 @@ public:
+   virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+                                         const ngsiv2::HttpInfo&          httpInfo,
+                                         const std::string&               tenant,
++                                        long long                        maxFailsLimit,
++				        long long                        failsCounter,
+                                         const std::string&               xauthToken,
+                                         const std::string&               fiwareCorrelator,
+                                         unsigned int                     correlatorCounter,
+@@ -60,6 +62,8 @@ protected:
+   static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
+                                                              const ngsiv2::HttpInfo&          httpInfo,
+                                                              const std::string&               tenant,
++                                                             long long                        maxFailsLimit,
++							     long long                        failsCounter,
+                                                              const std::string&               xauthToken,
+                                                              const std::string&               fiwareCorrelator,
+                                                              unsigned int                     correlatorCounter,
+diff --git a/src/lib/ngsiNotify/QueueNotifier.cpp b/src/lib/ngsiNotify/QueueNotifier.cpp
+index 994d730..709a829 100644
+--- a/src/lib/ngsiNotify/QueueNotifier.cpp
++++ b/src/lib/ngsiNotify/QueueNotifier.cpp
+@@ -127,6 +127,8 @@ void QueueNotifier::sendNotifyContextRequest
+   NotifyContextRequest&            ncr,
+   const ngsiv2::HttpInfo&          httpInfo,
+   const std::string&               tenant,
++  long long                        maxFailsLimit,
++  long long                        failsCounter,
+   const std::string&               xauthToken,
+   const std::string&               fiwareCorrelator,
+   unsigned int                     correlatorCounter,
+@@ -139,6 +141,8 @@ void QueueNotifier::sendNotifyContextRequest
+   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
+                                                                           httpInfo,
+                                                                           tenant,
++ 									  maxFailsLimit,
++ 									  failsCounter,
+                                                                           xauthToken,
+                                                                           fiwareCorrelator,
+                                                                           correlatorCounter,
+diff --git a/src/lib/ngsiNotify/QueueNotifier.h b/src/lib/ngsiNotify/QueueNotifier.h
+index 9a30066..19567ac 100644
+--- a/src/lib/ngsiNotify/QueueNotifier.h
++++ b/src/lib/ngsiNotify/QueueNotifier.h
+@@ -60,6 +60,8 @@ public:
+   void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+                                 const ngsiv2::HttpInfo&          httpInfo,
+                                 const std::string&               tenant,
++                                long long                        maxFailsLimit,
++                                long long                        failsCounter,
+                                 const std::string&               xauthToken,
+                                 const std::string&               fiwareCorrelator,
+                                 unsigned int                     correlatorCounter,
+diff --git a/src/lib/ngsiNotify/QueueWorkers.cpp b/src/lib/ngsiNotify/QueueWorkers.cpp
+index 8576658..3c77449 100644
+--- a/src/lib/ngsiNotify/QueueWorkers.cpp
++++ b/src/lib/ngsiNotify/QueueWorkers.cpp
+@@ -165,11 +165,13 @@ static void* workerFunc(void* pSyncQ)
+ 
+       strncpy(transactionId, params->transactionId, sizeof(transactionId));
+ 
+-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
++      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+                          params->ip.c_str(),
+                          params->port,
+                          params->verb.c_str(),
+                          params->tenant.c_str(),
++                         params->maxFailsLimit,
++                         params->failsCounter,
+                          params->servicePath.c_str(),
+                          params->xauthToken.c_str(),
+                          params->resource.c_str(),
+@@ -192,7 +194,7 @@ static void* workerFunc(void* pSyncQ)
+       else // we'll send the notification
+       {
+         int          r;
+-        CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
++//        CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+ 
+         r =  httpRequestSendWithCurl(curl,
+                                      params->from,
+@@ -201,6 +203,8 @@ static void* workerFunc(void* pSyncQ)
+                                      params->protocol,
+                                      params->verb,
+                                      params->tenant,
++                                     params->maxFailsLimit,
++                                     params->failsCounter,
+                                      params->servicePath,
+                                      params->xauthToken,
+                                      params->resource,
+@@ -221,7 +225,7 @@ static void* workerFunc(void* pSyncQ)
+           __sync_fetch_and_add(&noOfNotificationsSent, 1);
+           QueueStatistics::incSentOK();
+           alarmMgr.notificationErrorReset(url);
+-          cSubP->failsCounter = 0;
++          params->failsCounter = 0;
+ 
+           if (params->registration == false)
+           {
+@@ -233,7 +237,8 @@ static void* workerFunc(void* pSyncQ)
+           QueueStatistics::incSentError();
+           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
+ 
+-          cSubP->failsCounter = cSubP->failsCounter + 1;
++          params->failsCounter =+ params->failsCounter;
++  /*        cSubP->failsCounter = cSubP->failsCounter + 1;
+ 
+           if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+           {
+@@ -247,7 +252,7 @@ static void* workerFunc(void* pSyncQ)
+              orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+              cSubP->status = STATUS_INACTIVE;
+              LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
+-          }
++          }*/
+ 
+           if (params->registration == false)
+           {
+diff --git a/src/lib/ngsiNotify/senderThread.cpp b/src/lib/ngsiNotify/senderThread.cpp
+index bdcd3cc..e957690 100644
+--- a/src/lib/ngsiNotify/senderThread.cpp
++++ b/src/lib/ngsiNotify/senderThread.cpp
+@@ -50,23 +50,28 @@
+ void* startSenderThread(void* p)
+ {
+   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
++  int counter = 0;
+ 
+   for (unsigned ix = 0; ix < paramsV->size(); ix++)
+   {
+     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
+     char                portV[STRING_SIZE_FOR_INT];
+     std::string         url;
++   // long long           limit;
+ 
+     snprintf(portV, sizeof(portV), "%d", params->port);
+     url = params->ip + ":" + portV + params->resource;
++   // limit = params->maxFailsLimit;
+ 
+     strncpy(transactionId, params->transactionId, sizeof(transactionId));
+ 
+-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
++    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+                        params->ip.c_str(),
+                        params->port,
+                        params->verb.c_str(),
+                        params->tenant.c_str(),
++                       params->maxFailsLimit,
++                       params->failsCounter,
+                        params->servicePath.c_str(),
+                        params->xauthToken.c_str(),
+                        params->resource.c_str(),
+@@ -74,7 +79,7 @@ void* startSenderThread(void* p)
+ 
+     long long    statusCode = -1;
+     std::string  out;
+-    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
++  //  LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->maxFailsLimit));
+ 
+     CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+ 
+@@ -88,6 +93,8 @@ void* startSenderThread(void* p)
+                           params->protocol,
+                           params->verb,
+                           params->tenant,
++                          params->maxFailsLimit,
++                          params->failsCounter,
+                           params->servicePath,
+                           params->xauthToken,
+                           params->resource,
+@@ -99,13 +106,13 @@ void* startSenderThread(void* p)
+                           &statusCode,
+                           params->extraHeaders);
+ 
+-      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
++     // LM_T(LmtNotificationResponsePayload, ("notification response: %s", params->maxFailsLimit));
+ 
+       if (r == 0)
+       {
+         __sync_fetch_and_add(&noOfNotificationsSent, 1);
+         alarmMgr.notificationErrorReset(url);
+-        cSubP->failsCounter = 0;
++        params->failsCounter = 0;
+ 
+         if (params->registration == false)
+         {
+@@ -114,11 +121,44 @@ void* startSenderThread(void* p)
+       }
+       else
+       {
+-        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+-        cSubP->failsCounter = cSubP->failsCounter + 1;
++        cSubP->failsCounter = cSubP->failsCounter +1;
++        counter += 1;
++        // params->failsCounter               += 1;
++        //params->failsCounter =+  params->failsCounter;
++        alarmMgr.notificationError(url, "anjali notification failure for sender-thread: " + out);
++        //LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
++        LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, counter));
+ 
+-        if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
++
++        //loop
++        if (cSubP->failsCounter  > params->maxFailsLimit) 
+         {
++  
++         //params->failsCounter++;
++         //LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", params->failsCounter));
++         LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", cSubP->failsCounter ));
++
++        }
++        
++         //set fails
++        /*orion::BSONObj         query;
++        std::string err;
++        orion::BSONObjBuilder bobSet;
++        orion::BSONObjBuilder bobInc;
++        bobSet.append(CSUB_FAILSCOUNTER, (long long) 0);
++        bobInc.append(CSUB_FAILSCOUNTER, (long long) 1);
++
++        orion::BSONObjBuilder bobUpdate;
++        bobUpdate.append("$set", bobSet.obj());
++        bobUpdate.append("$inc", bobInc.obj());
++
++        orion::collectionUpdate(composeDatabaseName(params->tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);*/
++
++       /* if (params->failsCounter < 5)
++        {
++         
++         LM_T(LmtNotifier, ("anjali reach to max limit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
++        
+            orion::BSONObjBuilder bobSet1;
+            bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
+            orion::BSONObjBuilder bobUpdate;
+@@ -127,9 +167,9 @@ void* startSenderThread(void* p)
+            std::string err;
+ 
+            orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+-           cSubP->status = STATUS_INACTIVE;
+-           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
+-        }
++        //   cSubP->status = STATUS_INACTIVE;
++           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", CSUB_STATUS));
++        }*/
+ 
+         if (params->registration == false)
+         {
+diff --git a/src/lib/ngsiNotify/senderThread.h b/src/lib/ngsiNotify/senderThread.h
+index 7e4c5ea..f1aea1b 100644
+--- a/src/lib/ngsiNotify/senderThread.h
++++ b/src/lib/ngsiNotify/senderThread.h
+@@ -54,6 +54,8 @@ typedef struct SenderThreadParams
+   std::string                        protocol;
+   std::string                        verb;
+   std::string                        tenant;
++  long long                          maxFailsLimit;
++  long long                          failsCounter;
+   std::string                        servicePath;
+   std::string                        xauthToken;
+   std::string                        resource;
+diff --git a/src/lib/rest/httpRequestSend.cpp b/src/lib/rest/httpRequestSend.cpp
+index d6dd8a5..5d13aeb 100644
+--- a/src/lib/rest/httpRequestSend.cpp
++++ b/src/lib/rest/httpRequestSend.cpp
+@@ -247,6 +247,8 @@ int httpRequestSendWithCurl
+    const std::string&                         _protocol,
+    const std::string&                         verb,
+    const std::string&                         tenant,
++   long long                                  maxFailsLimit,
++   long long                                  failsCounter,
+    const std::string&                         servicePath,
+    const std::string&                         xauthToken,
+    const std::string&                         resource,
+@@ -627,6 +629,8 @@ int httpRequestSend
+    const std::string&                         protocol,
+    const std::string&                         verb,
+    const std::string&                         tenant,
++   long long                                  maxFailsLimit,
++   long long                                  failsCounter,
+    const std::string&                         servicePath,
+    const std::string&                         xauthToken,
+    const std::string&                         resource,
+@@ -668,6 +672,8 @@ int httpRequestSend
+                                      protocol,
+                                      verb,
+                                      tenant,
++                                     maxFailsLimit, 
++                                     failsCounter,
+                                      servicePath,
+                                      xauthToken,
+                                      resource,
+diff --git a/src/lib/rest/httpRequestSend.h b/src/lib/rest/httpRequestSend.h
+index 31fda7e..9604e2f 100644
+--- a/src/lib/rest/httpRequestSend.h
++++ b/src/lib/rest/httpRequestSend.h
+@@ -63,6 +63,8 @@ extern int httpRequestSend
+   const std::string&                         protocol,
+   const std::string&                         verb,
+   const std::string&                         tenant,
++  long long                                  maxFailsLimit,
++  long long                                  failsCounter,
+   const std::string&                         servicePath,
+   const std::string&                         xauthToken,
+   const std::string&                         resource,
+@@ -92,6 +94,8 @@ extern int httpRequestSendWithCurl
+   const std::string&                         protocol,
+   const std::string&                         verb,
+   const std::string&                         tenant,
++  long long                                  maxFailsLimit,
++  long long                                  failscounter,
+   const std::string&                         servicePath,
+   const std::string&                         xauthToken,
+   const std::string&                         resource,
+diff --git a/src/lib/serviceRoutines/postQueryContext.cpp b/src/lib/serviceRoutines/postQueryContext.cpp
+index dcbc5fd..1f44e93 100644
+--- a/src/lib/serviceRoutines/postQueryContext.cpp
++++ b/src/lib/serviceRoutines/postQueryContext.cpp
+@@ -142,6 +142,8 @@ static bool queryForward
+   std::string     verb;
+   std::string     resource;
+   std::string     tenant       = ciP->tenant;
++  long long       maxFailsLimit = -1;
++  long long       failsCounter = 0;
+   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+   std::string     mimeType;
+   std::string     op;
+@@ -276,6 +278,8 @@ static bool queryForward
+                       protocol,
+                       verb,
+                       tenant,
++                      maxFailsLimit,
++                      failsCounter,
+                       servicePath,
+                       ciP->httpHeaders.xauthToken,
+                       resource,
+diff --git a/src/lib/serviceRoutines/postUpdateContext.cpp b/src/lib/serviceRoutines/postUpdateContext.cpp
+index a0d24a6..6bd84b5 100644
+--- a/src/lib/serviceRoutines/postUpdateContext.cpp
++++ b/src/lib/serviceRoutines/postUpdateContext.cpp
+@@ -147,6 +147,8 @@ static bool updateForward
+   std::string     resource;
+   std::string     op;
+   std::string     tenant       = ciP->tenant;
++  long long       maxFailsLimit = -1;
++  long long       failsCounter  = 0;
+   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+   std::string     mimeType     = "application/json";
+   std::string     out;
+@@ -214,6 +216,8 @@ static bool updateForward
+                       protocol,
+                       verb,
+                       tenant,
++                      maxFailsLimit,
++                      failsCounter,
+                       servicePath,
+                       ciP->httpHeaders.xauthToken,
+                       resource,
+diff --git a/test/functionalTest/cases/0876_entity_dates/get_entity_dates_with_attr.test b/test/functionalTest/cases/0876_entity_dates/get_entity_dates_with_attr.test
+index 35cd6ba..3583745 100644
+--- a/test/functionalTest/cases/0876_entity_dates/get_entity_dates_with_attr.test
++++ b/test/functionalTest/cases/0876_entity_dates/get_entity_dates_with_attr.test
+@@ -230,7 +230,7 @@ payload='{
+     }
+   ],
+   "attrs": [
+-    "dateModified"
++    "dateOberved"
+   ]
+ }'
+ orionCurl --url '/v2/op/query' --payload "$payload"

@@ -1089,6 +1089,8 @@ static bool addTriggeredSubscriptions_withCache
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           cSubP->maxFailsLimit,
+                                                           cSubP->failsCounter,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
@@ -1108,6 +1110,11 @@ static bool addTriggeredSubscriptions_withCache
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
     std::string errorString;
+
+    if(cSubP->failsCounter)
+    {
+      LM_T(LmtSubCache, ("anjali11 NOT csub ignored: %lu", cSubP->failsCounter));
+    } 
 
     if (!subP->stringFilterSet(&cSubP->expression.stringFilter, &errorString))
     {
@@ -1507,6 +1514,8 @@ static bool addTriggeredSubscriptions_noCache
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long         maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?       getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)       : -1;
+      long long         failsCounter         = sub.hasField(CSUB_FAILSCOUNTER)?       getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)       : 0;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
@@ -1526,6 +1535,8 @@ static bool addTriggeredSubscriptions_noCache
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
+          maxFailsLimit,
+          failsCounter,
           lastNotification,
           renderFormat,
           httpInfo,
@@ -1681,6 +1692,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
+  long long                        maxFailsLimit,
+  long long                        failsCounter,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
@@ -1744,6 +1757,8 @@ static bool processOnChangeConditionForUpdateContext
   getNotifier()->sendNotifyContextRequest(ncr,
                                           httpInfo,
                                           tenant,
+                                          maxFailsLimit,
+                                          failsCounter,
                                           xauthToken,
                                           fiwareCorrelator,
                                           correlatorCounter,
@@ -1874,6 +1889,7 @@ static unsigned int processSubscriptions
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
+     LM_T(LmtSubCache, ("anjali11 NOT ignored: %lu", tSubP->failsCounter));
 
     bool  notificationSent;
 
@@ -1883,6 +1899,8 @@ static unsigned int processSubscriptions
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
                                                                 tenant,
+                                                                tSubP->maxFailsLimit,
+                                                                tSubP->failsCounter,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
@@ -1970,6 +1988,10 @@ static unsigned int processSubscriptions
 
           LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'",
                              cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
+
+          //fails
+          LM_T(LmtSubCache, ("anjali11 set lastNotificationTime to %lu and count to %lu",
+                             cSubP->lastNotificationTime, cSubP->failsCounter));
         }
         else
         {

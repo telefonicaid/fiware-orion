@@ -40,6 +40,8 @@
 TriggeredSubscription::TriggeredSubscription
 (
   long long                _throttling,
+  long long                _maxFailsLimit,
+  long long                _failsCounter,
   long long                _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
@@ -49,6 +51,8 @@ TriggeredSubscription::TriggeredSubscription
 )
 :
   throttling(_throttling),
+  maxFailsLimit(_maxFailsLimit),
+  failsCounter(_failsCounter),
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
   httpInfo(_httpInfo),
@@ -77,6 +81,8 @@ TriggeredSubscription::TriggeredSubscription
 )
 :
   throttling(-1),
+  maxFailsLimit(-1),
+  failsCounter(-1),
   lastNotification(-1),
   renderFormat(_renderFormat),
   httpInfo(_httpInfo),

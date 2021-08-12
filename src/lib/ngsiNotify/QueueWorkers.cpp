@@ -165,11 +165,13 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
                          params->tenant.c_str(),
+                         params->maxFailsLimit,
+                         params->failsCounter,
                          params->servicePath.c_str(),
                          params->xauthToken.c_str(),
                          params->resource.c_str(),
@@ -192,7 +194,7 @@ static void* workerFunc(void* pSyncQ)
       else // we'll send the notification
       {
         int          r;
-        CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+//        CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
 
         r =  httpRequestSendWithCurl(curl,
                                      params->from,
@@ -201,6 +203,8 @@ static void* workerFunc(void* pSyncQ)
                                      params->protocol,
                                      params->verb,
                                      params->tenant,
+                                     params->maxFailsLimit,
+                                     params->failsCounter,
                                      params->servicePath,
                                      params->xauthToken,
                                      params->resource,
@@ -221,7 +225,7 @@ static void* workerFunc(void* pSyncQ)
           __sync_fetch_and_add(&noOfNotificationsSent, 1);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
-          cSubP->failsCounter = 0;
+          params->failsCounter = 0;
 
           if (params->registration == false)
           {
@@ -233,7 +237,8 @@ static void* workerFunc(void* pSyncQ)
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
-          cSubP->failsCounter = cSubP->failsCounter + 1;
+          params->failsCounter =+ params->failsCounter;
+  /*        cSubP->failsCounter = cSubP->failsCounter + 1;
 
           if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
           {
@@ -247,7 +252,7 @@ static void* workerFunc(void* pSyncQ)
              orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
              cSubP->status = STATUS_INACTIVE;
              LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
-          }
+          }*/
 
           if (params->registration == false)
           {

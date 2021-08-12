@@ -1,0 +1,179 @@
+diff --git a/src/lib/apiTypesV2/Subscription.cpp b/src/lib/apiTypesV2/Subscription.cpp
+index 584a3e5..f33d415 100644
+--- a/src/lib/apiTypesV2/Subscription.cpp
++++ b/src/lib/apiTypesV2/Subscription.cpp
+@@ -97,6 +97,12 @@ std::string Subscription::toJson(void)
+     jh.addNumber("throttling", this->throttling);
+   }
+ 
++  if (this->maxFailsLimit > 0)
++  {
++    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
++  }
++
++
+   return jh.str();
+ }
+ 
+diff --git a/src/lib/mongoBackend/MongoCommonUpdate.cpp b/src/lib/mongoBackend/MongoCommonUpdate.cpp
+index a3fd978..7dfd2ba 100644
+--- a/src/lib/mongoBackend/MongoCommonUpdate.cpp
++++ b/src/lib/mongoBackend/MongoCommonUpdate.cpp
+@@ -1089,6 +1089,7 @@ static bool addTriggeredSubscriptions_withCache
+     }
+ 
+     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
++                                                           (long long) cSubP->maxFailsLimit,
+                                                            (long long) cSubP->lastNotificationTime,
+                                                            cSubP->renderFormat,
+                                                            cSubP->httpInfo,
+@@ -1507,6 +1508,7 @@ static bool addTriggeredSubscriptions_noCache
+       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
+       //
+       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
++      long long         maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?       getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)       : -1;
+       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+@@ -1526,6 +1528,7 @@ static bool addTriggeredSubscriptions_noCache
+       TriggeredSubscription* trigs = new TriggeredSubscription
+         (
+           throttling,
++          maxFailsLimit,
+           lastNotification,
+           renderFormat,
+           httpInfo,
+diff --git a/src/lib/mongoBackend/TriggeredSubscription.cpp b/src/lib/mongoBackend/TriggeredSubscription.cpp
+index e64c315..786d4e9 100644
+--- a/src/lib/mongoBackend/TriggeredSubscription.cpp
++++ b/src/lib/mongoBackend/TriggeredSubscription.cpp
+@@ -40,6 +40,7 @@
+ TriggeredSubscription::TriggeredSubscription
+ (
+   long long                _throttling,
++  long long                _maxFailsLimit,
+   long long                _lastNotification,
+   RenderFormat             _renderFormat,
+   const ngsiv2::HttpInfo&  _httpInfo,
+@@ -49,6 +50,7 @@ TriggeredSubscription::TriggeredSubscription
+ )
+ :
+   throttling(_throttling),
++  maxFailsLimit(_maxFailsLimit),
+   lastNotification(_lastNotification),
+   renderFormat(_renderFormat),
+   httpInfo(_httpInfo),
+@@ -77,6 +79,7 @@ TriggeredSubscription::TriggeredSubscription
+ )
+ :
+   throttling(-1),
++  maxFailsLimit(-1),
+   lastNotification(-1),
+   renderFormat(_renderFormat),
+   httpInfo(_httpInfo),
+diff --git a/src/lib/mongoBackend/TriggeredSubscription.h b/src/lib/mongoBackend/TriggeredSubscription.h
+index f0671e6..e6fef92 100644
+--- a/src/lib/mongoBackend/TriggeredSubscription.h
++++ b/src/lib/mongoBackend/TriggeredSubscription.h
+@@ -53,6 +53,7 @@ class TriggeredSubscription
+ {
+  public:
+   long long                 throttling;
++  long long                 maxFailsLimit;
+   long long                 lastNotification;
+   RenderFormat              renderFormat;
+   ngsiv2::HttpInfo          httpInfo;
+@@ -72,6 +73,7 @@ class TriggeredSubscription
+   }                        expression;      // Only used by NGSIv2 subscription
+ 
+   TriggeredSubscription(long long                _throttling,
++                        long long                _maxFailsLimit,
+                         long long                _lastNotification,
+                         RenderFormat             _renderFormat,
+                         const ngsiv2::HttpInfo&  _httpInfo,
+diff --git a/src/lib/mongoBackend/mongoCreateSubscription.cpp b/src/lib/mongoBackend/mongoCreateSubscription.cpp
+index 68ec8ca..6fc43ec 100644
+--- a/src/lib/mongoBackend/mongoCreateSubscription.cpp
++++ b/src/lib/mongoBackend/mongoCreateSubscription.cpp
+@@ -148,6 +148,7 @@ std::string mongoCreateSubscription
+   setExpiration(sub, &b);
+   setHttpInfo(sub, &b);
+   setThrottling(sub, &b);
++  setMaxFailsLimit(sub, &b);
+   setServicePath(servicePath, &b);
+   setDescription(sub, &b);
+   setStatus(sub, &b);
+diff --git a/src/lib/mongoBackend/mongoSubCache.cpp b/src/lib/mongoBackend/mongoSubCache.cpp
+index 4c82b33..5c7e450 100644
+--- a/src/lib/mongoBackend/mongoSubCache.cpp
++++ b/src/lib/mongoBackend/mongoSubCache.cpp
+@@ -107,6 +107,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
+   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+   cSubP->renderFormat          = renderFormat;
+   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
++  cSubP->maxFailsLimit            = sub.hasField(CSUB_MAXFAILSLIMIT)?       getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)       : -1;
+   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
+   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
+@@ -360,6 +361,7 @@ int mongoSubCacheItemInsert
+   cSubP->servicePath           = strdup(servicePath);
+   cSubP->renderFormat          = renderFormat;
+   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
++  cSubP->maxFailsLimit            = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
+   cSubP->expirationTime        = expirationTime;
+   cSubP->lastNotificationTime  = lastNotificationTime;
+   cSubP->count                 = 0;
+diff --git a/src/lib/mongoBackend/mongoUpdateSubscription.cpp b/src/lib/mongoBackend/mongoUpdateSubscription.cpp
+index f84ae69..fe1249e 100644
+--- a/src/lib/mongoBackend/mongoUpdateSubscription.cpp
++++ b/src/lib/mongoBackend/mongoUpdateSubscription.cpp
+@@ -162,6 +162,29 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
+ }
+ 
+ 
++/* ****************************************************************************
++ * *
++ * * setMaxFailsLimit -
++ * */
++static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
++{
++  if (subUp.maxFailsLimitProvided)
++  {
++    setMaxFailsLimit(subUp, b);
++  }
++  else
++  {
++    if (subOrig.hasField(CSUB_MAXFAILSLIMIT))
++    {
++      long long maxFailsLimit = getIntOrLongFieldAsLongF(subOrig, CSUB_MAXFAILSLIMIT);
++
++      b->append(CSUB_MAXFAILSLIMIT, maxFailsLimit);
++      LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", maxFailsLimit));
++    }
++  }
++}
++
++
+ 
+ /* ****************************************************************************
+ *
+@@ -816,6 +839,7 @@ std::string mongoUpdateSubscription
+   setExpiration(subUp, subOrig, &b);
+   setHttpInfo(subUp, subOrig, &b);
+   setThrottling(subUp, subOrig, &b);
++  setMaxFailsLimit(subUp, subOrig, &b);
+   setServicePath(servicePath, &b);
+   setDescription(subUp, subOrig, &b);
+   setStatus(subUp, subOrig, &b);
+diff --git a/src/lib/ngsiNotify/senderThread.cpp b/src/lib/ngsiNotify/senderThread.cpp
+index bdcd3cc..7611fb0 100644
+--- a/src/lib/ngsiNotify/senderThread.cpp
++++ b/src/lib/ngsiNotify/senderThread.cpp
+@@ -116,6 +116,7 @@ void* startSenderThread(void* p)
+       {
+         alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+         cSubP->failsCounter = cSubP->failsCounter + 1;
++        LM_T(LmtSubCache, ("anjali maxlimit to '%s' as Subscription status is inactive", CSUB_THROTTLING));
+ 
+         if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+         {

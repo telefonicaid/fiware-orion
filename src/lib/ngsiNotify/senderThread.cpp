@@ -50,23 +50,28 @@
 void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+  int counter = 0;
 
   for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
+   // long long           limit;
 
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
+   // limit = params->maxFailsLimit;
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
                        params->tenant.c_str(),
+                       params->maxFailsLimit,
+                       params->failsCounter,
                        params->servicePath.c_str(),
                        params->xauthToken.c_str(),
                        params->resource.c_str(),
@@ -74,7 +79,7 @@ void* startSenderThread(void* p)
 
     long long    statusCode = -1;
     std::string  out;
-    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
+  //  LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->maxFailsLimit));
 
     CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
 
@@ -88,6 +93,8 @@ void* startSenderThread(void* p)
                           params->protocol,
                           params->verb,
                           params->tenant,
+                          params->maxFailsLimit,
+                          params->failsCounter,
                           params->servicePath,
                           params->xauthToken,
                           params->resource,
@@ -99,13 +106,13 @@ void* startSenderThread(void* p)
                           &statusCode,
                           params->extraHeaders);
 
-      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
+     // LM_T(LmtNotificationResponsePayload, ("notification response: %s", params->maxFailsLimit));
 
       if (r == 0)
       {
         __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
-        cSubP->failsCounter = 0;
+        params->failsCounter = 0;
 
         if (params->registration == false)
         {
@@ -114,11 +121,44 @@ void* startSenderThread(void* p)
       }
       else
       {
-        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
-        cSubP->failsCounter = cSubP->failsCounter + 1;
+        cSubP->failsCounter = cSubP->failsCounter +1;
+        counter += 1;
+        // params->failsCounter               += 1;
+        //params->failsCounter =+  params->failsCounter;
+        alarmMgr.notificationError(url, "anjali notification failure for sender-thread: " + out);
+        //LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
+        LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, counter));
 
-        if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+
+        //loop
+        if (cSubP->failsCounter  > params->maxFailsLimit) 
         {
+  
+         //params->failsCounter++;
+         //LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", params->failsCounter));
+         LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", cSubP->failsCounter ));
+
+        }
+        
+         //set fails
+        /*orion::BSONObj         query;
+        std::string err;
+        orion::BSONObjBuilder bobSet;
+        orion::BSONObjBuilder bobInc;
+        bobSet.append(CSUB_FAILSCOUNTER, (long long) 0);
+        bobInc.append(CSUB_FAILSCOUNTER, (long long) 1);
+
+        orion::BSONObjBuilder bobUpdate;
+        bobUpdate.append("$set", bobSet.obj());
+        bobUpdate.append("$inc", bobInc.obj());
+
+        orion::collectionUpdate(composeDatabaseName(params->tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);*/
+
+       /* if (params->failsCounter < 5)
+        {
+         
+         LM_T(LmtNotifier, ("anjali reach to max limit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
+        
            orion::BSONObjBuilder bobSet1;
            bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
            orion::BSONObjBuilder bobUpdate;
@@ -127,9 +167,9 @@ void* startSenderThread(void* p)
            std::string err;
 
            orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
-           cSubP->status = STATUS_INACTIVE;
-           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
-        }
+        //   cSubP->status = STATUS_INACTIVE;
+           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", CSUB_STATUS));
+        }*/
 
         if (params->registration == false)
         {

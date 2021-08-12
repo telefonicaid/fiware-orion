@@ -73,6 +73,14 @@ extern void setThrottling(const ngsiv2::Subscription& sub, orion::BSONObjBuilder
 extern void setMaxFailsLimit(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
+
+/* ****************************************************************************
+ * *
+ * * setFailsCounter -
+ * */
+extern void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b);
+
+
 /* ****************************************************************************
 *
 * setServicePath -

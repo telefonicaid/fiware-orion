@@ -148,6 +148,8 @@ std::string mongoCreateSubscription
   setExpiration(sub, &b);
   setHttpInfo(sub, &b);
   setThrottling(sub, &b);
+  setMaxFailsLimit(sub, &b);
+  //setFailsCounter(sub, &b);
   setServicePath(servicePath, &b);
   setDescription(sub, &b);
   setStatus(sub, &b);
