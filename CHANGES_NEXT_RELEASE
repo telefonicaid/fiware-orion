@@ -1,4 +1,5 @@
 - Hardening: Improve notification pool worker thread termination logic (#3877)
 - Remove: deprecated feature initial notification upon subscription creation or update
 - Fix: return 400 instead of 500 when GeoJSON syntax error occur (#3347)
+- Fix: onlyChangedAttrs set to true not working after csubs cache refresh (#3906)
 - Fix: 400 BadRequest when attempting to DELETE with multi-servicepath or SP with '/#' (instead of silently failing) (#3071)
