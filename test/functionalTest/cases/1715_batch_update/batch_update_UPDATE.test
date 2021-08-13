@@ -186,13 +186,13 @@ Date: REGEX(.*)
 05. Try to UPDATE non-existing attribute A3, see error
 ======================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 105
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [A3]",
+    "description": "one or more of the attributes in the request do not exist: [ A3 ]",
     "error": "Unprocessable"
 }
 

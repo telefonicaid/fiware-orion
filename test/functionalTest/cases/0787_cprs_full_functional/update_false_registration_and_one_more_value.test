@@ -182,7 +182,7 @@ Date: REGEX(.*)
 03. Update/UPDATE E1/T1/A1+A2 in CB
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 393
+Content-Length: 387
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -193,37 +193,30 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "string", 
+                        "name": "A2",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "404", 
-                "details": "E1", 
-                "reasonPhrase": "No context element found"
+                "code": "400",
+                "details": "one or more of the attributes in the request do not exist: [ A1 ]",
+                "reasonPhrase": "Bad Request"
             }
         }
     ]

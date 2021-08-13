@@ -809,118 +809,16 @@ Date: REGEX(.*)
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 1010
+Content-Length: 67
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A4", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A5", 
-                        "type": "string", 
-                        "value": ""
-                    },
-                    {
-                        "name": "A3",
-                        "type": "string",
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "404", 
-                "details": "E1", 
-                "reasonPhrase": "No context element found"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A5", 
-                        "type": "string", 
-                        "value": ""
-                    },
-                    {
-                        "name": "A3",
-                        "type": "string",
-                        "value": ""
-                    },
-                    {
-                        "name": "A4", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "404", 
-                "details": "E2", 
-                "reasonPhrase": "No context element found"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
+    "errorCode": {
+        "code": "500",
+        "reasonPhrase": "Internal Server Error"
+    }
 }
 
 
@@ -940,7 +838,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 via CB"
+                        "value": "A1 in CP1"
                     }
                 ], 
                 "id": "E1", 
@@ -990,7 +888,7 @@ Date: REGEX(.*)
                     {
                         "name": "A2", 
                         "type": "string", 
-                        "value": "A2 via CB"
+                        "value": "A2 in CP2"
                     }
                 ], 
                 "id": "E1", 
@@ -1040,7 +938,7 @@ Date: REGEX(.*)
                     {
                         "name": "A3", 
                         "type": "string", 
-                        "value": "A3 via CB"
+                        "value": "A3 in CP3"
                     }
                 ], 
                 "id": "E1", 

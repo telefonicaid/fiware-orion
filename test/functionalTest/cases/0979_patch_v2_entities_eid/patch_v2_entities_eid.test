@@ -168,13 +168,13 @@ Date: REGEX(.*)
 06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
 =========================================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 108
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [attr3]",
+    "description": "one or more of the attributes in the request do not exist: [ attr3 ]",
     "error": "Unprocessable"
 }
 

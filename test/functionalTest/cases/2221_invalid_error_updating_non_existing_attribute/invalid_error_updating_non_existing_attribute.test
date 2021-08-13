@@ -80,13 +80,13 @@ Date: REGEX(.*)
 02. Attempt to replace E1/A2, see error about attribute not found
 =================================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 105
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [A2]",
+    "description": "one or more of the attributes in the request do not exist: [ A2 ]",
     "error": "Unprocessable"
 }
 

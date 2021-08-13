@@ -165,17 +165,20 @@ Date: REGEX(.*)
 }
 4: +++++++++ PUT that fails +++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 172
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "errorCode": {
-        "code": "472",
-        "details": "action: UPDATE - entity: [ENTITY_ID, ] - offending attribute: temperature",
-        "reasonPhrase": "request parameter is invalid/not allowed"
-    }
+    "contextResponses": [
+        {
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 5: +++++++++ Register an entity +++++++++++++++++
 HTTP/1.1 200 OK
