@@ -692,7 +692,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (serviceV != restBadVerbV)
+    if (serviceV != restBadVerbV && !(ciP->httpStatusCode = SccBadRequest))
     {
       alarmMgr.badInputReset(clientIp);
     }
