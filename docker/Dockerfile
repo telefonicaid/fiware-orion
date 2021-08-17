@@ -83,14 +83,15 @@ RUN \
     make install && \
     ldconfig && \
     # Install mosquitto from source
-    # FIXME PR: this version is old, try with newer ones
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-1.5.tar.gz && \
-    tar xvf mosquitto-1.5.tar.gz && \
-    cd mosquitto-1.5 && \
+    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz && \
+    tar xvf mosquitto-2.0.11.tar.gz && \
+    cd mosquitto-2.0.11 && \
+    sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
+    sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
+    sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
     make && \
     make install && \
-    echo '/usr/local/lib' | tee /etc/ld.so.conf.d/99mosquitto.conf && \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
@@ -126,9 +127,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           # FIXME PR: this version is old, try with newer ones
-           /opt/mosquitto-1.5.tar.gz \
-           /opt/mosquitto-1.5 \
+           /opt/mosquitto-2.0.11.tar.gz \
+           /opt/mosquitto-2.0.11 \
            /opt/mongo-c-driver-1.17.4.tar.gz \
            /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \
