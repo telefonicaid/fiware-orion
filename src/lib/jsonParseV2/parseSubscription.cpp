@@ -425,7 +425,6 @@ static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 */
 static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
 {
-  // FIXME PR: check topic doesn't contain # or + (add new steps to ftest)
   Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
 
   if (!topicOpt.ok())
@@ -437,12 +436,16 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
     return badInput(ciP, "mandatory mqtt field /topic/");
   }
 
-  // Any other checking appart from empty-ness in the topic? Not sure
-  // but from the MQTT spec I'd say that any string is valid...
   if (topicOpt.value.empty())
   {
     return badInput(ciP, "empty mqtt field /topic/");
   }
+
+  if (forbiddenMqttTopic(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "+ and # are not allowed in mqtt field /topic/");
+  }
+
 
   if (forbiddenChars(topicOpt.value.c_str()))
   {
