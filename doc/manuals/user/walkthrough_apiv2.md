@@ -643,6 +643,9 @@ curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json
       "attrs": [
         "pressure"
       ]
+    },
+    "expression": {
+        "q": "sensorStatus:ok"
     }
   },
   "notification": {
@@ -705,9 +708,11 @@ Let's examine in detail the different elements included in the payload:
 -   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
--   You can include filtering expressions in `condition`. For example, to get notified
-    not only if pressure changes, but if it changes within the range 700-800. This
-    is an advanced topic, see the "Subscriptions" section in the
+-   You can include filtering expressions in `condition`. In the example, a notification will be
+    triggered only if the sensorStatus attribute equals "ok". Other examples of filtering
+    expressiones would be for example, to get notified not only if pressure changes, 
+    but if it changes within the range 700-800.   
+    This is an advanced topic, see the "Subscriptions" section in the
     [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 The response corresponding to that request uses 201 Created as HTTP response code.
