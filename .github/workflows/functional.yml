@@ -24,7 +24,13 @@ jobs:
         image: eclipse-mosquitto:1.6.7
         ports:
         - 1883:1883
-        
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
+
     steps:
       - uses: actions/checkout@v2
 
@@ -46,6 +52,12 @@ jobs:
         image: eclipse-mosquitto:1.6.7
         ports:
         - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2
@@ -69,6 +81,12 @@ jobs:
         ports:
         - 1883:1883
 
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
+
     steps:
       - uses: actions/checkout@v2
 
@@ -90,6 +108,12 @@ jobs:
         image: eclipse-mosquitto:1.6.7
         ports:
         - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2

@@ -19,7 +19,6 @@
 # iot_support at tid dot es
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
-# FIXME PR: this .test is planned to be improved and finalized in following PRs as a part of the work for #3001"
 
 --NAME--
 MQTT Notifications
@@ -28,7 +27,7 @@ MQTT Notifications
 dbInit CB
 
 # Using default MQTT configuration in testEnv.sh
-brokerStart CB 0-255 IPV4 -mqttHost ${MQTT_HOST} -mqttPort ${MQTT_PORT}
+brokerStart CB 0-255 IPV4
 accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic orion
 
 --SHELL--
@@ -79,15 +78,13 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost",
+      "url": "mqtt://localhost:1883",
       "topic": "orion"
     },
     "attrs": [
       "A1"
     ]
-  },
-  "expires": "2040-01-01T14:00:00.00Z",
-  "throttling": 1
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
