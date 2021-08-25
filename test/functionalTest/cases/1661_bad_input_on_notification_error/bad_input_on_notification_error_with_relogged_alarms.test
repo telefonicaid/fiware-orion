@@ -264,7 +264,6 @@ Date: REGEX(.*)
 Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notification url
 Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notification url
 Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notification url
-Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 
 07. Corrupt reference in subscription (using mongo)

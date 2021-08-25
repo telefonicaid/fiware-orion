@@ -277,7 +277,6 @@ Date: REGEX(.*)
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
 Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL
-Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 
 07. Corrupt reference in subscription (using mongo)
