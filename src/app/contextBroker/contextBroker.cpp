@@ -1279,7 +1279,7 @@ int main(int argC, char* argV[])
   {
     // At the present moment, this is the only one periodic process we need to do
     // If some other is introduced in the future, this part should be adapted.
-    // Note that the cache refresch process runs in its own thread (as it can be
+    // Note that the cache refresh process runs in its own thread (as it can be
     // disabled with the -noCache switch)
     sleep(mqttMaxAge);
     mqttMgr.cleanup(mqttMaxAge);
