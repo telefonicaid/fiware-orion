@@ -861,7 +861,7 @@ but the following one won't:
 curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 801
 ```
 
-Thre are more possibilities appart from range filters (equality filters, geo-filters, etc.). This is
+There are more possibilities apart from range filters (equality filters, geo-filters, etc.). This is
 an advanced topic, see the "Subscriptions" section in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 [Top](#top)
