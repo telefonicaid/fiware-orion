@@ -12,6 +12,7 @@
     * [すべてのエンティティの取得とフィルタリング](#getting-all-entities-and-filtering)
     * [エンティティの更新](#update-entity)
     * [サブスクリプション](#subscriptions)
+    * [フィルタリング式付きのサブスクリプション](#subscriptions-with-expressions)
     * [すべての型と型に関する詳細情報のブラウズ](#browsing-all-types-and-detailed-information-on-a-type)
     * [バッチ処理](#batch-operations)
 * [コンテキスト・アベイラビリティ管理](#context-availability-management)
@@ -552,7 +553,6 @@ EOF
 -   エンティティ属性の変更時に通知トリガーを作成するには、`condition.attrs` を空のままにしておくことができます (属性の名前に関係なく)
 -   通知には、通知をトリガする更新オペレーションを処理した後の属性値が含まれます。ただし、Orion に以前の値も含めさせることができ ます。これはメタデータを使用して実現されます。[次のドキュメント](metadata.md#metadata-in-notifications)を見てください
 -   また、"_いくつか_の属性を除くすべての属性に通知する" サブスクリプション (一種のブラック・リスト機能) を設定することもできます。この場合、`notifications` 内の `attrs` の代わり `exceptAttrs` を使用してください
--   `condition` に中にフィルタリング式をに含めることができます。たとえば、気圧が変化するだけでなく、700-800 の範囲で変化するかどうかを通知するためにも使用します。これは高度なトピックです。[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "サブスクリプション" を参照して ください
 
 そのリクエストに対応するレスポンスは、201 HTTP レスポンス・コードとして作成されたものを使用します。サブスクリプション ID (サブスクリプションの更新とキャンセルに使用される24桁16進数) を保持する Location ヘッダが含まれています。このチュートリアルの後半で必要になるので、書き留めておいてください。
 
@@ -629,6 +629,64 @@ EOF
 ```
 
 * 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Notification Messages" と "Custom Notifications" を見て ください。
+
+[トップ](#top)
+
+<a name="subscriptions-with-expressions"></a>
+### フィルタリング式付きのサブスクリプション
+
+`condition` にフィルタリング式を含めることができます。たとえば、圧力が変化した場合だけでなく、
+700〜800の範囲内で変化した場合に通知を受け取るためです。これは、次のサブスクリプションで
+行われます:
+
+```
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "description": "A subscription to get info about Room1 with filtering expresion",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    },
+    "expression": {
+        "q": "pressure:700..800"
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1028/accumulate"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "expires": "2040-01-01T14:00:00.00Z"
+}
+EOF
+```
+
+したがって、次の更新により通知がトリガーされます:
+
+```
+curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 715
+```
+
+しかし、次の更新はトリガーされません:
+
+```
+curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 801
+```
+
+範囲フィルター (等式フィルター, ジオフィルターなど) 以外にも、より多くの可能性があります。
+これは高度なトピックです。[NGSIv2仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)
+の "サブスクリプション" セクションを参照してください。
 
 [トップ](#top)
 
