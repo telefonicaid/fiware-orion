@@ -116,6 +116,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
   cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
+  cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->next                  = NULL;
 
 
