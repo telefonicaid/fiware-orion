@@ -12,6 +12,7 @@
     * [Getting all entities and filtering](#getting-all-entities-and-filtering)
     * [Update entity](#update-entity)
     * [Subscriptions](#subscriptions)
+    * [Subscriptions with expressions](#subscriptions-with-expressions)
     * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
     * [Batch operations](#batch-operations)
 * [Context availability management](#context-availability-management)
@@ -705,10 +706,6 @@ Let's examine in detail the different elements included in the payload:
 -   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
--   You can include filtering expressions in `condition`. For example, to get notified
-    not only if pressure changes, but if it changes within the range 700-800. This
-    is an advanced topic, see the "Subscriptions" section in the
-    [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 The response corresponding to that request uses 201 Created as HTTP response code.
 In addition, it contains a `Location header` which holds the subscription ID: a
@@ -810,6 +807,62 @@ EOF
   custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
   Have a look at "Notification Messages" and "Custom Notifications" in the
   [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+
+[Top](#top)
+
+### Subscriptions with expressions
+
+You can include filtering expressions in `condition`. For example, to get notified
+not only if pressure changes, but if it changes within the range 700-800. This would be done
+with the following subscription:
+
+```
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "description": "A subscription to get info about Room1 with filtering expresion",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    },
+    "expression": {
+        "q": "pressure:700..800"
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1028/accumulate"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "expires": "2040-01-01T14:00:00.00Z"
+}
+EOF
+```
+
+So now the following update will trigger a notification:
+
+```
+curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 715
+```
+
+but the following one won't:
+
+```
+curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 801
+```
+
+Thre are more possibilities appart from range filters (equality filters, geo-filters, etc.). This is
+an advanced topic, see the "Subscriptions" section in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
 
 [Top](#top)
 
