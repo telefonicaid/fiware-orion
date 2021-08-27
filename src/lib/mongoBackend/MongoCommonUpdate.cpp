@@ -1111,11 +1111,6 @@ static bool addTriggeredSubscriptions_withCache
 
     std::string errorString;
 
-    if(cSubP->failsCounter)
-    {
-      LM_T(LmtSubCache, ("anjali11 NOT csub ignored: %lu", cSubP->failsCounter));
-    } 
-
     if (!subP->stringFilterSet(&cSubP->expression.stringFilter, &errorString))
     {
       LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
@@ -1889,7 +1884,6 @@ static unsigned int processSubscriptions
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", tSubP->cacheSubId.c_str()));
-     LM_T(LmtSubCache, ("anjali11 NOT ignored: %lu", tSubP->failsCounter));
 
     bool  notificationSent;
 
@@ -1989,9 +1983,6 @@ static unsigned int processSubscriptions
           LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'",
                              cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
 
-          //fails
-          LM_T(LmtSubCache, ("anjali11 set lastNotificationTime to %lu and count to %lu",
-                             cSubP->lastNotificationTime, cSubP->failsCounter));
         }
         else
         {

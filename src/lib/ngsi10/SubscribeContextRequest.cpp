@@ -57,8 +57,7 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
       ((res = duration.check())                                                         != "OK") ||
       ((res = restriction.check(restrictions))                                          != "OK") ||
       ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check())                                                       != "OK") ||
-      ((res = maxFailsLimit.check())                                                    != "OK"))
+      ((res = throttling.check())                                                       != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);

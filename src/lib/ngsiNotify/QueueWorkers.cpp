@@ -237,10 +237,9 @@ static void* workerFunc(void* pSyncQ)
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
-          params->failsCounter =+ params->failsCounter;
-  /*        cSubP->failsCounter = cSubP->failsCounter + 1;
+          params->failsCounter = params->failsCounter +1;
 
-          if ((cSubP->failsCounter) > (cSubP->maxFailsLimit))
+          if ((params->failsCounter)  > (params->maxFailsLimit))
           {
              orion::BSONObjBuilder bobSet1;
              bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
@@ -250,9 +249,7 @@ static void* workerFunc(void* pSyncQ)
              std::string err;
 
              orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
-             cSubP->status = STATUS_INACTIVE;
-             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", cSubP->status.c_str()));
-          }*/
+          }
 
           if (params->registration == false)
           {

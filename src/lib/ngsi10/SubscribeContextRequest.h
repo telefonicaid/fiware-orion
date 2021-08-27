@@ -55,7 +55,6 @@ typedef struct SubscribeContextRequest
   Restriction            restriction;            // Optional
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
-  MaxFailsLimit          maxFailsLimit;          // Optional
 
   /* The number of restrictions */
   int                    restrictions;

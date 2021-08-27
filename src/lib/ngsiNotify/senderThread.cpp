@@ -50,18 +50,15 @@
 void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
-  int counter = 0;
 
   for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
-   // long long           limit;
 
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
-   // limit = params->maxFailsLimit;
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
@@ -79,9 +76,7 @@ void* startSenderThread(void* p)
 
     long long    statusCode = -1;
     std::string  out;
-  //  LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->maxFailsLimit));
-
-    CachedSubscription* cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
     if (!simulatedNotification)
     {
@@ -106,7 +101,8 @@ void* startSenderThread(void* p)
                           &statusCode,
                           params->extraHeaders);
 
-     // LM_T(LmtNotificationResponsePayload, ("notification response: %s", params->maxFailsLimit));
+      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
+
 
       if (r == 0)
       {
@@ -119,46 +115,16 @@ void* startSenderThread(void* p)
           subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
+
+
       else
       {
-        cSubP->failsCounter = cSubP->failsCounter +1;
-        counter += 1;
-        // params->failsCounter               += 1;
-        //params->failsCounter =+  params->failsCounter;
-        alarmMgr.notificationError(url, "anjali notification failure for sender-thread: " + out);
-        //LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
-        LM_T(LmtNotifier, ("sending to maxliit and failslimit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, counter));
+        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
 
+        params->failsCounter = params->failsCounter +1;
 
-        //loop
-        if (cSubP->failsCounter  > params->maxFailsLimit) 
+        if ((params->failsCounter)  > (params->maxFailsLimit)) 
         {
-  
-         //params->failsCounter++;
-         //LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", params->failsCounter));
-         LM_T(LmtNotifier, ("anjali33 reach to max limit: failsCounter='%lu'", cSubP->failsCounter ));
-
-        }
-        
-         //set fails
-        /*orion::BSONObj         query;
-        std::string err;
-        orion::BSONObjBuilder bobSet;
-        orion::BSONObjBuilder bobInc;
-        bobSet.append(CSUB_FAILSCOUNTER, (long long) 0);
-        bobInc.append(CSUB_FAILSCOUNTER, (long long) 1);
-
-        orion::BSONObjBuilder bobUpdate;
-        bobUpdate.append("$set", bobSet.obj());
-        bobUpdate.append("$inc", bobInc.obj());
-
-        orion::collectionUpdate(composeDatabaseName(params->tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);*/
-
-       /* if (params->failsCounter < 5)
-        {
-         
-         LM_T(LmtNotifier, ("anjali reach to max limit: maxFailsLimit='%lu', failsCounter='%lu'", params->maxFailsLimit, params->failsCounter));
-        
            orion::BSONObjBuilder bobSet1;
            bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
            orion::BSONObjBuilder bobUpdate;
@@ -167,9 +133,7 @@ void* startSenderThread(void* p)
            std::string err;
 
            orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
-        //   cSubP->status = STATUS_INACTIVE;
-           LM_T(LmtSubCache, ("set status to '%s' as Subscription status is inactive", CSUB_STATUS));
-        }*/
+        }
 
         if (params->registration == false)
         {

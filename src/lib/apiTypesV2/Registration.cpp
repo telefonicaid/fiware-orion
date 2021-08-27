@@ -141,7 +141,6 @@ std::string ForwardingInformation::toJson()
 
   jh.addNumber("timesSent", timesSent);
 
-
   if (lastSuccess > 0)
   {
     jh.addDate("lastSuccess", lastSuccess);
