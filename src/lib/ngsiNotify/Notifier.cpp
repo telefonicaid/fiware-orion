@@ -123,7 +123,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const ngsiv2::HttpInfo&              httpInfo,
     const std::string&                   tenant,
     long long                            maxFailsLimit,
-    long long                        failsCounter,
+    long long                            failsCounter,
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
     unsigned int                         correlatorCounter,

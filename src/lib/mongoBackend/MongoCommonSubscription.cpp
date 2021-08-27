@@ -178,9 +178,9 @@ void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
 
 
 /* ****************************************************************************
- * *
- * * setFailsCounter -
- * */
+*
+* setFailsCounter -
+*/
 void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_FAILSCOUNTER, failsCounter);

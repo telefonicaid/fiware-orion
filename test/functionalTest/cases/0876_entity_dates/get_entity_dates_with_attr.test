@@ -230,7 +230,7 @@ payload='{
     }
   ],
   "attrs": [
-    "dateOberved"
+    "dateModified"
   ]
 }'
 orionCurl --url '/v2/op/query' --payload "$payload"

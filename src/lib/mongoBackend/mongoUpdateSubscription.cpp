@@ -163,9 +163,9 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
 
 
 /* ****************************************************************************
- * *
- * * setMaxFailsLimit -
- * */
+*
+* setMaxFailsLimit -
+*/
 static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subUp.maxFailsLimitProvided)
@@ -186,9 +186,9 @@ static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONO
 
 
 /* ****************************************************************************
- * *
- * * setFailsCount -
- * */
+*
+* setFailsCount -
+*/
 static void setFailsCounter(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subOrig.hasField(CSUB_FAILSCOUNTER))
@@ -854,7 +854,6 @@ std::string mongoUpdateSubscription
   setHttpInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
   setMaxFailsLimit(subUp, subOrig, &b);
-//  setFailsCounter(subOrig, &b);
   setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);
   setStatus(subUp, subOrig, &b);
