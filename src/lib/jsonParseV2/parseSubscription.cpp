@@ -241,7 +241,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->throttling = 0;  // Default value if not provided at creation => no throttling
   }
 
-  //MaxFailsLimit
+  // MaxFailsLimit
   Opt<int64_t> maxFailsLimitOpt = getInt64Opt(document, "maxFailsLimit");
   if (!maxFailsLimitOpt.ok())
   {
