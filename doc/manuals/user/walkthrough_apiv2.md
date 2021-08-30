@@ -810,6 +810,8 @@ EOF
   custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
   Have a look at "Notification Messages" and "Custom Notifications" in the
   [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+* In addition to the HTTP notifications described in this section, Orion also supports
+  MQTT notifications. This topic is described in more detail in [this document](mqtt_notifications.md).
 
 [Top](#top)
 

@@ -16,6 +16,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot Subscription](#oneshot-subscriptions)
 * [Custom notifications without payload](#custom-notifications-without-payload)
+* [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
@@ -319,6 +320,14 @@ associated to that subscription will not include any payload (i.e. content-lengt
 
 Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
 the notification will be sent using the NGSIv2 normalized format.
+
+[Top](#top)
+
+## MQTT notifications
+
+Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
+in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
+topic is described with more detail [in this specific document](mqtt_notifications.md).
 
 [Top](#top)
 

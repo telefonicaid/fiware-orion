@@ -177,9 +177,9 @@ void MqttConnectionManager::semGive(void)
 */
 MqttConnection MqttConnectionManager::getConnection(const std::string& host, int port)
 {
+  // Note we don't take the sem here, as the caller has already done that
   std::string endpoint = getEndpoint(host, port);
 
-  semTake();
   if (connections.find(endpoint) == connections.end())
   {
     // Doesn't exists: create it
@@ -196,7 +196,6 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
      if (c.mosq == NULL)
      {
        LM_E(("Runtime Error (could not create mosquitto client instance for %s)", endpoint.c_str()));
-       semGive();
        return c;
      }
 
@@ -210,7 +209,6 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
        LM_E(("Runtime Error (could not connect to MQTT Broker %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
        mosquitto_destroy(c.mosq);
        c.mosq = NULL;
-       semGive();
        return c;
      }
 
@@ -224,7 +222,6 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
      c.lastTime = getCurrentTime();
      connections[endpoint] = c;
 
-     semGive();
      return c;
   }
   else
@@ -232,7 +229,7 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
     // Already exists: update the time counter
     LM_T(LmtMqttNotif, ("Existing MQTT broker connection for %s", endpoint.c_str()));
     connections[endpoint].lastTime = getCurrentTime();
-    semGive();
+
     return connections[endpoint];
   }
 }
@@ -245,12 +242,19 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
 */
 int MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos)
 {
+  // A previous version of the implementation took the sem in getConnection(), but we
+  // need to do it in sendMqttNotification to avoid the connection get removed by
+  // the cleanup() method while is beinig used here (the probability is small, but
+  // it could happen in theory)
+  semTake();
+
   MqttConnection c = getConnection(host, port);
   mosquitto* mosq = c.mosq;
 
   if (mosq == NULL)
   {
     // No need of log traces here: the getConnection() method would already print them
+    semGive();
     return -1;
   }
 
@@ -268,6 +272,7 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
     LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d with id %d", host.c_str(), port, topic.c_str(), qos, id));
   }
 
+  semGive();
   return 0;
 }
 
