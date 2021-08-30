@@ -639,15 +639,16 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enable for the broker");
     }
-    LM_TMP(("TENANT: orionldState.tenantName == %s", orionldState.tenantName));
   }
   else if (strcasecmp(key, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
-  else if (strcasecmp(key, HTTP_X_AUTH_TOKEN) == 0)
+  else if (strcasecmp(key, "X-Auth-Token") == 0)
   {
     orionldState.xauthHeader    = (char*) value;
     headerP->xauthToken         = value;
   }
+  else if (strcasecmp(key, "Authorization") == 0)
+    orionldState.authorizationHeader = (char*) value;
   else if (strcasecmp(key, HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
   else if (strcasecmp(key, HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
   else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
@@ -1775,13 +1776,10 @@ static MHD_Result connectionTreat
   // As older (non NGSI-LD) requests also need orionldState.tenantP, this piece of code has been copied
   // from orionldMhdConnectionTreat(). Had to be a little simplified though ...
   //
-  LM_TMP(("TENANT: '%s'", orionldState.tenantName));
   if (orionldState.tenantName != NULL)
     orionldState.tenantP = orionldTenantGet(orionldState.tenantName);
   else
     orionldState.tenantP = &tenant0;
-
-  LM_TMP(("TENANT: '%s', at %p", orionldState.tenantP->tenant, orionldState.tenantP));
 
   lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
 

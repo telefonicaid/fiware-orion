@@ -28,9 +28,10 @@
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kMacros.h"                                       // K_VEC_SIZE
+#include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjFree.h"                                        // kjFree
-#include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -100,6 +101,7 @@ OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
 char              pgPortString[16];
+char              mongoServerVersion[32];
 
 
 //
@@ -152,6 +154,10 @@ void orionldStateInit(void)
 
   // TRoE
   orionldState.troeOpMode = TROE_ENTITY_CREATE;
+
+  // GeoProperty array
+  orionldState.geoAttrMax = K_VEC_SIZE(orionldState.geoAttr);
+  orionldState.geoAttrV   = orionldState.geoAttr;
 }
 
 

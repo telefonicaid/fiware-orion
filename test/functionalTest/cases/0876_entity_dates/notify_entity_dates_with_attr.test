@@ -429,7 +429,7 @@ Date: REGEX(.*)
 
 01d. Dump and reset: see E1 with attribute dateCreated (2 notifications)
 ========================================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 160
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -454,7 +454,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 160
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -511,7 +511,7 @@ Date: REGEX(.*)
 
 02d. Dump and reset: see E2 with attribute dateModified (2 notifications)
 =========================================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 161
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -536,7 +536,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 161
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -593,7 +593,7 @@ Date: REGEX(.*)
 
 03d. Dump and reset: see E3 with attributes dateCreated and dateModified (2 notifications)
 ==========================================================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 244
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -623,7 +623,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 244
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -685,7 +685,7 @@ Date: REGEX(.*)
 
 04d. Dump and reset: see E4 with attributes A, B, dateCreated, dateModified (2 notifications)
 =============================================================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 337
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -725,7 +725,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 339
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -797,7 +797,7 @@ Date: REGEX(.*)
 
 05d. Dump and reset: see E5 with attributes A, dateCreated, dateModified (2 notifications)
 ==========================================================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 290
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -832,7 +832,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 292
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -924,7 +924,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 124
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

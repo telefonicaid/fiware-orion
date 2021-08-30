@@ -96,7 +96,7 @@ static const char* headerName[7] = {
   "Accept",
   "Link",
   "NGSILD-Tenant",
-  "NGSILD-Path",
+  "NGSILD-Scope",
   "X-Auth-Token"
 };
 
@@ -245,15 +245,22 @@ bool orionldRequestSend
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);  // Should be enough with one call ...
   }
 
-  int ix = 0;
+  int   ix = 0;
+  char  headerString[256];
   while (headerV[ix].type != HttpHeaderNone)
   {
     OrionldHttpHeader* headerP = &headerV[ix];
-    char               headerString[256];
 
     snprintf(headerString, sizeof(headerString), "%s:%s", headerName[headerP->type], headerP->value);
     headers = curl_slist_append(headers, headerString);
     ++ix;
+  }
+
+  // Authorization header
+  if (orionldState.authorizationHeader != NULL)
+  {
+    snprintf(headerString, sizeof(headerString), "Authorization:%s", orionldState.authorizationHeader);
+    headers = curl_slist_append(headers, headerString);
   }
 
   cCode = curl_easy_perform(cc.curl);

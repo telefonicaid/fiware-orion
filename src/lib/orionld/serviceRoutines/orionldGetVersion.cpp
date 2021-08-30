@@ -133,23 +133,17 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  // Lib versions
-  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
-  kjChildAdd(orionldState.responseTree, nodeP);
+  // Direct libraries
+
+  // microhttpd
   nodeP = kjString(orionldState.kjsonP, "microhttpd version", mhdVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
-  kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "mongocpp version", mongo::client::kVersionString);
-  kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "mongoc version", MONGOC_VERSION_S);
-  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // rapidjson
   nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  //
-  // CURL lib
-  //
+  // curl
   curlVersionP = curl_version_info(CURLVERSION_NOW);
   if (curlVersionP != NULL)
     nodeP = kjString(orionldState.kjsonP, "libcurl version", curlVersionP->version);
@@ -157,10 +151,30 @@ bool orionldGetVersion(ConnectionInfo* ciP)
     nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  //
   // libuuid
-  //
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // mongocpp
+  nodeP = kjString(orionldState.kjsonP, "mongocpp version", mongo::client::kVersionString);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // mongoc
+  nodeP = kjString(orionldState.kjsonP, "mongoc version", MONGOC_VERSION_S);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+
+  //
+  // Mongo Server
+  //
+  nodeP = kjString(orionldState.kjsonP, "mongodb server version", mongoServerVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+
+  // Libs needed by the "direct libs"
+  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
   kjChildAdd(orionldState.responseTree, nodeP);
 
   if (troe)

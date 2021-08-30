@@ -3,7 +3,7 @@ FROM debian:stretch-slim
 ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
 
-# Update apt
+# Update apt 
 RUN apt-get -y update
 
 RUN mkdir /tmp/build

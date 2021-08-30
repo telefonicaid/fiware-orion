@@ -42,7 +42,6 @@ brokerStart CP1
 # 05. Query CP1 for Ei - see the change propagated
 #
 
-
 echo "01. Make CP1 subscribe to changes in E1 on CB"
 echo "============================================="
 payload='{

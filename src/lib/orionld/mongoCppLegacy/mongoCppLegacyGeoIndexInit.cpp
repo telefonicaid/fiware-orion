@@ -59,8 +59,6 @@ void mongoCppLegacyGeoIndexInit(void)
   tenantP = &tenant0;
   while (tenantP != NULL)
   {
-    LM_TMP(("TENANT: '%s' (mongo db name: '%s')", tenantP->tenant, tenantP->mongoDbName));
-
     // Foreach ENTITY (only attrs)
     mongo::BSONObjBuilder  dbFields;
 

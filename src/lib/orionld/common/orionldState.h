@@ -135,6 +135,7 @@ typedef struct OrionldUriParams
   uint32_t  mask;
   bool      prettyPrint;
   int       spaces;
+  char*     subscriptionId;
 } OrionldUriParams;
 
 
@@ -200,11 +201,16 @@ typedef struct OrionldConnectionState
   bool                    noLinkHeader;
   char*                   preferHeader;
   char*                   xauthHeader;
+  char*                   authorizationHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 geoAttrV[100];                // Array of GeoProperty attributes
+
+  KjNode*                 geoAttr[10];                 // Preallocated array of GeoProperties
+  KjNode**                geoAttrV;                    // Array of GeoProperty attributes
   int                     geoAttrs;
+  int                     geoAttrMax;
+
   char*                   geoType;
   KjNode*                 geoCoordsP;
   char*                   entityId;
@@ -395,6 +401,8 @@ extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
+extern bool              noNotifyFalseUpdate;      // From orionld.cpp
+extern char              mongoServerVersion[32];
 
 
 

@@ -46,6 +46,8 @@ void* startSenderThread(void* p)
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
 
+    LM_TMP(("SUBID: Got subId '%s'", params->subscriptionId.c_str()));
+
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
@@ -85,7 +87,10 @@ void* startSenderThread(void* p)
                           params->renderFormat,
                           NOTIFICATION_WAIT_MODE,
                           &out,
-                          params->extraHeaders);
+                          params->extraHeaders,
+                          "",
+                          -1,
+                          params->subscriptionId.c_str());  // Subscription ID as URL param
 
       if (params->toFree != NULL)
       {

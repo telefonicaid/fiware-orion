@@ -102,11 +102,17 @@ static void* workerFunc(void* pSyncQ)
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
-      struct timespec     now;
-      struct timespec     howlong;
-      size_t              estimatedQSize;
+      struct timespec      now;
+      struct timespec      howlong;
+      size_t               estimatedQSize;
+      SenderThreadParams*  params             = (*paramsV)[ix];
+      char*                subscriptionId     = (char*) params->subscriptionId.c_str();
+      const char*          tenant             = params->tenant.c_str();
+      bool                 ngsildSubscription = false;
+      CachedSubscription*  subP               = subCacheItemLookup(tenant, subscriptionId);
 
-      SenderThreadParams* params = (*paramsV)[ix];
+      if ((subP != NULL) && (subP->ldContext != ""))
+        ngsildSubscription = true;
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);
@@ -153,10 +159,14 @@ static void* workerFunc(void* pSyncQ)
                              params->mqttVersion,
                              params->xauthToken.c_str(),
                              params->extraHeaders);
+        // FIXME: +subscriptionId
       }
       else // Send HTTP notification
       {
-        std::string  out;
+        std::string out;
+
+        if (ngsildSubscription == false)
+          subscriptionId = NULL;
 
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
@@ -173,7 +183,10 @@ static void* workerFunc(void* pSyncQ)
                                     params->renderFormat,
                                     NOTIFICATION_WAIT_MODE,
                                     &out,
-                                    params->extraHeaders);
+                                    params->extraHeaders,
+                                    "",
+                                    -1,
+                                    subscriptionId);  // Subscription ID as URL param
       }
 
       if (params->toFree != NULL)

@@ -211,6 +211,13 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
     }
   }
 
+  if (endpointP == NULL)
+  {
+    LM_W(("Bad Input (notification::endpoint is missing)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint");
+    return false;
+  }
+
   if (pcheckSubscriptionAcceptAndFormat(subP->attrsFormat, subP->notification.httpInfo.mimeType) == false)
   {
     LM_W(("Bad Input (Non-compatible 'format' (%s) and 'accept' (%s) fields)", renderFormatToString(subP->attrsFormat), mimeTypeToLongString(subP->notification.httpInfo.mimeType)));

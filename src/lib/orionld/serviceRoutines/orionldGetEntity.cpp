@@ -196,6 +196,9 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
         attrsV[attrs++] = uriParamAttrV[ix];
     }
 
+    if (attrs == 0)
+      return NULL;
+
     attrsToAlias(orionldState.contextP, attrsV, attrs);
     kStringArrayJoin(newUriParamAttrsString, attrsV, attrs, ",");
   }
@@ -231,6 +234,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     else
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
   }
+
 
   //
   // Sending the Forwarded request
@@ -305,7 +309,6 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
     KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, attrsV, attrs);
     if (partTree == NULL)
     {
-      LM_E(("Internal Error (forwarded request failed)"));
       continue;
     }
 

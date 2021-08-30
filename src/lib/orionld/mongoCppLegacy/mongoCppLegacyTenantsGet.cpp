@@ -82,14 +82,9 @@ bool mongoCppLegacyTenantsGet(void)
           char* tenantName = &name[dbNameLen + 1];
 
           if (orionldTenantLookup(tenantName) == NULL)
-          {
-            LM_TMP(("TENANT: calling orionldTenantCreate(%s)", tenantName));
             orionldTenantCreate(tenantName);
-          }
         }
       }
-      else
-        LM_TMP(("TENANT: it's not a DB for the broker (doesn't start with dbPrefix): '%s'", name));
     }
   }
   catch (const std::exception &e)

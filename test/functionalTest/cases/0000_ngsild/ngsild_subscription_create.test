@@ -53,6 +53,9 @@ brokerStart CB 0-255
 # 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
 # 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 #
+# 11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
+# 12. See the subscription in mongo
+#
 
 
 echo "01. POST /ngsi-ld/v1/subscriptions, with a sub-id"
@@ -368,6 +371,37 @@ echo
 echo
 
 
+echo "11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895"
+echo "======================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:subs:11",
+  "description": "test0001",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/test0001",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "12. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:11"})'
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/subscriptions, with a sub-id
 =================================================
@@ -649,6 +683,58 @@ Date: REGEX(.*)
     },
     "type": "Subscription"
 }
+
+
+11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:11
+Date: REGEX(.*)
+
+
+
+12. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:11",
+	"expiration" : REGEX(.*),
+	"reference" : "http://tutorial:3000/subscription/test0001",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/",
+	"description" : "test0001",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "http://XXXX/YYYY/ngsi-context.jsonld#Person",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
 
 
 --TEARDOWN--

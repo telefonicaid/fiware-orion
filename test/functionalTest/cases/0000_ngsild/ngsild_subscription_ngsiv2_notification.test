@@ -394,7 +394,7 @@ Date: REGEX(.*)
 
 03. Dump accumulator to see the notification
 ============================================
-POST http://REGEX(.*)/notify
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Fiware-Servicepath: /
 Content-Length: 236
 User-Agent: orion/REGEX(.*)
@@ -447,7 +447,7 @@ Date: REGEX(.*)
 
 07. Dump accumulator to see the notification (and reset the accumulator afterwards)
 ===================================================================================
-POST http://REGEX(.*)/notify
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub02
 Fiware-Servicepath: /
 Content-Length: 237
 User-Agent: orion/REGEX(.*)
@@ -500,7 +500,7 @@ Date: REGEX(.*)
 
 11. Dump accumulator to see the notification with P3 only (and reset the accumulator afterwards)
 ================================================================================================
-POST http://REGEX(.*)/notify
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub03
 Fiware-Servicepath: /
 Content-Length: 238
 User-Agent: orion/REGEX(.*)
@@ -553,7 +553,7 @@ Date: REGEX(.*)
 
 15. Dump accumulator to see location in the notification (and reset the accumulator afterwards)
 ===============================================================================================
-POST http://localhost:9997/notify
+POST http://localhost:9997/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 238
 User-Agent: REGEX(.*)
@@ -632,7 +632,7 @@ Date: REGEX(.*)
 
 18. Dump accumulator to see observationSpace in the notification (and reset the accumulator afterwards)
 =======================================================================================================
-POST http://REGEX(.*)/notify
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 388
 User-Agent: orion/REGEX(.*)
@@ -691,7 +691,7 @@ Date: REGEX(.*)
 
 20. Dump accumulator to see operationSpace in the notification (and reset the accumulator afterwards)
 =====================================================================================================
-POST http://REGEX(.*)/notify
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 536
 User-Agent: orion/REGEX(.*)
