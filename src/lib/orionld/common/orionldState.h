@@ -205,8 +205,12 @@ typedef struct OrionldConnectionState
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 geoAttrV[100];                // Array of GeoProperty attributes
+
+  KjNode*                 geoAttr[10];                 // Preallocated array of GeoProperties
+  KjNode**                geoAttrV;                    // Array of GeoProperty attributes
   int                     geoAttrs;
+  int                     geoAttrMax;
+
   char*                   geoType;
   KjNode*                 geoCoordsP;
   char*                   entityId;
