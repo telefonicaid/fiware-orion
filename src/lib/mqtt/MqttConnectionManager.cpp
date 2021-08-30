@@ -244,7 +244,7 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
 {
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
-  // the cleanup() method while is beinig used here (the probability is small, but
+  // the cleanup() method while is being used here (the probability is small, but
   // it could happen in theory)
   semTake();
 
