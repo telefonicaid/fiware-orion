@@ -26,7 +26,7 @@ No notification if no real change
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4 -noNotifyFalseUpdate
+brokerStart CB 0 IPv4 -noNotifyFalseUpdate
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
