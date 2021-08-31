@@ -180,7 +180,7 @@ Date: REGEX(.*)
 
 03. Dump and reset accumulator and see one notification
 =======================================================
-POST http://REGEX(.*)/notify
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:01
 Fiware-Servicepath: /
 Content-Length: 480
 User-Agent: orion/REGEX(.*)
