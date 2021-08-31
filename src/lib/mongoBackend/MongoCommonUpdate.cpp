@@ -32,9 +32,12 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                         // K_FT
+#include "kalloc/kaAlloc.h"                                        // kaAlloc
 #include "kjson/KjNode.h"                                          // KjNode, kjValueType
 #include "kjson/kjLookup.h"                                        // kjLookup
 #include "kjson/kjRender.h"                                        // kjFastRender
+#include "kjson/kjRenderSize.h"                                    // kjFastRenderSize
 }
 
 #include "logMsg/logMsg.h"
@@ -66,6 +69,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                             // tenant0
 #include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
+#include "orionld/kjTree/kjSort.h"                                 // kjSort
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
 
 #include "mongoBackend/connectionOperations.h"
@@ -317,21 +321,17 @@ static bool equalMetadata(const BSONObj* md1P, const BSONObj* md2P)
 
 /* ****************************************************************************
 *
-* changedAttr -
+* attrValueChanged -
 */
-static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
+static bool attrValueChanged(const BSONObj& attr, ContextAttribute* caP, ApiVersion apiVersion)
 {
-  /* Not finding the attribute field at MongoDB is considered as an implicit "" */
+  // Not finding the attribute's "value" field in MongoDB is considered an implicit ""
   if (!attr.hasField(ENT_ATTRS_VALUE))
-  {
-    return (caP->valueType != orion::ValueTypeString || caP->stringValue != "");
-  }
+    return (caP->valueType != orion::ValueTypeString) || (caP->stringValue != "");
 
-  /* No value in the request means that the value stays as it was before, so it is not a change */
+  // No value in the request means that the value stays as it was - no changed
   if (caP->valueType == orion::ValueTypeNotGiven)
-  {
     return false;
-  }
 
   switch (getFieldF(&attr, ENT_ATTRS_VALUE).type())
   {
@@ -467,23 +467,70 @@ static void appendMetadata
 
 
 
-bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* oldValueAsBsonP)
+// -----------------------------------------------------------------------------
+//
+// compoundValueDiffers -
+//
+static bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* oldValueAsBsonP, mongo::BSONArray* oldArrayValueP, bool isArray)
 {
   char*    details;
   char*    title        = (char*) "no title";
   KjNode*  newValueTree = kjTreeFromCompoundValue(newValueP, NULL, false, &details);
-  KjNode*  oldValueTree = mongoCppLegacyDataToKjTree(oldValueAsBsonP, false, &title, &details);
+  KjNode*  oldValueTree;
+
+  if (isArray)
+    oldValueTree = mongoCppLegacyDataToKjTree(oldArrayValueP, true, &title, &details);
+  else
+    oldValueTree = mongoCppLegacyDataToKjTree(oldValueAsBsonP, false, &title, &details);
 
   if ((newValueTree == NULL) || (oldValueTree == NULL))
     LM_RE(true, ("%s: %s", title, details));
 
-  char buf[1024];
-  kjFastRender(newValueTree, buf);
-  LM_TMP(("CDIF: New Value: %s", buf));
-  kjFastRender(oldValueTree, buf);
-  LM_TMP(("CDIF: OLD Value: %s", buf));
+  int   bufSizeOld = kjFastRenderSize(oldValueTree);
+  int   bufSizeNew = kjFastRenderSize(newValueTree);
+  char* bufOld     = kaAlloc(&orionldState.kalloc, bufSizeOld);
+  char* bufNew     = kaAlloc(&orionldState.kalloc, bufSizeNew);
 
-  return true;
+  kjSort(newValueTree);
+  kjSort(oldValueTree);
+
+  kjFastRender(newValueTree, bufNew);
+  kjFastRender(oldValueTree, bufOld);
+
+  bool differs = strcmp(bufOld, bufNew) != 0;
+
+  return differs;
+}
+
+
+
+/* ****************************************************************************
+*
+* valueTypeDiffers -
+*/
+static bool valueTypeDiffers(mongo::BSONType  oldValueType, orion::ValueType newValueType)
+{
+  //
+  // If both are compounds, then the comparison is done later
+  //
+  if ((newValueType == orion::ValueTypeVector || newValueType == orion::ValueTypeObject) &&
+      (oldValueType == mongo::Array           || oldValueType == mongo::Object))
+    return false;
+
+  // If just one is compound, then the value type differs
+  if (oldValueType == mongo::Array           || oldValueType == mongo::Object)             return true;
+  if (newValueType == orion::ValueTypeVector || newValueType == orion::ValueTypeObject)    return true;
+
+  if      ((newValueType == orion::ValueTypeString)  && (oldValueType != mongo::String))   return true;
+  else if ((newValueType == orion::ValueTypeBoolean) && (oldValueType != mongo::Bool))     return true;
+  else if ((newValueType == orion::ValueTypeNull)    && (oldValueType != mongo::jstNULL))  return true;
+  else if ((newValueType == orion::ValueTypeNumber)  &&
+           (oldValueType != mongo::NumberDouble)     &&
+           (oldValueType != mongo::NumberInt)        &&
+           (oldValueType != mongo::NumberLong))
+    return true;
+
+  return false;
 }
 
 
@@ -642,14 +689,15 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
 
   if (caP->compoundValueP == NULL)
   {
-    /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
-     *
-     * 1) the value of the attribute changed (see attrValueChanges for details)
-     * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
-     *    type is optional according to NGSI and the attribute may not have that field in the BSON)
-     * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
-     *    different and, if they are of the same size, checking if the vectors are not equal)
-     */
+    //
+    // We consider there is an actual change if one or more of the following are true:
+    //
+    // 1) the value of the attribute changed (see attrValueChanged for details)
+    // 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+    //    type is optional according to NGSIv1/2 and the attribute may not have that field in the BSON)
+    // 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+    //    different and, if they are of the same size, checking if the vectors are not equal)
+    //
 
     //
     // For NGSI-LD, we want ALL updates to give notifications, even if nothing changed.
@@ -659,34 +707,50 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       actualUpdate = true;
     else
     {
-      const char* attrType        = getStringFieldF(&attr, ENT_ATTRS_TYPE);
-      bool        attrTypeChanged = (strcmp(attrType, caP->type.c_str()) != 0);
+      const char*      attrType     = getStringFieldF(&attr, ENT_ATTRS_TYPE);
+      mongo::BSONType  oldValueType = getFieldF(&attr, ENT_ATTRS_VALUE).type();
+      orion::ValueType newValueType = caP->valueType;
 
-      actualUpdate = (attrValueChanges(attr, caP, apiVersion)  ||
-                      ((caP->type != "") && attrTypeChanged)   ||
-                       mdNew.nFields() != mdSize               ||
-                       !equalMetadata(&md, &mdNew));
+      if (valueTypeDiffers(oldValueType, newValueType) == true)
+        actualUpdate = true;
+      else if ((caP->type != "") && (strcmp(attrType, caP->type.c_str()) != 0))
+        actualUpdate = true;
+      else if (mdNew.nFields() != mdSize)
+        actualUpdate = true;
+      else if (!equalMetadata(&md, &mdNew))
+        actualUpdate = true;
+      else if (attrValueChanged(attr, caP, apiVersion) == true)
+        actualUpdate = true;
+      else
+        actualUpdate = false;
     }
   }
   else
   {
-    // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
-    // has really changed its value (many levels have to be traversed). Until we can develop the
-    // matching logic, we consider actualUpdate always true.
-    //
+    mongo::BSONType   oldValueType = getFieldF(&attr, ENT_ATTRS_VALUE).type();
+    orion::ValueType  newValueType = caP->valueType;
+    const char*       attrType     = getStringFieldF(&attr, ENT_ATTRS_TYPE);
+    mongo::BSONObj    value;
+    mongo::BSONArray  arrayValue;
 
-    const char*     attrType = getStringFieldF(&attr, ENT_ATTRS_TYPE);
-    mongo::BSONObj  value;
+    bool isArray = false;
+    if (oldValueType == 4)
+    {
+      isArray = true;
+      getArrayFieldF(&arrayValue, &attr, "value");
+    }
+    else
+      getObjectFieldF(&value, &attr, "value");
 
-    getObjectFieldF(&value, &attr, "value");
-    
-    if ((caP->type != "") && (strcmp(attrType, caP->type.c_str()) != 0))
+    if (valueTypeDiffers(oldValueType, newValueType) == true)
+      actualUpdate = true;
+    else if ((caP->type != "") && (strcmp(attrType, caP->type.c_str()) != 0))
       actualUpdate = true;
     else if (mdNew.nFields() != mdSize)
       actualUpdate = true;
     else if (!equalMetadata(&md, &mdNew))
       actualUpdate = true;
-    else if (compoundValueDiffers(caP->compoundValueP, &value) == true)
+    else if (compoundValueDiffers(caP->compoundValueP, &value, &arrayValue, isArray) == true)
       actualUpdate = true;
   }
 
@@ -806,7 +870,6 @@ static bool updateAttribute
   if (isReplace)
   {
     BSONObjBuilder newAttr;
-
     *actualUpdate = true;
 
     std::string attrType;
@@ -848,9 +911,7 @@ static bool updateAttribute
   else
   {
     if (!attrsBobjP->hasField(effectiveName))
-    {
       return false;
-    }
 
     BSONObj newAttr;
     BSONObj attr;

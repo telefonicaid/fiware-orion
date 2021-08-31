@@ -9,3 +9,4 @@
 * Issue #899  Authorization HTTP header supported for forwarding
 * Issue #914  Bug fix for double @context member for GET /attributes?details=true and GET /attributes/{attrName}
 * Issue #280  HTTP header NGSILD-Tenant (not FIWARE-Service) in notifications on NGSI-LD subscriptions
+* Issue #917  No notification when a compound value is updated without modification

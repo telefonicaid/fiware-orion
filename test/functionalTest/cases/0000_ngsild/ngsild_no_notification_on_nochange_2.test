@@ -26,7 +26,7 @@ No notification if no real change
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0-255 IPv4 -noNotifyFalseUpdate
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
@@ -84,11 +84,11 @@ payload='{
   },
   "object": {
     "type": "Property",
-    "value": {"a": 1, "b": 2}
+    "value": {"a": 1, "b": 2, "c": 3, "d": "4", "E": [1,2,3]}
   },
   "array": {
     "type": "Property",
-    "value": [1,2]
+    "value": [ 1, 2, { "a": 1, "b": 2 } ]
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
@@ -107,17 +107,52 @@ echo
 echo "04. Update E1.number to the same value it already has"
 echo "====================================================="
 payload='{
-  "number": {
-    "type": "Property",
-    "value": 1
-  }
+  "type": "Property",
+  "value": 1
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/number -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "05. Dump accumulator, see no notification"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+echo "10. Update E1.object to the same value it already has"
+echo "====================================================="
+payload='{
+  "type": "Property",
+  "value": {"d": "4", "E": [1,2,3], "b": 2, "a": 1, "c": 3 }
+
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/object -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. Dump accumulator, see no notification"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+echo "12. Update E1.array to the same value it already has"
+echo "===================================================="
+payload='{
+  "type": "Property",
+  "value": [ 1, 2, { "b": 2, "a": 1 } ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/array -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "13. Dump accumulator, see no notification"
 echo "========================================="
 accumulatorDump
 echo
@@ -147,7 +182,7 @@ Date: REGEX(.*)
 =======================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 440
+Content-Length: 480
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -162,7 +197,11 @@ Content-Type: application/json; charset=utf-8
                 "type": "Property", 
                 "value": [
                     1, 
-                    2
+                    2, 
+                    {
+                        "a": 1, 
+                        "b": 2
+                    }
                 ]
             }, 
             "bool": {
@@ -177,8 +216,15 @@ Content-Type: application/json; charset=utf-8
             "object": {
                 "type": "Property", 
                 "value": {
+                    "E": [
+                        1, 
+                        2, 
+                        3
+                    ], 
                     "a": 1, 
-                    "b": 2
+                    "b": 2, 
+                    "c": 3, 
+                    "d": "4"
                 }
             }, 
             "string": {
@@ -198,9 +244,34 @@ Content-Type: application/json; charset=utf-8
 
 04. Update E1.number to the same value it already has
 =====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
 
 
 05. Dump accumulator, see no notification
+=========================================
+
+
+10. Update E1.object to the same value it already has
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. Dump accumulator, see no notification
+=========================================
+
+
+12. Update E1.array to the same value it already has
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+13. Dump accumulator, see no notification
 =========================================
 
 
