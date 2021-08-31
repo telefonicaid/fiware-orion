@@ -58,7 +58,7 @@ do                                                                           \
 {                                                                            \
   LM_E((errorString));                                                       \
   orionldErrorResponseCreate(OrionldBadRequestData, errorString, details);   \
-  orionldState.httpStatusCode = SccBadRequest;                               \
+  orionldState.httpStatusCode = 400;                                         \
   return false;                                                              \
 } while (0)
 
@@ -99,7 +99,7 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
     if (otherNodeP != NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
 
@@ -113,7 +113,7 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
         const char* errorString = "DateTime value of @value/@type compound must be a valid ISO8601";
         LM_W(("Bad Input (%s - got '%s')", errorString, valueNodeP->value.s));
         orionldErrorResponseCreate(OrionldBadRequestData, errorString, valueNodeP->value.s);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
     }
@@ -123,7 +123,7 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
     if (otherNodeP != NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
   }
@@ -132,7 +132,7 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
     if (valueNodeP == NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "missing @value in @value/@type compound", "@value is mandatory");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
   }
@@ -435,7 +435,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   {
     *detailP = (char*) "Attribute must be a JSON object";
     orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", attributeName);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -483,7 +483,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         *detailP = (char*) "Duplicated field";
         LM_E(("Duplicated field: 'Attribute Type'"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Attribute Type");
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
       typeP = nodeP;
@@ -495,7 +495,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       {
         *detailP = (char*) "Attribute type must be a JSON String";
         orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", "attribute type");
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
 
@@ -511,6 +511,23 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       {
         isProperty    = true;
         isGeoProperty = true;
+
+        if (orionldState.geoAttrs >= orionldState.geoAttrMax)
+        {
+          KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax + 100);
+
+          if (tmp == NULL)
+          {
+            orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Unable to allocate memory");
+            orionldState.httpStatusCode = 500;
+            return false;
+          }
+
+          memcpy(tmp, orionldState.geoAttrV, sizeof(KjNode*) * orionldState.geoAttrs);
+          orionldState.geoAttrV = tmp;
+
+          orionldState.geoAttrMax += 100;
+        }
 
         orionldState.geoAttrV[orionldState.geoAttrs++] = kNodeP;
       }
@@ -734,7 +751,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         LM_E(("pcheckGeoProperty error for %s", attributeName));
         // pcheckGeoProperty fills in error response
         *detailP = (char*) "pcheckGeoProperty failed";
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;

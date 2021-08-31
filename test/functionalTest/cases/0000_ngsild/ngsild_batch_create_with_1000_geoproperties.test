@@ -1,0 +1,196 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Create with an array of three entities, see issue #776
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 
+
+--SHELL--
+
+#
+# 01. Batch create 100 entities with 10 geoproperties each
+#
+
+echo "01. Batch create 100 entities with 10 geoproperties each"
+echo "========================================================"
+typeset -i eId
+eId=1
+entities="["
+while [ $eId -le 50 ]
+do
+  entity='{
+    "id": "urn:ngsi-ld:TemperatureSensor:'$eId'",
+    "type": "TemperatureSensor",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location2": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location3": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location4": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location5": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location6": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location7": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location8": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location9": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "location10": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    }
+  }'
+  entities=$entities$entity
+  if [ $eId != 50 ]
+  then
+    entities=$entities","
+  fi
+  eId=$eId+1
+done
+entities=$entities"]"
+echo $entities > /tmp/entities
+
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$entities"
+echo
+echo
+
+--REGEXPECT--
+01. Batch create 100 entities with 10 geoproperties each
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 1742
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:TemperatureSensor:1",
+    "urn:ngsi-ld:TemperatureSensor:2",
+    "urn:ngsi-ld:TemperatureSensor:3",
+    "urn:ngsi-ld:TemperatureSensor:4",
+    "urn:ngsi-ld:TemperatureSensor:5",
+    "urn:ngsi-ld:TemperatureSensor:6",
+    "urn:ngsi-ld:TemperatureSensor:7",
+    "urn:ngsi-ld:TemperatureSensor:8",
+    "urn:ngsi-ld:TemperatureSensor:9",
+    "urn:ngsi-ld:TemperatureSensor:10",
+    "urn:ngsi-ld:TemperatureSensor:11",
+    "urn:ngsi-ld:TemperatureSensor:12",
+    "urn:ngsi-ld:TemperatureSensor:13",
+    "urn:ngsi-ld:TemperatureSensor:14",
+    "urn:ngsi-ld:TemperatureSensor:15",
+    "urn:ngsi-ld:TemperatureSensor:16",
+    "urn:ngsi-ld:TemperatureSensor:17",
+    "urn:ngsi-ld:TemperatureSensor:18",
+    "urn:ngsi-ld:TemperatureSensor:19",
+    "urn:ngsi-ld:TemperatureSensor:20",
+    "urn:ngsi-ld:TemperatureSensor:21",
+    "urn:ngsi-ld:TemperatureSensor:22",
+    "urn:ngsi-ld:TemperatureSensor:23",
+    "urn:ngsi-ld:TemperatureSensor:24",
+    "urn:ngsi-ld:TemperatureSensor:25",
+    "urn:ngsi-ld:TemperatureSensor:26",
+    "urn:ngsi-ld:TemperatureSensor:27",
+    "urn:ngsi-ld:TemperatureSensor:28",
+    "urn:ngsi-ld:TemperatureSensor:29",
+    "urn:ngsi-ld:TemperatureSensor:30",
+    "urn:ngsi-ld:TemperatureSensor:31",
+    "urn:ngsi-ld:TemperatureSensor:32",
+    "urn:ngsi-ld:TemperatureSensor:33",
+    "urn:ngsi-ld:TemperatureSensor:34",
+    "urn:ngsi-ld:TemperatureSensor:35",
+    "urn:ngsi-ld:TemperatureSensor:36",
+    "urn:ngsi-ld:TemperatureSensor:37",
+    "urn:ngsi-ld:TemperatureSensor:38",
+    "urn:ngsi-ld:TemperatureSensor:39",
+    "urn:ngsi-ld:TemperatureSensor:40",
+    "urn:ngsi-ld:TemperatureSensor:41",
+    "urn:ngsi-ld:TemperatureSensor:42",
+    "urn:ngsi-ld:TemperatureSensor:43",
+    "urn:ngsi-ld:TemperatureSensor:44",
+    "urn:ngsi-ld:TemperatureSensor:45",
+    "urn:ngsi-ld:TemperatureSensor:46",
+    "urn:ngsi-ld:TemperatureSensor:47",
+    "urn:ngsi-ld:TemperatureSensor:48",
+    "urn:ngsi-ld:TemperatureSensor:49",
+    "urn:ngsi-ld:TemperatureSensor:50"
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
