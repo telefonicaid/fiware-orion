@@ -2278,8 +2278,8 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      details = "one or more of the attributes in the request do not exist:" + targetAttr->getName();
-      oe->fill(SccInvalidModification, details, "Unprocessable");
+      oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
     }
@@ -3169,7 +3169,8 @@ static unsigned int updateEntity
     //
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
+    if ((!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict))) ||
+        (!(attributeNotExistingError && (action == ActionTypeUpdate))))
     {
       // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
@@ -3179,11 +3180,6 @@ static unsigned int updateEntity
     else
     {
       delete cerP;
-    }
-
-    if (!(attributeNotExistingError && (action == ActionTypeUpdate)))
-    {
-      responseP->contextElementResponseVector.push_back(cerP);
     }
 
     releaseTriggeredSubscriptions(&subsToNotify);
