@@ -66,7 +66,7 @@ To create a shared subscription (cluster name “g1”)
 mosquitto_sub -h <host> -p 1883 -t '$share/g1/#'
 ```
 
-To publish using TLS:
+To publish using TLS (not yet supported by Orion, pending on [this issue](https://github.com/telefonicaid/fiware-orion/issues/3915)):
 
 ```
 mosquitto_pub -d --insecure --cafile file.pem -h <host> -p 1883 -u <username> -P <password> -t '/topic' -m 'payload'
