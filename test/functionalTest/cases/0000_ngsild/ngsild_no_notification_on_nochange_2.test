@@ -159,13 +159,6 @@ echo
 echo
 
 
-echo "00. See logfile"
-echo "==============="
-egrep 'CDIF|Servicing' /tmp/orionld.log
-echo
-echo
-
-
 --REGEXPECT--
 01. Create a subscription matching Entity urn:ngsi-ld:entities:E1
 =================================================================
