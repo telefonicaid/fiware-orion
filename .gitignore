@@ -41,6 +41,8 @@ fiware-orion.creator.user
 fiware-orion.creator.user.*
 fiware-orion.files
 fiware-orion.includes
+fiware-orion.cflags
+fiware-orion.cxxflags
 
 rpm/RPMS/
 rpm/SRPMS/
