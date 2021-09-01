@@ -19,6 +19,7 @@ pages:
       - 'Pagination': 'user/pagination.md'
       - 'CORS': 'user/cors.md'
       - 'Geolocation': 'user/geolocation.md'
+      - 'MQTT notifications': 'user/mqtt_notifications.md'
       - 'Transient Entities': 'user/transient_entities.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'

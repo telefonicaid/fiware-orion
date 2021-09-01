@@ -213,8 +213,9 @@ The Orion Context Broker uses the following flows:
 
 -   From client applications to the broker, using TCP port 1026 by
     default (this is overridden with "-port" option).
--   From the broker to subscribed applications, using the port specified
+-   From the broker to subscribed applications, using the HTTP port specified
     by the application in the callback at subscription creation time.
+-   From the broker to MQTT brokers, for MQTT-based notifications
 -   From the broker to MongoDB database. In the case of running MongoDB
     in the same host as the broker, this is an internal flow (i.e. using
     the loopback interface). The standard port in MongoDB is 27017
