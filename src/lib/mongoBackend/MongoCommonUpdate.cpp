@@ -499,14 +499,6 @@ static bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* o
 
   bool differs = strcmp(bufOld, bufNew) != 0;
 
-  LM_TMP(("CDIF: Sorted old tree: %s", bufOld));
-  LM_TMP(("CDIF: Sorted new tree: %s", bufNew));
-
-  if (differs == true)
-    LM_TMP(("CDIF: the trees differ"));
-  else
-    LM_TMP(("CDIF: the trees are equal"));
-
   return differs;
 }
 

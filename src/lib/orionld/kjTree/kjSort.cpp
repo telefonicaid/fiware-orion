@@ -49,23 +49,10 @@ extern "C"
 void kjSort(KjNode* nodeP)
 {
   if ((nodeP->type != KjObject) && (nodeP->type != KjArray))
-  {
-    LM_TMP(("CDIF: From kjSort (not an object nor an array)"));
     return;
-  }
 
   if (nodeP->value.firstChildP == NULL)
-  {
-    LM_TMP(("CDIF: From kjSort (empty object/array)"));
     return;
-  }
-
-  // <DEBUG>
-  char buf[1024];
-  kjFastRender(nodeP, buf);
-  LM_TMP(("CDIF: sorting compound: %s", buf));
-  // </DEBUG>
-
 
   // Recursive calls for all child items that are Object or Array
   for (KjNode* currentP = nodeP->value.firstChildP; currentP != NULL; currentP = currentP->next)
@@ -108,5 +95,4 @@ void kjSort(KjNode* nodeP)
   }
 
   kjFastRender(nodeP, buf);
-  LM_TMP(("CDIF: sorted: %s", buf));
 }
