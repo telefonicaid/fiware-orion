@@ -2998,7 +2998,7 @@ static unsigned int updateEntity
   *attributeAlreadyExistsList          = "[ ";
 
   *attributeNotExistingError           = false;
-  *attributeAlreadyExistsList          = "[";
+  *attributeNotExistingList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
