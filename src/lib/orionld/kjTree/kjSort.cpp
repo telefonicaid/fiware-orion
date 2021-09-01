@@ -93,6 +93,4 @@ void kjSort(KjNode* nodeP)
     if ((startP == NULL) || (startP->next == NULL))
       break;
   }
-
-  kjFastRender(nodeP, buf);
 }
