@@ -761,6 +761,8 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       actualUpdate = true;
     else if (compoundValueDiffers(caP->compoundValueP, &value, &arrayValue, isArray) == true)
       actualUpdate = true;
+    else
+      actualUpdate = false;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
