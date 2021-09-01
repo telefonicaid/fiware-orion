@@ -162,7 +162,7 @@ echo
 echo
 
 
-echo "08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec"
+echo "08. Query Dev1 in CP1 - get lazyAttr=2 and command=init"
 echo "======================================================="
 orionCurl --url /v2/entities/Dev1 --port $CP1_PORT
 echo
@@ -236,10 +236,16 @@ Date: REGEX(.*)
 
 06. Update Dev1 entity localAttr=10 command=exec in CB
 ======================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 112
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+{
+    "description": "one or more of the attributes in the request do not exist: [ command ]",
+    "error": "Unprocessable"
+}
 
 
 07. Query Dev1 entity in CB - get localAttr=10 and lazyAttrs=2
@@ -266,7 +272,7 @@ Date: REGEX(.*)
 }
 
 
-08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec
+08. Query Dev1 in CP1 - get lazyAttr=2 and command=init
 =======================================================
 HTTP/1.1 200 OK
 Content-Length: 140
@@ -278,7 +284,7 @@ Date: REGEX(.*)
     "command": {
         "metadata": {},
         "type": "command",
-        "value": "exec"
+        "value": "init"
     },
     "id": "Dev1",
     "lazyAttr": {

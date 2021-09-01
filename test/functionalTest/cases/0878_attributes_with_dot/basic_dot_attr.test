@@ -270,7 +270,7 @@ Date: REGEX(.*)
 03. Update/UPDATE E1 attribute d.o.t=10
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 192
+Content-Length: 334
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,13 +279,6 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "attributes": [
-                    {
-                        "name": "d.o.t",
-                        "type": "string",
-                        "value": ""
-                    }
-                ],
                 "id": "E1",
                 "isPattern": "false",
                 "type": "T1"
@@ -293,6 +286,18 @@ Date: REGEX(.*)
             "statusCode": {
                 "code": "200",
                 "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "400",
+                "details": "one or more of the attributes in the request do not exist: [ d.o.t ]",
+                "reasonPhrase": "Bad Request"
             }
         }
     ]
@@ -302,7 +307,7 @@ Date: REGEX(.*)
 04. Query E1 gets d.o.t=10 and normal=2
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 240
+Content-Length: 239
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -315,7 +320,7 @@ Date: REGEX(.*)
                     {
                         "name": "d.o.t",
                         "type": "string",
-                        "value": "10"
+                        "value": "1"
                     },
                     {
                         "name": "normal",
@@ -371,7 +376,7 @@ Date: REGEX(.*)
 06. Query E1 gets d.o.t=10, normal=2, d.o.t.bis=3
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 288
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -384,7 +389,7 @@ Date: REGEX(.*)
                     {
                         "name": "d.o.t",
                         "type": "string",
-                        "value": "10"
+                        "value": "1"
                     },
                     {
                         "name": "d.o.t.bis",

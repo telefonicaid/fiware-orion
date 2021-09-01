@@ -236,13 +236,24 @@ Date: REGEX(.*)
 05. v1 APPEND_STRICT with attr2 -> fails
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 335
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "contextResponses": [
+        {
+            "contextElement": {
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
         {
             "contextElement": {
                 "id": "E1",
