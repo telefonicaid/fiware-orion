@@ -63,7 +63,7 @@
 *
 * Others -
 */
-#define IP_LENGTH_MAX           15     // Based on xxx.xxx.xxx.xxx
+#define IP_LENGTH_MAX           45     // Based on IPv6 max length, see https://stackoverflow.com/questions/166132/maximum-length-of-the-textual-representation-of-an-ipv6-address
 #define STRING_SIZE_FOR_INT     16     // Room enough for a 32 bit integer
 #define STRING_SIZE_FOR_LONG    20     // Room enough for a 64 bit integer
 #define STRING_SIZE_FOR_DOUBLE  64     // Room enough for a double
