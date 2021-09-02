@@ -1141,6 +1141,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   {
     return compoundValueP->check("");
   }
+
   if (valueType == orion::ValueTypeString)
   {
     if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
