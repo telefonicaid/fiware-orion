@@ -652,7 +652,10 @@ function brokerStop
     vMsg "should be dead"
     rm -f /tmp/orion_${port}.pid 2> /dev/null
   else
-    curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    # harakiri exit is problematic in modern OS. See https://github.com/telefonicaid/fiware-orion/issues/3809
+    #curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
+    rm -f /tmp/orion_${port}.pid 2> /dev/null
     # Waiting for valgrind to terminate (sleep a max of 10)
     brokerStopAwait $port
   fi
