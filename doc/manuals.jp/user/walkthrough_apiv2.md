@@ -628,7 +628,9 @@ curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
 EOF
 ```
 
-* 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Notification Messages" と "Custom Notifications" を見て ください。
+* 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Notification Messages" と "Custom Notifications" を見てください。
+* このセクションで説明されている HTTP 通知に加えて、Orion は MQTT 通知もサポートしています。
+  このトピックについては、[このドキュメント](mqtt_notifications.md) で詳しく説明されています。
 
 [トップ](#top)
 
