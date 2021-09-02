@@ -1137,9 +1137,17 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0) && (type != TEXT_UNRESTRICTED_TYPE))
+  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
+  }
+  if (valueType == orion::ValueTypeString)
+  {
+    if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      return "Invalid characters in attribute value";
+    }
   }
   
   return metadataVector.check(apiVersion);
