@@ -402,7 +402,7 @@ CPrs への転送をスキップするために、クエリで `skipForwarding` 
 `GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
 されます。
 
-`skipForwarding` を転送しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+`skipForwarding` を更新しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
 セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)
