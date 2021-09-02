@@ -25,7 +25,7 @@ instead of `http` in the `notification` object.
 
 The following elements can be used within `mqtt`:
 
-* `url` to specify the MQTT broker enpoint to use. URL must start with `mqtt://` and never contains
+* `url` to specify the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains
   a path (i.e. it only includes host and port)
 * `topic` to specify the MQTT topic to use
 * `qos`: to specify the MQTT QoS value to use in the notifications associated to the subscription

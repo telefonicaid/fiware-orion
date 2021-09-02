@@ -209,7 +209,9 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **expiration** : サブスクリプションの有効期限が切れるタイムスタンプです (整数、秒を意味します)。永続的なサブスクリプションの場合、不当に高い値が使用されます。ソースコードの PERMANENT_SUBS_DATETIME を参照してください
 -   **lastNotification** : 最後の通知が送信された時刻です (整数、秒を意味します)。これは、通知が送信されるたびに更新され、スロットリング違反を回避します
 -   **throttling** : 通知の最小間隔です。0または -1 は、スロットリングがないことを意味します
--   **reference** : 通知の URL です
+-   **reference** : 通知の URL です。HTTPまたはMQTTのいずれかを指定します
+-   **mqttTopic**: MQTTトピック (MQTT 通知のみ)
+-   **mqttQoS**: MQTT QoS 値 (MQTT 通知のみ)
 -   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, **isPattern** および **isTypePattern** が含まれています。従来の理由から、**isPattern** は `"true"` または `"false"` (テキスト) で、**isTypePattern** は `true` または `false` (ブール値) であることに注意してください
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
