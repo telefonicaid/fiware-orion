@@ -473,6 +473,10 @@ static void appendMetadata
 //
 static bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* oldValueAsBsonP, mongo::BSONArray* oldArrayValueP, bool isArray)
 {
+  // Non NGSI-LD requests assume there's a diff whenever a compound is updated => always notifies
+  if (orionldState.apiVersion != NGSI_LD_V1)
+    return true;
+
   char*    details;
   char*    title        = (char*) "no title";
   KjNode*  newValueTree = kjTreeFromCompoundValue(newValueP, NULL, false, &details);
@@ -488,6 +492,10 @@ static bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* o
 
   int   bufSizeOld = kjFastRenderSize(oldValueTree);
   int   bufSizeNew = kjFastRenderSize(newValueTree);
+
+  if ((bufSizeOld <= 0) || (bufSizeNew <= 0))
+    return true;
+
   char* bufOld     = kaAlloc(&orionldState.kalloc, bufSizeOld);
   char* bufNew     = kaAlloc(&orionldState.kalloc, bufSizeNew);
 
@@ -734,7 +742,6 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     mongo::BSONArray  arrayValue;
 
     bool isArray = false;
-    LM_TMP(("oldValueType: %d", oldValueType));
     if (oldValueType == 4)
     {
       isArray = true;
