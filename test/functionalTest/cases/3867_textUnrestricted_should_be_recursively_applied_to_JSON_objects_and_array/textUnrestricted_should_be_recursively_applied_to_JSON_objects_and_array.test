@@ -31,6 +31,7 @@ brokerStart CB
 
 #
 # 01. POST /v2/entities with attribute type TextUnrestricted
+# 02. GET /v2/entities to check the TextUnrestricted fields are correctly rendered
 #
 
 echo "01. POST /v2/entities with attribute type TextUnrestricted"
@@ -56,6 +57,13 @@ echo
 echo
 
 
+echo "02. GET /v2/entities/ to check the TextUnrestricted fields are correctly rendered"
+echo "================================================================================="
+orionCurl --url '/v2/entities/'
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/entities with attribute type TextUnrestricted
 ==========================================================
@@ -65,6 +73,49 @@ Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+
+
+02. GET /v2/entities/ to check the TextUnrestricted fields are correctly rendered
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 215
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "TextUnrestricted",
+            "value": {
+                "(A)": "(A)",
+                "(B)": {
+                    "(A)": "(A)"
+                },
+                "(C)": [
+                    "(A)"
+                ]
+            }
+        },
+        "B": {
+            "metadata": {},
+            "type": "TextUnrestricted",
+            "value": [
+                "(A)",
+                {
+                    "(A)": "(A)"
+                },
+                [
+                    "(A)",
+                    "(A)"
+                ]
+            ]
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--
