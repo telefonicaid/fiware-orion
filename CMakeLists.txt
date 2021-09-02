@@ -216,6 +216,7 @@ SET (ORION_LIBS
     orionld_payloadCheck
     orionld_mqtt
     orionld_types
+    orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     parse
     apiTypesV2
     orionTypes

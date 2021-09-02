@@ -41,6 +41,7 @@
 * Some macros to make the usage of these functions prettier
 */
 #define getObjectFieldF(outP, b, field)     getObjectField(outP, b, field, __FUNCTION__, __LINE__)
+#define getArrayFieldF(outP, b, field)      getArrayField(outP, b, field, __FUNCTION__, __LINE__)
 #define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
 #define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
