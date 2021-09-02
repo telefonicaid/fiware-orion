@@ -1150,7 +1150,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
       return "Invalid characters in attribute value";
     }
   }
-  
+ 
   return metadataVector.check(apiVersion);
 }
 
