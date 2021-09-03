@@ -1213,8 +1213,8 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    char* httpsPrivateServerKey = (char*) calloc(2048, 1);
+    char* httpsCertificate      = (char*) calloc(2048, 1);
 
     if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
     {
