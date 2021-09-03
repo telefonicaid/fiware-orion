@@ -297,6 +297,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->type             = QUEUE_MSG_NOTIF;
     params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
@@ -314,18 +315,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
 
-    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
-    // case of initial notification)
-    if (correlatorCounter > 0)
-    {
-      char suffix[STRING_SIZE_FOR_INT];
-      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
-    }
-    else
-    {
-      params->fiwareCorrelator = fiwareCorrelator;
-    }
+    char suffix[STRING_SIZE_FOR_INT];
+    snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
     paramsV->push_back(params);
   }
@@ -397,35 +389,17 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
-    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
+    // Since the removal of initial notification feature, notifications are mono-entity
+    // by construction, i.e. ncr vector has only one element.
     //
-    std::string spathList;
-    bool        atLeastOneNotDefault = false;
+    // FIXME P3: not sure if the check on ncr size > 0 is done in some previous point
+    // In that case the if guard could be removed
+    //
+    std::string spath;
 
-    for (unsigned int ix = 0; ix < ncr.contextElementResponseVector.size(); ++ix)
+    if (ncr.contextElementResponseVector.size() > 0)
     {
-      Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
-
-      if (!spathList.empty())
-      {
-        spathList += ",";
-      }
-      spathList += eP->servicePath;
-      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
-    }
-
-    //
-    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
-    // request not having that header. However, this causes as side-effect that a
-    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
-    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
-    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
-    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
-    // this FIXME will be removed (and all the test harness adjusted, if needed)
-    //
-    if (!atLeastOneNotDefault)
-    {
-      spathList = "";
+      spath = ncr.contextElementResponseVector[0]->entity.servicePath;
     }
 
     ci.outMimeType = JSON;
@@ -459,13 +433,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    params->type             = QUEUE_MSG_NOTIF;
     params->from             = fromIp;  // note fromIp is a thread variable
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
     params->verb             = verbName(verb);
     params->tenant           = tenant;
-    params->servicePath      = spathList;
+    params->servicePath      = spath;
     params->xauthToken       = xauthToken;
     params->resource         = uriPath;
     params->content_type     = content_type;
@@ -475,18 +450,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
 
-    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
-    // case of initial notification)
-    if (correlatorCounter > 0)
-    {
-      char suffix[STRING_SIZE_FOR_INT];
-      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
-    }
-    else
-    {
-      params->fiwareCorrelator = fiwareCorrelator;
-    }
+    char suffix[STRING_SIZE_FOR_INT];
+    snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
     paramsV->push_back(params);
     return paramsV;

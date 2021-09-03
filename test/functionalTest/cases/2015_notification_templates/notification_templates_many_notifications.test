@@ -31,53 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E1/T1 
-# 02. Create E1/T2 
-# 03. Create E1/T3 
-# 04. Create regular subscription for E1 -> 3 entities in one notification
-# 05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 notifications
-# 06. Create custom subscription for E1 -> 3 notifications
-# 07. Dump accumulator and see 7 notifications (one first one multi-entity)
+# 01. Create regular subscription for E1
+# 02. Create same subscription but with 'httpCustom' instead of 'http'
+# 03. Create custom subscription for E1
+# 04. Create E1/T1
+# 05. Create E1/T2
+# 06. Create E1/T3
+# 07. Dump accumulator and see 9 notifications
 #
 
-echo "01. Create E1/T1"
-echo "================"
-payload='{
-  "id": "E1",
-  "type": "T1",
-  "A1": true
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "02. Create E1/T2"
-echo "================"
-payload='{
-  "id": "E1",
-  "type": "T2",
-  "A2": null
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "03. Create E1/T3"
-echo "================"
-payload='{
-  "id": "E1",
-  "type": "T3",
-  "A3": 3
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "04. Create regular subscription for E1 -> 3 entities in one notification"
-echo "========================================================================"
+echo "01. Create regular subscription for E1"
+echo "======================================"
 payload='{
   "subject": {
     "entities": [
@@ -101,8 +65,8 @@ echo
 echo
 
 
-echo "05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 notifications"
-echo "======================================================================================="
+echo "02. Create same subscription but with 'httpCustom' instead of 'http'"
+echo "===================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -126,8 +90,8 @@ echo
 echo
 
 
-echo "06. Create custom subscription for E1 -> 3 notifications"
-echo "========================================================"
+echo "03. Create custom subscription for E1"
+echo "====================================="
 payload='{
   "subject": {
     "entities": [
@@ -155,8 +119,44 @@ echo
 echo
 
 
-echo "07. Dump accumulator and see 7 notifications (one first one multi-entity)"
-echo "========================================================================="
+echo "04. Create E1/T1"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": true
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05. Create E1/T2"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T2",
+  "A2": null
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "06. Create E1/T3"
+echo "================"
+payload='{
+  "id": "E1",
+  "type": "T3",
+  "A3": 3
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump accumulator and see 9 notifications"
+echo "============================================"
 sleep 0.5  # Without this sleep, sometimes the last notification is missing
 accumulatorDump
 echo
@@ -164,7 +164,37 @@ echo
 
 
 --REGEXPECT--
-01. Create E1/T1
+01. Create regular subscription for E1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create same subscription but with 'httpCustom' instead of 'http'
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create custom subscription for E1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E1/T1
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -174,7 +204,7 @@ Date: REGEX(.*)
 
 
 
-02. Create E1/T2
+05. Create E1/T2
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -184,7 +214,7 @@ Date: REGEX(.*)
 
 
 
-03. Create E1/T3
+06. Create E1/T3
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -194,47 +224,18 @@ Date: REGEX(.*)
 
 
 
-04. Create regular subscription for E1 -> 3 entities in one notification
-========================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. Create same subscription but with 'httpCustom' instead of 'http' -> 3 notifications
-=======================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. Create custom subscription for E1 -> 3 notifications
-========================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-07. Dump accumulator and see 7 notifications (one first one multi-entity)
-=========================================================================
+07. Dump accumulator and see 9 notifications
+#SORT_START
+============================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 272
+Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "data": [
@@ -246,24 +247,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "id": "E1",
             "type": "T1"
-        },
-        {
-            "A2": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "id": "E1",
-            "type": "T2"
-        },
-        {
-            "A3": {
-                "metadata": {},
-                "type": "Number",
-                "value": 3
-            },
-            "id": "E1",
-            "type": "T3"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -277,7 +260,7 @@ Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "data": [
@@ -289,56 +272,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             },
             "id": "E1",
             "type": "T1"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 126
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A2": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "id": "E1",
-            "type": "T2"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 125
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A3": {
-                "metadata": {},
-                "type": "Number",
-                "value": 3
-            },
-            "id": "E1",
-            "type": "T3"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
@@ -355,12 +288,64 @@ Accept: application/json
 A1: true
 Entity-Type: T1
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "A1": "true",
     "A2": "",
     "A3": ""
+}
+#SORT_END
+#SORT_START
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 126
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
+
+{
+    "data": [
+        {
+            "A2": {
+                "metadata": {},
+                "type": "None",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 126
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
+
+{
+    "data": [
+        {
+            "A2": {
+                "metadata": {},
+                "type": "None",
+                "value": null
+            },
+            "id": "E1",
+            "type": "T2"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 PUT http://127.0.0.1:REGEX(\d+)/notify?a2=null&type=T2&id=E1
@@ -374,12 +359,64 @@ Accept: application/json
 A2: null
 Entity-Type: T2
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "A1": "",
     "A2": "null",
     "A3": ""
+}
+#SORT_END
+#SORT_START
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
+
+{
+    "data": [
+        {
+            "A3": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
+
+{
+    "data": [
+        {
+            "A3": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 PUT http://127.0.0.1:REGEX(\d+)/notify?a3=3&type=T3&id=E1
@@ -393,7 +430,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Entity-Type: T3
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "A1": "",
@@ -401,6 +438,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "A3": "3"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--

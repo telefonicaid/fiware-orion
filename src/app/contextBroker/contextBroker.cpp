@@ -576,6 +576,23 @@ void exitFunc(void)
   curl_global_cleanup();
 
 #ifdef DEBUG
+  // valgrind pass is done using DEBUG compilation, so we have to take care with
+  // the cache releasing to avoid false positives. In production this is not really
+  // needed
+
+  if (subCacheState == ScsSynchronizing)
+  {
+    //
+    // Subscription Cache is busy doing a synchronization.
+    // Two secs should be enough for it to finish.
+    //
+    // Not very important anyway. This 'hack' is just to avoid
+    // false leaks in the valgrind test suite.
+    //
+    LM_W(("Subscription cache is synchronizing, wait a few seconds before dying"));
+    sleep(2);
+  }
+
   // Take mongo req-sem ?
   LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();

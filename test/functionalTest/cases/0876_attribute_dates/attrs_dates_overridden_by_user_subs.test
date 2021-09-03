@@ -47,12 +47,10 @@ accumulatorStart --pretty-print
 # 07. Dump & reset accumulator: see E2-auto [but also E1-user]
 #
 # 08. Create sub E.*/T with filter dateModified<2049-01-01
-# 09. Dump & reset accumulator: see initial notif E2 -auto [but also E1-user]
-#
-# 10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
-# 11. Modify just attr value in E1 (should trigger 2 notif)
-# 12. Modify just attr value in E2 (should trigger 2 notif)
-# 13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
+# 09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
+# 10. Modify just attr value in E1 (should trigger 2 notif)
+# 11. Modify just attr value in E2 (should trigger 2 notif)
+# 12. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
 #
 
 echo "01. Create sub E.*/T with filter mq dateModified<2049-01-01"
@@ -191,15 +189,7 @@ echo
 echo
 
 
-echo "09. Dump & reset accumulator: see initial notif E2-auto [but also E1-user]"
-echo "=========================================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator"
+echo "09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator"
 echo "==================================================================================="
 payload='{
   "A": {
@@ -213,7 +203,7 @@ echo
 echo
 
 
-echo "11. Modify just attr value in E1 (should trigger 2 notifs)"
+echo "10. Modify just attr value in E1 (should trigger 2 notifs)"
 echo "=========================================================="
 payload='{
   "A": {
@@ -226,7 +216,7 @@ echo
 echo
 
 
-echo "12. Modify just attr value in E2 (should trigger 2 notifs)"
+echo "11. Modify just attr value in E2 (should trigger 2 notifs)"
 echo "=========================================================="
 payload='{
   "A": {
@@ -239,7 +229,7 @@ echo
 echo
 
 
-echo "13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto"
+echo "12. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto"
 echo "==============================================================="
 accumulatorDump
 accumulatorReset
@@ -432,55 +422,7 @@ Date: REGEX(.*)
 
 
 
-09. Dump & reset accumulator: see initial notif E2-auto [but also E1-user]
-==========================================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 334
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {
-                    "dateModified": {
-                        "type": "DateTime",
-                        "value": "2051-01-01T00:00:00.555Z"
-                    }
-                },
-                "type": "Text",
-                "value": "bar"
-            },
-            "id": "E1",
-            "type": "T"
-        },
-        {
-            "A": {
-                "metadata": {
-                    "dateModified": {
-                        "type": "DateTime",
-                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                    }
-                },
-                "type": "Text",
-                "value": "bar"
-            },
-            "id": "E2",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
+09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
 ===================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -488,7 +430,7 @@ Date: REGEX(.*)
 
 
 
-11. Modify just attr value in E1 (should trigger 2 notifs)
+10. Modify just attr value in E1 (should trigger 2 notifs)
 ==========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -496,7 +438,7 @@ Date: REGEX(.*)
 
 
 
-12. Modify just attr value in E2 (should trigger 2 notifs)
+11. Modify just attr value in E2 (should trigger 2 notifs)
 ==========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -504,7 +446,7 @@ Date: REGEX(.*)
 
 
 
-13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
+12. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
 ===============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

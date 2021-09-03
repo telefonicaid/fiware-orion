@@ -100,8 +100,8 @@ echo
 echo
 
 
-echo "04. Check that the accumulator received the initial notification of E/T Madrid only"
-echo "==================================================================================="
+echo "04. Check that the accumulator received the notification of E/T Madrid only"
+echo "==========================================================================="
 sleep 1
 accumulatorDump
 echo
@@ -186,8 +186,8 @@ Date: REGEX(.*)
 }
 
 
-04. Check that the accumulator received the initial notification of E/T Madrid only
-===================================================================================
+04. Check that the accumulator received the notification of E/T Madrid only
+===========================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /Madrid
 Content-Length: 258

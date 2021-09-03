@@ -738,7 +738,6 @@ void subCacheItemInsert
   int64_t                            expirationTime,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
-  bool                               notificationDone,
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
@@ -778,7 +777,7 @@ void subCacheItemInsert
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
-  cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;

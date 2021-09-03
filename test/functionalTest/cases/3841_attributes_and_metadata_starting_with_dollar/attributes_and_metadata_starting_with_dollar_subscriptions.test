@@ -31,37 +31,16 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. Create entity E with attribute $temperature=22 with metadata $avg=23
-# 02. Create subscription covering the entity (triggers initial notif)
+# 01. Create subscription covering the entity
+# 02. Create entity E with attribute $temperature=22 with metadata $avg=23
 # 03. Update $temperature=32 $avg=33 (triggers new notif)
 # 04. Dump accumulator, see 2 notifications
 # 05. Get subscription
 #
 
 
-echo '01. Create entity E with attribute $temperature=22 with metadata $avg=23'
-echo '========================================================================'
-payload='{
-  "id": "E",
-  "type": "T",
-  "$temperature": {
-    "value": 22,
-    "type": "Number",
-    "metadata": {
-      "$avg": {
-        "value": 23,
-        "type": "Number"
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo '02. Create subscription covering the entity (triggers initial notif)'
-echo '===================================================================='
+echo '01. Create subscription covering the entity'
+echo '==========================================='
 payload='{
   "subject": {
     "entities": [
@@ -86,6 +65,27 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. Create entity E with attribute $temperature=22 with metadata $avg=23'
+echo '========================================================================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "$temperature": {
+    "value": 22,
+    "type": "Number",
+    "metadata": {
+      "$avg": {
+        "value": 23,
+        "type": "Number"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -125,21 +125,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with attribute $temperature=22 with metadata $avg=23
-========================================================================
+01. Create subscription covering the entity
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create subscription covering the entity (triggers initial notif)
-====================================================================
+02. Create entity E with attribute $temperature=22 with metadata $avg=23
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -163,7 +163,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

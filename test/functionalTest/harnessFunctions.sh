@@ -652,7 +652,10 @@ function brokerStop
     vMsg "should be dead"
     rm -f /tmp/orion_${port}.pid 2> /dev/null
   else
-    curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    # harakiri exit is problematic in modern OS. See https://github.com/telefonicaid/fiware-orion/issues/3809
+    #curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
+    rm -f /tmp/orion_${port}.pid 2> /dev/null
     # Waiting for valgrind to terminate (sleep a max of 10)
     brokerStopAwait $port
   fi
@@ -894,6 +897,29 @@ function accumulatorReset()
 }
 
 
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Reset -
+#
+function accumulator2Reset()
+{
+  curl localhost:${LISTENER2_PORT}/reset -s -S -X POST
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator3Reset -
+#
+function accumulator3Reset()
+{
+  curl localhost:${LISTENER3_PORT}/reset -s -S -X POST
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # valgrindSleep
@@ -987,16 +1013,23 @@ function dbInsertEntity()
   doc='doc = {
     "_id": {
         "id": entity,
-        "type": "T"
+        "type": "T",
+        "servicePath": "/"
     },
-    "attrNames": [ "A" ],
+    "attrNames": [ "A", "B" ],
     "attrs": {
         "A": {
             "type": "TA",
-            "value": s,
+            "value": 0,
             "creDate" : 1389376081,
             "modDate" : 1389376081
         },
+        "B": {
+            "type": "TB",
+            "value": s,
+            "creDate" : 1389376081,
+            "modDate" : 1389376081
+        }
     },
     "creDate": 1389376081,
     "modDate": 1389376081
@@ -1277,6 +1310,8 @@ export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count
 export -f accumulatorReset
+export -f accumulator2Reset
+export -f accumulator3Reset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

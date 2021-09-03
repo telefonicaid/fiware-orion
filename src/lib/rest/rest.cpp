@@ -561,13 +561,6 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  //
-  // delayed release of ContextElementResponseVector must be effectuated now.
-  // See github issue #2994
-  //
-  extern void delayedReleaseExecute(void);
-  delayedReleaseExecute();
-
   // It's unsual, but *con_cls can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
   // In addition, we add a similar check for con_cls (we haven't found any case in which this happens, but
   // let's be conservative... otherwise CB will crash)
@@ -718,11 +711,20 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 1;
   }
 
-  if (ciP->verb == PATCH && ciP->servicePathV.size() > 1)
+  if (ciP->servicePathV.size() > 1)
   {
-    OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
-    return 1;
+    if (ciP->verb == PATCH)
+    {
+      OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 1;
+    }
+    if (ciP->verb == DELETE)
+    {
+      OrionError oe(SccBadRequest, "more than one servicepath is not allowed in DELETE operation");
+      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return 1;
+    }
   }
 
   components = stringSplit(servicePath, '/', compV);
@@ -758,6 +760,12 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (ciP->verb == PATCH)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in patch update request");
+        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+        return 3;
+      }
+      else if (ciP->verb == DELETE)
+      {
+        OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in DELETE operation");
         ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
         return 3;
       }

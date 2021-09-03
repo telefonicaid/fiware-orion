@@ -43,8 +43,7 @@
 * postSubscriptions -
 *
 * URI parameters -
-*   - skipInitialNotification 
-*
+*   NONE
 */
 extern std::string postSubscriptions
 (
@@ -56,7 +55,6 @@ extern std::string postSubscriptions
 {
   SubscribeContextResponse  scr;
   std::string               answer = "";
-  bool skipInitialNotification = ciP->uriParamOptions[OPT_SKIPINITALNOTIFICATION];
 
   if (ciP->servicePathV.size() > 1)
   {
@@ -80,11 +78,7 @@ extern std::string postSubscriptions
                           parseDataP->subsV2,
                           &beError,
                           ciP->tenant,
-                          ciP->servicePathV,
-                          ciP->httpHeaders.xauthToken,
-                          ciP->httpHeaders.correlator,
-                          skipInitialNotification,
-                          ciP->apiVersion));
+                          ciP->servicePathV));
 
   // Check potential error
   if (beError.code != SccNone)

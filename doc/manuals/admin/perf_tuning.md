@@ -171,7 +171,7 @@ It will work as follows:
 * Notification associated to service `serv1` (i.e. notifications triggered by update requests using
 `fiware-service: serv1` header) will use queue q1 and workers pool n1.
 * Notification associated to service `serv2` will use queue q2 and workers pool n2.
-* Any other notification (i.e. not associated to `serv1` or `serv2` will use queue q and workers pool n.
+* Any other notification (i.e. not associated to `serv1` or `serv2`) will use queue q and workers pool n.
 
 So, if for instance `serv1` has a load peak in notifications, notifications in that service may be
 discarded (with `Runtime Error (serv1 notification queue is full)` errors in the logs) but the saturation

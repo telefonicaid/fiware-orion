@@ -259,29 +259,19 @@ static void setAttrs(const SubscriptionUpdate& subUp, const orion::BSONObj& subO
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotifyNgsiv1 -
+* setCondsNgsiv1 -
 *
 * This method could be removed along with the rest of NGSIv1 stuff
 */
-static void setCondsAndInitialNotifyNgsiv1
+static void setCondsNgsiv1
 (
   const Subscription&              sub,
   const orion::BSONObj&            subOrig,
-  const std::string&               subId,
-  const std::string&               status,
-  const std::string&               url,
-  RenderFormat                     attrsFormat,
-  const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  orion::BSONObjBuilder*           b,
-  const bool&                      skipInitialNotification,
-  bool*                            notificationDone
+  orion::BSONObjBuilder*           b
 )
 {
   //
-  // Similar to setCondsAndInitialNotify() in MongoCommonSubscripion.cpp, but
+  // Similar to setConds() in MongoCommonSubscripion.cpp, but
   // entities and notifications attributes are not taken from sub but from subOrig
   //
   // Most of the following code is copied from mongoGetSubscription logic but, given
@@ -321,27 +311,10 @@ static void setCondsAndInitialNotifyNgsiv1
     setStringVectorF(subOrig, CSUB_METADATA, &metadata);
   }
 
-  /* Conds vector (and maybe an initial notification) */
-  *notificationDone = false;
-
+  /* Conds vector */
   orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             entities,
-                                            attributes,
-                                            metadata,
-                                            subId,
-                                            ngsiv2::HttpInfo(url),
-                                            notificationDone,
-                                            attrsFormat,
-                                            tenant,
-                                            xauthToken,
-                                            servicePathV,
-                                            &(sub.restriction),
-                                            status,
-                                            fiwareCorrelator,
-                                            sub.notification.attributes,
-                                            sub.notification.blacklist,
-                                            skipInitialNotification,
-                                            V1);
+                                            attributes);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -351,32 +324,21 @@ static void setCondsAndInitialNotifyNgsiv1
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotify -
+* setConds
 */
-static void setCondsAndInitialNotify
+static void setConds
 (
   const SubscriptionUpdate&        subUp,
   const orion::BSONObj&            subOrig,
-  const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  orion::BSONObjBuilder*           b,
-  const bool&                      skipInitialNotification,
-  bool*                            notificationDone
+  orion::BSONObjBuilder*           b
 )
 {
-  // notification can be changed to true by setCondsAndInitialNotify()
-  *notificationDone = false;
-
   if (subUp.subjectProvided)
   {
     std::string               status;
     HttpInfo                  httpInfo;
-    bool                      blacklist;
     std::vector<std::string>  notifAttributesV;
     std::vector<std::string>  metadataV;
-    RenderFormat              attrsFormat = NGSI_V2_NORMALIZED;
 
     if (subUp.statusProvided)
     {
@@ -390,29 +352,18 @@ static void setCondsAndInitialNotify
     if (subUp.notificationProvided)
     {
       httpInfo         = subUp.notification.httpInfo;
-      blacklist        = subUp.notification.blacklist;
       metadataV        = subUp.notification.metadata;
       notifAttributesV = subUp.notification.attributes;
     }
     else
     {
       httpInfo.fill(subOrig);
-      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
       setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
 
       if (subOrig.hasField(CSUB_METADATA))
       {
         setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
       }
-    }
-
-    if (subUp.attrsFormatProvided)
-    {
-      attrsFormat = subUp.attrsFormat;
-    }
-    else if (subOrig.hasField(CSUB_FORMAT))
-    {
-      attrsFormat = stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT));
     }
 
     if (subUp.fromNgsiv1)
@@ -425,38 +376,11 @@ static void setCondsAndInitialNotify
       //
       // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       //
-      setCondsAndInitialNotifyNgsiv1(subUp,
-                                     subOrig,
-                                     subUp.id,
-                                     status,
-                                     httpInfo.url,
-                                     attrsFormat,
-                                     tenant,
-                                     servicePathV,
-                                     xauthToken,
-                                     fiwareCorrelator,
-                                     b,
-                                     skipInitialNotification,
-                                     notificationDone);
+      setCondsNgsiv1(subUp, subOrig, b);
     }
     else
     {
-      setCondsAndInitialNotify(subUp,
-                               subUp.id,
-                               status,
-                               notifAttributesV,
-                               metadataV,
-                               httpInfo,
-                               blacklist,
-                               attrsFormat,
-                               tenant,
-                               servicePathV,
-                               xauthToken,
-                               fiwareCorrelator,
-                               b,
-                               notificationDone,
-                               skipInitialNotification,
-                               V2);
+      setConds(subUp, notifAttributesV, b);
     }
   }
   else
@@ -474,20 +398,12 @@ static void setCondsAndInitialNotify
 *
 * setCount -
 */
-static void setCount(long long inc, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setCount(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subOrig.hasField(CSUB_COUNT))
   {
     long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
-    setCount(count + inc, b);
-  }
-  else
-  {
-    // In this case we only add if inc is different from 0
-    if (inc > 0)
-    {
-      setCount(inc, b);
-    }
+    setCount(count, b);
   }
 }
 
@@ -497,12 +413,6 @@ static void setCount(long long inc, const orion::BSONObj& subOrig, orion::BSONOb
 *
 * setLastNotification -
 *
-* NOTE
-*   Unlike setLastFailure() and setLastSucces(), this function doesn't return any value.
-*   This is due to the fact that lastNotification is added to before sending the notification
-*   while the other two (lastSuccess/lastFailure) need to wait until after - to know the status
-*   of the notification and the resulting values are stored in the sub-cache only,
-*   to be added to mongo when a sub cache refresh is performed.
 */
 static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
 {
@@ -856,12 +766,7 @@ std::string mongoUpdateSubscription
   const SubscriptionUpdate&        subUp,
   OrionError*                      oe,
   const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
-
+  const std::vector<std::string>&  servicePathV
 )
 {
   bool reqSemTaken = false;
@@ -896,7 +801,6 @@ std::string mongoUpdateSubscription
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
-  bool                   notificationDone = false;
   long long              lastNotification = 0;
   CachedSubscription*    subCacheP        = NULL;
 
@@ -921,49 +825,17 @@ std::string mongoUpdateSubscription
   setBlacklist(subUp, subOrig, &b);
   setOnlyChanged(subUp, subOrig, &b);
 
-  setCondsAndInitialNotify(subUp,
-                           subOrig,
-                           tenant,
-                           servicePathV,
-                           xauthToken,
-                           fiwareCorrelator,
-                           &b,
-                           skipInitialNotification,
-                           &notificationDone);
+  setConds(subUp, subOrig, &b);
 
-  if (notificationDone)
-  {
-    int64_t countInc = 1;
-
-    lastNotification = (long long) getCurrentTime();
-
-    // Update sub-cache
-    if (subCacheP != NULL)
-    {
-      cacheSemTake(__FUNCTION__, "Updating count and last notification in cache subscription");
-
-      subCacheP->count                 += 1;  // 'count' to be reset later if DB operation OK
-      subCacheP->lastNotificationTime  = lastNotification;
-
-      cacheSemGive(__FUNCTION__, "Updating count and last notification in cache subscription");
-
-      countInc = subCacheP->count;  // already inc with +1
-    }
-
-    setLastNotification(lastNotification, &b);
-    setCount(countInc, subOrig, &b);
-  }
-  else
-  {
-    setLastNotification(subOrig, subCacheP, &b);
-    setCount(0, subOrig, &b);
-  }
-
-  setLastFailure(subOrig, subCacheP, &b);
-  setLastSuccess(subOrig, subCacheP, &b);
+  setCount(subOrig, &b);
 
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
+
+  // last* field take into account potenatially newer information in the cache
+  setLastNotification(subOrig, subCacheP, &b);
+  setLastFailure(subOrig, subCacheP, &b);
+  setLastSuccess(subOrig, subCacheP, &b);
 
   orion::BSONObj doc = b.obj();
 

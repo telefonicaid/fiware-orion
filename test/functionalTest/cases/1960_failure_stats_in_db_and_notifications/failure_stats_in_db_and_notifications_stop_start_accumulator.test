@@ -31,8 +31,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1
-# 02. Create sub (with valid url), matching E1
+# 01. Create sub (with valid url), matching E1
+# 02. Create entity E1
 #     Sleep 3.5 seconds to get a sub-cache-refresh
 # 03. GET subscription, see lastSuccess but not lastFailure and status==active
 # 04. Stop accumulator
@@ -45,19 +45,7 @@ accumulatorStart --pretty-print
 # 09. GET subscription, see lastSuccess GT lastFailure and status==active
 #
 
-echo "01. Create entity E1"
-echo "===================="
-payload='{
-  "id": "E1",
-  "type": "T1",
-  "A1": 1
-}'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
-echo
-echo
-
-
-echo "02. Create sub (with valid url), matching E1"
+echo "01. Create sub (with valid url), matching E1"
 echo "============================================"
 payload='{
   "subject": {
@@ -79,6 +67,18 @@ payload='{
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -150,21 +150,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1
-====================
+01. Create sub (with valid url), matching E1
+============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create sub (with valid url), matching E1
-============================================
+02. Create entity E1
+====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=T1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
