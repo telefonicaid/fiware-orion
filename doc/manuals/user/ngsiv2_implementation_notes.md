@@ -429,7 +429,7 @@ not have been migrated yet to NGSIv2, so this mode may prove useful.
 You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
 forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
 
-Note that in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
+Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
 just use an update request with append/creation semantics).
 
 [Top](#top)
