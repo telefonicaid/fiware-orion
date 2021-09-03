@@ -3101,7 +3101,7 @@ static unsigned int updateEntity
     *attributeAlreadyExistsList += " ]";
   }
 
-  if (action == ActionTypeUpdate)
+  if ((apiVersion == V2 ) && (action == ActionTypeUpdate))
   {
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {

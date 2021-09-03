@@ -549,22 +549,22 @@ Date: REGEX(.*)
 
 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 ===============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 127
+HTTP/1.1 404 Not Found
+Content-Length: 113
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ A2, A3, A4, A5, A6, A7 ]",
-    "error": "Unprocessable"
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A6, A7] }",
+    "error": "PartialUpdate"
 }
 
 
 10. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 151
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -572,11 +572,11 @@ Date: REGEX(.*)
 [
     {
         "A1": "A1 in step 09",
-        "A2": "A2 in CP1",
-        "A3": "A3 in CP2",
-        "A4": "A4 in CP1",
-        "A5": "A5 in CP2",
-        "A6": "A6 in CP3",
+        "A2": "A2 in step 09",
+        "A3": "A3 in step 09",
+        "A4": "A4 in step 09",
+        "A5": "A5 in step 09",
+        "A6": "A6 in step 09",
         "id": "E1",
         "type": "T1"
     }
@@ -586,15 +586,15 @@ Date: REGEX(.*)
 11. Query CP1 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 67
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "A2": "A2 in CP1",
-        "A4": "A4 in CP1",
+        "A2": "A2 in step 09",
+        "A4": "A4 in step 09",
         "id": "E1",
         "type": "T1"
     }
@@ -604,15 +604,15 @@ Date: REGEX(.*)
 12. Query CP2 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 67
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "A3": "A3 in CP2",
-        "A5": "A5 in CP2",
+        "A3": "A3 in step 09",
+        "A5": "A5 in step 09",
         "id": "E1",
         "type": "T1"
     }
@@ -622,14 +622,14 @@ Date: REGEX(.*)
 13. Query CP3 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 46
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "A6": "A6 in CP3",
+        "A6": "A6 in step 09",
         "id": "E1",
         "type": "T1"
     }

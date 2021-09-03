@@ -270,44 +270,7 @@ Date: REGEX(.*)
 03. Update/UPDATE E1 attribute d.o.t=10
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 334
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ d.o.t ]",
-                "reasonPhrase": "Bad Request"
-            }
-        }
-    ]
-}
-
-
-04. Query E1 gets d.o.t=10 and normal=2
-=======================================
-HTTP/1.1 200 OK
-Content-Length: 239
+Content-Length: 192
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -320,7 +283,39 @@ Date: REGEX(.*)
                     {
                         "name": "d.o.t",
                         "type": "string",
-                        "value": "1"
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Query E1 gets d.o.t=10 and normal=2
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 240
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "d.o.t",
+                        "type": "string",
+                        "value": "10"
                     },
                     {
                         "name": "normal",
@@ -376,7 +371,7 @@ Date: REGEX(.*)
 06. Query E1 gets d.o.t=10, normal=2, d.o.t.bis=3
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 288
+Content-Length: 289
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -389,7 +384,7 @@ Date: REGEX(.*)
                     {
                         "name": "d.o.t",
                         "type": "string",
-                        "value": "1"
+                        "value": "10"
                     },
                     {
                         "name": "d.o.t.bis",

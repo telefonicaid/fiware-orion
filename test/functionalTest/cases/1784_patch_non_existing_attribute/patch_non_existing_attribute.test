@@ -85,15 +85,15 @@ Date: REGEX(.*)
 
 02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)
 ================================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 107
+HTTP/1.1 404 Not Found
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ A2 ]",
-    "error": "Unprocessable"
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
 }
 
 

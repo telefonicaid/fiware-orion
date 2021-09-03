@@ -626,7 +626,7 @@ Date: REGEX(.*)
 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 407
+Content-Length: 598
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -637,30 +637,62 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1",
-                        "type": "string",
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A6", 
+                        "type": "string", 
                         "value": ""
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
-        },
+        }, 
         {
             "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
+                "attributes": [
+                    {
+                        "name": "A7", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ A2, A3, A4, A5, A6, A7 ]",
-                "reasonPhrase": "Bad Request"
+                "code": "404", 
+                "details": "E1", 
+                "reasonPhrase": "No context element found"
             }
         }
     ]
@@ -670,7 +702,7 @@ Date: REGEX(.*)
 10. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 452
+Content-Length: 472
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -681,42 +713,42 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1",
-                        "type": "string",
+                        "name": "A1", 
+                        "type": "string", 
                         "value": "A1 in step 09"
-                    },
+                    }, 
                     {
-                        "name": "A2",
-                        "type": "string",
-                        "value": "A2 in CP1"
-                    },
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in step 09"
+                    }, 
                     {
-                        "name": "A4",
-                        "type": "string",
-                        "value": "A4 in CP1"
-                    },
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": "A4 in step 09"
+                    }, 
                     {
-                        "name": "A3",
-                        "type": "string",
-                        "value": "A3 in CP2"
-                    },
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 in step 09"
+                    }, 
                     {
-                        "name": "A5",
-                        "type": "string",
-                        "value": "A5 in CP2"
-                    },
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": "A5 in step 09"
+                    }, 
                     {
-                        "name": "A6",
-                        "type": "string",
-                        "value": "A6 in CP3"
+                        "name": "A6", 
+                        "type": "string", 
+                        "value": "A6 in step 09"
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -727,7 +759,7 @@ Date: REGEX(.*)
 11. Query CP1 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -738,22 +770,22 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2",
-                        "type": "string",
-                        "value": "A2 in CP1"
-                    },
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in step 09"
+                    }, 
                     {
-                        "name": "A4",
-                        "type": "string",
-                        "value": "A4 in CP1"
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": "A4 in step 09"
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -764,7 +796,7 @@ Date: REGEX(.*)
 12. Query CP2 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -775,22 +807,22 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3",
-                        "type": "string",
-                        "value": "A3 in CP2"
-                    },
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 in step 09"
+                    }, 
                     {
-                        "name": "A5",
-                        "type": "string",
-                        "value": "A5 in CP2"
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": "A5 in step 09"
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -801,7 +833,7 @@ Date: REGEX(.*)
 13. Query CP3 for E1/{}
 =======================
 HTTP/1.1 200 OK
-Content-Length: 198
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -812,17 +844,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A6",
-                        "type": "string",
-                        "value": "A6 in CP3"
+                        "name": "A6", 
+                        "type": "string", 
+                        "value": "A6 in step 09"
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }

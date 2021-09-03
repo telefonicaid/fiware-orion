@@ -415,15 +415,15 @@ Date: REGEX(.*)
 
 08. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7+A8
 ============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 131
+HTTP/1.1 404 Not Found
+Content-Length: 121
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ A1, A2, A3, A4, A5, A6, A8 ]",
-    "error": "Unprocessable"
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A8, A2, A4, A6] }",
+    "error": "PartialUpdate"
 }
 
 
@@ -437,9 +437,9 @@ Date: REGEX(.*)
 
 [
     {
-        "A1": "A1 On CP1",
-        "A3": "A3 On CP2",
-        "A5": "A5 On CP3",
+        "A1": "A1 Via CB",
+        "A3": "A3 Via CB",
+        "A5": "A5 Via CB",
         "A7": "A7 Via CB",
         "id": "E1",
         "type": "T1"

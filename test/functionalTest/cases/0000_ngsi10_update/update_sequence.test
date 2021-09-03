@@ -995,7 +995,7 @@ Date: REGEX(.*)
 13. Update/UPDATE OfficeRoom/Room/pressure=p230
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 357
+Content-Length: 330
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1004,25 +1004,21 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
                 "id": "OfficeRoom",
                 "isPattern": "false",
                 "type": "Room"
             },
             "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "OfficeRoom",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ pressure ]",
-                "reasonPhrase": "Bad Request"
+                "code": "472",
+                "details": "action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure",
+                "reasonPhrase": "request parameter is invalid/not allowed"
             }
         }
     ]
@@ -1032,7 +1028,7 @@ Date: REGEX(.*)
 14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 543
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1041,25 +1037,21 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
                 "id": "OfficeRoom",
                 "isPattern": "false",
                 "type": "Room"
             },
             "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "OfficeRoom",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ pressure ]",
-                "reasonPhrase": "Bad Request"
+                "code": "472",
+                "details": "action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure",
+                "reasonPhrase": "request parameter is invalid/not allowed"
             }
         },
         {
@@ -1119,7 +1111,7 @@ Date: REGEX(.*)
 16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -1146,14 +1138,21 @@ Date: REGEX(.*)
         },
         {
             "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
                 "id": "OfficeRoom",
                 "isPattern": "false",
                 "type": "Room"
             },
             "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ lightstatus ]",
-                "reasonPhrase": "Bad Request"
+                "code": "404",
+                "details": "OfficeRoom",
+                "reasonPhrase": "No context element found"
             }
         }
     ]

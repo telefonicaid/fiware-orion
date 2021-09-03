@@ -239,7 +239,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 329
+Content-Length: 188
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -248,25 +248,20 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T"
-            },
-            "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ A1 ]",
-                "reasonPhrase": "Bad Request"
             }
         }
     ]
@@ -289,7 +284,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "E1/A1 in CP1"
+                        "value": "E1/A1 via CB"
                     }
                 ], 
                 "id": "E1", 

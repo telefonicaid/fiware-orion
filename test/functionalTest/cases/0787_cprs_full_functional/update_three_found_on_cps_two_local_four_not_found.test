@@ -870,7 +870,7 @@ Date: REGEX(.*)
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 642
+Content-Length: 1010
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -881,64 +881,103 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A4",
-                        "type": "string",
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
                         "value": ""
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
-        },
+        }, 
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A5",
-                        "type": "string",
+                        "name": "A5", 
+                        "type": "string", 
                         "value": ""
                     }
-                ],
-                "id": "E2",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "404",
-                "details": "E2",
+                "code": "404", 
+                "details": "E1", 
                 "reasonPhrase": "No context element found"
             }
-        },
+        }, 
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1",
-                        "type": "string",
+                        "name": "A5", 
+                        "type": "string", 
                         "value": ""
-                    },
+                    }, 
                     {
-                        "name": "A2",
-                        "type": "string",
-                        "value": ""
-                    },
-                    {
-                        "name": "A3",
-                        "type": "string",
+                        "name": "A4", 
+                        "type": "string", 
                         "value": ""
                     }
-                ],
-                "id": "E2",
-                "isPattern": "false",
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "404", 
+                "details": "E2", 
+                "reasonPhrase": "No context element found"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -962,7 +1001,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 in CP1"
+                        "value": "A1 via CB"
                     }
                 ], 
                 "id": "E1", 
@@ -1012,7 +1051,7 @@ Date: REGEX(.*)
                     {
                         "name": "A2", 
                         "type": "string", 
-                        "value": "A2 in CP2"
+                        "value": "A2 via CB"
                     }
                 ], 
                 "id": "E1", 
@@ -1062,7 +1101,7 @@ Date: REGEX(.*)
                     {
                         "name": "A3", 
                         "type": "string", 
-                        "value": "A3 in CP3"
+                        "value": "A3 via CB"
                     }
                 ], 
                 "id": "E1", 

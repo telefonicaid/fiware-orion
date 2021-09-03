@@ -453,7 +453,7 @@ Date: REGEX(.*)
 08. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7+A8
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 411
+Content-Length: 639
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -464,30 +464,67 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A7",
-                        "type": "string",
+                        "name": "A7", 
+                        "type": "string", 
                         "value": ""
                     }
-                ],
-                "id": "E1",
-                "isPattern": "false",
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
-        },
+        }, 
         {
             "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
+                "attributes": [
+                    {
+                        "name": "A8", 
+                        "type": "string", 
+                        "value": ""
+                    },
+                    {
+                        "name": "A1",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A5",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "A6", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
                 "type": "T1"
-            },
+            }, 
             "statusCode": {
-                "code": "400",
-                "details": "one or more of the attributes in the request do not exist: [ A1, A2, A3, A4, A5, A6, A8 ]",
-                "reasonPhrase": "Bad Request"
+                "code": "404", 
+                "details": "E1", 
+                "reasonPhrase": "No context element found"
             }
         }
     ]
@@ -515,17 +552,17 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 On CP1"
+                        "value": "A1 Via CB"
                     }, 
                     {
                         "name": "A3", 
                         "type": "string", 
-                        "value": "A3 On CP2"
+                        "value": "A3 Via CB"
                     }, 
                     {
                         "name": "A5", 
                         "type": "string", 
-                        "value": "A5 On CP3"
+                        "value": "A5 Via CB"
                     }
                 ], 
                 "id": "E1", 
