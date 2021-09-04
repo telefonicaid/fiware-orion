@@ -172,6 +172,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
+* libmosquitto: 2.0.11 (from source)
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -215,6 +216,18 @@ commands that require root privilege):
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
+
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
+
+        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
+        tar xvf mosquitto-2.0.11.tar.gz
+        cd mosquitto-2.0.11
+        sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
+        sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
+        sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib
 
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
