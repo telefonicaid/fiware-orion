@@ -168,15 +168,15 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
 して次のライブラリを使用します :
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.70 (from source)
+* libmicrohttpd: 0.9.70 (ソースから)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
 * libmosquitto: 2.0.11 (ソースから)
-* Mongo C driver: 1.17.4 (from source)
-* rapidjson: 1.1.0 (from source)
-* gtest (only for `make unit_test` building target): 1.5 (from sources)
-* gmock (only for `make unit_test` building target): 1.5 (from sources)
+* Mongo C driver: 1.17.4 (ソースから)
+* rapidjson: 1.1.0 (ソースから)
+* gtest (only for `make unit_test` building target): 1.5 (ソースから)
+* gmock (only for `make unit_test` building target): 1.5 (ソースから)
 
 基本的な手順は次のとおりです (root 権限でコマンドを実行しないと仮定し、root 権限が必要なコマンドに sudo を使用します) :
 
