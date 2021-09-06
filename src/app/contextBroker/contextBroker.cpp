@@ -1239,8 +1239,13 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    // FIXME P3: we suspect that loadFile() is not working well as it doesn't include the
+    // char terminator \0 at the end, thus causing valgrind errors. Using calloc will ensure
+    // that all the buffer is initialized with \0, thus avoiding the problem, although it would
+    // be better to fix loadFile()
+    // See issue https://github.com/telefonicaid/fiware-orion/issues/3925 for more detail
+    char* httpsPrivateServerKey = (char*) calloc(2048, 1);
+    char* httpsCertificate      = (char*) calloc(2048, 1);
 
     if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
     {
