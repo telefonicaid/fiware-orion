@@ -31,6 +31,7 @@ SET (SOURCES
     BatchQuery.cpp
     BatchUpdate.cpp
     HttpInfo.cpp
+    MqttInfo.cpp
     ngsiWrappers.cpp
 )
 
@@ -45,6 +46,7 @@ SET (HEADERS
     BatchQuery.h
     BatchUpdate.h
     HttpInfo.h
+    MqttInfo.cpp
     ngsiWrappers.h
 )
 

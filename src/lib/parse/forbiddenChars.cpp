@@ -189,3 +189,31 @@ bool forbiddenQuotes(char* s)
 
   return false;
 }
+
+
+
+/* ****************************************************************************
+*
+* forbiddenMqttTopic -
+*/
+bool forbiddenMqttTopic(const char* s)
+{
+  if (s == (void*) 0)
+  {
+    return false;
+  }
+
+  while (*s != 0)
+  {
+    switch (*s)
+    {
+    case '+':
+    case '#':
+      return true;
+    }
+
+    ++s;
+  }
+
+  return false;
+}
