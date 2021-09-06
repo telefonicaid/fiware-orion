@@ -3120,8 +3120,6 @@ static unsigned int updateEntity
         alarmMgr.badInput(clientIp, "attribute not exists");
         *attributeNotExistingError = true;
 
-        eP->attributeVector[ix]->skip = true;
-
         // Add to the list of non existing attributes - for the error response
         if (*attributeNotExistingList != "[ ")
         {
