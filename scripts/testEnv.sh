@@ -71,7 +71,6 @@ export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 #
 export MQTT_HOST=${MQTT_HOST:-localhost}
 export MQTT_PORT=${MQTT_PORT:-1883}
-export MQTT_TOPIC=${MQTT_TOPIC:-accumulate_mqtt}
 
 
 # -----------------------------------------------------------------------------
