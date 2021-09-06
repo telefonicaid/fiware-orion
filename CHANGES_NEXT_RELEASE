@@ -1,4 +1,5 @@
 - Fix: PATCH /v2/entities/ID/attrs error doesn't provide info about offending attributes (#2933)
+- Fix: TextUnrestricted recursively applies to JSON objects and array (#3867)
 - Hardening: Improve notification pool worker thread termination logic (#3877)
 - Remove: deprecated feature initial notification upon subscription creation or update
 - Fix: return 400 instead of 500 when GeoJSON syntax error occur (#3347)
