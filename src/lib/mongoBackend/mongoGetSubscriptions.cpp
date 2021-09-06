@@ -145,6 +145,19 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
 */
 static void setNotification(Subscription* subP, const orion::BSONObj& r, const std::string& tenant)
 {
+  // Type check is based in the existence of mqttTopic in the DB document. Alternativelly, any
+  // other mandatory field in MQTT subs could be used (i.e. mqttQoS)
+  if (r.hasField(CSUB_MQTTTOPIC))
+  {
+    subP->notification.type = ngsiv2::MqttNotification;
+    subP->notification.mqttInfo.fill(r);
+  }
+  else
+  {
+    subP->notification.type = ngsiv2::HttpNotification;
+    subP->notification.httpInfo.fill(r);
+  }
+
   // Attributes
   setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
@@ -153,8 +166,6 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   {
     setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
   }
-
-  subP->notification.httpInfo.fill(r);
 
   ngsiv2::Notification* nP = &subP->notification;
 

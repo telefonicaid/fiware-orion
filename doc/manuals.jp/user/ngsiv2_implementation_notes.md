@@ -16,6 +16,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
+* [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
@@ -290,6 +291,15 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 これは、`payload` を `""` に設定したり、フィールドを省略したりすることと同じではないことに注意してください。
 その場合、通知は NGSIv2 正規化形式を使用して送信されます。
+
+[トップ](#top)
+
+<a name="mqtt-notificationsmqtt-notificationsmqtt-notifications"></a>
+## MQTT 通知
+
+NGISv2 仕様で説明されているサブスクリプションの `notification` オブジェクト内の `http` および
+`httpCustom` フィールドとは別に、Orion は MQTT 通知用の `mqtt` および `mqttCustom` もサポートして
+います。このトピックは、[この特定のドキュメント](mqtt_notifications.md)でより詳細に説明されています。
 
 [トップ](#top)
 

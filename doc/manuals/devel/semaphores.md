@@ -8,6 +8,7 @@ Orion manages a number of semaphores for protection of delicate data and resourc
 * [Mongo connection pool](#mongo-connection-pool-semaphores)
 * [Metrics Manager](#metrics-manager-semaphore)
 * [Alarm Manager](#alarm-manager-semaphore)
+* [MQTT Connection Manager](#mqtt-connection-manager-semaphore)
 * [Log file](#log-file-semaphore)
 * [Notification queue](#notification-queue-semaphore)
 * [Notification queue statistics](#notification-queue-statistics-semaphore)
@@ -142,6 +143,19 @@ The semaphore protects the list of alarms and is accessed by the following metho
 * `badInputReset()`
 
 **Note:** The Alarm Manager semaphore is private in the class `AlarmManager`, **but** the methods `semTake()` and `semGive()` are **public**. This is a mistake, the methods should be private as well. They are only called from within methods of `AlarmManager`, so, no problem in making the methods private.
+
+[Top](#top)
+
+## MQTT Connection Manager semaphore
+The MQTT Connection Manager is pretty similar to the Metrics Manager, and its semaphore follows the same pattern. The class `MqttConnectionManager` has a private field called `sem` and methods:
+
+* `MqttConnectionManager::semTake()`
+* `MqttConnectionManager::semGive()`
+
+The semaphore protects the access to the connections hashmap and is accessed by the following methods:
+
+* `sendMqttNotification()`
+* `cleanup()`
 
 [Top](#top)
 
