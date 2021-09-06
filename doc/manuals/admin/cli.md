@@ -178,6 +178,7 @@ The list of available options is the following:
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
+    **-mqttMaxAge**. Max time (in seconds) that an unused MQTT connection is kept. Default: 3600
 
 ## Configuration using environment variables
 
@@ -252,3 +253,4 @@ Two facts have to be taken into account:
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
+|       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |

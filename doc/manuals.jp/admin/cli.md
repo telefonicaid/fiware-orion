@@ -104,6 +104,7 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
+-   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (秒単位)。デフォルト値: 3600
 
 ## 環境変数を使用した設定
 
@@ -178,3 +179,4 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
 |   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |
+|   ORION_MQTT_MAX_AGE      |  mqttMaxAge  |

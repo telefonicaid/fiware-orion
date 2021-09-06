@@ -94,6 +94,9 @@ curl <host>:<port>/admin/sem
     "metrics": {
         "status": "free"
      },
+    "mqttMgr": {
+        "status": "free"
+    },
     "request": {
         "status": "free"
     },

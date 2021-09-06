@@ -82,6 +82,17 @@ RUN \
     make && \
     make install && \
     ldconfig && \
+    # Install mosquitto from source
+    cd /opt && \
+    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz && \
+    tar xvf mosquitto-2.0.11.tar.gz && \
+    cd mosquitto-2.0.11 && \
+    sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
+    sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
+    sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
+    make && \
+    make install && \
+    ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
     curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz && \
@@ -116,6 +127,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
+           /opt/mosquitto-2.0.11.tar.gz \
+           /opt/mosquitto-2.0.11 \
            /opt/mongo-c-driver-1.17.4.tar.gz \
            /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \

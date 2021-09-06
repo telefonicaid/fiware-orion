@@ -81,6 +81,7 @@ echo "INSTALL: python special dependencies" \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==1.0.2 \
 && pip install pyOpenSSL==19.0.0 \
+&& pip install paho-mqtt==1.5.1 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
@@ -112,14 +113,14 @@ echo "INSTALL: gmock" \
 && make \
 && make install
 
-# FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
-# which the same procedure described in "Build from source" documentation
-#  echo "INSTALL: mosquitto" \
-#  && curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
-#  && cd /opt/mosquitto-1.5 \
-#  && make \
-#  && make install
-#  && rm -Rf /opt/mosquitto-1.5 (this one moved to the end)
+echo "INSTALL: mosquitto" \
+&& curl -kL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-2.0.11 \
+&& sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
+&& sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk \
+&& sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk \
+&& make \
+&& make install
 
 ldconfig
 
@@ -129,4 +130,5 @@ yum -y remove \
 && rm -Rf /opt/mongo-c-driver-1.17.4 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.70 \
+&& rm -Rf /opt/mosquitto-2.0.11 \
 && rm -Rf /opt/gmock-1.5.0

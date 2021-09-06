@@ -136,19 +136,59 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setCustomMqttInfo -
 */
-void setHttpInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
-  b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-  b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
-
-  LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-  LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
-
-  if (sub.notification.httpInfo.custom)
+  if (!mqttInfo.includePayload)
   {
-    setCustomHttpInfo(sub.notification.httpInfo, b);
+    b->appendNull(CSUB_PAYLOAD);
+    LM_T(LmtMongo, ("Subscription payload: null"));
+  }
+  else if (!mqttInfo.payload.empty())
+  {
+    b->append(CSUB_PAYLOAD, mqttInfo.payload);
+    LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setNotificationInfo -
+*/
+void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  if (sub.notification.type == ngsiv2::HttpNotification)
+  {
+    b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
+    b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
+
+    if (sub.notification.httpInfo.custom)
+    {
+      setCustomHttpInfo(sub.notification.httpInfo, b);
+    }
+  }
+  else  // MqttNotification
+  {
+    b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
+    b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
+    b->append(CSUB_MQTTQOS,   (int) sub.notification.mqttInfo.qos);
+    b->append(CSUB_CUSTOM,    sub.notification.mqttInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.mqttInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
+    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
+
+    if (sub.notification.mqttInfo.custom)
+    {
+      setCustomMqttInfo(sub.notification.mqttInfo, b);
+    }
   }
 }
 

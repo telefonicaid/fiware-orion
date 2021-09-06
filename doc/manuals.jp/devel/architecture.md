@@ -23,8 +23,10 @@ _現在の Orion の内部アーキテクチャ_
 	* 次に、NGSIv1 と同様に、サービス・ルーチンが呼び出されてリクエストを処理します。HTTP および URL パターンに関して、各リクエスト・タイプには、サービス・ルーチンがあります。これらの "NGSIv2 サービス・ルーチン" は、ライブラリの [**serviceRoutinesV2**](sourceCode.md#srclibserviceroutinesv2) にあります。一部の V2 サービス・ルーチンは、NGSIv1 サービス・ルーチンを呼び出すかもしれないことに注意してください。詳細は、[マッピングのドキュメント](ServiceRoutines.txt)を参照してください。
 	* 最後に、**mongoBackend** ライブラリが呼び出されます。場合によっては、V2 サービス・ルーチンから直接行うことも、上の図に示すように V1 サービス・ルーチンを介して間接的に行うこともできます
 * **mongoBackend** のライブラリは、いくつかの点で、Orion の"頭脳"です。Orion が実行する、エンティティ情報の取得、エンティティの更新、サブスクリプションの作成などのさまざまな操作を目的とした一連の関数が含まれています。このライブラリは、対応する **mongoDriver** ライブラリ (対応する [MongoDB C driver](http://mongoc.org) をラップします) を使用して MongoDB とインタフェースします。歴史的な理由から、MongoDB バックエンドのほとんどは NGSIv1 ベースです。したがって、V1 サービス・ルーチンからアクセスされます。例外は、V2 サービス・ルーチンから直接呼び出される サブスクリプション一覧などの NGSIv2 専用の操作です
-* 既存のサブスクリプションによってカバーされるエンティティを更新する結果として通知がトリガーされると、[**ngsiNotify** library](sourceCode.md#srclibngsinotify) にある通知モジュールが **mongoBackend** から呼び出され、通知が送信されます
-* `httpRequestSend()` 関数 (**残り**のライブラリの一部) は、HTTP リクエストを送信を担当しています。これは [libcurl](https://curl.haxx.se/libcurl/) の外部ライブラリに基づいています。これらの関数は、通知を送信する通知モジュール、またはいくつかの条件の下で[コンテキスト・プロバイダ](../user/context_providers.md)にクエリ/更新を転送できる **serviceRoutines** 関数によって呼び出されます。
+* 通知がトリガーされるたびに (たとえば、既存のサブスクリプションでカバーされるエンティティを更新した結果として)、通知モジュール([**ngsiNotify** ライブラリ](sourceCode.md#srclibngsinotify) にある) が **mongoBackend から呼び出されます**。このような通知を送信するため、Orion は2つの通知タイプをサポートしています
+        * HTTP 通知。この場合、`httpRequestSend()` 関数 (**rest** ライブラリの一部) が HTTP リクエストの送信を担当します。これは、[libcurl](https://curl.haxx.se/libcurl/) 外部ライブラリに基づいています
+        * MQTT 通知。この場合、`sendMqttNotification()` 関数 (**mqtt** ライブラリの一部) は、対応する MQTT broker での MQTT 通知の公開を担当します。これは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいています
+* `httpRequestSend()` 関数は、特定の条件下でクエリ/更新を[コンテキスト・プロバイダ](../user/context_providers.md) に転送できる**serviceRoutines** 関数によっても呼び出されます
 
 [トップ](#top)
 
