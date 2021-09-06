@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
 #include "rest/StringFilter.h"
@@ -56,6 +57,7 @@ class TriggeredSubscription
   long long                 lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
+  ngsiv2::MqttInfo          mqttInfo;
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
@@ -75,12 +77,14 @@ class TriggeredSubscription
                         long long                _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
+                        const ngsiv2::MqttInfo&  _mqttInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         const char*              _tenant);
 
   TriggeredSubscription(RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
+                        const ngsiv2::MqttInfo&  _mqttInfo,
                         const StringList&        _attrL);
 
   ~TriggeredSubscription();

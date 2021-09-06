@@ -690,6 +690,7 @@ function accumulatorStop()
 }
 
 
+
 # ------------------------------------------------------------------------------
 #
 # accumulatorStart - 
@@ -733,6 +734,27 @@ function accumulatorStart()
     shift
   fi
 
+  if [ "$1" = "--mqttHost" ]
+  then
+    mqttHost="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--mqttPort" ]
+  then
+    mqttPort="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--mqttTopic" ]
+  then
+    mqttPort="$1 $2"
+    shift
+    shift
+  fi
+
   bindIp=$1
   port=$2
 
@@ -749,8 +771,16 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-  echo accumulator running as PID $$
+  if [ -z "$mqttHost" ]
+  then
+    # Start without MQTT
+    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+    echo accumulator running as PID $$
+  else
+    # Start with MQTT
+    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+    echo accumulator running as PID $$
+  fi
 
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1

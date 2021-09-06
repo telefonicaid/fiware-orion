@@ -18,6 +18,18 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+          
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2
@@ -34,6 +46,18 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+          
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2
@@ -50,6 +74,18 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+          
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2
@@ -66,6 +102,18 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+          
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
 
     steps:
       - uses: actions/checkout@v2

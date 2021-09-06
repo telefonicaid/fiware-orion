@@ -9,6 +9,7 @@
   * [Pagination](pagination.md)
   * [CORS](cors.md)
   * [Geolocation ](geolocation.md)
+  * [MQTT notifications](mqtt_notifications.md)
   * [Transient Entities](transient_entities.md)
   * [Structured values for attributes](structured_attribute_valued.md)
   * [Context Providers registration and request forwarding](context_providers.md)
