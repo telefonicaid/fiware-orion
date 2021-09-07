@@ -297,6 +297,7 @@ if [ -n "${test}" ] && [ "${stage}" = "valgrind" ]; then
     _fix
 
     . scripts/testEnv.sh
+    . /opt/ft_env/bin/activate
     test/valgrind/valgrindTestSuite.sh
     if [ $? -ne 0 ]; then status=false; else status=true; fi
 
