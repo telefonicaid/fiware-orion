@@ -195,7 +195,7 @@ fi
 if [ -n "${make}" ]; then
     echo "===================================== MAKE ============================================="
 
-    # Build for valgrind is the same as build for functional
+    # Build for valgrind is the same as build for functional tests
     if [ "${stage}" = "valgrind" ]; then
       build_stage="functional"
     else
