@@ -1,9 +1,0 @@
-- Fix: PATCH /v2/entities/ID/attrs error doesn't provide info about offending attributes (#2933)
-- Fix: TextUnrestricted recursively applies to JSON objects and array (#3867)
-- Hardening: Improve notification pool worker thread termination logic (#3877)
-- Remove: deprecated feature initial notification upon subscription creation or update
-- Fix: -key and -cert files loading (was causing valgrind errors) (#3925)
-- Add: MQTT notifications (#3001)
-- Fix: return 400 instead of 500 when GeoJSON syntax error occur (#3347)
-- Fix: onlyChangedAttrs set to true not working after csubs cache refresh (#3906)
-- Fix: 400 BadRequest when attempting to DELETE with multi-servicepath or SP with '/#' (instead of silently failing) (#3071)
