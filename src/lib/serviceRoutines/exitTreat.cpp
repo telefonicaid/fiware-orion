@@ -43,6 +43,10 @@
 /* ****************************************************************************
 *
 * exitTreat -
+*
+* FIXME P5: this function maybe is no longer needed. The only known user was the exit logic
+* in valgrind test pass (functional test has been using SIGTERM since a long term or maybe
+* always) that has changed to SIGTERM due to issue https://github.com/telefonicaid/fiware-orion/issues/3809
 */
 std::string exitTreat
 (
@@ -83,19 +87,6 @@ std::string exitTreat
   }
   else
   {
-    if (subCacheState == ScsSynchronizing)
-    {
-      //
-      // Subscription Cache is busy doing a synchronization.
-      // Two secs should be enough for it to finish.
-      //
-      // Not very important anyway. This 'hack' is just to avoid
-      // false leaks in the valgrind test suite.
-      //
-      LM_W(("Subscription cache is synchronizing, wait a few seconds before dying"));
-      sleep(2);
-    }
-
     compV.clear();
     return "DIE";
   }

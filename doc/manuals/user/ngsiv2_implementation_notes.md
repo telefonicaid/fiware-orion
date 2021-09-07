@@ -16,6 +16,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot Subscription](#oneshot-subscriptions)
 * [Custom notifications without payload](#custom-notifications-without-payload)
+* [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
@@ -322,6 +323,14 @@ the notification will be sent using the NGSIv2 normalized format.
 
 [Top](#top)
 
+## MQTT notifications
+
+Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
+in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
+topic is described with more detail [in this specific document](mqtt_notifications.md).
+
+[Top](#top)
+
 ## Notify only attributes that change
 
 Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
@@ -429,7 +438,7 @@ not have been migrated yet to NGSIv2, so this mode may prove useful.
 You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
 forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
 
-Note that in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
+Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
 just use an update request with append/creation semantics).
 
 [Top](#top)

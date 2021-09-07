@@ -16,6 +16,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
+* [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
@@ -293,6 +294,15 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="mqtt-notificationsmqtt-notificationsmqtt-notifications"></a>
+## MQTT 通知
+
+NGISv2 仕様で説明されているサブスクリプションの `notification` オブジェクト内の `http` および
+`httpCustom` フィールドとは別に、Orion は MQTT 通知用の `mqtt` および `mqttCustom` もサポートして
+います。このトピックは、[この特定のドキュメント](mqtt_notifications.md)でより詳細に説明されています。
+
+[トップ](#top)
+
 <a name="notify-only-attributes-that-change"></a>
 ## 変更された属性のみを通知
 
@@ -402,7 +412,7 @@ CPrs への転送をスキップするために、クエリで `skipForwarding` 
 `GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
 されます。
 
-`skipForwarding` を転送しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+`skipForwarding` を更新しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
 セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)

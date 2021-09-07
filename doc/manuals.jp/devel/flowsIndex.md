@@ -106,9 +106,13 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
 
 通知に関連する図 (NF prefix): 
 
-* [NF-01: スレッド・プールを使用しないエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-01)
+* [NF-01: スレッド・プールを使用しないエンティティ属性の更新/作成に関する HTTP 通知](sourceCode.md#flow-nf-01)
   * MD-01 からの続きです
-* [NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-03)
+* [NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT 通知](sourceCode.md#flow-nf-01b)
+  * MD-01 からの続きです
+* [NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する HTTP 通知](sourceCode.md#flow-nf-03)
+  * MD-01 からの続きです
+* [NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT 通知](sourceCode.md#flow-nf-03b)
   * MD-01 からの続きです
 
 サブスクリプション・キャッシュに関連する図 (SC prefix):

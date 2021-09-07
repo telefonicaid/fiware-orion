@@ -51,14 +51,15 @@ typedef struct SenderThreadParams
   std::string                        from;
   std::string                        ip;
   unsigned short                     port;
-  std::string                        protocol;
+  std::string                        protocol;  // used to disinguish between mqtt and http/https notifications
   std::string                        verb;
   std::string                        tenant;
   long long                          maxFailsLimit;
   long long                          failsCounter;
   std::string                        servicePath;
   std::string                        xauthToken;
-  std::string                        resource;
+  std::string                        resource;  // path for HTTP notifications, topic for MQTT notifications
+  unsigned int                       qos;       // used only in MQTT notifications
   std::string                        content_type;
   std::string                        content;
   char                               transactionId[64];

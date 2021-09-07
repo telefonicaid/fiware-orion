@@ -52,9 +52,9 @@ extern void setExpiration(const ngsiv2::Subscription& sub, orion::BSONObjBuilder
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setNotificationInfo -
 */
-extern void setHttpInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setNotificationInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 

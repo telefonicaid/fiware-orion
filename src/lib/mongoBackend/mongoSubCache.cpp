@@ -123,11 +123,12 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 
 
   //
-  // 04.2 httpInfo
+  // 04.2 httpInfo & mqttInfo
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
   cSubP->httpInfo.fill(sub);
+  cSubP->mqttInfo.fill(sub);
 
 
   //
@@ -377,11 +378,12 @@ int mongoSubCacheItemInsert
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
 
   //
-  // httpInfo
+  // httpInfo & mqttInfo
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
   cSubP->httpInfo.fill(sub);
+  cSubP->mqttInfo.fill(sub);
 
 
   //
@@ -444,11 +446,6 @@ int mongoSubCacheItemInsert
 * 2. Lookup all subscriptions in the database
 * 3. Insert them again in the cache (with fresh data from database)
 *
-* NOTE
-*   The query for the database ONLY extracts the interesting subscriptions:
-*   - "conditions.type" << "ONCHANGE"
-*
-*   I.e. the subscriptions is for ONCHANGE.
 */
 void mongoSubCacheRefresh(const std::string& database)
 {

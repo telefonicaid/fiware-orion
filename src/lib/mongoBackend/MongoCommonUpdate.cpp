@@ -1094,6 +1094,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
+                                                           cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
@@ -1517,8 +1518,10 @@ static bool addTriggeredSubscriptions_noCache
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
+      ngsiv2::MqttInfo  mqttInfo;
 
       httpInfo.fill(sub);
+      mqttInfo.fill(sub);
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
@@ -1535,6 +1538,7 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           renderFormat,
           httpInfo,
+          mqttInfo,
           aList, "", "");
 
       if (!onlyChanged)
@@ -1692,7 +1696,7 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
-  const ngsiv2::HttpInfo&          httpInfo,
+  const ngsiv2::Notification&      notification,
   bool                             blacklist = false
 )
 {
@@ -1750,7 +1754,7 @@ static bool processOnChangeConditionForUpdateContext
 
   ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(ncr,
-                                          httpInfo,
+                                          notification,
                                           tenant,
                                           maxFailsLimit,
                                           failsCounter,
@@ -1887,6 +1891,12 @@ static unsigned int processSubscriptions
 
     bool  notificationSent;
 
+    // Build notification object. We use topic empty-ness to know the type
+    ngsiv2::Notification notification;
+    notification.httpInfo = tSubP->httpInfo;
+    notification.mqttInfo = tSubP->mqttInfo;
+    notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
+
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
                                                                 tSubP->metadata,
@@ -1898,7 +1908,7 @@ static unsigned int processSubscriptions
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
-                                                                tSubP->httpInfo,
+                                                                notification,
                                                                 tSubP->blacklist);
 
     if (notificationSent)

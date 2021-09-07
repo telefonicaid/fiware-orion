@@ -83,13 +83,13 @@ static void setExpiration(const SubscriptionUpdate& subUp, const orion::BSONObj&
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setNotificationInfo -
 */
-static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subUp.notificationProvided)
   {
-    setHttpInfo(subUp, b);
+    setNotificationInfo(subUp, b);
   }
   else
   {
@@ -133,6 +133,22 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
       b->append(CSUB_PAYLOAD, payload);
       LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_MQTTTOPIC))
+    {
+      std::string topic = getStringFieldF(subOrig, CSUB_MQTTTOPIC);
+
+      b->append(CSUB_MQTTTOPIC, topic);
+      LM_T(LmtMongo, ("Subscription mqttTopic: %s", topic.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_MQTTQOS))
+    {
+      int qos = getIntFieldF(subOrig, CSUB_MQTTQOS);
+
+      b->append(CSUB_MQTTQOS, qos);
+      LM_T(LmtMongo, ("Subscription mqttQos:   %d", qos));
     }
   }
 }
@@ -851,7 +867,7 @@ std::string mongoUpdateSubscription
   }
 
   setExpiration(subUp, subOrig, &b);
-  setHttpInfo(subUp, subOrig, &b);
+  setNotificationInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
   setMaxFailsLimit(subUp, subOrig, &b);
   setServicePath(servicePath, &b);
