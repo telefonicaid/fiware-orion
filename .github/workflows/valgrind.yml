@@ -90,7 +90,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run valgrind test
-        # By the moment FT_FROM_IX and FT_TO_IX doesn't work with valgrind
         run: |
           docker run  --privileged --network host -t --rm -e FT_FROM_IX=601 -e FT_TO_IX=900 -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind
 
