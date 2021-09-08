@@ -42,7 +42,7 @@ License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
 Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
-URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
+URL:        https://github.com/telefonicaid/fiware-orion
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
 Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate, libuuid
