@@ -343,7 +343,8 @@ static bool updateForward
       upcrsP->fill(upcrP, SccOk);
       return true;
     }
-    if (statusCode == SccContextElementNotFound)
+    // SccInvalidModification is the case por partial updates
+    if ((statusCode == SccContextElementNotFound) || (statusCode == SccInvalidModification))
     {
       upcrsP->fill(upcrP, SccContextElementNotFound);
       return true;
