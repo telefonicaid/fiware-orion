@@ -157,7 +157,7 @@ shift $((OPTIND-1))
 
 echo "===================================== CHECKS ==========================================="
 
-echo "Builder: if upload is on, check if credentials exists"
+echo "Builder: if upload is on, check if credentials exist"
 if [ -n "${upload}" ]; then
     if [ -z "${REPO_USER}" ] || [ -z "${REPO_PASSWORD}" ]; then
         echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables not set"; exit 1;
