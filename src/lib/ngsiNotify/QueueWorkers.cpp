@@ -166,8 +166,7 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
@@ -198,27 +197,6 @@ static void* workerFunc(void* pSyncQ)
       }
       else // we'll send the notification
       {
-        int          r;
-        
-        r =  httpRequestSendWithCurl(curl,
-                                     params->from,
-                                     params->ip,
-                                     params->port,
-                                     params->protocol,
-                                     params->verb,
-                                     params->tenant,
-                                     params->maxFailsLimit,
-                                     params->failsCounter,
-                                     params->servicePath,
-                                     params->xauthToken,
-                                     params->resource,
-                                     params->content_type,
-                                     params->content,
-                                     params->fiwareCorrelator,
-                                     params->renderFormat,
-                                     &out,
-                                     &statusCode,
-                                     params->extraHeaders);
         int  r;
 
         if (params->protocol == "mqtt:")
@@ -245,6 +223,8 @@ static void* workerFunc(void* pSyncQ)
                                        params->protocol,
                                        params->verb,
                                        params->tenant,
+                                       params->maxFailsLimit,
+                                       params->failsCounter,
                                        params->servicePath,
                                        params->xauthToken,
                                        params->resource,

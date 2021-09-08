@@ -492,50 +492,30 @@ static void mongoSubCountersUpdateCount
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
-  long long           count
+  long long           count,
+  long long           failsCounter
 )
 {
   orion::BSONObjBuilder  condition;
   orion::BSONObjBuilder  update;
   orion::BSONObjBuilder  countB;
+  orion::BSONObjBuilder  failsCounterB;
+
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
   countB.append(CSUB_COUNT, count);
   update.append("$inc", countB.obj());
 
+  if (failsCounter > 0)
+  {
+  failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
+  update.append("$inc", failsCounterB.obj());
+  }
+
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCountersUpdatefailsCounter -
-*/
-static void mongoSubCountersUpdatefailsCounter
-(
-  const std::string&  db,
-  const std::string&  collection,
-  const std::string&  subId,
-  long long           failsCounter
-)
-{
-  orion::BSONObjBuilder  condition;
-  orion::BSONObjBuilder  update;
-  orion::BSONObjBuilder  failsCounterB;
-  std::string  err;
-
-  condition.append("_id", orion::OID(subId));
-  failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
-  update.append("$inc", failsCounterB.obj());
-
-  if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
-  {
-    LM_E(("Internal Error (error updating 'failCounter' for a subscription)"));
   }
 }
 
@@ -738,12 +718,7 @@ void mongoSubCountersUpdate
 
   if (count > 0)
   {
-    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count);
-  }
-
-  if (failsCounter > 0)
-  {
-    mongoSubCountersUpdatefailsCounter(db, COL_CSUBS, subId, failsCounter);
+    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter);
   }
 
   if (lastNotificationTime > 0)

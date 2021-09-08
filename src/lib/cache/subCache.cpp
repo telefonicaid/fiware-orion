@@ -773,7 +773,7 @@ void subCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
-  cSubP->failsCounter          = 0;
+  cSubP->failsCounter          = failsCounter;
   cSubP->maxFailsLimit         = maxFailsLimit;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -1287,12 +1287,12 @@ void subNotificationErrorStatus
     if (errors == 0)
     {
       // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, -1, now, -1, now, "", statusCode);
     }
     else
     {
       // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, now, -1, failureReason, -1);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, -1, now, now, -1, failureReason, -1);
     }
 
     return;

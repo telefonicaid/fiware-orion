@@ -65,8 +65,7 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
@@ -87,27 +86,7 @@ void* startSenderThread(void* p)
     {
       int          r;
 
-      r = httpRequestSend(params->from,
-                          params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant,
-                          params->maxFailsLimit,
-                          params->failsCounter,
-                          params->servicePath,
-                          params->xauthToken,
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          params->fiwareCorrelator,
-                          params->renderFormat,
-                          &out,
-                          &statusCode,
-                          params->extraHeaders);
-
       LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
-      int  r;
 
       if (params->protocol == "mqtt:")
       {
@@ -132,6 +111,8 @@ void* startSenderThread(void* p)
                             params->protocol,
                             params->verb,
                             params->tenant,
+                            params->maxFailsLimit,
+                            params->failsCounter,
                             params->servicePath,
                             params->xauthToken,
                             params->resource,
