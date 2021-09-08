@@ -3006,6 +3006,8 @@ static unsigned int updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
+  bool*                           attributeNotExistingError,
+  std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
@@ -3016,6 +3018,9 @@ static unsigned int updateEntity
   // Used to accumulate error response information
   *attributeAlreadyExistsError         = false;
   *attributeAlreadyExistsList          = "[ ";
+
+  *attributeNotExistingError           = false;
+  *attributeNotExistingList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -3116,6 +3121,26 @@ static unsigned int updateEntity
       }
     }
     *attributeAlreadyExistsList += " ]";
+  }
+
+  if ((apiVersion == V2) && (action == ActionTypeUpdate))
+  {
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+    {
+      if (!attrs.hasField (eP->attributeVector[ix]->name))
+      {
+        alarmMgr.badInput(clientIp, "attribute not exists");
+        *attributeNotExistingError = true;
+
+        // Add to the list of non existing attributes - for the error response
+        if (*attributeNotExistingList != "[ ")
+        {
+          *attributeNotExistingList += ", ";
+        }
+        *attributeNotExistingList += eP->attributeVector[ix]->name;
+      }
+    }
+    *attributeNotExistingList += " ]";
   }
 
   /* Build CER used for notifying (if needed) */
@@ -3663,6 +3688,10 @@ unsigned int processContextElement
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
+
+  bool         attributeNotExistingError = false;
+  std::string  attributeNotExistingList  = "[ ";
+
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
@@ -3676,6 +3705,8 @@ unsigned int processContextElement
                              responseP,
                              &attributeAlreadyExistsError,
                              &attributeAlreadyExistsList,
+                             &attributeNotExistingError,
+                             &attributeNotExistingList,
                              forcedUpdate,
                              apiVersion,
                              fiwareCorrelator,
@@ -3843,6 +3874,13 @@ unsigned int processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+  }
+
+  if (attributeNotExistingError == true)
+  {
+    std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
   }

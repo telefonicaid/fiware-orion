@@ -1140,7 +1140,7 @@ int main(int argC, char* argV[])
                         &serviceV,
                         &serviceQueueSizeV,
                         &serviceNumThreadV);
-  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, service with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, services with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
 
   if ((strcmp(notifFlowControl, "") != 0) && (strcmp(notificationMode, "threadpool") != 0))
   {

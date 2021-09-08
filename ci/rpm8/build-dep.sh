@@ -35,6 +35,7 @@ yum -y install \
   openssl-devel \
   libuuid-devel \
   make \
+  valgrind \
   mongodb-org-shell \
   nc \
   python2 \
