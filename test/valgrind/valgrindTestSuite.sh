@@ -78,6 +78,7 @@ function usage()
   echo "$empty [-leakTest (test a memory leak)]"
   echo "$empty [-dryLeaks (simulate leaks and functest errors)]"
   echo "$empty [-fromIx <index of test where to start>]"
+  echo "$empty [-toIx <index of test where to end>]"
   echo "$empty [-ixList <list of testNo indexes>]"
   echo "$empty [test case file]"
 
@@ -145,12 +146,14 @@ fi
 # Parsing parameters
 #
 typeset -i fromIx
+typeset -i toIx
 verbose=off
 TEST_FILTER=${TEST_FILTER:-"*.*test"}
 dryrun=off
 leakTest=off
 dryLeaks=off
 fromIx=0
+toIx=0
 ixList=""
 file=""
 vMsg "parsing options"
@@ -163,6 +166,7 @@ do
   elif [ "$1" == "-dryrun" ];   then dryrun=on;
   elif [ "$1" == "-dryLeaks" ]; then dryLeaks=on;
   elif [ "$1" == "-fromIx" ];   then  shift; fromIx=$1;
+  elif [ "$1" == "-toIx" ];     then  shift; toIx=$1;
   elif [ "$1" == "-ixList" ];   then  shift; ixList=$1;
   else
     if [ "$file" == "" ]
@@ -176,6 +180,30 @@ do
   fi
   shift
 done
+
+# -----------------------------------------------------------------------------
+#
+# Check if fromIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
+then
+  fromIx=$FT_FROM_IX
+  unset FT_FROM_IX
+fi
+
+# -----------------------------------------------------------------------------
+#
+# Check if toIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
+then
+  toIx=$FT_TO_IX
+  unset FT_TO_IX
+fi
+
+echo "Run tests $fromIx to $toIx"
 
 if [ "$dryrun" == "on" ]
 then
@@ -495,12 +523,14 @@ then
     testNo=$testNo+1
     xTestNo=$(printf "%03d" $testNo)
 
-    if [ $fromIx != 0 ]
+    if [ $fromIx != 0 ] && [ $testNo -lt $fromIx ]
     then
-      if [ $testNo -lt $fromIx ]
-      then
-        continue
-      fi
+      continue
+    fi
+
+    if [ $toIx != 0 ] && [ $testNo -gt $toIx ]
+    then
+      continue;
     fi
 
     if [ "$ixList" != "" ]
