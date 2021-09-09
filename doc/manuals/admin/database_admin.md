@@ -23,8 +23,7 @@ site](https://education.mongodb.com/)). Otherwise, we recommend to be very caref
 The usual procedure for MongoDB databases is used.
 
 Use mongobackup command to get a backup of the Orion Context Broker
-database. It is strongly recommended that you stop the broker before
-doing a backup.
+database. In case a sharded MongoDB is used, the broker needs to be stopped before the backup or one of the tools mentioned in the [MongoDB-Documentation](https://docs.mongodb.com/manual/administration/backup-sharded-clusters/) has to be used.
 
 ```
 mongodump --host <dbhost> --db <db>
