@@ -12,6 +12,7 @@ env:
 jobs:
   valgrind:
     runs-on: ubuntu-18.04
+    continue-on-error: true
 
     services:
       mongodb:
