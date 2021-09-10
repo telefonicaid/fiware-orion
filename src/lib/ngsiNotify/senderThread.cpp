@@ -88,6 +88,8 @@ void* startSenderThread(void* p)
 
       LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
 
+      CachedSubscription*  cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+
       if (params->protocol == "mqtt:")
       {
         // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
@@ -148,14 +150,18 @@ void* startSenderThread(void* p)
 
         if ((params->failsCounter)  > (params->maxFailsLimit)) 
         {
-           orion::BSONObjBuilder bobSet1;
-           bobSet1.append(CSUB_STATUS, STATUS_INACTIVE);
+           orion::BSONObjBuilder bobSet;
            orion::BSONObjBuilder bobUpdate;
-           bobUpdate.append("$set", bobSet1.obj());
-           orion::BSONObj         query;
-           std::string err;
+           orion::BSONObj        query;
+           std::string           err;
 
-           orion::collectionUpdate(composeDatabaseName(params->tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+           bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+           bobUpdate.append("$set", bobSet.obj());
+            
+           // update the status to inactive (in both DB and csubs cache)
+           orion::collectionUpdate(composeDatabaseName(params->tenant), params->subscriptionId, query, bobUpdate.obj(), false, &err);
+           
+           cSubP->status == STATUS_INACTIVE;
         }
 
         if (params->registration == false)

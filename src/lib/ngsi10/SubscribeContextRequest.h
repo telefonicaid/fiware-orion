@@ -35,6 +35,7 @@
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/Reference.h"
 #include "ngsi/MaxFailsLimit.h"
+#include "ngsi/FailsCounter.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Throttling.h"
 #include "rest/EntityTypeInfo.h"

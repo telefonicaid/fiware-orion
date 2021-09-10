@@ -221,10 +221,10 @@ void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setFailsCounter -
 */
-void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b)
+void setFailsCounter(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  b->append(CSUB_FAILSCOUNTER, failsCounter);
-  LM_T(LmtMongo, ("Subscription failsCounter: %lu", failsCounter));
+  b->append(CSUB_FAILSCOUNTER, sub.failsCounter);
+  LM_T(LmtMongo, ("Subscription failsCounter: %lu", sub.failsCounter));
 }
 
 

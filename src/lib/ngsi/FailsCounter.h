@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
-#define SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
+#ifndef SRC_LIB_NGSI_FAILSCOUNTER_H_
+#define SRC_LIB_NGSI_FAILSCOUNTER_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,33 +25,32 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>
 #include <string>
 
 #include "ngsi/Request.h"
-#include "ngsi/EntityId.h"
-#include "ngsi/Duration.h"
-#include "ngsi/NotifyCondition.h"
-#include "ngsi/Restriction.h"
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/NotifyConditionVector.h"
-#include "ngsi/Throttling.h"
-#include "ngsi/FailsCounter.h"
-#include "ngsi10/SubscribeContextRequest.h"
-#include "apiTypesV2/SubscriptionUpdate.h"
+
 
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionRequest -
+* FailsCounter - 
 */
-struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
+typedef struct FailsCounter
 {
-  SubscriptionId                 subscriptionId;         // Mandatory
+  std::string   string;
+  int64_t       seconds;
 
-  UpdateContextSubscriptionRequest();  
-  std::string check(const std::string& predetectedError, int counter);
-  void        release(void);
-  void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
-};
+  FailsCounter(): seconds(-1) {}
 
-#endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
+  void               set(const std::string& value);
+  const std::string  get(void);
+  bool               isEmpty(void);
+  std::string        toJsonV1(bool comma);
+
+  std::string        check(void);
+
+  int64_t            parse(void);
+} FailsCounter;
+
+#endif  // SRC_LIB_NGSI_FAILSCOUNTER_H_

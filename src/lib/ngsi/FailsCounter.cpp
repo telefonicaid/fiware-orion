@@ -30,14 +30,14 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
-#include "ngsi/MaxFailsLimit.h"
+#include "ngsi/FailsCounter.h"
 
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::parse -
+* FailsCounter::parse -
 */
-int64_t MaxFailsLimit::parse(void)
+int64_t FailsCounter::parse(void)
 {
   seconds = parse8601(string);
   return seconds;
@@ -47,9 +47,9 @@ int64_t MaxFailsLimit::parse(void)
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::check -
+* FailsCounter::check -
 */
-std::string MaxFailsLimit::check(void)
+std::string FailsCounter::check(void)
 {
   if (string.empty())
   {
@@ -58,7 +58,7 @@ std::string MaxFailsLimit::check(void)
 
   if (parse() == -1)
   {
-    return "syntax error in maxFailsLimit string";
+    return "syntax error in failsCounter string";
   }
 
   return "OK";
@@ -68,9 +68,9 @@ std::string MaxFailsLimit::check(void)
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::isEmpty -
+* FailsCounter::isEmpty -
 */
-bool MaxFailsLimit::isEmpty(void)
+bool FailsCounter::isEmpty(void)
 {
   return (string.empty())? true : false;
 }
@@ -79,9 +79,9 @@ bool MaxFailsLimit::isEmpty(void)
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::set -
+* FailsCounter::set -
 */
-void MaxFailsLimit::set(const std::string& value)
+void FailsCounter::set(const std::string& value)
 {
   string = value;
 }
@@ -90,9 +90,9 @@ void MaxFailsLimit::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::get -
+* FailsCounter::get -
 */
-const std::string MaxFailsLimit::get(void)
+const std::string FailsCounter::get(void)
 {
   return string;
 }
@@ -101,14 +101,14 @@ const std::string MaxFailsLimit::get(void)
 
 /* ****************************************************************************
 *
-* MaxFailsLimit::toJsonV1 -
+* FailsCounter::toJsonV1 -
 */
-std::string MaxFailsLimit::toJsonV1(bool comma)
+std::string FailsCounter::toJsonV1(bool comma)
 {
   if (string.empty())
   {
     return "";
   }
 
-  return valueTag("maxFailsLimit", string, comma);
+  return valueTag("FailsCounter", string, comma);
 }

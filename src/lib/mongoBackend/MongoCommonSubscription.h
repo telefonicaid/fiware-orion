@@ -78,7 +78,7 @@ extern void setMaxFailsLimit(const ngsiv2::Subscription& sub, orion::BSONObjBuil
 *
 * setFailsCounter -
 */
-extern void setFailsCounter(long long failsCounter, orion::BSONObjBuilder* b);
+extern void setFailsCounter(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 /* ****************************************************************************

@@ -118,7 +118,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("timesSent", this->timesSent);
   }
 
-  if ((this->failsCounter> 0) && (this->maxFailsLimit> 0))
+  if ((this->failsCounter > 0) && (this->maxFailsLimit > 0))
   {
     jh.addNumber("failsCounter", this->failsCounter);
   }

@@ -257,6 +257,22 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->maxFailsLimit = 0;  // Default value if not provided at creation => no maxFailsLimit
   }
 
+  //FailsCounter
+  Opt<int64_t> failsCounterOpt = getInt64Opt(document, "failsCounter");
+  if (!failsCounterOpt.ok())
+  {
+    return badInput(ciP, failsCounterOpt.error);
+  }
+  else if (failsCounterOpt.given)
+  {
+    subsP->failsCounterProvided = true;
+    subsP->failsCounter = failsCounterOpt.value;
+  }
+  else if (!update)
+  {
+    subsP->failsCounter = 0;
+  }
+
   return "OK";
 }
 

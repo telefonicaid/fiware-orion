@@ -1292,7 +1292,7 @@ void subNotificationErrorStatus
     else
     {
       // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, -1, now, now, -1, failureReason, -1);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1);
     }
 
     return;
@@ -1315,11 +1315,13 @@ void subNotificationErrorStatus
 
   if (errors == 0)
   {
+    subP->failsCounter    = 0;
     subP->lastSuccess     = now;
     subP->lastSuccessCode = statusCode;
   }
   else
   {
+    subP->failsCounter     += 1;
     subP->lastFailure       = now;
     subP->lastFailureReason = failureReason;
   }
