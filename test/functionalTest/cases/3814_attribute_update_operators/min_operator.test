@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute update operator: inc
+Attribute update operator: min
 
 --SHELL-INIT--
 dbInit CB
@@ -30,19 +30,19 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity E with A=1
-# 02. Update A with $inc: 2
-# 03. Get entity, see E-A=3
+# 01. Create entity E with A=5
+# 02. Update A with $min: 2
+# 03. Get entity, see E-A=2
 #
 
 
-echo '01. Create entity E with A=1'
+echo '01. Create entity E with A=5'
 echo '============================'
 payload='{
   "id": "E",
   "type": "T",
   "A": {
-    "value": 1,
+    "value": 5,
     "type": "Number"
   }
 }'
@@ -51,11 +51,11 @@ echo
 echo
 
 
-echo '02. Update A with $inc: 2'
+echo '02. Update A with $min: 2'
 echo '========================='
 payload='{
   "A": {
-    "value": { "$inc": 2 },
+    "value": { "$min": 2 },
     "type": "Number"
   }
 }'
@@ -64,7 +64,7 @@ echo
 echo
 
 
-echo '03. Get entity, see E-A=3'
+echo '03. Get entity, see E-A=2'
 echo '========================='
 orionCurl --url /v2/entities/E
 echo
@@ -72,7 +72,7 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with A=1
+01. Create entity E with A=5
 ============================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -82,7 +82,7 @@ Date: REGEX(.*)
 
 
 
-02. Update A with $inc: 2
+02. Update A with $min: 2
 =========================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -90,7 +90,7 @@ Date: REGEX(.*)
 
 
 
-03. Get entity, see E-A=3
+03. Get entity, see E-A=2
 =========================
 HTTP/1.1 200 OK
 Content-Length: 67
@@ -102,7 +102,7 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Number",
-        "value": 3
+        "value": 2
     },
     "id": "E",
     "type": "T"

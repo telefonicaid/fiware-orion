@@ -485,7 +485,10 @@ static bool calculateOperatorUsage(ContextAttribute* caP)
     return false;
   }
 
-  if (caP->compoundValueP->childV[0]->name == "$inc")
+  if ((caP->compoundValueP->childV[0]->name == "$inc") ||
+      (caP->compoundValueP->childV[0]->name == "$min") ||
+      (caP->compoundValueP->childV[0]->name == "$max") ||
+      (caP->compoundValueP->childV[0]->name == "$mul"))
   {
     return true;
   }
@@ -3003,11 +3006,13 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 /* ****************************************************************************
 *
-* calculateOperatorInc -
+* calculateOperatorAritmetic -
 *
-* Return bool if some content has been added to toInc
+* Return bool if some content has been added to the BSONObjBuilders passed as parameter
+* This funcion covers $inc, $min, $max, $mul. Note that $min and $max allow a non-numerica
+* value, but that case is weird and we specifically check for orion::ValueTypeNumber
 */
-bool calculateOperatorInc(ContextElementResponse* cerP, orion::BSONObjBuilder* toInc)
+static bool calculateOperatorAritmetic(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
 {
   bool r = false;
 
@@ -3016,9 +3021,9 @@ bool calculateOperatorInc(ContextElementResponse* cerP, orion::BSONObjBuilder* t
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
     if (attr->compoundValueP != NULL)
     {
-      if ((attr->compoundValueP->childV[0]->name == "$inc") && (attr->compoundValueP->childV[0]->valueType == orion::ValueTypeNumber))
+      if ((attr->compoundValueP->childV[0]->name == op) && (attr->compoundValueP->childV[0]->valueType == orion::ValueTypeNumber))
       {
-        toInc->append(std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE, attr->compoundValueP->childV[0]->numberValue);
+        b->append(std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE, attr->compoundValueP->childV[0]->numberValue);
         r = true;
       }
     }
@@ -3377,12 +3382,27 @@ static unsigned int updateEntity
     }
 
     orion::BSONObjBuilder toInc;
-    // Note we call calculateOperator functions using notifyCerP instead than eP, given that
+    orion::BSONObjBuilder toMin;
+    orion::BSONObjBuilder toMax;
+    orion::BSONObjBuilder toMul;
+    // Note we call calculateOperator* function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
-    if (calculateOperatorInc(notifyCerP, &toInc))
+    if (calculateOperatorAritmetic(notifyCerP, "$inc", &toInc))
     {
       updatedEntity.append("$inc", toInc.obj());
+    }
+    if (calculateOperatorAritmetic(notifyCerP, "$min", &toInc))
+    {
+      updatedEntity.append("$min", toInc.obj());
+    }
+    if (calculateOperatorAritmetic(notifyCerP, "$max", &toInc))
+    {
+      updatedEntity.append("$max", toInc.obj());
+    }
+    if (calculateOperatorAritmetic(notifyCerP, "$mul", &toInc))
+    {
+      updatedEntity.append("$mul", toInc.obj());
     }
   }
 
