@@ -470,6 +470,29 @@ static void appendMetadata
   }
 }
 
+/* ****************************************************************************
+*
+* calculatedOperatorUsage -
+*
+* Returns true if some calculated operator ($inc, etc.) is in use, so the
+* appending value has to be skipped in mergeAttrInfo (given that a caculateOperatorXXX()
+* will include it)
+*/
+static bool calculateOperatorUsage(ContextAttribute* caP)
+{
+  if (caP->compoundValueP == NULL)
+  {
+    return false;
+  }
+
+  if (caP->compoundValueP->childV[0]->name == "$inc")
+  {
+    return true;
+  }
+
+  return false;
+}
+
 
 
 /* ****************************************************************************
@@ -477,19 +500,28 @@ static void appendMetadata
 * mergeAttrInfo -
 *
 * Takes as input the information of a given attribute, both in database (attr) and
-* request (caP), and merged them producing the mergedAttr output. The function returns
+* request (caP), and merged them in the toSet builder. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, orion::BSONObj* mergedAttr, const bool& forcedUpdate, ApiVersion apiVersion)
+static bool mergeAttrInfo
+(
+  const orion::BSONObj&   attr,
+  ContextAttribute*       caP,
+  const std::string&      composedName,
+  orion::BSONObjBuilder*  toSet,
+  const bool&             forcedUpdate,
+  ApiVersion              apiVersion
+)
 {
-  orion::BSONObjBuilder ab;
-
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+    if (!calculateOperatorUsage(caP))
+    {
+      caP->valueBson(composedName, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+    }
   }
   else
   {
@@ -500,27 +532,27 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
     switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
     case orion::Object:
-      ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::Array:
-      ab.append(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::NumberDouble:
-      ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::Bool:
-      ab.append(ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::String:
-      ab.append(ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::jstNULL:
-      ab.appendNull(ENT_ATTRS_VALUE);
+      toSet->appendNull(composedName + "." + ENT_ATTRS_VALUE);
       break;
 
     default:
@@ -531,13 +563,13 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   /* 2. Add type, if present in request. If not, just use the one that is already present in the database. */
   if (!caP->type.empty())
   {
-    ab.append(ENT_ATTRS_TYPE, caP->type);
+    toSet->append(composedName + "." + ENT_ATTRS_TYPE, caP->type);
   }
   else
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, getStringFieldF(attr, ENT_ATTRS_TYPE));
+      toSet->append(composedName + "." + ENT_ATTRS_TYPE, getStringFieldF(attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -597,14 +629,14 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
 
   if (mdNew.nFields() > 0)
   {
-    ab.append(ENT_ATTRS_MD, mdNew);
+    toSet->append(composedName + "." + ENT_ATTRS_MD, mdNew);
   }
-  ab.append(ENT_ATTRS_MDNAMES, mdNamesBuilder.arr());
+  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNamesBuilder.arr());
 
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE));
+    toSet->append(composedName + "." + ENT_ATTRS_CREATION_DATE, getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -637,7 +669,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   /* 5. Add modification date (actual change only if actual update) */
   if (actualUpdate)
   {
-    ab.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
+    toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
   }
   else
   {
@@ -645,11 +677,9 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
-
-  *mergedAttr = ab.obj();
 
   return actualUpdate;
 }
@@ -736,6 +766,7 @@ static bool updateAttribute
   *actualUpdate = false;
 
   std::string effectiveName = dbEncode(caP->name);
+  const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   if (isReplace)
   {
@@ -790,12 +821,7 @@ static bool updateAttribute
     orion::BSONObj newAttr;
     orion::BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, forcedUpdate, apiVersion);
-    if (*actualUpdate)
-    {
-      const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-      toSet->append(composedName, newAttr);
-    }
+    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, forcedUpdate, apiVersion);
   }
 
   return true;
@@ -2975,6 +3001,33 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 }
 
 
+/* ****************************************************************************
+*
+* calculateOperatorInc -
+*
+* Return bool if some content has been added to toInc
+*/
+bool calculateOperatorInc(ContextElementResponse* cerP, orion::BSONObjBuilder* toInc)
+{
+  bool r = false;
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
+  {
+    ContextAttribute* attr = cerP->entity.attributeVector[ix];
+    if (attr->compoundValueP != NULL)
+    {
+      if ((attr->compoundValueP->childV[0]->name == "$inc") && (attr->compoundValueP->childV[0]->valueType == orion::ValueTypeNumber))
+      {
+        toInc->append(std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE, attr->compoundValueP->childV[0]->numberValue);
+        r = true;
+      }
+    }
+  }
+
+  return r;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -3321,6 +3374,15 @@ static unsigned int updateEntity
       orion::BSONObjBuilder bobAttrs;
       bobAttrs.append(ENT_ATTRNAMES, toPull.arr());
       updatedEntity.append("$pullAll", bobAttrs.obj());
+    }
+
+    orion::BSONObjBuilder toInc;
+    // Note we call calculateOperator functions using notifyCerP instead than eP, given that
+    // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
+    // processing process)
+    if (calculateOperatorInc(notifyCerP, &toInc))
+    {
+      updatedEntity.append("$inc", toInc.obj());
     }
   }
 

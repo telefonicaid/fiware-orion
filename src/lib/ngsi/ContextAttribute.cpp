@@ -53,6 +53,10 @@
 *
 * ContextAttribute::bsonAppendAttrValue -
 *
+* Used to render attribute value to BSON, using a intermediate BSONObjBuilder. To
+* be used by the APPEND and REPLACE logic
+*
+* FIXME PR: try to unify both functions
 */
 void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
@@ -131,9 +135,103 @@ void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, cons
 
 /* ****************************************************************************
 *
+* ContextAttribute::bsonAppendAttrValue -
+*
+* Used to render attribute value to BSON, directly in the toSet builder. To
+* be used by the UPDATE logic
+*
+* FIXME PR: try to unify both functions
+*
+*/
+void ContextAttribute::bsonAppendAttrValue
+(
+  const std::string&      composedName,
+  orion::BSONObjBuilder*  toSet,
+  const std::string&      attrType,
+  bool                    autocast
+) const
+{
+  std::string effectiveStringValue = stringValue;
+  bool        effectiveBoolValue   = boolValue;
+  double      effectiveNumberValue = numberValue;
+  orion::ValueType   effectiveValueType   = valueType;
+
+  // Checking for ValueTypeString is an additional safety measure (ensuring that the attribute came from NGSIv1 in plain text)
+  if ((autocast) && (effectiveValueType == orion::ValueTypeString))
+  {
+    // Autocast only for selected attribute types
+    if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
+    {
+      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      {
+        effectiveValueType = orion::ValueTypeNumber;
+      }
+      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
+    }
+    if (attrType == DEFAULT_ATTR_BOOL_TYPE)
+    {
+      // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
+      // valid true/false values and JSON spec mandates exactly true or false
+      if (effectiveStringValue == "true")
+      {
+        effectiveBoolValue = true;
+        effectiveValueType = orion::ValueTypeBoolean;
+      }
+      else if (effectiveStringValue == "false")
+      {
+        effectiveBoolValue = false;
+        effectiveValueType = orion::ValueTypeBoolean;
+      }
+      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
+    }
+    if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
+    {
+      effectiveNumberValue = parse8601Time(effectiveStringValue);
+      if (effectiveNumberValue != -1)
+      {
+        effectiveValueType = orion::ValueTypeNumber;
+      }
+      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+    }
+  }
+
+  switch (effectiveValueType)
+  {
+    case orion::ValueTypeString:
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, effectiveStringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, effectiveNumberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, effectiveBoolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      toSet->appendNull(composedName + "." + ENT_ATTRS_VALUE);
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::valueBson -
 *
-* Used to render attribute value to BSON, appended into the bsonAttr builder
+* Used to render attribute value to BSON, using a intermediate BSONObjBuilder. To
+* be used by the APPEND and REPLACE logic
+*
+* FIXME PR: try to unify both functions
 */
 void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
 {
@@ -175,6 +273,80 @@ void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::str
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
+    {
+      LM_E(("Runtime Error (value not given in compound value)"));
+    }
+    else
+    {
+      LM_E(("Runtime Error (Unknown type in compound value)"));
+    }
+  }
+}
+
+
+
+
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::valueBson -
+*
+* Used to render attribute value to BSON, directly in the toSet builder. To
+* be used by the UPDATE logic
+*
+* FIXME PR: try to unify both functions
+*/
+void ContextAttribute::valueBson
+(
+  const std::string&      composedName,
+  orion::BSONObjBuilder*  toSet,
+  const std::string&      attrType,
+  bool                    autocast,
+  bool                    strings2numbers
+) const
+{
+  if (compoundValueP == NULL)
+  {
+    bsonAppendAttrValue(composedName, toSet, attrType, autocast);
+  }
+  else
+  {
+    if (compoundValueP->valueType == orion::ValueTypeVector)
+    {
+      orion::BSONArrayBuilder b;
+      compoundValueBson(compoundValueP->childV, b, strings2numbers);
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, b.arr());
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeObject)
+    {
+      orion::BSONObjBuilder b;
+
+      compoundValueBson(compoundValueP->childV, b, strings2numbers);
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, b.obj());
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeString)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, compoundValueP->stringValue);
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeNumber)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, compoundValueP->numberValue);
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeBoolean)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      toSet->append(composedName + "." + ENT_ATTRS_VALUE, compoundValueP->boolValue);
+    }
+    else if (compoundValueP->valueType == orion::ValueTypeNull)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      toSet->appendNull(composedName + "." + ENT_ATTRS_VALUE);
     }
     else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
     {
