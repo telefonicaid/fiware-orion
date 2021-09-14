@@ -513,6 +513,9 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
 * Takes as input the information of a given attribute, both in database (attr) and
 * request (caP), and merged them in the toSet builder. The function returns
 * true if it was an actual update, false otherwise.
+*
+* You may wonder why we need toUnset if this function is not related with delete attribute
+* logic. However, it's need to "clean" metadata in some cases.
 */
 static bool mergeAttrInfo
 (
@@ -520,6 +523,7 @@ static bool mergeAttrInfo
   ContextAttribute*       caP,
   const std::string&      composedName,
   orion::BSONObjBuilder*  toSet,
+  orion::BSONObjBuilder*  toUnset,
   const bool&             forcedUpdate,
   ApiVersion              apiVersion
 )
@@ -642,6 +646,11 @@ static bool mergeAttrInfo
   {
     toSet->append(composedName + "." + ENT_ATTRS_MD, mdNew);
   }
+  else
+  {
+    // No metadata, so we remove the field
+    toUnset->append(composedName + "." + ENT_ATTRS_MD, 1);
+  }
   toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNamesBuilder.arr());
 
   /* 4. Add creation date */
@@ -761,11 +770,15 @@ static bool contextAttributeCustomMetadataToBson
 *
 * In addition, in the case of isReplace, the attribute is added to toPush (otherwise, toPush is not
 * touched).
+*
+* You may wonder why we need toUnset if this function is not related with delete attribute
+* logic. However, it's need to "clean" metadata in some cases.
 */
 static bool updateAttribute
 (
   orion::BSONObj&           attrs,
   orion::BSONObjBuilder*    toSet,
+  orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
   bool*                     actualUpdate,
@@ -832,7 +845,7 @@ static bool updateAttribute
     orion::BSONObj newAttr;
     orion::BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, forcedUpdate, apiVersion);
+    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, apiVersion);
   }
 
   return true;
@@ -852,11 +865,16 @@ static bool updateAttribute
 * In addition, return value is as follows:
 * - true: there was an actual append change
 * - false: there was an append-as-update change
+*
+* You may wonder why we need toUnset if this function is not related with delete attribute
+* logic. However, it's need to "clean" metadata in some cases.
+*
 */
 static bool appendAttribute
 (
   orion::BSONObj&           attrs,
   orion::BSONObjBuilder*    toSet,
+  orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
   bool*                     actualUpdate,
@@ -869,7 +887,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, apiVersion);
+    updateAttribute(attrs, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, apiVersion);
     return false;
   }
 
@@ -2276,6 +2294,8 @@ static void deleteAttrInNotifyCer
 *
 * updateContextAttributeItem -
 *
+* You may wonder why we need toUnset if this function is not related with delete attribute
+* logic. However, it's need to "clean" metadata in some cases.
 */
 static bool updateContextAttributeItem
 (
@@ -2286,6 +2306,7 @@ static bool updateContextAttributeItem
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
+  orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   bool*                     actualUpdate,
   bool*                     entityModified,
@@ -2301,7 +2322,7 @@ static bool updateContextAttributeItem
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
+  if (updateAttribute(attrs, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2358,6 +2379,8 @@ static bool updateContextAttributeItem
 *
 * appendContextAttributeItem -
 *
+* You may wonder why we need toUnset if this function is not related with delete attribute
+* logic. However, it's need to "clean" metadata in some cases.
 */
 static bool appendContextAttributeItem
 (
@@ -2367,6 +2390,7 @@ static bool appendContextAttributeItem
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
+  orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   bool*                     actualUpdate,
   bool*                     entityModified,
@@ -2380,7 +2404,7 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrs, toSet, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, apiVersion);
+  bool actualAppend = appendAttribute(attrs, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
@@ -2559,6 +2583,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toSet,
+                                      toUnset,
                                       attrNamesAdd,
                                       &actualUpdate,
                                       &entityModified,
@@ -2582,6 +2607,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toSet,
+                                      toUnset,
                                       attrNamesAdd,
                                       &actualUpdate,
                                       &entityModified,
