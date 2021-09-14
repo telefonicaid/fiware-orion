@@ -11,3 +11,4 @@
 * Issue #280  HTTP header NGSILD-Tenant (not FIWARE-Service) in notifications on NGSI-LD subscriptions
 * Issue #922  Dynamic allocation of GeoProperties array
 * Issue #917  No notification when a compound value is updated without modification
+* Issue #926  GET local location of a cached context using URI params location and url - to be able to refresh it in the context cache

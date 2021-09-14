@@ -436,6 +436,26 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
     orionldState.uriParams.subscriptionId  = (char*) value;
     orionldState.uriParams.mask           |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
   }
+  else if (SCOMPARE9(key, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.location = true;
+    else if (strcmp(value, "false") == 0)
+      orionldState.uriParams.location = false;
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'location'", value);
+      orionldState.httpStatusCode = 400;
+      return MHD_YES;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_LOCATION;
+  }
+  else if (SCOMPARE4(key, 'u', 'r', 'l', 0))
+  {
+    orionldState.uriParams.url   = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_URL;
+  }
   else
   {
     LM_W(("Bad Input (unknown URI parameter: '%s')", key));
