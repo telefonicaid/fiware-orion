@@ -531,7 +531,7 @@ static bool mergeAttrInfo
   {
     if (!isSomeCalculatedOperatorUsed(caP))
     {
-      caP->valueBson(composedName, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+      caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
     }
   }
   else
@@ -3426,7 +3426,7 @@ static unsigned int updateEntity
       updatedEntity.append("$addToSet", toAddToSet.obj());
     }
 
-    // $addToSet is special, as it is shared between attrsName removals and
+    // $pullAll is special, as it is shared between attrsName removals and
     // attribute operator. Probably both cases cannot happen at the same
     // time (as attrsName removal can only happen in DELETE updates), but
     // the logic supports the simultenous case
@@ -3441,7 +3441,7 @@ static unsigned int updateEntity
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
-    // Note we call calculateOperator* function using notifyCerP instead than eP, given that
+    // Note we call calculateOperator() function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
     for (unsigned ix = 0; ix < UPDATE_OPERATORS_NUMBER; ix++)
