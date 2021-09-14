@@ -485,13 +485,17 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
     return false;
   }
 
-  if ((caP->compoundValueP->childV[0]->name == "$inc") ||
-      (caP->compoundValueP->childV[0]->name == "$min") ||
-      (caP->compoundValueP->childV[0]->name == "$max") ||
-      (caP->compoundValueP->childV[0]->name == "$mul") ||
-      (caP->compoundValueP->childV[0]->name == "$push") ||
-      (caP->compoundValueP->childV[0]->name == "$addToSet") ||
-      (caP->compoundValueP->childV[0]->name == "$pull") ||
+  for (unsigned ix = 0; ix < UPDATE_OPERATORS_NUMBER; ix++)
+  {
+    if (caP->compoundValueP->childV[0]->name == UPDATE_OPERATORS[ix])
+    {
+      return true;
+    }
+  }
+
+  // $addToSet and $pullAll are not included in UPDATE_OPERATORS, so they
+  // are checked separartelly
+  if ((caP->compoundValueP->childV[0]->name == "$addToSet") ||
       (caP->compoundValueP->childV[0]->name == "$pullAll"))
   {
     return true;
@@ -3437,38 +3441,16 @@ static unsigned int updateEntity
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
-    orion::BSONObjBuilder toInc;
-    orion::BSONObjBuilder toMin;
-    orion::BSONObjBuilder toMax;
-    orion::BSONObjBuilder toMul;
-    orion::BSONObjBuilder toPush;
-    orion::BSONObjBuilder toPull;
     // Note we call calculateOperator* function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
-    if (calculateOperator(notifyCerP, "$inc", &toInc))
+    for (unsigned ix = 0; ix < UPDATE_OPERATORS_NUMBER; ix++)
     {
-      updatedEntity.append("$inc", toInc.obj());
-    }
-    if (calculateOperator(notifyCerP, "$min", &toMin))
-    {
-      updatedEntity.append("$min", toMin.obj());
-    }
-    if (calculateOperator(notifyCerP, "$max", &toMax))
-    {
-      updatedEntity.append("$max", toMax.obj());
-    }
-    if (calculateOperator(notifyCerP, "$mul", &toMul))
-    {
-      updatedEntity.append("$mul", toMul.obj());
-    }
-    if (calculateOperator(notifyCerP, "$push", &toPush))
-    {
-      updatedEntity.append("$push", toPush.obj());
-    }
-    if (calculateOperator(notifyCerP, "$pull", &toPull))
-    {
-      updatedEntity.append("$pull", toPull.obj());
+      orion::BSONObjBuilder b;
+      if (calculateOperator(notifyCerP, UPDATE_OPERATORS[ix], &b))
+      {
+        updatedEntity.append(UPDATE_OPERATORS[ix], b.obj());
+      }
     }
   }
 
