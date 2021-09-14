@@ -490,7 +490,8 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
       (caP->compoundValueP->childV[0]->name == "$max") ||
       (caP->compoundValueP->childV[0]->name == "$mul") ||
       (caP->compoundValueP->childV[0]->name == "$push") ||
-      (caP->compoundValueP->childV[0]->name == "$addToSet"))
+      (caP->compoundValueP->childV[0]->name == "$addToSet") ||
+      (caP->compoundValueP->childV[0]->name == "$pull"))
   {
     return true;
   }
@@ -3432,6 +3433,7 @@ static unsigned int updateEntity
     orion::BSONObjBuilder toMax;
     orion::BSONObjBuilder toMul;
     orion::BSONObjBuilder toPush;
+    orion::BSONObjBuilder toPull;
     // Note we call calculateOperator* function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
@@ -3454,6 +3456,10 @@ static unsigned int updateEntity
     if (calculateOperator(notifyCerP, "$push", &toPush))
     {
       updatedEntity.append("$push", toPush.obj());
+    }
+    if (calculateOperator(notifyCerP, "$pull", &toPull))
+    {
+      updatedEntity.append("$pull", toPull.obj());
     }
   }
 
