@@ -32,6 +32,12 @@
 #include "mongoDriver/BSONArrayBuilder.h"
 
 
+/* ****************************************************************************
+*
+* compoundValueBson (for a single child) -
+*/
+extern void compoundValueBson(orion::CompoundValueNode* children, orion::BSONObjBuilder& b, bool strings2numbers = false);
+
 
 /* ****************************************************************************
 *

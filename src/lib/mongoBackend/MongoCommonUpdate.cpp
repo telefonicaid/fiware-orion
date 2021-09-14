@@ -488,7 +488,8 @@ static bool calculateOperatorUsage(ContextAttribute* caP)
   if ((caP->compoundValueP->childV[0]->name == "$inc") ||
       (caP->compoundValueP->childV[0]->name == "$min") ||
       (caP->compoundValueP->childV[0]->name == "$max") ||
-      (caP->compoundValueP->childV[0]->name == "$mul"))
+      (caP->compoundValueP->childV[0]->name == "$mul") ||
+      (caP->compoundValueP->childV[0]->name == "$push"))
   {
     return true;
   }
@@ -3036,6 +3037,72 @@ static bool calculateOperatorAritmetic(ContextElementResponse* cerP, const std::
 
 /* ****************************************************************************
 *
+* calculateOperatorPush -
+*/
+static bool calculateOperatorPush(ContextElementResponse* cerP, orion::BSONObjBuilder* b)
+{
+  bool r = false;
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
+  {
+    ContextAttribute* attr = cerP->entity.attributeVector[ix];
+    if (attr->compoundValueP != NULL)
+    {
+      CompoundValueNode* child0 = attr->compoundValueP->childV[0];
+      if ((child0->name == "$push"))
+      {
+        std::string valueKey = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
+        if (child0->valueType == orion::ValueTypeString)
+        {
+          b->append(valueKey, child0->stringValue);
+        }
+        else if (child0->valueType == orion::ValueTypeNumber)
+        {
+          b->append(valueKey, child0->numberValue);
+        }
+        else if (child0->valueType == orion::ValueTypeBoolean)
+        {
+          b->append(valueKey, child0->boolValue);
+        }
+        else if (child0->valueType == orion::ValueTypeNull)
+        {
+          b->appendNull(valueKey);
+        }
+        else if (child0->valueType == orion::ValueTypeVector)
+        {
+          orion::BSONArrayBuilder ba;
+          compoundValueBson(child0->childV, ba);
+          b->append(valueKey, ba.arr());
+        }
+        else if (child0->valueType == orion::ValueTypeObject)
+        {
+          orion::BSONObjBuilder bo;
+          compoundValueBson(child0->childV, bo);
+          b->append(valueKey, bo.obj());
+        }
+        else if (child0->valueType == orion::ValueTypeNotGiven)
+        {
+          LM_E(("Runtime Error (value not given in calculateOperatorPush)"));
+          return false;
+        }
+        else
+        {
+          LM_E(("Runtime Error (Unknown type in calculateOperatorPush)"));
+          return false;
+        }
+
+        r = true;
+      }
+    }
+  }
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
 * updateEntity -
 *
 * Returns the number of notifications sent as consecuence of the update (used by the
@@ -3385,6 +3452,7 @@ static unsigned int updateEntity
     orion::BSONObjBuilder toMin;
     orion::BSONObjBuilder toMax;
     orion::BSONObjBuilder toMul;
+    orion::BSONObjBuilder toPush;
     // Note we call calculateOperator* function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
@@ -3392,17 +3460,21 @@ static unsigned int updateEntity
     {
       updatedEntity.append("$inc", toInc.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$min", &toInc))
+    if (calculateOperatorAritmetic(notifyCerP, "$min", &toMin))
     {
-      updatedEntity.append("$min", toInc.obj());
+      updatedEntity.append("$min", toMin.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$max", &toInc))
+    if (calculateOperatorAritmetic(notifyCerP, "$max", &toMax))
     {
-      updatedEntity.append("$max", toInc.obj());
+      updatedEntity.append("$max", toMax.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$mul", &toInc))
+    if (calculateOperatorAritmetic(notifyCerP, "$mul", &toMul))
     {
-      updatedEntity.append("$mul", toInc.obj());
+      updatedEntity.append("$mul", toMul.obj());
+    }
+    if (calculateOperatorPush(notifyCerP, &toPush))
+    {
+      updatedEntity.append("$push", toPush.obj());
     }
   }
 
