@@ -1,0 +1,1 @@
+- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (without notifications) (#3814)
