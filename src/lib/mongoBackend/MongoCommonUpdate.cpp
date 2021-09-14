@@ -472,13 +472,13 @@ static void appendMetadata
 
 /* ****************************************************************************
 *
-* calculatedOperatorUsage -
+* isSomeCalculatedOperatorUsed -
 *
 * Returns true if some calculated operator ($inc, etc.) is in use, so the
 * appending value has to be skipped in mergeAttrInfo (given that a caculateOperatorXXX()
 * will include it)
 */
-static bool calculateOperatorUsage(ContextAttribute* caP)
+static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
 {
   if (caP->compoundValueP == NULL)
   {
@@ -523,7 +523,7 @@ static bool mergeAttrInfo
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    if (!calculateOperatorUsage(caP))
+    if (!isSomeCalculatedOperatorUsed(caP))
     {
       caP->valueBson(composedName, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
     }
@@ -3006,41 +3006,14 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 }
 
 
+
 /* ****************************************************************************
 *
-* calculateOperatorAritmetic -
+* calculateOperator -
 *
 * Return bool if some content has been added to the BSONObjBuilders passed as parameter
-* This funcion covers $inc, $min, $max, $mul. Note that $min and $max allow a non-numerica
-* value, but that case is weird and we specifically check for orion::ValueTypeNumber
 */
-static bool calculateOperatorAritmetic(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
-{
-  bool r = false;
-
-  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
-  {
-    ContextAttribute* attr = cerP->entity.attributeVector[ix];
-    if (attr->compoundValueP != NULL)
-    {
-      if ((attr->compoundValueP->childV[0]->name == op) && (attr->compoundValueP->childV[0]->valueType == orion::ValueTypeNumber))
-      {
-        b->append(std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE, attr->compoundValueP->childV[0]->numberValue);
-        r = true;
-      }
-    }
-  }
-
-  return r;
-}
-
-
-
-/* ****************************************************************************
-*
-* calculateOperatorPush -
-*/
-static bool calculateOperatorPush(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
+static bool calculateOperator(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
 {
   bool r = false;
 
@@ -3083,12 +3056,12 @@ static bool calculateOperatorPush(ContextElementResponse* cerP, const std::strin
         }
         else if (child0->valueType == orion::ValueTypeNotGiven)
         {
-          LM_E(("Runtime Error (value not given in calculateOperatorPush)"));
+          LM_E(("Runtime Error (value not given in calculateOperator)"));
           return false;
         }
         else
         {
-          LM_E(("Runtime Error (Unknown type in calculateOperatorPush)"));
+          LM_E(("Runtime Error (Unknown type in calculateOperator)"));
           return false;
         }
 
@@ -3435,7 +3408,7 @@ static unsigned int updateEntity
     // $addToSet is special, as it is shared between attrsName additions and
     // attribute operator
     orion::BSONObjBuilder toAddToSet;
-    bool calculatedAddToSet = calculateOperatorPush(notifyCerP, "$addToSet", &toAddToSet);
+    bool calculatedAddToSet = calculateOperator(notifyCerP, "$addToSet", &toAddToSet);
     if (attrNamesAdd.arrSize() > 0)
     {
       orion::BSONObjBuilder bobEach;
@@ -3462,23 +3435,23 @@ static unsigned int updateEntity
     // Note we call calculateOperator* function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
-    if (calculateOperatorAritmetic(notifyCerP, "$inc", &toInc))
+    if (calculateOperator(notifyCerP, "$inc", &toInc))
     {
       updatedEntity.append("$inc", toInc.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$min", &toMin))
+    if (calculateOperator(notifyCerP, "$min", &toMin))
     {
       updatedEntity.append("$min", toMin.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$max", &toMax))
+    if (calculateOperator(notifyCerP, "$max", &toMax))
     {
       updatedEntity.append("$max", toMax.obj());
     }
-    if (calculateOperatorAritmetic(notifyCerP, "$mul", &toMul))
+    if (calculateOperator(notifyCerP, "$mul", &toMul))
     {
       updatedEntity.append("$mul", toMul.obj());
     }
-    if (calculateOperatorPush(notifyCerP, "$push", &toPush))
+    if (calculateOperator(notifyCerP, "$push", &toPush))
     {
       updatedEntity.append("$push", toPush.obj());
     }
