@@ -807,7 +807,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
     orion::BSONObj    md;
@@ -877,7 +877,7 @@ static bool appendAttribute
   orion::BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
+  caP->valueBson(std::string(ENT_ATTRS_VALUE), &ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -2748,7 +2748,7 @@ static bool createEntity
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbEncode(attrsV[ix]->name);
 
