@@ -146,7 +146,7 @@ void* startSenderThread(void* p)
       {
         alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
 
-        params->failsCounter = params->failsCounter +1;
+        params->failsCounter++;
 
         if ((params->failsCounter)  > (params->maxFailsLimit)) 
         {

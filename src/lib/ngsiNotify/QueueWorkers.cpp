@@ -260,7 +260,7 @@ static void* workerFunc(void* pSyncQ)
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
-          params->failsCounter = params->failsCounter +1;
+          params->failsCounter++;
 
           if ((params->failsCounter)  > (params->maxFailsLimit))
           {
