@@ -507,9 +507,12 @@ static void mongoSubCountersUpdateCount
   countB.append(CSUB_COUNT, count);
   update.append("$inc", countB.obj());
 
+  if (failsCounter > 0)
+  {
   failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
   update.append("$inc", failsCounterB.obj());
-
+  }
+ 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
