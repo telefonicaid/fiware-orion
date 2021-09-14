@@ -440,6 +440,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
     serviceP->options  = 0;  // Tenant is Ignored
+
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
@@ -449,6 +450,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;  // Tenant is Ignored
 
     serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LOCATION;
+    serviceP->uriParams |= ORIONLD_URIPARAM_URL;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;

@@ -1,0 +1,122 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET the location of an @context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity with a context, only to put the context in the context cache
+# 02. GET the local location of the context from step 1 and save its URL
+# 03. DELETE the context from the cache
+# 04. Attempt to GET the context again - see 404 Not Found
+#
+
+echo "01. Create an entity with a context, only to put the context in the context cache"
+echo "================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A3": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. GET the local location of the context from step 1 and save its URL"
+echo "======================================================================"
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?location=true&url=https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld'
+contextUrl=$(cat /tmp/httpHeaders.out | grep 'Location' | awk '{ print $2}')
+echo contextUrl: $contextUrl
+echo
+echo
+
+
+echo "03. DELETE the context from the cache"
+echo "====================================="
+orionCurl --url $contextUrl -X DELETE
+echo
+echo
+
+
+echo "04. Attempt to GET the context again - see 404 Not Found"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?location=true&url=https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a context, only to put the context in the context cache
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET the local location of the context from step 1 and save its URL
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Location: /ngsi-ld/v1/jsonldContexts/REGEX(.*)
+Date: REGEX(.*)
+
+contextUrl: /ngsi-ld/v1/jsonldContexts/REGEX(.*)
+
+
+03. DELETE the context from the cache
+=====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Attempt to GET the context again - see 404 Not Found
+========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 176
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+    "title": "Context Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
