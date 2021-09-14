@@ -26,47 +26,27 @@ Strings in q URI Param
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+accumulatorStart --pretty-print localhost $LISTENER2_PORT
 
 --SHELL--
 
 #
-# 01. Create E1 with a String attribute S == '123'
-# 02. Create E2 with a Number attribute S == 123
-# 03. Create subscription with q=S:121,122,123
-# 04. Dump accumulator, see E2
-# 05. Create subscription with q=S:'121','122','123'
-# 06. Dump accumulator, see E1
+# 01. Create subscription with q=S:121,122,123 (accum 1)
+# 02. Create subscription with q=S:'121','122','123' (accum 2)
+# 03. Create E1 with a String attribute S == '123'
+# 04. Create E2 with a Number attribute S == 123
+# 05. Dump & reset accum1, see E2
+# 06. Dump & reset accum2, see E1
 # 07. Update E1/S to '121'
-# 08. Dump accumulator, see E1
-# 09. Update E2/S to 121
-# 10. Dump accumulator, see E2
+# 08. Update E2/S to 121
+# 09. Dump accum1, see E2
+# 10. Dump accum2, see E1
 #
 
-echo "01. Create E1 with a String attribute S == '123'"
-echo "================================================"
-payload='{
-  "id": "E1",
-  "S": "123"
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
 
-
-echo "02. Create E2 with a Number attribute S == 123"
-echo "=============================================="
-payload='{
-  "id": "E2",
-  "S": 123
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "03. Create subscription with q=S:121,122,123"
-echo "============================================"
+echo "01. Create subscription with q=S:121,122,123 (accum 1)"
+echo "======================================================"
 payload='
 {
     "subject": {
@@ -94,17 +74,8 @@ echo
 echo
 
 
-echo "04. Dump accumulator, see E2"
-echo "============================"
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-
-echo "05. Create subscription with q=S:'121','122','123'"
-echo "=================================================="
+echo "02. Create subscription with q=S:'121','122','123' (accum 2)"
+echo "============================================================"
 filter="'121','122','123'"
 payload='
 {
@@ -122,7 +93,7 @@ payload='
          }
     },
     "notification": {
-        "http": { "url": "http://localhost:'$LISTENER_PORT'/notify" },
+        "http": { "url": "http://localhost:'$LISTENER2_PORT'/notify" },
         "attrs": [ ]
     },
     "expires": "2050-04-05T14:00:00.00Z"
@@ -133,10 +104,40 @@ echo
 echo
 
 
-echo "06. Dump accumulator, see E1"
-echo "============================"
+echo "03. Create E1 with a String attribute S == '123'"
+echo "================================================"
+payload='{
+  "id": "E1",
+  "S": "123"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. Create E2 with a Number attribute S == 123"
+echo "=============================================="
+payload='{
+  "id": "E2",
+  "S": 123
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump & reset accum1, see E2"
+echo "==============================="
 accumulatorDump
 accumulatorReset
+echo
+echo
+
+
+echo "06. Dump & reset accum2, see E1"
+echo "==============================="
+accumulator2Dump
+accumulator2Reset
 echo
 echo
 
@@ -151,15 +152,7 @@ echo
 echo
 
 
-echo "08. Dump accumulator, see E1"
-echo "============================"
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "09. Update E2/S to 121"
+echo "08. Update E2/S to 121"
 echo "======================"
 payload='{
   "S": 121
@@ -169,16 +162,44 @@ echo
 echo
 
 
-echo "10. Dump accumulator, see E2"
-echo "============================"
+echo "08. Dump accum1, see E2"
+echo "======================="
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
+echo "10. Dump accum2, see E1"
+echo "======================="
+accumulator2Dump
+accumulator2Reset
+echo
+echo
+
+
 --REGEXPECT--
-01. Create E1 with a String attribute S == '123'
+01. Create subscription with q=S:121,122,123 (accum 1)
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create subscription with q=S:'121','122','123' (accum 2)
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1 with a String attribute S == '123'
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -188,7 +209,7 @@ Date: REGEX(.*)
 
 
 
-02. Create E2 with a Number attribute S == 123
+04. Create E2 with a Number attribute S == 123
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -198,18 +219,8 @@ Date: REGEX(.*)
 
 
 
-03. Create subscription with q=S:121,122,123
-============================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Dump accumulator, see E2
-============================
+05. Dump & reset accum1, see E2
+===============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 129
@@ -218,7 +229,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -237,18 +248,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 
 
-05. Create subscription with q=S:'121','122','123'
-==================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. Dump accumulator, see E1
-============================
+06. Dump & reset accum2, see E1
+===============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 129
@@ -257,7 +258,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -284,36 +285,7 @@ Date: REGEX(.*)
 
 
 
-08. Dump accumulator, see E1
-============================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 129
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "S": {
-                "metadata": {},
-                "type": "Text",
-                "value": "121"
-            },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-09. Update E2/S to 121
+08. Update E2/S to 121
 ======================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -321,8 +293,8 @@ Date: REGEX(.*)
 
 
 
-10. Dump accumulator, see E2
-============================
+08. Dump accum1, see E2
+=======================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 129
@@ -350,8 +322,37 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
+10. Dump accum2, see E1
+=======================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 129
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "S": {
+                "metadata": {},
+                "type": "Text",
+                "value": "121"
+            },
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
+accumulatorStop $LISTENER_PORT
+accumulatorStop $LISTENER2_PORT
 dbDrop CB
-    

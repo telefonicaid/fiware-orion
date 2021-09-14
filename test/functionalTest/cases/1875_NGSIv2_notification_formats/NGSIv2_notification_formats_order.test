@@ -33,26 +33,39 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Create E1/A1+A2+A3
+# 01. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2
 # 02. Create NGSIv2 subscription for E1 format default attr-order set to A3-A1-A2
-# 03. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2
+# 03. Create E1/A1+A2+A3
 # 04. Dump accumulator to see the notifications
 #
 
-echo "01. Create E1/A1+A2+A3"
-echo "======================"
-payload='{
-  "id": "E1",
-  "type": "none",
-  "A1": 1,
-  "A2": 2,
-  "A3": 3
+
+echo "01. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2"
+echo "================================================================================="
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ "A3", "A1", "A2" ],
+    "attrsFormat": "keyValues"
+  }
 }'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-valgrindSleep 1
 
 echo "02. Create NGSIv2 subscription for E1 format default attr-order set to A3-A1-A2"
 echo "==============================================================================="
@@ -80,34 +93,25 @@ echo
 echo
 
 
-echo "03. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2"
-echo "================================================================================="
-payload='
-{
-  "subject": {
-    "entities": [
-      {
-        "id": "E1"
-      }
-    ],
-    "condition": {
-      "attrs": [ ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [ "A3", "A1", "A2" ],
-    "attrsFormat": "keyValues"
-  }
+valgrindSleep 1
+
+
+echo "03. Create E1/A1+A2+A3"
+echo "======================"
+payload='{
+  "id": "E1",
+  "type": "none",
+  "A1": 1,
+  "A2": 2,
+  "A3": 3
 }'
-orionCurl --url /v2/subscriptions --payload "$payload"
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
 
 valgrindSleep 1
+
 
 echo "04. Dump accumulator to see the notifications"
 echo "============================================="
@@ -117,11 +121,11 @@ echo
 
 
 --REGEXPECT--
-01. Create E1/A1+A2+A3
-======================
+01. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2
+=================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=none
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -137,11 +141,11 @@ Date: REGEX(.*)
 
 
 
-03. Create NGSIv2 subscription for E1 format keyValues attr-order set to A3-A1-A2
-=================================================================================
+03. Create E1/A1+A2+A3
+======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=none
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -149,17 +153,7 @@ Date: REGEX(.*)
 
 04. Dump accumulator to see the notifications
 =============================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 221
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":{"type":"Number","value":3,"metadata":{}},"A1":{"type":"Number","value":1,"metadata":{}},"A2":{"type":"Number","value":2,"metadata":{}}}]}=======================================
+#SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 101
@@ -168,9 +162,21 @@ Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":3,"A1":1,"A2":2}]}=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 221
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":{"type":"Number","value":3,"metadata":{}},"A1":{"type":"Number","value":1,"metadata":{}},"A2":{"type":"Number","value":2,"metadata":{}}}]}=======================================
+#SORT_END
 
 
 --TEARDOWN--

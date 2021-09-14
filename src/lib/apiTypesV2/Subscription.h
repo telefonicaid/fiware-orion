@@ -32,12 +32,25 @@
 #include "ngsi/Throttling.h"
 #include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
 {
+/* ****************************************************************************
+*
+* NotificationType -
+*/
+typedef enum NotificationType
+{
+  HttpNotification,
+  MqttNotification
+} NotificationType;
+
+
+
 /* ****************************************************************************
 *
 * Notification -
@@ -50,7 +63,9 @@ struct Notification
   bool                     onlyChanged;
   long long                timesSent;
   long long                lastNotification;
-  HttpInfo                 httpInfo;
+  HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
+  MqttInfo                 mqttInfo;
+  NotificationType         type;
   int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
   int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
   std::string              lastFailureReason;
@@ -65,6 +80,8 @@ struct Notification
     timesSent(0),
     lastNotification(-1),
     httpInfo(),
+    mqttInfo(),
+    type(HttpNotification),
     lastFailure(-1),
     lastSuccess(-1),
     lastFailureReason(""),

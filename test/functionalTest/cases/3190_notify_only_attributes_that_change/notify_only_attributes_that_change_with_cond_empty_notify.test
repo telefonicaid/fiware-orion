@@ -31,9 +31,9 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
-# 02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.
-# 03. Dump and reset accumulator, see A, B, C and D (as this is initial notification).
+# 01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.
+# 02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
+# 03. Dump and reset accumulator, see A, B, C and D
 # 04. PATCH /v2/entities/Room1/attrs, update the value of D attribute.
 # 05. Dump and reset accumulator, see no notification.
 # 06. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
@@ -44,34 +44,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 11. Dump and reset accumulator, see A, B, C and D.
 #
 
-echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
-echo '=========================================================================='
-payload='{
-  "id": "Room1",
-  "type": "Room",
-  "A": {
-    "value": 10,
-    "type": "Integer"
-  },
-  "B": {
-    "value": 20,
-    "type": "Integer"
-  },
-  "C": {
-    "value": 30,
-    "type": "Integer"
-  },
-  "D": {
-    "value": 40,
-    "type": "Integer"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo '02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.'
+echo '01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.'
 echo '================================================================================================================================='
 payload='{
   "description": "A subscription to get info about Room1",
@@ -103,8 +77,35 @@ echo
 echo
 
 
-echo '03. Dump and reset accumulator, see A, B, C and D (as this is initial notification).'
-echo '===================================================================================='
+echo '02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
+echo '=========================================================================='
+payload='{
+  "id": "Room1",
+  "type": "Room",
+  "A": {
+    "value": 10,
+    "type": "Integer"
+  },
+  "B": {
+    "value": 20,
+    "type": "Integer"
+  },
+  "C": {
+    "value": 30,
+    "type": "Integer"
+  },
+  "D": {
+    "value": 40,
+    "type": "Integer"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '03. Dump and reset accumulator, see A, B, C and D'
+echo '================================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -216,17 +217,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
-==========================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.
+01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify attrs: [], onlyChangedAttrs: true.
 =================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -236,8 +227,18 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see A, B, C and D (as this is initial notification).
-====================================================================================
+02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room1?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump and reset accumulator, see A, B, C and D
+=================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 275
@@ -246,7 +247,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

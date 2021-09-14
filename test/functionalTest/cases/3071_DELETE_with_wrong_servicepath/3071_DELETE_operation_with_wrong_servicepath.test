@@ -1,0 +1,228 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+SP with wildcard (/#) and multiple service-path are not allowed in DELETE operation
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# 
+# 01. Create entity E1/T1/A1=1, with servicepath '/Level_1/'
+# 02. GET /v2/entities/E1, with servicepath '/Level_1/' to see E1/T1/A1=1
+# 03. Create entity E2/T2/A2=2, with servicepath '/Level_2/'
+# 04. GET /v2/entities/E2, with servicepath '/Level_2/' to see E2/T2/A2=2
+# 05. Attempt to DELETE entity E1, using DELETE operation, with servicepath '/#', see 400 error
+# 06. Attempt to DELETE entity E2, using DELETE operation, with servicepath '/Level_1/,/Level_2/' see 400 error
+# 07. GET /v2/entities with service path '/#' to ensure previous DELETE attempt didn't work
+#
+
+
+echo "01. Create entity E1/T1/A1=1, with servicepath '/Level_1/'"
+echo "=========================================================="
+payload='{
+    "id": "E1",
+    "type": "T1",
+    "A1": {
+      "value": 1,
+      "type": "Integer"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /Level_1/
+echo
+echo
+
+
+echo "02. GET /v2/entities/E1 with servicepath '/Level_1/' to see E1/T1/A1=1"
+echo "======================================================================"
+orionCurl --url /v2/entities/E1 --servicePath /Level_1/
+echo
+echo
+
+
+echo "03. Create entity E2/T2/A2=2, with servicepath '/Level_2/'"
+echo "=========================================================="
+payload='{
+    "id": "E2",
+    "type": "T2",
+    "A2": {
+      "value": 2,
+      "type": "Integer"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /Level_2/
+echo
+echo
+
+
+echo "04. GET /v2/entities/E2 with servicepath '/Level_2/' to see E2/T2/A2=2"
+echo "======================================================================"
+orionCurl --url /v2/entities/E2 --servicePath /Level_2/
+echo
+echo
+
+
+echo "05. Attempt to DELETE entity E1, using DELETE operation, with servicepath '/#', see 400 error"
+echo "============================================================================================="
+orionCurl --url '/v2/entities/E1' -X DELETE --servicePath /#
+echo
+echo
+
+
+echo "06. Attempt to DELETE entity E2, using DELETE operation, with servicepath '/Level_1/,/Level_2/' see 400 error"
+echo "============================================================================================================="
+orionCurl --url '/v2/entities/E2' -X DELETE --servicePath /Level_1/,/Level_2/
+echo
+echo
+
+
+echo "07. GET /v2/entities with service path '/#' to ensure previous DELETE attempt didn't work"
+echo "========================================================================================="
+orionCurl --url /v2/entities --servicePath /#
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1/T1/A1=1, with servicepath '/Level_1/'
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/E1 with servicepath '/Level_1/' to see E1/T1/A1=1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {}, 
+        "type": "Integer", 
+        "value": 1
+    }, 
+    "id": "E1", 
+    "type": "T1"
+}
+
+
+03. Create entity E2/T2/A2=2, with servicepath '/Level_2/'
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities/E2 with servicepath '/Level_2/' to see E2/T2/A2=2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A2": {
+        "metadata": {}, 
+        "type": "Integer", 
+        "value": 2
+    }, 
+    "id": "E2", 
+    "type": "T2"
+}
+
+
+05. Attempt to DELETE entity E1, using DELETE operation, with servicepath '/#', see 400 error
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 101
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "servicepath with wildcard # is not allowed in DELETE operation", 
+    "error": "BadRequest"
+}
+
+
+06. Attempt to DELETE entity E2, using DELETE operation, with servicepath '/Level_1/,/Level_2/' see 400 error
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 99
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "more than one servicepath is not allowed in DELETE operation", 
+    "error": "BadRequest"
+}
+
+
+07. GET /v2/entities with service path '/#' to ensure previous DELETE attempt didn't work
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {}, 
+            "type": "Integer", 
+            "value": 1
+        }, 
+        "id": "E1", 
+        "type": "T1"
+    }, 
+    {
+        "A2": {
+            "metadata": {}, 
+            "type": "Integer", 
+            "value": 2
+        }, 
+        "id": "E2", 
+        "type": "T2"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

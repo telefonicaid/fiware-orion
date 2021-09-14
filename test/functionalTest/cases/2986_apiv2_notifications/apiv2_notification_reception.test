@@ -38,10 +38,11 @@ brokerStart CP2
 # 02. Create entity 'CheckInCP1' in CB to be notified to CP1
 # 03. Query CP1, see 'CheckInCP1'
 # 04. Make CP2 subscribe to ALL in CP1 (federation)
-# 05. Query CP2, see 'CheckInCP1'
-# 06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
-# 07. Query CP1, see 2 entities
-# 08. Query CP2, see 2 entities
+# 05. Update (forced) entity 'CheckInCP1' in CP1 to be notified to CP2
+# 06. Query CP2, see 'CheckInCP1'
+# 07. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
+# 08. Query CP1, see 2 entities
+# 09. Query CP2, see 2 entities
 #
 
 echo "01. Make CP1 subscribe to ALL in CB (federation creation)"
@@ -118,17 +119,33 @@ echo
 echo
 
 
+echo "05. Update (forced) entity 'CheckInCP1' in CP1 to be notified to CP2"
+echo "===================================================================="
+payload='{
+  "A1": {
+    "type": "geo:json",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1.0, 1.1 ]
+    }
+  }
+}'
+orionCurl --url /v2/entities/CheckInCP1/attrs?options=forcedUpdate --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
 valgrindSleep 3
 
 
-echo "05. Query CP2, see 'CheckInCP1'"
+echo "06. Query CP2, see 'CheckInCP1'"
 echo "==============================="
 orionCurl --url /v2/entities --port $CP2_PORT
 echo
 echo
 
 
-echo "06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1"
+echo "07. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1"
 echo "========================================================================="
 payload='{
   "id": "Check2",
@@ -149,14 +166,14 @@ echo
 valgrindSleep 3
 
 
-echo "07. Query CP1, see 2 entities"
+echo "08. Query CP1, see 2 entities"
 echo "============================="
 orionCurl --url /v2/entities --port $CP1_PORT
 echo
 echo
 
 
-echo "08. Query CP2, see 2 entities"
+echo "09. Query CP2, see 2 entities"
 echo "============================="
 orionCurl --url /v2/entities --port $CP2_PORT
 echo
@@ -221,7 +238,15 @@ Date: REGEX(.*)
 
 
 
-05. Query CP2, see 'CheckInCP1'
+05. Update (forced) entity 'CheckInCP1' in CP1 to be notified to CP2
+====================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Query CP2, see 'CheckInCP1'
 ===============================
 HTTP/1.1 200 OK
 Content-Length: 118
@@ -248,7 +273,7 @@ Date: REGEX(.*)
 ]
 
 
-06. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
+07. Create entity 'Check2' in CB to be notified to CP1 and to CP2 via CP1
 =========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -258,7 +283,7 @@ Date: REGEX(.*)
 
 
 
-07. Query CP1, see 2 entities
+08. Query CP1, see 2 entities
 =============================
 HTTP/1.1 200 OK
 Content-Length: 259
@@ -320,7 +345,7 @@ Date: REGEX(.*)
 ]
 
 
-08. Query CP2, see 2 entities
+09. Query CP2, see 2 entities
 =============================
 HTTP/1.1 200 OK
 Content-Length: 259

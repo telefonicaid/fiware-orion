@@ -34,6 +34,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
@@ -730,6 +731,7 @@ void subCacheItemInsert
   const char*                        tenant,
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
+  const ngsiv2::MqttInfo&            mqttInfo,
   const std::vector<ngsiv2::EntID>&  entIdVector,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
@@ -738,7 +740,6 @@ void subCacheItemInsert
   int64_t                            expirationTime,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
-  bool                               notificationDone,
   int64_t                            lastNotificationTime,
   int64_t                            lastNotificationSuccessTime,
   int64_t                            lastNotificationFailureTime,
@@ -778,7 +779,7 @@ void subCacheItemInsert
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
-  cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
@@ -787,6 +788,7 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
   cSubP->httpInfo              = httpInfo;
+  cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;

@@ -295,13 +295,13 @@ echo
 01. Create entity with geo:json attribute with string value -> fail
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:json needs an object as value",
+    "description": "geo:json needs an object or null as value",
     "error": "BadRequest"
 }
 
@@ -323,13 +323,13 @@ Date: REGEX(.*)
 02. Create entity with geo:json attribute with array value -> fail
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:json needs an object as value",
+    "description": "geo:json needs an object or null as value",
     "error": "BadRequest"
 }
 

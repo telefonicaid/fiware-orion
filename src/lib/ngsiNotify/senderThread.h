@@ -33,19 +33,31 @@
 
 /* ****************************************************************************
 *
+* QUEUE_MSG_NOTIF
+* QUEUE_MSG_KILL
+*/
+#define QUEUE_MSG_NOTIF 0
+#define QUEUE_MSG_KILL  1
+
+
+
+/* ****************************************************************************
+*
 * SenderThreadParams - 
 */
 typedef struct SenderThreadParams
 {
+  unsigned short                     type; // 0 -> regular notif, 1 -> kill thread
   std::string                        from;
   std::string                        ip;
   unsigned short                     port;
-  std::string                        protocol;
+  std::string                        protocol;  // used to disinguish between mqtt and http/https notifications
   std::string                        verb;
   std::string                        tenant;
   std::string                        servicePath;
   std::string                        xauthToken;
-  std::string                        resource;
+  std::string                        resource;  // path for HTTP notifications, topic for MQTT notifications
+  unsigned int                       qos;       // used only in MQTT notifications
   std::string                        content_type;
   std::string                        content;
   char                               transactionId[64];

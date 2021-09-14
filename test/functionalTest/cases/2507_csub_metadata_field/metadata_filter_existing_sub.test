@@ -31,8 +31,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity with attribute with metadata M1, M2, M3
-# 02. Create sub with metadata: *
+# 01. Create sub with metadata: *
+# 02. Create entity with attribute with metadata M1, M2, M3
 # 03. Dump and reset: see notification with metadata M1+M2+M3
 # 04. Update sub with metadata: M1, M2
 # 05. Update entity to trigger notification
@@ -46,7 +46,33 @@ accumulatorStart --pretty-print
 #
 
 
-echo "01. Create entity with attribute with metadata M1, M2, M3"
+echo "01. Create sub with metadata: *"
+echo "==============================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [ ],
+    "metadata": [ "*" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create entity with attribute with metadata M1, M2, M3"
 echo "========================================================="
 payload='{
   "type": "T",
@@ -82,32 +108,6 @@ payload='{
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
-
-
-echo "02. Create sub with metadata: *"
-echo "==============================="
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "id": "E",
-        "type": "T"
-      }
-    ]
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [ ],
-    "metadata": [ "*" ]
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
 echo "03. Dump and reset: see notification with metadata M1+M2+M3"
@@ -245,21 +245,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with attribute with metadata M1, M2, M3
-=========================================================
+01. Create sub with metadata: *
+===============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create sub with metadata: *
-===============================
+02. Create entity with attribute with metadata M1, M2, M3
+=========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -275,7 +275,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

@@ -146,13 +146,27 @@ std::string Notification::toJson(const std::string& attrsFormat)
 
   jh.addString("attrsFormat", attrsFormat);
 
-  if (this->httpInfo.custom)
+  if (this->type == HttpNotification)
   {
-    jh.addRaw("httpCustom", this->httpInfo.toJson());
+    if (this->httpInfo.custom)
+    {
+      jh.addRaw("httpCustom", this->httpInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("http", this->httpInfo.toJson());
+    }
   }
-  else
+  else  // MqttNotification
   {
-    jh.addRaw("http", this->httpInfo.toJson());
+    if (this->mqttInfo.custom)
+    {
+      jh.addRaw("mqttCustom", this->mqttInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("mqtt", this->mqttInfo.toJson());
+    }
   }
 
   if (this->metadata.size() > 0)

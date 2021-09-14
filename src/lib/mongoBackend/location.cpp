@@ -165,10 +165,10 @@ static bool getGeoJson
 
   if (caP->type == GEO_JSON)
   {
-    // Attribute value has to be object in this case
-    if ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject()))
+    // If attribute value is not null, then it has to be object in this case
+    if ((caP->valueType != orion::ValueTypeNull) && ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject())))
     {
-      *errDetail = "geo:json needs an object as value";
+      *errDetail = "geo:json needs an object or null as value";
       return false;
     }
 

@@ -98,7 +98,6 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 * - MongoDbInsertEntityFail
 * - MongoDbUpsertRegistrationFail
 * - MongoDbEntitiesInconsistency
-* - MongoDbCAsubsFindFail
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -2284,17 +2283,12 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     const DBException e = DBException("boom!!", 33);
     BSONObj fakeEntity = BSON("_id" << BSON("id" << "E1" << "type" << "T1"));
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    DBClientCursorMock* cursorMockCAsub = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
     ON_CALL(*connectionMock, count(_, _, _, _, _))
             .WillByDefault(Return(1));
     ON_CALL(*connectionMock, findOne(_, _, _, _))
             .WillByDefault(Return(fakeEntity));
     ON_CALL(*connectionMock, update("utest.registrations", _, _, _, _, _))
             .WillByDefault(Throw(e));
-    ON_CALL(*cursorMockCAsub, more())
-            .WillByDefault(Return(false));
-    ON_CALL(*connectionMock, _query("utest.casubs", _, _, _, _, _, _))
-            .WillByDefault(Return(cursorMockCAsub));
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
@@ -2344,7 +2338,6 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 
     /* Release mock */
     delete connectionMock;
-    delete cursorMockCAsub;
 
     /* check collection has not been touched */
     EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2354,16 +2347,3 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 }
 
 
-
-/* ****************************************************************************
-*
-* MongoDbCAsubsFindFail -
-*
-* FIXME: test disabled by the moment. The same comment done in
-* mongoUpdateContext_withOnchangeSubscriptions.MongoDbQueryFail applyes here
-*/
-TEST(mongoRegisterContextRequest, DISABLED_MongoDbCAsubsFindFail)
-{
-  // FIXME
-  EXPECT_EQ(1, 2);
-}

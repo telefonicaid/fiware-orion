@@ -25,6 +25,7 @@ SET (SOURCES
     senderThread.cpp
     ContextSubscriptionInfo.cpp
     QueueWorkers.cpp
+    ServiceQueue.cpp
     QueueNotifier.cpp
     QueueStatistics.cpp
 )
@@ -33,9 +34,8 @@ SET (HEADERS
     ContextSubscriptionInfo.h
     Notifier.h
     senderThread.h
-    ThreadData.h
-    OnIntervalThreadParams.h
     QueueWorkers.h
+    ServiceQueue.h
     QueueNotifier.h
     QueueStatistics.h
 )

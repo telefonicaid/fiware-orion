@@ -31,35 +31,14 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1, attribute temperature, metadata TimeInstant
-# 02. Create subscription with metadata filter a_md
+# 01. Create subscription with metadata filter a_md
+# 02. Create entity E1, attribute temperature, metadata TimeInstant
 # 03. Update entity E1, attribute temperature, metadata TimeInstant
 # 04. Dump accumulator and check none of the two notifications have "TimeInstant" metadata
 #
 
 
-echo "01. Create entity E1, attribute temperature, metadata TimeInstant"
-echo "================================================================="
-payload='{
-  "id": "E1",
-  "type": "T",
-  "temperature": {
-    "value": 23,
-    "type": "Float",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-09-12T16:14:00Z"
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create subscription with metadata filter a_md"
+echo "01. Create subscription with metadata filter a_md"
 echo "================================================="
 payload='{
         "subject": {
@@ -80,6 +59,28 @@ payload='{
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
+
+
+echo "02. Create entity E1, attribute temperature, metadata TimeInstant"
+echo "================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "temperature": {
+    "value": 23,
+    "type": "Float",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-09-12T16:14:00Z"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
 
 # Sleep more than subCacheIval, to ensure cache is refresed
 sleep 3
@@ -112,21 +113,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1, attribute temperature, metadata TimeInstant
-=================================================================
+01. Create subscription with metadata filter a_md
+=================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create subscription with metadata filter a_md
-=================================================
+02. Create entity E1, attribute temperature, metadata TimeInstant
+=================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -150,7 +151,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

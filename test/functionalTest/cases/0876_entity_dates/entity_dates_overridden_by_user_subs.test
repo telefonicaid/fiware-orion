@@ -47,13 +47,11 @@ accumulatorStart --pretty-print
 # 07. Dump & reset accumulator: see E2-auto [but also E1-user]
 #
 # 08. Create sub E.*/T with filter dateModified<2049-01-01
-# 09. Dump & reset accumulator: see initial notif E2-auto [but also E1-user]
-#
-# 10. Sanity check: E2 has dateModified in a far away future
-# 11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
-# 12. Modify E1 (should trigger 2 notif)
-# 13. Modify E2 (should trigger 2 notif)
-# 14. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
+# 09. Sanity check: E2 has dateModified in a far away future
+# 10. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
+# 11. Modify E1 (should trigger 2 notif)
+# 12. Modify E2 (should trigger 2 notif)
+# 13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
 #
 
 echo "01. Create sub E.*/T with filter dateModified<2049-01-01"
@@ -184,22 +182,14 @@ echo
 echo
 
 
-echo "09. Dump & reset accumulator: see initial notif E2-auto [but also E1-user]"
-echo "=========================================================================="
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo "10. Sanity check: E1 has dateModified in a far away future"
+echo "09. Sanity check: E1 has dateModified in a far away future"
 echo "=========================================================="
 orionCurl --url '/v2/entities/E1/attrs'
 echo
 echo
 
 
-echo "11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator"
+echo "10. Delete user dateModified from E1 (should not trigger notif) & reset accumulator"
 echo "==================================================================================="
 orionCurl --url '/v2/entities/E1/attrs/dateModified' -X DELETE
 accumulatorReset
@@ -207,7 +197,7 @@ echo
 echo
 
 
-echo "12. Modify E1 (should trigger 2 notifs)"
+echo "11. Modify E1 (should trigger 2 notifs)"
 echo "======================================="
 payload='{
   "A": {
@@ -220,7 +210,7 @@ echo
 echo
 
 
-echo "13. Modify E2 (should trigger 2 notifs)"
+echo "12. Modify E2 (should trigger 2 notifs)"
 echo "======================================="
 payload='{
   "A": {
@@ -233,7 +223,7 @@ echo
 echo
 
 
-echo "14. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto"
+echo "13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto"
 echo "==============================================================="
 accumulatorDump
 accumulatorReset
@@ -426,55 +416,7 @@ Date: REGEX(.*)
 
 
 
-09. Dump & reset accumulator: see initial notif E2-auto [but also E1-user]
-==========================================================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 364
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2051-01-01T00:00:00.666Z"
-            },
-            "id": "E1",
-            "type": "T"
-        },
-        {
-            "A": {
-                "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "dateModified": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-            },
-            "id": "E2",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-
-
-10. Sanity check: E1 has dateModified in a far away future
+09. Sanity check: E1 has dateModified in a far away future
 ==========================================================
 HTTP/1.1 200 OK
 Content-Length: 133
@@ -496,7 +438,7 @@ Date: REGEX(.*)
 }
 
 
-11. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
+10. Delete user dateModified from E1 (should not trigger notif) & reset accumulator
 ===================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -504,7 +446,7 @@ Date: REGEX(.*)
 
 
 
-12. Modify E1 (should trigger 2 notifs)
+11. Modify E1 (should trigger 2 notifs)
 =======================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -512,7 +454,7 @@ Date: REGEX(.*)
 
 
 
-13. Modify E2 (should trigger 2 notifs)
+12. Modify E2 (should trigger 2 notifs)
 =======================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -520,7 +462,7 @@ Date: REGEX(.*)
 
 
 
-14. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
+13. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
 ===============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

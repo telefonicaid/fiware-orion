@@ -56,10 +56,9 @@ EOF
 ```
 
 Create 1 subscription for entity E1. Thus, each time E1 gets updated a notification will be sent (1:1 relationship).
-Note we use `skipInitialNotification` to avoid a "noisy" initial notification to be sent.
 
 ```
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E1 subscription",
   "subject": {
@@ -80,10 +79,9 @@ EOF
 ```
 
 Create 10 subscriptions for entity E10. Thus, each time E10 gets updated ten notifications will be sent (1:10 relationship).
-Note we use `skipInitialNotification` to avoid a "noisy" initial notification to be sent.
 
 ```
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 1",
   "subject": {
@@ -102,7 +100,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 2",
   "subject": {
@@ -121,7 +119,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 3",
   "subject": {
@@ -140,7 +138,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 4",
   "subject": {
@@ -159,7 +157,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 5",
   "subject": {
@@ -178,7 +176,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 6",
   "subject": {
@@ -197,7 +195,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 7",
   "subject": {
@@ -216,7 +214,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 8",
   "subject": {
@@ -235,7 +233,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 9",
   "subject": {
@@ -254,7 +252,7 @@ curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H
 }
 EOF
 
-curl -v localhost:1026/v2/subscriptions?options=skipInitialNotification -s -S -H 'Content-Type: application/json' -d @- <<EOF
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "E10 subscription 10",
   "subject": {

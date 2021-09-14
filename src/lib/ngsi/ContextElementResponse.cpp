@@ -139,7 +139,7 @@ ContextElementResponse::ContextElementResponse
     bool               noLocationMetadata      = true;
 
     // Name and type
-    ca.name           = dbDotDecode(attrName);
+    ca.name           = dbDecode(attrName);
     ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
@@ -222,7 +222,7 @@ ContextElementResponse::ContextElementResponse
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
+        Metadata*   md = new Metadata(dbDecode(currentMd), getObjectFieldF(mds, currentMd));
 
         /* The flag below indicates that a location metadata with WGS84 was found during iteration.
         *  It needs to the NGSIV1 check below, in order to add it if the flag is false

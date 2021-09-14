@@ -43,6 +43,7 @@ public:
   void        addNumber(const std::string& key, double value);
   void        addDate(const std::string& key, double timestamp);
   void        addBool(const std::string& key, bool b);
+  void        addNull(const std::string& key);
 
   std::string str();
 
@@ -63,6 +64,7 @@ public:
   void        addNumber(double value);
   void        addDate(double timestamp);
   void        addBool(bool b);
+
 
   std::string str();
 

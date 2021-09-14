@@ -31,39 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
-# 02. GET E1 and see its two 'ts' attribute with their milliseconds
-# 03. Create a subscription to provoke an initial notification of E1
+# 01. Create a subscription on E1
+# 02. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
+# 03. GET E1 and see its two 'ts' attribute with their milliseconds
 # 04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs
 #
 
-echo "01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone"
-echo "================================================================================================================================================================="
-payload='{
-  "id": "E1",
-  "ts": {
-    "type": "DateTime",
-    "value": "2020-07-03T09:24:04.456"
-  },
-  "ts2": {
-    "type": "DateTime",
-    "value": "2020-07-03T09:24:04.456+0100"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo "02. GET E1 and see its two 'ts' attribute with their milliseconds"
-echo "================================================================="
-orionCurl --url /v2/entities/E1
-echo
-echo
-
-
-echo "03. Create a subscription to provoke an initial notification of E1"
-echo "=================================================================="
+echo "01. Create a subscription on E1"
+echo "==============================="
 payload='
 {
   "subject": {
@@ -87,6 +63,31 @@ echo
 echo
 
 
+echo "02. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone"
+echo "================================================================================================================================================================="
+payload='{
+  "id": "E1",
+  "ts": {
+    "type": "DateTime",
+    "value": "2020-07-03T09:24:04.456"
+  },
+  "ts2": {
+    "type": "DateTime",
+    "value": "2020-07-03T09:24:04.456+0100"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1 and see its two 'ts' attribute with their milliseconds"
+echo "================================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
 echo "04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs"
 echo "=============================================================================================="
 accumulatorDump
@@ -95,7 +96,17 @@ echo
 
 
 --REGEXPECT--
-01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
+01. Create a subscription on E1
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
 =================================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -105,7 +116,7 @@ Date: REGEX(.*)
 
 
 
-02. GET E1 and see its two 'ts' attribute with their milliseconds
+03. GET E1 and see its two 'ts' attribute with their milliseconds
 =================================================================
 HTTP/1.1 200 OK
 Content-Length: 175
@@ -129,16 +140,6 @@ Date: REGEX(.*)
 }
 
 
-03. Create a subscription to provoke an initial notification of E1
-==================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
 04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs
 ==============================================================================================
 POST http://localhost:REGEX(\d+)/notify
@@ -149,7 +150,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

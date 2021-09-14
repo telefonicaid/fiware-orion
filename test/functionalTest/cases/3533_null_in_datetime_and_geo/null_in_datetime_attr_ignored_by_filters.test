@@ -1,0 +1,273 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Null in DateTime in attrs ignored by filters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with DateTime attribute T with value 2018-12-10T00:00:00.000Z
+# 02. Create entity E2 with DateTime attribute T with value 2018-12-20T00:00:00.000Z
+# 03. Create entity E3 with DateTime attribute T with value null
+# 04. GET /v2/entities?q=T<2018-12-15 -> get E1
+# 05. GET /v2/entities?q=T>2018-12-15 -> get E2
+# 06. Update E2-T: null
+# 07. Update E3-T: 2018-12-16T00:00:00.000Z
+# 08. GET /v2/entities?q=T<2018-12-15 -> get E1
+# 09. GET /v2/entities?q=T>2018-12-15 -> get E3
+#
+
+echo "01. Create entity E1 with DateTime attribute T with value 2018-12-10T00:00:00.000Z"
+echo "=================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T": {
+    "value": "2018-12-10T00:00:00.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+echo "02. Create entity E2 with DateTime attribute T with value 2018-12-20T00:00:00.000Z"
+echo "=================================================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "T": {
+    "value": "2018-12-20T00:00:00.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+echo "03. Create entity E1 with DateTime attribute T with value null"
+echo "=============================================================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "T": {
+    "value": null,
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+echo "04. GET /v2/entities?q=T<2018-12-15 -> get E1"
+echo "============================================="
+orionCurl --url '/v2/entities?q=T<2018-12-15'
+echo
+echo
+
+
+echo "05. GET /v2/entities?q=T>2018-12-15 -> get E2"
+echo "============================================="
+orionCurl --url '/v2/entities?q=T>2018-12-15'
+echo
+echo
+
+
+echo "06. Update E2-T: null"
+echo "====================="
+payload='{
+  "T": {
+    "value": null,
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. Update E3-T: 2018-12-16T00:00:00.000Z"
+echo "========================================="
+payload='{
+  "T": {
+    "value": "2018-12-16T00:00:00.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E3/attrs --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /v2/entities?q=T<2018-12-15 -> get E1"
+echo "============================================="
+orionCurl --url '/v2/entities?q=T<2018-12-15'
+echo
+echo
+
+
+echo "09. GET /v2/entities?q=T>2018-12-15 -> get E3"
+echo "============================================="
+orionCurl --url '/v2/entities?q=T>2018-12-15'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with DateTime attribute T with value 2018-12-10T00:00:00.000Z
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with DateTime attribute T with value 2018-12-20T00:00:00.000Z
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E1 with DateTime attribute T with value null
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities?q=T<2018-12-15 -> get E1
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "T": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2018-12-10T00:00:00.000Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+05. GET /v2/entities?q=T>2018-12-15 -> get E2
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "T": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2018-12-20T00:00:00.000Z"
+        },
+        "id": "E2",
+        "type": "T"
+    }
+]
+
+
+06. Update E2-T: null
+=====================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update E3-T: 2018-12-16T00:00:00.000Z
+=========================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/entities?q=T<2018-12-15 -> get E1
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "T": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2018-12-10T00:00:00.000Z"
+        },
+        "id": "E1",
+        "type": "T"
+    }
+]
+
+
+09. GET /v2/entities?q=T>2018-12-15 -> get E3
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "T": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2018-12-16T00:00:00.000Z"
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

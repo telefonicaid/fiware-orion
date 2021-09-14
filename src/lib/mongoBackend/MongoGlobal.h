@@ -351,22 +351,7 @@ extern orion::BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,
-  const std::vector<std::string>&    notifAttributesV,
-  const std::vector<std::string>&    metadataV,
-  const std::string&                 subId,
-  const ngsiv2::HttpInfo&            httpInfo,
-  bool*                              notificationDone,
-  RenderFormat                       renderFormat,
-  const std::string&                 tenant,
-  const std::string&                 xauthToken,
-  const std::vector<std::string>&    servicePathV,
-  const Restriction*                 resP,
-  const std::string&                 status,
-  const std::string&                 fiwareCorrelator,
-  const std::vector<std::string>&    attrsOrder,
-  bool                               blacklist,
-  const bool&                        skipInitialNotification,
-  ApiVersion                         apiVersion
+  const std::vector<std::string>&    notifAttributesV
 );
 
 

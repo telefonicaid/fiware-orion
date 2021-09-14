@@ -14,13 +14,16 @@
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
-* [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
+* [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
+* [`skipForwarding` オプション](#skipforwarding-option)
+* [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
 
@@ -271,27 +274,32 @@ NGISv2 仕様 "Ordering Results" セクションから :
 
 [Top](#top)
 
-<a name="initial-notifications"></a>
-## 初期通知
-
-NGSIv2 仕様では、サブスクリプションの対象となるエンティティの更新に基づいて、特定のサブスクリプションに対応する通知をトリガするルールを "サブスクリプション" セクションで説明しています。そのような定期的な通知以外にも、Orion は、また、サブスクリプションの作成/更新時時に初期通知を送信することがあります。
-
-初期通知は、新しい URI パラメータオプション `skipInitialNotification`
-を使用して設定できます。
-例えば、`POST /v2/subscriptions?options=skipInitialNotification` または、
-`PATCH /v2/subscriptions/{subId}?options=skipInitialNotification` です。
-
-[初期通知](initial_notification.md) について、ドキュメントで詳細を
-確認してください。
-
-[トップ](#top)
-
 <a name="oneshot-subscriptions"></a>
 ## Oneshot サブスクリプション
 
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[トップ](#top)
+
+<a name="custom-notifications-without-payload"></a>
+## ペイロードなしのカスタム通知
+
+カスタム通知の `httpCustom` フィールド内で `payload` が `null` に設定されている場合、そのサブスクリプションに
+関連付けられた通知にはペイロードが含まれません (つまり、conten-length 0 の通知)。
+
+これは、`payload` を `""` に設定したり、フィールドを省略したりすることと同じではないことに注意してください。
+その場合、通知は NGSIv2 正規化形式を使用して送信されます。
+
+[トップ](#top)
+
+<a name="mqtt-notificationsmqtt-notificationsmqtt-notifications"></a>
+## MQTT 通知
+
+NGISv2 仕様で説明されているサブスクリプションの `notification` オブジェクト内の `http` および
+`httpCustom` フィールドとは別に、Orion は MQTT 通知用の `mqtt` および `mqttCustom` もサポートして
+います。このトピックは、[この特定のドキュメント](mqtt_notifications.md)でより詳細に説明されています。
 
 [トップ](#top)
 
@@ -394,6 +402,43 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
+
+[Top](#top)
+
+<a name="skipforwarding-option"></a>
+## `skipForwarding` オプション
+
+CPrs への転送をスキップするために、クエリで `skipForwarding` オプションを使用できます (例:
+`GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
+されます。
+
+`skipForwarding` を更新しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+セマンティクスを使用して更新要求を使用するだけです)。
+
+[Top](#top)
+
+<a name="null-support-in-datetime-and-geolocation-types"></a>
+## DateTime および geolocation タイプでの `null` サポート
+
+NGSIv2仕様によると:
+
+* `DateTime` 属性およびメタデータ: ISO8601 形式の文字列である必要があります
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`: 属性は特定のフォーマット・ルールに
+  従う必要があります ("エンティティの地理空間プロパティ" セクションで定義されています)
+
+これらの場合に `null` 値がサポートされているかどうかは、NGSIv2 仕様では明確ではありません。
+明確にするために、Orion はその可能性をサポートします。
+
+`DateTime` 属性およびメタデータに関して:
+
+* `DateTime` 属性または `null` 値を持つメタデータはフィルターで考慮されません。つまり
+  `GET /v2/entities?q=T>2021-04-21` 
+
+`geo:` 属性に関して:
+
+* `null` 値を持つ `geo:` 属性は、ジオ・クエリでは考慮されません。つまり、ジオ・クエリの結果として
+  エンティティは返されません
+* `null` 値を持つ `geo:` 属性は[属性の制限](#limit-to-attributes-for-entity-location)にはカウントされません
 
 [Top](#top)
 

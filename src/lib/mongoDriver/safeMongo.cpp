@@ -61,7 +61,7 @@ void static logKeyNotFound(const char* supposed, const char* field, bson_t* b, c
   int type = bsonTypeNumber(b, field);
 
   LM_E(("Runtime Error (field '%s' was supposed to be %s but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-        field, supposed, orion::bsonType2String((orion::BSONType) type), field, type, bsonStr, caller, line));
+        field, supposed, orion::bsonType2String((orion::BSONType) type), type, bsonStr, caller, line));
 
   bson_free(bsonStr);
 }

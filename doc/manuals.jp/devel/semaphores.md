@@ -9,6 +9,7 @@ Orion は、以下のような繊細なデータやリソースを保護する�
 * [Mongo コネクション・プール](#mongo-connection-pool-semaphores) (Mongo connection pool)
 * [メトリック・マネージャ](#metrics-manager-semaphore) (Metrics Manager)
 * [アラーム・マネージャ](#alarm-manager-semaphore) (Alarm Manager)
+* [MQTT 接続マネージャ](#mqtt-connection-manager-semaphore)
 * [ログ・ファイル](#log-file-semaphore) (Log file)
 * [通知キュー](#notification-queue-semaphore) (Notification queue)
 * [通知キュー統計情報](#notification-queue-statistics-semaphore) (Notification queue statistics)
@@ -150,6 +151,20 @@ Orion はデータベースへのコネクション用のプールを実装し�
 
 [トップ](#top)
 
+<a name="mqtt-connection-manager-semaphore"></a>
+## MQTT 接続マネージャ・セマフォ
+MQTT 接続マネージャは MetricsManager と非常によく似ており、そのセマフォは同じパターンに従います。クラス `MqttConnectionManager` には、`sem`と 呼ばれるプライベート・フィールドとメソッドがあります:
+
+* `MqttConnectionManager::semTake()`
+* `MqttConnectionManager::semGive()`
+
+セマフォは接続ハッシュ・マップへのアクセスを保護し、次の方法でアクセスします:
+
+* `sendMqttNotification()`
+* `cleanup()`
+
+[トップ](#top)
+
 <a name="log-file-semaphore"></a>
 ## ログ・ファイル・セマフォ
 Orion はログ・ファイルを保持しており、同時に2つのスレッドからログ・ファイルを保護するためにセマフォが必要です。このセマフォを保持する変数は `sem` と呼ばれ、それは、`lib/logMsg/logMsg.cpp` にあります。これは静的変数なので、このファイルの外からは参照できません。
@@ -164,7 +179,10 @@ Orion はログ・ファイルを保持しており、同時に2つのスレッ�
 
 <a name="notification-queue-semaphore"></a>
 ## 通知キューセマフォ
-通知を送信するために、[CLI parameter](../admin/cli.md) `-notificationMode` を使って、スレッド・プールを使用するとき、スレッド・プール内のワーカーに通知を送るためにキューが使用されます。このキューはセマフォによって保護されています。
+通知を送信するために、[CLI parameter](../admin/cli.md) `-notificationMode` を使って、スレッド・プール (thread pools)
+を使用するとき、スレッド・プール内のワーカーに通知を送るためにキューが使用されます。このキューはセマフォによって
+保護されています。複数のキューが使用されている場合 (つまり、デフォルトのキューとサービスごとのキュー)、セマフォは
+各キューに存在します。
 
 `boost::mutex` タイプのセマフォは、`mtx` と呼ばれ、それは、`src/lib/common/SyncQOverflow.h` で見つかる、`SyncQOverflow` クラスのプライベート・メンバでです :
 
@@ -185,7 +203,10 @@ public:
 };
 ```
 
-`QueueWorkers` クラスは `SyncQOverflow` タイプのプライベート・メンバーを含み、`QueueNotifier` クラスは ` QueueWorkers` タイプのプライベート・メンバーを含みます。
+`QueueWorkers` と `ServiceQueue` の両方のクラスには `SyncQOverflow` タイプのプライベート・メンバが含まれ、`ServiceQueue`
+クラスには `QueueWorkers` タイプのプライベート・メンバも含まれます。
+`QueueNotifier` クラスには、サービスごとの `ServiceQueue` のベクトルと、デフォルトの `ServiceQueue` (予約されたキューを
+持つサービスに関連付けられていない通知用) が含まれる場合があります。
 
 最後に、`src/app/contextBroker/contextBroker.cpp` の `contextBrokerInit()` は、CLI パラメータ `-notificationMode` が **threadpool** に等しいときにリクエストされたときに、シングルトンとして `QueueNotifier` のインスタンスを生成します。
 

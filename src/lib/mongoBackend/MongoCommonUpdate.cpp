@@ -373,7 +373,7 @@ static void appendMetadata
   }
 
   mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbDotEncode(mdP->name);
+  std::string effectiveName = dbEncode(mdP->name);
 
   // FIXME P8: this code probably should be refactored to be clearer and cleaner
   if (!type.empty())
@@ -582,7 +582,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
 
       if (apiVersion != V2 || caP->onlyValue)
       {
-        if (!hasMetadata(dbDotDecode(md.name), md.type, caP))
+        if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
           appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
         }
@@ -735,7 +735,7 @@ static bool updateAttribute
 {
   *actualUpdate = false;
 
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   if (isReplace)
   {
@@ -827,7 +827,7 @@ static bool appendAttribute
   ApiVersion          apiVersion
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
@@ -903,7 +903,7 @@ static bool deleteAttribute
   ContextAttribute*                     caP
 )
 {
-  std::string effectiveName = dbDotEncode(caP->name);
+  std::string effectiveName = dbEncode(caP->name);
 
   if (!attrs.hasField(effectiveName.c_str()))
   {
@@ -1092,6 +1092,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
+                                                           cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
@@ -1513,8 +1514,10 @@ static bool addTriggeredSubscriptions_noCache
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
+      ngsiv2::MqttInfo  mqttInfo;
 
       httpInfo.fill(sub);
+      mqttInfo.fill(sub);
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
@@ -1529,6 +1532,7 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           renderFormat,
           httpInfo,
+          mqttInfo,
           aList, "", "");
 
       if (!onlyChanged)
@@ -1684,7 +1688,7 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
-  const ngsiv2::HttpInfo&          httpInfo,
+  const ngsiv2::Notification&      notification,
   bool                             blacklist = false
 )
 {
@@ -1742,7 +1746,7 @@ static bool processOnChangeConditionForUpdateContext
 
   ncr.subscriptionId.set(subId);
   getNotifier()->sendNotifyContextRequest(ncr,
-                                          httpInfo,
+                                          notification,
                                           tenant,
                                           xauthToken,
                                           fiwareCorrelator,
@@ -1877,6 +1881,12 @@ static unsigned int processSubscriptions
 
     bool  notificationSent;
 
+    // Build notification object. We use topic empty-ness to know the type
+    ngsiv2::Notification notification;
+    notification.httpInfo = tSubP->httpInfo;
+    notification.mqttInfo = tSubP->mqttInfo;
+    notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
+
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
                                                                 tSubP->metadata,
@@ -1886,7 +1896,7 @@ static unsigned int processSubscriptions
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
-                                                                tSubP->httpInfo,
+                                                                notification,
                                                                 tSubP->blacklist);
 
     if (notificationSent)
@@ -2641,6 +2651,7 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
+  bool                             upsert,
   OrionError*                      oeP
 )
 {
@@ -2702,7 +2713,7 @@ static bool createEntity
 
     attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
-    std::string effectiveName = dbDotEncode(attrsV[ix]->name);
+    std::string effectiveName = dbEncode(attrsV[ix]->name);
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
@@ -2722,28 +2733,30 @@ static bool createEntity
     attrNamesToAdd.append(attrsV[ix]->name);
   }
 
-  orion::BSONObjBuilder bsonId;
+  orion::BSONObjBuilder bsonIdBuilder;
 
-  bsonId.append(ENT_ENTITY_ID, eP->id);
+  bsonIdBuilder.append(ENT_ENTITY_ID, eP->id);
 
   if (eP->type.empty())
   {
     if (apiVersion == V2)
     {
       // NGSIv2 uses default entity type
-      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
+      bsonIdBuilder.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
     }
   }
   else
   {
-    bsonId.append(ENT_ENTITY_TYPE, eP->type);
+    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
+  bsonIdBuilder.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
+
+  orion::BSONObj bsonId = bsonIdBuilder.obj();
 
   orion::BSONObjBuilder insertedDoc;
 
-  insertedDoc.append("_id", bsonId.obj());
+  insertedDoc.append("_id", bsonId);
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
   insertedDoc.append(ENT_CREATION_DATE, now);
@@ -2770,10 +2783,39 @@ static bool createEntity
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
-  if (!collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
+  // Why upsert here? See issue: https://github.com/telefonicaid/fiware-orion/issues/3821
+  if (upsert)
   {
-    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
-    return false;
+    orion::BSONObjBuilder q;
+    q.append("_id", bsonId);
+    if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, q.obj(), insertedDoc.obj(), true, errDetail))
+    {
+      oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      return false;
+    }
+  }
+  else
+  {
+    if (!orion::collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
+    {
+      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
+      // of "duplicate key" is used in the error message, then it will break. It would be better to use
+      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
+      // orion::collectionInsert() function.
+      if (errDetail->find("duplicate key") != std::string::npos)
+      {
+        oeP->fill(SccInvalidModification, "Already Exists", "Unprocessable");
+      }
+      else if (errDetail->find("Can't extract geo keys") != std::string::npos)
+      {
+        oeP->fill(SccBadRequest, "Wrong GeoJson", "BadRequest");
+      }
+      else
+      {
+        oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      }
+      return false;
+    }
   }
 
   return true;
@@ -2952,6 +2994,8 @@ static unsigned int updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
+  bool*                           attributeNotExistingError,
+  std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
@@ -2962,6 +3006,9 @@ static unsigned int updateEntity
   // Used to accumulate error response information
   *attributeAlreadyExistsError         = false;
   *attributeAlreadyExistsList          = "[ ";
+
+  *attributeNotExistingError           = false;
+  *attributeNotExistingList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -3062,6 +3109,26 @@ static unsigned int updateEntity
       }
     }
     *attributeAlreadyExistsList += " ]";
+  }
+
+  if ((apiVersion == V2) && (action == ActionTypeUpdate))
+  {
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+    {
+      if (!attrs.hasField (eP->attributeVector[ix]->name))
+      {
+        alarmMgr.badInput(clientIp, "attribute not exists");
+        *attributeNotExistingError = true;
+
+        // Add to the list of non existing attributes - for the error response
+        if (*attributeNotExistingList != "[ ")
+        {
+          *attributeNotExistingList += ", ";
+        }
+        *attributeNotExistingList += eP->attributeVector[ix]->name;
+      }
+    }
+    *attributeNotExistingList += " ]";
   }
 
   /* Build CER used for notifying (if needed) */
@@ -3609,6 +3676,10 @@ unsigned int processContextElement
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
+
+  bool         attributeNotExistingError = false;
+  std::string  attributeNotExistingList  = "[ ";
+
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
@@ -3622,6 +3693,8 @@ unsigned int processContextElement
                              responseP,
                              &attributeAlreadyExistsError,
                              &attributeAlreadyExistsList,
+                             &attributeNotExistingError,
+                             &attributeNotExistingList,
                              forcedUpdate,
                              apiVersion,
                              fiwareCorrelator,
@@ -3696,7 +3769,18 @@ unsigned int processContextElement
       std::string  errDetail;
       double       now = getCurrentTime();
 
-      if (!createEntity(eP, eP->attributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
+      // upsert condition is based on ngsiv2Flavour. It happens that when upsert is on,
+      // ngsiv2Flavour is NGSIV2_NO_FLAVOUR (see postEntities.cpp code)
+      if (!createEntity(eP,
+                        eP->attributeVector,
+                        now,
+                        &errDetail,
+                        tenant,
+                        servicePathV,
+                        apiVersion,
+                        fiwareCorrelator,
+                        ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
+                        &(responseP->oe)))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that
@@ -3778,6 +3862,13 @@ unsigned int processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+  }
+
+  if (attributeNotExistingError == true)
+  {
+    std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
   }

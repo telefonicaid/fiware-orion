@@ -120,7 +120,12 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
   }
 
-  if (!httpInfo.payload.empty())
+  if (!httpInfo.includePayload)
+  {
+    b->appendNull(CSUB_PAYLOAD);
+    LM_T(LmtMongo, ("Subscription payload: null"));
+  }
+  else if (!httpInfo.payload.empty())
   {
     b->append(CSUB_PAYLOAD, httpInfo.payload);
     LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
@@ -131,19 +136,59 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setCustomMqttInfo -
 */
-void setHttpInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
-  b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-  b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
-
-  LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-  LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
-
-  if (sub.notification.httpInfo.custom)
+  if (!mqttInfo.includePayload)
   {
-    setCustomHttpInfo(sub.notification.httpInfo, b);
+    b->appendNull(CSUB_PAYLOAD);
+    LM_T(LmtMongo, ("Subscription payload: null"));
+  }
+  else if (!mqttInfo.payload.empty())
+  {
+    b->append(CSUB_PAYLOAD, mqttInfo.payload);
+    LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setNotificationInfo -
+*/
+void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  if (sub.notification.type == ngsiv2::HttpNotification)
+  {
+    b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
+    b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
+
+    if (sub.notification.httpInfo.custom)
+    {
+      setCustomHttpInfo(sub.notification.httpInfo, b);
+    }
+  }
+  else  // MqttNotification
+  {
+    b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
+    b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
+    b->append(CSUB_MQTTQOS,   (int) sub.notification.mqttInfo.qos);
+    b->append(CSUB_CUSTOM,    sub.notification.mqttInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.mqttInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
+    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
+
+    if (sub.notification.mqttInfo.custom)
+    {
+      setCustomMqttInfo(sub.notification.mqttInfo, b);
+    }
   }
 }
 
@@ -285,26 +330,13 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-* setCondsAndInitialNotify -
+* setConds
 */
-void setCondsAndInitialNotify
+void setConds
 (
   const Subscription&              sub,
-  const std::string&               subId,
-  const std::string&               status,
   const std::vector<std::string>&  notifAttributesV,
-  const std::vector<std::string>&  metadataV,
-  const HttpInfo&                  httpInfo,
-  bool                             blacklist,
-  RenderFormat                     attrsFormat,
-  const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  orion::BSONObjBuilder*           b,
-  bool*                            notificationDone,
-  const bool&                      skipInitialNotification,
-  ApiVersion                       apiVersion
+  orion::BSONObjBuilder*           b
 )
 {
   //
@@ -313,27 +345,11 @@ void setCondsAndInitialNotify
   // the original subscription has to be taken; the caller deal with that)
   //
 
-  /* Conds vector (and maybe an initial notification) */
-  *notificationDone = false;
+  /* Conds vector */
 
   orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
                                             sub.subject.entities,
-                                            notifAttributesV,
-                                            metadataV,
-                                            subId,
-                                            httpInfo,
-                                            notificationDone,
-                                            attrsFormat,
-                                            tenant,
-                                            xauthToken,
-                                            servicePathV,
-                                            &(sub.restriction),
-                                            status,
-                                            fiwareCorrelator,
-                                            notifAttributesV,
-                                            blacklist,
-                                            skipInitialNotification,
-                                            apiVersion);
+                                            notifAttributesV);
 
   b->append(CSUB_CONDITIONS, conds);
   LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));

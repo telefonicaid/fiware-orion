@@ -14,13 +14,16 @@
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [Custom notifications without payload](#custom-notifications-without-payload)
+* [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
+* [`skipForwarding` option](#skipforwarding-option)
+* [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
@@ -304,22 +307,29 @@ From lowest to highest:
 
 [Top](#top)
 
-## Initial notifications
-
-The NGSIv2 specification describes in section "Subscriptions" the rules that trigger notifications
-corresponding to a given subscription, based on updates to the entities covered by the subscription.
-Apart from that kind of regular notifications, Orion may send also an initial notification at
-subscription creation/update time.
-
-Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification` or `PATCH /v2/subscriptions/{subId}?options=skipInitialNotification`
-
-Check details in the document about [initial notifications](initial_notification.md)
-
-[Top](#top)
-
 ## Oneshot subscriptions
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
+
+[Top](#top)
+
+## Custom notifications without payload
+
+If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
+associated to that subscription will not include any payload (i.e. content-length 0 notifications).
+
+Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
+the notification will be sent using the NGSIv2 normalized format.
+
+[Top](#top)
+
+## MQTT notifications
+
+Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
+in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
+topic is described with more detail [in this specific document](mqtt_notifications.md).
+
+[Top](#top)
 
 ## Notify only attributes that change
 
@@ -420,6 +430,40 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
+
+[Top](#top)
+
+## `skipForwarding` option
+
+You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
+forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
+
+Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
+just use an update request with append/creation semantics).
+
+[Top](#top)
+
+## `null` support in DateTime and geolocation types
+
+According to NGSIv2 specification:
+
+* `DateTime` attributes and metadata: has to be strings in in ISO8601 format
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`: attributes has to follow specific formatting rules
+  (defined in the "Geospatial properties of entities section)
+
+It is not clear in the NGSIv2 specification if the `null` value is supported in these cases or not.
+Just to be clear, Orion supports that possibility.
+
+With regards to `DateTime` attributes and metadata:
+
+* A `DateTime` attribute or metadata with `null` value will not be taken into account in filters, i.e.
+  `GET /v2/entities?q=T>2021-04-21`
+
+With regards to `geo:` attributes:
+
+* A `geo:` attribute with `null` value will not be taken into account in geo-queries, i.e. the entity will
+  not be returned as a result of geo-query
+* `geo:` attributes with `null` value doesn't count towards [the limit of one](#limit-to-attributes-for-entity-location)
 
 [Top](#top)
 

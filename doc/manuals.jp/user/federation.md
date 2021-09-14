@@ -106,5 +106,3 @@ curl localhost:1032/v2/entities -s -S H-header 'Accept: application/json' -d @- 
 ```
 
 通知リクエストのセマンティクスは、`POST /v2/entities?options=upsert` は同じです。したがって、エンティティが存在する場合は、更新されます。エンティティが存在しない場合は作成されます。したがって、フェデレーションは正確なミラーリングを提供しません : 最初の Context Broker でエンティティが削除されると、エンティティは 2番目の Context Broker で削除されません。
-
-フェデレーションのサブスクリプションが完了すると、Orion Context Broker が [初期通知](initial_notification.md)を送信できることに注意してください。場合によっては、この初期通知は受信側の Context Broker によって処理不能になる可能性があります。特に、初期通知で合法的に許可されているよりも多くの要素がサービスパス・ヘッダに含まれている場合があります ([サービスパスに関するドキュメント](service_path.md)を参照してください)。したがって、`"too many service paths - a maximum of ten service paths is allowed"` エラーが発生します。ただし、この初期通知だけが無視され、この問題が発生せず、受信側の Context Broker によって正しく処理された後の通常の通知が無視されることに注意してください。

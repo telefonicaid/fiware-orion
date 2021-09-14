@@ -34,8 +34,8 @@ accumulatorStart --pretty-print
 # 01. Create E with A/T/V
 # 02. Subscribe to changes of A in E
 # 03. Update only attribute type, i.e. A/T2/V
-# 04. Do update without actually updating anyghing, i.e. A/T2/V
-# 05. Check that 2 notification arrived (initial one an the one due to step 3)
+# 04. Do update without actually updating anything, i.e. A/T2/V
+# 05. Check that 1 notification arrived (the one due to step 3)
 #
 
 echo "01. Create E with A/T/V"
@@ -92,7 +92,7 @@ echo
 echo
 
 
-echo "04. Do update without actually updating anyghing, i.e. A/T2/V"
+echo "04. Do update without actually updating anything, i.e. A/T2/V"
 echo "============================================================="
 payload='{
    "type" : "T2",
@@ -103,8 +103,8 @@ echo
 echo
 
 
-echo "05. Check that 2 notification arrived (initial one an the one due to step 3)"
-echo "============================================================================"
+echo "05. Check that 1 notification arrived (the one due to step 3)"
+echo "============================================================="
 accumulatorDump
 echo
 echo
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 }
 
 
-04. Do update without actually updating anyghing, i.e. A/T2/V
+04. Do update without actually updating anything, i.e. A/T2/V
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 34
@@ -185,42 +185,8 @@ Date: REGEX(.*)
 }
 
 
-05. Check that 2 notification arrived (initial one an the one due to step 3)
-============================================================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 254
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A",
-                        "type": "T",
-                        "value": "V"
-                    }
-                ],
-                "id": "E",
-                "isPattern": "false",
-                "type": "TEnt"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "originator": "localhost",
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
+05. Check that 1 notification arrived (the one due to step 3)
+=============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 255

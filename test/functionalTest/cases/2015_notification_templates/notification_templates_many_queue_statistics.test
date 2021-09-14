@@ -31,52 +31,19 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E1/T
-# 02. Create E2/T
-# 03. Create E3/T
-# 04. Create custom subscription covering E1/T and E2/T -> 2 notifications
-# 05. Update subscription covering E2/T and E3/T -> 2 notifications
-# 06. Get statistics, see 4 notifications
+# 01. Create custom subscription covering E1/T and E2/T
+# 02. Create E1/T (notif)
+# 03. Create E2/T (notif)
+# 04. Create E3/T (not notif)
+# 05. Update subscription covering E2/T and E3/T
+# 06. Update E1/T (not notif)
+# 07. Update E2/T (notif)
+# 08. Update E3/T (notif)
+# 09. Get statistics, see 4 notifications
 #
 
-echo "01. Create E1/T"
-echo "==============="
-payload='{
-  "id": "E1",
-  "type": "T",
-  "A1": true
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "02. Create E2/T"
-echo "==============="
-payload='{
-  "id": "E2",
-  "type": "T",
-  "A2": null
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "03. Create E3/T"
-echo "==============="
-payload='{
-  "id": "E3",
-  "type": "T",
-  "A3": 3
-}'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload"
-echo
-echo
-
-
-echo "04. Create custom subscription covering E1/T and E2/T -> 2 notifications"
-echo "========================================================================"
+echo "01. Create custom subscription covering E1/T and E2/T"
+echo "====================================================="
 payload='{
   "subject": {
     "entities": [
@@ -103,8 +70,44 @@ echo
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "05. Update subscription covering E2/T and E3/T -> 2 notifications"
-echo "================================================================="
+echo "02. Create E1/T (notif)"
+echo "======================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A1": true
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E2/T (notif)"
+echo "======================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A2": null
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. Create E3/T (not notif)"
+echo "==========================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A3": 3
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05. Update subscription covering E2/T and E3/T"
+echo "=============================================="
 payload='{
   "subject": {
     "entities": [
@@ -123,45 +126,45 @@ echo
 echo
 
 
-echo "06. Get statistics, see 4 notifications"
+echo "06. Update E1/T (not notif)"
+echo "==========================="
+payload='{
+  "A1": false
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "07. Update E2/T (notif)"
+echo "======================="
+payload='{
+  "A2": "notnull"
+}'
+orionCurl --url /v2/entities/E2/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "08. Update E3/T (notif)"
+echo "======================="
+payload='{
+  "A3": 4
+}'
+orionCurl --url /v2/entities/E3/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "09. Get statistics, see 4 notifications"
 echo "======================================="
 orionCurl --url /statistics
 echo
 echo
 
 --REGEXPECT--
-01. Create E1/T
-===============
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Create E2/T
-===============
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Create E3/T
-===============
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Create custom subscription covering E1/T and E2/T -> 2 notifications
-========================================================================
+01. Create custom subscription covering E1/T and E2/T
+=====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -170,15 +173,69 @@ Date: REGEX(.*)
 
 
 
-05. Update subscription covering E2/T and E3/T -> 2 notifications
-=================================================================
+02. Create E1/T (notif)
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E2/T (notif)
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E3/T (not notif)
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update subscription covering E2/T and E3/T
+==============================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Get statistics, see 4 notifications
+06. Update E1/T (not notif)
+===========================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update E2/T (notif)
+=======================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Update E3/T (notif)
+=======================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Get statistics, see 4 notifications
 =======================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
@@ -189,14 +246,14 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "notifQueue": {
-        "avgTimeInQueue": REGEX(0\.\d+),
+        "avgTimeInQueue": REGEX(.*),
         "in": 4,
         "out": 4,
         "reject": 0,
         "sentError": 0,
         "sentOk": 4,
         "size": 0,
-        "timeInQueue": REGEX(0\.\d+)
+        "timeInQueue": REGEX(.*)
     },
     "uptime_in_secs": REGEX(\d+)
 }

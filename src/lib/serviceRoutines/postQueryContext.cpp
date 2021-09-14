@@ -51,6 +51,9 @@
 #include "jsonParse/jsonRequest.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
 
+// FIXME P3: matchEntity() should be in a better place, and the following include to be removed
+#include "mongoBackend/MongoGlobal.h"  // matchEntity()
+
 
 
 /* ****************************************************************************
@@ -252,6 +255,8 @@ static bool queryForward
   //
   std::string     out;
   int             r;
+  std::string     url;
+  char            portV[STRING_SIZE_FOR_INT];
 
   LM_T(LmtCPrForwardRequestPayload, ("Forward Query: %s %s: %s", verb.c_str(), resource.c_str(), payload.c_str()));
 
@@ -261,6 +266,9 @@ static bool queryForward
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
+  snprintf(portV, sizeof(portV), "%d", port);
+  url = ip + ":" + portV + resource;
 
   r = httpRequestSend(fromIp,  // thread variable
                       ip,
@@ -279,12 +287,17 @@ static bool queryForward
                       &statusCode,
                       noHeaders,
                       mimeType);
-
+  
   if (r != 0)
   {
     LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
+    alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
+  }
+  else
+  {
+    alarmMgr.forwardingErrorReset(url);
   }
 
   LM_T(LmtCPrForwardResponsePayload, ("forward queryContext response payload: %s", out.c_str()));
@@ -301,7 +314,7 @@ static bool queryForward
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    LM_W(("Other Error (context provider response to QueryContext is empty)"));
+    LM_W(("Forwarding Error (context provider response to QueryContext is empty)"));
     return false;
   }
 
@@ -460,6 +473,8 @@ std::string postQueryContext
   QueryContextResponseVector  responseV;
   long long                   count = 0;
   long long*                  countP = NULL;
+
+  bool skipForwarding = ciP->uriParamOptions[OPT_SKIPFORWARDING];
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
@@ -671,58 +686,100 @@ std::string postQueryContext
   }
 
 
-  //
-  // Now, forward the Query requests, each in a separate thread (to be implemented) and
-  // await all the responses.
-  // Actually, if there is only ONE forward to be done then there is no reason to
-  // do the forward in a separate shell. Better to do it inside the current thread.
-  //
-  // If providingApplication is empty then that part of the query has been performed already, locally.
-  //
-  //
-  QueryContextResponse* qP;
-
-  // Note that queryForward() (due to internal calls to httpRequestSend())
-  // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
-  // FIXME P5: maybe this is not the right place to store&recover old transaction.
-  // What about inside httpRequestSend?
-
-  std::string prevCoorId  = correlationIdGet();
-  std::string prevTransId = transactionIdGetAsString();
-
-  if (requestV.size() > 0)
+  if (!skipForwarding)
   {
-    logInfoFwdStart(ciP->method.c_str(), ciP->uriForLogs.c_str());
+    //
+    // Now, forward the Query requests, each in a separate thread (to be implemented) and
+    // await all the responses.
+    // Actually, if there is only ONE forward to be done then there is no reason to
+    // do the forward in a separate shell. Better to do it inside the current thread.
+    //
+    // If providingApplication is empty then that part of the query has been performed already, locally.
+    //
+    //
+    QueryContextResponse* qP;
+
+    // Note that queryForward() (due to internal calls to httpRequestSend())
+    // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+    // FIXME P5: maybe this is not the right place to store&recover old transaction.
+    // What about inside httpRequestSend?
+
+    std::string prevCoorId  = correlationIdGet();
+    std::string prevTransId = transactionIdGetAsString();
+
+    if (requestV.size() > 0)
+    {
+      logInfoFwdStart(ciP->method.c_str(), ciP->uriForLogs.c_str());
+    }
+
+    for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
+    {
+      if (requestV[fIx]->contextProvider.empty())
+      {
+        LM_E(("Internal Error (empty context provider string)"));
+        continue;
+      }
+
+      qP = new QueryContextResponse();
+      qP->errorCode.fill(SccOk);
+
+      if (queryForward(ciP, requestV[fIx], regIdsV[fIx], fIx + 1, qP) == true)
+      {
+        //
+        // Each ContextElementResponse of qP should be tested to see whether there
+        // is already an existing ContextElementResponse in responseV
+        //
+        responseV.push_back(qP);
+      }
+      else
+      {
+        qP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+        responseV.push_back(qP);
+      }
+    }
+
+    correlatorIdSet(prevCoorId.c_str());
+    transactionIdSet(prevTransId.c_str());
+
+    // In the case of registrations with ".*" some entities could be over-added to
+    // the response. This fragment of code filters them out.
+    //
+    // FIXME P5: this is a kind of dirty hack. But if CPrs functionality is removed at the end, there is no
+    // reason to provide a more costly fix for this. Maybe this should be done in QueryContextResponseVector::populate()
+    // method. Check https://github.com/telefonicaid/fiware-orion/issues/3463#issuecomment-477312079 for additional ideas
+    for (unsigned int ix = 0; ix < responseV.size(); ++ix)
+    {
+      std::vector<int> ixToBeErased;
+
+      // First step: store in ixToBeErased the indexes of cerV to be erased
+      // Second step: remove indexes in cerV, from greater to lower
+
+      for (unsigned int jx = 0; jx < responseV[ix]->contextElementResponseVector.size(); ++jx)
+      {
+        bool found = false;
+        EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false");
+        for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
+        {
+          if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
+          {
+            found = true;
+            break; // kx
+          }
+        }
+        if (!found)
+        {
+          ixToBeErased.push_back((jx));
+        }
+      }
+
+      for (int jx = ixToBeErased.size() - 1; jx >= 0; jx--)
+      {
+        responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]]->release();
+        delete responseV[ix]->contextElementResponseVector.vec[ixToBeErased[jx]];
+        responseV[ix]->contextElementResponseVector.vec.erase(responseV[ix]->contextElementResponseVector.vec.begin() + ixToBeErased[jx]);
+      }
+    }
   }
-
-  for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
-  {
-    if (requestV[fIx]->contextProvider.empty())
-    {
-      LM_E(("Internal Error (empty context provider string)"));
-      continue;
-    }
-
-    qP = new QueryContextResponse();
-    qP->errorCode.fill(SccOk);
-
-    if (queryForward(ciP, requestV[fIx], regIdsV[fIx], fIx + 1, qP) == true)
-    {
-      //
-      // Each ContextElementResponse of qP should be tested to see whether there
-      // is already an existing ContextElementResponse in responseV
-      //
-      responseV.push_back(qP);
-    }
-    else
-    {
-      qP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
-      responseV.push_back(qP);
-    }
-  }
-
-  correlatorIdSet(prevCoorId.c_str());
-  transactionIdSet(prevTransId.c_str());
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;

@@ -137,15 +137,17 @@ The list of available options is the following:
     the subscriptions cache in [this document](perf_tuning.md#subscription-cache)).
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
--   **-notificationMode**. Allows to select notification mode, either:
-    `transient`, `persistent` or `threadpool:q:n`. Default mode is `transient`.
+-   **-notificationMode**. Explained in detail [here](perf_tuning.md#notification-modes-and-performance).
+    Allows to select notification mode, either: `transient`, `persistent` or
+    `threadpool:q:n[,service1:q1:n1,...,serviceN:qN:nN]`. Default mode is `transient`.
     * In transient mode, connections are closed by the CB right after sending the notification.
     * In persistent connection mode, a persistent connection is created the first time a notification
       is sent to a given URL path (if the receiver supports persistent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
-      from the queue and perform the outgoing requests asynchronously. Please have a look at the
-      [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
+      from the queue and perform the outgoing requests asynchronously. Reserved per-service queues/threads can be also
+      set. Please have a look at the [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section
+      if you want to use this mode.
 -   **-notifFlowControl guage:stepDelay:maxInterval**. Enables flow control mechanism.
     See [this section in the documentation](perf_tuning.md#updates-flow-control-mechanism).
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the
@@ -176,6 +178,7 @@ The list of available options is the following:
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
+    **-mqttMaxAge**. Max time (in seconds) that an unused MQTT connection is kept. Default: 3600
 
 ## Configuration using environment variables
 
@@ -250,3 +253,4 @@ Two facts have to be taken into account:
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
+|       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |

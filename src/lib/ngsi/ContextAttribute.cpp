@@ -561,7 +561,8 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
   }
   else // v2
   {
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
+    // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
+    if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
       return LOCATION_WGS84;
     }
@@ -1136,7 +1137,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
+  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
   }
@@ -1273,7 +1274,7 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
+      if (dbEncode(current->childV[cIx]->name) == compoundPathV[ix])
       {
         current = current->childV[cIx];
         found   = true;

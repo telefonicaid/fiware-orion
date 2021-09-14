@@ -221,7 +221,7 @@ Metadata* MetadataVector::lookupByName(const std::string& _name)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (dbDotEncode(vec[ix]->name) == _name)
+    if (dbEncode(vec[ix]->name) == _name)
     {
       return vec[ix];
     }

@@ -33,10 +33,12 @@ accumulatorStart --pretty-print
 #
 # 01. Create E1/A1
 # 02. GET E1/A1, see dateCreated == dateModified
-# 03. Update E1/A1
-# 04. GET E1/A1, see dateModified > dateCreated
-# 05. Create a subscription with metadata dateCreated and dateModified for A1
+# 03. Create a subscription with metadata dateCreated and dateModified for A1
+# 04. Update E1/A1
+# 05. GET E1/A1, see dateModified > dateCreated
 # 06. Dump accumulator to see dateCreated and dateModified for E1/A1
+# 07. Update E1/A1
+# 08. Dump accumulator to see dateCreated and dateModified for E1/A1
 #
 
 echo "01. Create E1/A1"
@@ -77,7 +79,31 @@ echo
 echo
 
 
-echo "03. Update E1/A1"
+echo "03. Create a subscription with metadata dateCreated and dateModified for A1"
+echo "==========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "E.*"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+    "metadata": [ "dateCreated", "dateModified" ]
+  },
+  "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Update E1/A1"
 echo "================"
 sleep 1.1
 payload='{
@@ -96,7 +122,7 @@ echo
 echo
 
 
-echo "04. GET E1/A1, check dateModified and dateCreated"
+echo "05. GET E1/A1, check dateModified and dateCreated"
 echo "================================================="
 # Note that we remove the milliseconds part, as this makes comparison with date output easier
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
@@ -119,30 +145,6 @@ then
   echo "should be:   $T_1"
 fi
 
-echo
-echo
-
-
-echo "05. Create a subscription with metadata dateCreated and dateModified for A1"
-echo "==========================================================================="
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "E.*"
-      }
-    ],
-    "condition": {
-      "attrs": [ ]
-    }
-  },
-  "notification": {
-    "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
-    "metadata": [ "dateCreated", "dateModified" ]
-  },
-  "expires": "2050-04-05T14:00:00.00Z"
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -219,7 +221,17 @@ Date: REGEX(.*)
 }
 
 
-03. Update E1/A1
+03. Create a subscription with metadata dateCreated and dateModified for A1
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Update E1/A1
 ================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -227,7 +239,7 @@ Date: REGEX(.*)
 
 
 
-04. GET E1/A1, check dateModified and dateCreated
+05. GET E1/A1, check dateModified and dateCreated
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 109
@@ -264,16 +276,6 @@ Date: REGEX(.*)
 }
 
 
-05. Create a subscription with metadata dateCreated and dateModified for A1
-===========================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
 06. Dump accumulator to see dateCreated and dateModified for E1/A1
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
@@ -284,7 +286,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

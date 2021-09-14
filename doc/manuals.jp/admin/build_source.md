@@ -11,6 +11,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * libcurl: 7.61.1
 * openssl: 1.1.1g
 * libuuid: 2.32.1
+* libmosquitto: 2.0.11 (ソースから)
 * Mongo C driver: 1.17.4 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
@@ -52,6 +53,18 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
+
+* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.11/ の下の config.mk ファイルを変更してビルドを微調整できます)
+
+        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
+        tar xvf mosquitto-2.0.11.tar.gz
+        cd mosquitto-2.0.11
+        sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
+        sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
+        sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib
 
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、`git clone git@github.com:telefonicaid/fiware-orion.git`) :
 
@@ -155,14 +168,15 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
 して次のライブラリを使用します :
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.70 (from source)
+* libmicrohttpd: 0.9.70 (ソースから)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
-* Mongo C driver: 1.17.4 (from source)
-* rapidjson: 1.1.0 (from source)
-* gtest (only for `make unit_test` building target): 1.5 (from sources)
-* gmock (only for `make unit_test` building target): 1.5 (from sources)
+* libmosquitto: 2.0.11 (ソースから)
+* Mongo C driver: 1.17.4 (ソースから)
+* rapidjson: 1.1.0 (ソースから)
+* gtest (only for `make unit_test` building target): 1.5 (ソースから)
+* gmock (only for `make unit_test` building target): 1.5 (ソースから)
 
 基本的な手順は次のとおりです (root 権限でコマンドを実行しないと仮定し、root 権限が必要なコマンドに sudo を使用します) :
 
@@ -202,6 +216,18 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
+
+* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.11/ の下の config.mk ファイルを変更してビルドを微調整できます)
+
+        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
+        tar xvf mosquitto-2.0.11.tar.gz
+        cd mosquitto-2.0.11
+        sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
+        sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
+        sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # Update /etc/ld.so.cache with the new library files in /usr/local/lib
 
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、
 `git clone git@github.com:telefonicaid/fiware-orion.git`) :

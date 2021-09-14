@@ -90,8 +90,8 @@ elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.3)
   message("gcc version between 6.3 and 8.3, compiling with -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 else()
-  message("gcc version higher than 8.3, compiling with -Wno-deprecated-declarations -Wno-format-truncation -Wno-stringop-truncation -Wno-maybe-uninitialized")
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments -Wno-format-truncation -Wno-stringop-truncation -Wno-maybe-uninitialized")
+  message("gcc version higher than 8.3, compiling with -Wno-deprecated-declarations -Wno-format-truncation -Wno-stringop-truncation")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments -Wno-format-truncation -Wno-stringop-truncation")
 endif()
 
 #
@@ -201,6 +201,7 @@ SET (ORION_LIBS
     logSummary
     lm
     pa
+    mqtt
 )
 
 SET (BOOST
@@ -225,6 +226,7 @@ find_package (mongoc-1.0 1.17.4 EXACT)
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
+    mosquitto.a
     mongo::mongoc_static
 )
 
@@ -312,6 +314,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
   ADD_SUBDIRECTORY(src/lib/logSummary)
+  ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

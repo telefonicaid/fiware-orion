@@ -58,10 +58,13 @@ AlarmManager::AlarmManager()
   badInputResets(0),
   notificationErrors(0),
   notificationErrorResets(0),
+  forwardingErrors(0),
+  forwardingErrorResets(0),
   dbErrors(0),
   dbErrorResets(0),
   dbOk(true),
   notificationErrorLogAlways(false),
+  forwardingErrorLogAlways(false),
   badInputLogAlways(false),
   dbErrorLogAlways(false)
 {
@@ -78,6 +81,7 @@ int AlarmManager::init(bool logAlreadyRaisedAlarms)
   notificationErrorLogAlways = logAlreadyRaisedAlarms;
   badInputLogAlways          = logAlreadyRaisedAlarms;
   dbErrorLogAlways           = logAlreadyRaisedAlarms;
+  forwardingErrorLogAlways   = logAlreadyRaisedAlarms;
 
   return semInit();
 }
@@ -187,6 +191,19 @@ void AlarmManager::dbErrorLogAlwaysSet(bool _dbErrorLogAlways)
 
 /* ****************************************************************************
 *
+* AlarmManager::forwardingErrorLogAlwaysSet -
+*/
+void AlarmManager::forwardingErrorLogAlwaysSet(bool _forwardingErrorLogAlways)
+{
+  semTake();
+  forwardingErrorLogAlways = _forwardingErrorLogAlways;
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::dbError - 
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -269,6 +286,22 @@ void AlarmManager::notificationErrorGet(int64_t* active, int64_t* raised, int64_
   *active    = notificationV.size();
   *raised    = notificationErrors;
   *released  = notificationErrorResets;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::forwardingErrorGet -
+*
+* NOTE
+* To read values, no semaphore is used.
+*/
+void AlarmManager::forwardingErrorGet(int64_t* active, int64_t* raised, int64_t* released)
+{
+  *active    = forwardingErrorV.size();
+  *raised    = forwardingErrors;
+  *released  = forwardingErrorResets;
 }
 
 
@@ -403,6 +436,76 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   semGive();
 
   LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::forwardingError -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*
+* NOTE
+* The number of forwardingErrors per url is maintained in the map.
+* Right now that info is not used, but might be use in the future.
+* To do so, we'd need another counter as well, to not forget the accumulated
+* number each time the forwardingErrors are reset.
+*/
+bool AlarmManager::forwardingError(const std::string& url, const std::string& details)
+{
+  semTake();
+
+  std::map<std::string, int>::iterator iter = forwardingErrorV.find(url);
+
+  if (iter != forwardingErrorV.end())  // Already exists - add to the 'url-specific' counter
+  {
+    iter->second += 1;
+
+    if (forwardingErrorLogAlways)
+    {
+      LM_W(("Repeated forwardingError %s: %s", url.c_str(), details.c_str()));
+    }
+
+    semGive();
+    return false;
+  }
+
+  ++forwardingErrors;
+
+  forwardingErrorV[url] = 1;
+  semGive();
+
+  LM_W(("Raising alarm forwardingError %s: %s", url.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::forwardingErrorReset -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
+bool AlarmManager::forwardingErrorReset(const std::string& url)
+{
+  semTake();
+
+  if (forwardingErrorV.find(url) == forwardingErrorV.end())  // Doesn't exist
+  {
+    semGive();
+    return false;
+  }
+
+  forwardingErrorV.erase(url);
+  ++forwardingErrorResets;
+  semGive();
+
+  LM_W(("Releasing alarm forwardingError %s", url.c_str()));
 
   return true;
 }

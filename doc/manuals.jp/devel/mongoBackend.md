@@ -22,7 +22,6 @@
 	* [`mongoInit()`](#mongoinit)
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
-	* [`processConditionVector()`](#processconditionvector)
 
 <a name="introduction"></a>
 ## イントロダクション
@@ -348,11 +347,10 @@ _MB-11: mongoCreateSubscription_
 
 * `mongoCreateSubscription()`は、サービス・ルーチンから呼び出されます(ステップ1)。これは `lib/serviceRoutinesV2/postSubscriptions.cpp` の `postSubscriptions()` または ` lib/mongoBackend/mongoSubscribeContext.cpp` の `mongoSubscribeContext()` のいずれかです
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください。
-* この関数は、`setExpiration()`, `setHttpInfo()` などの異なる `set*()` 関数を使用してデータベースに永続化される BSON オブジェクトを構築します。これらの関数の1つである `setCondsAndInitialNotify()` は、作成されているサブスクリプション (ステップ3で呼び出されたもの) に対応する初期通知を送る可能性があるという副作用があります
-* `processConditionVector()` は実際に通知を送信するために呼び出されます (ステップ4)。その詳細は `MongoGlobal` モジュール・セクションの一部として記述されます。図 [MD-03](#flow-md-03) を参照してください
-* 新しいサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionInsert()` を使ってデータベースに挿入されます (ステップ5と6)
-* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache`が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュに挿入されます (ステップ7)。`insertInCache()` はサブスクリプション・キャッシュ・セマフォを内部的に使用します。詳細は[このドキュメント](semaphores.md#subscription-cache-semaphore)を参照してください
-* リクエスト・セマフォがステップ2で取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ8)
+* この関数は、さまざまな `set*()` 関数 (`setExpiration()`, `setHttpInfo()` など) を使用して、最終的にデータベースに保存される BSON オブジェクトになる BSON オブジェクトを構築します (ステップ3)
+* 新しいサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionInsert()` を使用してデータベースに挿入されます (ステップ4 および5)
+* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュに挿入されます (ステップ6)。`insertInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します ([詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore) を参照)
+* リクエスト・セマフォがステップ2 で取得された場合は、戻る前に解放されます (ステップ7)
 
 潜在的な通知はサブスクリプションをデータベース/キャッシュに挿入する前に送信されるため、最後の通知時間とカウントに関する正しい情報が考慮されます。
 
@@ -374,12 +372,10 @@ _MB-12: mongoUpdateSubscription_
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * 更新されるサブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得されます (ステップ3と4)
 * サブスクリプション・キャッシュが有効な場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュのオブジェクトは `cache` モジュールの `subCacheItemLoopkup()` を使用してサブスクリプション・キャッシュから取得されます (ステップ5)
-* オリジナル・サブスクリプションの BSON オブジェクトは、サブスクリプションの作成ケース `setExpiration()`,  `setHttpInfo()` と同様の異なる `set*()` 関数を使用して、元のサブスクリプションの BSON オブジェクトに基づいて構築されます。これらの関数の1つ、`setCondsAndInitialNotify()` は、ステップ6で呼び出された更新されたサブスクリプションに対応する初期通知を送信する可能性のある "副作用" を持っています
-* この関数は `MongoGlobal` モジュール・セクションの一部として記述された通知を実際に送信するために `processConditionVector()` を順番に使用します (ステップ7)。図 [MD-03](#flow-md-03) を参照してください
-* `update`, `count` および `lastNotification` フィールドはサブスクリプションキャッシュで更新されます (ステップ9)。この操作は、ステップ8とステップ10で受け入れられて受け入れられたサブスクリプション・キャッシュ・セマフォによって保護されます。セマフォの[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore) を参照してください
-* 更新されたサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionUpdate()` を使ってデータベース内で更新されます (ステップ11と12)
-* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュ内で新しいサブスクリプションが更新されます(ステップ13)。`updatetInCache()` はサブスクリプション・キャッシュ・セマフォを内部的に使用します
-* ステップ2でリクエスト・セマフォが取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ14)
+* 最終的なサブスクリプションの BSON オブジェクトは、元のサブスクリプションの BSON オブジェクトに基づいて、サブスクリプションの作成の場合 (`setExpiration()`, `setHttpInfo()`　等) と同様のさまざまな `set*()` 関数を使用して構築されます。(ステップ6)
+* 更新されたサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionUpdate()` を使用してデータベースで更新されます (ステップ7 および 8)
+* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュで更新されます (ステップ9)。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します
+* リクエスト・セマフォがステップ2 で取得された場合は、戻る前に解放されます (ステップ10)
 
 潜在的な通知は、データベース/キャッシュ内のサブスクリプションを更新する前に送信されるため、最後の通知時間とカウントに関する正しい情報が考慮されます。
 
@@ -655,10 +651,7 @@ _MB-27: mongoRegistrationDelete_
 
 `entitiesQuery()` は、`connectionOperations` モジュールの `collectionRangedQuery()` を利用してデータベース内の実際のクエリを実行します。データベース内のクエリの後、`found` 属性フラグ (詳細はソースコード内を参照) を使用して、関数の一部が結果に注釈を付けて、呼び出し側関数によって行われた、コンテキスト・プロバイダの検索に役立ちます。結果は出力パラメータとして  `ContextElementResponseVector` オブジェクトに保存されます。
 
-この関数は、次の場所から呼び出されます :
-
-* `mongoQueryContext()` (`mongoQuery` モジュール内で), クエリ・オペレーションの "コア" として使用します
-* `processOnChangeConditionForSubscription()`, コンテキスト・サブスクリプションの作成/更新中に初期通知を "満たす" ようにエンティティを検索します
+この関数は、クエリ操作の "core" として、(`mongoQuery`モジュール内の) `mongoQueryContext()` から呼び出されます。
 
 [Top](#top)
 
@@ -672,28 +665,5 @@ _MB-27: mongoRegistrationDelete_
 * `mongoDiscoverContextAvailability()` (`mongoDiscoverContextAvailability`モジュール内で) ディスカバリー・オペレーションの "コア" として使用します
 * `mongoQueryContext` モジュールの `mongoQueryContext()`, クエリの転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 * `MongoCommonUpdate` モジュールの `searchContextProviders()`, 更新の転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
-
-[Top](#top)
-
-<a name="processconditionvector"></a>
-#### `processConditionVector()`
-
-この関数は、コンテキスト・サブスクリプションの作成/更新時に呼び出され、サブスクリプションに関連付けられた初期通知を送信する可能性があります。
-
-<a name="flow-md-03"></a>
-![`processConditionVector()` function detail](../../manuals/devel/images/Flow-MD-03.png)
-
-_MD-03: `processConditionVector()` 機能の詳細_
-
-* `processConditionVector()` (ステップ1) は、mongoBackend 関数によって呼び出されます。図 [MB-11](#flow-mb-11) と [MB-12](#flow-mb-12) を参照してください
-* ループは `NotifyConditionVector` ベクトル内の個々の条件に対して繰り返します。ほとんどの場合、このベクターには1つのアイテムしかありません
-   * `processOnChangeConditionForSubscription()` が個々の条件を処理するために呼び出されます (ステップ2)
-   * エンティティをデータベースから取得するために、`entitiesQuery()` が呼び出されてエンティティが通知に含まれるようにします (ステップ3)。これは `connectionOperations` モジュールの `collectionRangedQuery()` に順番に依存します (ステップ4および5)。
-   * `pruneContextElements()` は、見つからなかった要素を取り除くために呼び出されます。通知にそれらを含めることは意味がありません (ステップ6) 
-   * プルーニング (pruning) 後に送信するエンティティがある場合は、ステップ7〜11が実行されます
-	   * 特定の属性の条件 (空でない条件) の場合、2回目の検索は `entitiesQuery()` (ステップ7, 8, 9 および ステップ10のプルーニング) を使用して行われます
-	   * 通知を実際に送信するために `Notify` オブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリから) を使用して通知が送信されます (ステップ11)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) または [NF-03](sourceCode.md#flow-nf-03) に記載されています。特定の属性の条件の場合、前のチェックがOKだった場合にのみ通知が送信されます。すべての属性通知 (空の状態) の場合、通知は常に送信されます。
-
-`processOnChangeConditionForSubscription()` には初期以外の通知用の `processOnChangeConditionForUpdateContext()` という名前の "兄弟 "関数があることに注意してください。図 [MD-01](#flow-md-01) を参照してください。
 
 [Top](#top)

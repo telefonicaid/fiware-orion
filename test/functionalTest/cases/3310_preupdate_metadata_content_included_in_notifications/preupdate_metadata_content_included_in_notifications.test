@@ -31,38 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E with atribute A with metadata MDA=1
-# 02. Create subscription (triggers notif)
+# 02. Create subscription
+# 01. Create entity E with atribute A with metadata MDA=1 (triggers notif)
 # 03. Update attribute A with MDB=2 (triggers notif)
 # 04. Update attribute A without metadata (triggers notif)
-# 05. Create new entity E2 with attribute A with metadata MDC=3
+# 05. Create new entity E2 with attribute A with metadata MDC=3 (triggers notif)
 # 06. Dump accumulator and see four notification: E-A-MDA=1, E-A-MDB=2, E-A-<no-metadata>, E2-A-MDC=3
 #
 
 
-echo "01. Create entity E with atribute A with metadata MDA=1"
-echo "======================================================="
-payload='{
-  "id": "E",
-  "type": "T",
-  "A":{
-    "type": "Text",
-    "value": "foo",
-    "metadata": {
-      "MDA": {
-        "type": "Number",
-        "value": 1
-      }
-    }
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create subscription (triggers notif)"
-echo "========================================"
+echo "01. Create subscription"
+echo "======================="
 payload='{
   "subject": {
     "entities": [
@@ -81,6 +60,27 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E with atribute A with metadata MDA=1 (triggers notif)"
+echo "========================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A":{
+    "type": "Text",
+    "value": "foo",
+    "metadata": {
+      "MDA": {
+        "type": "Number",
+        "value": 1
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -117,8 +117,8 @@ echo
 echo
 
 
-echo "05. Create new entity E2 with attribute A with metadata MDC=3"
-echo "============================================================="
+echo "05. Create new entity E2 with attribute A with metadata MDC=3 (triggers notif)"
+echo "=============================================================================="
 payload='{
   "id": "E2",
   "type": "T",
@@ -146,21 +146,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with atribute A with metadata MDA=1
-=======================================================
+01. Create subscription
+=======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create subscription (triggers notif)
-========================================
+02. Create entity E with atribute A with metadata MDA=1 (triggers notif)
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -182,8 +182,8 @@ Date: REGEX(.*)
 
 
 
-05. Create new entity E2 with attribute A with metadata MDC=3
-=============================================================
+05. Create new entity E2 with attribute A with metadata MDC=3 (triggers notif)
+==============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
@@ -202,7 +202,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

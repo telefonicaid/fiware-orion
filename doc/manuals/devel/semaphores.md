@@ -8,6 +8,7 @@ Orion manages a number of semaphores for protection of delicate data and resourc
 * [Mongo connection pool](#mongo-connection-pool-semaphores)
 * [Metrics Manager](#metrics-manager-semaphore)
 * [Alarm Manager](#alarm-manager-semaphore)
+* [MQTT Connection Manager](#mqtt-connection-manager-semaphore)
 * [Log file](#log-file-semaphore)
 * [Notification queue](#notification-queue-semaphore)
 * [Notification queue statistics](#notification-queue-statistics-semaphore)
@@ -145,6 +146,19 @@ The semaphore protects the list of alarms and is accessed by the following metho
 
 [Top](#top)
 
+## MQTT Connection Manager semaphore
+The MQTT Connection Manager is pretty similar to the Metrics Manager, and its semaphore follows the same pattern. The class `MqttConnectionManager` has a private field called `sem` and methods:
+
+* `MqttConnectionManager::semTake()`
+* `MqttConnectionManager::semGive()`
+
+The semaphore protects the access to the connections hashmap and is accessed by the following methods:
+
+* `sendMqttNotification()`
+* `cleanup()`
+
+[Top](#top)
+
 ## Log file semaphore
 Orion keeps a log file and a semaphore is needed to protect the log file from two threads writing to it at the same time. The variable holding this semaphore is called `sem` and it resides in `lib/logMsg/logMsg.cpp`. It is a static variable so it is not visible outside this file.
 
@@ -156,7 +170,8 @@ The semaphore is initialized in the function `lmSemInit()` and used in the two s
 [Top](#top)
 
 ## Notification queue semaphore
-When a thread pool is used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore. 
+When thread pools are used (using the [CLI parameter](../admin/cli.md) `-notificationMode`), for sending of notifications, a queue is used to feed the notifications to the workers in the thread pool. This queue is protected by a semaphore.
+If several queues are used (i.e. a default queue and a per-service queues) then a semaphore exists in each queue.
 
 The semaphore, of type `boost::mutex`, is called `mtx` and it is a private member of the class `SyncQOverflow`, found in `src/lib/common/SyncQOverflow.h`:
 
@@ -176,7 +191,8 @@ public:
   size_t   size() const;
 };
 ```
-The class `QueueWorkers` includes a private member of type `SyncQOverflow`, while the class `QueueNotifier` includes a private member of type `QueueWorkers`.
+Both classes `QueueWorkers` and `ServiceQueue` include a private member of type `SyncQOverflow`, while the class `ServiceQueue` also includes a private member of type `QueueWorkers`.
+Class `QueueNotifier` may include a vector of per-service `ServiceQueue` and also a default `ServiceQueue` (for notifications not associated to any service with reserved queue).
 
 Finally, `contextBrokerInit()` in `src/app/contextBroker/contextBroker.cpp` creates an instance of `QueueNotifier` as a singleton, when requested (when CLI parameter `-notificationMode` equals **threadpool**).
 

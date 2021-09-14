@@ -42,7 +42,7 @@ License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
 Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
-URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
+URL:        https://github.com/telefonicaid/fiware-orion
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
 Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, openssl, logrotate, libuuid
@@ -74,7 +74,7 @@ fi
 
 %pre
 getent group %{owner} >/dev/null || groupadd -r %{owner}
-getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /opt/orion -s /bin/bash -c 'Orion account' %{owner}
+getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /home/orion -s /bin/bash -c 'Orion account' %{owner}
 # Backup previous sysconfig file (if any)
 DATE=$(date "+%Y-%m-%d")
 if [ -f "/etc/sysconfig/%{name}" ]; then
@@ -195,6 +195,49 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Sep 07 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.2.0-1
+- Add: MQTT notifications (#3001)
+- Fix: TextUnrestricted recursively applies to JSON objects and array (#3867)
+- Fix: onlyChangedAttrs set to true not working after csubs cache refresh (#3906)
+- Fix: PATCH /v2/entities/ID/attrs error doesn't provide info about offending attributes (#2933)
+- Fix: -key and -cert files loading (was causing valgrind errors) (#3925)
+- Fix: return 400 instead of 500 when GeoJSON syntax error occur (#3347)
+- Fix: 400 BadRequest when attempting to DELETE with multi-servicepath or SP with '/#' (instead of silently failing) (#3071)
+- Hardening: improve notification pool worker thread termination logic (#3877)
+- Remove: deprecated feature initial notification upon subscription creation or update
+
+* Wed Jun 09 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.1.0-1
+- Add: skipForwarding option in queries to avoid request forwarding to Context Provider (#3851)
+- Add: per-service reserved queues/pools to threadpool notification mode (#3843) (experimental feature)
+- Add: support to null in DateTime attributes and metadata (#3533)
+- Add: support to null in geo:json, geo:point, geo:line, geo:box and geo:polygon attributes (#3533)
+- Add: new alarm (id number 6) for forwarding errors (#1794)
+- Add: null as allowed value for httpCustom.notification.payload to avoid sending payloads in custom notification (#3272)
+- Add: statistic counter re-worked, based in NGSIv2 requests (#3805)
+- Add: counter for requests without payload in statistics (#1400)
+- Add: debug tracelevels for notifications payload request/response in logs (#2895)
+- Fix: use "Forwarding Error" instead of "Other Error" in WARN traces (#1794)
+- Fix: potential crash (although under very rare situations) in log trace code 
+- Fix: support attributes and metadata starting with dollar sign ($) (#3841)
+- Fix: avoid duplicating forwarded query requests to CPrs in some cases (this may cause illegal JSON with duplicated attribute keys in the response to clients at the end)
+- Fix: support for single entity query forwarding with global registration idPattern (#3463, partially)
+- Deprecated: initial notification upon subscription creation or update (along with skipInitialNotification option)
+
+* Mon Apr 12 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.0.0-1
+- Reference distribution changed from RHEL/CentOS 7 to RHEL/CentOS 8 (#3764)
+- Reference MongoDB version changed from 3.6 to 4.4
+- Add: SCRAM-SHA-256 as allowed mechanism in -dbAuthMech (#3782)
+- Add: tlsAllowInvalidCertificates=true to mongo connection URI along with tls=true when -dbSSL switch is used
+- Add: new CLI parameter -dbDisableRetryWrites to set retryWrite parameter to false in DB connections (#3797)
+- Add: machine information in GET /version
+- Fix: response rightly 500 Internal Error when DB query fails (previously 200 OK with empty entities array was returned)
+- Fix: -logForHumans traces including full timestamp information
+- Fix: PATCH update operation return right error code, when multiple service paths or service path /# is used (#3640)
+- Fix: avoid 500 Internal Error when simulataneous entity creation takes place with -reqMutextPolicy none (either with and without ?options=upsert) (#3821)
+- Hardening: MongoDB connection logic largely rewritten
+- Hardening: upgrade Mongo driver dependency form C++ legacy-1.1.2 to C 1.17.4 (#3132, #3797, #3695 and probably #3717, #3778, #3326)
+- Remove: MONGODB-CR as -dbAuthMech
+
 * Wed Mar 10 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.6.0-1
 - Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
 - Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file

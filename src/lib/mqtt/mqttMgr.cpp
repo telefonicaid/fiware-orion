@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_
-#define SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,13 +23,14 @@
 * Author: Fermin Galan
 */
 
-class Notifier;     // actually defined in Notifier.h
+#include "mqtt/MqttConnectionManager.h"
 
-typedef struct OnIntervalThreadParams {
-    std::string     subId;
-    int             interval;
-    std::string     tenant;
-    Notifier*       notifier;
-} OnIntervalThreadParams;
 
-#endif  // SRC_LIB_NGSINOTIFY_ONINTERVALTHREADPARAMS_H_
+
+/* ****************************************************************************
+*
+* mqttMgr -
+*
+*/
+MqttConnectionManager mqttMgr;
+

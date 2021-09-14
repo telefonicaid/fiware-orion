@@ -31,17 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1 inside area A
-# 02. Create entity E2 outside area A
-# 03. Create subscription covering A (initial notification including E1)
+# 01. Create subscription covering A
+# 02. Create entity E1 inside area A (notif)
+# 03. Create entity E2 outside area A (not notif)
 # 04. Modify E2 location to another point outside A (not notif)
 # 05. Modify E2 location to point inside A (notif)
 # 06. Modify E1 location to point outise A (not notif)
 # 07. Modify E1 location to point inside A (notif)
 # 08. Modify E1 location to another point inside A (notif)
 # 09. With subscription in place, create entity E3 inside area A (notif)
-# 10. With subscription in place, create entity E4 outside area A (not notif)
-# 11. Update subscription using a micro-area centered at E4 (notif)
+# 10. Update subscription using a micro-area centered at E4
+# 11. With subscription in place, create entity E4 outside area A (notif)
 # 12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)
 #
 # Area (100 km max distance to Madrid):
@@ -68,46 +68,9 @@ accumulatorStart --pretty-print
 # Useful link: http://www.distancecalculator.net/
 #
 
-echo "01. Create entity E1 inside area A"
+
+echo "01. Create subscription covering A"
 echo "=================================="
-payload='{
-  "id": "E1",
-  "type": "T",
-  "city": {
-    "value": "Toledo",
-    "type": "Text"
-  },
-  "location": {
-    "value": "39.867459, -4.035825",
-    "type": "geo:point"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create entity E2 outise area A"
-echo "=================================="
-payload='{
-  "id": "E2",
-  "type": "T",
-  "city": {
-    "value": "Barcelona",
-    "type": "Text"
-  },
-  "location": {
-    "value": "41.366656, 2.154006",
-    "type": "geo:point"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "03. Create subscription covering A (initial notification including E1)"
-echo "======================================================================"
 payload='
 {
     "subject": {
@@ -137,6 +100,44 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create entity E1 inside area A (notif)"
+echo "=========================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "city": {
+    "value": "Toledo",
+    "type": "Text"
+  },
+  "location": {
+    "value": "39.867459, -4.035825",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 outise area A (not notif)"
+echo "=============================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "city": {
+    "value": "Barcelona",
+    "type": "Text"
+  },
+  "location": {
+    "value": "41.366656, 2.154006",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
 
 
 echo "04. Modify E2 location to another point outside A (not notif)"
@@ -243,26 +244,8 @@ echo
 echo
 
 
-echo "10. With subscription in place, create entity E4 outside area A (not notif)"
-echo "==========================================================================="
-payload='{
-  "id": "E4",
-  "type": "T",
-  "city": {
-    "value": "Cadiz",
-    "type": "Text"
-  },
-  "location": {
-    "value": "36.532787, -6.297897",
-    "type": "geo:point"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-echo "11. Update subscription using a micro-area centered at E4 (notif)"
-echo "================================================================="
+echo "10. Update subscription using a micro-area centered at E4"
+echo "========================================================="
 payload='
 {
     "subject": {
@@ -288,6 +271,25 @@ echo
 echo
 
 
+echo "11. With subscription in place, create entity E4 outside area A (notif)"
+echo "======================================================================="
+payload='{
+  "id": "E4",
+  "type": "T",
+  "city": {
+    "value": "Cadiz",
+    "type": "Text"
+  },
+  "location": {
+    "value": "36.532787, -6.297897",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
 echo "12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)"
 echo "======================================================"
 accumulatorDump
@@ -296,8 +298,18 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 inside area A
+01. Create subscription covering A
 ==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 inside area A (notif)
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -306,21 +318,11 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E2 outise area A
-==================================
+03. Create entity E2 outise area A (not notif)
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Create subscription covering A (initial notification including E1)
-======================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -376,19 +378,19 @@ Date: REGEX(.*)
 
 
 
-10. With subscription in place, create entity E4 outside area A (not notif)
-===========================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
+10. Update subscription using a micro-area centered at E4
+=========================================================
+HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-11. Update subscription using a micro-area centered at E4 (notif)
-=================================================================
-HTTP/1.1 204 No Content
+11. With subscription in place, create entity E4 outside area A (notif)
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -404,7 +406,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -554,7 +556,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

@@ -110,9 +110,6 @@ typedef enum RequestType
   EntityAttributeResponse,
   EntityAttributeValueRequest,
   EntityAttributeValueResponse,
-  PostEntity,
-  PostAttributes,
-  DeleteEntity,
   EntityTypeRequest,
   EntityAllTypesRequest,
   SubscriptionsRequest,
@@ -142,6 +139,14 @@ struct ParseData;
 * requestType - 
 */
 extern const char* requestType(RequestType rt);
+
+
+
+/* ****************************************************************************
+*
+* requestTypeForCounter -
+*/
+extern const char* requestTypeForCounter(RequestType rt);
 
 
 

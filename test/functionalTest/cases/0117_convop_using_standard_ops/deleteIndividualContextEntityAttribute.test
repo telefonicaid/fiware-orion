@@ -167,15 +167,17 @@ echo
 00. Try to delete an attribute with TWO service-paths
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 131
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "more than one service path in context update request", 
-    "reasonPhrase": "Bad Request"
+    "orionError": {
+        "code": "400",
+        "details": "more than one servicepath is not allowed in DELETE operation",
+        "reasonPhrase": "Bad Request"
+    }
 }
 
 

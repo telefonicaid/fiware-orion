@@ -126,6 +126,7 @@
 #define OPT_UPSERT                      "upsert"
 #define OPT_SKIPINITALNOTIFICATION      "skipInitialNotification"
 #define OPT_FORCEDUPDATE                "forcedUpdate"
+#define OPT_SKIPFORWARDING              "skipForwarding"
 
 
 

@@ -17,7 +17,7 @@ any time.
 
 Disclaimer:
 
-* This section has been last updated in March 2021. Please take into account its 
+* This section has been last updated in May 2021. Please take into account its 
   content could be obsolete.
 * Note we develop this software in Agile way, so development plan is continuously 
   under review. Thus, this roadmap has to be understood as rough plan of features 
@@ -32,6 +32,7 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
+- Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842))
 - Migration from legacy to new MongoDB driver ([#3132](https://github.com/telefonicaid/fiware-orion/issues/3132))
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Attribute update operators (inc, push, etc.) ([#3814](https://github.com/telefonicaid/fiware-orion/issues/3814))
@@ -43,10 +44,12 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
+- Service provisioning API (pools, etc.) ([#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
 - Advanced query language
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
+- Signed entities
 
 ## Long term
 

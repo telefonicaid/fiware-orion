@@ -50,7 +50,7 @@
 *
 * flowControlAwait -
 */
-static void flowControlAwait(unsigned int q0, unsigned int notifSent)
+static void flowControlAwait(unsigned int q0, unsigned int notifSent, const std::string& service)
 {
   unsigned int pass = 0;
   unsigned int accumulatedDelay = 0;
@@ -64,7 +64,7 @@ static void flowControlAwait(unsigned int q0, unsigned int notifSent)
   unsigned int qi = 0;
 #else
   // get current size of the queue
-  unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
+  unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize(service);
 #endif
   LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                      pass, accumulatedDelay, qi));
@@ -83,7 +83,7 @@ static void flowControlAwait(unsigned int q0, unsigned int notifSent)
     accumulatedDelay += fcStepDelay;
 
 #ifndef UNIT_TEST
-    qi = ((QueueNotifier*) getNotifier())->queueSize();
+    qi = ((QueueNotifier*) getNotifier())->queueSize(service);
 #endif
     LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                        pass, accumulatedDelay, qi));
@@ -127,7 +127,7 @@ HttpStatusCode mongoUpdateContext
   if (strcmp(notificationMode, "threadpool") == 0)
   {
 #ifndef UNIT_TEST
-    q0 = ((QueueNotifier*) getNotifier())->queueSize();
+    q0 = ((QueueNotifier*) getNotifier())->queueSize(tenant);
 #endif
     LM_T(LmtNotifier, ("notification queue size before processing update: %d", q0));
   }
@@ -179,7 +179,7 @@ HttpStatusCode mongoUpdateContext
   if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
   {
     LM_T(LmtNotifier, ("start notification flow control algorithm"));
-    flowControlAwait(q0, notifSent);
+    flowControlAwait(q0, notifSent, tenant);
     LM_T(LmtNotifier, ("end notification flow control algorithm"));
   }
 

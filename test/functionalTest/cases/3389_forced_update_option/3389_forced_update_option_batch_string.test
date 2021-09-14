@@ -31,49 +31,20 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
-# 02. POST /v2/subscriptions, to create subscription for Slot1.
-# 03. Dump and reset accumulator, see notification.
-# 04. POST /v2/subscriptions, to create subscription for Slot2.
-# 05. Dump and reset accumulator, see notification.
-# 06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
-# 07. Dump and reset accumulator, see no notification (as there was no actual update).
-# 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
-# 09. Dump and reset accumulator, see notification.
-# 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
-# 11. Dump and reset accumulator, see notification.
-#
+# 01. POST /v2/subscriptions, to create subscription for Slot1.
+# 02. POST /v2/subscriptions, to create subscription for Slot2.
+# 03. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
+# 04. Dump and reset accumulator, see Slot1 and Slot2 notification.
+# 05. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+# 06. Dump and reset accumulator, see no notification (as there was no actual update).
+# 07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
+# 08. Dump and reset accumulator, see notification.
+# 09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+# 10. Dump and reset accumulator, see notification.
 #
 
-echo '01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.'
-echo '==================================================================================================='
-payload='{
-  "actionType": "append",
-  "entities": [
-    {
-      "type": "Slot",
-      "id": "Slot1",
-      "availability": {
-        "value": "available",
-        "type": "Text"
-      }
-    },
-    {
-      "type": "Slot",
-      "id": "Slot2",
-      "availability": {
-        "value": "available",
-        "type": "Text"
-      }
-    }
-  ]
-}'
-orionCurl --url /v2/op/update --payload "$payload"
-echo
-echo
 
-
-echo '02. POST /v2/subscriptions, to create subscription for Slot1.'
+echo '01. POST /v2/subscriptions, to create subscription for Slot1.'
 echo '============================================================='
 payload='{
   "description": "A subscription to get info about Room1",
@@ -104,15 +75,7 @@ echo
 echo
 
 
-echo '03. Dump and reset accumulator, see notification.'
-echo '================================================='
-accumulatorDump
-accumulatorReset
-echo
-echo
-
-
-echo '04. POST /v2/subscriptions, to create subscription for Slot2.'
+echo '02. POST /v2/subscriptions, to create subscription for Slot2.'
 echo '============================================================='
 payload='{
   "description": "A subscription to get info about Room2",
@@ -143,15 +106,44 @@ echo
 echo
 
 
-echo '05. Dump and reset accumulator, see notification.'
-echo '================================================='
+echo '03. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.'
+echo '==================================================================================================='
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "type": "Slot",
+      "id": "Slot1",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    },
+    {
+      "type": "Slot",
+      "id": "Slot2",
+      "availability": {
+        "value": "available",
+        "type": "Text"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+
+echo '04. Dump and reset accumulator, see Slot1 and Slot2 notification.'
+echo '================================================================='
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo '06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.'
+echo '05. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.'
 echo '============================================================================================'
 payload='{
   "actionType": "update",
@@ -179,7 +171,7 @@ echo
 echo
 
 
-echo '07. Dump and reset accumulator, see no notification (as there was no actual update).'
+echo '06. Dump and reset accumulator, see no notification (as there was no actual update).'
 echo '===================================================================================='
 accumulatorDump
 accumulatorReset
@@ -187,7 +179,7 @@ echo
 echo
 
 
-echo '08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.'
+echo '07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.'
 echo '=============================================================================================================='
 payload='{
   "actionType": "update",
@@ -215,7 +207,7 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see notification.'
+echo '08. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -223,7 +215,7 @@ echo
 echo
 
 
-echo '10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.'
+echo '09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.'
 echo '=============================================================================================================='
 payload='{
   "actionType": "append",
@@ -251,7 +243,7 @@ echo
 echo
 
 
-echo '11. Dump and reset accumulator, see notification.'
+echo '10. Dump and reset accumulator, see notification.'
 echo '================================================='
 accumulatorDump
 accumulatorReset
@@ -260,15 +252,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
-===================================================================================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. POST /v2/subscriptions, to create subscription for Slot1.
+01. POST /v2/subscriptions, to create subscription for Slot1.
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -278,8 +262,27 @@ Date: REGEX(.*)
 
 
 
-03. Dump and reset accumulator, see notification.
-=================================================
+02. POST /v2/subscriptions, to create subscription for Slot2.
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to available.
+===================================================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Dump and reset accumulator, see Slot1 and Slot2 notification.
+=================================================================
+#SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 148
@@ -288,7 +291,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -305,20 +308,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-
-
-04. POST /v2/subscriptions, to create subscription for Slot2.
-=============================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. Dump and reset accumulator, see notification.
-=================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 148
@@ -327,7 +316,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -344,9 +333,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+#SORT_END
 
 
-06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
+05. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
 ============================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -354,11 +344,11 @@ Date: REGEX(.*)
 
 
 
-07. Dump and reset accumulator, see no notification (as there was no actual update).
+06. Dump and reset accumulator, see no notification (as there was no actual update).
 ====================================================================================
 
 
-08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
+07. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -366,7 +356,7 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset accumulator, see notification.
+08. Dump and reset accumulator, see notification.
 #SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify
@@ -422,7 +412,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 #SORT_END
 
 
-10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
+09. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -430,7 +420,7 @@ Date: REGEX(.*)
 
 
 
-11. Dump and reset accumulator, see notification.
+10. Dump and reset accumulator, see notification.
 #SORT_START
 =================================================
 POST http://localhost:REGEX(\d+)/notify

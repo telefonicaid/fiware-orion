@@ -43,9 +43,7 @@ extern HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*         requestP,
   SubscribeContextResponse*        responseP,
   const std::string&               tenant,
-  const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  const std::string&               fiwareCorrelator = "no correlator"
+  const std::vector<std::string>&  servicePathV
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBSCRIBECONTEXT_H_

@@ -25,6 +25,7 @@ SET (SOURCES
     restReply.cpp
     RestService.cpp
     Verb.cpp
+    curlSem.cpp
     httpRequestSend.cpp
     orionLogReply.cpp
     OrionError.cpp
@@ -43,6 +44,7 @@ SET (HEADERS
     restReply.h
     RestService.h
     Verb.h
+    curlSem.h
     httpRequestSend.h
     orionLogReply.h
     OrionError.h

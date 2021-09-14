@@ -37,8 +37,10 @@
 extern void logInfoNotification
 (
   const char*  subId,
+  const char*  protocol,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
   int          rc
 );
 
@@ -51,8 +53,10 @@ extern void logInfoNotification
 extern void logInfoNotification
 (
   const char*  subId,
+  const char*  protocol,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
   const char*  rc
 );
 

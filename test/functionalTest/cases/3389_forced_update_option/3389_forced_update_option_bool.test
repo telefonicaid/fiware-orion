@@ -31,8 +31,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 --SHELL--
 
 #
-# 01. POST /v2/entities, to create Slot1 with availability set to true.
-# 02. POST /v2/subscriptions, to create subscription.
+# 01. POST /v2/subscriptions, to create subscription.
+# 02. POST /v2/entities, to create Slot1 with availability set to true.
 # 03. Dump and reset accumulator, see notification.
 # 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 # 05. Dump and reset accumulator, see notification.
@@ -48,22 +48,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 15. Dump and reset accumulator, see notification.
 #
 
-echo '01. POST /v2/entities, to create Slot1 with availability set to true.'
-echo '====================================================================='
-payload='{
-  "id": "Slot1",
-  "type": "Slot",
-  "availability": {
-    "value": true,
-    "type": "Boolean"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
 
-
-echo '02. POST /v2/subscriptions, to create subscription.'
+echo '01. POST /v2/subscriptions, to create subscription.'
 echo '==================================================='
 payload='{
   "description": "A subscription to get info about Slot1",
@@ -90,6 +76,21 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/entities, to create Slot1 with availability set to true.'
+echo '====================================================================='
+payload='{
+  "id": "Slot1",
+  "type": "Slot",
+  "availability": {
+    "value": true,
+    "type": "Boolean"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -221,21 +222,21 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities, to create Slot1 with availability set to true.
-=====================================================================
+01. POST /v2/subscriptions, to create subscription.
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Slot1?type=Slot
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription.
-===================================================
+02. POST /v2/entities, to create Slot1 with availability set to true.
+=====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/Slot1?type=Slot
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -251,7 +252,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [

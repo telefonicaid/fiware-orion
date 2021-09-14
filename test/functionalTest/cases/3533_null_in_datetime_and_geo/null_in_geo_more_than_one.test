@@ -1,0 +1,282 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+More than one geo: field when its value is null
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with two geo:json attributes to null: loc1 and loc2
+# 02. Update E1-loc1 to actual location: it works
+# 03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one
+# 04. Get the entity and see loc1 with actual location and loc2 with null
+# 05. Update E1-loc1 back to null
+# 06. Update E2-loc1 to actual location: it works
+# 07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one
+# 08. Get the entity and see loc1 with null and loc2 with actual location
+#
+
+echo "01. Create entity E1 with two geo:json attributes to null: loc1 and loc2"
+echo "========================================================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "loc1": {
+    "value": null,
+    "type": "geo:json"
+  },
+  "loc2":  {
+    "value": null,
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Update E1-loc1 to actual location: it works"
+echo "==============================================="
+payload='{
+  "loc1": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one"
+echo "================================================================================"
+payload='{
+  "loc2": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "04. Get the entity and see loc1 with actual location and loc2 with null"
+echo "======================================================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "05. Update E1-loc1 back to null"
+echo "==============================="
+payload='{
+  "loc1": {
+    "value": null,
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "06. Update E1-loc2 to actual location: it works"
+echo "==============================================="
+payload='{
+  "loc2": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one"
+echo "================================================================================"
+payload='{
+  "loc1": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -4, 36 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "08. Get the entity and see loc1 with null and loc2 with actual location"
+echo "======================================================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with two geo:json attributes to null: loc1 and loc2
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Update E1-loc1 to actual location: it works
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one
+================================================================================
+HTTP/1.1 413 Payload Too Large
+Content-Length: 148
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+    "error": "NoResourcesAvailable"
+}
+
+
+04. Get the entity and see loc1 with actual location and loc2 with null
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "loc1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    -4,
+                    36
+                ],
+                "type": "Point"
+            }
+        },
+        "loc2": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": null
+        },
+        "type": "T"
+    }
+]
+
+
+05. Update E1-loc1 back to null
+===============================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update E1-loc2 to actual location: it works
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one
+================================================================================
+HTTP/1.1 413 Payload Too Large
+Content-Length: 148
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+    "error": "NoResourcesAvailable"
+}
+
+
+08. Get the entity and see loc1 with null and loc2 with actual location
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "loc1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": null
+        },
+        "loc2": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    -4,
+                    36
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

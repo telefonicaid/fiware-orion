@@ -192,3 +192,21 @@ extern Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* fiel
 {
   return getInt64Aux(parent, field, description, true);
 }
+
+
+
+/* *****************************************************************************
+*
+* isNull - check if a given rapidjson node is null
+*/
+extern bool isNull(const rapidjson::Value& parent, const char* field)
+{
+  if (parent.HasMember(field))
+  {
+    const rapidjson::Value& value = parent[field];
+
+    return value.IsNull();
+  }
+
+  return false;
+}

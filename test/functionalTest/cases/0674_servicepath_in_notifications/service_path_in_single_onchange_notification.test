@@ -31,37 +31,14 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1/ET with service-path /entity
-# 02. Query E.*/ET with service-path /entity
-# 03. Add ONCHANGE subscription to E.*/ET with service-path /entity
+# 01. Add ONCHANGE subscription to E.*/ET with service-path /entity
+# 02. Create entity E1/ET with service-path /entity
+# 03. Query E.*/ET with service-path /entity
 # 04. Query accumulator
 #
 
 
-echo "01. Create entity E1/ET with service-path /entity"
-echo "================================================="
-payload='{
-  "attributes" : [
-    {
-      "name" : "A",
-      "type" : "string",
-      "value" : "V"
-    }
-  ]
-}'
-orionCurl --url /v1/contextEntities/type/ET/id/E1 --servicePath '/entity' --payload "${payload}"
-echo
-echo
-
-
-echo "02. Query ET-typed entities  with service-path /entity"
-echo "======================================================"
-orionCurl --url /v1/contextEntityTypes/ET --servicePath '/entity'
-echo
-echo
-
-
-echo "03. Add subscription to E.*/ET with service-path /entity"
+echo "01. Add subscription to E.*/ET with service-path /entity"
 echo "========================================================"
 payload='{
   "entities": [
@@ -87,6 +64,29 @@ echo
 echo
 
 
+echo "02. Create entity E1/ET with service-path /entity"
+echo "================================================="
+payload='{
+  "attributes" : [
+    {
+      "name" : "A",
+      "type" : "string",
+      "value" : "V"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --servicePath '/entity' --payload "${payload}"
+echo
+echo
+
+
+echo "03. Query ET-typed entities  with service-path /entity"
+echo "======================================================"
+orionCurl --url /v1/contextEntityTypes/ET --servicePath '/entity'
+echo
+echo
+
+
 echo "04. Query accumulator"
 echo "====================="
 accumulatorDump
@@ -95,7 +95,23 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1/ET with service-path /entity
+01. Add subscription to E.*/ET with service-path /entity
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create entity E1/ET with service-path /entity
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 169
@@ -125,7 +141,7 @@ Date: REGEX(.*)
 }
 
 
-02. Query ET-typed entities  with service-path /entity
+03. Query ET-typed entities  with service-path /entity
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 189
@@ -157,22 +173,6 @@ Date: REGEX(.*)
 }
 
 
-03. Add subscription to E.*/ET with service-path /entity
-========================================================
-HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})"
-    }
-}
-
-
 04. Query accumulator
 =====================
 POST http://127.0.0.1:REGEX(\d+)/notify
@@ -182,7 +182,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [

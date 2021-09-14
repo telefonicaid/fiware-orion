@@ -1,4 +1,4 @@
- # <a name="top"></a>Data model
+# <a name="top"></a>Data model
 
 * [Introduction](#introduction)
 * [entities collection](#entities-collection)
@@ -282,7 +282,9 @@ Fields:
 -   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
--   **reference**: the URL for notifications
+-   **reference**: the URL for notifications, either HTTP or MQTT
+-   **mqttTopic**: MQTT topic (only in MQTT notifications)
+-   **mqttQoS**: MQTT QoS value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
     due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
@@ -311,7 +313,9 @@ Fields:
 -   **headers**: optional field to store the HTTP headers keymap for notification customization functionality in NGSIv2.
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
--   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
+-   **payload**: optional field to store the payload for notification customization functionality in NGSIv2. If
+    its value is `null` means that no payload has to be included in the notification. If its value is `""` or if
+    the field is omitted, then the NGSIv2 normalized format is used.
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.

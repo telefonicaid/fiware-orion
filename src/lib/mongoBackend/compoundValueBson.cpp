@@ -112,7 +112,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode*  child         = children[ix];
-    std::string                effectiveName = dbDotEncode(child->name);
+    std::string                effectiveName = dbEncode(child->name);
 
     if (child->valueType == orion::ValueTypeString)
     {

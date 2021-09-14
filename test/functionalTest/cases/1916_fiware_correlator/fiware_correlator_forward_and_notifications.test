@@ -35,11 +35,11 @@ accumulatorStart --pretty-print
 #
 # 01. Make accumulator subscribe to E1/A1, in CB
 # 02. Create E1/A1 in CB, using correlator CORRELATOR1, which is notified to accumulator
-# 03. Create E2/A2 in CPR1
-# 04. Register E2/A2 for CPR1 in CB
-# 05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2
+# 03. Register E2/A2 for CPR1 in CB
+# 04. Make accumulator subscribe to E2/A2 in CPR1
+# 05. Create E2/A2 in CPR1, using CORRELATOR2
 # 06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2
-# 07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
+# 07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the entity in step 05)
 #
 
 
@@ -82,19 +82,7 @@ echo
 echo
 
 
-echo "03. Create E2/A2 in CPR1"
-echo "========================"
-payload='
-{
-  "id": "E2",
-  "A2": "A2 of E2 in CPR1"
-}'
-orionCurl --url /v2/entities?options=keyValues --port $CP1_PORT --payload "$payload"
-echo
-echo
-
-
-echo "04. Register E2/A2 for CPR1 in CB"
+echo "03. Register E2/A2 for CPR1 in CB"
 echo "================================="
 payload='{
   "contextRegistrations": [
@@ -119,8 +107,8 @@ echo
 echo
 
 
-echo "05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2"
-echo "=================================================================="
+echo "04. Make accumulator subscribe to E2/A2 in CPR1"
+echo "==============================================="
 payload='
 {
     "subject": {
@@ -142,7 +130,19 @@ payload='
     "expires": "2050-04-05T14:00:00.00Z"
 }
 '
-orionCurl --url /v2/subscriptions --port $CP1_PORT --payload "$payload" --header "Fiware-Correlator: CORRELATOR2"
+orionCurl --url /v2/subscriptions --port $CP1_PORT --payload "$payload"
+echo
+echo
+
+
+echo "05. Create E2/A2 in CPR1, using CORRELATOR2"
+echo "==========================================="
+payload='
+{
+  "id": "E2",
+  "A2": "A2 of E2 in CPR1"
+}'
+orionCurl --url /v2/entities?options=keyValues --port $CP1_PORT --payload "$payload" --header "Fiware-Correlator: CORRELATOR2"
 echo
 echo
 
@@ -169,8 +169,8 @@ echo
 echo
 
 
-echo "07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)"
-echo "======================================================================================================================================================================================="
+echo "07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the entity in step 05)"
+echo "================================================================================================================================================================================="
 accumulatorDump
 echo
 echo
@@ -197,17 +197,7 @@ Date: REGEX(.*)
 
 
 
-03. Create E2/A2 in CPR1
-========================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Register E2/A2 for CPR1 in CB
+03. Register E2/A2 for CPR1 in CB
 =================================
 HTTP/1.1 200 OK
 Content-Length: 63
@@ -221,11 +211,21 @@ Date: REGEX(.*)
 }
 
 
-05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2
-==================================================================
+04. Make accumulator subscribe to E2/A2 in CPR1
+===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E2/A2 in CPR1, using CORRELATOR2
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
 Fiware-Correlator: CORRELATOR2
 Date: REGEX(.*)
 
@@ -263,8 +263,8 @@ Date: REGEX(.*)
 }
 
 
-07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
-=======================================================================================================================================================================================
+07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the entity in step 05)
+=================================================================================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 141
@@ -298,7 +298,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: CORRELATOR2
+Fiware-Correlator: CORRELATOR2; cbnotif=1
 
 {
     "data": [

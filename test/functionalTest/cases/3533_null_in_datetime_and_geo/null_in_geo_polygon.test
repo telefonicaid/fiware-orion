@@ -1,0 +1,347 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Null support in geo:polygon attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with geo:polygon attribute loc [ 2,2 7,7 7,2, 2,2 ]
+# 02. Create entity E2 with geo:polygon attribute loc with value null
+# 03. Get entities (E1-loc: with actual location, E2-loc: null)
+# 04. Geoquery covering all planet, shows only E1
+# 05. Update E1-loc: null
+# 06. Update E2-loc: [ 2,2 7,7 7,2, 2,2 ]
+# 07. Get entities (E1-loc: null, E2-loc: actual location)
+# 08. Geoquery covering all planet, shows only E2
+# 09. Update E1-loc: foo, see error
+# 10. Update E2-loc: bar, see error
+#
+# (Actually, queries at 04 and 08 don't cover all the planet, but a single hemisphere.
+# See https://stackoverflow.com/questions/67493504/earth-wide-polygon-query-in-mongodb-doesnt-return-geo-located-document/67501039#67501039)
+#
+
+echo "01. Create entity E1 with geo:polygon attribute loc [ 2,2 7,7 7,2, 2,2 ]"
+echo "========================================================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "loc": {
+    "value": [ "2, 2", "7, 7", "7, 2", "2, 2" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 with geo:polygon attribute loc with value null"
+echo "==================================================================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "loc": {
+    "value": null,
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Get entities (E1-loc: with actual location, E2-loc: null)"
+echo "============================================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. Geoquery covering all planet, shows only E1"
+echo "==============================================="
+orionCurl --url '/v2/entities?geometry=box&georel=coveredBy&coords=-90,-90;90,90'
+echo
+echo
+
+
+echo "05. Update E1-loc: null"
+echo "======================="
+payload='{
+  "loc": {
+    "value": null,
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "06. Update E2-loc: [ 2,2 7,7 7,2, 2,2 ]"
+echo "======================================="
+payload='{
+  "loc": {
+    "value": [ "2, 2", "7, 7", "7, 2", "2, 2" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. Get entities (E1-loc: null, E2-loc: actual location)"
+echo "========================================================"
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "08. Geoquery covering all planet, shows only E2"
+echo "==============================================="
+orionCurl --url '/v2/entities?geometry=box&georel=coveredBy&coords=-90,-90;90,90'
+echo
+echo
+
+
+echo "09. Update E1-loc, see error"
+echo "============================"
+payload='{
+  "loc": {
+    "value": "foo",
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "08. Update E2-loc, see error"
+echo "============================"
+payload='{
+  "loc": {
+    "value": "bar",
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E2/attrs --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with geo:polygon attribute loc [ 2,2 7,7 7,2, 2,2 ]
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with geo:polygon attribute loc with value null
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get entities (E1-loc: with actual location, E2-loc: null)
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 184
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": null
+        },
+        "type": "T"
+    }
+]
+
+
+04. Geoquery covering all planet, shows only E1
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+
+
+05. Update E1-loc: null
+=======================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update E2-loc: [ 2,2 7,7 7,2, 2,2 ]
+=======================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Get entities (E1-loc: null, E2-loc: actual location)
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 184
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": null
+        },
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+
+
+08. Geoquery covering all planet, shows only E2
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "loc": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+
+
+09. Update E1-loc, see error
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 161
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "error parsing location attribute for existing attribute: geo:line, geo:box and geo:polygon needs array of strings as value",
+    "error": "BadRequest"
+}
+
+
+08. Update E2-loc, see error
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "error parsing location attribute: geo:line, geo:box and geo:polygon needs array of strings as value",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

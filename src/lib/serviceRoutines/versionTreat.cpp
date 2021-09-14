@@ -45,6 +45,7 @@
 #include <boost/version.hpp>
 #include <mongoc/mongoc.h>
 #include <bson/bson.h>
+#include <mosquitto.h>
 
 /* ****************************************************************************
 *
@@ -65,6 +66,7 @@ std::string libVersions(void)
   std::string  total  = "\"libversions\": {\n";
   std::string  boost  = "     \"boost\": ";
   std::string  curl   = "     \"libcurl\": ";
+  std::string  mosq   = "     \"libmosquitto\": ";
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
@@ -73,8 +75,18 @@ std::string libVersions(void)
 
   char*        curlVersion = curl_version();
 
+  int mosqMayor;
+  int mosqMinor;
+  int mosqRevision;
+  mosquitto_lib_version(&mosqMayor, &mosqMinor, &mosqRevision);
+
+  // XX.XX.XX -> 8 chars << 16 chars
+  char  mosqVersion[16];
+  snprintf(mosqVersion, sizeof(mosqVersion), "%d.%d.%d", mosqMayor, mosqMinor, mosqRevision);
+
   total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
+  total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";

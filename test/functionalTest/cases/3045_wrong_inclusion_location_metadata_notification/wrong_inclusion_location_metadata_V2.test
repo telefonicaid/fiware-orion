@@ -32,14 +32,45 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E with type T
-# 02. Create NGSIv2 subscription for E
+# 01. Create NGSIv2 subscription for E
+# 02. Create E with type T
 # 03. Trigger notification by updating value of "name" attribute (in NGSIv2)
-# 04. Trigger notification by updating the subscription itself (in NGSIv2)
-# 05. See NGSIv2 notifications and make sure "location" metadata is not included
+# 04. See NGSIv2 notifications and make sure "location" metadata is not included
 #
 
-echo "01. Create E with type: T"
+
+echo "01. Create NGSIv2 subscription for E"
+echo "===================================="
+payload='{
+  "description": "A subscription to get info about E",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": [
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create E with type: T"
 echo "========================="
 payload='{
   "id": "E",
@@ -69,37 +100,6 @@ echo
 echo
 
 
-echo "02. Create NGSIv2 subscription for E"
-echo "===================================="
-payload='{
-  "description": "A subscription to get info about E",
-  "subject": {
-    "entities": [
-      {
-        "id": "E",
-        "type": "T"
-      }
-    ],
-    "condition": {
-      "attrs": [
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [     
-    ]
-  } 
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
 echo "03. Trigger notification by updating value of name attribute (in NGSIV2)"
 echo "========================================================================"
 payload='{
@@ -110,28 +110,7 @@ echo
 echo
 
 
-echo "04. Trigger notification by updating the subscription itself (in NGSIV2)"
-echo "========================================================================"
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "id": "E",
-        "type": "T"
-      }
-    ],
-    "condition": {
-      "attrs": [
-      ]
-    }
-  }
-}'
-orionCurl --url /v2/subscriptions/$SUB_ID  --payload "$payload" -X PATCH
-echo
-echo
-
-
-echo "05. See NGSIv2 notifications and make sure location metadata is not included"
+echo "04. See NGSIv2 notifications and make sure location metadata is not included"
 echo "============================================================================"
 accumulatorDump
 echo
@@ -139,21 +118,21 @@ echo
 
 
 --REGEXPECT--
-01. Create E with type: T
-=========================
+01. Create NGSIv2 subscription for E
+====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create NGSIv2 subscription for E
-====================================
+02. Create E with type: T
+=========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -167,15 +146,7 @@ Date: REGEX(.*)
 
 
 
-04. Trigger notification by updating the subscription itself (in NGSIV2)
-========================================================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-05. See NGSIv2 notifications and make sure location metadata is not included
+04. See NGSIv2 notifications and make sure location metadata is not included
 ============================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -185,7 +156,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "data": [
@@ -247,67 +218,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "id": "E", 
-            "name": {
-                "metadata": {}, 
-                "type": "Text", 
-                "value": "SD1"
-            }, 
-            "perimeter": {
-                "metadata": {}, 
-                "type": "geo:json", 
-                "value": {
-                    "coordinates": [
-                        [
-                            [
-                                -13.806455, 
-                                33.467278, 
-                                0
-                            ], 
-                            [
-                                -13.806708, 
-                                33.467234, 
-                                0
-                            ], 
-                            [
-                                -13.806864, 
-                                33.467206, 
-                                0
-                            ], 
-                            [
-                                -13.807017, 
-                                33.467191, 
-                                0
-                            ], 
-                            [
-                                -13.806455, 
-                                33.467278, 
-                                0
-                            ]
-                        ]
-                    ], 
-                    "type": "Polygon"
-                }
-            }, 
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 343
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "data": [

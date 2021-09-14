@@ -46,7 +46,7 @@ private:
 
 public:
     SyncQOverflow(size_t sz): max_size(sz) {}
-    bool try_push(Data element);
+    bool try_push(Data element, bool unstoppable = false);
     Data pop();
     size_t size() const;
 };
@@ -56,11 +56,11 @@ public:
 * SyncQOverflow<Data>::try_push -
 */
 template <typename Data>
-bool SyncQOverflow<Data>::try_push(Data element)
+bool SyncQOverflow<Data>::try_push(Data element, bool unstoppable)
 {
   boost::mutex::scoped_lock lock(mtx);
 
-  if (queue.size() < max_size)
+  if (unstoppable || (queue.size() < max_size))
     {
       queue.push(element);
       lock.unlock();

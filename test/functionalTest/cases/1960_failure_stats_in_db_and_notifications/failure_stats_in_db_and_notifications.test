@@ -31,31 +31,19 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E1
-# 02. Create sub (with invalid url), matching E1
+# 01. Create sub (with invalid url), matching E1
+# 02. Create entity E1
 # 03. GET subscription, see error stats in notification field
 # 04. Update sub (with OK url), matching E1
-# 05. GET subscription, see NO error stats in notification field
-# 06. Update E1, to provoke notification that now works
-# 07. GET subscription, see NO error stats in notification field
-# 08. Dump accelerator, see 2 notification
-# 09. Update sub (with invalid url)
+# 05. Update E1, to provoke notification that now works
+# 06. GET subscription, see NO error stats in notification field
+# 07. Dump accelerator, see 1 notification
+# 08. Update sub (with invalid url)
+# 09. Update E1, to provoke notification that fails
 # 10. GET subscription, see error stats in notification field
 #
 
-echo "01. Create entity E1"
-echo "===================="
-payload='{
-  "id": "E1",
-  "type": "T1",
-  "A1": 1
-}'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
-echo
-echo
-
-
-echo "02. Create sub (with invalid url), matching E1"
+echo "01. Create sub (with invalid url), matching E1"
 echo "=============================================="
 payload='{
   "subject": {
@@ -77,6 +65,18 @@ payload='{
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
 
@@ -122,14 +122,7 @@ echo
 sleep 3.5
 
 
-echo "05. GET subscription, see NO error stats in notification field"
-echo "=============================================================="
-orionCurl --url /v2/subscriptions
-echo
-echo
-
-
-echo "06. Update E1, to provoke notification that now works"
+echo "05. Update E1, to provoke notification that now works"
 echo "====================================================="
 payload='{
   "A1": 6
@@ -143,21 +136,21 @@ echo
 sleep 3.5
 
 
-echo "07. GET subscription, see NO error stats in notification field"
+echo "06. GET subscription, see NO error stats in notification field"
 echo "=============================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "08. Dump accelerator, see 2 notification"
+echo "07. Dump accelerator, see 1 notification"
 echo "========================================"
 accumulatorDump
 echo
 echo
 
 
-echo "09. Update sub (with invalid url)"
+echo "08. Update sub (with invalid url)"
 echo "================================="
 payload='{
   "subject": {
@@ -185,6 +178,21 @@ echo
 # Await sub-cache contents to be dumped into database
 sleep 3.5
 
+
+echo "09. Update E1, to provoke notification that now fails"
+echo "====================================================="
+payload='{
+  "A1": 7
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
 echo "10. GET subscription, see error stats in notification field"
 echo "==========================================================="
 orionCurl --url /v2/subscriptions
@@ -193,21 +201,21 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1
-====================
+01. Create sub (with invalid url), matching E1
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Create sub (with invalid url), matching E1
-==============================================
+02. Create entity E1
+====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Location: /v2/entities/E1?type=T1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -259,7 +267,15 @@ Date: REGEX(.*)
 
 
 
-05. GET subscription, see NO error stats in notification field
+05. Update E1, to provoke notification that now works
+=====================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
 Content-Length: 454
@@ -299,81 +315,8 @@ Date: REGEX(.*)
 ]
 
 
-06. Update E1, to provoke notification that now works
-=====================================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-07. GET subscription, see NO error stats in notification field
-==============================================================
-HTTP/1.1 200 OK
-Content-Length: 454
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-[
-    {
-        "id": "REGEX([0-9a-f]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/notify"
-            },
-            "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't resolve host name",
-            "lastNotification": "REGEX(.*)",
-            "lastSuccess": "REGEX(.*)",
-            "lastSuccessCode": 200,
-            "onlyChangedAttrs": false,
-            "timesSent": 3
-        },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": []
-            },
-            "entities": [
-                {
-                    "id": "E1"
-                }
-            ]
-        }
-    }
-]
-
-
-08. Dump accelerator, see 2 notification
+07. Dump accelerator, see 1 notification
 ========================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 125
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {}, 
-                "type": "Number", 
-                "value": 1
-            }, 
-            "id": "E1", 
-            "type": "T1"
-        }
-    ], 
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 125
@@ -401,8 +344,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
-09. Update sub (with invalid url)
+08. Update sub (with invalid url)
 =================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Update E1, to provoke notification that now fails
+=====================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -432,7 +383,7 @@ Date: REGEX(.*)
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
-            "timesSent": 4
+            "timesSent": 3
         },
         "status": "failed",
         "subject": {
