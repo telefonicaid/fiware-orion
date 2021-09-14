@@ -1,0 +1,171 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute update operator: pullAll
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with A=[1,2,foo], B=[{x:1},{y:2},[z]], C=3
+# 02. Update A with $pullAll: [1,foo]
+# 03. Update B with $pullAll: [{y:2},{x:1}}
+# 04. Delete attribute C
+# 05. Get entity, see E-A=[2] and E-B=[[z]]
+#
+
+
+echo '01. Create entity E with A=[1,2,foo], B=[{x:1},{y:2},[z]], C=3'
+echo '=============================================================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": [ 1, 2, "foo" ],
+    "type": "StructuredValue"
+  },
+  "B": {
+    "value": [ {"x": 1}, {"y": 2}, ["z"] ],
+    "type": "StructuredValue"
+  },
+  "C": {
+    "value": 3,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update A with $pull: [1,foo]'
+echo '================================'
+payload='{
+  "A": {
+    "value": { "$pullAll": [1, "foo"] },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '03. Update B with $pullAll: [{y:2},{x:1}]'
+echo '========================================='
+payload='{
+  "B": {
+    "value": { "$pullAll": [{"y": 2}, {"x": 1} ]},
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '04. Delete attribute C'
+echo '======================'
+orionCurl --url /v2/entities/E/attrs/C -X DELETE
+echo
+echo
+
+
+echo '05. Get entity, see E-A=[2] and E-B=[[z]]'
+echo '========================================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with A=[1,2,foo], B=[{x:1},{y:2},[z]], C=3
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Update A with $pull: [1,foo]
+================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Update B with $pullAll: [{y:2},{x:1}]
+=========================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Delete attribute C
+======================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Get entity, see E-A=[2] and E-B=[[z]]
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            2
+        ]
+    },
+    "B": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            [
+                "z"
+            ]
+        ]
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

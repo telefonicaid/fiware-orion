@@ -491,7 +491,8 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
       (caP->compoundValueP->childV[0]->name == "$mul") ||
       (caP->compoundValueP->childV[0]->name == "$push") ||
       (caP->compoundValueP->childV[0]->name == "$addToSet") ||
-      (caP->compoundValueP->childV[0]->name == "$pull"))
+      (caP->compoundValueP->childV[0]->name == "$pull") ||
+      (caP->compoundValueP->childV[0]->name == "$pullAll"))
   {
     return true;
   }
@@ -3416,16 +3417,24 @@ static unsigned int updateEntity
       bobEach.append("$each", attrNamesAdd.arr());
       toAddToSet.append(ENT_ATTRNAMES, bobEach.obj());
     }
-    if ((attrNamesAdd.arrSize() > 0) || calculatedAddToSet)
+    if (calculatedAddToSet || (attrNamesAdd.arrSize() > 0))
     {
       updatedEntity.append("$addToSet", toAddToSet.obj());
     }
 
+    // $addToSet is special, as it is shared between attrsName removals and
+    // attribute operator. Probably both cases cannot happen at the same
+    // time (as attrsName removal can only happen in DELETE updates), but
+    // the logic supports the simultenous case
+    orion::BSONObjBuilder toPullAll;
+    bool calculatedPullAll = calculateOperator(notifyCerP, "$pullAll", &toPullAll);
     if (attrNamesRemove.arrSize() > 0)
     {
-      orion::BSONObjBuilder bobAttrs;
-      bobAttrs.append(ENT_ATTRNAMES, attrNamesRemove.arr());
-      updatedEntity.append("$pullAll", bobAttrs.obj());
+      toPullAll.append(ENT_ATTRNAMES, attrNamesRemove.arr());
+    }
+    if (calculatedPullAll || (attrNamesRemove.arrSize() > 0))
+    {
+      updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
     orion::BSONObjBuilder toInc;
