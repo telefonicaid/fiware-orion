@@ -229,8 +229,6 @@ class NotifierMock : public Notifier
   MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&           ncr,
                                               const ngsiv2::Notification&      notification,
                                               const std::string&               tenant,
-                                              long long                        maxFailsLimit,
-                                              long long                        failsCounter,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
                                               unsigned int                     correlatorCounter,
