@@ -16,7 +16,7 @@
 ```
 [fiware-release]
 name=FIWARE release repository
-baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/release
+baseurl=https://nexus.lab.fiware.org/repository/el/8/x86_64/release
 enabled=1
 protect=0
 gpgcheck=0
@@ -25,10 +25,10 @@ autorefresh=1
 type=rpm-md
 
 ```
-または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-release.repo) からダウンロードします。
+または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-release.repo) からダウンロードします。
 
 ```
-sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-release.repo
+sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-release.repo
 ```
 
 ナイトリー・リポジトリには、この設定を使用します :
@@ -36,7 +36,7 @@ sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/publi
 ```
 [fiware-nightly]
 name=FIWARE nightly repository
-baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/nightly
+baseurl=https://nexus.lab.fiware.org/repository/el/8/x86_64/nightly
 enabled=1
 protect=0
 gpgcheck=0
@@ -45,10 +45,10 @@ autorefresh=1
 type=rpm-md
 
 ```
-または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo) からダウンロードします。
+または、[FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-nightly.repo) からダウンロードします。
 
 ```
-sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo
+sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-nightly.repo
 
 ```
 

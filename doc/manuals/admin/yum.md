@@ -1,9 +1,6 @@
 ## Using Yum repositories
 
-**FIXME:** reference distribution changed from CentOS/RHEL 7 to 8 in Orion 3.0.0. This document needs to be
-reviewed and updated.
-
-This document describes the guidelines of using FIWARE Yum repository to install Orion Context Broker. Provided configuration corresponds to x86_64 architecture and CentOS/RHEL 7 OS.
+This document describes the guidelines of using FIWARE Yum repository to install Orion Context Broker. Provided configuration corresponds to x86_64 architecture and CentOS/RHEL 8 OS.
 
 There are two available repositories:
 
@@ -19,7 +16,7 @@ Use this configuration for release repository:
 ```
 [fiware-release]
 name=FIWARE release repository
-baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/release
+baseurl=https://nexus.lab.fiware.org/repository/el/8/x86_64/release
 enabled=1
 protect=0
 gpgcheck=0
@@ -28,15 +25,15 @@ autorefresh=1
 type=rpm-md
 
 ```
-or download it from [FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-release.repo)
+or download it from [FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-release.repo)
 ```
-sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-release.repo
+sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-release.repo
 ```
 Use this configuration for nightly repository:
 ```
 [fiware-nightly]
 name=FIWARE nightly repository
-baseurl=https://nexus.lab.fiware.org/repository/el/7/x86_64/nightly
+baseurl=https://nexus.lab.fiware.org/repository/el/8/x86_64/nightly
 enabled=1
 protect=0
 gpgcheck=0
@@ -45,9 +42,9 @@ autorefresh=1
 type=rpm-md
 
 ```
-or download it from [FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo)
+or download it from [FIWARE public repository](https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-nightly.repo)
 ```
-sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/7/x86_64/fiware-nightly.repo
+sudo wget -P /etc/yum.repos.d/ https://nexus.lab.fiware.org/repository/raw/public/repositories/el/8/x86_64/fiware-nightly.repo
 
 ```
 
