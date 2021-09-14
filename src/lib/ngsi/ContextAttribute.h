@@ -121,14 +121,12 @@ public:
   void         release(void);
   std::string  getName(void);
 
-  /* Used to render attribute value to BSON. There are two variants,
-   * one for APPEND/REPLACE and other for UPDATE */
-  void valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers = false) const;
-  void valueBson(const std::string&      composedName,
-                 orion::BSONObjBuilder*  toSet,
+  /* Used to render attribute value to BSON */
+  void valueBson(const std::string&      valueKey,
+                 orion::BSONObjBuilder*  bsonAttr,
                  const std::string&      attrType,
-                 bool autocast,
-                 bool strings2numbers = false) const;
+                 bool                    autocast,
+                 bool                    strings2numbers = false) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
@@ -141,12 +139,10 @@ private:
   void filterAndOrderMetadata(const std::vector<std::string>&  metadataFilter,
                               std::vector<Metadata*>*          orderedMetadata);
 
-  /* As with valueBson(), there are two variants of this method: one for APPEND/REPLACE and other for UPDATE */
-  void bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
-  void bsonAppendAttrValue(const std::string&      composedName,
-                           orion::BSONObjBuilder*  toSet,
+  void bsonAppendAttrValue(const std::string&      valueKey,
+                           orion::BSONObjBuilder*  bsonAttr,
                            const std::string&      attrType,
-                           bool autocast) const;
+                           bool                    autocast) const;
 
 } ContextAttribute;
 

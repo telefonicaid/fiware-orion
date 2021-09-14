@@ -53,27 +53,6 @@
 *
 * ContextAttribute::bsonAppendAttrValue -
 *
-* Used to render attribute value to BSON, using a intermediate BSONObjBuilder. To
-* be used by the APPEND and REPLACE logic
-*
-* FIXME PR: try to unify both functions
-*/
-void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
-{
-  bsonAppendAttrValue(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, autocast);
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttribute::bsonAppendAttrValue -
-*
-* Used to render attribute value to BSON, directly in the toSet builder. To
-* be used by the UPDATE logic
-*
-* FIXME PR: try to unify both functions
-*
 */
 void ContextAttribute::bsonAppendAttrValue
 (
@@ -160,26 +139,6 @@ void ContextAttribute::bsonAppendAttrValue
 *
 * ContextAttribute::valueBson -
 *
-* Used to render attribute value to BSON, using a intermediate BSONObjBuilder. To
-* be used by the APPEND and REPLACE logic
-*
-* FIXME PR: try to unify both functions
-*/
-void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
-{
-  valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, autocast, strings2numbers);
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttribute::valueBson -
-*
-* Used to render attribute value to BSON, directly in the toSet builder. To
-* be used by the UPDATE logic
-*
-* FIXME PR: try to unify both functions
 */
 void ContextAttribute::valueBson
 (
