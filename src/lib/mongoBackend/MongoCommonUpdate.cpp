@@ -3052,6 +3052,15 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
+
+    // previousValue equal to NULL is a way of detecting attributes that has been created
+    // due to append. These ones are not included in calculated operator BSONObjBuilder, as they
+    // has been already included in $set
+    if (attr->previousValue == NULL)
+    {
+      continue;
+    }
+
     if (attr->compoundValueP != NULL)
     {
       CompoundValueNode* child0 = attr->compoundValueP->childV[0];
