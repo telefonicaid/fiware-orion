@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute update operator: push
+Attribute update operator: addToSet
 
 --SHELL-INIT--
 dbInit CB
@@ -31,12 +31,12 @@ brokerStart CB
 
 #
 # 01. Create entity E with A=[1] and B=[{x:1}]
-# 02. Update A with $push: 2
-# 03. Update A with $push: foo
-# 04. Update B with $push: {y:2}
-# 05. Update B with $push: [z]
-# 06. Update A with $push: foo (duplicated)
-# 07. Get entity, see E-A=[1,2,foo,foo] and E-B=[{x:1},{y:2},[z]]
+# 02. Update A with $addToSet: 1 (already in the array)
+# 03. Update A with $addToSet: foo
+# 04. Update B with $addToSet: {x:1} (already in the array)
+# 05. Update B with $addToSet: [z]
+# 06. Update A with $addToSet: bar and new attribute C at the same time
+# 07. Get entity, see E-A=[1,foo,bar], E-B=[{x:1},[z]], E-C=3
 #
 
 
@@ -59,11 +59,11 @@ echo
 echo
 
 
-echo '02. Update A with $push: 2'
-echo '=========================='
+echo '02. Update A with $addToSet: 1 (already in the array)'
+echo '====================================================='
 payload='{
   "A": {
-    "value": { "$push": 2 },
+    "value": { "$addToSet": 1 },
     "type": "StructuredValue"
   }
 }'
@@ -72,11 +72,11 @@ echo
 echo
 
 
-echo '03. Update A with $push: foo'
-echo '============================'
+echo '03. Update A with $addToSet: foo'
+echo '================================'
 payload='{
   "A": {
-    "value": { "$push": "foo" },
+    "value": { "$addToSet": "foo" },
     "type": "StructuredValue"
   }
 }'
@@ -85,11 +85,11 @@ echo
 echo
 
 
-echo '04. Update B with $push: {y:2}'
-echo '=============================='
+echo '04. Update B with $addToSet: {x:1} (already in the array)'
+echo '========================================================='
 payload='{
   "B": {
-    "value": { "$push": {"y": 2} },
+    "value": { "$addToSet": {"x": 1} },
     "type": "StructuredValue"
   }
 }'
@@ -98,11 +98,11 @@ echo
 echo
 
 
-echo '05. Update B with $push: [z]'
-echo '============================'
+echo '05. Update B with $addToSet: [z]'
+echo '================================'
 payload='{
   "B": {
-    "value": { "$push": [ "z" ] },
+    "value": { "$addToSet": [ "z" ] },
     "type": "StructuredValue"
   }
 }'
@@ -111,12 +111,16 @@ echo
 echo
 
 
-echo '06. Update A with $push: foo (duplicated)'
-echo '========================================='
+echo '06. Update A with $addToSet: bar and new attribute C at the same time'
+echo '====================================================================='
 payload='{
   "A": {
-    "value": { "$push": "foo" },
+    "value": { "$addToSet": "bar" },
     "type": "StructuredValue"
+  },
+  "C": {
+    "value": 3,
+    "type": "Number"
   }
 }'
 orionCurl --url /v2/entities/E/attrs --payload "$payload"
@@ -124,8 +128,8 @@ echo
 echo
 
 
-echo '07. Get entity, see E-A=[1,2,foo,foo] and E-B=[{x:1},{y:2},[z]]'
-echo '==============================================================='
+echo '07. Get entity, see E-A=[1,foo,bar], E-B=[{x:1},[z]], E-C=3'
+echo '==========================================================='
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -142,50 +146,50 @@ Date: REGEX(.*)
 
 
 
-02. Update A with $push: 2
-==========================
+02. Update A with $addToSet: 1 (already in the array)
+=====================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-03. Update A with $push: foo
-============================
+03. Update A with $addToSet: foo
+================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-04. Update B with $push: {y:2}
-==============================
+04. Update B with $addToSet: {x:1} (already in the array)
+=========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Update B with $push: [z]
-============================
+05. Update B with $addToSet: [z]
+================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Update A with $push: foo (duplicated)
-=========================================
+06. Update A with $addToSet: bar and new attribute C at the same time
+=====================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-07. Get entity, see E-A=[1,2,foo,foo] and E-B=[{x:1},{y:2},[z]]
-===============================================================
+07. Get entity, see E-A=[1,foo,bar], E-B=[{x:1},[z]], E-C=3
+===========================================================
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 205
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -196,9 +200,8 @@ Date: REGEX(.*)
         "type": "StructuredValue",
         "value": [
             1,
-            2,
             "foo",
-            "foo"
+            "bar"
         ]
     },
     "B": {
@@ -208,13 +211,15 @@ Date: REGEX(.*)
             {
                 "x": 1
             },
-            {
-                "y": 2
-            },
             [
                 "z"
             ]
         ]
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
     },
     "id": "E",
     "type": "T"

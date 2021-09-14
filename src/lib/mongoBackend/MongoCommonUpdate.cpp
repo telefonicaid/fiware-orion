@@ -489,7 +489,8 @@ static bool calculateOperatorUsage(ContextAttribute* caP)
       (caP->compoundValueP->childV[0]->name == "$min") ||
       (caP->compoundValueP->childV[0]->name == "$max") ||
       (caP->compoundValueP->childV[0]->name == "$mul") ||
-      (caP->compoundValueP->childV[0]->name == "$push"))
+      (caP->compoundValueP->childV[0]->name == "$push") ||
+      (caP->compoundValueP->childV[0]->name == "$addToSet"))
   {
     return true;
   }
@@ -757,14 +758,14 @@ static bool contextAttributeCustomMetadataToBson
 */
 static bool updateAttribute
 (
-  orion::BSONObj&            attrs,
-  orion::BSONObjBuilder*     toSet,
-  orion::BSONArrayBuilder*   toPush,
-  ContextAttribute*   caP,
-  bool*               actualUpdate,
-  bool                isReplace,
-  const bool&         forcedUpdate,
-  ApiVersion          apiVersion
+  orion::BSONObj&           attrs,
+  orion::BSONObjBuilder*    toSet,
+  orion::BSONArrayBuilder*  attrNamesAdd,
+  ContextAttribute*         caP,
+  bool*                     actualUpdate,
+  bool                      isReplace,
+  const bool&               forcedUpdate,
+  ApiVersion                apiVersion
 )
 {
   *actualUpdate = false;
@@ -813,7 +814,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
 
     toSet->append(effectiveName, newAttr.obj());
-    toPush->append(caP->name);
+    attrNamesAdd->append(caP->name);
   }
   else
   {
@@ -848,13 +849,13 @@ static bool updateAttribute
 */
 static bool appendAttribute
 (
-  orion::BSONObj&            attrs,
-  orion::BSONObjBuilder*     toSet,
-  orion::BSONArrayBuilder*   toPush,
-  ContextAttribute*   caP,
-  bool*               actualUpdate,
-  const bool&         forcedUpdate,
-  ApiVersion          apiVersion
+  orion::BSONObj&           attrs,
+  orion::BSONObjBuilder*    toSet,
+  orion::BSONArrayBuilder*  attrNamesAdd,
+  ContextAttribute*         caP,
+  bool*                     actualUpdate,
+  const bool&               forcedUpdate,
+  ApiVersion                apiVersion
 )
 {
   std::string effectiveName = dbEncode(caP->name);
@@ -862,7 +863,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, forcedUpdate, apiVersion);
+    updateAttribute(attrs, toSet, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, apiVersion);
     return false;
   }
 
@@ -910,7 +911,7 @@ static bool appendAttribute
 
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
   toSet->append(composedName, ab.obj());
-  toPush->append(caP->name);
+  attrNamesAdd->append(caP->name);
 
   *actualUpdate = true;
   return true;
@@ -927,10 +928,10 @@ static bool appendAttribute
 */
 static bool deleteAttribute
 (
-  orion::BSONObj&                              attrs,
-  orion::BSONObjBuilder*                       toUnset,
-  orion::BSONArrayBuilder*                     toPull,
-  ContextAttribute*                     caP
+  orion::BSONObj&           attrs,
+  orion::BSONObjBuilder*    toUnset,
+  orion::BSONArrayBuilder*  attrNamesRemove,
+  ContextAttribute*         caP
 )
 {
   std::string effectiveName = dbEncode(caP->name);
@@ -943,7 +944,7 @@ static bool deleteAttribute
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   toUnset->append(composedName, 1);
-  toPull->append(caP->name);
+  attrNamesRemove->append(caP->name);
 
   return true;
 }
@@ -2279,7 +2280,7 @@ static bool updateContextAttributeItem
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
-  orion::BSONArrayBuilder*  toPush,
+  orion::BSONArrayBuilder*  attrNamesAdd,
   bool*                     actualUpdate,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
@@ -2294,7 +2295,7 @@ static bool updateContextAttributeItem
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
+  if (updateAttribute(attrs, toSet, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2360,7 +2361,7 @@ static bool appendContextAttributeItem
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
-  orion::BSONArrayBuilder*  toPush,
+  orion::BSONArrayBuilder*  attrNamesAdd,
   bool*                     actualUpdate,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
@@ -2373,7 +2374,7 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, forcedUpdate, apiVersion);
+  bool actualAppend = appendAttribute(attrs, toSet, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
@@ -2419,7 +2420,7 @@ static bool deleteContextAttributeItem
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
   orion::BSONObjBuilder*    toUnset,
-  orion::BSONArrayBuilder*  toPull,
+  orion::BSONArrayBuilder*  attrNamesRemove,
   std::string*              currentLocAttrName,
   bool*                     entityModified,
   orion::BSONDate*          dateExpiration,
@@ -2427,7 +2428,7 @@ static bool deleteContextAttributeItem
   OrionError*               oe
 )
 {
-  if (deleteAttribute(attrs, toUnset, toPull, targetAttr))
+  if (deleteAttribute(attrs, toUnset, attrNamesRemove, targetAttr))
   {
     deleteAttrInNotifyCer(notifyCerP, targetAttr);
     *entityModified = true;
@@ -2503,8 +2504,8 @@ static bool processContextAttributeVector
   orion::BSONObj&                                 attrs,
   orion::BSONObjBuilder*                          toSet,
   orion::BSONObjBuilder*                          toUnset,
-  orion::BSONArrayBuilder*                        toPush,
-  orion::BSONArrayBuilder*                        toPull,
+  orion::BSONArrayBuilder*                        attrNamesAdd,
+  orion::BSONArrayBuilder*                        attrNamesRemove,
   ContextElementResponse*                         cerP,
   std::string*                                    currentLocAttrName,
   orion::BSONObjBuilder*                          geoJson,
@@ -2552,7 +2553,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toSet,
-                                      toPush,
+                                      attrNamesAdd,
                                       &actualUpdate,
                                       &entityModified,
                                       currentLocAttrName,
@@ -2575,7 +2576,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toSet,
-                                      toPush,
+                                      attrNamesAdd,
                                       &actualUpdate,
                                       &entityModified,
                                       currentLocAttrName,
@@ -2597,7 +2598,7 @@ static bool processContextAttributeVector
                                       notifyCerP,
                                       entityDetail,
                                       toUnset,
-                                      toPull,
+                                      attrNamesRemove,
                                       currentLocAttrName,
                                       &entityModified,
                                       dateExpiration,
@@ -3039,7 +3040,7 @@ static bool calculateOperatorAritmetic(ContextElementResponse* cerP, const std::
 *
 * calculateOperatorPush -
 */
-static bool calculateOperatorPush(ContextElementResponse* cerP, orion::BSONObjBuilder* b)
+static bool calculateOperatorPush(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
 {
   bool r = false;
 
@@ -3049,7 +3050,7 @@ static bool calculateOperatorPush(ContextElementResponse* cerP, orion::BSONObjBu
     if (attr->compoundValueP != NULL)
     {
       CompoundValueNode* child0 = attr->compoundValueP->childV[0];
-      if ((child0->name == "$push"))
+      if ((child0->name == op))
       {
         std::string valueKey = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
         if (child0->valueType == orion::ValueTypeString)
@@ -3169,8 +3170,8 @@ static unsigned int updateEntity
   orion::BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
   orion::BSONObjBuilder    toSet;
   orion::BSONObjBuilder    toUnset;
-  orion::BSONArrayBuilder  toPush;
-  orion::BSONArrayBuilder  toPull;
+  orion::BSONArrayBuilder  attrNamesAdd;
+  orion::BSONArrayBuilder  attrNamesRemove;
 
   /* We accumulate the subscriptions in a map. The key of the map is the string representing
    * subscription id */
@@ -3280,8 +3281,8 @@ static unsigned int updateEntity
                                      attrs,
                                      &toSet,
                                      &toUnset,
-                                     &toPush,
-                                     &toPull,
+                                     &attrNamesAdd,
+                                     &attrNamesRemove,
                                      cerP,
                                      &locAttr,
                                      &geoJson,
@@ -3392,7 +3393,7 @@ static unsigned int updateEntity
     // Note entity replacement could be caused by a notification request
     // (with cbnotif= in the correlator) so we need to use correlatorRoot()
     replaceSet.append(ENT_ATTRS, toSet.obj());
-    replaceSet.append(ENT_ATTRNAMES, toPush.arr());
+    replaceSet.append(ENT_ATTRNAMES, attrNamesAdd.arr());
     replaceSet.append(ENT_MODIFICATION_DATE, now);
     replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
@@ -3431,20 +3432,25 @@ static unsigned int updateEntity
       updatedEntity.append("$unset", toUnset.obj());
     }
 
-    if (toPush.arrSize() > 0)
+    // $addToSet is special, as it is shared between attrsName additions and
+    // attribute operator
+    orion::BSONObjBuilder toAddToSet;
+    bool calculatedAddToSet = calculateOperatorPush(notifyCerP, "$addToSet", &toAddToSet);
+    if (attrNamesAdd.arrSize() > 0)
     {
       orion::BSONObjBuilder bobEach;
-      orion::BSONObjBuilder bobAttrs;
-      bobEach.append("$each", toPush.arr());
-      bobAttrs.append(ENT_ATTRNAMES, bobEach.obj());
-
-      updatedEntity.append("$addToSet", bobAttrs.obj());
+      bobEach.append("$each", attrNamesAdd.arr());
+      toAddToSet.append(ENT_ATTRNAMES, bobEach.obj());
+    }
+    if ((attrNamesAdd.arrSize() > 0) || calculatedAddToSet)
+    {
+      updatedEntity.append("$addToSet", toAddToSet.obj());
     }
 
-    if (toPull.arrSize() > 0)
+    if (attrNamesRemove.arrSize() > 0)
     {
       orion::BSONObjBuilder bobAttrs;
-      bobAttrs.append(ENT_ATTRNAMES, toPull.arr());
+      bobAttrs.append(ENT_ATTRNAMES, attrNamesRemove.arr());
       updatedEntity.append("$pullAll", bobAttrs.obj());
     }
 
@@ -3472,7 +3478,7 @@ static unsigned int updateEntity
     {
       updatedEntity.append("$mul", toMul.obj());
     }
-    if (calculateOperatorPush(notifyCerP, &toPush))
+    if (calculateOperatorPush(notifyCerP, "$push", &toPush))
     {
       updatedEntity.append("$push", toPush.obj());
     }
