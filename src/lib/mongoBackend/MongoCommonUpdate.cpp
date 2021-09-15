@@ -533,6 +533,7 @@ static bool mergeAttrInfo
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
+    // value is omitted from toSet in the case some operator ($inc, etc.) is used
     if (!isSomeCalculatedOperatorUsed(caP))
     {
       caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
@@ -883,6 +884,7 @@ static bool appendAttribute
 )
 {
   std::string effectiveName = dbEncode(caP->name);
+  const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
@@ -891,11 +893,13 @@ static bool appendAttribute
     return false;
   }
 
-  /* Build the attribute to append */
-  orion::BSONObjBuilder ab;
 
   /* 1. Value */
-  caP->valueBson(std::string(ENT_ATTRS_VALUE), &ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
+  // value is omitted from toSet in the case some operator ($inc, etc.) is used
+  if (!isSomeCalculatedOperatorUsed(caP))
+  {
+    caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type, ngsiv1Autocast && (apiVersion == V1));
+  }
 
   /* 2. Type */
   if ((apiVersion == V2) && !caP->typeGiven)
@@ -911,11 +915,11 @@ static bool appendAttribute
       attrType = defaultType(orion::ValueTypeVector);
     }
 
-    ab.append(ENT_ATTRS_TYPE, attrType);
+    toSet->append(composedName + "." + ENT_ATTRS_TYPE, attrType);
   }
   else
   {
-    ab.append(ENT_ATTRS_TYPE, caP->type);
+    toSet->append(composedName + "." + ENT_ATTRS_TYPE, caP->type);
   }
 
   /* 3. Metadata */
@@ -924,17 +928,15 @@ static bool appendAttribute
 
   if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
   {
-    ab.append(ENT_ATTRS_MD, md);
+    toSet->append(composedName + "." + ENT_ATTRS_MD, md);
   }
-  ab.append(ENT_ATTRS_MDNAMES, mdNames);
+  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
   double now = getCurrentTime();
-  ab.append(ENT_ATTRS_CREATION_DATE, now);
-  ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
+  toSet->append(composedName + "." + ENT_ATTRS_CREATION_DATE, now);
+  toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, now);
 
-  const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-  toSet->append(composedName, ab.obj());
   attrNamesAdd->append(caP->name);
 
   *actualUpdate = true;
@@ -3052,14 +3054,6 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
-
-    // previousValue equal to NULL is a way of detecting attributes that has been created
-    // due to append. These ones are not included in calculated operator BSONObjBuilder, as they
-    // has been already included in $set
-    if (attr->previousValue == NULL)
-    {
-      continue;
-    }
 
     if (attr->compoundValueP != NULL)
     {

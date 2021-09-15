@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Create/append/replace operations using operators
+Create entity with operators
 
 --SHELL-INIT--
 dbInit CB
@@ -30,18 +30,17 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity E with A={$inc:1}, B=2
-# 02. Update/append E with B={$inc:3}, C={$inc:4}
-# 03. Get entity, see A={$inc:1}, B=5, C={$inc:4}
-# 04. Replace entity with D={$inc:5}
-# 05. Get entity, see D={$inc:5}
+# 01. Create entity E1 with A={$inc:1}, B=2
+# 02. Get entity E1, see A={$inc:1}, B=2
+# 03. Create entity E2 with A={$max:10}, B=4 using batch operation
+# 04. Get entity E2, see A={$max:10}, B=4
 #
 
 
-echo '01. Create entity E with A={$inc:1}, B=2'
-echo '========================================'
+echo '01. Create entity E1 with A={$inc:1}, B=2'
+echo '========================================='
 payload='{
-  "id": "E",
+  "id": "E1",
   "type": "T",
   "A": {
     "value": { "$inc": 1},
@@ -57,73 +56,59 @@ echo
 echo
 
 
-echo '02. Update/append E with B={$inc:3}, C={$inc:4}'
-echo '==============================================='
+echo '02. Get entity E1, see A={$inc:1}, B=2'
+echo '======================================'
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo '03. Create entity E2 with A={$max:10}, B=4 using batch operation'
+echo '================================================================'
 payload='{
-  "B": {
-    "value": { "$inc": 3 },
-    "type": "Number"
-  },
-  "C": {
-    "value": { "$inc": 4 },
-    "type": "Number"
-  }
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "E2",
+      "type": "T",
+      "A": {
+        "value": { "$max": 10 },
+        "type": "Number"
+      },
+      "B": {
+        "value": 4,
+        "type": "Number"
+      }
+    }
+  ]
 }'
-orionCurl --url /v2/entities/E/attrs --payload "$payload"
+orionCurl --url /v2/op/update --payload "$payload"
 echo
 echo
 
 
-echo '03. Get entity, see A={$inc:1}, B=5, C={$inc:4}'
-echo '==============================================='
-orionCurl --url /v2/entities/E
-echo
-echo
-
-
-echo '04. Replace entity with D={$inc:5}'
-echo '=================================='
-payload='{
-  "D": {
-    "value": { "$inc": 5 },
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities/E/attrs --payload "$payload" -X PUT
-echo
-echo
-
-
-echo '05. Get entity, see D={$inc:5}'
-echo '=============================='
-orionCurl --url /v2/entities/E
+echo '04. Get entity E2, see A={$max:10}, B=4'
+echo '======================================='
+orionCurl --url /v2/entities/E2
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity E with A={$inc:1}, B=2
-========================================
+01. Create entity E1 with A={$inc:1}, B=2
+=========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
+Location: /v2/entities/E1?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. Update/append E with B={$inc:3}, C={$inc:4}
-===============================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. Get entity, see A={$inc:1}, B=5, C={$inc:4}
-===============================================
+02. Get entity E1, see A={$inc:1}, B=2
+======================================
 HTTP/1.1 200 OK
-Content-Length: 177
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -139,45 +124,43 @@ Date: REGEX(.*)
     "B": {
         "metadata": {},
         "type": "Number",
-        "value": 5
+        "value": 2
     },
-    "C": {
-        "metadata": {},
-        "type": "Number",
-        "value": {
-            "$inc": 4
-        }
-    },
-    "id": "E",
+    "id": "E1",
     "type": "T"
 }
 
 
-04. Replace entity with D={$inc:5}
-==================================
+03. Create entity E2 with A={$max:10}, B=4 using batch operation
+================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Get entity, see D={$inc:5}
-==============================
+04. Get entity E2, see A={$max:10}, B=4
+=======================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 124
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "D": {
+    "A": {
         "metadata": {},
         "type": "Number",
         "value": {
-            "$inc": 5
+            "$max": 10
         }
     },
-    "id": "E",
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "id": "E2",
     "type": "T"
 }
 
