@@ -39,6 +39,8 @@ brokerStart CB
 # 07. Get entity, see A=6, B=9, C=2
 # 08. Update/append E with A=0, C={$inc:2}, D={$inc:5}, E=10 with batch operation
 # 09. Get entity, see A=0, B=9, C=4, D=5, E=10
+# 10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation
+# 11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8
 #
 
 
@@ -163,6 +165,41 @@ echo
 
 echo '09. Get entity, see A=0, B=9, C=4, D=5, E=10'
 echo '============================================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation'
+echo '================================================================================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "B": {
+    "value": 0,
+    "type": "Number"
+  },
+  "D": {
+    "value": { "$inc": 5 },
+    "type": "Number"
+  },
+  "F": {
+    "value": { "$inc": -1 },
+    "type": "Number"
+  },
+  "G": {
+    "value": 8,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert --payload "$payload"
+echo
+echo
+echo
+
+
+echo '11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8'
+echo '========================================================'
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -321,6 +358,65 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "Number",
         "value": 10
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation
+================================================================================
+HTTP/1.1 204 No Content
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+
+11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 346
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "D": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "E": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "F": {
+        "metadata": {},
+        "type": "Number",
+        "value": -1
+    },
+    "G": {
+        "metadata": {},
+        "type": "Number",
+        "value": 8
     },
     "id": "E",
     "type": "T"

@@ -34,6 +34,8 @@ brokerStart CB
 # 02. Get entity E1, see A={$inc:1}, B=2
 # 03. Create entity E2 with A={$max:10}, B=4 using batch operation
 # 04. Get entity E2, see A={$max:10}, B=4
+# 05. Create entity E3 with A={$min:2}, B=3 using upsert operation
+# 06. Get entity E3, see A={$min:2}, B=3
 #
 
 
@@ -90,6 +92,32 @@ echo
 echo '04. Get entity E2, see A={$max:10}, B=4'
 echo '======================================='
 orionCurl --url /v2/entities/E2
+echo
+echo
+
+
+echo '05. Create entity E3 with A={$min:2}, B=3 using upsert operation'
+echo '================================================================'
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A": {
+    "value": { "$min": 2},
+    "type": "Number"
+  },
+  "B": {
+    "value": 3,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert --payload "$payload"
+echo
+echo
+
+
+echo '06. Get entity E3, see A={$min:2}, B=3'
+echo '======================================='
+orionCurl --url /v2/entities/E3
 echo
 echo
 
@@ -161,6 +189,41 @@ Date: REGEX(.*)
         "value": 4
     },
     "id": "E2",
+    "type": "T"
+}
+
+
+05. Create entity E3 with A={$min:2}, B=3 using upsert operation
+================================================================
+HTTP/1.1 204 No Content
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Get entity E3, see A={$min:2}, B=3
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 123
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": {
+            "$min": 2
+        }
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
+    },
+    "id": "E3",
     "type": "T"
 }
 
