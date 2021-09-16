@@ -323,7 +323,7 @@ POST /v2/entities/E/attrs/A
 ```
 
 The attribute A in entity E will be increased by 2 (so if you do after that for instance
-`GET /v2/entities/E/attrs/A you will get the increased value). But in notifications triggered
+`GET /v2/entities/E/attrs/A` you will get the increased value). But in notifications triggered
 by this update you will see (literally) this JSON object: `{ "$inc": 2 }`.
 
 ### Create or replace entities
