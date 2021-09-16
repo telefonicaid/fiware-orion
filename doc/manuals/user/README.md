@@ -12,6 +12,7 @@
   * [MQTT notifications](mqtt_notifications.md)
   * [Transient Entities](transient_entities.md)
   * [Structured values for attributes](structured_attribute_valued.md)
+  * [Update operators for attribute values](update_operators.md)
   * [Context Providers registration and request forwarding](context_providers.md)
   * [Attribute metadata](metadata.md)
   * [Filtering results](filtering.md)

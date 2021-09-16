@@ -607,6 +607,10 @@ use complex structures or custom metadata. These are advanced topics, described 
 More details on adding/removing attributes can be found in [this section](update_action_types.md)
 of the manual.
 
+In the examples of this walkthrough we update attributes with particular values,
+such as `26.5`. However, you can also do updates like *"increase tempeture by 2.5 degrees"*.
+This kind of updates are an advanced topic, described in [this document](update_operators.md).
+
 [Top](#top)
 
 ### Subscriptions
