@@ -185,7 +185,7 @@ static bool getGeoJson
     orion::BSONObjBuilder bo;
 
     // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
-    caP->valueBson(bo, "", true, apiVersion == V1);
+    caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
     geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
