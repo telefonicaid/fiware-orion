@@ -1,0 +1,518 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+subscription_that_pass_to_inactive_state_after_a_limit_of_failed_connection_attemps
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 --cache -subCacheIval 3
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription with maxFailsLimit set to 5
+# 02. Create entity E1
+# 03. GET subscription, see maxFailsLimit=5 and status==active
+# 04. Stop accumulator
+# 05. Update E1, to provoke notification that now fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 06. GET subscription, see failsCounter=1 and status==failed
+# 07. Update E1 again, to provoke notification that fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 08. GET subscription, see failsCounter=2 and status==failed
+# 09. Update E1 again, to provoke notification that fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 10. GET subscription, see failsCounter=3 and status==failed
+# 11. Update E1 again, to provoke notification that fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 12. GET subscription, see failsCounter=4 and status==failed
+# 13. Update E1 again, to provoke notification that fails
+#     Sleep 3.5 seconds to get a sub-cache-refresh
+# 14. GET subscription, see failsCounter=5 and status==inactive
+#
+
+echo "01. Create subscription with maxFailsLimit set to 5"
+echo "==================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "maxFailsLimit": 3
+    },
+    "attrs": [ ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": 1
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. GET subscription, see maxFailsLimit=5 and status==active"
+echo "============================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Stop accumulator"
+echo "===================="
+accumulatorStop
+echo
+echo
+
+
+echo "05. Update E1, to provoke notification that now fails"
+echo "====================================================="
+payload='{
+  "A1": 6
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "06. GET subscription, see failsCounter=1 and status==failed"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "07. Update E1 again, to provoke notification that fails"
+echo "======================================================="
+payload='{
+  "A1": 7
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "08. GET subscription, see failsCounter=2 and status==failed"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "09. Update E1 again, to provoke notification that fails"
+echo "======================================================="
+payload='{
+  "A1": 3
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "10. GET subscription, see failsCounter=3 and status==failed"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "11. Update E1 again, to provoke notification that fails"
+echo "======================================================="
+payload='{
+  "A1": 10
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "12. GET subscription, see failsCounter=4 and status==failed"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "13. Update E1 again, to provoke notification that fails"
+echo "======================================================="
+payload='{
+  "A1": 13
+}'
+orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+# Await sub-cache contents to be dumped into database
+sleep 3.5
+
+
+echo "14. GET subscription, see failsCounter=5 and status==inactive"
+echo "============================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with maxFailsLimit set to 5
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET subscription, see maxFailsLimit=5 and status==active
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 364
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Stop accumulator
+====================
+
+
+05. Update E1, to provoke notification that now fails
+=====================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET subscription, see failsCounter=1 and status==failed
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "failsCounter": 1,
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFail"failsCounter": 8,ureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+07. Update E1 again, to provoke notification that fails
+=======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET subscription, see failsCounter=2 and status==failed
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "failsCounter": 2,
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 3
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+09. Update E1 again, to provoke notification that fails
+=======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET subscription, see failsCounter=3 and status==failed
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "failsCounter": 3,
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 3
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+11. Update E1 again, to provoke notification that fails
+=======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. GET subscription, see failsCounter=4 and status==failed
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "failsCounter": 4,
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 3
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+13. Update E1 again, to provoke notification that fails
+=======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+14. GET subscription, see failsCounter=5 and status==inactive
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 454
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "failsCounter": 5,
+            "http": {
+                "url": "http://localhost:REGEX(\d+)/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 3
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

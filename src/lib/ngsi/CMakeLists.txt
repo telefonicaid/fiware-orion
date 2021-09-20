@@ -55,8 +55,6 @@ SET (SOURCES
     SubscribeError.cpp
     SubscriptionId.cpp
     Throttling.cpp
-    MaxFailsLimit.cpp
-    FailsCounter.cpp
 )
 
 SET (HEADERS
@@ -92,8 +90,6 @@ SET (HEADERS
     SubscribeResponse.h
     SubscriptionId.h
     Throttling.h
-    MaxFailsLimit.h
-    FailsCounter.h
 )
 
 

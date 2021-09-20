@@ -117,7 +117,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
   cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
-  cSubP->failsCounter          = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)     : -1;
+  cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->next                  = NULL;
 
@@ -367,7 +367,7 @@ int mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
-  cSubP->failsCounter          = sub.hasField(CSUB_FAILSCOUNTER)? getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER) : -1;
+  cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
@@ -509,10 +509,10 @@ static void mongoSubCountersUpdateCount
 
   if (failsCounter > 0)
   {
-  failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
-  update.append("$inc", failsCounterB.obj());
+    failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
+    update.append("$inc", failsCounterB.obj());
   }
- 
+
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));

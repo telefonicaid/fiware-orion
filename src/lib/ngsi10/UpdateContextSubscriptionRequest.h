@@ -35,7 +35,6 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/Throttling.h"
-#include "ngsi/FailsCounter.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 

@@ -41,6 +41,8 @@
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoDriver/connectionOperations.h"
 
 using std::map;
 
@@ -1275,7 +1277,9 @@ void subNotificationErrorStatus
   const std::string&  subscriptionId,
   int                 errors,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  long long           failsCounter,
+  long long           maxFailsLimit
 )
 {
   if (noCache)
@@ -1324,6 +1328,24 @@ void subNotificationErrorStatus
     subP->failsCounter     += 1;
     subP->lastFailure       = now;
     subP->lastFailureReason = failureReason;
+  }
+
+  CachedSubscription*  cSubP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
+
+  if (failsCounter > maxFailsLimit)
+  {
+    orion::BSONObjBuilder bobSet;
+    orion::BSONObjBuilder bobUpdate;
+    orion::BSONObj        query;
+    std::string           err;
+
+    bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+    bobUpdate.append("$set", bobSet.obj());
+
+    // update the status to inactive (in both DB and csubs cache)
+    orion::collectionUpdate(composeDatabaseName(tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
+    cSubP->status = STATUS_INACTIVE;
+    LM_T(LmtSubCache, ("Update the status to %s", cSubP->status.c_str()));
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

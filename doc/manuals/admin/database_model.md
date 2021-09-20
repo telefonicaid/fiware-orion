@@ -326,7 +326,7 @@ Fields:
     time a successful notification was sent.
     Not present if the subscription has never provoked a successful notification.
 -   **maxFailsLimit**: An optional field used to specify the maximum limit of connection attempts, so when that number of failing notifications is reached, then the subscription passes automatically to inactive state.
--   **failsCounter**: the number of failing notifications associated to the subscription.
+-   **failsCounter**: the number of failing notifications associated to the subscription. This is increased by one each time a notification attempt fails. It is reset to 0 if a notification attempt successes or the subscription transition from "inactive" to "active" status.
 
 Example document:
 

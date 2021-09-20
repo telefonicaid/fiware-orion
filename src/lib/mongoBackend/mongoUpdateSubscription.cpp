@@ -212,7 +212,6 @@ static void setFailsCounter(const SubscriptionUpdate& subUp, const orion::BSONOb
     long long failsCounter = getIntOrLongFieldAsLongF(subOrig, CSUB_FAILSCOUNTER);
     b->append(CSUB_FAILSCOUNTER, failsCounter);
     LM_T(LmtMongo, ("Subscription failsCounter: %lu", failsCounter));
-
   }
 }
 

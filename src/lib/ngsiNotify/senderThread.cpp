@@ -32,16 +32,6 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/MongoCommonUpdate.h"
-#include "cache/subCache.h"
-#include "mongoDriver/connectionOperations.h"
-#include "mongoBackend/MongoCommonUpdate.h"
-#include "apiTypesV2/Subscription.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoDriver/safeMongo.h"
-#include "mongoBackend/mongoSubCache.h"
-#include "ngsi/MaxFailsLimit.h"
 
 
 /* ****************************************************************************
@@ -87,8 +77,6 @@ void* startSenderThread(void* p)
       int          r;
 
       LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
-
-      CachedSubscription*  cSubP = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
 
       if (params->protocol == "mqtt:")
       {
@@ -137,7 +125,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "", params->failsCounter, params->maxFailsLimit);
         }
       }
 
@@ -148,25 +136,9 @@ void* startSenderThread(void* p)
 
         params->failsCounter++;
 
-        if ((params->failsCounter)  > (params->maxFailsLimit)) 
-        {
-           orion::BSONObjBuilder bobSet;
-           orion::BSONObjBuilder bobUpdate;
-           orion::BSONObj        query;
-           std::string           err;
-
-           bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
-           bobUpdate.append("$set", bobSet.obj());
-            
-           // update the status to inactive (in both DB and csubs cache)
-           orion::collectionUpdate(composeDatabaseName(params->tenant), params->subscriptionId, query, bobUpdate.obj(), false, &err);
-           
-           cSubP->status == STATUS_INACTIVE;
-        }
-
         if (params->registration == false)
         {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out, params->failsCounter, params->maxFailsLimit);
         }
       }
     }
