@@ -250,7 +250,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   else if (maxFailsLimitOpt.given)
   {
     subsP->maxFailsLimitProvided = true;
-    subsP->failsCounter = 0; //Set failsCounter = 0
+    subsP->failsCounter = 0; // Set failsCounter = 0
     subsP->maxFailsLimit = maxFailsLimitOpt.value;
   }
   else if (!update)  // maxFailsLimit was not set and it is not update
