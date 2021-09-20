@@ -114,8 +114,8 @@ echo "INSTALL: gmock" \
 && make install
 
 echo "INSTALL: mosquitto" \
-&& curl -kL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz | tar xzC /opt/ \
-&& cd /opt/mosquitto-2.0.11 \
+&& curl -kL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-2.0.12 \
 && sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
 && sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk \
 && sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk \
@@ -130,5 +130,5 @@ yum -y remove \
 && rm -Rf /opt/mongo-c-driver-1.17.4 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.70 \
-&& rm -Rf /opt/mosquitto-2.0.11 \
+&& rm -Rf /opt/mosquitto-2.0.12 \
 && rm -Rf /opt/gmock-1.5.0

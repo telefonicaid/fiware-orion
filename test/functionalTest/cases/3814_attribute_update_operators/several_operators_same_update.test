@@ -1,0 +1,217 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Several operators in the same update operation
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. Update entity using all the operators
+# 03. Get entity
+#
+
+
+echo '01. Create entity'
+echo '================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A1": {
+    "value": 1,
+    "type": "Number"
+  },
+  "A2": {
+    "value": 5,
+    "type": "Number"
+  },
+  "A3": {
+    "value": 5,
+    "type": "Number"
+  },
+  "A4": {
+    "value": 3,
+    "type": "Number"
+  },
+  "A5": {
+    "value": [ "foo" ],
+    "type": "StructuredValue"
+  },
+  "A6": {
+    "value": [ "foo" ],
+    "type": "StructuredValue"
+  },
+  "A7": {
+    "value": [ 1, 2, 3, 4],
+    "type": "StructuredValue"
+  },
+  "A8": {
+    "value": [ 1, 2, 3, 4],
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update entity using all the operators'
+echo '========================================='
+payload='{
+  "A1": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  },
+  "A2": {
+    "value": { "$min": 0 },
+    "type": "Number"
+  },
+  "A3": {
+    "value": { "$max": 8 },
+    "type": "Number"
+  },
+  "A4": {
+    "value": { "$mul": 5 },
+    "type": "Number"
+  },
+  "A5": {
+    "value": { "$push": "bar" },
+    "type": "StructuredValue"
+  },
+  "A6": {
+    "value": { "$addToSet": "foo" },
+    "type": "StructuredValue"
+  },
+  "A7": {
+    "value": { "$pull": 2 },
+    "type": "StructuredValue"
+  },
+  "A8": {
+    "value": { "$pullAll": [2, 4] },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '03. Get entity'
+echo '=============='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity
+=================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Update entity using all the operators
+=========================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 462
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "A3": {
+        "metadata": {},
+        "type": "Number",
+        "value": 8
+    },
+    "A4": {
+        "metadata": {},
+        "type": "Number",
+        "value": 15
+    },
+    "A5": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "foo",
+            "bar"
+        ]
+    },
+    "A6": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "foo"
+        ]
+    },
+    "A7": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            1,
+            3,
+            4
+        ]
+    },
+    "A8": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            1,
+            3
+        ]
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

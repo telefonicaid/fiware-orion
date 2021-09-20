@@ -150,21 +150,21 @@ echo
 echo
 
 
-echo "13. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing"
+echo "12. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing"
 echo "================================================================="
 orionCurl --url '/v2/entities?mq=A.dateModified>2049-01-01'
 echo
 echo
 
 
-echo "14. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1"
+echo "13. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1"
 echo "==========================================================="
 orionCurl --url '/v2/entities?mq=A.dateCreated<2049-01-01'
 echo
 echo
 
 
-echo "15. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1"
+echo "14. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1"
 echo "============================================================"
 orionCurl --url '/v2/entities?mq=A.dateModified<2049-01-01'
 echo
@@ -386,7 +386,7 @@ Date: REGEX(.*)
 []
 
 
-13. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing
+12. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing
 =================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -397,7 +397,7 @@ Date: REGEX(.*)
 []
 
 
-14. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1
+13. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 71
@@ -418,7 +418,7 @@ Date: REGEX(.*)
 ]
 
 
-15. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1
+14. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 71

@@ -84,9 +84,9 @@ RUN \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz && \
-    tar xvf mosquitto-2.0.11.tar.gz && \
-    cd mosquitto-2.0.11 && \
+    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz && \
+    tar xvf mosquitto-2.0.12.tar.gz && \
+    cd mosquitto-2.0.12 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
     sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
@@ -127,8 +127,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           /opt/mosquitto-2.0.11.tar.gz \
-           /opt/mosquitto-2.0.11 \
+           /opt/mosquitto-2.0.12.tar.gz \
+           /opt/mosquitto-2.0.12 \
            /opt/mongo-c-driver-1.17.4.tar.gz \
            /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \
