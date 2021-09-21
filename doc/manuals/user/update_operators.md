@@ -212,8 +212,8 @@ would not change attribute value.
 
 ### `$pull`
 
-To be used with attributes which value is an array, removes all ocurrences of the item
-passes as parameter.
+To be used with attributes which value is an array, removes all occurrences of the item
+passed as parameter.
 
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
@@ -230,7 +230,7 @@ would change the value of attribute A to `[1, 3]`.
 ### `$pullAll`
 
 To be used with attributes which value is an array. The parameter is also an array. All
-the ocurrences of any of the members of the array used as parameter are removed.
+the occurrences of any of the members of the array used as parameter are removed.
 
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
