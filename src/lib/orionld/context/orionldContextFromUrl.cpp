@@ -253,7 +253,7 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
   if (buffer == NULL)
   {
     // orionldContextDownload fills in pdP
-    LM_W(("Bad Input? (%s: %s)", pdP->title, pdP->detail));
+    LM_W(("Bad Input? (%s: %s). URL: %s", pdP->title, pdP->detail, url));
     return NULL;
   }
 

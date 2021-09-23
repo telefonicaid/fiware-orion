@@ -57,6 +57,10 @@ static void contextCacheReleaseOne(OrionldContext* contextP)
 //
 bool orionldContextCacheDelete(const char* id)
 {
+  bool found = false;
+
+  sem_wait(&orionldContextCacheSem);
+
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     if (orionldContextCache[ix] == NULL)
@@ -71,6 +75,14 @@ bool orionldContextCacheDelete(const char* id)
       mongocContextCacheDelete(orionldContextCache[ix]->id);
       contextCacheReleaseOne(orionldContextCache[ix]);
       orionldContextCache[ix] = NULL;
+      found = true;
+    }
+    else if ((orionldContextCache[ix]->url != NULL) && (strcmp(id, orionldContextCache[ix]->url) == 0))
+    {
+      mongocContextCacheDelete(orionldContextCache[ix]->id);
+      contextCacheReleaseOne(orionldContextCache[ix]);
+      orionldContextCache[ix] = NULL;
+      found = true;
     }
     else if ((orionldContextCache[ix]->origin != OrionldContextDownloaded) && (orionldContextCache[ix]->parent != NULL) && (strcmp(id, orionldContextCache[ix]->parent) == 0))
     {
@@ -80,5 +92,7 @@ bool orionldContextCacheDelete(const char* id)
     }
   }
 
-  return true;
+  sem_post(&orionldContextCacheSem);
+
+  return found;
 }

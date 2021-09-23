@@ -49,7 +49,6 @@ extern "C"
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"                     // Temporary Error Payloads
-#include "orionld/rest/uriParamName.h"                               // uriParamName
 #include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"              // orionldGetEntities
@@ -83,6 +82,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
 #include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
+#include "orionld/serviceRoutines/orionldDeleteContext.h"            // orionldDeleteContext
 #include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
 
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
@@ -471,6 +471,17 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteContext)
+  {
+    serviceP->options  = 0;  // Tenant is Ignored
+
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_RELOAD;
   }
 
   if (troe)  // CLI Option to turn on Temporal Representation of Entities
