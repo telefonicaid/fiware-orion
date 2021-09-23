@@ -125,10 +125,9 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "", params->failsCounter, params->maxFailsLimit);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
-
 
       else
       {
@@ -138,7 +137,7 @@ void* startSenderThread(void* p)
 
         if (params->registration == false)
         {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out, params->failsCounter, params->maxFailsLimit);
+          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
         }
       }
     }

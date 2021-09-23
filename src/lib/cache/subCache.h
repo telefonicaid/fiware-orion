@@ -334,9 +334,7 @@ extern void subNotificationErrorStatus
   const std::string&  subscriptionId,
   int                 errors,
   long long           statusCode,
-  const std::string&  failureReason,
-  long long           failsCounter,
-  long long           maxFailsCounter
+  const std::string&  failureReason
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

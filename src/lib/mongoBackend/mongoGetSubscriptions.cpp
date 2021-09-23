@@ -199,12 +199,12 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       subP->notification.lastNotification = cSubP->lastNotificationTime;
     }
 
-    if (cSubP->maxFailsLimit > 0)
+    if (cSubP->maxFailsLimit != 0)
     {
        subP->notification.maxFailsLimit = cSubP->maxFailsLimit;
     }
 
-    if (cSubP->failsCounter > 0)
+    if (cSubP->failsCounter != 0)
     {
        subP->notification.failsCounter = cSubP->failsCounter;
     }

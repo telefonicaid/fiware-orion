@@ -80,9 +80,16 @@ std::string Subscription::toJson(void)
     jh.addDate("expires", this->expires);
   }
 
-  if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
+  if (this->notification.failsCounter <= this->notification.maxFailsLimit)
   {
-    jh.addString("status", "failed");
+    if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
+    {
+      jh.addString("status", "failed");
+    }
+    else
+    {
+      jh.addString("status", this->status);
+    }
   }
   else
   {

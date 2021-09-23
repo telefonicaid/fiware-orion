@@ -21,48 +21,68 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-subscription_without_maxfailslimit_and_failscounter.test
+subscription_without_maxfailslimit_and_failscounter
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 --cache -subCacheIval 3
-accumulatorStart --pretty-print
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. Create subscription without maxFailsLimit
-# 02. Create entity E1
-#     Sleep 3.5 seconds to get a sub-cache-refresh
-# 03. GET subscription, see no maxFailsLimit and status==active
+# 01. POST /v2/entities, to create Room1 with temperature and pressure
+# 02. POST /v2/subscriptions, to create subscription without maxFailsLimit
+# 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
 # 04. Stop accumulator
-# 05. Update E1, to provoke notification that now fails
-#     Sleep 3.5 seconds to get a sub-cache-refresh
-# 06. GET subscription, see no failsCounter and status==failed
-# 07. Start accumulator again
-# 08. GET subscription, see set no failsCounter and status==active
-# 09. Create subscription with maxFailsLimit=foo and see error
+# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+# 07. POST /v2/subscriptions, to create subscription without maxFailsLimit=foo and see error
 #
 
-echo "01. Create subscription without maxFailsLimit"
-echo "============================================="
+echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
+echo '====================================================================='
 payload='{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Integer"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/subscriptions, to create subscription without maxFailsLimit'
+echo '========================================================================'
+payload='{
+  "description": "A subscription to get info about Room1",
   "subject": {
     "entities": [
       {
-        "idPattern": "E.*",
-        "type": "T"
+        "id": "Room1",
+        "type": "Room"
       }
     ],
     "condition": {
-      "attrs": [ "A1" ]
+      "attrs": [
+        "pressure"
+      ]
     }
   },
   "notification": {
-    "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
-    "attrs": [ "A1" ]
-  },
-  "expires": "2050-04-05T14:00:00.00Z"
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -70,27 +90,12 @@ echo
 echo
 
 
-echo "02. Create entity E1"
-echo "===================="
-payload='{
-  "id": "E1",
-  "type": "T1",
-  "A1": 1
-}'
-orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo '03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active'
+echo '======================================================================================'
+orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
-
-# Sleep > 3 seconds to get a cache refresh
-sleep 3.5
-
-
-echo "03. GET subscription, see no maxFailsLimit and status==active"
-echo "============================================================="
-orionCurl --url /v2/subscriptions
-echo
-echo
 
 
 echo "04. Stop accumulator"
@@ -100,12 +105,19 @@ echo
 echo
 
 
-echo "05. Update E1, to provoke notification that now fails"
-echo "====================================================="
+echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '=============================================================================='
 payload='{
-  "A1": 6
+  "temperature": {
+    "value": 24,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 740,
+    "type": "Float"
+  }
 }'
-orionCurl --url /v2/entities/E1/attrs?options=keyValues --payload "$payload"
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
@@ -114,61 +126,60 @@ echo
 sleep 3.5
 
 
-echo "06. GET subscription, see no failsCounter and status==failed"
-echo "============================================================"
-orionCurl --url /v2/subscriptions
+echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
+echo '====================================================================================='
+orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo "07. Start accumulator"
-echo "====================="
-accumulatorStart
-echo
-echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
-echo "08. GET subscription, see set no failsCounter and status==active"
-echo "================================================================"
-orionCurl --url /v2/subscriptions
-echo
-echo
-
-
-echo "09. Create subscription with maxFailsLimit=foo and see error"
-echo "============================================================"
+echo '07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error'
+echo '======================================================================================'
 payload='{
+  "description": "A subscription to get info about Room1",
   "subject": {
     "entities": [
       {
-        "idPattern": "E.*",
-        "type": "T"
+        "id": "Room1",
+        "type": "Room"
       }
     ],
     "condition": {
-      "attrs": [ "A1" ]
+      "attrs": [
+        "pressure"
+      ]
     }
   },
   "notification": {
-    "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
-    "attrs": [ "A1" ]
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature"
+    ]
   },
-  "expires": "2050-04-05T14:00:00.00Z",
-  "maxFailsLimit": "foo"
+  "maxFailsLimit" : "foo"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
 
 
 --REGEXPECT--
-01. Create subscription without maxFailsLimit
-=============================================
+01. POST /v2/entities, to create Room1 with temperature and pressure.
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room1?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/subscriptions, to create subscription without maxFailsLimit
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -177,155 +188,100 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E1
-====================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-03. GET subscription, see no maxFailsLimit and status==active
-=============================================================
+03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
+======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 305
+Content-Length: 334
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "expires": "REGEX([0-9a-f\-]{36}",
-        "id": "REGEX([0-9a-f]{24})",
-        "notification": {
-            "attrs": [
-                "A1"
-            ],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/notify"
-            },
-            "onlyChangedAttrs": false
+{
+    "description": "A subscription to get info about Room1",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
         },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": [
-                    "A1"
-                ]
-            },
-            "entities": [
-                {
-                    "idPattern": "E.*",
-                    "type": "T"
-                }
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "pressure"
             ]
-        }
+        },
+        "entities": [
+            {
+                "id": "Room1",
+                "type": "Room"
+            }
+        ]
     }
-]
+}
 
 
 04. Stop accumulator
 ====================
 
 
-05. Update E1, to provoke notification that now fails
-=====================================================
+05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. GET subscription, see no failsCounter and status==failed
-============================================================
+06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+=====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 484
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "id": "REGEX([0-9a-f]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/notify"
-            },
-            "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't connect to server",
-            "lastNotification": "REGEX(.*)",
-            "lastSuccess": "REGEX(.*)",
-            "lastSuccessCode": 200,
-            "onlyChangedAttrs": false,
-            "timesSent": 2
+{
+    "description": "A subscription to get info about Room1",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
         },
-        "status": "failed",
-        "subject": {
-            "condition": {
-                "attrs": []
-            },
-            "entities": [
-                {
-                    "id": "E1"
-                }
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "pressure"
             ]
-        }
-    }
-]
-
-
-07. Start accumulator again
-===========================
-accumulator running as PID REGEX(\d+)
-
-
-08. GET subscription, see set no failsCounter and status==active
-================================================================
-HTTP/1.1 200 OK
-Content-Length: 454
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-[
-    {
-        "id": "REGEX([0-9a-f]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://localhost:REGEX(\d+)/notify"
-            },
-            "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't connect to server",
-            "lastNotification": "REGEX(.*)",
-            "lastSuccess": "REGEX(.*)",
-            "lastSuccessCode": 200,
-            "onlyChangedAttrs": false,
-            "timesSent": 3
         },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": []
-            },
-            "entities": [
-                {
-                    "id": "E1"
-                }
-            ]
-        }
+        "entities": [
+            {
+                "id": "Room1",
+                "type": "Room"
+            }
+        ]
     }
-]
+}
 
 
-09. Create subscription with maxFailsLimit=foo and see error
-============================================================
+07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error
+======================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 66
 Content-Type: application/json
@@ -342,3 +298,4 @@ Date: REGEX(.*)
 brokerStop CB
 accumulatorStop
 dbDrop CB
+

@@ -1277,9 +1277,7 @@ void subNotificationErrorStatus
   const std::string&  subscriptionId,
   int                 errors,
   long long           statusCode,
-  const std::string&  failureReason,
-  long long           failsCounter,
-  long long           maxFailsLimit
+  const std::string&  failureReason
 )
 {
   if (noCache)
@@ -1332,20 +1330,23 @@ void subNotificationErrorStatus
 
   CachedSubscription*  cSubP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
 
-  if (failsCounter > maxFailsLimit)
+  if (subP->maxFailsLimit > 0 && subP->failsCounter > 0)
   {
-    orion::BSONObjBuilder bobSet;
-    orion::BSONObjBuilder bobUpdate;
-    orion::BSONObj        query;
-    std::string           err;
+    if (subP->failsCounter > subP->maxFailsLimit)
+    {
+      orion::BSONObjBuilder bobSet;
+      orion::BSONObjBuilder bobUpdate;
+      orion::BSONObj        query;
+      std::string           err;
 
-    bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
-    bobUpdate.append("$set", bobSet.obj());
+      bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+      bobUpdate.append("$set", bobSet.obj());
 
-    // update the status to inactive (in both DB and csubs cache)
-    orion::collectionUpdate(composeDatabaseName(tenant), CSUB_STATUS, query, bobUpdate.obj(), false, &err);
-    cSubP->status = STATUS_INACTIVE;
-    LM_T(LmtSubCache, ("Update the status to %s", cSubP->status.c_str()));
+      // update the status to inactive (in both DB and csubs cache)
+      orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);
+      cSubP->status = STATUS_INACTIVE;
+      LM_T(LmtSubCache, ("Update the status to %s", cSubP->status.c_str()));
+    }
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

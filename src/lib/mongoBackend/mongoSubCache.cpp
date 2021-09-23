@@ -497,8 +497,9 @@ static void mongoSubCountersUpdateCount
 )
 {
   orion::BSONObjBuilder  condition;
-  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  update;  
   orion::BSONObjBuilder  countB;
+  orion::BSONObjBuilder  updatefailsCounter;
   orion::BSONObjBuilder  failsCounterB;
 
   std::string  err;
@@ -509,8 +510,10 @@ static void mongoSubCountersUpdateCount
 
   if (failsCounter > 0)
   {
+    condition.append("_id", orion::OID(subId));
     failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
-    update.append("$inc", failsCounterB.obj());
+    updatefailsCounter.append("$inc", failsCounterB.obj());
+    collectionUpdate(db, collection, condition.obj(), updatefailsCounter.obj(), false, &err);
   }
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
@@ -721,10 +724,10 @@ void mongoSubCountersUpdate
     mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter);
   }
 
-  if (failsCounter > 0)
+/*  if (failsCounter > 0)
   {
     mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter);
-  }
+  }*/
 
 
   if (lastNotificationTime > 0)
