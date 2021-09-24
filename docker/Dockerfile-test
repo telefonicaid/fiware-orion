@@ -2,7 +2,7 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
 
-RUN  apt-get install -y lcov docker
+RUN  apt-get install -y lcov
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
