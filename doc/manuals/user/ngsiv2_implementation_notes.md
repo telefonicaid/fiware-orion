@@ -62,7 +62,7 @@ POST /v2/entities/E/attrs/A
 }
 ```
 
-which means *"increase the value of attribute A by 3".
+which means *"increase the value of attribute A by 3"*.
 
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
