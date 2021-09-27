@@ -50,6 +50,13 @@ jobs:
         image: mongo:4.0
         ports:
           - 27017:27017
+      context-server:
+        image: wistefan/context-server:0.2.0
+        env:
+          MEMORY_ENABLED: true
+        ports:
+          - 7080:8080
+
     strategy:
       fail-fast: true
       matrix:

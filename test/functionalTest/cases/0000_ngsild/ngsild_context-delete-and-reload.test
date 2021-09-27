@@ -28,7 +28,6 @@ export BROKER=orionld
 dbInit CB
 dbDrop orionld
 brokerStart CB
-cServerStart
 
 --SHELL--
 
