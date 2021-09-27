@@ -92,7 +92,7 @@ POST /v2/entities/E/attrs/A
 
 would change the value of attribute A to 12.
 
-This operator only accept numeric values (either positive or negative, interger or decimal).
+This operator only accept numeric values (either positive or negative, integer or decimal).
 
 ### `$mul`
 
@@ -110,7 +110,7 @@ POST /v2/entities/E/attrs/A
 
 would change the value of attribute A to 20.
 
-This operator only accept numeric values (either positive or negative, interger or decimal).
+This operator only accept numeric values (either positive or negative, integer or decimal).
 
 ### `$min`
 
@@ -138,7 +138,7 @@ POST /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Appart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings).
 
 ### `$max`
 
@@ -166,7 +166,7 @@ POST /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Appart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings).
 
 ### `$push`
 
@@ -299,7 +299,7 @@ POST /v2/entities/E/attrs/A
 ```
 
 
-you will get (randomly, in princple) one among this ones:
+you will get (randomly, in principle) one among this ones:
 
 * A gets increased its value by 1
 * A gets multiply its value by 10
