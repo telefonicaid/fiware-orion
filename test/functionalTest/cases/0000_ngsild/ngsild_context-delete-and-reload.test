@@ -107,9 +107,9 @@ echo
 echo
 
 
-echo "07. Kill the context server"
+echo "07. Delete the context on the context server"
 echo "==========================="
-cServerStop
+cServerCurl --url /jsonldContexts/testContext --verb DELETE
 echo
 echo
 
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 }
 
 
-07. Kill the context server
+07. Delete the context on the context server
 ===========================
 REGEX(.*)
 
@@ -237,4 +237,3 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-cServerStop
