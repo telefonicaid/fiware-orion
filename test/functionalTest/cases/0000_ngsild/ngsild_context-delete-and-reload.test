@@ -113,15 +113,20 @@ cServerCurl --url /jsonldContexts/testContext --verb DELETE
 echo
 echo
 
+echo "08. Get the context on the context server"
+echo "==========================="
+cServerCurl --url /jsonldContexts/testContext --verb GET
+echo
+echo
 
-echo "08. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead"
+echo "09. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead"
 echo "================================================================================================================="
 orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext?reload=true' -X DELETE
 echo
 echo
 
 
-echo "09. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06"
+echo "10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06"
 echo "======================================================================================================================="
 orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext'
 echo
@@ -204,8 +209,12 @@ Date: REGEX(.*)
 ===========================
 REGEX(.*)
 
+08. Get the context on the context server
+===========================
+REGEX(.*)
 
-08. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead
+
+09. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead
 =================================================================================================================
 HTTP/1.1 503 Service Unavailable
 Content-Length: 165
@@ -219,7 +228,7 @@ Date: REGEX(.*)
 }
 
 
-09. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
+10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
 =======================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 56
