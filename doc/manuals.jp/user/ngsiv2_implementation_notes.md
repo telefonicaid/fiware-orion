@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 実装ノート (NGSIv2 Implementation Notes)
 
 * [禁止されている文字](#forbidden-characters)
+* [属性値の更新演算子](#update-operators-for-attribute-values)
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
@@ -42,6 +43,29 @@ Orion に適用される追加の制限事項は、マニュアルの [禁止さ
 NGSIv2 仕様で定義されているもの以外の特別な属性タイプ) を使用できることに注意してください。
 ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性がある
 ため、自己責任で使用してください!
+
+[トップ](#top)
+
+<a name="update-operators-for-attribute-values"></a>
+
+## 属性値の更新演算子
+
+一部の属性値の更新には、NGSIv2 仕様で説明されているもの以外に特別なセマンティクスが
+あります。特に、このようなリクエストを行うことができます:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+これは、*"属性Aの値を3増やす"* ことを意味します。
+
+この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
+アプリケーションの競合状態を回避するために役立ちます。
+詳細は[このドキュメント](update_operators.md)を参照してください。
 
 [トップ](#top)
 

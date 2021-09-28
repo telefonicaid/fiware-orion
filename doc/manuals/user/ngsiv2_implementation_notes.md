@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Forbidden characters](#forbidden-characters)
+* [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
@@ -45,6 +46,27 @@ Note that you can use "TextUnrestricted" attribut type (and special attribute ty
 the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
 in the attribute value. However, it could have security implications (possible script
 injections attacks) so use it at your own risk!
+
+[Top](#top)
+
+## Update operators for attribute values
+
+Some attribute value updates has special semantics, beyond the ones described in the
+NGSIv2 specification. In particular we can do requests like this one:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+which means *"increase the value of attribute A by 3"*.
+
+This functionality is usefeul to reduce the complexity of applications and avoid
+race conditions in applications that access simultaneously to the same piece of
+context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
 

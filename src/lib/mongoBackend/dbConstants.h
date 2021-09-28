@@ -26,7 +26,7 @@
 * Author: Fermín Galán
 */
 
-
+#include <string>
 
 /* ***************************************************************************
 *
@@ -129,5 +129,14 @@
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 #define STATUS_ONESHOT       "oneshot"
+
+
+
+/* ****************************************************************************
+*
+* Attribute update operators (except $addToSet and $pullAll, which are special ones)
+*/
+#define UPDATE_OPERATORS_NUMBER 6
+const std::string UPDATE_OPERATORS[UPDATE_OPERATORS_NUMBER] = { "$inc", "$min", "$max", "$mul", "$push", "$pull" };
 
 #endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_
