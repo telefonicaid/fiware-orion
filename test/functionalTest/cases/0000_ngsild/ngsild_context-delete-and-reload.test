@@ -38,9 +38,10 @@ brokerStart CB
 # 04. Update the context in the context server
 # 05. DELETE and RELOAD the context in the broker's context cache
 # 06. GET the context (from step 05) from the broker and make sure it's been updated
-# 07. Kill the context server
-# 08. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead
-# 09. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
+# 07. Delete the context in the context server
+# 08. Get the context in the context server
+# 09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead
+# 10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
 #
 
 echo "01. Create a context in the context server"
@@ -107,20 +108,22 @@ echo
 echo
 
 
-echo "07. Delete the context on the context server"
-echo "==========================="
+echo "07. Delete the context in the context server"
+echo "============================================"
 cServerCurl --url /jsonldContexts/testContext --verb DELETE
 echo
 echo
 
-echo "08. Get the context on the context server"
-echo "==========================="
+
+echo "08. Get the context in the context server"
+echo "========================================="
 cServerCurl --url /jsonldContexts/testContext --verb GET
 echo
 echo
 
-echo "09. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead"
-echo "================================================================================================================="
+
+echo "09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead"
+echo "================================================================================================================"
 orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext?reload=true' -X DELETE
 echo
 echo
@@ -205,17 +208,25 @@ Date: REGEX(.*)
 }
 
 
-07. Delete the context on the context server
-===========================
-REGEX(.*)
-
-08. Get the context on the context server
-===========================
-REGEX(.*)
+07. Delete the context in the context server
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+connection: keep-alive
 
 
-09. Attempt to DELETE and RELOAD	the context in the broker's context cache - fails as the context server is dead
-=================================================================================================================
+
+08. Get the context in the context server
+=========================================
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+content-length: 159
+connection: keep-alive
+
+{"type":"https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound ","title":"Context does not exist.","status":404,"detail":"Requested context was not available."}
+
+09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead
+================================================================================================================
 HTTP/1.1 503 Service Unavailable
 Content-Length: 165
 Content-Type: application/json
