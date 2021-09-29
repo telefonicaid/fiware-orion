@@ -1536,6 +1536,91 @@ function postgresCmd()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# cServerStart
+#
+function cServerStart
+{
+  cServerStop
+  $REPO_HOME/scripts/cServer.sh
+}
+
+
+# -----------------------------------------------------------------------------
+#
+# cServerStop
+#
+function cServerStop
+{
+  CID=$(docker ps | grep wistefan/context-server | awk '{print $1}')
+
+  if [ "$CID" != "" ]
+  then
+    docker kill $CID
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# cServerCurl [--verb <verb>] --url <url> [--payload <payload>]
+#
+function cServerCurl
+{
+  #
+  # Parsing parameters
+  #
+  verb=GET
+  url=""
+  payload=""
+  hasPayload=no
+
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "--verb" ];    then  verb=$2;    shift;
+    elif [ "$1" == "--url" ];     then  url=$2;     shift;
+    elif [ "$1" == "--payload" ]; then  payload=$2; hasPayload=yes; shift;
+    else
+      echo "Invalid option/parameter for cServerCurl: $1"
+      exit 1
+    fi
+    shift;
+  done
+
+  if [ "$url" == "" ]
+  then
+    echo "'--url' option missing ... (--url <url>)"
+    exit 1
+  fi
+
+  if [ "$verb" == "GET" ] && [ "$hasPayload" == "yes" ]
+  then
+    verb=POST
+  fi
+
+  if [ "$hasPayload" == "yes" ]
+  then
+    curl -s http://localhost:7080$url -X $verb -d "$payload" -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    r=$?
+  else
+    curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+#    curl -s http://localhost:7080$url -X $verb -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    r=$?
+  fi
+
+  if [ $r != 0 ]
+  then
+    echo curl error $r
+    echo curl command: curl http:localhost:7080$url -d "$payload"
+    echo curl response:
+  fi
+  cat /tmp/cServerHeaders
+  cat /tmp/cServerOut
+}
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1571,3 +1656,6 @@ export -f postgresCmd
 export -f pgDrop
 export -f pgInit
 export -f pgCreate
+export -f cServerStart
+export -f cServerStop
+export -f cServerCurl

@@ -56,6 +56,12 @@ const char* uriParamName(uint32_t bit)
   case ORIONLD_URIPARAM_TIMEAT:              return "timeAt";
   case ORIONLD_URIPARAM_ENDTIMEAT:           return "endTimeAt";
   case ORIONLD_URIPARAM_DETAILS:             return "details";
+  case ORIONLD_URIPARAM_PRETTYPRINT:         return "prettyPrint";
+  case ORIONLD_URIPARAM_SPACES:              return "spaces";
+  case ORIONLD_URIPARAM_SUBSCRIPTION_ID:     return "subscriptionId";
+  case ORIONLD_URIPARAM_LOCATION:            return "location";
+  case ORIONLD_URIPARAM_URL:                 return "url";
+  case ORIONLD_URIPARAM_RELOAD:              return "reload";
   }
 
   return "unknown URI parameter";

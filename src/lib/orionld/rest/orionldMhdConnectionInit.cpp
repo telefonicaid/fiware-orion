@@ -456,6 +456,11 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
     orionldState.uriParams.url   = (char*) value;
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_URL;
   }
+  else if (SCOMPARE7(key, 'r', 'e', 'l', 'o', 'a', 'd', 0))
+  {
+    orionldState.uriParams.reload = true;
+    orionldState.uriParams.mask  |= ORIONLD_URIPARAM_RELOAD;
+  }
   else
   {
     LM_W(("Bad Input (unknown URI parameter: '%s')", key));
