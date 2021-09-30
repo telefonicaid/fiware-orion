@@ -261,7 +261,7 @@ Date: REGEX(.*)
 06. GET registrations and see all them
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 1397
+Content-Length: 1402
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -285,7 +285,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:9801/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -308,7 +308,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:9801/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -331,7 +331,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:9801/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "query"
         },
         "status": "active"
@@ -354,7 +354,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:9801/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "update"
         },
         "status": "active"
@@ -377,7 +377,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:9801/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "none"
         },
         "status": "active"
