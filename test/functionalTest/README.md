@@ -51,6 +51,23 @@ cd test/functionalTest
 ./testHarness.sh
 ```
 
+In case you only one to run a single file or folder, you can also add the path to the file or folder like this:
+
+```
+./testHarness.sh cases/3949_upsert_with_wrong_geojson/
+```
+
+If you want to set the number of retries of the test you can use the env var `CB_MAX_TRIES` (e.g. you only want to run the test once when you know it is going 
+to fail but it is useful to see the output)
+
+Another useful env var is `CB_DIFF_TOOL`, that allows to view diff of failing tests
+
+As an example of the usage of both env vars, the following line:
+
+```
+CB_MAX_TRIES=1 CB_DIFF_TOOL=meld ./testHarness.sh cases/3949_upsert_with_wrong_geojson/
+```
+
 ## Known issues
 
 ### Decimal numbers rounding
