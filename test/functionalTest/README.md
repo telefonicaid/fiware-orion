@@ -51,7 +51,7 @@ cd test/functionalTest
 ./testHarness.sh
 ```
 
-In case you only one to run a single file or folder, you can also add the path to the file or folder like this:
+In case you only want to run a single file or folder, you can also add the path to the file or folder like this:
 
 ```
 ./testHarness.sh cases/3949_upsert_with_wrong_geojson/
