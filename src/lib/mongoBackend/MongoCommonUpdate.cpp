@@ -2855,7 +2855,18 @@ static bool createEntity
     q.append("_id", bsonId);
     if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, q.obj(), insertedDoc.obj(), true, errDetail))
     {
-      oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
+      // of MONGODB_ERROR_WRONGJSON is used in the error message, then it will break. It would be better to use
+      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
+      // orion::collectionInsert() function.
+      if (errDetail->find(MONGODB_ERROR_WRONGJSON) != std::string::npos)
+      {
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON, ERROR_BAD_REQUEST);
+      }
+      else
+      {
+        oeP->fill(SccReceiverInternalError, *errDetail, ERROR_INTERNAL_ERROR);
+      }
       return false;
     }
   }
@@ -2863,21 +2874,18 @@ static bool createEntity
   {
     if (!orion::collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
     {
-      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
-      // of "duplicate key" is used in the error message, then it will break. It would be better to use
-      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
-      // orion::collectionInsert() function.
-      if (errDetail->find("duplicate key") != std::string::npos)
+      // FIXME P7: same comment in the upsert case
+      if (errDetail->find(MONGODB_ERROR_DUPLICATE_KEY) != std::string::npos)
       {
-        oeP->fill(SccInvalidModification, "Already Exists", "Unprocessable");
+        oeP->fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       }
-      else if (errDetail->find("Can't extract geo keys") != std::string::npos)
+      else if (errDetail->find(MONGODB_ERROR_WRONGJSON) != std::string::npos)
       {
-        oeP->fill(SccBadRequest, "Wrong GeoJson", "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON, ERROR_BAD_REQUEST);
       }
       else
       {
-        oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+        oeP->fill(SccReceiverInternalError, *errDetail, ERROR_INTERNAL_ERROR);
       }
       return false;
     }
