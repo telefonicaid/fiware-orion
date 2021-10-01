@@ -461,6 +461,39 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
 /* ****************************************************************************
 *
+* parseHttpTimeout -
+*/
+static std::string parseHttpTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
+{
+  Opt<int64_t> httpTimeoutOpt = getInt64Opt(http, "httpTimeout");
+  if (!httpTimeoutOpt.ok())
+  {
+    return badInput(ciP, httpTimeoutOpt.error);
+  }
+  if (httpTimeoutOpt.given)
+  {
+    if ((httpTimeoutOpt.value < 0) || (httpTimeoutOpt.value > MAX_SUB_HTTP_TIMEOUT))
+    {
+      // FIXME - There is any way to display the value of the constant MAX_SUB_HTTP_TIMEOUT? 
+      return badInput(ciP, "httpTimeout field must be an integer between 0 and MAX_SUB_HTTP_TIMEOUT");
+    }
+    else
+    {
+      subsP->notification.httpInfo.httpTimeout = httpTimeoutOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.httpInfo.httpTimeout = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
@@ -513,6 +546,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in http field /url/");
+      }
+
+      // httpTimeout
+      r = parseHttpTimeout(ciP, subsP, http);
+      if (!r.empty())
+      {
+        return r;
       }
 
       std::string  host;

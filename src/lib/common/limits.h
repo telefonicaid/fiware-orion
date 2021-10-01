@@ -150,6 +150,13 @@
 
 /* ****************************************************************************
 *
+* MAX_SUB_HTTP_TIMEOUT - 300000 milliseconds, 5 minutes
+*/
+#define MAX_SUB_HTTP_TIMEOUT     300000
+
+
+/* ****************************************************************************
+*
 * Pagination definitions -
 */
 #define MAX_PAGINATION_LIMIT            "1000"

@@ -103,6 +103,14 @@ static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BS
     LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
     LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
 
+    if (subOrig.hasField(CSUB_HTTPTIMEOUT))
+    {
+      long long httpTimeout = getIntOrLongFieldAsLongF(subOrig, CSUB_HTTPTIMEOUT);
+
+      b->append(CSUB_HTTPTIMEOUT, httpTimeout);
+      LM_T(LmtMongo, ("Subscription httpTimeout:   %lu", httpTimeout));
+    }
+
     if (subOrig.hasField(CSUB_METHOD))
     {
       std::string method = getStringFieldF(subOrig, CSUB_METHOD);

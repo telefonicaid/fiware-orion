@@ -106,6 +106,7 @@
 #define CSUB_STATUS                  "status"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
+#define CSUB_HTTPTIMEOUT             "httpTimeout"
 #define CSUB_METHOD                  "method"
 #define CSUB_HEADERS                 "headers"
 #define CSUB_QS                      "qs"
