@@ -28,6 +28,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"

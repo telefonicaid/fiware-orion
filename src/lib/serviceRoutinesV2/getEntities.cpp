@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"

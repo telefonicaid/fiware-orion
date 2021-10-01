@@ -24,6 +24,7 @@
 */
 #include <string>
 
+#include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"

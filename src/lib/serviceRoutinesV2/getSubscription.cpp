@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Subscription.h"
 #include "common/JsonHelper.h"

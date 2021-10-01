@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
