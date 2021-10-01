@@ -54,7 +54,7 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, httpTimeout=%d",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
@@ -63,7 +63,8 @@ void* startSenderThread(void* p)
                        params->xauthToken.c_str(),
                        params->resource.c_str(),
                        params->content_type.c_str(),
-                       params->qos));
+                       params->qos,
+                       params->httpTimeout));
 
     long long    statusCode = -1;
     std::string  out;
@@ -105,7 +106,9 @@ void* startSenderThread(void* p)
                             params->renderFormat,
                             &out,
                             &statusCode,
-                            params->extraHeaders);
+                            params->extraHeaders,
+                            "",                         //default acceptFormat
+                            params->httpTimeout);
 
         LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
       }

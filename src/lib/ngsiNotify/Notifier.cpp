@@ -492,6 +492,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
     params->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
+    params->httpTimeout      = notification.httpInfo.httpTimeout; // unspecified in case of MQTT notifications
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
