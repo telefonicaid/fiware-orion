@@ -104,7 +104,7 @@ bool processDateExpirationAtEntityCreation
     {
       if (!getDateExpiration(caP, dateExpiration, errDetail))
       {
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
 
@@ -146,7 +146,7 @@ bool processDateExpirationAtUpdateAttribute
     {
       if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
       {
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
       else
@@ -184,7 +184,7 @@ bool processDateExpirationAtAppendAttribute
     {
       if (!getDateExpiration(targetAttr, dateExpiration, errDetail))
       {
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
     }

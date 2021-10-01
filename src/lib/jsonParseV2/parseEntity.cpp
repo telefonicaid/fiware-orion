@@ -105,7 +105,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (document.HasMember("id"))
     {
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD, "BadRequest");
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTID_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
@@ -115,7 +115,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
     if (document.HasMember("type"))
     {
-      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD, "BadRequest");
+      OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ENTTYPE_IN_PAYLOAD);
       ciP->httpStatusCode = SccBadRequest;
@@ -152,7 +152,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         if (type != "String")
         {
-          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, "BadRequest");
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID, ERROR_BAD_REQUEST);
 
           alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
           ciP->httpStatusCode = SccBadRequest;
@@ -174,7 +174,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
         if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
         {
-          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
+          OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, ERROR_BAD_REQUEST);
 
           alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
           ciP->httpStatusCode = SccBadRequest;
@@ -184,7 +184,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_ID_AS_ATTR);
         ciP->httpStatusCode = SccBadRequest;
@@ -196,7 +196,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       if (type != "String")
       {
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
@@ -210,7 +210,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       if (eP->type.empty())
       {
         const char* errorText = ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
-        OrionError  oe(SccBadRequest, errorText, "BadRequest");
+        OrionError  oe(SccBadRequest, errorText, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, errorText);
         ciP->httpStatusCode = SccBadRequest;
@@ -220,7 +220,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
       if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
       {
-        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
+        OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
         ciP->httpStatusCode = SccBadRequest;
@@ -246,7 +246,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        OrionError oe(SccBadRequest, r, "BadRequest");
+        OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, "parse error in context attribute");
         ciP->httpStatusCode = SccBadRequest;

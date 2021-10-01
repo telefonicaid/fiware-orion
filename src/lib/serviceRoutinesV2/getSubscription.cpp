@@ -65,7 +65,7 @@ std::string getSubscription
 
   if ((err = idCheck(idSub)) != "OK")
   {
-    oe.fill(SccBadRequest, "Invalid subscription ID: " + err, "BadRequest");
+    oe.fill(SccBadRequest, "Invalid subscription ID: " + err, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }

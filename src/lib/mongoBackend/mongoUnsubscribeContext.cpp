@@ -89,7 +89,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
     return SccOk;
   }
@@ -119,7 +119,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
     return SccOk;
   }
