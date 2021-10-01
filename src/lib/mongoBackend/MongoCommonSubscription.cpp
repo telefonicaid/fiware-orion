@@ -164,7 +164,6 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
   {
     b->append(CSUB_REFERENCE,     sub.notification.httpInfo.url);
     b->append(CSUB_CUSTOM,        sub.notification.httpInfo.custom);
-    // FIXME httpTimeout is a long value, should cast to long or int?
     b->append(CSUB_HTTPTIMEOUT,   sub.notification.httpInfo.httpTimeout);
 
     LM_T(LmtMongo, ("Subscription reference:   %s", sub.notification.httpInfo.url.c_str()));

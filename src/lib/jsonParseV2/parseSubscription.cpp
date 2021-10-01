@@ -474,8 +474,7 @@ static std::string parseHttpTimeout(ConnectionInfo* ciP, SubscriptionUpdate* sub
   {
     if ((httpTimeoutOpt.value < 0) || (httpTimeoutOpt.value > MAX_SUB_HTTP_TIMEOUT))
     {
-      // FIXME - There is any way to display the value of the constant MAX_SUB_HTTP_TIMEOUT?
-      return badInput(ciP, "httpTimeout field must be an integer between 0 and " + std::string(MAX_SUB_HTTP_TIMEOUT));
+      return badInput(ciP, "httpTimeout field must be an integer between 0 and " + std::to_string(MAX_SUB_HTTP_TIMEOUT));
     }
     else
     {
