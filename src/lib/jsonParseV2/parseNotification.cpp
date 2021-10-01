@@ -162,7 +162,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   else if (!document.HasMember("subscriptionId"))
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID);
-    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, "BadRequest");
+    oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
     return false;
@@ -172,7 +172,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
     std::string  details = "Invalid JSON payload, mandatory field /data/ not found";
 
     alarmMgr.badInput(clientIp, details);
-    oeP->fill(SccBadRequest, details, "BadRequest");
+    oeP->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
     return false;
@@ -187,7 +187,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
     {
       if (type != "String")
       {
-        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
         ciP->httpStatusCode = SccBadRequest;
@@ -201,7 +201,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
     {
       if (type != "Array")
       {
-        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
         ciP->httpStatusCode = SccBadRequest;
@@ -222,7 +222,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
       alarmMgr.badInput(clientIp, description);
-      oeP->fill(SccBadRequest, description, "BadRequest");
+      oeP->fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
       return false;

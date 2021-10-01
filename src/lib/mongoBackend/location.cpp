@@ -28,6 +28,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
@@ -357,13 +358,13 @@ bool processLocationAtEntityCreation
     if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
     {
       *errDetail = "only WGS84 are supported, found: " + location;
-      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
 
     if (!getGeoJson(caP, geoJson, errDetail, apiVersion))
     {
-      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
 
@@ -397,7 +398,7 @@ bool processLocationAtUpdateAttribute
   if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-    oe->fill(SccBadRequest, *errDetail, "BadRequest");
+    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
     return false;
   }
 
@@ -416,7 +417,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
 
@@ -447,7 +448,7 @@ bool processLocationAtUpdateAttribute
         if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
         {
           *errDetail = "error parsing location attribute: " + subErr;
-          oe->fill(SccBadRequest, *errDetail, "BadRequest");
+          oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
           return false;
         }
         *currentLocAttrName = targetAttr->name;
@@ -464,7 +465,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
       return true;
@@ -485,7 +486,7 @@ bool processLocationAtUpdateAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
     }
@@ -524,7 +525,7 @@ bool processLocationAtAppendAttribute
   if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-    oe->fill(SccBadRequest, *errDetail, "BadRequest");
+    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
     return false;
   }
 
@@ -549,7 +550,7 @@ bool processLocationAtAppendAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for new attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
       *currentLocAttrName = targetAttr->name;
@@ -577,7 +578,7 @@ bool processLocationAtAppendAttribute
       if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for existing attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, "BadRequest");
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
       *currentLocAttrName = targetAttr->name;
@@ -587,7 +588,7 @@ bool processLocationAtAppendAttribute
     if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
     {
       *errDetail = "error parsing location attribute: " + subErr;
-      oe->fill(SccBadRequest, *errDetail, "BadRequest");
+      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
     return true;
