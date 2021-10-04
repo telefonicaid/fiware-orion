@@ -1,4 +1,4 @@
-- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (without notifications) (#3814)
+- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
 - Fix: return 400 instead of 500 when GeoJSON syntax error occur in ?options=upsert operations (#3949)
 - Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
 - Fix: service path ignored in GET /v2/subscriptions/{subId} (#3945)
