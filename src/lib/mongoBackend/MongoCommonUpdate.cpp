@@ -3532,6 +3532,8 @@ static unsigned int updateEntity
 
     // update the entity in memory for notifications with the result from DB, as the
     // usage of update operators requires the DB to evaluate the result
+    // Note the actual value is not in reply itself, but in the key "value", see
+    // https://jira.mongodb.org/browse/CDRIVER-4173
     notifyCerP->release();
     notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
   }
