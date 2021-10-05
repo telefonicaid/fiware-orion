@@ -309,23 +309,6 @@ So be careful of avoiding this situations.
 
 ## Current limitations
 
-### Notifications
-
-By the moment, this functionality does not work with notifications. The notified value is literally
-the operator. For instance if you update using this:
-
-```
-POST /v2/entities/E/attrs/A
-{
-  "value": { "$inc": 2 },
-  "type": "Number"
-}
-```
-
-The attribute A in entity E will be increased by 2 (so if you do after that for instance
-`GET /v2/entities/E/attrs/A` you will get the increased value). But in notifications triggered
-by this update you will see (literally) this JSON object: `{ "$inc": 2 }`.
-
 ### Create or replace entities
 
 Update operators cannot be used in entity creation or replace operations. For instance if

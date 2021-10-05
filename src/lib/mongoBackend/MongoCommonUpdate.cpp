@@ -3400,6 +3400,7 @@ static unsigned int updateEntity
   }
 
   orion::BSONObjBuilder  updatedEntity;
+  bool useFindAndModify = false;
 
   if (action == ActionTypeReplace)
   {
@@ -3481,6 +3482,9 @@ static unsigned int updateEntity
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
+    // useFindAndModify is set to true if calculation was done
+    useFindAndModify = calculatedAddToSet || calculatedPullAll;
+
     // Note we call calculateOperator() function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
@@ -3489,6 +3493,7 @@ static unsigned int updateEntity
       orion::BSONObjBuilder b;
       if (calculateOperator(notifyCerP, UPDATE_OPERATORS[ix], &b))
       {
+        useFindAndModify = true;
         updatedEntity.append(UPDATE_OPERATORS[ix], b.obj());
       }
     }
@@ -3522,7 +3527,24 @@ static unsigned int updateEntity
   }
 
   std::string err;
-  if (!collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err))
+  bool success;
+  if (useFindAndModify)
+  {
+    orion::BSONObj reply;
+    success = collectionFindAndModify(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, true, &reply, &err);
+
+    // update the entity in memory for notifications with the result from DB, as the
+    // usage of update operators requires the DB to evaluate the result
+    // Note the actual value is not in reply itself, but in the key "value", see
+    // https://jira.mongodb.org/browse/CDRIVER-4173
+    notifyCerP->release();
+    notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+  }
+  else
+  {
+    success = collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err);
+  }
+  if (!success)
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
