@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
@@ -86,7 +87,7 @@ std::string postEntities
 
   if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
   {
-    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", ERROR_BAD_REQUEST);
     eP->release();
 
     std::string out;

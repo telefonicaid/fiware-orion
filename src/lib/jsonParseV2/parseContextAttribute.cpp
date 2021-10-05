@@ -371,7 +371,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   }
   else if (r != "OK")  // other error cases get a general treatment
   {
-    OrionError oe(SccBadRequest, r, "BadRequest");
+    OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
 
     alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;

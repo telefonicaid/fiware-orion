@@ -1761,19 +1761,22 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
+    /* 'skip' field is used to mark deleted attributes that must not be included in the
+     * notification (see deleteAttrInNotifyCer function for details) */
     if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added
        * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
        * cer.entity destructor does release() on the attrs vector */
-      cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      if (!caP->skip)
+      {
+        cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      }
     }
     else
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        /* 'skip' field is used to mark deleted attributes that must not be included in the
-         * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
@@ -2474,7 +2477,7 @@ static bool deleteContextAttributeItem
                             " - location attribute has to be defined at creation time, with APPEND";
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccInvalidModification, details, "Unprocessable");
+      oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
@@ -2647,7 +2650,7 @@ static bool processContextAttributeVector
       std::string details = std::string("unknown actionType");
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccBadRequest, details, "BadRequest");
+      oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
       // If we reach this point, there's a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType)"));
@@ -3627,7 +3630,7 @@ static bool contextElementPreconditionsCheck
         alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
-        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", "BadRequest");
+        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
       }
     }
@@ -3663,7 +3666,7 @@ static bool contextElementPreconditionsCheck
             " - empty attribute not allowed in APPEND or UPDATE";
 
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
-        responseP->oe.fill(SccBadRequest, details, "BadRequest");
+        responseP->oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false;  // Error already in responseP
@@ -3781,8 +3784,8 @@ unsigned int processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, "Already Exists");
-      responseP->oe.fill(SccInvalidModification, "Already Exists", "Unprocessable");
+      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
+      responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       return 0;
     }
 
@@ -3999,7 +4002,7 @@ unsigned int processContextElement
         {
           releaseTriggeredSubscriptions(&subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
-          responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+          responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
           responseP->contextElementResponseVector.push_back(cerP);
           return 0;  // Error already in responseP
@@ -4052,14 +4055,14 @@ unsigned int processContextElement
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   if (attributeNotExistingError == true)
   {
     std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   // Response in responseP
