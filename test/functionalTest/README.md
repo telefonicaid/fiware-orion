@@ -26,6 +26,7 @@ Next install accumulator-server.py depencencies:
 ```
 pip install Flask==1.0.2
 pip install pyOpenSSL==19.0.0
+pip install paho-mqtt==1.5.1
 ```
 
 Next, install the accumulator-server.py script itself:
