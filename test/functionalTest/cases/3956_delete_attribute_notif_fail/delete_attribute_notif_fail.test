@@ -34,8 +34,8 @@ accumulatorStart --pretty-print
 # 01. Create entity E with A=1, B=2, C=3
 # 02. Create sub for entity E
 # 03. Delete attribute C
-# 04. Get entity, see E-A=1, E-B=2, E-C=3
-# 05. Dump accumulator, see E-A=1, E-B=2, E-C=3
+# 04. Get entity, see E-A=1, E-B=2
+# 05. Dump accumulator, see E-A=1, E-B=2
 #
 
 
@@ -91,15 +91,15 @@ echo
 echo
 
 
-echo '04. Get entity, see E-A=1, E-B=2, E-C=3'
-echo '======================================='
+echo '04. Get entity, see E-A=1, E-B=2'
+echo '================================'
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '05. Dump accumulator, see E-A=1, E-B=2, E-C=3'
-echo '============================================='
+echo '05. Dump accumulator, see E-A=1, E-B=2'
+echo '======================================'
 accumulatorDump
 echo
 echo
@@ -134,8 +134,8 @@ Date: REGEX(.*)
 
 
 
-04. Get entity, see E-A=1, E-B=2, E-C=3
-=======================================
+04. Get entity, see E-A=1, E-B=2
+================================
 HTTP/1.1 200 OK
 Content-Length: 113
 Content-Type: application/json
@@ -158,8 +158,8 @@ Date: REGEX(.*)
 }
 
 
-05. Dump accumulator, see E-A=1, E-B=2, E-C=3
-=============================================
+05. Dump accumulator, see E-A=1, E-B=2
+======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 168
