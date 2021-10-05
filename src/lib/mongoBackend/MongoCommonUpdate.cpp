@@ -1761,19 +1761,22 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
+    /* 'skip' field is used to mark deleted attributes that must not be included in the
+     * notification (see deleteAttrInNotifyCer function for details) */
     if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added
        * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
        * cer.entity destructor does release() on the attrs vector */
-      cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      if (!caP->skip)
+      {
+        cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      }
     }
     else
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        /* 'skip' field is used to mark deleted attributes that must not be included in the
-         * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
