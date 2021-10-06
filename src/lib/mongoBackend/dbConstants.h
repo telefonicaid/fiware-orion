@@ -120,6 +120,9 @@
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"
 
+#define CSUB_USER                    "user"
+#define CSUB_PASSWD                  "passwd"
+
 
 
 /* ****************************************************************************

@@ -65,7 +65,7 @@ class MqttConnectionManager
 
   const char*  semGet(void);
 
-  int sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos);
+  int sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
   void cleanup(double maxAge, bool ignoreSems = false);
 
  private:
@@ -73,7 +73,7 @@ class MqttConnectionManager
   void semTake(void);
   void semGive(void);
 
-  MqttConnection getConnection(const std::string& host, int port);
+  MqttConnection getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
 };
 
 #endif  // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
