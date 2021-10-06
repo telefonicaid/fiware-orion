@@ -1,4 +1,4 @@
 - Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (without notifications) (#3814)
 - Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
 - Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
-- Add: Per sub/reg httpTimeout (#3842)
+- Add: per sub notification.http.timeout (#3842)
