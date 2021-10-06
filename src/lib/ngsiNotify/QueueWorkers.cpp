@@ -160,7 +160,7 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, httpTimeout=%d",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
@@ -170,7 +170,7 @@ static void* workerFunc(void* pSyncQ)
                          params->resource.c_str(),
                          params->content_type.c_str(),
                          params->qos,
-                         params->httpTimeout));
+                         params->timeout));
 
       char                portV[STRING_SIZE_FOR_INT];
       std::string         endpoint;
@@ -227,7 +227,7 @@ static void* workerFunc(void* pSyncQ)
                                        &statusCode,
                                        params->extraHeaders,
                                        "",                         //default acceptFormat
-                                       params->httpTimeout);
+                                       params->timeout);
         }
 
         //

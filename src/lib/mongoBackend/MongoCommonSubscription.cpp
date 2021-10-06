@@ -164,11 +164,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
   {
     b->append(CSUB_REFERENCE,     sub.notification.httpInfo.url);
     b->append(CSUB_CUSTOM,        sub.notification.httpInfo.custom);
-    b->append(CSUB_HTTPTIMEOUT,   sub.notification.httpInfo.httpTimeout);
+    b->append(CSUB_TIMEOUT,   sub.notification.httpInfo.timeout);
 
     LM_T(LmtMongo, ("Subscription reference:   %s", sub.notification.httpInfo.url.c_str()));
     LM_T(LmtMongo, ("Subscription custom:      %s", sub.notification.httpInfo.custom? "true" : "false"));
-    LM_T(LmtMongo, ("Subscription httpTimeout: %d", sub.notification.httpInfo.httpTimeout));
+    LM_T(LmtMongo, ("Subscription timeout: %d", sub.notification.httpInfo.timeout));
 
 
     if (sub.notification.httpInfo.custom)

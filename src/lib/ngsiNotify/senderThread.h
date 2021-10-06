@@ -68,7 +68,7 @@ typedef struct SenderThreadParams
   std::map<std::string, std::string> extraHeaders;
   std::string                        subscriptionId;
   bool                               registration;
-  long long                          httpTimeout;
+  long long                          timeout;
 } SenderThreadParams;
 
 

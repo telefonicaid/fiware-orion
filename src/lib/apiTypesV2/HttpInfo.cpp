@@ -43,7 +43,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true), httpTimeout(0)
+HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true), timeout(0)
 {
 }
 
@@ -59,9 +59,9 @@ std::string HttpInfo::toJson()
 
   jh.addString("url", this->url);
 
-  if (this->httpTimeout > 0)
+  if (this->timeout > 0)
   {
-    jh.addNumber("httpTimeout", this->httpTimeout);
+    jh.addNumber("timeout", this->timeout);
   }
 
   if (custom)
@@ -102,9 +102,9 @@ std::string HttpInfo::toJson()
 */
 void HttpInfo::fill(const orion::BSONObj& bo)
 {
-  this->url         = bo.hasField(CSUB_REFERENCE)?    getStringFieldF(bo, CSUB_REFERENCE) : "";
-  this->httpTimeout = bo.hasField(CSUB_HTTPTIMEOUT)?  getLongFieldF(bo, CSUB_HTTPTIMEOUT)  : 0;
-  this->custom      = bo.hasField(CSUB_CUSTOM)?       getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
+  this->url      = bo.hasField(CSUB_REFERENCE)?  getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->timeout  = bo.hasField(CSUB_TIMEOUT)?    getLongFieldF(bo, CSUB_TIMEOUT)     : 0;
+  this->custom   = bo.hasField(CSUB_CUSTOM)?     getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
   if (this->custom)
   {

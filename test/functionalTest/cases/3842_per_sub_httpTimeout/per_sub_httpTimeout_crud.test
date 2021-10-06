@@ -20,7 +20,7 @@
 
 
 --NAME--
-Per subscrition httpTimeout CRUD
+Per subscrition timeout CRUD
 
 --SHELL-INIT--
 dbInit CB
@@ -29,22 +29,22 @@ brokerStart CB 0
 --SHELL--
 
 #
-# 01. Create a subscrition with a correct httpTimeout field, get 204
+# 01. Create a subscrition with a correct timeout field, get 204
 # 02. GET /v2/subscriptions/ID
-# 03. Modify the subscription changing httpTimeout, get 204
+# 03. Modify the subscription changing timeout, get 204
 # 04. GET /v2/subscriptions/ID
 # 05. Delete the subscription, get 204
-# 06. Create a subscrition without httpTimeout field, get 201
+# 06. Create a subscrition without timeout field, get 201
 # 07. GET /v2/subscriptions/ID
-# 08. Create a subscrition with a negative httpTimeout field, get 400
-# 09. Create a subscrition with a overranged httpTimeout field, get 400
-# 10. Create a subscrition with a text httpTimeout field, get 400
+# 08. Create a subscrition with a negative timeout field, get 400
+# 09. Create a subscrition with a overranged timeout field, get 400
+# 10. Create a subscrition with a text timeout field, get 400
 #
 #
 
 
 
-echo "01. Create a subscrition with a correct httpTimeout field, get 204"
+echo "01. Create a subscrition with a correct timeout field, get 204"
 echo "=================================================================="
 payload='
 {
@@ -60,7 +60,7 @@ payload='
   "notification": {
     "http": {
       "url": "http://localhost:1234",
-      "httpTimeout":1000
+      "timeout":1000
     }
   }
 }'
@@ -79,7 +79,7 @@ echo
 echo
 
 
-echo "03. Modify the subscription changing httpTimeout, get 204"
+echo "03. Modify the subscription changing timeout, get 204"
 echo "========================================================="
 payload='
 {
@@ -95,7 +95,7 @@ payload='
   "notification": {
     "http": {
       "url": "http://localhost:1234",
-      "httpTimeout":2000
+      "timeout":2000
     }
   }
 }'
@@ -120,7 +120,7 @@ echo
 echo
 
 
-echo "06. Create a subscrition without httpTimeout field, get 201"
+echo "06. Create a subscrition without timeout field, get 201"
 echo "==========================================================="
 payload='
 {
@@ -155,7 +155,7 @@ echo
 echo
 
 
-echo "08. Create a subscrition with a negative httpTimeout field, get 400"
+echo "08. Create a subscrition with a negative timeout field, get 400"
 echo "=================================================================="
 payload='
 {
@@ -171,7 +171,7 @@ payload='
   "notification": {
     "http": {
       "url": "http://localhost:1234",
-      "httpTimeout":-1000
+      "timeout":-1000
     }
   }
 }'
@@ -181,7 +181,7 @@ echo
 echo
 
 
-echo "09. Create a subscrition with a overranged httpTimeout field, get 400"
+echo "09. Create a subscrition with a overranged timeout field, get 400"
 echo "====================================================================="
 payload='
 {
@@ -197,7 +197,7 @@ payload='
   "notification": {
     "http": {
       "url": "http://localhost:1234",
-      "httpTimeout":999999999
+      "timeout":999999999
     }
   }
 }'
@@ -206,7 +206,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-echo "10. Create a subscrition with a text httpTimeout field, get 400"
+echo "10. Create a subscrition with a text timeout field, get 400"
 echo "==============================================================="
 payload='
 {
@@ -222,7 +222,7 @@ payload='
   "notification": {
     "http": {
       "url": "http://localhost:1234",
-      "httpTimeout":"textvalue"
+      "timeout":"textvalue"
     }
   }
 }'
@@ -233,7 +233,7 @@ echo
 
 
 --REGEXPECT--
-01. Create a subscrition with a correct httpTimeout field, get 204
+01. Create a subscrition with a correct timeout field, get 204
 ==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 286
+Content-Length: 282
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,7 +258,7 @@ Date: REGEX(.*)
         "attrs": [], 
         "attrsFormat": "normalized", 
         "http": {
-            "httpTimeout": 1000, 
+            "timeout": 1000, 
             "url": "http://localhost:1234"
         }, 
         "onlyChangedAttrs": false
@@ -278,7 +278,7 @@ Date: REGEX(.*)
 }
 
 
-03. Modify the subscription changing httpTimeout, get 204
+03. Modify the subscription changing timeout, get 204
 =========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -289,7 +289,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 286
+Content-Length: 282
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,7 +301,7 @@ Date: REGEX(.*)
         "attrs": [], 
         "attrsFormat": "normalized", 
         "http": {
-            "httpTimeout": 2000, 
+            "timeout": 2000, 
             "url": "http://localhost:1234"
         }, 
         "onlyChangedAttrs": false
@@ -329,7 +329,7 @@ Date: REGEX(.*)
 
 
 
-06. Create a subscrition without httpTimeout field, get 201
+06. Create a subscrition without timeout field, get 201
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -373,44 +373,44 @@ Date: REGEX(.*)
 }
 
 
-08. Create a subscrition with a negative httpTimeout field, get 400
+08. Create a subscrition with a negative timeout field, get 400
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 96
+Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "httpTimeout field must be an integer between 0 and 300000", 
+    "description": "timeout field must be an integer between 0 and 300000", 
     "error": "BadRequest"
 }
  
 
-09. Create a subscrition with a overranged httpTimeout field, get 400
+09. Create a subscrition with a overranged timeout field, get 400
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 96
+Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "httpTimeout field must be an integer between 0 and 300000", 
+    "description": "timeout field must be an integer between 0 and 300000", 
     "error": "BadRequest"
 }
 
 
-10. Create a subscrition with a text httpTimeout field, get 400
+10. Create a subscrition with a text timeout field, get 400
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 64
+Content-Length: 60
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "httpTimeout is not an int", 
+    "description": "timeout is not an int", 
     "error": "BadRequest"
 }
 

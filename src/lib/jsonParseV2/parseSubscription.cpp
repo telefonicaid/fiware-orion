@@ -461,29 +461,29 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
 /* ****************************************************************************
 *
-* parseHttpTimeout -
+* parseTimeout -
 */
-static std::string parseHttpTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
+static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
 {
-  Opt<int64_t> httpTimeoutOpt = getInt64Opt(http, "httpTimeout");
-  if (!httpTimeoutOpt.ok())
+  Opt<int64_t> timeoutOpt = getInt64Opt(http, "timeout");
+  if (!timeoutOpt.ok())
   {
-    return badInput(ciP, httpTimeoutOpt.error);
+    return badInput(ciP, timeoutOpt.error);
   }
-  if (httpTimeoutOpt.given)
+  if (timeoutOpt.given)
   {
-    if ((httpTimeoutOpt.value < 0) || (httpTimeoutOpt.value > MAX_SUB_HTTP_TIMEOUT))
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_SUB_HTTP_TIMEOUT))
     {
-      return badInput(ciP, "httpTimeout field must be an integer between 0 and " + std::to_string(MAX_SUB_HTTP_TIMEOUT));
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_SUB_HTTP_TIMEOUT));
     }
     else
     {
-      subsP->notification.httpInfo.httpTimeout = httpTimeoutOpt.value;
+      subsP->notification.httpInfo.timeout = timeoutOpt.value;
     }
   }
   else
   {
-    subsP->notification.httpInfo.httpTimeout = 0;
+    subsP->notification.httpInfo.timeout = 0;
   }
 
   return "";
@@ -547,8 +547,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
-      // httpTimeout
-      r = parseHttpTimeout(ciP, subsP, http);
+      // timeout
+      r = parseTimeout(ciP, subsP, http);
       if (!r.empty())
       {
         return r;
