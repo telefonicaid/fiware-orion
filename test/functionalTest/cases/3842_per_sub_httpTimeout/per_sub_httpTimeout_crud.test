@@ -18,7 +18,6 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
 Per subscrition httpTimeout CRUD
