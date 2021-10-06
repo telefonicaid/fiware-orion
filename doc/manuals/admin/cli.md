@@ -119,7 +119,8 @@ The list of available options is the following:
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
-    is 5 seconds.
+    is 5 seconds. This parameter can be defined individually for subscriptions. If defined on the subscription's
+    JSON, the default parameter would be ignored.   
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request

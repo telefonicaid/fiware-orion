@@ -467,8 +467,10 @@ In the second case, it means there are workers in the pool that cannot take on n
 In the case of queries/updates forwarded to context providers, the effect is that the original client will take a long time
 to get the answer. In fact, some clients may give up and close the connection.
 
-In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion should wait for
-outgoing HTTP connections, overriding the default operating system timeout.
+In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion 
+should wait for outgoing HTTP connections, overriding the default operating system timeout. Note that this 
+parameter can be defined individually for subscriptions. If `-httpTimeout` is defined on the subscription's 
+JSON, the default parameter would be ignored.
 
 [Top](#top)
 
