@@ -3570,6 +3570,7 @@ static void updateEntity
 
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
+      releaseTriggeredSubscriptions(&subsToNotify);
       notifyCerP->release();
       delete notifyCerP;
       cerP->release();
