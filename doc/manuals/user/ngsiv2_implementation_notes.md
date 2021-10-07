@@ -374,7 +374,7 @@ Apart from the subscription fields described in NGSIv2 specification for `GET /v
 field. This field specify the maximum time the subscription waits for the response when using HTTP
 notifications in milliseconds.
 
-The maximum value allowed for this parameter is 300000 (5 minutes). If 
+The maximum value allowed for this parameter is 1800000 (30 minutes). If 
 `timeout` is defined to 0 or omitted, then the value passed as CLI parameter is used. See section in the
 [Command line options](../admin/cli.md#command-line-options) for more details.
 

@@ -472,9 +472,9 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   }
   if (timeoutOpt.given)
   {
-    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_SUB_HTTP_TIMEOUT))
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
     {
-      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_SUB_HTTP_TIMEOUT));
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
     }
     else
     {
