@@ -273,8 +273,6 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-  LM_TMP(("Resource: '%s'", resource.c_str()));
-
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
   if (metricsMgr.isOn())
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
@@ -522,15 +520,11 @@ int httpRequestSendWithCurl
   {
     const char* qMark = strchr(resource.c_str(), '?');  // '?' already present?
 
-    LM_TMP(("SUBID: subscriptionId: %s", subscriptionId));
-
     if (qMark == NULL)
       url += std::string("?subscriptionId=") + subscriptionId;
     else
       url += std::string("&subscriptionId=") + subscriptionId;
   }
-  else
-    LM_TMP(("SUBID: none"));
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

@@ -46,8 +46,6 @@ void* startSenderThread(void* p)
     char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
 
-    LM_TMP(("SUBID: Got subId '%s'", params->subscriptionId.c_str()));
-
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
