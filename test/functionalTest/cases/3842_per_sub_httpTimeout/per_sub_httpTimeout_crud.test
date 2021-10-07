@@ -44,8 +44,6 @@ brokerStart CB 0
 # 13. Create a subscrition with a overranged timeout field, get 400
 # 14. Create a subscrition with a text timeout field, get 400
 
-#
-
 
 
 echo "01. Create a subscrition with a correct timeout field, get 204"
