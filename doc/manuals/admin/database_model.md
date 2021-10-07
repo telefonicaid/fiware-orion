@@ -307,7 +307,7 @@ Fields:
     (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
--   **httpTimeout** this field configures the maximum time the subscription waits for the response for http 
+-   **timeout** this field configures the maximum time the subscription waits for the response for http 
 notifications. It is a number between 0 and 300000. If defined to 0, the default timeout will be used.
 -   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
     If this field exist and its value is "true" then customized notifications are used and the `headers`, `qs`, `method` and

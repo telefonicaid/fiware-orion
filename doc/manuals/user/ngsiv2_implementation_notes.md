@@ -19,7 +19,7 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
-* [`httpTimeout` subscriptions option](#httpTimeout-subscriptions-option)
+* [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
@@ -367,13 +367,15 @@ if `onlyChangedAttrs` is `true` and the triggering update only modified A then o
 
 [Top](#top)
 
-## `httpTimeout` subscriptions option
+## `timeout` subscriptions option
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
 `GET /v2/subscriptions/subId` requests, Orion supports this extra parameter within the `http`
-field. This field specify the maximum time the subscription waits for the response when using http 
-notifications in milliseconds. The maximum value allowed for this parameter is 300000 (5 minutes). If 
-`httpTimeout` is defined to 0, the value passed as CLI parameter is used. See section in the
+field. This field specify the maximum time the subscription waits for the response when using HTTP
+notifications in milliseconds.
+
+The maximum value allowed for this parameter is 300000 (5 minutes). If 
+`timeout` is defined to 0 or omitted, then the value passed as CLI parameter is used. See section in the
 [Command line options](../admin/cli.md#command-line-options) for more details.
 
 [Top](#top)
