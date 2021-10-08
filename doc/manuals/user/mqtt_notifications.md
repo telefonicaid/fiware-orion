@@ -31,7 +31,8 @@ The following elements can be used within `mqtt`:
 * `qos`: to specify the MQTT QoS value to use in the notifications associated to the subscription
   (0, 1 or 2). This is an optional field, if omitted then QoS 0 is used.
 * `user` and `passwd`: optional fields, to be used in the case MQTT broker needs user/password based
-  authentication. If used, both fields have to be used together.
+  authentication. If used, both fields have to be used together. Note that for security reasons,
+  the password is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).
 
 ## Custom notifications
 
