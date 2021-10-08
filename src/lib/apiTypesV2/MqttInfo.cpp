@@ -40,7 +40,7 @@ namespace ngsiv2
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo() : qos(0), custom(false), includePayload(true)
+MqttInfo::MqttInfo() : qos(0), custom(false), includePayload(true), providedAuth(false)
 {
 }
 
@@ -50,7 +50,7 @@ MqttInfo::MqttInfo() : qos(0), custom(false), includePayload(true)
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), includePayload(true)
+MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), includePayload(true), providedAuth(false)
 {
 }
 
@@ -67,6 +67,12 @@ std::string MqttInfo::toJson()
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
   jh.addNumber("qos", (long long) this->qos);
+
+  if (providedAuth)
+  {
+    jh.addString("user", this->user);
+    jh.addString("passwd", "*****");
+  }
 
   if (custom)
   {
@@ -95,6 +101,20 @@ void MqttInfo::fill(const orion::BSONObj& bo)
   this->topic  = bo.hasField(CSUB_MQTTTOPIC)? getStringFieldF(bo, CSUB_MQTTTOPIC) : "";
   this->qos    = bo.hasField(CSUB_MQTTQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
+
+  // both user and passwd have to be used at the same time
+  if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
+  {
+    this->user   = getStringFieldF(bo, CSUB_USER);
+    this->passwd = getStringFieldF(bo, CSUB_PASSWD);
+    this->providedAuth = true;
+  }
+  else
+  {
+    this->user   = "";
+    this->passwd = "";
+    this->providedAuth = false;
+  }
 
   if (this->custom)
   {
