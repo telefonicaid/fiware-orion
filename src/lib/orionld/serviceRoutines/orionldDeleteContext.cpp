@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjFree.h"                                        // kjFree
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -110,6 +111,9 @@ bool orionldDeleteContext(ConnectionInfo* ciP)
     }
     contextP->createdAt      = oldContextP->createdAt;
     contextP->usedAt         = orionldState.requestTime;
+
+    // Free the kj tree of the now obsolete old context
+    kjFree(oldContextP->tree);
   }
   else
   {
