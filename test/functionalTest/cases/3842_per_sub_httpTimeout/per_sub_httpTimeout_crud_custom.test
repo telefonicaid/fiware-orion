@@ -60,9 +60,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":1000
+      "timeout":1000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -95,9 +96,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":2000
+      "timeout":2000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -130,8 +132,9 @@ payload='
     ]
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:1234"
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "payload": "Custom payload"
     }
   }
 }'
@@ -164,9 +167,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":1000
+      "timeout":1000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -204,8 +208,9 @@ payload='
     ]
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:1234"
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "payload": "Custom payload"
     }
   }
 }'
@@ -239,9 +244,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":-1000
+      "timeout":-1000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -265,9 +271,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":999999999
+      "timeout":999999999,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -290,9 +297,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:1234",
-      "timeout":"textvalue"
+      "timeout":"textvalue",
+      "payload": "Custom payload"
     }
   }
 }'
@@ -316,7 +324,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID see timeout field
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 315
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -327,7 +335,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "timeout": 1000, 
             "url": "http://localhost:1234"
         }, 
@@ -359,7 +368,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID and see timeout changed
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 315
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -370,7 +379,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "timeout": 2000, 
             "url": "http://localhost:1234"
         }, 
@@ -402,7 +412,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID and see no timeout is field is foud
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 267
+Content-Length: 300
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -413,7 +423,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "url": "http://localhost:1234"
         }, 
         "onlyChangedAttrs": false
@@ -444,7 +455,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID and see the added timeout
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 315
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -455,7 +466,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload",
             "timeout": 1000, 
             "url": "http://localhost:1234"
         }, 
@@ -497,7 +509,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/ID and check no timeout field
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 267
+Content-Length: 300
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -508,7 +520,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "url": "http://localhost:1234"
         }, 
         "onlyChangedAttrs": false

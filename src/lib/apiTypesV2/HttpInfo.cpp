@@ -128,6 +128,11 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       this->includePayload = true;
     }
 
+    if (bo.hasField(CSUB_TIMEOUT))
+    {
+      this->timeout = getLongFieldF(bo, CSUB_TIMEOUT);
+    }
+
     if (bo.hasField(CSUB_METHOD))
     {
       this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));

@@ -57,9 +57,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:'$LISTENER_PORT'/noresponse",
-      "timeout":12000
+      "timeout":12000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -84,9 +85,10 @@ payload='
     ]
   },
   "notification": {
-    "http": {
+    "httpCustom": {
       "url": "http://localhost:'$LISTENER_PORT'/noresponse",
-      "timeout":8000
+      "timeout":8000,
+      "payload": "Custom payload"
     }
   }
 }'
@@ -170,7 +172,7 @@ Date: REGEX(.*)
 05. Check if 1st sub notification succeed
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 417
+Content-Length: 450
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -181,7 +183,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "timeout": 12000, 
             "url": "http://localhost:9997/noresponse"
         }, 
@@ -209,7 +212,7 @@ Date: REGEX(.*)
 06. Check if 2nd sub notification failed
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 469
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +223,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [], 
         "attrsFormat": "normalized", 
-        "http": {
+        "httpCustom": {
+            "payload": "Custom payload", 
             "timeout": 8000, 
             "url": "http://localhost:9997/noresponse"
         }, 

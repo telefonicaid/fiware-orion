@@ -704,6 +704,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
     }
 
+    // timeout
+    r = parseTimeout(ciP, subsP, httpCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.httpInfo.custom = true;
   }
   else if (notification.HasMember("mqtt"))
