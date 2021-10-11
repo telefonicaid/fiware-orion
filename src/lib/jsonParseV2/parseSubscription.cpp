@@ -309,10 +309,13 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 *
 * Both for HTTP and MQTT notifications
 */
-static std::string parseCustomPayload(ConnectionInfo* ciP,
-                                      std::string* payload,
-                                      bool* includePayload,
-                                      const Value& holder)
+static std::string parseCustomPayload
+(
+  ConnectionInfo*  ciP,
+  std::string*     payload,
+  bool*            includePayload,
+  const Value&     holder
+)
 {
   if (isNull(holder, "payload"))
   {
