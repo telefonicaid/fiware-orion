@@ -29,7 +29,7 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-# FIXME This test is using /noresponse path on accumulator for delaying the notification's response. This may enlarge
+# FIXME This test is using /noresponse path on accumulator for delaying the notification's response (10 seconds). This may enlarge
 # the testing time. Implementing a new accumulator route with a shorter delay would improve it
 
 #
