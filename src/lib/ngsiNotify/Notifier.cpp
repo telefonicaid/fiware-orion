@@ -344,7 +344,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->extraHeaders     = headers;
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
-    params->qos              = notification.mqttInfo.qos;    // unspecified in case of HTTP notifications
+    params->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
+    params->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
     params->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
     params->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
 
@@ -494,6 +495,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
     params->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
+    params->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
     params->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
     params->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
 

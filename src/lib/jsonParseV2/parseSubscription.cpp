@@ -309,7 +309,13 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 *
 * Both for HTTP and MQTT notifications
 */
-static std::string parseCustomPayload(ConnectionInfo* ciP, std::string* payload, bool* includePayload, const Value& holder)
+static std::string parseCustomPayload
+(
+  ConnectionInfo*  ciP,
+  std::string*     payload,
+  bool*            includePayload,
+  const Value&     holder
+)
 {
   if (isNull(holder, "payload"))
   {
@@ -461,6 +467,38 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
 /* ****************************************************************************
 *
+* parseTimeout -
+*/
+static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
+{
+  Opt<int64_t> timeoutOpt = getInt64Opt(http, "timeout");
+  if (!timeoutOpt.ok())
+  {
+    return badInput(ciP, timeoutOpt.error);
+  }
+  if (timeoutOpt.given)
+  {
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
+    {
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
+    }
+    else
+    {
+      subsP->notification.httpInfo.timeout = timeoutOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.httpInfo.timeout = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseMqttAuth -
 */
 static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
@@ -510,6 +548,7 @@ static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
 
   return "";
 }
+
 
 
 /* ****************************************************************************
@@ -566,6 +605,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in http field /url/");
+      }
+
+      // timeout
+      r = parseTimeout(ciP, subsP, http);
+      if (!r.empty())
+      {
+        return r;
       }
 
       std::string  host;
@@ -663,7 +709,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
-    r = parseCustomPayload(ciP, &subsP->notification.httpInfo.payload, &subsP->notification.httpInfo.includePayload, httpCustom);
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.httpInfo.payload,
+                           &subsP->notification.httpInfo.includePayload,
+                           httpCustom);
     if (!r.empty())
     {
       return r;
@@ -716,6 +765,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return r;
       }
+    }
+
+    // timeout
+    r = parseTimeout(ciP, subsP, httpCustom);
+    if (!r.empty())
+    {
+      return r;
     }
 
     subsP->notification.httpInfo.custom = true;
@@ -801,7 +857,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
-    r = parseCustomPayload(ciP, &subsP->notification.mqttInfo.payload, &subsP->notification.mqttInfo.includePayload, mqttCustom);
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.mqttInfo.payload,
+                           &subsP->notification.mqttInfo.includePayload,
+                           mqttCustom);
+
     if (!r.empty())
     {
       return r;

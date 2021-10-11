@@ -19,6 +19,7 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
@@ -363,6 +364,19 @@ update request, in combination with the `attrs` or `exceptAttrs` field.
 For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
 update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
 if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
+
+[Top](#top)
+
+## `timeout` subscriptions option
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
+field. This field specifies the maximum time the subscription waits for the response when using HTTP
+notifications in milliseconds.
+
+The maximum value allowed for this parameter is 1800000 (30 minutes). If 
+`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
+[Command line options](../admin/cli.md#command-line-options) for more details.
 
 [Top](#top)
 

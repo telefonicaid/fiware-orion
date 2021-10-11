@@ -49,6 +49,7 @@ struct HttpInfo
   std::string                         payload;
   bool                                custom;
   bool                                includePayload;
+  long long                           timeout;
 
   HttpInfo();
 

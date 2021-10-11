@@ -284,7 +284,7 @@ int httpRequestSendWithCurl
     content_type += "; charset=utf-8";
   }
 
-  if (timeoutInMilliseconds == -1)
+  if (timeoutInMilliseconds <= 0)
   {
     timeoutInMilliseconds = defaultTimeout;
   }
@@ -535,7 +535,7 @@ int httpRequestSendWithCurl
   // The parameter timeoutInMilliseconds holds the timeout time in milliseconds.
   // If the timeout time requested is 0, then no timeuot is used.
   //
-  if (timeoutInMilliseconds != 0)
+  if (timeoutInMilliseconds > 0)
   {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }

@@ -160,7 +160,7 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, user=%s, passwd=*****",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
@@ -170,6 +170,7 @@ static void* workerFunc(void* pSyncQ)
                          params->resource.c_str(),
                          params->content_type.c_str(),
                          params->qos,
+                         params->timeout,
                          params->user.c_str()));
 
       char                portV[STRING_SIZE_FOR_INT];
@@ -225,7 +226,9 @@ static void* workerFunc(void* pSyncQ)
                                        params->renderFormat,
                                        &out,
                                        &statusCode,
-                                       params->extraHeaders);
+                                       params->extraHeaders,
+                                       "",                         //default acceptFormat
+                                       params->timeout);
         }
 
         //
