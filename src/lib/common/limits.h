@@ -150,7 +150,7 @@
 
 /* ****************************************************************************
 *
-* MAX_HTTP_TIMEOUT - 300000 milliseconds, 5 minutes
+* MAX_HTTP_TIMEOUT - 1800000 milliseconds, 30 minutes
 */
 #define MAX_HTTP_TIMEOUT     1800000
 

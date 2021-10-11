@@ -370,7 +370,7 @@ if `onlyChangedAttrs` is `true` and the triggering update only modified A then o
 ## `timeout` subscriptions option
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports this extra parameter within the `http`
+`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
 field. This field specify the maximum time the subscription waits for the response when using HTTP
 notifications in milliseconds.
 
