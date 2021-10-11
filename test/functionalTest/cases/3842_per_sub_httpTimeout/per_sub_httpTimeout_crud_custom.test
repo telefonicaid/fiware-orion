@@ -20,7 +20,7 @@
 
 
 --NAME--
-Per subscrition timeout CRUD
+Per custom subscrition timeout CRUD
 
 --SHELL-INIT--
 dbInit CB
