@@ -371,11 +371,11 @@ if `onlyChangedAttrs` is `true` and the triggering update only modified A then o
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
 `GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
-field. This field specify the maximum time the subscription waits for the response when using HTTP
+field. This field specifies the maximum time the subscription waits for the response when using HTTP
 notifications in milliseconds.
 
 The maximum value allowed for this parameter is 1800000 (30 minutes). If 
-`timeout` is defined to 0 or omitted, then the value passed as CLI parameter is used. See section in the
+`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
 [Command line options](../admin/cli.md#command-line-options) for more details.
 
 [Top](#top)
