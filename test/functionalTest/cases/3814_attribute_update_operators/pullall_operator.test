@@ -26,15 +26,18 @@ Attribute update operator: pullAll
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+accumulatorStart --pretty-print
 
 --SHELL--
 
 #
 # 01. Create entity E with A=[1,2,foo], B=[{x:1},{y:2},[z]], C=3
-# 02. Update A with $pullAll: [1,foo]
-# 03. Update B with $pullAll: [{y:2},{x:1}}
-# 04. Delete attribute C
-# 05. Get entity, see E-A=[2] and E-B=[[z]]
+# 02. Create sub for entity E
+# 03. Update A with $pullAll: [1,foo]
+# 04. Update B with $pullAll: [{y:2},{x:1}}
+# 05. Delete attribute C
+# 06. Get entity, see E-A=[2] and E-B=[[z]]
+# 07. Dump accumulator, see the sequence of 3 notifications
 #
 
 
@@ -61,7 +64,29 @@ echo
 echo
 
 
-echo '02. Update A with $pull: [1,foo]'
+echo '02. Create sub for entity E'
+echo '==========================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+   },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Update A with $pull: [1,foo]'
 echo '================================'
 payload='{
   "A": {
@@ -74,7 +99,7 @@ echo
 echo
 
 
-echo '03. Update B with $pullAll: [{y:2},{x:1}]'
+echo '04. Update B with $pullAll: [{y:2},{x:1}]'
 echo '========================================='
 payload='{
   "B": {
@@ -87,16 +112,23 @@ echo
 echo
 
 
-echo '04. Delete attribute C'
+echo '05. Delete attribute C'
 echo '======================'
 orionCurl --url /v2/entities/E/attrs/C -X DELETE
 echo
 echo
 
 
-echo '05. Get entity, see E-A=[2] and E-B=[[z]]'
+echo '06. Get entity, see E-A=[2] and E-B=[[z]]'
 echo '========================================='
 orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '07. Dump accumulator, see the sequence of 3 notifications'
+echo '========================================================='
+accumulatorDump
 echo
 echo
 
@@ -112,7 +144,17 @@ Date: REGEX(.*)
 
 
 
-02. Update A with $pull: [1,foo]
+02. Create sub for entity E
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Update A with $pull: [1,foo]
 ================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -120,7 +162,7 @@ Date: REGEX(.*)
 
 
 
-03. Update B with $pullAll: [{y:2},{x:1}]
+04. Update B with $pullAll: [{y:2},{x:1}]
 =========================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -128,7 +170,7 @@ Date: REGEX(.*)
 
 
 
-04. Delete attribute C
+05. Delete attribute C
 ======================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -136,7 +178,7 @@ Date: REGEX(.*)
 
 
 
-05. Get entity, see E-A=[2] and E-B=[[z]]
+06. Get entity, see E-A=[2] and E-B=[[z]]
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 139
@@ -166,6 +208,135 @@ Date: REGEX(.*)
 }
 
 
+07. Dump accumulator, see the sequence of 3 notifications
+=========================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 256
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    2
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    },
+                    {
+                        "y": 2
+                    },
+                    [
+                        "z"
+                    ]
+                ]
+            },
+            "C": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 240
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    2
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    [
+                        "z"
+                    ]
+                ]
+            },
+            "C": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 194
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    2
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    [
+                        "z"
+                    ]
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
+accumulatorStop $LISTENER_PORT
 dbDrop CB

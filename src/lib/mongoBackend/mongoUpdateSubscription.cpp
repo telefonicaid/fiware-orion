@@ -158,6 +158,22 @@ static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BS
       b->append(CSUB_MQTTQOS, qos);
       LM_T(LmtMongo, ("Subscription mqttQos:   %d", qos));
     }
+
+    if (subOrig.hasField(CSUB_USER))
+    {
+      std::string user = getStringFieldF(subOrig, CSUB_USER);
+
+      b->append(CSUB_USER, user);
+      LM_T(LmtMongo, ("Subscription user:   %s", user.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_PASSWD))
+    {
+      std::string passwd = getStringFieldF(subOrig, CSUB_PASSWD);
+
+      b->append(CSUB_PASSWD, passwd);
+      LM_T(LmtMongo, ("Subscription passwd:   *****"));
+    }
   }
 }
 

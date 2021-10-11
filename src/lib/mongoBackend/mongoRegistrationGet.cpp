@@ -262,6 +262,10 @@ void mongoRegistrationGet
 
   orion::BSONObjBuilder bob;
   bob.append("_id", oid);
+  if (!servicePath.empty())
+  {
+    bob.append(REG_SERVICE_PATH, servicePath);
+  }
   q = bob.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();

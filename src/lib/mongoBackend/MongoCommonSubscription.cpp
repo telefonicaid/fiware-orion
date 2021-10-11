@@ -188,6 +188,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
     LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
 
+    if (sub.notification.mqttInfo.providedAuth)
+    {
+      b->append(CSUB_USER,   sub.notification.mqttInfo.user);
+      b->append(CSUB_PASSWD, sub.notification.mqttInfo.passwd);
+      LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.mqttInfo.user.c_str()));
+      LM_T(LmtMongo, ("Subscription passwd: *****"));
+    }
+
     if (sub.notification.mqttInfo.custom)
     {
       setCustomMqttInfo(sub.notification.mqttInfo, b);

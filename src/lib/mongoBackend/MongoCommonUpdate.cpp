@@ -1761,19 +1761,22 @@ static bool processOnChangeConditionForUpdateContext
   {
     ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
+    /* 'skip' field is used to mark deleted attributes that must not be included in the
+     * notification (see deleteAttrInNotifyCer function for details) */
     if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
     {
       /* Empty attribute list in the subscription mean that all attributes are added
        * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
        * cer.entity destructor does release() on the attrs vector */
-      cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      if (!caP->skip)
+      {
+        cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+      }
     }
     else
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        /* 'skip' field is used to mark deleted attributes that must not be included in the
-         * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
@@ -2474,7 +2477,7 @@ static bool deleteContextAttributeItem
                             " - location attribute has to be defined at creation time, with APPEND";
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccInvalidModification, details, "Unprocessable");
+      oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
@@ -2647,7 +2650,7 @@ static bool processContextAttributeVector
       std::string details = std::string("unknown actionType");
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccBadRequest, details, "BadRequest");
+      oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
       // If we reach this point, there's a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType)"));
@@ -2855,7 +2858,18 @@ static bool createEntity
     q.append("_id", bsonId);
     if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, q.obj(), insertedDoc.obj(), true, errDetail))
     {
-      oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
+      // of MONGODB_ERROR_WRONGJSON is used in the error message, then it will break. It would be better to use
+      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
+      // orion::collectionInsert() function.
+      if (errDetail->find(MONGODB_ERROR_WRONGJSON) != std::string::npos)
+      {
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON, ERROR_BAD_REQUEST);
+      }
+      else
+      {
+        oeP->fill(SccReceiverInternalError, *errDetail, ERROR_INTERNAL_ERROR);
+      }
       return false;
     }
   }
@@ -2863,21 +2877,18 @@ static bool createEntity
   {
     if (!orion::collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
     {
-      // FIXME P7: this checking is weak. If mongoc driver implementation changes, and a slight variation
-      // of "duplicate key" is used in the error message, then it will break. It would be better to use
-      // bson_error_t code (which is numeric) to check this, but this will involved modifications to the
-      // orion::collectionInsert() function.
-      if (errDetail->find("duplicate key") != std::string::npos)
+      // FIXME P7: same comment in the upsert case
+      if (errDetail->find(MONGODB_ERROR_DUPLICATE_KEY) != std::string::npos)
       {
-        oeP->fill(SccInvalidModification, "Already Exists", "Unprocessable");
+        oeP->fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       }
-      else if (errDetail->find("Can't extract geo keys") != std::string::npos)
+      else if (errDetail->find(MONGODB_ERROR_WRONGJSON) != std::string::npos)
       {
-        oeP->fill(SccBadRequest, "Wrong GeoJson", "BadRequest");
+        oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON, ERROR_BAD_REQUEST);
       }
       else
       {
-        oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+        oeP->fill(SccReceiverInternalError, *errDetail, ERROR_INTERNAL_ERROR);
       }
       return false;
     }
@@ -3389,6 +3400,7 @@ static unsigned int updateEntity
   }
 
   orion::BSONObjBuilder  updatedEntity;
+  bool useFindAndModify = false;
 
   if (action == ActionTypeReplace)
   {
@@ -3470,6 +3482,9 @@ static unsigned int updateEntity
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
+    // useFindAndModify is set to true if calculation was done
+    useFindAndModify = calculatedAddToSet || calculatedPullAll;
+
     // Note we call calculateOperator() function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
     // processing process)
@@ -3478,6 +3493,7 @@ static unsigned int updateEntity
       orion::BSONObjBuilder b;
       if (calculateOperator(notifyCerP, UPDATE_OPERATORS[ix], &b))
       {
+        useFindAndModify = true;
         updatedEntity.append(UPDATE_OPERATORS[ix], b.obj());
       }
     }
@@ -3511,7 +3527,24 @@ static unsigned int updateEntity
   }
 
   std::string err;
-  if (!collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err))
+  bool success;
+  if (useFindAndModify)
+  {
+    orion::BSONObj reply;
+    success = collectionFindAndModify(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, true, &reply, &err);
+
+    // update the entity in memory for notifications with the result from DB, as the
+    // usage of update operators requires the DB to evaluate the result
+    // Note the actual value is not in reply itself, but in the key "value", see
+    // https://jira.mongodb.org/browse/CDRIVER-4173
+    notifyCerP->release();
+    notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+  }
+  else
+  {
+    success = collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err);
+  }
+  if (!success)
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3597,7 +3630,7 @@ static bool contextElementPreconditionsCheck
         alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
-        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", "BadRequest");
+        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
       }
     }
@@ -3633,7 +3666,7 @@ static bool contextElementPreconditionsCheck
             " - empty attribute not allowed in APPEND or UPDATE";
 
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
-        responseP->oe.fill(SccBadRequest, details, "BadRequest");
+        responseP->oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false;  // Error already in responseP
@@ -3751,8 +3784,8 @@ unsigned int processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, "Already Exists");
-      responseP->oe.fill(SccInvalidModification, "Already Exists", "Unprocessable");
+      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
+      responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       return 0;
     }
 
@@ -3969,7 +4002,7 @@ unsigned int processContextElement
         {
           releaseTriggeredSubscriptions(&subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
-          responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+          responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
           responseP->contextElementResponseVector.push_back(cerP);
           return 0;  // Error already in responseP
@@ -4022,14 +4055,14 @@ unsigned int processContextElement
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   if (attributeNotExistingError == true)
   {
     std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, "Unprocessable");
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   // Response in responseP

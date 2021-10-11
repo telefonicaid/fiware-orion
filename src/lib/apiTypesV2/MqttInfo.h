@@ -46,6 +46,10 @@ struct MqttInfo
   std::string   payload;
   bool          includePayload;
 
+  bool          providedAuth;
+  std::string   user;
+  std::string   passwd;
+
   MqttInfo();
   explicit MqttInfo(const std::string& _url);
 
