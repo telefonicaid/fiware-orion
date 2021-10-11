@@ -170,7 +170,7 @@ static void* workerFunc(void* pSyncQ)
                          params->resource.c_str(),
                          params->content_type.c_str(),
                          params->qos,
-                         params->timeout));
+                         params->timeout,
                          params->user.c_str()));
 
       char                portV[STRING_SIZE_FOR_INT];

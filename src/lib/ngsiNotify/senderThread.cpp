@@ -64,7 +64,7 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str(),
                        params->qos,
-                       params->timeout));
+                       params->timeout,
                        params->user.c_str()));
 
     long long    statusCode = -1;
