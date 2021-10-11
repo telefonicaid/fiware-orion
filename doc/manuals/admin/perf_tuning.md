@@ -469,7 +469,7 @@ to get the answer. In fact, some clients may give up and close the connection.
 
 In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion 
 should wait for outgoing HTTP connections, overriding the default operating system timeout. Note that this 
-parameter can be defined individually for subscriptions. If `-httpTimeout` is defined on the subscription's 
+parameter can be defined individually for subscriptions. If `timeout` is defined on the subscription's 
 JSON, the default parameter would be ignored.
 
 [Top](#top)
