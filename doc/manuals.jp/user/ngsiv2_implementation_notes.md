@@ -19,6 +19,7 @@
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
@@ -339,6 +340,15 @@ Orion は、NGSIv2 仕様で説明されているものとは別に、サブス�
 例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
 A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
 が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
+<a name="timeout-subscriptions-option"></a>
+## `timeout` サブスクリプション・オプション
+
+`GET/v2/subscriptions` および `GET/v2/subsets/subId` リクエストの NGSIv2 仕様で説明されているサブスクリプションフィールドとは別に、Orion は `http` または `httpCustom` フィールド内の `timeout` 追加パラメータをサポートします。このフィールドは、HTTP 通知を使用するときにサブスクリプションがレスポンスを待機する最大時間をミリ秒単位で指定します。
+
+このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に設定されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](../admin/cli.md#command-line-options)のセクションを参照してください。
 
 [トップ](#top)
 
