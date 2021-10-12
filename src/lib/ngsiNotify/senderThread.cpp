@@ -54,7 +54,7 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
@@ -63,7 +63,9 @@ void* startSenderThread(void* p)
                        params->xauthToken.c_str(),
                        params->resource.c_str(),
                        params->content_type.c_str(),
-                       params->qos));
+                       params->qos,
+                       params->timeout,
+                       params->user.c_str()));
 
     long long    statusCode = -1;
     std::string  out;
@@ -81,7 +83,7 @@ void* startSenderThread(void* p)
         lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                            params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
-        mqttMgr.sendMqttNotification(params->ip, params->port, params->content, params->resource, params->qos);
+        mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos);
 
         // In MQTT notifications we don't have any response, so we always assume they are ok
         // When publish is sucessfull mqttOnPublishCallback is called (by the moment we are not doing nothing
@@ -105,7 +107,9 @@ void* startSenderThread(void* p)
                             params->renderFormat,
                             &out,
                             &statusCode,
-                            params->extraHeaders);
+                            params->extraHeaders,
+                            "",                         //default acceptFormat
+                            params->timeout);
 
         LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
       }

@@ -119,7 +119,9 @@ The list of available options is the following:
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
-    is 5 seconds.
+    is 5000 (5 seconds). Max value is 1800000 (30 minutes). This parameter can be defined individually for subscriptions. If defined on the subscription's
+    JSON, the default parameter would be ignored. See section in the 
+    [NGSIv2 Implementation Notes](../user/ngsiv2_implementation_notes.md#timeout-subscriptions-option)
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request

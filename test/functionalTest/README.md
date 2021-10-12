@@ -26,6 +26,7 @@ Next install accumulator-server.py depencencies:
 ```
 pip install Flask==1.0.2
 pip install pyOpenSSL==19.0.0
+pip install paho-mqtt==1.5.1
 ```
 
 Next, install the accumulator-server.py script itself:
@@ -49,6 +50,23 @@ The easiest way is running just:
 ```
 cd test/functionalTest
 ./testHarness.sh
+```
+
+In case you only want to run a single file or folder, you can also add the path to the file or folder like this:
+
+```
+./testHarness.sh cases/3949_upsert_with_wrong_geojson/
+```
+
+If you want to set the number of retries of the test you can use the env var `CB_MAX_TRIES` (e.g. you only want to run the test once when you know it is going 
+to fail but it is useful to see the output)
+
+Another useful env var is `CB_DIFF_TOOL`, that allows to set a tool to view diff of failing tests (e.g. [meld](https://meldmerge.org/))
+
+As an example of the usage of both env vars, the following line:
+
+```
+CB_MAX_TRIES=1 CB_DIFF_TOOL=meld ./testHarness.sh cases/3949_upsert_with_wrong_geojson/
 ```
 
 ## Known issues

@@ -106,6 +106,7 @@
 #define CSUB_STATUS                  "status"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
+#define CSUB_TIMEOUT                 "timeout"
 #define CSUB_METHOD                  "method"
 #define CSUB_HEADERS                 "headers"
 #define CSUB_QS                      "qs"
@@ -119,6 +120,9 @@
 
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"
+
+#define CSUB_USER                    "user"
+#define CSUB_PASSWD                  "passwd"
 
 
 

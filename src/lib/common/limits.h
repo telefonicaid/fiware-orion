@@ -150,6 +150,13 @@
 
 /* ****************************************************************************
 *
+* MAX_HTTP_TIMEOUT - 1800000 milliseconds, 30 minutes
+*/
+#define MAX_HTTP_TIMEOUT     1800000
+
+
+/* ****************************************************************************
+*
 * Pagination definitions -
 */
 #define MAX_PAGINATION_LIMIT            "1000"

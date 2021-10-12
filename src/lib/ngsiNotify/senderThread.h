@@ -56,8 +56,10 @@ typedef struct SenderThreadParams
   std::string                        tenant;
   std::string                        servicePath;
   std::string                        xauthToken;
-  std::string                        resource;  // path for HTTP notifications, topic for MQTT notifications
-  unsigned int                       qos;       // used only in MQTT notifications
+  std::string                        resource;      // path for HTTP notifications, topic for MQTT notifications
+  unsigned int                       qos;           // used only in MQTT notifications
+  std::string                        user;          // for user/pass auth connections (only MQTT at the present moment)
+  std::string                        passwd;        // for user/pass auth connections (only MQTT at the present moment)
   std::string                        content_type;
   std::string                        content;
   char                               transactionId[64];
@@ -68,6 +70,7 @@ typedef struct SenderThreadParams
   std::map<std::string, std::string> extraHeaders;
   std::string                        subscriptionId;
   bool                               registration;
+  long long                          timeout;
 } SenderThreadParams;
 
 

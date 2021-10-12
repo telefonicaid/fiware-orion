@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute update operator: min
+Ensure delete attribute is not shown in notification
 
 --SHELL-INIT--
 dbInit CB
@@ -31,21 +31,29 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create entity E with A=5
+# 01. Create entity E with A=1, B=2, C=3
 # 02. Create sub for entity E
-# 03. Update A with $min: 2
-# 04. Get entity, see E-A=2
-# 05. Dump accumulator, see E-A=2
+# 03. Delete attribute C
+# 04. Get entity, see E-A=1, E-B=2
+# 05. Dump accumulator, see E-A=1, E-B=2
 #
 
 
-echo '01. Create entity E with A=5'
-echo '============================'
+echo '01. Create entity E with A=1, B=2, C=3'
+echo '======================================'
 payload='{
   "id": "E",
   "type": "T",
   "A": {
-    "value": 5,
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": 2,
+    "type": "Number"
+  },
+  "C": {
+    "value": 3,
     "type": "Number"
   }
 }'
@@ -76,36 +84,30 @@ echo
 echo
 
 
-echo '03. Update A with $min: 2'
-echo '========================='
-payload='{
-  "A": {
-    "value": { "$min": 2 },
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo '03. Delete attribute C'
+echo '======================'
+orionCurl --url /v2/entities/E/attrs/C -X DELETE
 echo
 echo
 
 
-echo '04. Get entity, see E-A=2'
-echo '========================='
+echo '04. Get entity, see E-A=1, E-B=2'
+echo '================================'
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '05. Dump accumulator, see E-A=2'
-echo '==============================='
+echo '05. Dump accumulator, see E-A=1, E-B=2'
+echo '======================================'
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity E with A=5
-============================
+01. Create entity E with A=1, B=2, C=3
+======================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
@@ -124,24 +126,29 @@ Date: REGEX(.*)
 
 
 
-03. Update A with $min: 2
-=========================
+03. Delete attribute C
+======================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-04. Get entity, see E-A=2
-=========================
+04. Get entity, see E-A=1, E-B=2
+================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 113
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "B": {
         "metadata": {},
         "type": "Number",
         "value": 2
@@ -151,11 +158,11 @@ Date: REGEX(.*)
 }
 
 
-05. Dump accumulator, see E-A=2
-===============================
+05. Dump accumulator, see E-A=1, E-B=2
+======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 122
+Content-Length: 168
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -167,6 +174,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "B": {
                 "metadata": {},
                 "type": "Number",
                 "value": 2

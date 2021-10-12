@@ -1,5 +1,10 @@
-- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (without notifications) (#3814)
+- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
+- Add: support to user and password in MQTT subscriptions (#3914)
+- Fix: deleted attribute incorrectly included in notifications (#3956)
+- Fix: return 400 instead of 500 when GeoJSON syntax error occur in ?options=upsert operations (#3949)
 - Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
 - Fix: service path ignored in GET /v2/subscriptions/{subId} (#3945)
 - Fix: service path ignored in GET /v2/registrations/{regId} (#3945)
 - Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
+- Add: per sub notification.http.timeout (#3842)
+- Add: hard limit for -requestTimeout to 1800000 millliseconds (30 min)

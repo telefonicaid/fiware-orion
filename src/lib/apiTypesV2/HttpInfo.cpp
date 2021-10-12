@@ -43,7 +43,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true)
+HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true), timeout(0)
 {
 }
 
@@ -58,6 +58,11 @@ std::string HttpInfo::toJson()
   JsonObjectHelper jh;
 
   jh.addString("url", this->url);
+
+  if (this->timeout > 0)
+  {
+    jh.addNumber("timeout", this->timeout);
+  }
 
   if (custom)
   {
@@ -97,8 +102,9 @@ std::string HttpInfo::toJson()
 */
 void HttpInfo::fill(const orion::BSONObj& bo)
 {
-  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
-  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
+  this->url      = bo.hasField(CSUB_REFERENCE)?  getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->timeout  = bo.hasField(CSUB_TIMEOUT)?    getLongFieldF(bo, CSUB_TIMEOUT)     : 0;
+  this->custom   = bo.hasField(CSUB_CUSTOM)?     getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
   if (this->custom)
   {
@@ -120,6 +126,11 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     {
       this->payload = "";
       this->includePayload = true;
+    }
+
+    if (bo.hasField(CSUB_TIMEOUT))
+    {
+      this->timeout = getLongFieldF(bo, CSUB_TIMEOUT);
     }
 
     if (bo.hasField(CSUB_METHOD))

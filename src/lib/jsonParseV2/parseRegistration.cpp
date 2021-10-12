@@ -58,7 +58,7 @@ static bool dataProvidedParse
   {
     ciP->httpStatusCode = SccBadRequest;
     oeP->code           = SccBadRequest;
-    oeP->reasonPhrase   = "BadRequest";
+    oeP->reasonPhrase   = ERROR_BAD_REQUEST;
     oeP->details        = "/dataProvided/ must be a JSON object";
 
     return false;
@@ -68,7 +68,7 @@ static bool dataProvidedParse
   {
     ciP->httpStatusCode = SccBadRequest;
     oeP->code           = SccBadRequest;
-    oeP->reasonPhrase   = "BadRequest";
+    oeP->reasonPhrase   = ERROR_BAD_REQUEST;
     oeP->details        = "/dataProvided/ is empty";
 
     return false;
@@ -81,7 +81,7 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccBadRequest;
       oeP->code           = SccBadRequest;
-      oeP->reasonPhrase   = "BadRequest";
+      oeP->reasonPhrase   = ERROR_BAD_REQUEST;
 
       return false;
     }
@@ -122,7 +122,7 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccBadRequest;
       oeP->code           = SccBadRequest;
-      oeP->reasonPhrase   = "BadRequest";
+      oeP->reasonPhrase   = ERROR_BAD_REQUEST;
 
       return false;
     }

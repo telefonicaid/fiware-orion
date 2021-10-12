@@ -175,7 +175,7 @@ void MqttConnectionManager::semGive(void)
 *
 * MqttConnectionManager::getConnection -
 */
-MqttConnection MqttConnectionManager::getConnection(const std::string& host, int port)
+MqttConnection MqttConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
 {
   // Note we don't take the sem here, as the caller has already done that
   std::string endpoint = getEndpoint(host, port);
@@ -199,9 +199,26 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
        return c;
      }
 
+     // Use auth is user and password has been specified
+     if ((!user.empty()) && (!passwd.empty()))
+     {
+       int resultCode = mosquitto_username_pw_set(c.mosq, user.c_str(), passwd.c_str());
+       if (resultCode != MOSQ_ERR_SUCCESS)
+       {
+         LM_E(("Runtime Error (could not set user/pass in MQTT Broker connection %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
+         mosquitto_destroy(c.mosq);
+         c.mosq = NULL;
+         return c;
+       }
+     }
+
      mosquitto_publish_callback_set(c.mosq, mqttOnPublishCallback);
 
      LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s", endpoint.c_str()));
+
+     // FIXME P8: user/pass errors passed unnoticed at connection timee, as
+     // mosquitto_connect() always returns MOSQ_ERR_SUCCESS. There is an
+     // open question about it: https://stackoverflow.com/questions/69464187/how-can-i-detect-problems-with-user-password-in-the-connection-to-mqtt-broker-at
 
      int resultCode = mosquitto_connect(c.mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
      if (resultCode != MOSQ_ERR_SUCCESS)
@@ -240,7 +257,7 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
 *
 * MqttConnectionManager::sendMqttNotification -
 */
-int MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& content, const std::string& topic, unsigned int qos)
+int MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
 {
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
@@ -248,7 +265,7 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
   // it could happen in theory)
   semTake();
 
-  MqttConnection c = getConnection(host, port);
+  MqttConnection c = getConnection(host, port, user, passwd);
   mosquitto* mosq = c.mosq;
 
   if (mosq == NULL)
