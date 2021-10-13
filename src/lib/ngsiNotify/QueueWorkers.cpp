@@ -203,6 +203,7 @@ static void* workerFunc(void* pSyncQ)
 
           mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos);
 
+          // FIXME PR: this is wrong. It leads to "MQTT Notif delivered" log traces even it the sendMqttNotification() returns false
           // In MQTT notifications we don't have any response, so we always assume they are ok
           // When publish is sucessfull mqttOnPublishCallback is called (by the moment we are not doing nothing
           // there, just printing in DEBUG log level)

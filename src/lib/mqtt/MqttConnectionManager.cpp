@@ -58,13 +58,31 @@ inline std::string getEndpoint(const std::string& host, int port)
 
 /* ****************************************************************************
 *
-* mqttOnPublishCallback -
-*
+* mqttOnConnectCallback -
 */
+void mqttOnConnectCallback(struct mosquitto* mosq, void *userdata, int rc)
+{
+  MqttConnection* cP = (MqttConnection*) userdata;
+
+  // To be used in getConnetion()
+  cP->conectionResult = rc;
+
+  // This allows the code waiting in getConnection() to continue
+  sem_post(&cP->connectionSem);
+}
+
+
+
+/* ****************************************************************************
+*
+* mqttOnPublishCallback -*/
 void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
-  /* mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level */
-  LM_T(LmtMqttNotif, ("MQTT notification successfully published at %s with id %d", (char*)userdata, mid));
+  MqttConnection* cP = (MqttConnection*) userdata;
+
+  // mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level
+  // Note this trace use N/A in corrid= and transid=
+  LM_T(LmtMqttNotif, ("MQTT notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
 }
 
 
@@ -175,7 +193,7 @@ void MqttConnectionManager::semGive(void)
 *
 * MqttConnectionManager::getConnection -
 */
-MqttConnection MqttConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
+MqttConnection* MqttConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
 {
   // Note we don't take the sem here, as the caller has already done that
   std::string endpoint = getEndpoint(host, port);
@@ -185,67 +203,86 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
     // Doesn't exists: create it
      LM_T(LmtMqttNotif, ("New MQTT broker connection for %s", endpoint.c_str()));
 
-     MqttConnection c;
+     MqttConnection* cP = new MqttConnection();
 
-     // We use userdata to store the endpoint associated to the connection, to be used later at mqttOnPublishCallback()
-     // 100 should suffice for any well educated endpoint string...
-     c.userdata = (char*) malloc(100);
-     strncpy(c.userdata, endpoint.c_str(), 100);
+     cP->endpoint = endpoint;
 
-     c.mosq = mosquitto_new(NULL, true, c.userdata);
-     if (c.mosq == NULL)
+     // Note sem is started at 0, so next sem_wait will block
+     if (sem_init(&cP->connectionSem, 0, 0) == -1)
+     {
+       LM_E(("Runtime Error (error initializing connection sem for %s: %s)", endpoint.c_str(), strerror(errno)));
+       cP->mosq = NULL;
+       return cP;
+     }
+
+     cP->mosq = mosquitto_new(NULL, true, cP);
+     if (cP->mosq == NULL)
      {
        LM_E(("Runtime Error (could not create mosquitto client instance for %s)", endpoint.c_str()));
-       return c;
+       return cP;
      }
 
      // Use auth is user and password has been specified
      if ((!user.empty()) && (!passwd.empty()))
      {
-       int resultCode = mosquitto_username_pw_set(c.mosq, user.c_str(), passwd.c_str());
+       int resultCode = mosquitto_username_pw_set(cP->mosq, user.c_str(), passwd.c_str());
        if (resultCode != MOSQ_ERR_SUCCESS)
        {
          LM_E(("Runtime Error (could not set user/pass in MQTT Broker connection %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
-         mosquitto_destroy(c.mosq);
-         c.mosq = NULL;
-         return c;
+         mosquitto_destroy(cP->mosq);
+         cP->mosq = NULL;
+         return cP;
        }
      }
 
-     mosquitto_publish_callback_set(c.mosq, mqttOnPublishCallback);
+     mosquitto_connect_callback_set(cP->mosq, mqttOnConnectCallback);
+     mosquitto_publish_callback_set(cP->mosq, mqttOnPublishCallback);
 
      LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s", endpoint.c_str()));
 
-     // FIXME P8: user/pass errors passed unnoticed at connection timee, as
-     // mosquitto_connect() always returns MOSQ_ERR_SUCCESS. There is an
-     // open question about it: https://stackoverflow.com/questions/69464187/how-can-i-detect-problems-with-user-password-in-the-connection-to-mqtt-broker-at
-
-     int resultCode = mosquitto_connect(c.mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
+     int resultCode = mosquitto_connect(cP->mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
      if (resultCode != MOSQ_ERR_SUCCESS)
      {
-       LM_E(("Runtime Error (could not connect to MQTT Broker %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
-       mosquitto_destroy(c.mosq);
-       c.mosq = NULL;
-       return c;
+       LM_E(("Runtime Error (error calling mosquitto_connect: %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
+       mosquitto_destroy(cP->mosq);
+       cP->mosq = NULL;
+       return cP;
      }
-
-     LM_T(LmtMqttNotif, ("Successfully connected to MQTT Broker at %s", endpoint.c_str()));
 
      // Starts the client loop in its own thread. The client loop processes the network traffic.
      // According to documentation (https://mosquitto.org/api/files/mosquitto-h.html#mosquitto_threaded_set):
      // "When using mosquitto_loop_start, this [mosquitto_threaded_set] is set automatically."
-     mosquitto_loop_start(c.mosq);
+     mosquitto_loop_start(cP->mosq);
 
-     c.lastTime = getCurrentTime();
-     connections[endpoint] = c;
+     // We block until the connect callback release the connection semaphore
+     sem_wait(&cP->connectionSem);
 
-     return c;
+     // Check if the connection went ok
+     if (cP->conectionResult)
+     {
+       LM_W(("MQTT connection error for %s: %d (%s)", endpoint.c_str(), cP->conectionResult, mosquitto_connack_string(cP->conectionResult)));
+
+       mosquitto_disconnect(cP->mosq);
+       mosquitto_loop_stop(cP->mosq, false);
+       mosquitto_destroy(cP->mosq);
+
+       cP->mosq = NULL;
+       return cP;
+     }
+
+     // If it went ok, it is included in the connection map
+     LM_T(LmtMqttNotif, ("MQTT successfull connection for %s", endpoint.c_str()));
+
+     cP->lastTime = getCurrentTime();
+     connections[endpoint] = cP;
+
+     return cP;
   }
   else
   {
     // Already exists: update the time counter
     LM_T(LmtMqttNotif, ("Existing MQTT broker connection for %s", endpoint.c_str()));
-    connections[endpoint].lastTime = getCurrentTime();
+    connections[endpoint]->lastTime = getCurrentTime();
 
     return connections[endpoint];
   }
@@ -257,7 +294,7 @@ MqttConnection MqttConnectionManager::getConnection(const std::string& host, int
 *
 * MqttConnectionManager::sendMqttNotification -
 */
-int MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
+bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
 {
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
@@ -265,14 +302,14 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
   // it could happen in theory)
   semTake();
 
-  MqttConnection c = getConnection(host, port, user, passwd);
-  mosquitto* mosq = c.mosq;
+  MqttConnection* cP = getConnection(host, port, user, passwd);
+  mosquitto* mosq = cP->mosq;
 
   if (mosq == NULL)
   {
     // No need of log traces here: the getConnection() method would already print them
     semGive();
-    return -1;
+    return false;
   }
 
   const char* msg = content.c_str();
@@ -290,7 +327,7 @@ int MqttConnectionManager::sendMqttNotification(const std::string& host, int por
   }
 
   semGive();
-  return 0;
+  return true;
 }
 
 
@@ -310,11 +347,11 @@ void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
 
   std::vector<std::string> toErase;
 
-  for (std::map<std::string, MqttConnection>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  for (std::map<std::string, MqttConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
     std::string endpoint = iter->first;
-    MqttConnection c     = iter->second;
-    double age = getCurrentTime() - c.lastTime;
+    MqttConnection* cP   = iter->second;
+    double age = getCurrentTime() - cP->lastTime;
     if (age > maxAge)
     {
       LM_T(LmtMqttNotif, ("MQTT connection %s too old (age: %f, maxAge: %f), removing it", endpoint.c_str(), age, maxAge));
@@ -322,7 +359,7 @@ void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
       toErase.push_back(endpoint);
 
       LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
-      int resultCode = mosquitto_disconnect(c.mosq);
+      int resultCode = mosquitto_disconnect(cP->mosq);
       if (resultCode != MOSQ_ERR_SUCCESS)
       {
         LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
@@ -331,10 +368,11 @@ void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
       {
         LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker at %s", endpoint.c_str()));
       }
-      mosquitto_loop_stop(c.mosq, false);
-      mosquitto_destroy(c.mosq);
+      mosquitto_loop_stop(cP->mosq, false);
+      mosquitto_destroy(cP->mosq);
+      cP->mosq = NULL;
 
-      free(c.userdata);
+      delete cP;
     }
   }
 
