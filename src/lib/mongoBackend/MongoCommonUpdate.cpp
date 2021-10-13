@@ -3538,6 +3538,8 @@ static unsigned int updateEntity
     // Note the actual value is not in reply itself, but in the key "value", see
     // https://jira.mongodb.org/browse/CDRIVER-4173
     notifyCerP->release();
+    delete notifyCerP;
+
     notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
   }
   else
