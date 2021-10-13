@@ -33,6 +33,7 @@
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
 
+
 /* ****************************************************************************
 *
 * startSenderThread -
@@ -54,11 +55,13 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
                        params->tenant.c_str(),
+                       params->maxFailsLimit,
+                       params->failsCounter,
                        params->servicePath.c_str(),
                        params->xauthToken.c_str(),
                        params->resource.c_str(),
@@ -73,7 +76,9 @@ void* startSenderThread(void* p)
 
     if (!simulatedNotification)
     {
-      int  r;
+      int          r;
+
+      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
 
       if (params->protocol == "mqtt:")
       {
@@ -98,6 +103,8 @@ void* startSenderThread(void* p)
                             params->protocol,
                             params->verb,
                             params->tenant,
+                            params->maxFailsLimit,
+                            params->failsCounter,
                             params->servicePath,
                             params->xauthToken,
                             params->resource,
@@ -118,15 +125,19 @@ void* startSenderThread(void* p)
       {
         __sync_fetch_and_add(&noOfNotificationsSent, 1);
         alarmMgr.notificationErrorReset(url);
+        params->failsCounter = 0;
 
         if (params->registration == false)
         {
           subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
         }
       }
+
       else
       {
         alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
+
+        params->failsCounter++;
 
         if (params->registration == false)
         {

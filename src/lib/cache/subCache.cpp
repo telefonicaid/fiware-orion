@@ -41,6 +41,8 @@
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoDriver/connectionOperations.h"
 
 using std::map;
 
@@ -738,6 +740,8 @@ void subCacheItemInsert
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
+  int64_t                            failsCounter,
+  int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
   int64_t                            lastNotificationTime,
@@ -771,6 +775,8 @@ void subCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
+  cSubP->failsCounter          = failsCounter;
+  cSubP->maxFailsLimit         = maxFailsLimit;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastNotificationFailureTime;
@@ -1043,6 +1049,7 @@ typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
   int64_t      count;
+  int64_t      failsCounter;
   int64_t      lastFailure;
   int64_t      lastSuccess;
   std::string  lastFailureReason;
@@ -1107,6 +1114,7 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->failsCounter         = cSubP->failsCounter;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->lastFailureReason    = cSubP->lastFailureReason;
@@ -1174,6 +1182,7 @@ void subCacheSync(void)
       mongoSubCountersUpdate(tenant,
                              cSubP->subscriptionId,
                              cssP->count,
+                             cssP->failsCounter,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
                              cssP->lastSuccess,
@@ -1280,12 +1289,12 @@ void subNotificationErrorStatus
     if (errors == 0)
     {
       // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now, "", statusCode);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, -1, now, -1, now, "", statusCode);
     }
     else
     {
       // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1, failureReason, -1);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1);
     }
 
     return;
@@ -1308,13 +1317,36 @@ void subNotificationErrorStatus
 
   if (errors == 0)
   {
+    subP->failsCounter    = 0;
     subP->lastSuccess     = now;
     subP->lastSuccessCode = statusCode;
   }
   else
   {
+    subP->failsCounter     += 1;
     subP->lastFailure       = now;
     subP->lastFailureReason = failureReason;
+  }
+
+  CachedSubscription*  cSubP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
+
+  if (subP->maxFailsLimit > 0 && subP->failsCounter > 0)
+  {
+    if (subP->failsCounter > subP->maxFailsLimit)
+    {
+      orion::BSONObjBuilder bobSet;
+      orion::BSONObjBuilder bobUpdate;
+      orion::BSONObj        query;
+      std::string           err;
+
+      bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
+      bobUpdate.append("$set", bobSet.obj());
+
+      // update the status to inactive (in both DB and csubs cache)
+      orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);
+      cSubP->status = STATUS_INACTIVE;
+      LM_T(LmtSubCache, ("Update the status to %s", cSubP->status.c_str()));
+    }
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

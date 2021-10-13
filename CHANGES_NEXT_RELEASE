@@ -1,3 +1,4 @@
+- Fix: Subscription that pass to inactive state after a limit of failed connection attemps (#3541)
 - Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
 - Add: support to user and password in MQTT subscriptions (#3914)
 - Fix: deleted attribute incorrectly included in notifications (#3956)

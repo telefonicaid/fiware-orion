@@ -62,6 +62,8 @@ struct Notification
   bool                     blacklist;
   bool                     onlyChanged;
   long long                timesSent;
+  long long                failsCounter;
+  long long                maxFailsLimit;
   long long                lastNotification;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
   MqttInfo                 mqttInfo;
@@ -78,6 +80,8 @@ struct Notification
     blacklist(false),
     onlyChanged(false),
     timesSent(0),
+    failsCounter(-1),
+    maxFailsLimit(-1),
     lastNotification(-1),
     httpInfo(),
     mqttInfo(),
@@ -130,6 +134,8 @@ struct Subscription
   long long     expires;
   std::string   status;
   Notification  notification;
+  long long     maxFailsLimit;
+  long long     failsCounter;
   long long     throttling;
   RenderFormat  attrsFormat;
   Restriction   restriction;

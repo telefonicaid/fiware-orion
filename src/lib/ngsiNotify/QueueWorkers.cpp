@@ -42,7 +42,6 @@
 #include "ngsiNotify/QueueWorkers.h"
 
 
-
 /* ****************************************************************************
 *
 * workerFunc - prototype
@@ -160,11 +159,13 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
                          params->tenant.c_str(),
+                         params->maxFailsLimit,
+                         params->failsCounter,
                          params->servicePath.c_str(),
                          params->xauthToken.c_str(),
                          params->resource.c_str(),
@@ -217,6 +218,8 @@ static void* workerFunc(void* pSyncQ)
                                        params->protocol,
                                        params->verb,
                                        params->tenant,
+                                       params->maxFailsLimit,
+                                       params->failsCounter,
                                        params->servicePath,
                                        params->xauthToken,
                                        params->resource,
@@ -240,6 +243,7 @@ static void* workerFunc(void* pSyncQ)
           __sync_fetch_and_add(&noOfNotificationsSent, 1);
           QueueStatistics::incSentOK();
           alarmMgr.notificationErrorReset(url);
+          params->failsCounter = 0;
 
           if (params->registration == false)
           {
@@ -250,6 +254,8 @@ static void* workerFunc(void* pSyncQ)
         {
           QueueStatistics::incSentError();
           alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
+
+          params->failsCounter++;
 
           if (params->registration == false)
           {

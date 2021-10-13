@@ -107,7 +107,8 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
@@ -116,6 +117,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
   cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->next                  = NULL;
 
@@ -361,9 +363,11 @@ int mongoSubCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
@@ -488,17 +492,29 @@ static void mongoSubCountersUpdateCount
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
-  long long           count
+  long long           count,
+  long long           failsCounter
 )
 {
   orion::BSONObjBuilder  condition;
-  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  update; 
   orion::BSONObjBuilder  countB;
+  orion::BSONObjBuilder  updatefailsCounter;
+  orion::BSONObjBuilder  failsCounterB;
+
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
   countB.append(CSUB_COUNT, count);
   update.append("$inc", countB.obj());
+
+  if (failsCounter > 0)
+  {
+    condition.append("_id", orion::OID(subId));
+    failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
+    updatefailsCounter.append("$inc", failsCounterB.obj());
+    collectionUpdate(db, collection, condition.obj(), updatefailsCounter.obj(), false, &err);
+  }
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
@@ -687,6 +703,7 @@ void mongoSubCountersUpdate
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
+  long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
   long long           lastSuccess,
@@ -704,7 +721,7 @@ void mongoSubCountersUpdate
 
   if (count > 0)
   {
-    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count);
+    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter);
   }
 
   if (lastNotificationTime > 0)

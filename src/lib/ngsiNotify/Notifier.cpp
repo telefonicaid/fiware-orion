@@ -67,6 +67,8 @@ void Notifier::sendNotifyContextRequest
     NotifyContextRequest&            ncr,
     const ngsiv2::Notification&      notification,
     const std::string&               tenant,
+    long long                        maxFailsLimit,
+    long long                        failsCounter,
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
     unsigned int                     correlatorCounter,
@@ -80,6 +82,8 @@ void Notifier::sendNotifyContextRequest
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
                                                                           notification,
                                                                           tenant,
+                                                                          maxFailsLimit,
+                                                                          failsCounter,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
                                                                           correlatorCounter,
@@ -118,6 +122,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const ContextElementResponseVector&  cv,
     const ngsiv2::Notification&          notification,
     const std::string&                   tenant,
+    long long                            maxFailsLimit,
+    long long                            failsCounter,
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
     unsigned int                         correlatorCounter,
@@ -334,6 +340,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->protocol         = protocol;
     params->verb             = method;
     params->tenant           = tenant;
+    params->maxFailsLimit    = maxFailsLimit;
+    params->failsCounter     = failsCounter;
     params->servicePath      = en.servicePath;
     params->xauthToken       = xauthToken;
     params->resource         = notification.type == ngsiv2::HttpNotification? uri : topic;
@@ -370,6 +378,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   NotifyContextRequest&            ncr,
   const ngsiv2::Notification&      notification,
   const std::string&               tenant,
+  long long                        maxFailsLimit,
+  long long                        failsCounter,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
@@ -420,6 +430,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                                      ncr.contextElementResponseVector,
                                      notification,
                                      tenant,
+                                     maxFailsLimit,
+                                     failsCounter,
                                      xauthToken,
                                      fiwareCorrelator,
                                      correlatorCounter,
@@ -485,6 +497,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->protocol         = protocol;
     params->verb             = verbName(verb);
     params->tenant           = tenant;
+    params->maxFailsLimit    = maxFailsLimit;
+    params->failsCounter     = failsCounter;
     params->servicePath      = spath;
     params->xauthToken       = xauthToken;
     params->resource         = notification.type == ngsiv2::HttpNotification? uriPath : notification.mqttInfo.topic;
