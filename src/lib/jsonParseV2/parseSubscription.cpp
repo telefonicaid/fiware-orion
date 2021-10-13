@@ -327,7 +327,13 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 *
 * Both for HTTP and MQTT notifications
 */
-static std::string parseCustomPayload(ConnectionInfo* ciP, std::string* payload, bool* includePayload, const Value& holder)
+static std::string parseCustomPayload
+(
+  ConnectionInfo*  ciP,
+  std::string*     payload,
+  bool*            includePayload,
+  const Value&     holder
+)
 {
   if (isNull(holder, "payload"))
   {
@@ -479,6 +485,92 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
 /* ****************************************************************************
 *
+* parseTimeout -
+*/
+static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
+{
+  Opt<int64_t> timeoutOpt = getInt64Opt(http, "timeout");
+  if (!timeoutOpt.ok())
+  {
+    return badInput(ciP, timeoutOpt.error);
+  }
+  if (timeoutOpt.given)
+  {
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
+    {
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
+    }
+    else
+    {
+      subsP->notification.httpInfo.timeout = timeoutOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.httpInfo.timeout = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttAuth -
+*/
+static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  unsigned int howMany = 0;
+  subsP->notification.mqttInfo.providedAuth = false;
+
+  Opt<std::string> userOpt = getStringOpt(mqtt, "user", "user mqtt notification");
+  if (!userOpt.ok())
+  {
+    return badInput(ciP, userOpt.error);
+  }
+
+  // Note there is no forbidden chars checking for password. It is not needed: this
+  // field is never rendered in the JSON response API, so there is no risk of injection attacks
+  if (forbiddenChars(userOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt /user/");
+  }
+
+  if (userOpt.given)
+  {
+    subsP->notification.mqttInfo.user = userOpt.value;
+    howMany++;
+  }
+
+  Opt<std::string> passwdOpt = getStringOpt(mqtt, "passwd", "passwd mqtt notification");
+  if (!passwdOpt.ok())
+  {
+    return badInput(ciP, passwdOpt.error);
+  }
+  if (passwdOpt.given)
+  {
+    subsP->notification.mqttInfo.passwd = passwdOpt.value;
+    howMany++;
+  }
+
+  // howMany has to be either 0 (no auth no pass) or 2 (auth and passwd)
+  if (howMany == 1)
+  {
+    return badInput(ciP, "you must use user and passwd fields simultaneously");
+  }
+  else if (howMany == 2)
+  {
+    subsP->notification.mqttInfo.providedAuth = true;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
@@ -531,6 +623,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (forbiddenChars(urlOpt.value.c_str()))
       {
         return badInput(ciP, "forbidden characters in http field /url/");
+      }
+
+      // timeout
+      r = parseTimeout(ciP, subsP, http);
+      if (!r.empty())
+      {
+        return r;
       }
 
       std::string  host;
@@ -628,7 +727,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
-    r = parseCustomPayload(ciP, &subsP->notification.httpInfo.payload, &subsP->notification.httpInfo.includePayload, httpCustom);
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.httpInfo.payload,
+                           &subsP->notification.httpInfo.includePayload,
+                           httpCustom);
     if (!r.empty())
     {
       return r;
@@ -683,6 +785,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
     }
 
+    // timeout
+    r = parseTimeout(ciP, subsP, httpCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.httpInfo.custom = true;
   }
   else if (notification.HasMember("mqtt"))
@@ -698,6 +807,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // url
     r = parseMqttUrl(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // user/pass
+    r = parseMqttAuth(ciP, subsP, mqtt);
     if (!r.empty())
     {
       return r;
@@ -737,6 +853,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // user/pass same as in not custom mqtt)
+    r = parseMqttAuth(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     // qos (same as in not custom mqtt)
     r = parseMqttQoS(ciP, subsP, mqttCustom);
     if (!r.empty())
@@ -752,7 +875,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
-    r = parseCustomPayload(ciP, &subsP->notification.mqttInfo.payload, &subsP->notification.mqttInfo.includePayload, mqttCustom);
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.mqttInfo.payload,
+                           &subsP->notification.mqttInfo.includePayload,
+                           mqttCustom);
+
     if (!r.empty())
     {
       return r;

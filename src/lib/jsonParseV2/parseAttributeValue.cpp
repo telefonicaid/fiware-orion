@@ -60,7 +60,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   if (!document.IsObject() && !document.IsArray())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", "BadRequest");
+    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
@@ -77,7 +77,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   }
   else if (r != "OK")  // other error cases get a general treatment
   {
-    OrionError oe(SccBadRequest, r, "BadRequest");
+    OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
     alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();

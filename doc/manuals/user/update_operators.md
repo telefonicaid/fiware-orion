@@ -92,7 +92,7 @@ POST /v2/entities/E/attrs/A
 
 would change the value of attribute A to 12.
 
-This operator only accept numeric values (either positive or negative, interger or decimal).
+This operator only accept numeric values (either positive or negative, integer or decimal).
 
 ### `$mul`
 
@@ -110,7 +110,7 @@ POST /v2/entities/E/attrs/A
 
 would change the value of attribute A to 20.
 
-This operator only accept numeric values (either positive or negative, interger or decimal).
+This operator only accept numeric values (either positive or negative, integer or decimal).
 
 ### `$min`
 
@@ -138,7 +138,7 @@ POST /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Appart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings).
 
 ### `$max`
 
@@ -166,7 +166,7 @@ POST /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Appart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings).
 
 ### `$push`
 
@@ -212,8 +212,8 @@ would not change attribute value.
 
 ### `$pull`
 
-To be used with attributes which value is an array, removes all ocurrences of the item
-passes as parameter.
+To be used with attributes which value is an array, removes all occurrences of the item
+passed as parameter.
 
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
@@ -230,7 +230,7 @@ would change the value of attribute A to `[1, 3]`.
 ### `$pullAll`
 
 To be used with attributes which value is an array. The parameter is also an array. All
-the ocurrences of any of the members of the array used as parameter are removed.
+the occurrences of any of the members of the array used as parameter are removed.
 
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
@@ -299,7 +299,7 @@ POST /v2/entities/E/attrs/A
 ```
 
 
-you will get (randomly, in princple) one among this ones:
+you will get (randomly, in principle) one among this ones:
 
 * A gets increased its value by 1
 * A gets multiply its value by 10
@@ -308,23 +308,6 @@ you will get (randomly, in princple) one among this ones:
 So be careful of avoiding this situations.
 
 ## Current limitations
-
-### Notifications
-
-By the moment, this functionality does not work with notifications. The notified value is literally
-the operator. For instance if you update using this:
-
-```
-POST /v2/entities/E/attrs/A
-{
-  "value": { "$inc": 2 },
-  "type": "Number"
-}
-```
-
-The attribute A in entity E will be increased by 2 (so if you do after that for instance
-`GET /v2/entities/E/attrs/A` you will get the increased value). But in notifications triggered
-by this update you will see (literally) this JSON object: `{ "$inc": 2 }`.
 
 ### Create or replace entities
 

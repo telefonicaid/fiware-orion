@@ -362,11 +362,11 @@ void mongoListSubscriptions
 */
 void mongoGetSubscription
 (
-  ngsiv2::Subscription*               sub,
-  OrionError*                         oe,
-  const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
+  ngsiv2::Subscription*  sub,
+  OrionError*            oe,
+  const std::string&     idSub,
+  const std::string&     servicePath,
+  const std::string&     tenant
 )
 {
   bool         reqSemTaken = false;
@@ -381,6 +381,10 @@ void mongoGetSubscription
   orion::BSONObjBuilder  qB;
 
   qB.append("_id", oid);
+  if (!servicePath.empty())
+  {
+    qB.append(CSUB_SERVICE_PATH, servicePath);
+  }
   orion::BSONObj q = qB.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();

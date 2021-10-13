@@ -159,7 +159,7 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d",
+      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', maxFailsLimit='%lu', failsCounter='%lu', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
@@ -170,7 +170,9 @@ static void* workerFunc(void* pSyncQ)
                          params->xauthToken.c_str(),
                          params->resource.c_str(),
                          params->content_type.c_str(),
-                         params->qos));
+                         params->qos,
+                         params->timeout,
+                         params->user.c_str()));
 
       char                portV[STRING_SIZE_FOR_INT];
       std::string         endpoint;
@@ -200,7 +202,7 @@ static void* workerFunc(void* pSyncQ)
           lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                              params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
-          mqttMgr.sendMqttNotification(params->ip, params->port, params->content, params->resource, params->qos);
+          mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos);
 
           // In MQTT notifications we don't have any response, so we always assume they are ok
           // When publish is sucessfull mqttOnPublishCallback is called (by the moment we are not doing nothing
@@ -227,7 +229,9 @@ static void* workerFunc(void* pSyncQ)
                                        params->renderFormat,
                                        &out,
                                        &statusCode,
-                                       params->extraHeaders);
+                                       params->extraHeaders,
+                                       "",                         //default acceptFormat
+                                       params->timeout);
         }
 
         //

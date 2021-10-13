@@ -124,7 +124,7 @@ std::string Provider::toJson(void)
   JsonObjectHelper   jh;
   jh.addRaw("http", jhUrl.str());
   jh.addString("supportedForwardingMode", forwardingModeToString(supportedForwardingMode));
-  jh.addBool("legacyForwarding", legacyForwardingMode? "true" : "false");
+  jh.addBool("legacyForwarding", legacyForwardingMode? true : false);
 
   return jh.str();
 }

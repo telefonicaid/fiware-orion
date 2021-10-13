@@ -100,6 +100,22 @@ extern bool collectionFindOne
 );
 
 
+/* ****************************************************************************
+*
+* orion::collectionFindAndModify -
+*/
+extern bool collectionFindAndModify
+(
+  const std::string&  db,
+  const std::string&  col,
+  const BSONObj&      q,
+  const BSONObj&      doc,
+  bool                _new,
+  BSONObj*            reply,
+  std::string*        err
+);
+
+
 
 /* ****************************************************************************
 *

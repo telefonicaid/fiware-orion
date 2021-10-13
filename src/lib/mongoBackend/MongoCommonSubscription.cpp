@@ -162,11 +162,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   if (sub.notification.type == ngsiv2::HttpNotification)
   {
-    b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-    b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
+    b->append(CSUB_REFERENCE,     sub.notification.httpInfo.url);
+    b->append(CSUB_CUSTOM,        sub.notification.httpInfo.custom);
+    b->append(CSUB_TIMEOUT,   sub.notification.httpInfo.timeout);
 
-    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription reference:   %s", sub.notification.httpInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:      %s", sub.notification.httpInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription timeout: %d", sub.notification.httpInfo.timeout));
+
 
     if (sub.notification.httpInfo.custom)
     {
@@ -184,6 +187,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
     LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
+
+    if (sub.notification.mqttInfo.providedAuth)
+    {
+      b->append(CSUB_USER,   sub.notification.mqttInfo.user);
+      b->append(CSUB_PASSWD, sub.notification.mqttInfo.passwd);
+      LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.mqttInfo.user.c_str()));
+      LM_T(LmtMongo, ("Subscription passwd: *****"));
+    }
 
     if (sub.notification.mqttInfo.custom)
     {

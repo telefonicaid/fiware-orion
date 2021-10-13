@@ -103,6 +103,14 @@ static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BS
     LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
     LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
 
+    if (subOrig.hasField(CSUB_TIMEOUT))
+    {
+      long long timeout = getIntOrLongFieldAsLongF(subOrig, CSUB_TIMEOUT);
+
+      b->append(CSUB_TIMEOUT, timeout);
+      LM_T(LmtMongo, ("Subscription timeout:   %lu", timeout));
+    }
+
     if (subOrig.hasField(CSUB_METHOD))
     {
       std::string method = getStringFieldF(subOrig, CSUB_METHOD);
@@ -149,6 +157,22 @@ static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BS
 
       b->append(CSUB_MQTTQOS, qos);
       LM_T(LmtMongo, ("Subscription mqttQos:   %d", qos));
+    }
+
+    if (subOrig.hasField(CSUB_USER))
+    {
+      std::string user = getStringFieldF(subOrig, CSUB_USER);
+
+      b->append(CSUB_USER, user);
+      LM_T(LmtMongo, ("Subscription user:   %s", user.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_PASSWD))
+    {
+      std::string passwd = getStringFieldF(subOrig, CSUB_PASSWD);
+
+      b->append(CSUB_PASSWD, passwd);
+      LM_T(LmtMongo, ("Subscription passwd:   *****"));
     }
   }
 }

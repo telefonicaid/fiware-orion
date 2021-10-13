@@ -501,6 +501,10 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-
 
 属性の追加/削除の詳細について は、マニュアルの [このセクション](update_action_types.md)を参照してください。
 
+このウォークスルーの例では、`26.5` などの特定の値で属性を更新します。ただし、*"温度を2.5度上げる"* などの
+更新を行うこともできます。この種の更新は高度なトピックであり、[このドキュメント](update_operators.md)
+で説明されています。
+
 [トップ](#top)
 
 <a name="subscriptions"></a>
