@@ -49,6 +49,8 @@ static int64_t  neRaisedInLastSummary      = 0;
 static int64_t  neReleasedInLastSummary    = 0;
 static int64_t  biRaisedInLastSummary      = 0;
 static int64_t  biReleasedInLastSummary    = 0;
+static int64_t  mceRaisedInLastSummary     = 0;
+static int64_t  mceReleasedInLastSummary   = 0;
 
 
 
@@ -91,6 +93,8 @@ static void* logSummary(void* vP)
     //
     alarmMgr.semTake();
 
+    // FIXME P10: also include forwarding alars. Fix examples in documentation
+
     bool     deActive;         // de: Database Error
     int64_t  deRaised;
     int64_t  deReleased;
@@ -100,10 +104,14 @@ static void* logSummary(void* vP)
     int64_t  biActive;         // bi:  Bad Input
     int64_t  biRaised;
     int64_t  biReleased;
+    int64_t  mceActive;        // mce: MQTT Connection Error
+    int64_t  mceRaised;
+    int64_t  mceReleased;
 
     alarmMgr.dbErrorsGet(&deActive, &deRaised, &deReleased);
     alarmMgr.badInputGet(&biActive, &biRaised, &biReleased);
     alarmMgr.notificationErrorGet(&neActive, &neRaised, &neReleased);
+    alarmMgr.mqttConnectionErrorGet(&mceActive, &mceRaised, &mceReleased);
 
     alarmMgr.semGive();
 
@@ -113,6 +121,8 @@ static void* logSummary(void* vP)
     int64_t neReleasedNew = neReleased - neReleasedInLastSummary;
     int64_t biRaisedNew   = biRaised   - biRaisedInLastSummary;
     int64_t biReleasedNew = biReleased - biReleasedInLastSummary;
+    int64_t mceRaisedNew   = mceRaised   - mceRaisedInLastSummary;
+    int64_t mceReleasedNew = mceReleased - mceReleasedInLastSummary;
 
     // Round the corner?
     if (deRaisedNew   < 0)  { deRaisedNew   = LONG_MAX - deRaisedInLastSummary   + deRaised;   }
@@ -121,6 +131,8 @@ static void* logSummary(void* vP)
     if (neReleasedNew < 0)  { neReleasedNew = LONG_MAX - neReleasedInLastSummary + neReleased; }
     if (biRaisedNew   < 0)  { biRaisedNew   = LONG_MAX - biRaisedInLastSummary   + biRaised;   }
     if (biReleasedNew < 0)  { biReleasedNew = LONG_MAX - biReleasedInLastSummary + biReleased; }
+    if (mceRaisedNew   < 0) { mceRaisedNew   = LONG_MAX - mceRaisedInLastSummary   + mceRaised;   }
+    if (mceReleasedNew < 0) { mceReleasedNew = LONG_MAX - mceReleasedInLastSummary + mceReleased; }
 
     LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
 
@@ -138,6 +150,13 @@ static void* logSummary(void* vP)
           neReleased,
           neReleasedNew));
 
+    LM_S(("MQTT connection failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
+          mceActive,
+          mceRaised,
+          mceRaisedNew,
+          mceReleased,
+          mceReleasedNew));
+
     LM_S(("Bad input active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
           biActive,
           biRaised,
@@ -151,6 +170,8 @@ static void* logSummary(void* vP)
     neReleasedInLastSummary = neReleased;
     biRaisedInLastSummary   = biRaised;
     biReleasedInLastSummary = biReleased;
+    mceRaisedInLastSummary   = mceRaised;
+    mceReleasedInLastSummary = mceReleased;
   }
 
   return NULL;

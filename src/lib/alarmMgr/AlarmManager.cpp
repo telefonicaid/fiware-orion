@@ -60,11 +60,14 @@ AlarmManager::AlarmManager()
   notificationErrorResets(0),
   forwardingErrors(0),
   forwardingErrorResets(0),
+  mqttConnectionErrors(0),
+  mqttConnectionResets(0),
   dbErrors(0),
   dbErrorResets(0),
   dbOk(true),
   notificationErrorLogAlways(false),
   forwardingErrorLogAlways(false),
+  mqttConnectionErrorLogAlways(false),
   badInputLogAlways(false),
   dbErrorLogAlways(false)
 {
@@ -158,6 +161,19 @@ void AlarmManager::notificationErrorLogAlwaysSet(bool _notificationErrorLogAlway
 {
   semTake();
   notificationErrorLogAlways = _notificationErrorLogAlways;
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::mqttConnectionErrorLogAlwaysSet -
+*/
+void AlarmManager::mqttConnectionErrorLogAlwaysSet(bool _mqttConnectionErrorLogAlways)
+{
+  semTake();
+  mqttConnectionErrorLogAlways = _mqttConnectionErrorLogAlways;
   semGive();
 }
 
@@ -324,6 +340,22 @@ void AlarmManager::badInputGet(int64_t* active, int64_t* raised, int64_t* releas
 
 /* ****************************************************************************
 *
+* AlarmManager::mqttConnectionErrorGet -
+*
+* NOTE
+*   To read values, no semaphore is used.
+*/
+void AlarmManager::mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released)
+{
+  *active    = mqttConnectionErrorV.size();
+  *raised    = mqttConnectionErrors;
+  *released  = mqttConnectionResets;
+}
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::notificationError - 
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -389,6 +421,77 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 
   return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::mqttConnectionError -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*
+* NOTE
+* The number of mqttConnectionErrors per endpoint is maintained in the map.
+* Right now that info is not used, but might be in the future.
+* To do so, we'd need another counter as well, to not forget the accumulated
+* number each time the notificationErrors are reset.
+*/
+bool AlarmManager::mqttConnectionError(const std::string& endpoint, const std::string& details)
+{
+  semTake();
+
+  std::map<std::string, int>::iterator iter = mqttConnectionErrorV.find(endpoint);
+
+  if (iter != mqttConnectionErrorV.end())  // Already exists - add to the 'url-specific' counter
+  {
+    iter->second += 1;
+
+    if (mqttConnectionErrorLogAlways)
+    {
+      LM_W(("Repeated MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+    }
+
+    semGive();
+    return false;
+  }
+
+  ++mqttConnectionErrors;
+
+  mqttConnectionErrorV[endpoint] = 1;
+  semGive();
+
+  LM_W(("Raising alarm MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::mqttConnectionReset -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
+bool AlarmManager::mqttConnectionReset(const std::string& endpoint)
+{
+  semTake();
+
+  if (mqttConnectionErrorV.find(endpoint) == mqttConnectionErrorV.end())  // Doesn't exist
+  {
+    semGive();
+    return false;
+  }
+
+  mqttConnectionErrorV.erase(endpoint);
+  ++mqttConnectionResets;
+  semGive();
+
+  LM_W(("Releasing alarm MqttConnectionError %s", endpoint.c_str()));
+
+  return true;
+}
+
 
 
 

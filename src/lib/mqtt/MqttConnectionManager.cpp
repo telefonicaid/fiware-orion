@@ -32,6 +32,7 @@
 
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -257,10 +258,10 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      // We block until the connect callback release the connection semaphore
      sem_wait(&cP->connectionSem);
 
-     // Check if the connection went ok
+     // Check if the connection went ok (if not, alarm is raised)
      if (cP->conectionResult)
      {
-       LM_W(("MQTT connection error for %s: %d (%s)", endpoint.c_str(), cP->conectionResult, mosquitto_connack_string(cP->conectionResult)));
+       alarmMgr.mqttConnectionError(endpoint, mosquitto_connack_string(cP->conectionResult));
 
        mosquitto_disconnect(cP->mosq);
        mosquitto_loop_stop(cP->mosq, false);
@@ -270,8 +271,9 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
        return cP;
      }
 
-     // If it went ok, it is included in the connection map
+     // If it went ok, it is included in the connection map (and alarm is released)
      LM_T(LmtMqttNotif, ("MQTT successfull connection for %s", endpoint.c_str()));
+     alarmMgr.mqttConnectionReset(endpoint);
 
      cP->lastTime = getCurrentTime();
      connections[endpoint] = cP;
