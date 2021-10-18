@@ -305,10 +305,260 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* parseCustomPayload -
+*
+* Both for HTTP and MQTT notifications
+*/
+static std::string parseCustomPayload
+(
+  ConnectionInfo*  ciP,
+  std::string*     payload,
+  bool*            includePayload,
+  const Value&     holder
+)
+{
+  if (isNull(holder, "payload"))
+  {
+    *includePayload = false;
+
+    // We initialize also payload in this case, although its value is irrelevant
+    *payload = "";
+  }
+  else
+  {
+    Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
+
+    if (!payloadOpt.ok())
+    {
+      return badInput(ciP, payloadOpt.error);
+    }
+
+    if (forbiddenChars(payloadOpt.value.c_str()))
+    {
+      return badInput(ciP, "forbidden characters in custom /payload/");
+    }
+
+    *includePayload = true;
+    *payload = payloadOpt.value;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttUrl -
+*/
+static std::string parseMqttUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<std::string> urlOpt = getStringMust(mqtt, "url", "url mqtt notification");
+
+  if (!urlOpt.ok())
+  {
+    return badInput(ciP, urlOpt.error);
+  }
+  if (!urlOpt.given)
+  {
+    return badInput(ciP, "mandatory mqtt field /url/");
+  }
+
+  if (forbiddenChars(urlOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt field /url/");
+  }
+
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+  if (!parseUrl(urlOpt.value, host, port, path, protocol))
+  {
+    return badInput(ciP, "invalid mqtt /url/");
+  }
+  if (protocol != "mqtt:")
+  {
+    return badInput(ciP, "http or https URL cannot be used in mqtt notifications");
+  }
+  if (path != "/")
+  {
+    return badInput(ciP, "path cannot be used in mqtt url, use topic instead");
+  }
+
+  subsP->notification.mqttInfo.url = urlOpt.value;
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttQoS -
+*/
+static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<int64_t> qosOpt = getInt64Opt(mqtt, "qos");
+  if (!qosOpt.ok())
+  {
+    return badInput(ciP, qosOpt.error);
+  }
+  if (qosOpt.given)
+  {
+    if ((qosOpt.value < 0) || (qosOpt.value > 2))
+    {
+      return badInput(ciP, "mqtt qos field must be an integer in the 0 to 2 range");
+    }
+    else
+    {
+      subsP->notification.mqttInfo.qos = qosOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.mqttInfo.qos = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttTopic -
+*/
+static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<std::string> topicOpt = getStringMust(mqtt, "topic", "topic mqtt notification");
+
+  if (!topicOpt.ok())
+  {
+    return badInput(ciP, topicOpt.error);
+  }
+  if (!topicOpt.given)
+  {
+    return badInput(ciP, "mandatory mqtt field /topic/");
+  }
+
+  if (topicOpt.value.empty())
+  {
+    return badInput(ciP, "empty mqtt field /topic/");
+  }
+
+  if (forbiddenMqttTopic(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "+ and # are not allowed in mqtt field /topic/");
+  }
+
+
+  if (forbiddenChars(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt field /topic/");
+  }
+
+  subsP->notification.mqttInfo.topic = topicOpt.value;
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseTimeout -
+*/
+static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& http)
+{
+  Opt<int64_t> timeoutOpt = getInt64Opt(http, "timeout");
+  if (!timeoutOpt.ok())
+  {
+    return badInput(ciP, timeoutOpt.error);
+  }
+  if (timeoutOpt.given)
+  {
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
+    {
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
+    }
+    else
+    {
+      subsP->notification.httpInfo.timeout = timeoutOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.httpInfo.timeout = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttAuth -
+*/
+static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  unsigned int howMany = 0;
+  subsP->notification.mqttInfo.providedAuth = false;
+
+  Opt<std::string> userOpt = getStringOpt(mqtt, "user", "user mqtt notification");
+  if (!userOpt.ok())
+  {
+    return badInput(ciP, userOpt.error);
+  }
+
+  // Note there is no forbidden chars checking for password. It is not needed: this
+  // field is never rendered in the JSON response API, so there is no risk of injection attacks
+  if (forbiddenChars(userOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in mqtt /user/");
+  }
+
+  if (userOpt.given)
+  {
+    subsP->notification.mqttInfo.user = userOpt.value;
+    howMany++;
+  }
+
+  Opt<std::string> passwdOpt = getStringOpt(mqtt, "passwd", "passwd mqtt notification");
+  if (!passwdOpt.ok())
+  {
+    return badInput(ciP, passwdOpt.error);
+  }
+  if (passwdOpt.given)
+  {
+    subsP->notification.mqttInfo.passwd = passwdOpt.value;
+    howMany++;
+  }
+
+  // howMany has to be either 0 (no auth no pass) or 2 (auth and passwd)
+  if (howMany == 1)
+  {
+    return badInput(ciP, "you must use user and passwd fields simultaneously");
+  }
+  else if (howMany == 2)
+  {
+    subsP->notification.mqttInfo.providedAuth = true;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
 {
+  std::string r;
+
   subsP->notificationProvided = true;
 
   if (!notification.IsObject())
@@ -316,14 +566,27 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     return badInput(ciP, "notification is not an object");
   }
 
-  // Callback
-  if (notification.HasMember("http") && notification.HasMember("httpCustom"))
+  // Check we have only one type
+  int n = 0;
+  if (notification.HasMember("http"))        n++;
+  if (notification.HasMember("httpCustom"))  n++;
+  if (notification.HasMember("mqtt"))        n++;
+  if (notification.HasMember("mqttCustom"))  n++;
+  if (n > 1)
   {
-    return badInput(ciP, "notification has http and httpCustom");
+    return badInput(ciP, "only one of http, httpCustom, mqtt or mqttCustom is allowed");
   }
-  else if (notification.HasMember("http"))
+  else if (n == 0)
+  {
+    return badInput(ciP, "http, httpCustom, mqtt or mqttCustom is missing");
+  }
+
+  // Callback
+  if (notification.HasMember("http"))
   {
     const Value& http = notification["http"];
+
+    subsP->notification.type = ngsiv2::HttpNotification;
 
     if (!http.IsObject())
     {
@@ -344,9 +607,24 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         return badInput(ciP, "forbidden characters in http field /url/");
       }
 
-      if (!validUrl(urlOpt.value))
+      // timeout
+      r = parseTimeout(ciP, subsP, http);
+      if (!r.empty())
+      {
+        return r;
+      }
+
+      std::string  host;
+      int          port;
+      std::string  path;
+      std::string  protocol;
+      if (!parseUrl(urlOpt.value, host, port, path, protocol))
       {
         return badInput(ciP, "Invalid URL parsing notification url");
+      }
+      if (protocol == "mqtt:")
+      {
+        return badInput(ciP, "mqtt URL cannot be used in http notifications");
       }
 
       subsP->notification.httpInfo.url    = urlOpt.value;
@@ -356,6 +634,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   else if (notification.HasMember("httpCustom"))
   {
     const Value& httpCustom = notification["httpCustom"];
+
+    subsP->notification.type = ngsiv2::HttpNotification;
 
     if (!httpCustom.IsObject())
     {
@@ -384,9 +664,17 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       //
       if (strstr(urlOpt.value.c_str(), "${") == NULL)
       {
-        if (!validUrl(urlOpt.value))
+        std::string  host;
+        int          port;
+        std::string  path;
+        std::string  protocol;
+        if (!parseUrl(urlOpt.value, host, port, path, protocol))
         {
           return badInput(ciP, "invalid custom /url/");
+        }
+        if (protocol == "mqtt:")
+        {
+          return badInput(ciP, "mqtt URL cannot be used in http notifications");
         }
       }
 
@@ -421,31 +709,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     // payload
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.httpInfo.payload,
+                           &subsP->notification.httpInfo.includePayload,
+                           httpCustom);
+    if (!r.empty())
     {
-      if (isNull(httpCustom, "payload"))
-      {
-        subsP->notification.httpInfo.includePayload = false;
-
-        // We initialize also httpInfo.payload in this case, although its value is irrelevant
-        subsP->notification.httpInfo.payload = "";
-      }
-      else
-      {
-        Opt<std::string> payloadOpt = getStringOpt(httpCustom, "payload", "payload httpCustom notification");
-
-        if (!payloadOpt.ok())
-        {
-          return badInput(ciP, payloadOpt.error);
-        }
-
-        if (forbiddenChars(payloadOpt.value.c_str()))
-        {
-          return badInput(ciP, "forbidden characters in custom /payload/");
-        }
-
-        subsP->notification.httpInfo.includePayload = true;
-        subsP->notification.httpInfo.payload = payloadOpt.value;
-      }
+      return r;
     }
 
     // qs
@@ -497,11 +767,107 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       }
     }
 
+    // timeout
+    r = parseTimeout(ciP, subsP, httpCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.httpInfo.custom = true;
   }
-  else  // missing callback field
+  else if (notification.HasMember("mqtt"))
   {
-    return badInput(ciP, "http notification is missing");
+    subsP->notification.type = ngsiv2::MqttNotification;
+
+    const Value& mqtt = notification["mqtt"];
+
+    if (!mqtt.IsObject())
+    {
+      return badInput(ciP, "mqtt notification is not an object");
+    }
+
+    // url
+    r = parseMqttUrl(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // user/pass
+    r = parseMqttAuth(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // qos
+    r = parseMqttQoS(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // topic
+    r = parseMqttTopic(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    subsP->notification.mqttInfo.custom = false;
+  }
+  else if (notification.HasMember("mqttCustom"))
+  {
+    subsP->notification.type = ngsiv2::MqttNotification;
+
+    const Value& mqttCustom = notification["mqttCustom"];
+
+    if (!mqttCustom.IsObject())
+    {
+      return badInput(ciP, "mqttCustom notification is not an object");
+    }
+
+    // url (same as in not custom mqtt)
+    r = parseMqttUrl(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // user/pass same as in not custom mqtt)
+    r = parseMqttAuth(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // qos (same as in not custom mqtt)
+    r = parseMqttQoS(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // topic (same as in not custom mqtt)
+    r = parseMqttTopic(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // payload
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.mqttInfo.payload,
+                           &subsP->notification.mqttInfo.includePayload,
+                           mqttCustom);
+
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    subsP->notification.mqttInfo.custom = true;
   }
 
   // Attributes

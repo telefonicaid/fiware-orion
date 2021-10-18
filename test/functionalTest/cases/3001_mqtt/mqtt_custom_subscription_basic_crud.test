@@ -1,0 +1,465 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT custom subcription basic crud errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create mqttCustom sub with default qos, with payload
+# 02. Create mqttCustom sub with explicit qos, with payload
+# 03. Create mqttCustom sub with default qos, without payload
+# 04. Create mqttCustom sub with explicit qos, without payload
+# 05. Create mqttCustom sub with default qos, with null payload
+# 06. Create mqttCustom sub with explicit qos, with null payload
+# 07. Get subs
+#
+
+echo "01. Create mqtt sub with default qos, with payload"
+echo "=================================================="
+payload='{
+  "description": "MQTT sub default QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}",
+      "payload": "temperature:${temperature}"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create mqtt sub with explicit qos, with payload"
+echo "==================================================="
+payload='{
+  "description": "MQTT sub explicit QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}",
+      "payload": "temperature:${temperature}",
+      "qos": 2
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create mqtt sub with default qos, without payload"
+echo "====================================================="
+payload='{
+  "description": "MQTT sub default QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create mqtt sub with explicit qos, without payload"
+echo "======================================================"
+payload='{
+  "description": "MQTT sub explicit QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}",
+      "qos": 2
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create mqtt sub with default qos, with null payload"
+echo "======================================================="
+payload='{
+  "description": "MQTT sub default QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}",
+      "payload": null
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create mqtt sub with explicit qos, with null payload"
+echo "========================================================"
+payload='{
+  "description": "MQTT sub explicit QoS",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion/${dest}",
+      "payload": null,
+      "qos": 2
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Get subs"
+echo "============"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create mqtt sub with default qos, with payload
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create mqtt sub with explicit qos, with payload
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create mqtt sub with default qos, without payload
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create mqtt sub with explicit qos, without payload
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create mqtt sub with default qos, with null payload
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create mqtt sub with explicit qos, with null payload
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Get subs
+============
+HTTP/1.1 200 OK
+Content-Length: 2062
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "MQTT sub default QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "payload": "temperature:${temperature}",
+                "qos": 0,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub explicit QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "payload": "temperature:${temperature}",
+                "qos": 2,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub default QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "qos": 0,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub explicit QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "qos": 2,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub default QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "payload": null,
+                "qos": 0,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub explicit QoS",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "mqttCustom": {
+                "payload": null,
+                "qos": 2,
+                "topic": "/orion/${dest}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

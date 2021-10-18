@@ -226,8 +226,8 @@ class NotifierMock : public Notifier
      */
   }
 
-  MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
-                                              const ngsiv2::HttpInfo&          httpInfo,
+  MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&           ncr,
+                                              const ngsiv2::Notification&      notification,
                                               const std::string&               tenant,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
@@ -239,7 +239,7 @@ class NotifierMock : public Notifier
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
     void parent_sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                         const ngsiv2::HttpInfo&          httpInfo,
+                                         const ngsiv2::Notification&      notification,
                                          const std::string&               tenant,
                                          const std::string&               xauthToken,
                                          const std::string&               fiwareCorrelator,
@@ -250,7 +250,7 @@ class NotifierMock : public Notifier
                                          const std::vector<std::string>&  metadataFilter)
     {
       Notifier::sendNotifyContextRequest(ncr,
-                                         httpInfo,
+                                         notification,
                                          tenant,
                                          xauthToken,
                                          fiwareCorrelator,

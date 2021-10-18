@@ -26,7 +26,7 @@
 * Author: Fermín Galán
 */
 
-
+#include <string>
 
 /* ***************************************************************************
 *
@@ -106,6 +106,7 @@
 #define CSUB_STATUS                  "status"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
+#define CSUB_TIMEOUT                 "timeout"
 #define CSUB_METHOD                  "method"
 #define CSUB_HEADERS                 "headers"
 #define CSUB_QS                      "qs"
@@ -117,6 +118,12 @@
 #define CSUB_LASTSUCCESS             "lastSuccess"
 #define CSUB_LASTSUCCESSCODE         "lastSuccessCode"
 
+#define CSUB_MQTTTOPIC               "topic"
+#define CSUB_MQTTQOS                 "qos"
+
+#define CSUB_USER                    "user"
+#define CSUB_PASSWD                  "passwd"
+
 
 
 /* ****************************************************************************
@@ -126,5 +133,14 @@
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 #define STATUS_ONESHOT       "oneshot"
+
+
+
+/* ****************************************************************************
+*
+* Attribute update operators (except $addToSet and $pullAll, which are special ones)
+*/
+#define UPDATE_OPERATORS_NUMBER 6
+const std::string UPDATE_OPERATORS[UPDATE_OPERATORS_NUMBER] = { "$inc", "$min", "$max", "$mul", "$push", "$pull" };
 
 #endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

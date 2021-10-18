@@ -83,13 +83,13 @@ static void setExpiration(const SubscriptionUpdate& subUp, const orion::BSONObj&
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setNotificationInfo -
 */
-static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setNotificationInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
   if (subUp.notificationProvided)
   {
-    setHttpInfo(subUp, b);
+    setNotificationInfo(subUp, b);
   }
   else
   {
@@ -102,6 +102,14 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
     LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
+
+    if (subOrig.hasField(CSUB_TIMEOUT))
+    {
+      long long timeout = getIntOrLongFieldAsLongF(subOrig, CSUB_TIMEOUT);
+
+      b->append(CSUB_TIMEOUT, timeout);
+      LM_T(LmtMongo, ("Subscription timeout:   %lu", timeout));
+    }
 
     if (subOrig.hasField(CSUB_METHOD))
     {
@@ -133,6 +141,38 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
       b->append(CSUB_PAYLOAD, payload);
       LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_MQTTTOPIC))
+    {
+      std::string topic = getStringFieldF(subOrig, CSUB_MQTTTOPIC);
+
+      b->append(CSUB_MQTTTOPIC, topic);
+      LM_T(LmtMongo, ("Subscription mqttTopic: %s", topic.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_MQTTQOS))
+    {
+      int qos = getIntFieldF(subOrig, CSUB_MQTTQOS);
+
+      b->append(CSUB_MQTTQOS, qos);
+      LM_T(LmtMongo, ("Subscription mqttQos:   %d", qos));
+    }
+
+    if (subOrig.hasField(CSUB_USER))
+    {
+      std::string user = getStringFieldF(subOrig, CSUB_USER);
+
+      b->append(CSUB_USER, user);
+      LM_T(LmtMongo, ("Subscription user:   %s", user.c_str()));
+    }
+
+    if (subOrig.hasField(CSUB_PASSWD))
+    {
+      std::string passwd = getStringFieldF(subOrig, CSUB_PASSWD);
+
+      b->append(CSUB_PASSWD, passwd);
+      LM_T(LmtMongo, ("Subscription passwd:   *****"));
     }
   }
 }
@@ -814,7 +854,7 @@ std::string mongoUpdateSubscription
   }
 
   setExpiration(subUp, subOrig, &b);
-  setHttpInfo(subUp, subOrig, &b);
+  setNotificationInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
   setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);

@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 実装ノート (NGSIv2 Implementation Notes)
 
 * [禁止されている文字](#forbidden-characters)
+* [属性値の更新演算子](#update-operators-for-attribute-values)
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
@@ -16,7 +17,9 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
+* [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
@@ -41,6 +44,29 @@ Orion に適用される追加の制限事項は、マニュアルの [禁止さ
 NGSIv2 仕様で定義されているもの以外の特別な属性タイプ) を使用できることに注意してください。
 ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性がある
 ため、自己責任で使用してください!
+
+[トップ](#top)
+
+<a name="update-operators-for-attribute-values"></a>
+
+## 属性値の更新演算子
+
+一部の属性値の更新には、NGSIv2 仕様で説明されているもの以外に特別なセマンティクスが
+あります。特に、このようなリクエストを行うことができます:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+これは、*"属性Aの値を3増やす"* ことを意味します。
+
+この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
+アプリケーションの競合状態を回避するために役立ちます。
+詳細は[このドキュメント](update_operators.md)を参照してください。
 
 [トップ](#top)
 
@@ -293,6 +319,15 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="mqtt-notificationsmqtt-notificationsmqtt-notifications"></a>
+## MQTT 通知
+
+NGISv2 仕様で説明されているサブスクリプションの `notification` オブジェクト内の `http` および
+`httpCustom` フィールドとは別に、Orion は MQTT 通知用の `mqtt` および `mqttCustom` もサポートして
+います。このトピックは、[この特定のドキュメント](mqtt_notifications.md)でより詳細に説明されています。
+
+[トップ](#top)
+
 <a name="notify-only-attributes-that-change"></a>
 ## 変更された属性のみを通知
 
@@ -305,6 +340,15 @@ Orion は、NGSIv2 仕様で説明されているものとは別に、サブス�
 例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
 A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
 が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
+<a name="timeout-subscriptions-option"></a>
+## `timeout` サブスクリプション・オプション
+
+`GET/v2/subscriptions` および `GET/v2/subsets/subId` リクエストの NGSIv2 仕様で説明されているサブスクリプションフィールドとは別に、Orion は `http` または `httpCustom` フィールド内の `timeout` 追加パラメータをサポートします。このフィールドは、HTTP 通知を使用するときにサブスクリプションがレスポンスを待機する最大時間をミリ秒単位で指定します。
+
+このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に設定されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](../admin/cli.md#command-line-options)のセクションを参照してください。
 
 [トップ](#top)
 
@@ -402,7 +446,7 @@ CPrs への転送をスキップするために、クエリで `skipForwarding` 
 `GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
 されます。
 
-`skipForwarding` を転送しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
+`skipForwarding` を更新しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
 セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)

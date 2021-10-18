@@ -103,6 +103,7 @@
 #include "contextBroker/version.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
@@ -200,6 +201,8 @@ double          fcGauge;
 unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
+int             mqttMaxAge;
+
 
 
 /* ****************************************************************************
@@ -265,6 +268,7 @@ unsigned long   fcMaxInterval;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define MQTT_MAX_AGE_DESC      "max time (in seconds) that an unused MQTT connection is kept, default: 3600"
 
 
 
@@ -279,77 +283,79 @@ unsigned long   fcMaxInterval;
 */
 PaArgument paArgs[] =
 {
-  { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,             FG_DESC                      },
-  { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,             LOCALIP_DESC                 },
-  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,             PORT_DESC                    },
-  { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,             PIDPATH_DESC                 },
+  { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,                  FG_DESC                      },
+  { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,                  LOCALIP_DESC                 },
+  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,                  PORT_DESC                    },
+  { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
-  { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,             DBHOST_DESC                  },
-  { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,             RPLSET_DESC                  },
-  { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBUSER_DESC                  },
-  { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBPASSWORD_DESC              },
+  { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
+  { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
+  { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
+  { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBPASSWORD_DESC              },
 
-  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHMECH_DESC              },
-  { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,             DBAUTHDB_DESC                },
-  { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,             DBSSL_DESC                   },
-  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,             DBDISABLERETRYWRITES_DESC    },
+  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHMECH_DESC              },
+  { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHDB_DESC                },
+  { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,                  DBSSL_DESC                   },
+  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
 
-  { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,             DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,         DB_TMO_DESC                  },
-  { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,            DBPS_DESC                    },
+  { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
+  { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
 
-  { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,             USEIPV4_DESC                 },
-  { "-ipv6",                        &useOnlyIPv6,           "USEIPV6",                  PaBool,   PaOpt, false,                           false, true,             USEIPV6_DESC                 },
-  { "-harakiri",                    &harakiri,              "HARAKIRI",                 PaBool,   PaHid, false,                           false, true,             HARAKIRI_DESC                },
+  { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
+  { "-ipv6",                        &useOnlyIPv6,           "USEIPV6",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV6_DESC                 },
+  { "-harakiri",                    &harakiri,              "HARAKIRI",                 PaBool,   PaHid, false,                           false, true,                  HARAKIRI_DESC                },
 
-  { "-https",                       &https,                 "HTTPS",                    PaBool,   PaOpt, false,                           false, true,             HTTPS_DESC                   },
-  { "-key",                         httpsKeyFile,           "HTTPS_KEYFILE",            PaString, PaOpt, _i "",                           PaNL,  PaNL,             HTTPSKEYFILE_DESC            },
-  { "-cert",                        httpsCertFile,          "HTTPS_CERTFILE",           PaString, PaOpt, _i "",                           PaNL,  PaNL,             HTTPSCERTFILE_DESC           },
+  { "-https",                       &https,                 "HTTPS",                    PaBool,   PaOpt, false,                           false, true,                  HTTPS_DESC                   },
+  { "-key",                         httpsKeyFile,           "HTTPS_KEYFILE",            PaString, PaOpt, _i "",                           PaNL,  PaNL,                  HTTPSKEYFILE_DESC            },
+  { "-cert",                        httpsCertFile,          "HTTPS_CERTFILE",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  HTTPSCERTFILE_DESC           },
 
-  { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,             MULTISERVICE_DESC            },
+  { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,                  MULTISERVICE_DESC            },
 
-  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    UINT_MAX,         HTTP_TMO_DESC                },
-  { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,             REQ_TMO_DESC                 },
-  { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,             MUTEX_POLICY_DESC            },
-  { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                WRITE_CONCERN_DESC           },
+  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
+  { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
+  { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
+  { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
 
-  { "-corsOrigin",                  allowedOrigin,          "CORS_ALLOWED_ORIGIN",      PaString, PaOpt, _i "",                           PaNL,  PaNL,             ALLOWED_ORIGIN_DESC          },
-  { "-corsMaxAge",                  &maxAge,                "CORS_MAX_AGE",             PaInt,    PaOpt, 86400,                           -1,    86400,            CORS_MAX_AGE_DESC            },
-  { "-cprForwardLimit",             &cprForwardLimit,       "CPR_FORWARD_LIMIT",        PaUInt,   PaOpt, 1000,                            0,     UINT_MAX,         CPR_FORWARD_LIMIT_DESC       },
-  { "-subCacheIval",                &subCacheInterval,      "SUBCACHE_IVAL",            PaInt,    PaOpt, 60,                              0,     3600,             SUB_CACHE_IVAL_DESC          },
-  { "-noCache",                     &noCache,               "NOCACHE",                  PaBool,   PaOpt, false,                           false, true,             NO_CACHE                     },
-  { "-connectionMemory",            &connectionMemory,      "CONN_MEMORY",              PaUInt,   PaOpt, 64,                              0,     1024,             CONN_MEMORY_DESC             },
-  { "-maxConnections",              &maxConnections,        "MAX_CONN",                 PaUInt,   PaOpt, 1020,                            1,     PaNL,             MAX_CONN_DESC                },
-  { "-reqPoolSize",                 &reqPoolSize,           "TRQ_POOL_SIZE",            PaUInt,   PaOpt, 0,                               0,     1024,             REQ_POOL_SIZE                },
+  { "-corsOrigin",                  allowedOrigin,          "CORS_ALLOWED_ORIGIN",      PaString, PaOpt, _i "",                           PaNL,  PaNL,                  ALLOWED_ORIGIN_DESC          },
+  { "-corsMaxAge",                  &maxAge,                "CORS_MAX_AGE",             PaInt,    PaOpt, 86400,                           -1,    86400,                 CORS_MAX_AGE_DESC            },
+  { "-cprForwardLimit",             &cprForwardLimit,       "CPR_FORWARD_LIMIT",        PaUInt,   PaOpt, 1000,                            0,     UINT_MAX,              CPR_FORWARD_LIMIT_DESC       },
+  { "-subCacheIval",                &subCacheInterval,      "SUBCACHE_IVAL",            PaInt,    PaOpt, 60,                              0,     3600,                  SUB_CACHE_IVAL_DESC          },
+  { "-noCache",                     &noCache,               "NOCACHE",                  PaBool,   PaOpt, false,                           false, true,                  NO_CACHE                     },
+  { "-connectionMemory",            &connectionMemory,      "CONN_MEMORY",              PaUInt,   PaOpt, 64,                              0,     1024,                  CONN_MEMORY_DESC             },
+  { "-maxConnections",              &maxConnections,        "MAX_CONN",                 PaUInt,   PaOpt, 1020,                            1,     PaNL,                  MAX_CONN_DESC                },
+  { "-reqPoolSize",                 &reqPoolSize,           "TRQ_POOL_SIZE",            PaUInt,   PaOpt, 0,                               0,     1024,                  REQ_POOL_SIZE                },
 
-  { "-inReqPayloadMaxSize",         &inReqPayloadMaxSize,   "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE, 0,     PaNL,             IN_REQ_PAYLOAD_MAX_SIZE_DESC },
-  { "-outReqMsgMaxSize",            &outReqMsgMaxSize,      "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,    0,     PaNL,             OUT_REQ_MSG_MAX_SIZE_DESC    },
+  { "-inReqPayloadMaxSize",         &inReqPayloadMaxSize,   "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE, 0,     PaNL,                  IN_REQ_PAYLOAD_MAX_SIZE_DESC },
+  { "-outReqMsgMaxSize",            &outReqMsgMaxSize,      "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,    0,     PaNL,                  OUT_REQ_MSG_MAX_SIZE_DESC    },
 
-  { "-notificationMode",            &notificationMode,      "NOTIF_MODE",               PaString, PaOpt, _i "transient",                  PaNL,  PaNL,             NOTIFICATION_MODE_DESC       },
-  { "-notifFlowControl",            &notifFlowControl,      "NOTIF_FLOW_CONTROL",       PaString, PaOpt, _i "",                           PaNL,  PaNL,             FLOW_CONTROL_DESC            },
-  { "-simulatedNotification",       &simulatedNotification, "DROP_NOTIF",               PaBool,   PaOpt, false,                           false, true,             SIMULATED_NOTIF_DESC         },
+  { "-notificationMode",            &notificationMode,      "NOTIF_MODE",               PaString, PaOpt, _i "transient",                  PaNL,  PaNL,                  NOTIFICATION_MODE_DESC       },
+  { "-notifFlowControl",            &notifFlowControl,      "NOTIF_FLOW_CONTROL",       PaString, PaOpt, _i "",                           PaNL,  PaNL,                  FLOW_CONTROL_DESC            },
+  { "-simulatedNotification",       &simulatedNotification, "DROP_NOTIF",               PaBool,   PaOpt, false,                           false, true,                  SIMULATED_NOTIF_DESC         },
 
-  { "-statCounters",                &statCounters,          "STAT_COUNTERS",            PaBool,   PaOpt, false,                           false, true,             STAT_COUNTERS                },
-  { "-statSemWait",                 &statSemWait,           "STAT_SEM_WAIT",            PaBool,   PaOpt, false,                           false, true,             STAT_SEM_WAIT                },
-  { "-statTiming",                  &statTiming,            "STAT_TIMING",              PaBool,   PaOpt, false,                           false, true,             STAT_TIMING                  },
-  { "-statNotifQueue",              &statNotifQueue,        "STAT_NOTIF_QUEUE",         PaBool,   PaOpt, false,                           false, true,             STAT_NOTIF_QUEUE             },
+  { "-statCounters",                &statCounters,          "STAT_COUNTERS",            PaBool,   PaOpt, false,                           false, true,                  STAT_COUNTERS                },
+  { "-statSemWait",                 &statSemWait,           "STAT_SEM_WAIT",            PaBool,   PaOpt, false,                           false, true,                  STAT_SEM_WAIT                },
+  { "-statTiming",                  &statTiming,            "STAT_TIMING",              PaBool,   PaOpt, false,                           false, true,                  STAT_TIMING                  },
+  { "-statNotifQueue",              &statNotifQueue,        "STAT_NOTIF_QUEUE",         PaBool,   PaOpt, false,                           false, true,                  STAT_NOTIF_QUEUE             },
 
-  { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC             },
-  { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,             RELOGALARMS_DESC             },
+  { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD,      LOG_SUMMARY_DESC             },
+  { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,                  RELOGALARMS_DESC             },
 
-  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,             CHECK_v1_ID_DESC             },
-  { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,             DISABLE_CUSTOM_NOTIF         },
+  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,                  CHECK_v1_ID_DESC             },
+  { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,                  DISABLE_CUSTOM_NOTIF         },
 
-  { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,             DISABLE_FILE_LOG             },
-  { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,             LOG_FOR_HUMANS_DESC          },
-  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,             LOG_LINE_MAX_SIZE_DESC       },
-  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,             LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+  { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
+  { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,                  LOG_FOR_HUMANS_DESC          },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
-  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,             METRICS_DESC                 },
+  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  METRICS_DESC                 },
 
-  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
+  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF               },
 
-  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,             NGSIV1_AUTOCAST              },
+  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST              },
+
+  { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 3600,                            PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 
   PA_END_OF_ARGS
 };
@@ -572,10 +578,29 @@ void exitFunc(void)
     }
   }
 
+  mqttMgr.release();
+  
   curl_context_cleanup();
   curl_global_cleanup();
 
 #ifdef DEBUG
+  // valgrind pass is done using DEBUG compilation, so we have to take care with
+  // the cache releasing to avoid false positives. In production this is not really
+  // needed
+
+  if (subCacheState == ScsSynchronizing)
+  {
+    //
+    // Subscription Cache is busy doing a synchronization.
+    // Two secs should be enough for it to finish.
+    //
+    // Not very important anyway. This 'hack' is just to avoid
+    // false leaks in the valgrind test suite.
+    //
+    LM_W(("Subscription cache is synchronizing, wait a few seconds before dying"));
+    sleep(2);
+  }
+
   // Take mongo req-sem ?
   LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
@@ -1115,7 +1140,7 @@ int main(int argC, char* argV[])
                         &serviceV,
                         &serviceQueueSizeV,
                         &serviceNumThreadV);
-  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, service with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, services with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
 
   if ((strcmp(notifFlowControl, "") != 0) && (strcmp(notificationMode, "threadpool") != 0))
   {
@@ -1171,6 +1196,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
+  mqttMgr.init();
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
@@ -1213,8 +1239,13 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    // FIXME P3: we suspect that loadFile() is not working well as it doesn't include the
+    // char terminator \0 at the end, thus causing valgrind errors. Using calloc will ensure
+    // that all the buffer is initialized with \0, thus avoiding the problem, although it would
+    // be better to fix loadFile()
+    // See issue https://github.com/telefonicaid/fiware-orion/issues/3925 for more detail
+    char* httpsPrivateServerKey = (char*) calloc(2048, 1);
+    char* httpsCertificate      = (char*) calloc(2048, 1);
 
     if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
     {
@@ -1268,6 +1299,11 @@ int main(int argC, char* argV[])
 
   while (1)
   {
-    sleep(60);
+    // At the present moment, this is the only one periodic process we need to do
+    // If some other is introduced in the future, this part should be adapted.
+    // Note that the cache refresh process runs in its own thread (as it can be
+    // disabled with the -noCache switch)
+    sleep(mqttMaxAge);
+    mqttMgr.cleanup(mqttMaxAge);
   }
 }

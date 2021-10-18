@@ -245,7 +245,7 @@ MESSAGE("unitTest distro: '${DISTRO}'")
 
 IF(${DISTRO} MATCHES "CentOS_6.*")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-ELSEIF((${DISTRO} MATCHES "Debian_8.*") OR (${DISTRO} MATCHES "Debian_9.*"))
+ELSEIF((${DISTRO} MATCHES "Debian_8.*") OR (${DISTRO} MATCHES "Debian_9.*") OR (${DISTRO} MATCHES "Debian_10.*") OR (${DISTRO} MATCHES "Debian_11.*"))
   # It seems that Debian 8.x/9.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "Debian_.*")

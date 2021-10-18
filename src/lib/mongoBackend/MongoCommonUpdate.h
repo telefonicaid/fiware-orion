@@ -32,6 +32,8 @@
 #include "orionTypes/UpdateActionType.h"
 #include "ngsi10/UpdateContextResponse.h"
 
+#define MONGODB_ERROR_DUPLICATE_KEY  "duplicate key"
+#define MONGODB_ERROR_WRONGJSON      "Can't extract geo keys"
 
 
 /* ****************************************************************************

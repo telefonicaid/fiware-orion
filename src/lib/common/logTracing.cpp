@@ -36,14 +36,16 @@
 void logInfoNotification
 (
   const char*  subId,
+  const char*  protocol,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
   int          rc
 )
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoNotification(subId, verb, url, buffer);
+  logInfoNotification(subId, protocol, endpoint, verb, resource, buffer);
 }
 
 
@@ -55,12 +57,21 @@ void logInfoNotification
 void logInfoNotification
 (
   const char*  subId,
+  const char*  protocol,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
   const char*  rc
 )
 {
-  LM_I(("Notif delivered (subId: %s): %s %s, response code: %s", subId, verb, url, rc));
+  if (strncmp(protocol, "mqtt:", strlen("mqtt:")) == 0)
+  {
+    LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s", subId, endpoint, resource));
+  }
+  else
+  {
+    LM_I(("Notif delivered (subId: %s): %s %s%s, response code: %s", subId, verb, endpoint, resource, rc));
+  }
 }
 
 

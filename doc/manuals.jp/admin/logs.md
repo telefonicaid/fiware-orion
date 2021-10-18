@@ -127,6 +127,12 @@ time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df
 time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
 ```
 
+* MQTT 通知の場合、上記のトレースの `msg` フィールドはわずかに異なります:
+
+```
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2
+```
+
 * [コンテキスト・プロバイダ](../user/context_providers.md) (クエリまたは更新) にフォワードされたリクエスト
   ごとに、Orion は次のようなトレースを表示します。Orion は、クライアント・リクエストに関連付けられた
   "root correlator" に `cbfwd=` サフィックスを追加することに注意してください (この例では、クライアント・

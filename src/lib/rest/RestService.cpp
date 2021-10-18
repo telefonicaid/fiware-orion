@@ -52,6 +52,16 @@
 #include "rest/RestService.h"
 
 
+/*****************************************************************************
+*
+* raisedAlarm -
+*
+* raisedAlarm is a variable is used when a BadInput alaarm is raised
+*
+*/
+__thread bool raisedAlarm = true;
+
+
 
 /* ****************************************************************************
 *
@@ -520,7 +530,7 @@ static bool compErrorDetect
 * This function is called with the appropriate RestService vector, depending on the VERB used in the request.
 * If no matching service is found in this RestService vector, then a recursive call in made, using the "badVerb RestService vector",
 * to see if we have a matching bad-verb-service-routine.
-* If there is no badVerb RestService vector, then the "default error service routine "badRequest" is used.
+* If there is no badVerb RestService vector, then the default error service routine (BadRequest) is used.
 * And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
 * response. See comments incrusted in the function as well.
 */
@@ -686,6 +696,17 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+    //
+    // If we have gotten this far the Input is OK.
+    // Except for all the badVerb/badRequest, in the restBadVerbV vector.
+    //
+    // So, the 'Bad Input' alarm is cleared for this client.
+    //
+    //
+    if ((serviceV != restBadVerbV) && (!raisedAlarm))
+    {
+      alarmMgr.badInputReset(clientIp);
+    }
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
@@ -742,21 +763,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  answer;
 
   restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
-  alarmMgr.badInput(clientIp, details);
+  raisedAlarm = alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
-
-  bool raisedAlarm;
-
-  if (alarmMgr.badInput(clientIp, details))
-  {
-    raisedAlarm = true;
-  }
-
-  if (serviceV != restBadVerbV && (!raisedAlarm))
-  {
-    alarmMgr.badInputReset(clientIp);
-  }
-
 
   restReply(ciP, answer);
 

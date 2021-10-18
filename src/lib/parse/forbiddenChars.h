@@ -58,4 +58,12 @@ extern bool forbiddenIdCharsV2(const char* s, const char* exceptions = NULL);
 */
 extern bool forbiddenQuotes(char* s);
 
+
+
+/* ****************************************************************************
+*
+* forbiddenMqttTopic -
+*/
+extern bool forbiddenMqttTopic(const char* s);
+
 #endif  // SRC_LIB_PARSE_FORBIDDENCHARS_H_

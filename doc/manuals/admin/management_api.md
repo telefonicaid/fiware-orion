@@ -101,6 +101,9 @@ The response is a listing of information of all the broker's semaphores:
     "metrics": {
         "status": "free"
      },
+    "mqttMgr": {
+        "status": "free"
+     },
     "request": {
         "status": "free"
     },
@@ -124,6 +127,7 @@ Short explanation of the semaphores:
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
 * **metrics**, protects internal data of the Metrics Manager
+* **mqttMgr**, protects the data of MTTQ connections manager
 * **request**, makes sure there are not two simultaneous requests to mongodb 
 * **subCache**, protects the Subscription Cache
 * **timeStat**, protects the data for timing statistics

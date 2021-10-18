@@ -303,7 +303,7 @@ The other three parameters (`-reqTimeout`, `-maxConnections` and `-connectionMem
 Orion is a multithread process. With default starting parameters and in idle state (i.e. no load),
 Orion consumes 4 threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
 * Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
@@ -342,7 +342,7 @@ There are two pools that can be configured independently:
 
 Using both parameters, in any situation (either idle or busy) Orion consumes a fixed number of threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
 * `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
@@ -467,8 +467,10 @@ In the second case, it means there are workers in the pool that cannot take on n
 In the case of queries/updates forwarded to context providers, the effect is that the original client will take a long time
 to get the answer. In fact, some clients may give up and close the connection.
 
-In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion should wait for
-outgoing HTTP connections, overriding the default operating system timeout.
+In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion 
+should wait for outgoing HTTP connections, overriding the default operating system timeout. Note that this 
+parameter can be defined individually for subscriptions. If `timeout` is defined on the subscription's 
+JSON, the default parameter would be ignored.
 
 [Top](#top)
 

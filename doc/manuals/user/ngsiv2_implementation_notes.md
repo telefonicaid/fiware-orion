@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Forbidden characters](#forbidden-characters)
+* [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
@@ -16,7 +17,9 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot Subscription](#oneshot-subscriptions)
 * [Custom notifications without payload](#custom-notifications-without-payload)
+* [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
@@ -44,6 +47,27 @@ Note that you can use "TextUnrestricted" attribut type (and special attribute ty
 the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
 in the attribute value. However, it could have security implications (possible script
 injections attacks) so use it at your own risk!
+
+[Top](#top)
+
+## Update operators for attribute values
+
+Some attribute value updates has special semantics, beyond the ones described in the
+NGSIv2 specification. In particular we can do requests like this one:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+which means *"increase the value of attribute A by 3"*.
+
+This functionality is usefeul to reduce the complexity of applications and avoid
+race conditions in applications that access simultaneously to the same piece of
+context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
 
@@ -322,6 +346,14 @@ the notification will be sent using the NGSIv2 normalized format.
 
 [Top](#top)
 
+## MQTT notifications
+
+Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
+in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
+topic is described with more detail [in this specific document](mqtt_notifications.md).
+
+[Top](#top)
+
 ## Notify only attributes that change
 
 Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
@@ -332,6 +364,19 @@ update request, in combination with the `attrs` or `exceptAttrs` field.
 For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
 update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
 if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
+
+[Top](#top)
+
+## `timeout` subscriptions option
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
+field. This field specifies the maximum time the subscription waits for the response when using HTTP
+notifications in milliseconds.
+
+The maximum value allowed for this parameter is 1800000 (30 minutes). If 
+`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
+[Command line options](../admin/cli.md#command-line-options) for more details.
 
 [Top](#top)
 
@@ -429,7 +474,7 @@ not have been migrated yet to NGSIv2, so this mode may prove useful.
 You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
 forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
 
-Note that in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
+Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
 just use an update request with append/creation semantics).
 
 [Top](#top)

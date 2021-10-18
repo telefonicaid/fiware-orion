@@ -54,7 +54,13 @@
 * ContextAttribute::bsonAppendAttrValue -
 *
 */
-void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
+void ContextAttribute::bsonAppendAttrValue
+(
+  const std::string&      valueKey,
+  orion::BSONObjBuilder*  bsonAttr,
+  const std::string&      attrType,
+  bool                    autocast
+) const
 {
   std::string effectiveStringValue = stringValue;
   bool        effectiveBoolValue   = boolValue;
@@ -103,19 +109,19 @@ void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, cons
   switch (effectiveValueType)
   {
     case orion::ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, effectiveStringValue);
+      bsonAttr->append(valueKey, effectiveStringValue);
       break;
 
     case orion::ValueTypeNumber:
-      bsonAttr.append(ENT_ATTRS_VALUE, effectiveNumberValue);
+      bsonAttr->append(valueKey, effectiveNumberValue);
       break;
 
     case orion::ValueTypeBoolean:
-      bsonAttr.append(ENT_ATTRS_VALUE, effectiveBoolValue);
+      bsonAttr->append(valueKey, effectiveBoolValue);
       break;
 
     case orion::ValueTypeNull:
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      bsonAttr->appendNull(valueKey);
       break;
 
     case orion::ValueTypeNotGiven:
@@ -133,13 +139,19 @@ void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, cons
 *
 * ContextAttribute::valueBson -
 *
-* Used to render attribute value to BSON, appended into the bsonAttr builder
 */
-void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
+void ContextAttribute::valueBson
+(
+  const std::string&      valueKey,
+  orion::BSONObjBuilder*  bsonAttr,
+  const std::string&      attrType,
+  bool                    autocast,
+  bool                    strings2numbers
+) const
 {
   if (compoundValueP == NULL)
   {
-    bsonAppendAttrValue(bsonAttr, attrType, autocast);
+    bsonAppendAttrValue(valueKey, bsonAttr, attrType, autocast);
   }
   else
   {
@@ -147,34 +159,34 @@ void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::str
     {
       orion::BSONArrayBuilder b;
       compoundValueBson(compoundValueP->childV, b, strings2numbers);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
+      bsonAttr->append(valueKey, b.arr());
     }
     else if (compoundValueP->valueType == orion::ValueTypeObject)
     {
       orion::BSONObjBuilder b;
 
       compoundValueBson(compoundValueP->childV, b, strings2numbers);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
+      bsonAttr->append(valueKey, b.obj());
     }
     else if (compoundValueP->valueType == orion::ValueTypeString)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->stringValue);
+      bsonAttr->append(valueKey, compoundValueP->stringValue);
     }
     else if (compoundValueP->valueType == orion::ValueTypeNumber)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->numberValue);
+      bsonAttr->append(valueKey, compoundValueP->numberValue);
     }
     else if (compoundValueP->valueType == orion::ValueTypeBoolean)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->boolValue);
+      bsonAttr->append(valueKey, compoundValueP->boolValue);
     }
     else if (compoundValueP->valueType == orion::ValueTypeNull)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      bsonAttr->appendNull(valueKey);
     }
     else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
     {
@@ -1137,7 +1149,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
+  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
   }

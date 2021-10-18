@@ -1,0 +1,258 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT notification QoS tests
+
+--SHELL-INIT--
+dbInit CB
+
+# tracelevel 163 is the one for MQTT notification logs
+brokerStart CB 163 IPV4
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+
+--SHELL--
+
+#
+# 01. Create MQTT sub for entity E with topic sub0 and qos=0
+# 02. Create MQTT sub for entity E with topic sub1 and qos=1
+# 03. Create MQTT sub for entity E with topic sub2 and qos=2
+# 04. Create entity E with A=1
+# 05. Dump and reset accumulator, see E A=1 in: 1 MQTT sub0, 1 MQTT sub1, 1 MQTT sub2
+# 06. Check log and see a trace for each qos possibility
+#
+
+echo "01. Create MQTT sub for entity E with topic sub0 and qos=0"
+echo "=========================================================="
+payload='{
+  "description": "MQTT sub on topic sub0",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub0",
+      "qos": 0
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create MQTT sub for entity E with topic sub1 and qos=1"
+echo "=========================================================="
+payload='{
+  "description": "MQTT sub on topic sub1",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub1",
+      "qos": 1
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create MQTT sub for entity E with topic sub2 and qos=2"
+echo "=========================================================="
+payload='{
+  "description": "MQTT sub on topic sub2",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub2",
+      "qos": 2
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E with A=1"
+echo "============================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of MQTT notifications
+# due to the lock in accumulator-server.py?
+sleep 0.5s
+
+
+echo "05. Dump and reset accumulator, see E A=1 in: 1 MQTT sub0, 1 MQTT sub1, 1 MQTT sub2"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Check log and see a trace for each qos possibility"
+echo "======================================================"
+cat /tmp/contextBroker.log | grep "with qos" | awk -F 'msg=' '{print $2}' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create MQTT sub for entity E with topic sub0 and qos=0
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create MQTT sub for entity E with topic sub1 and qos=1
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create MQTT sub for entity E with topic sub2 and qos=2
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E with A=1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump and reset accumulator, see E A=1 in: 1 MQTT sub0, 1 MQTT sub1, 1 MQTT sub2
+===================================================================================
+MQTT message at topic sub0:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Float",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+MQTT message at topic sub1:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Float",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+MQTT message at topic sub2:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Float",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
+06. Check log and see a trace for each qos possibility
+======================================================
+MQTT notification sent to localhost:1883 on topic sub0 with qos 0 with id 1
+MQTT notification sent to localhost:1883 on topic sub1 with qos 1 with id 2
+MQTT notification sent to localhost:1883 on topic sub2 with qos 2 with id 3
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

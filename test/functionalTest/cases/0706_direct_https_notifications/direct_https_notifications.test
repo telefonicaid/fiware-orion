@@ -18,7 +18,8 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# FIXME #3924: temporarly disabled. See details in cited issue
+# VALGRINDX_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
 Direct HTTP notification (accepting self signed certs)

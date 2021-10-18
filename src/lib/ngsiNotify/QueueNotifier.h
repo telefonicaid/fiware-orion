@@ -58,7 +58,7 @@ public:
   ~QueueNotifier(void);
 
   void sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                const ngsiv2::HttpInfo&          httpInfo,
+                                const ngsiv2::Notification&      notification,
                                 const std::string&               tenant,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,

@@ -172,6 +172,12 @@ time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df
 time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
 ```
 
+* In the case of MQTT notifications the `msg` field of the above trace is slightly different:
+
+```
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2
+```
+
 * For each forwarded request to a [Context Provider](../user/context_providers.md) (either queries or updates),
   Orion shows a trace like this. Note that Orion adds the `cbfwd=` suffix  to the "root correlator" associated
   to the client request (in this example, the client request uses `corr=eabce3e2-149f-11eb-a2e8-000c29df7908`). The value

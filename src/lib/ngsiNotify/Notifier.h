@@ -28,7 +28,7 @@
 #include <map>
 #include <pthread.h>
 
-#include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Subscription.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 
@@ -46,7 +46,7 @@ public:
   virtual ~Notifier(void);
 
   virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                        const ngsiv2::HttpInfo&          httpInfo,
+                                        const ngsiv2::Notification&      notification,
                                         const std::string&               tenant,
                                         const std::string&               xauthToken,
                                         const std::string&               fiwareCorrelator,
@@ -58,7 +58,7 @@ public:
 
 protected:
   static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
-                                                             const ngsiv2::HttpInfo&          httpInfo,
+                                                             const ngsiv2::Notification&      notification,
                                                              const std::string&               tenant,
                                                              const std::string&               xauthToken,
                                                              const std::string&               fiwareCorrelator,
