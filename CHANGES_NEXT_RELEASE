@@ -5,6 +5,7 @@
 - Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
 - Fix: service path ignored in GET /v2/subscriptions/{subId} (#3945)
 - Fix: service path ignored in GET /v2/registrations/{regId} (#3945)
+- Fix: change -mqttMaxAge from seconds to minutes
 - Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
 - Add: per sub notification.http.timeout (#3842)
 - Add: hard limit for -requestTimeout to 1800000 millliseconds (30 min)

@@ -335,6 +335,8 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
 /* ****************************************************************************
 *
 * MqttConnectionManager::cleanup -
+*
+* maxAge parameter is in seconds
 */
 void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
 {

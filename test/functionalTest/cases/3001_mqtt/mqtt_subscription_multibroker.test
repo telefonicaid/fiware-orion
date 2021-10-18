@@ -27,7 +27,7 @@ MQTT subscription multibroker
 dbInit CB
 
 # tracelevel 163 is the one for MQTT notification logs
-brokerStart CB 163 IPV4 -mqttMaxAge 3
+brokerStart CB 163 IPV4 -mqttMaxAge 1
 accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
 
 --SHELL--
@@ -43,9 +43,9 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 # 03. Create MQTT sub3 at localhost:1884 (1)
 # 04. Create MQTT sub4 at localhost:1884 (2)
 # 05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
-# 06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
-# 07. Sleep 3 seconds, get logs and see localhost:1883 connection went away
-# 08. Sleep 3 seconds, get logs and see localhost:1884 connection went away
+# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
+# 07. Sleep 60 seconds, get logs and see localhost:1883 connection went away
+# 08. Sleep 60 seconds, get logs and see localhost:1884 connection went away
 # 09. Update entity E1883 to re-create connections to localhost:1883
 # 10. Dump accumulator for localhost:1883 and see 4 notifications
 #
@@ -161,8 +161,8 @@ echo
 echo
 
 
-echo "06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)"
-echo "=================================================================================================================="
+echo "06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)"
+echo "==================================================================================================================="
 payload='{
   "id": "E1884",
   "type": "T",
@@ -171,23 +171,23 @@ payload='{
     "type": "Number"
   }
 }'
-sleep 3s
+sleep 60s
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "07. Sleep 3 seconds, get logs and see localhost:1883 connection went away"
-echo "========================================================================="
-sleep 3s
+echo "07. Sleep 60 seconds, get logs and see localhost:1883 connection went away"
+echo "=========================================================================="
+sleep 60s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
 echo
 echo
 
 
-echo "08. Sleep 3 seconds, get logs and see localhost:1884 connection went away"
-echo "========================================================================="
-sleep 3s
+echo "08. Sleep 60 seconds, get logs and see localhost:1884 connection went away"
+echo "=========================================================================="
+sleep 60s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
 echo
 echo
@@ -270,8 +270,8 @@ Date: REGEX(.*)
 
 
 
-06. Sleep 3 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
-==================================================================================================================
+06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
+===================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1884?type=T
@@ -280,9 +280,10 @@ Date: REGEX(.*)
 
 
 
-07. Sleep 3 seconds, get logs and see localhost:1883 connection went away
-=========================================================================
+07. Sleep 60 seconds, get logs and see localhost:1883 connection went away
+==========================================================================
 Initializing MQTT library
+#SORT_START
 New MQTT broker connection for localhost:1883
 Connecting to MQTT Broker at localhost:1883
 MQTT successfull connection for localhost:1883
@@ -291,7 +292,9 @@ Existing MQTT broker connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
 MQTT notification successfully published at localhost:1883 with id 1
 MQTT notification successfully published at localhost:1883 with id 2
+#SORT_END
 Checking MQTT connections age
+#SORT_START
 New MQTT broker connection for localhost:1884
 Connecting to MQTT Broker at localhost:1884
 MQTT successfull connection for localhost:1884
@@ -300,15 +303,17 @@ Existing MQTT broker connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
 MQTT notification successfully published at localhost:1884 with id 1
 MQTT notification successfully published at localhost:1884 with id 2
+#SORT_END
 Checking MQTT connections age
 MQTT connection localhost:1883 too old REGEX(.*)
 Disconnecting from MQTT Broker at localhost:1883
 Successfully disconnected from MQTT Broker at localhost:1883
 
 
-08. Sleep 3 seconds, get logs and see localhost:1884 connection went away
-=========================================================================
+08. Sleep 60 seconds, get logs and see localhost:1884 connection went away
+==========================================================================
 Initializing MQTT library
+#SORT_START
 New MQTT broker connection for localhost:1883
 Connecting to MQTT Broker at localhost:1883
 MQTT successfull connection for localhost:1883
@@ -317,7 +322,9 @@ Existing MQTT broker connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
 MQTT notification successfully published at localhost:1883 with id 1
 MQTT notification successfully published at localhost:1883 with id 2
+#SORT_END
 Checking MQTT connections age
+#SORT_START
 New MQTT broker connection for localhost:1884
 Connecting to MQTT Broker at localhost:1884
 MQTT successfull connection for localhost:1884
@@ -326,6 +333,7 @@ Existing MQTT broker connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
 MQTT notification successfully published at localhost:1884 with id 1
 MQTT notification successfully published at localhost:1884 with id 2
+#SORT_END
 Checking MQTT connections age
 MQTT connection localhost:1883 too old REGEX(.*)
 Disconnecting from MQTT Broker at localhost:1883
