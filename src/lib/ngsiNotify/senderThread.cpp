@@ -41,9 +41,12 @@ void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
 
+  // <----
+
   for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
     SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
+
     char                portV[STRING_SIZE_FOR_INT];
     std::string         endpoint;
     std::string         url;
@@ -71,7 +74,12 @@ void* startSenderThread(void* p)
     std::string  out;
     LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
-    if (!simulatedNotification)
+    if (simulatedNotification)
+    {
+      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
+      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
+    }
+    else // we'll send the notification
     {
       int  r;
 
@@ -135,11 +143,6 @@ void* startSenderThread(void* p)
         }
       }
     }
-    else
-    {
-      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
-      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-    }
 
     // Add notificacion result summary in log INFO level
     if (statusCode != -1)
@@ -160,6 +163,8 @@ void* startSenderThread(void* p)
 
   /* Delete the parameters vector after using it */
   delete paramsV;
+
+  //----------
 
   pthread_exit(NULL);
   return NULL;

@@ -144,19 +144,31 @@ static void* workerFunc(void* pSyncQ)
       pthread_exit(NULL);
     }
 
+    // <----
+
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
+      SenderThreadParams* params = (*paramsV)[ix];
+
+      // <--- queue statistics
       struct timespec     now;
       struct timespec     howlong;
       size_t              estimatedQSize;
-
-      SenderThreadParams* params = (*paramsV)[ix];
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);
       clock_difftime(&now, &params->timeStamp, &howlong);
       estimatedQSize = queue->size();
       QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
+      // ----> queue statistics
+
+      char                portV[STRING_SIZE_FOR_INT];
+      std::string         endpoint;
+      std::string         url;
+
+      snprintf(portV, sizeof(portV), "%d", params->port);
+      endpoint = params->ip + ":" + portV;
+      url = endpoint + params->resource;
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
@@ -173,16 +185,9 @@ static void* workerFunc(void* pSyncQ)
                          params->timeout,
                          params->user.c_str()));
 
-      char                portV[STRING_SIZE_FOR_INT];
-      std::string         endpoint;
-      std::string         url;
-
-      snprintf(portV, sizeof(portV), "%d", params->port);
-      endpoint = params->ip + ":" + portV;
-      url = endpoint + params->resource;
-
       long long    statusCode = -1;
       std::string  out;
+      LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
       if (simulatedNotification)
       {
@@ -229,6 +234,8 @@ static void* workerFunc(void* pSyncQ)
                                params->extraHeaders,
                                "",                         //default acceptFormat
                                params->timeout);
+
+          LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
         }
 
         //
@@ -277,6 +284,8 @@ static void* workerFunc(void* pSyncQ)
 
     // Free params vector memory
     delete paramsV;
+
+    //----------
 
     // Reset curl for next iteration
     curl_easy_reset(curl);
