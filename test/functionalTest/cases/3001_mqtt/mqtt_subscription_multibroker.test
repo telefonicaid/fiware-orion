@@ -280,7 +280,7 @@ Date: REGEX(.*)
 Initializing MQTT library
 New MQTT broker connection for localhost:1883
 Connecting to MQTT Broker at localhost:1883
-Successfully connected to MQTT Broker at localhost:1883
+MQTT successfull connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
 Existing MQTT broker connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
@@ -289,7 +289,7 @@ MQTT notification successfully published at localhost:1883 with id 2
 Checking MQTT connections age
 New MQTT broker connection for localhost:1884
 Connecting to MQTT Broker at localhost:1884
-Successfully connected to MQTT Broker at localhost:1884
+MQTT successfull connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
 Existing MQTT broker connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
@@ -306,7 +306,7 @@ Successfully disconnected from MQTT Broker at localhost:1883
 Initializing MQTT library
 New MQTT broker connection for localhost:1883
 Connecting to MQTT Broker at localhost:1883
-Successfully connected to MQTT Broker at localhost:1883
+MQTT successfull connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
 Existing MQTT broker connection for localhost:1883
 MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
@@ -315,7 +315,7 @@ MQTT notification successfully published at localhost:1883 with id 2
 Checking MQTT connections age
 New MQTT broker connection for localhost:1884
 Connecting to MQTT Broker at localhost:1884
-Successfully connected to MQTT Broker at localhost:1884
+MQTT successfull connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
 Existing MQTT broker connection for localhost:1884
 MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
