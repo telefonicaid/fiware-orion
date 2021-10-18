@@ -33,6 +33,11 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 --SHELL--
 
 #
+# Hint: use this to run the MQTT brokers needed for this .test:
+#
+#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#   docker run -d -p 1884:1883 eclipse-mosquitto:1.6.7
+#
 # 01. Create MQTT sub1 at localhost:1883 (1)
 # 02. Create MQTT sub2 at localhost:1883 (2)
 # 03. Create MQTT sub3 at localhost:1884 (1)
