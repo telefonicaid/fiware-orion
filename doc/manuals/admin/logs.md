@@ -335,21 +335,21 @@ time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df
 Notification endpoint response with 400 (a WARN trace is printed):
 
 ```
-time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
+time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification response NOT OK, http code: 400
 time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
 ```
 
 Notification endpoint response with 404 (a WARN trace is printed):
 
 ```
-time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
+time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification response NOT OK, http code: 404
 time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
 ```
 
 Notification endpoint response with 500 (a WARN trace is printed)
 
 ```
-time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
+time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification response NOT OK, http code: 500
 time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
 ```
 
