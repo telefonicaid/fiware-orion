@@ -92,7 +92,8 @@ void* startSenderThread(void* p)
       }
       else
       {
-        r = httpRequestSend(params->from,
+        r = httpRequestSend(NULL,
+                            params->from,
                             params->ip,
                             params->port,
                             params->protocol,

@@ -210,25 +210,25 @@ static void* workerFunc(void* pSyncQ)
         }
         else
         {
-          r =  httpRequestSendWithCurl(curl,
-                                       params->from,
-                                       params->ip,
-                                       params->port,
-                                       params->protocol,
-                                       params->verb,
-                                       params->tenant,
-                                       params->servicePath,
-                                       params->xauthToken,
-                                       params->resource,
-                                       params->content_type,
-                                       params->content,
-                                       params->fiwareCorrelator,
-                                       params->renderFormat,
-                                       &out,
-                                       &statusCode,
-                                       params->extraHeaders,
-                                       "",                         //default acceptFormat
-                                       params->timeout);
+          r =  httpRequestSend(curl,
+                               params->from,
+                               params->ip,
+                               params->port,
+                               params->protocol,
+                               params->verb,
+                               params->tenant,
+                               params->servicePath,
+                               params->xauthToken,
+                               params->resource,
+                               params->content_type,
+                               params->content,
+                               params->fiwareCorrelator,
+                               params->renderFormat,
+                               &out,
+                               &statusCode,
+                               params->extraHeaders,
+                               "",                         //default acceptFormat
+                               params->timeout);
         }
 
         //

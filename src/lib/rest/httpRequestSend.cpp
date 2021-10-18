@@ -217,10 +217,7 @@ static int contentLenParse(char* s)
 
 /* ****************************************************************************
 *
-* httpRequestSendWithCurl -
-*
-* The waitForResponse arguments specifies if the method has to wait for response
-* before return. If this argument is false, the return string is ""
+* httpRequestSend -
 *
 * NOTE
 * We are using a hybrid approach, consisting of a static thread-local buffer of a
@@ -236,11 +233,13 @@ static int contentLenParse(char* s)
 *     -5: No Content-Type BUT content present
 *     -6: Content-Type present but there is no content
 *     -7: Total outgoing message size is too big
+*     -8: Unable to initialize libcurl (NOTE: only possible if actual curl is not provided as first argument)
 *     -9: Error making HTTP request
+*
 */
-int httpRequestSendWithCurl
+int httpRequestSend
 (
-   CURL*                                      curl,
+   CURL*                                      _curl,
    const std::string&                         from,
    const std::string&                         _ip,
    unsigned short                             port,
@@ -261,6 +260,36 @@ int httpRequestSendWithCurl
    long                                       timeoutInMilliseconds
 )
 {
+  CURL*                curl;
+  struct curl_context  cc;
+  char                 servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+  firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+
+  if (_curl == NULL)
+  {
+    // if curl object has not been provided as paramter, then we create it
+    get_curl_context(_ip, &cc);
+
+    if (cc.curl == NULL)
+    {
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+
+      release_curl_context(&cc);
+      LM_E(("Runtime Error (could not get curl context)"));
+
+      *outP = "unable to get curl context";
+      return -8;
+    }
+
+    curl = cc.curl;
+  }
+  else
+  {
+    curl = _curl;
+  }
+
   char                            portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long       callNo             = 0;
   std::string                     ip                 = _ip;
@@ -270,9 +299,6 @@ int httpRequestSendWithCurl
   int                             outgoingMsgSize    = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
-  char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
-
-  firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
@@ -304,6 +330,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (port is ZERO)"));
 
     *outP = "invalid port";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -1;
   }
 
@@ -313,6 +345,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (ip is empty)"));
 
     *outP = "invalid IP";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -2;
   }
 
@@ -322,6 +360,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (verb is empty)"));
 
     *outP = "invalid verb";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -3;
   }
 
@@ -331,6 +375,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (resource is empty)"));
 
     *outP = "invalid resource";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -4;
   }
 
@@ -340,6 +390,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
 
     *outP = "no Content-Type but content present";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -5;
   }
 
@@ -349,6 +405,12 @@ int httpRequestSendWithCurl
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
 
     *outP = "Content-Type present but there is no content";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -6;
   }
 
@@ -487,6 +549,12 @@ int httpRequestSendWithCurl
     delete httpResponse;
 
     *outP = "total outgoing message size is too big";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
     return -7;
   }
 
@@ -596,91 +664,10 @@ int httpRequestSendWithCurl
   free(httpResponse->memory);
   delete httpResponse;
 
-  return res == CURLE_OK ? 0 : -9;
-}
-
-
-
-/* ****************************************************************************
-*
-* httpRequestSend -
-*
-* RETURN VALUES
-*   httpRequestSend returns 0 on success and a negative number on failure:
-*     -1: Invalid port
-*     -2: Invalid IP
-*     -3: Invalid verb
-*     -4: Invalid resource
-*     -5: No Content-Type BUT content present
-*     -6: Content-Type present but there is no content
-*     -7: Total outgoing message size is too big
-*     -8: Unable to initialize libcurl
-*     -9: Error making HTTP request
-*
-*   [ error codes -1 to -7 comes from httpRequestSendWithCurl ]
-*/
-int httpRequestSend
-(
-   const std::string&                         from,
-   const std::string&                         _ip,
-   unsigned short                             port,
-   const std::string&                         protocol,
-   const std::string&                         verb,
-   const std::string&                         tenant,
-   const std::string&                         servicePath,
-   const std::string&                         xauthToken,
-   const std::string&                         resource,
-   const std::string&                         orig_content_type,
-   const std::string&                         content,
-   const std::string&                         fiwareCorrelation,
-   const std::string&                         ngsiv2AttrFormat,
-   std::string*                               outP,
-   long long*                                 statusCodeP,
-   const std::map<std::string, std::string>&  extraHeaders,
-   const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
-)
-{
-  struct curl_context  cc;
-  int                  response;
-
-  get_curl_context(_ip, &cc);
-  if (cc.curl == NULL)
+  if (_curl == NULL)
   {
-    char servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
-
-    firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
-
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
-
     release_curl_context(&cc);
-    LM_E(("Runtime Error (could not init libcurl)"));
-
-    *outP = "unable to initialize libcurl";
-    return -8;
   }
 
-  response = httpRequestSendWithCurl(cc.curl,
-                                     from,
-                                     _ip,
-                                     port,
-                                     protocol,
-                                     verb,
-                                     tenant,
-                                     servicePath,
-                                     xauthToken,
-                                     resource,
-                                     orig_content_type,
-                                     content,
-                                     fiwareCorrelation,
-                                     ngsiv2AttrFormat,
-                                     outP,
-                                     statusCodeP,
-                                     extraHeaders,
-                                     acceptFormat,
-                                     timeoutInMilliseconds);
-
-  release_curl_context(&cc);
-  return response;
+  return res == CURLE_OK ? 0 : -9;
 }
