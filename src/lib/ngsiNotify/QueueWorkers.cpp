@@ -27,18 +27,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/globals.h"
-#include "common/clockFunctions.h"
-#include "common/statistics.h"
-#include "common/limits.h"
-#include "common/logTracing.h"
-#include "alarmMgr/alarmMgr.h"
-#include "mqtt/mqttMgr.h"
-
-#include "cache/subCache.h"
-#include "ngsi10/NotifyContextRequest.h"
-#include "rest/httpRequestSend.h"
-#include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueWorkers.h"
 
 #include "ngsiNotify/doNotify.h"
