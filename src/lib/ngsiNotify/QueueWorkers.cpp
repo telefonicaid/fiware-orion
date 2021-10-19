@@ -41,6 +41,8 @@
 #include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueWorkers.h"
 
+#include "ngsiNotify/doNotify.h"
+
 
 
 /* ****************************************************************************
@@ -144,6 +146,9 @@ static void* workerFunc(void* pSyncQ)
       pthread_exit(NULL);
     }
 
+    doNotify(paramsV, curl, queue, "worker");
+
+#if 0
     // <----
 
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
@@ -286,6 +291,7 @@ static void* workerFunc(void* pSyncQ)
     delete paramsV;
 
     //----------
+#endif
 
     // Reset curl for next iteration
     curl_easy_reset(curl);
