@@ -31,6 +31,7 @@
 #include "mqtt/mqttMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
+#include "ngsiNotify/doNotify.h"
 #include "cache/subCache.h"
 
 /* ****************************************************************************
@@ -41,6 +42,11 @@ void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
 
+  // process paramV to send notification (freeing memory after use)
+  // note NULL in queue statistics (it doesn't make sense in this case) and curl object (will be generated internally in doNotify)
+  doNotify(paramsV, NULL, NULL, "sender-thread");
+
+#if 0
   // <----
 
   for (unsigned ix = 0; ix < paramsV->size(); ix++)
@@ -165,6 +171,7 @@ void* startSenderThread(void* p)
   delete paramsV;
 
   //----------
+#endif
 
   pthread_exit(NULL);
   return NULL;
