@@ -1,4 +1,9 @@
-/* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#ifndef SRC_LIB_NGSINOTIFY_DONOTIFY_H_
+#define SRC_LIB_NGSINOTIFY_DONOTIFY_H_
+
+/*
+*
+* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -18,24 +23,25 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Márquez
+* Author: Fermin Galan
 */
 
+#include <curl/curl.h>
+
 #include "ngsiNotify/senderThread.h"
-#include "ngsiNotify/doNotify.h"
+#include "common/SyncQOverflow.h"
+
 
 /* ****************************************************************************
 *
-* startSenderThread -
+* doNotify -
 */
-void* startSenderThread(void* p)
-{
-  std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+extern void doNotify
+(
+  std::vector<SenderThreadParams*>*                  paramsV,
+  CURL*                                              curl,
+  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue,
+  const char*                                        logPrefix
+);
 
-  // process paramV to send notification (freeing memory after use)
-  // note NULL in queue statistics (it doesn't make sense in this case) and curl object (will be generated internally in doNotify)
-  doNotify(paramsV, NULL, NULL, "sender-thread");
-
-  pthread_exit(NULL);
-  return NULL;
-}
+#endif  // SRC_LIB_NGSINOTIFY_DONOTIFY_H_

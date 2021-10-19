@@ -270,7 +270,8 @@ static bool queryForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
-  r = httpRequestSend(fromIp,  // thread variable
+  r = httpRequestSend(NULL,
+                      fromIp,  // thread variable
                       ip,
                       port,
                       protocol,
