@@ -33,10 +33,9 @@
 *
 * logInfoNotification - rc as int
 */
-void logInfoNotification
+void logInfoHttpNotification
 (
   const char*  subId,
-  const char*  protocol,
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
@@ -45,33 +44,41 @@ void logInfoNotification
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoNotification(subId, protocol, endpoint, verb, resource, buffer);
+  logInfoHttpNotification(subId, endpoint, verb, resource, buffer);
 }
 
 
 
 /* ****************************************************************************
 *
-* logInfoNotification - rc as string
+* logInfoHttpNotification - rc as string
 */
-void logInfoNotification
+void logInfoHttpNotification
 (
   const char*  subId,
-  const char*  protocol,
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
   const char*  rc
 )
 {
-  if (strncmp(protocol, "mqtt:", strlen("mqtt:")) == 0)
-  {
-    LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s", subId, endpoint, resource));
-  }
-  else
-  {
-    LM_I(("Notif delivered (subId: %s): %s %s%s, response code: %s", subId, verb, endpoint, resource, rc));
-  }
+  LM_I(("Notif delivered (subId: %s): %s %s%s, response code: %s", subId, verb, endpoint, resource, rc));
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoMqttNotification
+*/
+void logInfoMqttNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  resource
+)
+{
+  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s", subId, endpoint, resource));
 }
 
 
