@@ -33,6 +33,10 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 --SHELL--
 
 #
+# Hint: use this to run the MQTT broker needed for this .test:
+#
+#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#
 # 01. Create MQTT sub for entity E with topic sub1
 # 02. Create MQTT sub for entity E with topic sub2
 # 03. Create HTTP sub for entity E

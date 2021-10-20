@@ -41,8 +41,10 @@
 typedef struct MqttConnection
 {
   struct mosquitto*  mosq;
-  char*              userdata;
+  std::string        endpoint;
   double             lastTime;
+  sem_t              connectionSem;
+  int                conectionResult;
 } MqttConnection;
 
 
@@ -54,26 +56,26 @@ typedef struct MqttConnection
 class MqttConnectionManager
 {
  private:
-  std::map<std::string, MqttConnection>  connections;
-  sem_t                                  sem;
+  std::map<std::string, MqttConnection*>  connections;
+  sem_t                                   sem;
 
  public:
   MqttConnectionManager();
 
   int  init(void);
-  void release(void);
+  void teardown(void);
 
   const char*  semGet(void);
 
-  int sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
-  void cleanup(double maxAge, bool ignoreSems = false);
+  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
+  void cleanup(double maxAge);
 
  private:
   int  semInit(void);
   void semTake(void);
   void semGive(void);
 
-  MqttConnection getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
+  MqttConnection* getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
 };
 
 #endif  // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_

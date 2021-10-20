@@ -46,16 +46,23 @@ class AlarmManager
   int64_t                     notificationErrorResets;
   int64_t                     forwardingErrors;
   int64_t                     forwardingErrorResets;
+  int64_t                     mqttConnectionErrors;
+  int64_t                     mqttConnectionResets;
   int64_t                     dbErrors;
   int64_t                     dbErrorResets;
   bool                        dbOk;
+
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  forwardingErrorV;
   std::map<std::string, int>  badInputV;
+  std::map<std::string, int>  mqttConnectionErrorV;
+
   bool                        notificationErrorLogAlways;
   bool                        forwardingErrorLogAlways;
+  bool                        mqttConnectionErrorLogAlways;
   bool                        badInputLogAlways;
   bool                        dbErrorLogAlways;
+
   sem_t                       sem;
 
  public:
@@ -69,6 +76,7 @@ class AlarmManager
 
   void notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways);
   void forwardingErrorLogAlwaysSet(bool _forwardingErrorLogAlways);
+  void mqttConnectionErrorLogAlwaysSet(bool _mqttConnectionErrorLogAlways);
   void badInputLogAlwaysSet(bool _badInputLogAlways);
   void dbErrorLogAlwaysSet(bool _dbErrorLogAlways);
 
@@ -84,11 +92,15 @@ class AlarmManager
   bool badInput(const std::string& ip, const std::string& details);
   bool badInputReset(const std::string& ip);
 
+  bool mqttConnectionError(const std::string& endpoint, const std::string& details);
+  bool mqttConnectionReset(const std::string& endpoint);
+
   // Methods for Log Summary
   void dbErrorsGet(bool* active, int64_t* raised, int64_t* released);
   void badInputGet(int64_t* active, int64_t* raised, int64_t* released);
   void notificationErrorGet(int64_t* active, int64_t* raised, int64_t* released);
   void forwardingErrorGet(int64_t* active, int64_t* raised, int64_t* released);
+  void mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released);
 
  private:
   int  semInit(void);
