@@ -265,6 +265,7 @@ Log traces between "Raising" and "Releasing" messages use "Repeated" in the mess
 in all traces, so re-logging alarms could be a means to get extra information when debugging problems. In the example above, it could correspond to a client
 that after fixing the problem with the JSON payload now has a new problem with the URL of the Orion API operation.
 
+Note that even when `-relogAlarms` is not used, repeat alarm errors may appear in some DEBUG tracelevel (but never in WARN or ERROR levels).
 
 [Top](#top)
 
