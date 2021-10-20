@@ -81,10 +81,11 @@ AlarmManager::AlarmManager()
 */
 int AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
-  notificationErrorLogAlways = logAlreadyRaisedAlarms;
-  badInputLogAlways          = logAlreadyRaisedAlarms;
-  dbErrorLogAlways           = logAlreadyRaisedAlarms;
-  forwardingErrorLogAlways   = logAlreadyRaisedAlarms;
+  notificationErrorLogAlways   = logAlreadyRaisedAlarms;
+  badInputLogAlways            = logAlreadyRaisedAlarms;
+  dbErrorLogAlways             = logAlreadyRaisedAlarms;
+  mqttConnectionErrorLogAlways = logAlreadyRaisedAlarms;
+  forwardingErrorLogAlways     = logAlreadyRaisedAlarms;
 
   return semInit();
 }
@@ -449,6 +450,11 @@ bool AlarmManager::mqttConnectionError(const std::string& endpoint, const std::s
     if (mqttConnectionErrorLogAlways)
     {
       LM_W(("Repeated MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtMqttNotif, ("Repeated MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
     }
 
     semGive();
