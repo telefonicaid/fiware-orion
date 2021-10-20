@@ -114,14 +114,26 @@ int MqttConnectionManager::init(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::release -
+* MqttConnectionManager::teardown -
 */
-void MqttConnectionManager::release(void)
+void MqttConnectionManager::teardown(void)
 {
-  LM_T(LmtMqttNotif, ("Cleanup MQTT conections"));
+  LM_T(LmtMqttNotif, ("Teardown MQTT connections"));
 
-  // Using a negative value ensures that all connections are cleaned out
-  cleanup(-1, true);
+  for (std::map<std::string, MqttConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  {
+    std::string endpoint = iter->first;
+    MqttConnection* cP   = iter->second;
+
+    LM_T(LmtMqttNotif, ("Teardown MQTT Broker connection %s", endpoint.c_str()));
+
+    mosquitto_disconnect(cP->mosq);
+    mosquitto_loop_stop(cP->mosq, false);
+    mosquitto_destroy(cP->mosq);
+    cP->mosq = NULL;
+
+    delete cP;
+  }
 
   mosquitto_lib_cleanup();
 }
@@ -340,14 +352,11 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
 *
 * maxAge parameter is in seconds
 */
-void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
+void MqttConnectionManager::cleanup(double maxAge)
 {
   LM_T(LmtMqttNotif, ("Checking MQTT connections age"));
 
-  if (!ignoreSems)
-  {
-    semTake();
-  }
+  semTake();
 
   std::vector<std::string> toErase;
 
@@ -385,8 +394,5 @@ void MqttConnectionManager::cleanup(double maxAge, bool ignoreSems)
     connections.erase(toErase[ix]);
   }
 
-  if (!ignoreSems)
-  {
-    semGive();
-  }
+  semGive();
 }

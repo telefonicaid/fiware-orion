@@ -63,12 +63,12 @@ class MqttConnectionManager
   MqttConnectionManager();
 
   int  init(void);
-  void release(void);
+  void teardown(void);
 
   const char*  semGet(void);
 
   bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
-  void cleanup(double maxAge, bool ignoreSems = false);
+  void cleanup(double maxAge);
 
  private:
   int  semInit(void);

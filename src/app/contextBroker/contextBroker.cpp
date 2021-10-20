@@ -578,7 +578,7 @@ void exitFunc(void)
     }
   }
 
-  mqttMgr.release();
+  mqttMgr.teardown();
   
   curl_context_cleanup();
   curl_global_cleanup();
