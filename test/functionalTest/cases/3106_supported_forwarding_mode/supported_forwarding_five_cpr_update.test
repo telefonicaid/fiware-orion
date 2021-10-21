@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-supportedFowardingMode with five CPrs (update scenario)
+supportedForwardingMode with five CPrs (update scenario)
 
 --SHELL-INIT--
 dbInit CB
@@ -40,7 +40,7 @@ brokerStart CP5
 --SHELL--
 
 # This test is based on cases/0787_cprs_full_functional_v2/ngsiv2_update_five_different_cprs_in_one_query.test
-# with some of the CPrs using fowarding mode "update" and others using "none" or "query". All operations
+# with some of the CPrs using forwarding mode "update" and others using "none" or "query". All operations
 # using NGSIv2 (original test has some of them using NGSIv1)
 
 #

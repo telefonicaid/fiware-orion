@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Mixed supportedFowardingMode in a same entity
+Mixed supportedForwardingMode in a same entity
 
 --SHELL-INIT--
 dbInit CB

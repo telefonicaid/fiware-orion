@@ -47,6 +47,8 @@ static int64_t  deRaisedInLastSummary      = 0;
 static int64_t  deReleasedInLastSummary    = 0;
 static int64_t  neRaisedInLastSummary      = 0;
 static int64_t  neReleasedInLastSummary    = 0;
+static int64_t  fwdRaisedInLastSummary     = 0;
+static int64_t  fwdReleasedInLastSummary   = 0;
 static int64_t  biRaisedInLastSummary      = 0;
 static int64_t  biReleasedInLastSummary    = 0;
 static int64_t  mceRaisedInLastSummary     = 0;
@@ -93,14 +95,15 @@ static void* logSummary(void* vP)
     //
     alarmMgr.semTake();
 
-    // FIXME P10: also include forwarding alars. Fix examples in documentation
-
     bool     deActive;         // de: Database Error
     int64_t  deRaised;
     int64_t  deReleased;
     int64_t  neActive;         // ne: Notification Error
     int64_t  neRaised;
     int64_t  neReleased;
+    int64_t  fwdActive;        // fwd: Forwarding Error
+    int64_t  fwdRaised;
+    int64_t  fwdReleased;
     int64_t  biActive;         // bi:  Bad Input
     int64_t  biRaised;
     int64_t  biReleased;
@@ -111,26 +114,31 @@ static void* logSummary(void* vP)
     alarmMgr.dbErrorsGet(&deActive, &deRaised, &deReleased);
     alarmMgr.badInputGet(&biActive, &biRaised, &biReleased);
     alarmMgr.notificationErrorGet(&neActive, &neRaised, &neReleased);
+    alarmMgr.forwardingErrorGet(&fwdActive, &fwdRaised, &fwdReleased);
     alarmMgr.mqttConnectionErrorGet(&mceActive, &mceRaised, &mceReleased);
 
     alarmMgr.semGive();
 
-    int64_t deRaisedNew   = deRaised   - deRaisedInLastSummary;
-    int64_t deReleasedNew = deReleased - deReleasedInLastSummary;
-    int64_t neRaisedNew   = neRaised   - neRaisedInLastSummary;
-    int64_t neReleasedNew = neReleased - neReleasedInLastSummary;
-    int64_t biRaisedNew   = biRaised   - biRaisedInLastSummary;
-    int64_t biReleasedNew = biReleased - biReleasedInLastSummary;
+    int64_t deRaisedNew    = deRaised    - deRaisedInLastSummary;
+    int64_t deReleasedNew  = deReleased  - deReleasedInLastSummary;
+    int64_t neRaisedNew    = neRaised    - neRaisedInLastSummary;
+    int64_t neReleasedNew  = neReleased  - neReleasedInLastSummary;
+    int64_t fwdRaisedNew   = fwdRaised   - fwdRaisedInLastSummary;
+    int64_t fwdReleasedNew = fwdReleased - fwdReleasedInLastSummary;
+    int64_t biRaisedNew    = biRaised    - biRaisedInLastSummary;
+    int64_t biReleasedNew  = biReleased  - biReleasedInLastSummary;
     int64_t mceRaisedNew   = mceRaised   - mceRaisedInLastSummary;
     int64_t mceReleasedNew = mceReleased - mceReleasedInLastSummary;
 
     // Round the corner?
-    if (deRaisedNew   < 0)  { deRaisedNew   = LONG_MAX - deRaisedInLastSummary   + deRaised;   }
-    if (deReleasedNew < 0)  { deReleasedNew = LONG_MAX - deReleasedInLastSummary + deReleased; }
-    if (neRaisedNew   < 0)  { neRaisedNew   = LONG_MAX - neRaisedInLastSummary   + neRaised;   }
-    if (neReleasedNew < 0)  { neReleasedNew = LONG_MAX - neReleasedInLastSummary + neReleased; }
-    if (biRaisedNew   < 0)  { biRaisedNew   = LONG_MAX - biRaisedInLastSummary   + biRaised;   }
-    if (biReleasedNew < 0)  { biReleasedNew = LONG_MAX - biReleasedInLastSummary + biReleased; }
+    if (deRaisedNew    < 0) { deRaisedNew    = LONG_MAX - deRaisedInLastSummary    + deRaised;    }
+    if (deReleasedNew  < 0) { deReleasedNew  = LONG_MAX - deReleasedInLastSummary  + deReleased;  }
+    if (neRaisedNew    < 0) { neRaisedNew    = LONG_MAX - neRaisedInLastSummary    + neRaised;    }
+    if (neReleasedNew  < 0) { neReleasedNew  = LONG_MAX - neReleasedInLastSummary  + neReleased;  }
+    if (fwdRaisedNew   < 0) { fwdRaisedNew   = LONG_MAX - fwdRaisedInLastSummary   + fwdRaised;   }
+    if (fwdReleasedNew < 0) { fwdReleasedNew = LONG_MAX - fwdReleasedInLastSummary + fwdReleased; }
+    if (biRaisedNew    < 0) { biRaisedNew    = LONG_MAX - biRaisedInLastSummary    + biRaised;    }
+    if (biReleasedNew  < 0) { biReleasedNew  = LONG_MAX - biReleasedInLastSummary  + biReleased;  }
     if (mceRaisedNew   < 0) { mceRaisedNew   = LONG_MAX - mceRaisedInLastSummary   + mceRaised;   }
     if (mceReleasedNew < 0) { mceReleasedNew = LONG_MAX - mceReleasedInLastSummary + mceReleased; }
 
@@ -150,6 +158,13 @@ static void* logSummary(void* vP)
           neReleased,
           neReleasedNew));
 
+    LM_S(("Forwarding failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
+          fwdActive,
+          fwdRaised,
+          fwdRaisedNew,
+          fwdReleased,
+          fwdReleasedNew));
+
     LM_S(("MQTT connection failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
           mceActive,
           mceRaised,
@@ -164,12 +179,14 @@ static void* logSummary(void* vP)
           biReleased,
           biReleasedNew));
 
-    deRaisedInLastSummary   = deRaised;
-    deReleasedInLastSummary = deReleased;
-    neRaisedInLastSummary   = neRaised;
-    neReleasedInLastSummary = neReleased;
-    biRaisedInLastSummary   = biRaised;
-    biReleasedInLastSummary = biReleased;
+    deRaisedInLastSummary    = deRaised;
+    deReleasedInLastSummary  = deReleased;
+    neRaisedInLastSummary    = neRaised;
+    neReleasedInLastSummary  = neReleased;
+    fwdRaisedInLastSummary   = fwdRaised;
+    fwdReleasedInLastSummary = fwdReleased;
+    biRaisedInLastSummary    = biRaised;
+    biReleasedInLastSummary  = biReleased;
     mceRaisedInLastSummary   = mceRaised;
     mceReleasedInLastSummary = mceReleased;
   }

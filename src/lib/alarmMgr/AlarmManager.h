@@ -74,12 +74,6 @@ class AlarmManager
   void         semGive(void);
   const char*  semGet(void);
 
-  void notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways);
-  void forwardingErrorLogAlwaysSet(bool _forwardingErrorLogAlways);
-  void mqttConnectionErrorLogAlwaysSet(bool _mqttConnectionErrorLogAlways);
-  void badInputLogAlwaysSet(bool _badInputLogAlways);
-  void dbErrorLogAlwaysSet(bool _dbErrorLogAlways);
-
   bool dbError(const std::string& details);
   bool dbErrorReset(void);
 

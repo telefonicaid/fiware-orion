@@ -228,7 +228,7 @@ Alarm conditions:
 | 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.                                        | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
 | 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.                                        | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
 | 4          | WARNING    | The following WARN text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                   | The following WARN text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where `<ip>` is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.                 | Bad Input. The `<detail>` text contains the detailed information.                                             | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
-| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
+| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the HTTP notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
 | 6          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm ForwardingError `<url>`": `<detail>`".         | The following WARN text appears in the 'msg' field: "Releasing alarm ForwardingError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully interact with ContextProvider to that URL.| Forwarding Error. The `<detail>`text contains the detailed information.                                       | Orion is trying to interact with ContextProvider and some problem has occurred. It may be due to context provider response for forwarded query or update is empty. No specific action has to be performed at Orion Context Broker service.
 | 7          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm MqttConnectionError `<endpoint>`": `<detail>`". | The following WARN text appears in the 'msg' field: "Releasing alarm MqttConnectionError `<endpoint>`", where `<endpoint>` is the same one that triggered the alarm. Orion prints this trace when it successfully interact with ContextProvider to that URL.| Error connection to MQTT broker. The `<detail>`text contains the detailed information.         | Orion is trying to connecto to an MQTT broker (associated to a subscription) and some problem has occurred. It may be due to several reasons: MQTT broker in unreachable, user/pass is wrong, etc. No specific action has to be performed at Orion Context Broker service, but maybe in the MQTT broker configuration or in the associated subscription.
 
@@ -244,6 +244,9 @@ time=... | lvl=WARN  | ... Releasing alarm BadInput 10.0.0.1
 ...
 time=... | lvl=WARN  | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
 time=... | lvl=WARN  | ... Releasing alarm NotificationError localhost:1028/accumulate
+...
+time=... | lvl=WARN  | ... Raising alarm ForwardingError localhost:9999/cpr/op/update: forwarding failure for sender-thread: Couldn't connect to server
+time=... | lvl=WARN  | ... Releasing alarm ForwardingError localhost:9999/v2/op/update
 ...
 time=... | lvl=WARN  | ... Raising alarm MqttConnectionError localhost:1883: Connection Refused: not authorised.
 time=... | lvl=WARN  | ... Releasing alarm MqttConnectionError localhost:1883
@@ -274,12 +277,13 @@ Note that even when `-relogAlarms` is not used, repeat alarm errors may appear i
 You can enable log summary traces with the `-logSummary` [CLI parameter](cli.md) which value is the summary reporting period in seconds. For
 example `-logSummary 5` involves that summary traces will be print each 5 seconds (no matter which log level has been set with `-logLevel`).
 
-Four traces are printed each time, as follows (the lines have been abbreviated, omitting some fields, for the sake of clarity):
+Six traces are printed each time, as follows (the lines have been abbreviated, omitting some fields, for the sake of clarity):
 
 ```
 time=... | lvl=SUMMARY | ... Transactions: 2345 (new: 45)
 time=... | lvl=SUMMARY | ... DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+time=... | lvl=SUMMARY | ... Forwarding failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... MQTT connection failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new: 1), released: (total: 7, new: 2)
 ```
@@ -287,13 +291,16 @@ time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new
 * First line (Transactions) shows the current number of transactions and the new ones in the last summary reporting period.
 * Second line is about [DB alarms](#alarms). It shows the current DB status (either "ok" or "erroneous"), the number of raised DB alarms (both total
   since Orion started and in the last summary reporting period) and the number of released DB alarms (both total since Orion started and in the last summary reporting period).
-* Third line is about [notification failure alarms](#alarms). It shows the current number of active notification failure alarms, the number of
-  raised notification failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
+* Third line is about [HTTP notification failure alarms](#alarms). It shows the current number of active HTTP notification failure alarms, the number of
+  raised HTTP notification failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
   (both total since Orion started and in the last summary reporting period).
-* Fourth line is about [MQTT connection failure alarms](#alarms). It shows the current number of active MQTT connection failure alarms, the number of
+* Fourth line is about [forwarding failure alarms](#alarms). It shows the current number of active forwarding failure alarms, the number of
+  raised forwarding failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
+  (both total since Orion started and in the last summary reporting period).
+* Fifth line is about [MQTT connection failure alarms](#alarms). It shows the current number of active MQTT connection failure alarms, the number of
   raised MQTT connection failure alarms (both total since Orion started and in the last summary reporting period) and the number of released MQTT connection failure alarms
   (both total since Orion started and in the last summary reporting period).
-* Fifth line is about [bad input alarms](#alarms). It shows the current number of bad input alarms, the number of raised bad input alarms (both total since Orion
+* Sixth line is about [bad input alarms](#alarms). It shows the current number of bad input alarms, the number of raised bad input alarms (both total since Orion
   started and in the last summary reporting period) and the number of released bad input alarms (both total since Orion started and in the last summary reporting period).
 
 [Top](#top)
