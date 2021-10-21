@@ -126,7 +126,7 @@ In the case of the aarch64 architecture, additionally install python2-devel, rpm
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
@@ -290,7 +290,7 @@ In the case of the aarch64 architecture, additionally install `python2-dev` and 
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * Run test harness (it takes some time, please be patient). Before starting test by make command, apply the following patch to avoid test failing.
 
