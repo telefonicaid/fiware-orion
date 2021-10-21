@@ -168,6 +168,11 @@ bool AlarmManager::dbError(const std::string& details)
     {
       LM_E(("Repeated Database Error: %s", details.c_str()));
     }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtMongo, ("Repeated Database Error: %s", details.c_str()));
+    }
 
     return false;
   }
@@ -315,6 +320,11 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
     if (notificationErrorLogAlways)
     {
       LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtNotifier, ("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
 
     semGive();
@@ -469,6 +479,10 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
     {
       LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
     }
+    else
+    {
+      // in this case it is not clear which LM_T use... we leave this comment as placeholder
+    }
 
     semGive();
     return false;
@@ -511,6 +525,11 @@ bool AlarmManager::forwardingError(const std::string& url, const std::string& de
     if (forwardingErrorLogAlways)
     {
       LM_W(("Repeated forwardingError %s: %s", url.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtCPrForwardRequestPayload, ("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
 
     semGive();
