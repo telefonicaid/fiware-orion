@@ -126,7 +126,7 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -303,7 +303,7 @@ aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 
