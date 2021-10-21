@@ -256,7 +256,8 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      int resultCode = mosquitto_connect(cP->mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
      if (resultCode != MOSQ_ERR_SUCCESS)
      {
-       LM_E(("Runtime Error (error calling mosquitto_connect: %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
+       // Alarm is raised in this case
+       alarmMgr.mqttConnectionError(endpoint, mosquitto_strerror(resultCode));
        mosquitto_destroy(cP->mosq);
        cP->mosq = NULL;
        return cP;
@@ -270,7 +271,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      // We block until the connect callback release the connection semaphore
      sem_wait(&cP->connectionSem);
 
-     // Check if the connection went ok (if not, alarm is raised)
+     // Check if the connection went ok (if not, e.g wrong user/pass, alarm is raised)
      if (cP->conectionResult)
      {
        alarmMgr.mqttConnectionError(endpoint, mosquitto_connack_string(cP->conectionResult));
