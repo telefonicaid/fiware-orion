@@ -524,12 +524,12 @@ bool AlarmManager::forwardingError(const std::string& url, const std::string& de
 
     if (forwardingErrorLogAlways)
     {
-      LM_W(("Repeated forwardingError %s: %s", url.c_str(), details.c_str()));
+      LM_W(("Repeated ForwardingError %s: %s", url.c_str(), details.c_str()));
     }
     else
     {
       // even if repeat alarms is off, this is a relevant event in debug level
-      LM_T(LmtCPrForwardRequestPayload, ("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
+      LM_T(LmtCPrForwardRequestPayload, ("Repeated ForwardingError %s: %s", url.c_str(), details.c_str()));
     }
 
     semGive();
@@ -541,7 +541,7 @@ bool AlarmManager::forwardingError(const std::string& url, const std::string& de
   forwardingErrorV[url] = 1;
   semGive();
 
-  LM_W(("Raising alarm forwardingError %s: %s", url.c_str(), details.c_str()));
+  LM_W(("Raising alarm ForwardingError %s: %s", url.c_str(), details.c_str()));
 
   return true;
 }
