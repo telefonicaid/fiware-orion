@@ -155,7 +155,7 @@ Some additional comments:
     weren't updated in a partial update. In the case of NGSIv2 CPr, the CPr response to Orion doesn't provide information
     about which attributes were updated and which ones were not in a partial update. Thus, in a general case the list
     of attributes in `description` contains *at least one* attribute that was not updated (to a maximum of all them). If
-    only NGSIv1 CPrs are involved in the fowarding, the list precisely identifies only the attributes that weren't updated.
+    only NGSIv1 CPrs are involved in the forwarding, the list precisely identifies only the attributes that weren't updated.
 -   You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
     forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information. Note that
     in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB just
