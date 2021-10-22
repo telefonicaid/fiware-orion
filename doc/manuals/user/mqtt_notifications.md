@@ -43,7 +43,7 @@ fields:
 
 However, note that `lastSuccess` and `lastFailure` fields (which specify the timestamp of the last
 success/failure) are supported in MQTT subscriptions in the same way than in HTTP subscriptions, along
-with correct mangagement of status field (e.g. if a MQTT subscrition is failing, `status` would be
+with correct management of status field (e.g. if a MQTT subscrition is failing, `status` would be
 `failed`).
 
 ## Custom notifications
