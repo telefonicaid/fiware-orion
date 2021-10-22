@@ -395,6 +395,9 @@ Both can be used to analyze possible problems with notifications. See section in
 [problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
 for more details.
 
+Note these two fields are included in HTTP subscriptions, but not in MQTT ones. See
+[MQTT notifications document](#mqtt_notifications.md) for more detail.
+
 [Top](#top)
 
 ## `flowControl` option

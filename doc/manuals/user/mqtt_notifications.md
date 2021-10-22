@@ -34,6 +34,18 @@ The following elements can be used within `mqtt`:
   authentication. If used, both fields have to be used together. Note that for security reasons,
   the password is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).
 
+Another difference between MQTT and HTTP subscriptions in that the former doesn't include the following
+fields:
+
+* `lastSuccessCode`. There is no equivalence to HTTP response codes in MQTT case
+* `lastFailureReason`. The only failure reason that Orion is able to detect is connection fail to the
+  corresponding MQTT broker. Thus, there is no need of providing extra detail.
+
+However, note that `lastSuccess` and `lastFailure` fields (which specify the timestamp of the last
+success/failure) are supported in MQTT subscriptions in the same way than in HTTP subscriptions, along
+with correct mangagement of status field (e.g. if a MQTT subscrition is failing, `status` would be
+`failed`).
+
 ## Custom notifications
 
 Custom notifications (described in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable))
