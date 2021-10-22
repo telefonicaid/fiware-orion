@@ -34,7 +34,7 @@ The following elements can be used within `mqtt`:
   authentication. If used, both fields have to be used together. Note that for security reasons,
   the password is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).
 
-Another difference between MQTT and HTTP subscriptions in that the former doesn't include the following
+Another difference between MQTT and HTTP subscriptions in that the former don't include the following
 fields:
 
 * `lastSuccessCode`. There is no equivalence to HTTP response codes in MQTT case

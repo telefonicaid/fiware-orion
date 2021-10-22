@@ -32,7 +32,7 @@ brokerStart CB 0 IPV4
 #
 # FIXME: this test relies on an external service (mqtt.flespi.io) which we don't control
 # It would be better to use a MQTT broker running by us (docker?)
-# Given the MQTT broker is a remote system in the Internet, we have to wait at some point
+# Given the MQTT broker is a remote system in the Internet, we have to wait at some points
 # so subscription status and logs get consolidated before checking it
 #
 # 01. Create MQTT sub with wrong user/pass
