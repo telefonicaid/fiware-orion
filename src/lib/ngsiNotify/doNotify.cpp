@@ -101,6 +101,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     __sync_fetch_and_add(&noOfNotificationsSent, 1);
     alarmMgr.notificationErrorReset(url);
 
+    // FIXME P3: at this point probably this is always false and the if condition could be removed,
+    // but it's safer this way...
     if (params->registration == false)
     {
       subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
@@ -115,6 +117,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     }
     alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
+    // FIXME P3: at this point probably this is always false and the if condition could be removed,
+    // but it's safer this way...
     if (params->registration == false)
     {
       subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
@@ -195,8 +199,6 @@ void doNotify
       estimatedQSize = queue->size();
       QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
     }
-
-
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
