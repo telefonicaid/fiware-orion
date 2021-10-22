@@ -8,6 +8,7 @@
 - Fix: service path ignored in GET /v2/registrations/{regId} (#3945)
 - Fix: change -mqttMaxAge from seconds to minutes
 - Fix: ForwardingError alarm included in log summary traces
+- Fix: lastFailure, lastSuccess and status correct management in MQTT subscriptions
 - Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
 - Hardening: improve MQTT connection logic
 - Add: per sub notification.http.timeout (#3842)
