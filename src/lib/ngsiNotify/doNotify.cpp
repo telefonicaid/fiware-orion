@@ -101,6 +101,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     __sync_fetch_and_add(&noOfNotificationsSent, 1);
     alarmMgr.notificationErrorReset(url);
 
+    // FIXME P3: at this point probably this is always false and the if condition could be removed,
+    // but it's safer this way...
     if (params->registration == false)
     {
       subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
@@ -115,6 +117,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     }
     alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
 
+    // FIXME P3: at this point probably this is always false and the if condition could be removed,
+    // but it's safer this way...
     if (params->registration == false)
     {
       subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
@@ -153,6 +157,8 @@ static void doNotifyMqtt(SenderThreadParams* params)
   lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                      params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
+  // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
+  // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
   if (mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos))
   {
     // MQTT transaction is logged only in the case it was actually published. Upon successful publishing
@@ -160,6 +166,11 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
     logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str());
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, -1, "");
+  }
+  else
+  {
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, "");
   }
 }
 
@@ -195,8 +206,6 @@ void doNotify
       estimatedQSize = queue->size();
       QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
     }
-
-
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 

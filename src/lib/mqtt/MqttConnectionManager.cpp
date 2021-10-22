@@ -311,6 +311,8 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 */
 bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
 {
+  std::string endpoint = getEndpoint(host, port);
+
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
   // the cleanup() method while is being used here (the probability is small, but
@@ -331,18 +333,22 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
 
   int id;
 
+  bool retval;
   int resultCode = mosquitto_publish(mosq, &id, topic.c_str(), (int) strlen(msg), msg, qos, false);
   if (resultCode != MOSQ_ERR_SUCCESS)
   {
-    LM_E(("Runtime Error (failed to send MQTT notification (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
+    retval = false;
+    alarmMgr.mqttConnectionError(endpoint, mosquitto_strerror(resultCode));
   }
   else
   {
+    retval = true;
     LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d with id %d", host.c_str(), port, topic.c_str(), qos, id));
+    alarmMgr.mqttConnectionReset(endpoint);
   }
 
   semGive();
-  return true;
+  return retval;
 }
 
 

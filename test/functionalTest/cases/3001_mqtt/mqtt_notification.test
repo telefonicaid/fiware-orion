@@ -43,7 +43,8 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 # 04. Create entity E with A=1
 # 05. Dump and reset accumulator, see E A=1 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP
 # 06. Update entity E with A=2
-# 07. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP
+# 07. GET subscriptions: 3 subs with timesSent 2 and lastSuccess
+# 08. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP
 #
 
 echo "01. Create MQTT sub for entity E with topic sub1"
@@ -165,7 +166,16 @@ echo
 sleep 0.5s
 
 
-echo "07. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP"
+# FIXME: if we put this step after dump&reset one, it is not checked... don't know why,
+# maybe the usage of SORT_START/END?
+echo "07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess"
+echo "=============================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP"
 echo "=============================================================================="
 accumulatorDump
 accumulatorReset
@@ -285,8 +295,106 @@ Date: REGEX(.*)
 
 
 
+07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 1211
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "MQTT sub on topic sub1",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "mqtt": {
+                "qos": 0,
+                "topic": "sub1",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "description": "MQTT sub on topic sub2",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "mqtt": {
+                "qos": 0,
+                "topic": "sub2",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "description": "HTTP sub",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
 #SORT_START
-07. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP
+08. Dump and reset accumulator, see E A=2 in: 1 MQTT sub1, 1 MQTT sub2, 1 HTTP
 ==============================================================================
 MQTT message at topic sub1:
 {
