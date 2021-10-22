@@ -32,13 +32,18 @@ brokerStart CB 0 IPV4 -relogAlarms
 #
 # FIXME: this test relies on an external service (mqtt.flespi.io) which we don't control
 # It would be better to use a MQTT broker running by us (docker?)
+# Given the MQTT broker is a remote system in the Internet, we have to wait at some points
+# so subscription status and logs get consolidated before checking it
 #
 # 01. Create MQTT sub with wrong user/pass
 # 02. Upsert to trigger first MQTT notification, which fails and raises alarm
-# 03. Upsert to trigger second MQTT notification, which fails and re-logs alarm
-# 04. Update subscription to fix user/pass
-# 05. Upsert to trigger third MQTT notification, which is ok and releases alarm
-# 06. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
+# 03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)
+# 04. Upsert to trigger second MQTT notification, which fails and re-logs alarm
+# 05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)
+# 06. Update subscription to fix user/pass
+# 07. Upsert to trigger third MQTT notification, which is ok and releases alarm
+# 08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess
+# 09. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
 #
 
 echo "01. Create MQTT sub with wrong user/pass"
@@ -84,7 +89,15 @@ echo
 echo
 
 
-echo "03. Upsert to trigger second MQTT notification, which fails and re-logs alarm"
+echo "03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)"
+echo "==================================================================================="
+sleep 1s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Upsert to trigger second MQTT notification, which fails and re-logs alarm"
 echo "============================================================================="
 payload='{
   "id": "E",
@@ -99,7 +112,15 @@ echo
 echo
 
 
-echo "04. Update subscription to fix user/pass"
+echo "05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)"
+echo "==================================================================================="
+sleep 1s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "06. Update subscription to fix user/pass"
 echo "========================================"
 payload='{
   "notification": {
@@ -116,7 +137,7 @@ echo
 echo
 
 
-echo "05. Upsert to trigger third MQTT notification, which is ok and releases alarm"
+echo "07. Upsert to trigger third MQTT notification, which is ok and releases alarm"
 echo "============================================================================="
 payload='{
   "id": "E",
@@ -130,11 +151,16 @@ orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
 echo
 echo
 
-# Given the MQTT broker is a remote system in the Internet, we have to wait some
-# times so full logs get generated
-sleep 1s
 
-echo "06. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm"
+echo "08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess"
+echo "=============================================================================================================="
+sleep 1s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "09. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm"
 echo "=========================================================================="
 cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}'
 echo
@@ -161,7 +187,49 @@ Date: REGEX(.*)
 
 
 
-03. Upsert to trigger second MQTT notification, which fails and re-logs alarm
+03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 404
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "mqtt": {
+                "passwd": "*****",
+                "qos": 0,
+                "topic": "sub1",
+                "url": "mqtt://mqtt.flespi.io:1883",
+                "user": "user"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Upsert to trigger second MQTT notification, which fails and re-logs alarm
 =============================================================================
 HTTP/1.1 204 No Content
 Location: /v2/entities/E?type=T
@@ -170,7 +238,49 @@ Date: REGEX(.*)
 
 
 
-04. Update subscription to fix user/pass
+05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 404
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "mqtt": {
+                "passwd": "*****",
+                "qos": 0,
+                "topic": "sub1",
+                "url": "mqtt://mqtt.flespi.io:1883",
+                "user": "user"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+06. Update subscription to fix user/pass
 ========================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -178,7 +288,7 @@ Date: REGEX(.*)
 
 
 
-05. Upsert to trigger third MQTT notification, which is ok and releases alarm
+07. Upsert to trigger third MQTT notification, which is ok and releases alarm
 =============================================================================
 HTTP/1.1 204 No Content
 Location: /v2/entities/E?type=T
@@ -187,18 +297,64 @@ Date: REGEX(.*)
 
 
 
-06. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
+08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess
+==============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 505
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "mqtt": {
+                "passwd": "*****",
+                "qos": 0,
+                "topic": "sub1",
+                "url": "mqtt://mqtt.flespi.io:1883",
+                "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+09. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
 ==========================================================================
 #SORT_START
 Request received: POST /v2/subscriptions, request payload (181 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "user", "passwd": "xxxx", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Raising alarm MqttConnectionError mqtt.flespi.io:1883: Connection Refused: bad user name or password.
+Request received: GET /v2/subscriptions, response code: 200
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
+Request received: GET /v2/subscriptions, response code: 200
 Repeated MqttConnectionError mqtt.flespi.io:1883: Connection Refused: bad user name or password.
 Request received: PATCH /v2/subscriptions/REGEX(.*): { "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Releasing alarm MqttConnectionError mqtt.flespi.io:1883
 MQTT Notif delivered REGEX(.*): broker: mqtt.flespi.io:1883, topic: sub1
+Request received: GET /v2/subscriptions, response code: 200
 #SORT_END
 
 

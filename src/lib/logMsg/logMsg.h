@@ -1851,25 +1851,6 @@ inline void lmTransactionStart(
 
 
 
-#if 0
-
-// This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION
-// notifications... let's hold in until OTI (deprecated in 0.26.0) gets definitivealy
-// removed from code
-
-/* ****************************************************************************
-*
-* lmTransactionStart_URL -
-*/
-inline void lmTransactionStart_URL(const char* url)
-{
-  transactionIdSet();
-  LM_T(LmtOldInfo, ("Starting transaction from %s", url));
-}
-#endif
-
-
-
 /* ****************************************************************************
 *
 * lmTransactionEnd -
