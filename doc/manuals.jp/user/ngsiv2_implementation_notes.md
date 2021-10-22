@@ -369,6 +369,10 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 [問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
 のセクションを参照してください。
 
+これらの2つのフィールドは HTTP サブスクリプションに含まれていますが、MQTT サブスクリプションには
+含まれていないことに注意してください。詳細については、[MQTT 通知ドキュメント](#mqtt_notifications.md)
+を参照してください。
+
 [トップ](#top)
 
 <a name="flowcontrol-option"></a>
