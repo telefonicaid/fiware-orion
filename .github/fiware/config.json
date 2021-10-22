@@ -1,0 +1,19 @@
+{
+    "enabler": "Orion Context Broker",
+    "chapter": "core",
+    "academy": "core/orion",
+    "readthedocs": "fiware-orion",
+    "helpdesk": "",
+    "coveralls": "",
+    "github": ["telefonicaid/fiware-orion"],
+    "dockerregistry": ["hub.docker.com"],
+    "docker": ["telefonicaiot/fiware-orion"],
+    "email": "iot_support@tid.es",
+    "status": "full",
+    "compose": "https://github.com/telefonicaid/fiware-orion/blob/master/docker/docker-compose.yml",
+    "exclude": ["mongo"],
+    "stackexchange": ["fiware-orion"],
+    "unit-test": "",
+    "smoke-test": "",
+    "dockerfile": "https://github.com/telefonicaid/fiware-orion/blob/master/docker/Dockerfile"
+}
