@@ -4,7 +4,7 @@
     "academy": "/core/orion-ld",
     "readthedocs": "fiware-orion-ld",
     "helpdesk": "Orion-LD",
-    "coveralls": "",
+    "coveralls": " https://coveralls.io/github/FIWARE/context.Orion-LD",
     "github": ["FIWARE/context.Orion-LD"],
     "dockerregistry": ["hub.docker.com"],
     "docker": ["fiware/orion-ld"],
@@ -15,5 +15,5 @@
     "stackexchange": ["http://stackoverflow.com/questions/tagged/fiware-orion"],
     "unit-test": "",
     "smoke-test": "",
-    "dockerfile": ""
+    "dockerfile": "https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/Dockerfile"
 }
