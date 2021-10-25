@@ -193,6 +193,23 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Oct 25 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.3.0-1
+- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
+- Add: support to user and password in MQTT subscriptions (#3914)
+- Add: new alarm MqttConnectionError
+- Add: per sub notification.http.timeout (#3842)
+- Add: hard limit for -requestTimeout to 1800000 millliseconds (30 min)
+- Fix: service path ignored in GET /v2/subscriptions/{subId} (#3945)
+- Fix: service path ignored in GET /v2/registrations/{regId} (#3945)
+- Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
+- Fix: deleted attribute incorrectly included in notifications (#3956)
+- Fix: return 400 instead of 500 when GeoJSON syntax error occur in ?options=upsert operations (#3949)
+- Fix: change -mqttMaxAge from seconds to minutes
+- Fix: ForwardingError alarm included in log summary traces
+- Fix: lastFailure, lastSuccess and status correct management in MQTT subscriptions
+- Hardening: improve MQTT connection logic
+- Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
+
 * Tue Sep 07 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.2.0-1
 - Add: MQTT notifications (#3001)
 - Fix: TextUnrestricted recursively applies to JSON objects and array (#3867)
