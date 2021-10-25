@@ -497,7 +497,7 @@ static void mongoSubCountersUpdateCount
 )
 {
   orion::BSONObjBuilder  condition;
-  orion::BSONObjBuilder  update; 
+  orion::BSONObjBuilder  update;
   orion::BSONObjBuilder  countB;
   orion::BSONObjBuilder  updatefailsCounter;
   orion::BSONObjBuilder  failsCounterB;

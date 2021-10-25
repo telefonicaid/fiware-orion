@@ -216,7 +216,7 @@ static bool updateForward
                       port,
                       protocol,
                       verb,
-                      tenant,                      
+                      tenant,
                       servicePath,
                       ciP->httpHeaders.xauthToken,
                       resource,
