@@ -71,6 +71,8 @@ extern int httpRequestSend
   const std::string&                         content,
   const std::string&                         fiwareCorrelation,
   const std::string&                         ngisv2AttrFormat,
+  long long                                  maxFailsLimit,
+  long long                                  failscounter,
   std::string*                               outP,
   long long*                                 statusCodeP,
   const std::map<std::string, std::string>&  extraHeaders,

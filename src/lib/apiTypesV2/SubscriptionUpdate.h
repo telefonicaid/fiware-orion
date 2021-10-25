@@ -43,6 +43,8 @@ class SubscriptionUpdate : public Subscription
   bool  statusProvided;
   bool  notificationProvided;
   bool  attrsFormatProvided;
+  bool  maxFailsLimitProvided;
+  bool  failsCounterProvided;
   bool  throttlingProvided;
   bool  blacklistProvided;
   bool  onlyChangedProvided;
@@ -54,6 +56,8 @@ class SubscriptionUpdate : public Subscription
     statusProvided(false),
     notificationProvided(false),
     attrsFormatProvided(false),
+    maxFailsLimitProvided(false),
+    failsCounterProvided(false),
     throttlingProvided(false),
     blacklistProvided(false),
     onlyChangedProvided(false),

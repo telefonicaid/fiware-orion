@@ -79,6 +79,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
                        params->content,
                        params->fiwareCorrelator,
                        params->renderFormat,
+                       params->maxFailsLimit,
+                       params->failsCounter,
                        &out,
                        &statusCode,
                        params->extraHeaders,
@@ -100,6 +102,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     }
     __sync_fetch_and_add(&noOfNotificationsSent, 1);
     alarmMgr.notificationErrorReset(url);
+    params->failsCounter = 0;
 
     // FIXME P3: at this point probably this is always false and the if condition could be removed,
     // but it's safer this way...
@@ -116,6 +119,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
       QueueStatistics::incSentError();
     }
     alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
+    params->failsCounter++;
 
     // FIXME P3: at this point probably this is always false and the if condition could be removed,
     // but it's safer this way...
@@ -209,7 +213,7 @@ void doNotify
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
+    LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****, maxFailsLimit=%lu, failsCounter=%lu",
                        logPrefix,
                        params->ip.c_str(),
                        params->port,
@@ -221,7 +225,9 @@ void doNotify
                        params->content_type.c_str(),
                        params->qos,
                        params->timeout,
-                       params->user.c_str()));
+                       params->user.c_str(),
+                       params->maxFailsLimit,
+                       params->failsCounter));
 
     LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 

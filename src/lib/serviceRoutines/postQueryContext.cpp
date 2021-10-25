@@ -142,6 +142,8 @@ static bool queryForward
   std::string     verb;
   std::string     resource;
   std::string     tenant       = ciP->tenant;
+  long long       maxFailsLimit = -1;
+  long long       failsCounter  = -1;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType;
   std::string     op;
@@ -284,6 +286,8 @@ static bool queryForward
                       payload,
                       effectiveCorrelator,
                       "",
+                      maxFailsLimit,
+                      failsCounter,
                       &out,
                       &statusCode,
                       noHeaders,

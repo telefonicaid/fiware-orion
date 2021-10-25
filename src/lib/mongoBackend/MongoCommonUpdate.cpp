@@ -1146,6 +1146,8 @@ static bool addTriggeredSubscriptions_withCache
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           cSubP->maxFailsLimit,
+                                                           cSubP->failsCounter,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
@@ -1565,6 +1567,8 @@ static bool addTriggeredSubscriptions_noCache
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long         maxFailsLimit      = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
+      long long         failsCounter       = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)     : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
@@ -1586,6 +1590,8 @@ static bool addTriggeredSubscriptions_noCache
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
+          maxFailsLimit,
+          failsCounter,
           lastNotification,
           renderFormat,
           httpInfo,
@@ -1742,6 +1748,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
+  long long                        maxFailsLimit,
+  long long                        failsCounter,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
@@ -1808,6 +1816,8 @@ static bool processOnChangeConditionForUpdateContext
   getNotifier()->sendNotifyContextRequest(ncr,
                                           notification,
                                           tenant,
+                                          maxFailsLimit,
+                                          failsCounter,
                                           xauthToken,
                                           fiwareCorrelator,
                                           correlatorCounter,
@@ -1953,6 +1963,8 @@ static unsigned int processSubscriptions
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
                                                                 tenant,
+                                                                tSubP->maxFailsLimit,
+                                                                tSubP->failsCounter,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,

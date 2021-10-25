@@ -147,6 +147,8 @@ static bool updateForward
   std::string     resource;
   std::string     op;
   std::string     tenant       = ciP->tenant;
+  long long       maxFailsLimit = -1;
+  long long       failsCounter  = -1;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = "application/json";
   std::string     out;
@@ -214,7 +216,7 @@ static bool updateForward
                       port,
                       protocol,
                       verb,
-                      tenant,
+                      tenant,                      
                       servicePath,
                       ciP->httpHeaders.xauthToken,
                       resource,
@@ -222,6 +224,8 @@ static bool updateForward
                       cleanPayload,
                       effectiveCorrelator,
                       "",
+                      maxFailsLimit,
+                      failsCounter,
                       &out,
                       &statusCode,
                       noHeaders,

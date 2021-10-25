@@ -202,6 +202,44 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
 }
 
 
+/* ****************************************************************************
+*
+* setMaxFailsLimit -
+*/
+static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+{
+  if (subUp.maxFailsLimitProvided)
+  {
+    setMaxFailsLimit(subUp, b);
+  }
+  else
+  {
+    if (subOrig.hasField(CSUB_MAXFAILSLIMIT))
+    {
+      long long maxFailsLimit = getIntOrLongFieldAsLongF(subOrig, CSUB_MAXFAILSLIMIT);
+
+      b->append(CSUB_MAXFAILSLIMIT, maxFailsLimit);
+      LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", maxFailsLimit));
+    }
+  }
+}
+
+
+/* ****************************************************************************
+*
+* setFailsCount -
+*/
+static void setFailsCounter(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+{
+  if (subOrig.hasField(CSUB_FAILSCOUNTER))
+  {
+    long long failsCounter = getIntOrLongFieldAsLongF(subOrig, CSUB_FAILSCOUNTER);
+    b->append(CSUB_FAILSCOUNTER, failsCounter);
+    LM_T(LmtMongo, ("Subscription failsCounter: %lu", failsCounter));
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -856,6 +894,8 @@ std::string mongoUpdateSubscription
   setExpiration(subUp, subOrig, &b);
   setNotificationInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
+  setMaxFailsLimit(subUp, subOrig, &b);
+  setFailsCounter(subUp, subOrig, &b);
   setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);
   setStatus(subUp, subOrig, &b);

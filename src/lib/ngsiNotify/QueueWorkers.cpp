@@ -32,7 +32,6 @@
 #include "ngsiNotify/doNotify.h"
 
 
-
 /* ****************************************************************************
 *
 * workerFunc - prototype
