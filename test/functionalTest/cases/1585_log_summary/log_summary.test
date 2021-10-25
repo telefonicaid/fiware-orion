@@ -206,6 +206,8 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
@@ -229,11 +231,16 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 Transactions: 5 _new: 1_
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
 
 
 10. PUT /v2/noService
@@ -259,6 +266,8 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 Transactions: 5 _new: 1_
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
@@ -268,6 +277,15 @@ Transactions: 6 _new: 1_
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
+Transactions: REGEX((6 _new: 1_|7 _new: 1_))
+DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Bad input active alarms: 1, raised: _total: 2, new: 1_, released: _total: 1, new: 0_
 
 
 --TEARDOWN--

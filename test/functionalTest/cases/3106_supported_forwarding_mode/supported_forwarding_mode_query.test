@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-supportedFowardingMode forwarding - query
+supportedForwardingMode forwarding - query
 
 --SHELL-INIT--
 dbInit CB

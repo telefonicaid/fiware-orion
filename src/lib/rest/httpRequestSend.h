@@ -51,39 +51,11 @@ extern int httpRequestConnect(const std::string& host, unsigned short port);
 
 
 
-/* ****************************************************************************
-*
-* httpRequestSend - 
-*/
-extern int httpRequestSend
-(
-  const std::string&                         from,
-  const std::string&                         ip,
-  unsigned short                             port,
-  const std::string&                         protocol,
-  const std::string&                         verb,
-  const std::string&                         tenant,
-  const std::string&                         servicePath,
-  const std::string&                         xauthToken,
-  const std::string&                         resource,
-  const std::string&                         content_type,
-  const std::string&                         content,
-  const std::string&                         fiwareCorrelation,
-  const std::string&                         ngisv2AttrFormat,
-  std::string*                               outP,
-  long long*                                 statusCodeP,
-  const std::map<std::string, std::string>&  extraHeaders,
-  const std::string&                         acceptFormat          = "",
-  long                                       timeoutInMilliseconds = -1
-);
-
-
-
 /* ****************************************** **********************************
 *
-* httpRequestSendWithCurl -
+* httpRequestSend -
 */
-extern int httpRequestSendWithCurl
+extern int httpRequestSend
 (
   CURL*                                      curl,
   const std::string&                         from,

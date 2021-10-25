@@ -308,6 +308,8 @@ Orion consumes 4 threads:
 * Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
 * Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
 
+An additional thread is created for printing [log summary traces](logs.md#summary-traces) if `-logSummary` is in use.
+
 In busy state, the number of threads will be higher. With default configuration, Orion creates a new thread
 for each incoming request and for each outgoing notification. These threads are destroyed once their
 work finalizes.
@@ -347,6 +349,8 @@ Using both parameters, in any situation (either idle or busy) Orion consumes a f
 * `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
 * `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
 * `n` threads corresponding to the workers in the notification thread pool.
+
+An additional thread is created for printing [log summary traces](logs.md#summary-traces) if `-logSummary` is in use.
 
 Apart from avoiding the thread exhaustion problem, there is a trade-off between using thread pools and
 not. On the one side, using thread pools is beneficial as it saves thread creation/destruction time.

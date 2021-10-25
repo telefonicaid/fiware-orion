@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-supportedFowardingMode basic CRUD
+supportedForwardingMode basic CRUD
 
 --SHELL-INIT--
 dbInit CB
@@ -30,13 +30,13 @@ brokerStart CB 0-255 IPv4 -statCounters
 --SHELL--
 
 #
-# 01. Register without supportedFowardingMode
+# 01. Register without supportedForwardingMode
 # 02. Register with supportedForwardingMode = all
 # 03. Register with supportedForwardingMode = update
 # 04. Register with supportedForwardingMode = query
 # 05. Register with supportedForwardingMode = none
 # 06. GET registrations and see all them
-# 07. Register with supportedFowardingMode = xxx, get error
+# 07. Register with supportedForwardingMode = xxx, get error
 #
 
 
@@ -181,8 +181,8 @@ echo
 echo
 
 
-echo "07. Register with supportedFowardingMode = xxx, get error"
-echo "========================================================="
+echo "07. Register with supportedForwardingMode = xxx, get error"
+echo "=========================================================="
 payload='{
    "dataProvided": {
      "entities": [
@@ -385,8 +385,8 @@ Date: REGEX(.*)
 ]
 
 
-07. Register with supportedFowardingMode = xxx, get error
-=========================================================
+07. Register with supportedForwardingMode = xxx, get error
+==========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 81
 Content-Type: application/json

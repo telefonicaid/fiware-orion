@@ -1,9 +1,9 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
+#ifndef SRC_LIB_NGSINOTIFY_DONOTIFY_H_
+#define SRC_LIB_NGSINOTIFY_DONOTIFY_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,11 +23,25 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
 
+#include <curl/curl.h>
+
+#include "ngsiNotify/senderThread.h"
+#include "common/SyncQOverflow.h"
 
 
-#define ORION_VERSION "3.3.0-next"
+/* ****************************************************************************
+*
+* doNotify -
+*/
+extern void doNotify
+(
+  std::vector<SenderThreadParams*>*                  paramsV,
+  CURL*                                              curl,
+  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue,
+  const char*                                        logPrefix
+);
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+#endif  // SRC_LIB_NGSINOTIFY_DONOTIFY_H_
