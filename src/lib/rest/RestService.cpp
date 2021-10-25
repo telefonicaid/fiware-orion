@@ -52,14 +52,15 @@
 #include "rest/RestService.h"
 
 
-/*****************************************************************************
+/* ****************************************************************************
 *
-* raisedAlarm -
+* badInputSeen - 
 *
-* raisedAlarm is a variable is used when a BadInput alaarm is raised
-*
+* badInputSeen is a variable to keep track of whether a BadInput has already been issued
+* for the current request.
+* We only want ONE Bad Input per request.
 */
-__thread bool raisedAlarm = true;
+__thread bool badInputSeen = true;
 
 
 
@@ -703,7 +704,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // So, the 'Bad Input' alarm is cleared for this client.
     //
     //
-    if ((serviceV != restBadVerbV) && (!raisedAlarm))
+    if ((serviceV != restBadVerbV) && (!badInputSeen))
     {
       alarmMgr.badInputReset(clientIp);
     }
@@ -763,7 +764,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  answer;
 
   restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
-  raisedAlarm = alarmMgr.badInput(clientIp, details);
+  badInputSeen = alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
 
   restReply(ciP, answer);
