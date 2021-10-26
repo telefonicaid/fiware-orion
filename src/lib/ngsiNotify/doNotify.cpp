@@ -79,8 +79,6 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
                        params->content,
                        params->fiwareCorrelator,
                        params->renderFormat,
-                       params->maxFailsLimit,
-                       params->failsCounter,
                        &out,
                        &statusCode,
                        params->extraHeaders,
@@ -102,13 +100,12 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     }
     __sync_fetch_and_add(&noOfNotificationsSent, 1);
     alarmMgr.notificationErrorReset(url);
-    params->failsCounter = 0;
 
     // FIXME P3: at this point probably this is always false and the if condition could be removed,
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
+      subNotificationErrorStatus(params->tenant, params->subscriptionId, false, statusCode, "");
     }
   }
   else
@@ -119,13 +116,12 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
       QueueStatistics::incSentError();
     }
     alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
-    params->failsCounter++;
 
     // FIXME P3: at this point probably this is always false and the if condition could be removed,
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
+      subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->maxFailsLimit > 0 && params->failsCounter >= params->maxFailsLimit);
     }
   }
 
@@ -170,11 +166,11 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
     logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str());
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, -1, "");
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
   {
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, "");
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->maxFailsLimit > 0 && params->failsCounter >= params->maxFailsLimit);
   }
 }
 

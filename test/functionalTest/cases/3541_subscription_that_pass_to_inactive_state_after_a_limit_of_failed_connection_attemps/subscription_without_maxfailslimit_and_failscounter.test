@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-subscription_without_maxfailslimit_and_failscounter
+Subscription without maxFailsLimit and failsCounter
 
 --SHELL-INIT--
 dbInit CB
@@ -35,7 +35,7 @@ brokerStart CB
 # 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
 # 07. POST /v2/subscriptions, to create subscription without maxFailsLimit=foo and see error
 #
 
@@ -122,11 +122,7 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
-echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
+echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed'
 echo '====================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -156,9 +152,9 @@ payload='{
     },
     "attrs": [
       "temperature"
-    ]
-  },
-  "maxFailsLimit" : "foo"
+    ],
+    "maxFailsLimit" : "foo"
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -238,7 +234,7 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
 =====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 484
@@ -263,7 +259,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "active",
+    "status": "failed",
     "subject": {
         "condition": {
             "attrs": [

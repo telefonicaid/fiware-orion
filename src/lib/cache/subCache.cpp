@@ -1269,15 +1269,16 @@ extern bool noCache;
 * A timestamp for this last failure is set for the sub-item in the sub-cache  and
 * the consecutive number of notification errors for the subscription is incremented.
 *
-* If 'errors' == 0, then the subscription is marked as non-erroneous.
+* If error == true, then the subscription is marked as non-erroneous.
 */
 void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors,
+  bool                error,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  bool                maxFailsReached
 )
 {
   if (noCache)
@@ -1286,15 +1287,20 @@ void subNotificationErrorStatus
 
     time_t now = time(NULL);
 
-    if (errors == 0)
+    if (error)
     {
-      // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, -1, now, -1, now, "", statusCode);
+      std::string status = "";
+      if (maxFailsReached)
+      {
+        status = STATUS_INACTIVE;
+      }
+      // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status);
     }
     else
     {
-      // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1);
+      // count == 0 (inc is done in another part), fails = 0, lastFailure == -1, failureReason == "", status == ""
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "");
     }
 
     return;
@@ -1315,38 +1321,24 @@ void subNotificationErrorStatus
     return;
   }
 
-  if (errors == 0)
+  if (error)
+  {
+    subP->failsCounter++;
+    subP->lastFailure       = now;
+    subP->lastFailureReason = failureReason;
+
+    if (maxFailsReached)
+    {
+      // update the status to inactive
+      subP->status = STATUS_INACTIVE;
+      LM_T(LmtSubCache, ("Update the status to %s", subP->status.c_str()));
+    }
+  }
+  else
   {
     subP->failsCounter    = 0;
     subP->lastSuccess     = now;
     subP->lastSuccessCode = statusCode;
-  }
-  else
-  {
-    subP->failsCounter     += 1;
-    subP->lastFailure       = now;
-    subP->lastFailureReason = failureReason;
-  }
-
-  CachedSubscription*  cSubP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
-
-  if (subP->maxFailsLimit > 0 && subP->failsCounter > 0)
-  {
-    if (subP->failsCounter > subP->maxFailsLimit)
-    {
-      orion::BSONObjBuilder bobSet;
-      orion::BSONObjBuilder bobUpdate;
-      orion::BSONObj        query;
-      std::string           err;
-
-      bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
-      bobUpdate.append("$set", bobSet.obj());
-
-      // update the status to inactive (in both DB and csubs cache)
-      orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);
-      cSubP->status = STATUS_INACTIVE;
-      LM_T(LmtSubCache, ("Update the status to %s", cSubP->status.c_str()));
-    }
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

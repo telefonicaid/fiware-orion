@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-subscription_that_pass_to_inactive_state_after_a_limit_of_failed_connection_attemps
+Subscription that pass to inactive state after a limit of failed connection attemps
 
 --SHELL-INIT--
 dbInit CB
@@ -90,9 +90,9 @@ payload='{
     },
     "attrs": [
       "temperature"
-    ]
-  },
-  "maxFailsLimit" : 5
+    ],
+    "maxFailsLimit": 5
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -132,10 +132,6 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
 echo '06. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
@@ -158,10 +154,6 @@ payload='{
 orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
 
 
 echo '08. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=2'
@@ -188,10 +180,6 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
 echo '10. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=3'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
@@ -214,10 +202,6 @@ payload='{
 orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
 
 
 echo '12. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=4'
@@ -244,10 +228,6 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
 echo '14. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=5'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
@@ -270,10 +250,6 @@ payload='{
 orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
 
 
 echo '16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.'
@@ -307,7 +283,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 369
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -320,6 +296,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "failsCounter": 0,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },

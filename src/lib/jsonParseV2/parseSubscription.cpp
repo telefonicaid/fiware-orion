@@ -241,24 +241,6 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     subsP->throttling = 0;  // Default value if not provided at creation => no throttling
   }
 
-  // MaxFailsLimit
-  Opt<int64_t> maxFailsLimitOpt = getInt64Opt(document, "maxFailsLimit");
-  if (!maxFailsLimitOpt.ok())
-  {
-    return badInput(ciP, maxFailsLimitOpt.error);
-  }
-  else if (maxFailsLimitOpt.given)
-  {
-    subsP->maxFailsLimitProvided = true;
-    subsP->failsCounter = 0;
-    subsP->maxFailsLimit = maxFailsLimitOpt.value;
-  }
-  else if (!update)  // maxFailsLimit was not set and it is not update
-  {
-    subsP->maxFailsLimit = 0;  // Default value if not provided at creation => no maxFailsLimit
-    subsP->failsCounter  = 0;  // Default value of failsCounter if no maxFailsLimit
-  }
-
   return "OK";
 }
 
@@ -985,6 +967,19 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   {
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
+  }
+
+  // MaxFailsLimit
+  Opt<int64_t> maxFailsLimitOpt = getInt64Opt(notification, "maxFailsLimit");
+  if (!maxFailsLimitOpt.ok())
+  {
+    return badInput(ciP, maxFailsLimitOpt.error);
+  }
+  // FIXME PR: check is actually a number greater than 0
+  else if (maxFailsLimitOpt.given)
+  {
+    subsP->notification.maxFailsLimit = maxFailsLimitOpt.value;
+    subsP->notification.failsCounter = 0;
   }
 
   return "";

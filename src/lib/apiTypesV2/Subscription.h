@@ -134,8 +134,6 @@ struct Subscription
   long long     expires;
   std::string   status;
   Notification  notification;
-  long long     maxFailsLimit;
-  long long     failsCounter;
   long long     throttling;
   RenderFormat  attrsFormat;
   Restriction   restriction;

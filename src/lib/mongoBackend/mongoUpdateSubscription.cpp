@@ -208,7 +208,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
 */
 static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 {
-  if (subUp.maxFailsLimitProvided)
+  if (subUp.notification.maxFailsLimit > 0)
   {
     setMaxFailsLimit(subUp, b);
   }

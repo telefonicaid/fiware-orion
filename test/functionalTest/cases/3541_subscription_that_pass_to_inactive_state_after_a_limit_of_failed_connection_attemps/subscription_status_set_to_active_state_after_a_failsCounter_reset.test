@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-subscription_status_set_to_active_state_after_a_failsCounter_reset
+Subscription status sest to active after a failsCounter reset
 
 --SHELL-INIT--
 dbInit CB
@@ -85,9 +85,9 @@ payload='{
     },
     "attrs": [
       "temperature"
-    ]
-  },
-  "maxFailsLimit" : 5
+    ],
+    "maxFailsLimit" : 5
+  }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -127,10 +127,6 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
 echo '06. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
@@ -153,10 +149,6 @@ payload='{
 orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
 
 
 echo '08. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=2'
@@ -188,10 +180,6 @@ payload='{
 orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
 echo
 echo
-
-
-# Await sub-cache contents to be dumped into database
-sleep 3.5
 
 
 echo '11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
@@ -226,7 +214,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 369
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -239,6 +227,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "failsCounter": 0,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
@@ -386,7 +375,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 565
+Content-Length: 582
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -399,6 +388,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "failsCounter": 0,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },

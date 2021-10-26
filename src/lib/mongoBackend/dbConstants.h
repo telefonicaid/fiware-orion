@@ -131,6 +131,8 @@
 /* ****************************************************************************
 *
 * Constant strings for field values acting as keywords
+*
+* FIXME P10: use an enum for active/inactive/expired instead of strings
 */
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
