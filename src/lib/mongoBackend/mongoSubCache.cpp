@@ -516,6 +516,7 @@ static void mongoSubCountersUpdateCount
   }
   else
   {
+    // no fails mean notification ok, thus reseting the counter
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
@@ -524,6 +525,8 @@ static void mongoSubCountersUpdateCount
     setB.append(CSUB_STATUS, status);
   }
 
+  // by construction, at least one of incB or setB has a field and update object
+  // cannot be empty
   if (incB.nFields() > 0)
   {
     update.append("$inc", incB.obj());

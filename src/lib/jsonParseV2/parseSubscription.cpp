@@ -974,10 +974,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   if (!maxFailsLimitOpt.ok())
   {
     return badInput(ciP, maxFailsLimitOpt.error);
-  }
-  // FIXME PR: check is actually a number greater than 0
+ }
   else if (maxFailsLimitOpt.given)
   {
+    if (maxFailsLimitOpt.value <= 0)
+    {
+      return badInput(ciP, "maxFailsLimit must be greater than zero");
+    }
+
     subsP->notification.maxFailsLimit = maxFailsLimitOpt.value;
     subsP->notification.failsCounter = 0;
   }

@@ -1336,6 +1336,7 @@ void subNotificationErrorStatus
   }
   else
   {
+    // no fails mean notification ok, thus reseting the counter
     subP->failsCounter    = 0;
     subP->lastSuccess     = now;
     subP->lastSuccessCode = statusCode;

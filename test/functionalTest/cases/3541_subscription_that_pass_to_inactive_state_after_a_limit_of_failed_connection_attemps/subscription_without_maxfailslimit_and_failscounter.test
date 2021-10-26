@@ -36,7 +36,6 @@ brokerStart CB
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 # 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
-# 07. POST /v2/subscriptions, to create subscription without maxFailsLimit=foo and see error
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -127,40 +126,6 @@ echo '==========================================================================
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
-
-
-echo '07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error'
-echo '======================================================================================'
-payload='{
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [
-      "temperature"
-    ],
-    "maxFailsLimit" : "foo"
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-echo
-echo
-
 
 
 --REGEXPECT--
@@ -273,20 +238,6 @@ Date: REGEX(.*)
             }
         ]
     }
-}
-
-
-07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error
-======================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 66
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "maxFailsLimit is not an int",
-    "error": "BadRequest"
 }
 
 
