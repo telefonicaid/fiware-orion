@@ -724,9 +724,8 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
 *
-* Note that 'count', which is the counter of how many times a notification has been
-* fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
-* has made a notification to be triggered/fired upon creation-time of the subscription.
+* Note that 'count' and 'failsCounter', which is the counter of how many times a notification has been
+* fired and has failed, are set to ZERO
 */
 void subCacheItemInsert
 (
@@ -740,7 +739,6 @@ void subCacheItemInsert
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
-  int64_t                            failsCounter,
   int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
@@ -775,7 +773,6 @@ void subCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
-  cSubP->failsCounter          = failsCounter;
   cSubP->maxFailsLimit         = maxFailsLimit;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -786,6 +783,7 @@ void subCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
@@ -1128,7 +1126,7 @@ void subCacheSync(void)
 
 
   //
-  // 2. Refresh cache (count set to 0)
+  // 2. Refresh cache (count and failsCounter set to 0)
   //
   subCacheRefresh();
 

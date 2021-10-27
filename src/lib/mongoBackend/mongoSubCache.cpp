@@ -62,7 +62,7 @@
 *  -5:  Error parsing string filter
 *  -6:  Error parsing metadata string filter
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter' of the inserted subscription are set to ZERO.
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
@@ -259,7 +259,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter" of the inserted subscription are set to ZERO.
 * This is because the sub cache only counts the increments in these accumulating counters,
 * so that other CBs, operating on the same DB will not overwrite the value of these accumulators
 */
