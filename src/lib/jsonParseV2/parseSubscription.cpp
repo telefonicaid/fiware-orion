@@ -983,7 +983,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
 
     subsP->notification.maxFailsLimit = maxFailsLimitOpt.value;
-    subsP->notification.failsCounter = 0;
   }
 
   return "";

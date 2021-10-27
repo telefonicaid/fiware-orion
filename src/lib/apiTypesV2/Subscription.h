@@ -80,7 +80,7 @@ struct Notification
     blacklist(false),
     onlyChanged(false),
     timesSent(0),
-    failsCounter(-1),
+    failsCounter(0),
     maxFailsLimit(-1),
     lastNotification(-1),
     httpInfo(),
