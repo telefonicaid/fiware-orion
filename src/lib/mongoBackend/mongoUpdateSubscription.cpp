@@ -872,7 +872,7 @@ std::string mongoUpdateSubscription
 
     // We save information to keep during the update in local CachedSubscription object, so we
     // avoid direct access to cache and potential concurrency problems (e.g. the cache
-    // is destroyed by the refresh logic while we are using)
+    // element pointed by subCacheP is destroyed by the refresh logic while we are using it)
     CachedSubscription* subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
 
     if (subCacheP != NULL)
