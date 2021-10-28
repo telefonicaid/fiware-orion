@@ -1117,6 +1117,8 @@ void subCacheSync(void)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
+    // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+    // lastNotification, lastFailure and lastSuccess
     if (cssP != NULL)
     {
       if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)

@@ -86,6 +86,9 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+
+  // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+  // lastNotification, lastFailure, lastSuccess and lastSuccessCode
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,

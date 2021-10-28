@@ -342,6 +342,9 @@ int mongoSubCacheItemInsert
     return -4;
   }
 
+  //
+  // 04. Use fresh data from CachedSubSaved
+  //
   if (cssP != NULL)
   {
     cSubP->lastNotificationTime  = cssP->lastNotificationTime;
@@ -356,7 +359,7 @@ int mongoSubCacheItemInsert
     // cssP cannot be NULL, as we have reached this point called by updateInCache()
     // which, in sequence, is called from mongoUpdateSubscription(). That function
     // has a guard that precules cssP to be NULL
-    LM_E(("Runtime Error (cssP is NULL)"));
+    LM_E(("Runtime Error (impossible NULL pointer situation)"));
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
@@ -365,7 +368,6 @@ int mongoSubCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
-  // cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
