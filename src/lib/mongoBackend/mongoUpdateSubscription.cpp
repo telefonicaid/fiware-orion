@@ -841,7 +841,6 @@ std::string mongoUpdateSubscription
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
-  long long              lastNotification = 0;
   CachedSubscription*    subCacheP        = NULL;
 
   if (!noCache)
@@ -894,7 +893,8 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification);
+    updateInCache(doc, subUp, tenant, subCacheP != NULL? subCacheP->lastNotificationTime : -1);
+    //updateInCache(doc, subUp, tenant, -1);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

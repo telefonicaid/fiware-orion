@@ -1138,19 +1138,19 @@ void subCacheSync(void)
       if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
       {
         // cssP->lastNotificationTime is older than what's currently in DB => throw away
-        cssP->lastNotificationTime = 0;
+        cssP->lastNotificationTime = -1;
       }
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
         // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure = 0;
+        cssP->lastFailure = -1;
       }
 
       if (cssP->lastSuccess < cSubP->lastSuccess)
       {
         // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess = 0;
+        cssP->lastSuccess = -1;
       }
     }
 

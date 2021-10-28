@@ -1084,6 +1084,7 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
+#if 0
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
@@ -1119,6 +1120,7 @@ static bool addTriggeredSubscriptions_withCache
                          now,
                          now - cSubP->lastNotificationTime));
     }
+#endif
 
     //
     // FIXME P4: See issue #2076.
