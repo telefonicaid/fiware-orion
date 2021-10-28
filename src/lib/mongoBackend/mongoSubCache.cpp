@@ -267,7 +267,7 @@ int mongoSubCacheItemInsert
   const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
-  int                    lastNotificationTime,
+  CachedSubSaved*        cssP,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -343,6 +343,7 @@ int mongoSubCacheItemInsert
   }
 
 
+#if 0
   //
   // 04. Extract data from mongo sub
   //
@@ -355,6 +356,21 @@ int mongoSubCacheItemInsert
     //
     lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
   }
+#endif
+
+  if (cssP != NULL)
+  {
+    cSubP->lastNotificationTime  = cssP->lastNotificationTime;
+    cSubP->lastFailure           = cssP->lastFailure;
+    cSubP->lastFailureReason     = cssP->lastFailureReason;
+    cSubP->lastSuccess           = cssP->lastSuccess;
+    cSubP->lastSuccessCode       = cssP->lastSuccessCode;
+    // FIXME PR: not sure what to do with count... currently it is set below to 0
+  }
+  else
+  {
+    LM_E(("Runtime Error (cssP is NULL)"));
+  }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
@@ -362,7 +378,7 @@ int mongoSubCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->lastNotificationTime  = lastNotificationTime;
+  // cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
