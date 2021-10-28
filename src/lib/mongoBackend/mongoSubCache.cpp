@@ -342,22 +342,6 @@ int mongoSubCacheItemInsert
     return -4;
   }
 
-
-#if 0
-  //
-  // 04. Extract data from mongo sub
-  //
-  if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
-  {
-    //
-    // If no lastNotificationTime is given to this function AND
-    // if the database objuect contains lastNotificationTime,
-    // then use the value from the database
-    //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
-  }
-#endif
-
   if (cssP != NULL)
   {
     cSubP->lastNotificationTime  = cssP->lastNotificationTime;
@@ -369,6 +353,9 @@ int mongoSubCacheItemInsert
   }
   else
   {
+    // cssP cannot be NULL, as we have reached this point called by updateInCache()
+    // which, in sequence, is called from mongoUpdateSubscription(). That function
+    // has a guard that precules cssP to be NULL
     LM_E(("Runtime Error (cssP is NULL)"));
   }
 

@@ -1084,44 +1084,6 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
-#if 0
-    // Throttling
-    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
-    {
-      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
-      {
-        LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime));
-        continue;
-      }
-      else
-      {
-        LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime));
-      }
-    }
-    else
-    {
-      LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu)",
-                         cSubP->subscriptionId,
-                         cSubP->throttling,
-                         cSubP->lastNotificationTime,
-                         now,
-                         now - cSubP->lastNotificationTime));
-    }
-#endif
-
     //
     // FIXME P4: See issue #2076.
     //           aList is just a copy of cSubP->attributes - would be good to avoid

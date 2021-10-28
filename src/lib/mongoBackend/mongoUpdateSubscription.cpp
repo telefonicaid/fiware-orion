@@ -886,6 +886,10 @@ std::string mongoUpdateSubscription
       cssP->lastFailureReason    = subCacheP->lastFailureReason;
       cssP->lastSuccessCode      = subCacheP->lastSuccessCode;
     }
+    else
+    {
+      LM_E(("Runtime Error (csub cache fail: csub not found during update subscription"));
+    }
 
     cacheSemGive(__FUNCTION__, "Looking for subscription in cache subscription");
   }
@@ -929,12 +933,12 @@ std::string mongoUpdateSubscription
     return "";
   }
 
-  // Update in cache
-  if (!noCache)
+  // Update in cache. Note that cssP is NULL only in the unpredectible case of cache fail, so
+  // no update in the cache has to be done in this case
+  if ((!noCache) && (cssP != NULL))
   {
     // At this point cssP object contains the up to date information, mixing from DB and old cache entry
     updateInCache(doc, subUp, tenant, cssP);
-    // updateInCache(doc, subUp, tenant, -1);
   }
 
   if (cssP != NULL)
