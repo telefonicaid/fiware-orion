@@ -454,7 +454,7 @@ static void setCount(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
 * setLastNotification -
 *
 */
-static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
+static void setLastNotification(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
   //
   // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
@@ -471,11 +471,18 @@ static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscriptio
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
-  // If the cached value of lastNotificationTime is higher, then use it.
+  // The higher value is used and normalized in both places
   //
-  if (subCacheP != NULL && (subCacheP->lastNotificationTime > lastNotification))
+  if (cssP != NULL)
   {
-    lastNotification = subCacheP->lastNotificationTime;
+    if (cssP->lastNotificationTime > lastNotification)
+    {
+      lastNotification = cssP->lastNotificationTime;
+    }
+    else
+    {
+      cssP->lastNotificationTime = lastNotification;
+    }
   }
 
   setLastNotification(lastNotification, b);
@@ -487,19 +494,27 @@ static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscriptio
 *
 * setLastFailure -
 */
-static void setLastFailure(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
+static void setLastFailure(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
   long long   lastFailure       = subOrig.hasField(CSUB_LASTFAILURE)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE) : -1;
   std::string lastFailureReason = subOrig.hasField(CSUB_LASTFAILUREASON) ? getStringFieldF(subOrig, CSUB_LASTFAILUREASON)      : "";
 
   //
   // Compare with 'lastFailure' from the sub-cache.
-  // If the cached value of lastFailure is higher, then use it.
+  // The higher value is used and normalized in both places
   //
-  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
+  if (cssP != NULL)
   {
-    lastFailure       = subCacheP->lastFailure;
-    lastFailureReason = subCacheP->lastFailureReason;
+    if (cssP->lastFailure > lastFailure)
+    {
+      lastFailure       = cssP->lastFailure;
+      lastFailureReason = cssP->lastFailureReason;
+    }
+    else
+    {
+      cssP->lastFailure       = lastFailure;
+      cssP->lastFailureReason = lastFailureReason;
+    }
   }
 
   setLastFailure(lastFailure, lastFailureReason, b);
@@ -511,19 +526,27 @@ static void setLastFailure(const orion::BSONObj& subOrig, CachedSubscription* su
 *
 * setLastSuccess -
 */
-static void setLastSuccess(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
+static void setLastSuccess(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
   long long lastSuccess     = subOrig.hasField(CSUB_LASTSUCCESS)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS)     : -1;
   long long lastSuccessCode = subOrig.hasField(CSUB_LASTSUCCESSCODE) ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE) : -1;
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
-  // If the cached value of lastSuccess is higher, then use it.
+  // The higher value is used and normalized in both places
   //
-  if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
+  if (cssP != NULL)
   {
-    lastSuccess     = subCacheP->lastSuccess;
-    lastSuccessCode = subCacheP->lastSuccessCode;
+    if (cssP->lastSuccess > lastSuccess)
+    {
+      lastSuccess     = cssP->lastSuccess;
+      lastSuccessCode = cssP->lastSuccessCode;
+    }
+    else
+    {
+      cssP->lastSuccess = lastSuccess;
+      cssP->lastSuccessCode = lastSuccessCode;
+    }
   }
 
   setLastSuccess(lastSuccess, lastSuccessCode, b);
@@ -673,7 +696,7 @@ static void updateInCache
   const orion::BSONObj&      doc,
   const SubscriptionUpdate&  subUp,
   const std::string&         tenant,
-  long long                  lastNotification
+  CachedSubSaved*            cssP
 )
 {
   //
@@ -764,7 +787,7 @@ static void updateInCache
                                           doc,
                                           subUp.id.c_str(),
                                           servicePathCache,
-                                          lastNotification,
+                                          cssP,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
@@ -841,14 +864,32 @@ std::string mongoUpdateSubscription
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
-  long long              lastNotification = 0;
-  CachedSubscription*    subCacheP        = NULL;
+  CachedSubSaved*        cssP = NULL;
 
   if (!noCache)
   {
     cacheSemTake(__FUNCTION__, "Looking for subscription in cache subscription");
 
-    subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+    // We save information to keep during the update in local CachedSubscription object, so we
+    // avoid direct access to cache and potential concurrency problems (e.g. the cache
+    // element pointed by subCacheP is destroyed by the refresh logic while we are using it)
+    CachedSubscription* subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+
+    if (subCacheP != NULL)
+    {
+      cssP = new CachedSubSaved();
+
+      cssP->lastNotificationTime = subCacheP->lastNotificationTime;
+      cssP->count                = subCacheP->count;
+      cssP->lastFailure          = subCacheP->lastFailure;
+      cssP->lastSuccess          = subCacheP->lastSuccess;
+      cssP->lastFailureReason    = subCacheP->lastFailureReason;
+      cssP->lastSuccessCode      = subCacheP->lastSuccessCode;
+    }
+    else
+    {
+      LM_E(("Runtime Error (csub cache fail: csub not found during update subscription"));
+    }
 
     cacheSemGive(__FUNCTION__, "Looking for subscription in cache subscription");
   }
@@ -873,9 +914,10 @@ std::string mongoUpdateSubscription
   setFormat(subUp, subOrig, &b);
 
   // last* field take into account potenatially newer information in the cache
-  setLastNotification(subOrig, subCacheP, &b);
-  setLastFailure(subOrig, subCacheP, &b);
-  setLastSuccess(subOrig, subCacheP, &b);
+  // the cssP may be updated, if information from DB is newer
+  setLastNotification(subOrig, cssP, &b);
+  setLastFailure(subOrig, cssP, &b);
+  setLastSuccess(subOrig, cssP, &b);
 
   orion::BSONObj doc = b.obj();
 
@@ -891,10 +933,17 @@ std::string mongoUpdateSubscription
     return "";
   }
 
-  // Update in cache
-  if (!noCache)
+  // Update in cache. Note that cssP is NULL only in the unpredectible case of cache fail, so
+  // no update in the cache has to be done in this case
+  if ((!noCache) && (cssP != NULL))
   {
-    updateInCache(doc, subUp, tenant, lastNotification);
+    // At this point cssP object contains the up to date information, mixing from DB and old cache entry
+    updateInCache(doc, subUp, tenant, cssP);
+  }
+
+  if (cssP != NULL)
+  {
+    delete cssP;
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);
