@@ -352,7 +352,7 @@ int mongoSubCacheItemInsert
     cSubP->lastFailureReason     = cssP->lastFailureReason;
     cSubP->lastSuccess           = cssP->lastSuccess;
     cSubP->lastSuccessCode       = cssP->lastSuccessCode;
-    // FIXME PR: not sure what to do with count... currently it is set below to 0
+    cSubP->count                 = cssP->count;  // actualy is 0, as cssP->count is flushed in setCount()
   }
   else
   {
@@ -368,7 +368,6 @@ int mongoSubCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
