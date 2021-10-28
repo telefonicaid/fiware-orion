@@ -1,3 +1,3 @@
-- Fix: throtting after subscription update when csubs cache is in use (#3981)
+- Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
 - Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
 - Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding some potential crash situation (although very rare) accessing to csub cache
