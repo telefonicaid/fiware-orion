@@ -23,8 +23,6 @@
 * Author: Fermin Galan
 */
 
-// FIXME PR: for each macthing include here, check if we can remove include in the calling module, to simplify
-
 #include <curl/curl.h>
 
 #include "ngsiNotify/doNotify.h"

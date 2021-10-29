@@ -42,7 +42,7 @@ brokerStart CB 0 IPV4 -relogAlarms
 # 05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)
 # 06. Update subscription to fix user/pass
 # 07. Upsert to trigger third MQTT notification, which is ok and releases alarm
-# 08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess
+# 08. Get sub and see status:active, timesSent:3, lastFailure (old) and lastSuccess
 # 09. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
 #
 
@@ -152,8 +152,8 @@ echo
 echo
 
 
-echo "08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess"
-echo "=============================================================================================================="
+echo "08. Get sub and see status:active, timesSent:3, lastFailure (old) and lastSuccess"
+echo "================================================================================="
 sleep 1s
 orionCurl --url /v2/subscriptions
 echo
@@ -297,8 +297,8 @@ Date: REGEX(.*)
 
 
 
-08. Get sub and see status:active, timesSent:1 (due to update subscription), lastFailure (old) and lastSuccess
-==============================================================================================================
+08. Get sub and see status:active, timesSent:3, lastFailure (old) and lastSuccess
+=================================================================================
 HTTP/1.1 200 OK
 Content-Length: 505
 Content-Type: application/json
@@ -322,7 +322,7 @@ Date: REGEX(.*)
                 "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ"
             },
             "onlyChangedAttrs": false,
-            "timesSent": 1
+            "timesSent": 3
         },
         "status": "active",
         "subject": {

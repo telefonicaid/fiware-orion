@@ -723,6 +723,7 @@ function partExecute()
   if [ "$what" == "shell" ]
   then
     mv $dirname/$filename.$what.stdout $dirname/$filename.out # We are very much used to this name ...
+    sed -i 's/[[:space:]]*$//' $dirname/$filename.out         # Remove trailing whitespace in .out (reduces diff noise)
 
     #
     # Special sorted diff or normal REGEX diff ?
