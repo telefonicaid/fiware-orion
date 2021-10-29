@@ -355,7 +355,7 @@ int mongoSubCacheItemInsert
     cSubP->lastSuccess           = cssP->lastSuccess;
     cSubP->lastSuccessCode       = cssP->lastSuccessCode;
     cSubP->count                 = cssP->count;        // actually is 0, as cssP->count is flushed in setCount()
-    cSubP->failsCounter          = cssP->failsCounter; // FIXME PR: add proper comment here
+    cSubP->failsCounter          = cssP->failsCounter; // actually is 0, as cssP->failsCounter is flushed in setFailsCounter()
   }
   else
   {

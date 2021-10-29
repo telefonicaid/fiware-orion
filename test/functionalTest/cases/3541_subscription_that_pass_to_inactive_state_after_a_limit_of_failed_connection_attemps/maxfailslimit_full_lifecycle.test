@@ -33,7 +33,7 @@ accumulatorStart
 #
 # 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 # 02. Upsert entity to trigger notification (ok)
-# 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0, maxFailsLimit=2
+# 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2
 # 04. Stop accumulator
 # 05. Upsert entity to trigger notification (fail)
 # 06. Upsert entity to trigger notification (fail)
@@ -57,7 +57,7 @@ accumulatorStart
 # 24. Start accumulator
 # 25. PATCH /v2/subscriptions/subId to set status=active again
 # 26. Upsert entity to trigger notification (ok)
-# 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0, maxFailsLimit=5
+# 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5
 #
 
 
@@ -100,8 +100,8 @@ echo
 echo
 
 
-echo "03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0, maxFailsLimit=2"
-echo "========================================================================================================="
+echo "03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2"
+echo "==================================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -378,8 +378,8 @@ echo
 echo
 
 
-echo "27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0, maxFailsLimit=5"
-echo "========================================================================================================="
+echo "27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5"
+echo "==================================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -405,10 +405,10 @@ Date: REGEX(.*)
 
 
 
-03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0, maxFailsLimit=2
-=========================================================================================================
+03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2
+===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 407
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -418,7 +418,6 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "failsCounter": 0,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -863,10 +862,10 @@ Date: REGEX(.*)
 
 
 
-27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0, maxFailsLimit=5
-=========================================================================================================
+27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5
+===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 497
+Content-Length: 480
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -876,7 +875,6 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
-        "failsCounter": 0,
         "http": {
             "url": "http://localhost:9997/notify"
         },

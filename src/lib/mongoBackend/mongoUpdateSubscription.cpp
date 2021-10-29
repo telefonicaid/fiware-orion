@@ -229,13 +229,24 @@ static void setMaxFailsLimit(const SubscriptionUpdate& subUp, const orion::BSONO
 *
 * setFailsCount -
 */
-static void setFailsCounter(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setFailsCounter(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
+  // accumulate failsCount in the cache, flushing cache count in the process
+  long long failsCounter = 0;
+  if (cssP != NULL)
+  {
+    failsCounter += cssP->failsCounter;
+    cssP->failsCounter = 0;
+  }
+
   if (subOrig.hasField(CSUB_FAILSCOUNTER))
   {
-    long long failsCounter = getIntOrLongFieldAsLongF(subOrig, CSUB_FAILSCOUNTER);
-    b->append(CSUB_FAILSCOUNTER, failsCounter);
-    LM_T(LmtMongo, ("Subscription failsCounter: %lu", failsCounter));
+    failsCounter += getIntOrLongFieldAsLongF(subOrig, CSUB_FAILSCOUNTER);
+  }
+
+  if (failsCounter > 0)
+  {
+    setFailsCounter(failsCounter, b);
   }
 }
 
@@ -948,7 +959,6 @@ std::string mongoUpdateSubscription
   setNotificationInfo(subUp, subOrig, &b);
   setThrottling(subUp, subOrig, &b);
   setMaxFailsLimit(subUp, subOrig, &b);
-  setFailsCounter(subUp, subOrig, &b);
   setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);
   setStatus(subUp, subOrig, &b);
@@ -966,6 +976,7 @@ std::string mongoUpdateSubscription
   // count and last* field take into account potenatially newer information in the cache
   // the cssP may be updated, if information from DB is newer
   setCount(subOrig, cssP, &b);
+  setFailsCounter(subOrig, cssP, &b);
   setLastNotification(subOrig, cssP, &b);
   setLastFailure(subOrig, cssP, &b);
   setLastSuccess(subOrig, cssP, &b);

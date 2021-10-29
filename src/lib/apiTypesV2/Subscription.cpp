@@ -208,6 +208,12 @@ std::string Notification::toJson(const std::string& attrsFormat)
   if (this->maxFailsLimit > 0)
   {
     jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
+
+  // FIXME PR: only if maxFailsLimit is in use failsCounter will be printed
+  // However, maybe we want this failsCounter in any case? It can be an useful statistic...
+  if ((this->failsCounter > 0) && (this->maxFailsLimit > 0))
+  {
     jh.addNumber("failsCounter", this->failsCounter);
   }
 
