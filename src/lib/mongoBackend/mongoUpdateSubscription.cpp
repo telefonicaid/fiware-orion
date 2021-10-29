@@ -438,11 +438,23 @@ static void setConds
 *
 * setCount -
 */
-static void setCount(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+static void setCount(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
+  // accumulate count in the cache, flushing cache count in the process
+  long long count = 0;
+  if (cssP != NULL)
+  {
+    count += cssP->count;
+    cssP->count = 0;
+  }
+
   if (subOrig.hasField(CSUB_COUNT))
   {
-    long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
+    count += getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
+  }
+
+  if (count > 0)
+  {
     setCount(count, b);
   }
 }
@@ -908,13 +920,12 @@ std::string mongoUpdateSubscription
 
   setConds(subUp, subOrig, &b);
 
-  setCount(subOrig, &b);
-
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
 
-  // last* field take into account potenatially newer information in the cache
+  // count and last* field take into account potenatially newer information in the cache
   // the cssP may be updated, if information from DB is newer
+  setCount(subOrig, cssP, &b);
   setLastNotification(subOrig, cssP, &b);
   setLastFailure(subOrig, cssP, &b);
   setLastSuccess(subOrig, cssP, &b);
