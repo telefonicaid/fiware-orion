@@ -94,7 +94,7 @@ extern void setStatus(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setEntities -
 */
-extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1 = false);
 
 
 
@@ -113,7 +113,7 @@ extern void setAttrs(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 extern void setConds
 (
   const ngsiv2::Subscription&      sub,
-  const std::vector<std::string>&  notifAttributesV,
+  //const std::vector<std::string>&  notifAttributesV,
   orion::BSONObjBuilder*           b
 );
 
