@@ -269,7 +269,7 @@ int mongoSubCacheItemInsert
   const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
-  int                    lastNotificationTime,
+  CachedSubSaved*        cssP,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -344,18 +344,25 @@ int mongoSubCacheItemInsert
     return -4;
   }
 
-
   //
-  // 04. Extract data from mongo sub
+  // 04. Use fresh data from CachedSubSaved
   //
-  if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
+  if (cssP != NULL)
   {
-    //
-    // If no lastNotificationTime is given to this function AND
-    // if the database objuect contains lastNotificationTime,
-    // then use the value from the database
-    //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
+    cSubP->lastNotificationTime  = cssP->lastNotificationTime;
+    cSubP->lastFailure           = cssP->lastFailure;
+    cSubP->lastFailureReason     = cssP->lastFailureReason;
+    cSubP->lastSuccess           = cssP->lastSuccess;
+    cSubP->lastSuccessCode       = cssP->lastSuccessCode;
+    cSubP->count                 = cssP->count;        // actually is 0, as cssP->count is flushed in setCount()
+    cSubP->failsCounter          = cssP->failsCounter; // FIXME PR: add proper comment here
+  }
+  else
+  {
+    // cssP cannot be NULL, as we have reached this point called by updateInCache()
+    // which, in sequence, is called from mongoUpdateSubscription(). That function
+    // has a guard that precules cssP to be NULL
+    LM_E(("Runtime Error (impossible NULL pointer situation)"));
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
@@ -365,9 +372,6 @@ int mongoSubCacheItemInsert
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->count                 = 0;
-  cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
