@@ -271,7 +271,7 @@ int mongoSubCacheItemInsert
   const char*            servicePath,
   CachedSubSaved*        cssP,
   long long              expirationTime,
-  const std::string&     status,
+  const std::string&     status, // FIXME PR: remove. We get it through cssP
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
@@ -356,6 +356,7 @@ int mongoSubCacheItemInsert
     cSubP->lastSuccessCode       = cssP->lastSuccessCode;
     cSubP->count                 = cssP->count;        // actually is 0, as cssP->count is flushed in setCount()
     cSubP->failsCounter          = cssP->failsCounter; // actually is 0, as cssP->failsCounter is flushed in setFailsCounter()
+    cSubP->status                = cssP->status;
   }
   else
   {
@@ -372,7 +373,6 @@ int mongoSubCacheItemInsert
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;

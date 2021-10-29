@@ -204,7 +204,15 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 
     if (cSubP->failsCounter != 0)
     {
-       subP->notification.failsCounter += cSubP->failsCounter;
+      //
+      // First, compensate for -1 in 'failsCounter'
+      //
+      if (subP->notification.failsCounter == -1)
+      {
+        subP->notification.failsCounter = 0;
+      }
+
+      subP->notification.failsCounter += cSubP->failsCounter;
     }
 
     if (cSubP->count != 0)

@@ -154,7 +154,7 @@ std::string mongoCreateSubscription
   setMaxFailsLimit(sub, &b);
   setServicePath(servicePath, &b);
   setDescription(sub, &b);
-  setStatus(sub, &b);
+  setStatus(sub.status, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
   setMetadata(sub, &b);

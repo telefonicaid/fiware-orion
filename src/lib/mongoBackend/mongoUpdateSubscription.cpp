@@ -276,6 +276,7 @@ static void setDescription(const SubscriptionUpdate& subUp, const orion::BSONObj
 
 
 
+#if 0
 /* ****************************************************************************
 *
 * setStatus -
@@ -297,7 +298,7 @@ static void setStatus(const SubscriptionUpdate& subUp, const orion::BSONObj& sub
     }
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -514,21 +515,14 @@ static void setCount(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion:
 *
 * setLastNotification -
 *
+* We need to deal with lastNotification and status at the same time, as the
+* former is used to chose which status should be used (either DB or cache, the
+* newest one) if status is not provided in the sub update request
 */
-static void setLastNotification(const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
+static void setLastNotificationAndStatus(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, CachedSubSaved* cssP, orion::BSONObjBuilder* b)
 {
-  //
-  // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
-  //           Is this necessary?
-  //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
-  //           to 'newSub'
-  //
-  if (!subOrig.hasField(CSUB_LASTNOTIFICATION))
-  {
-    return;
-  }
-
-  long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
+  long long lastNotification = subOrig.hasField(CSUB_LASTNOTIFICATION) ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION) : -1;
+  std::string status         = getStringFieldF(subOrig, CSUB_STATUS);
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
@@ -539,14 +533,29 @@ static void setLastNotification(const orion::BSONObj& subOrig, CachedSubSaved* c
     if (cssP->lastNotificationTime > lastNotification)
     {
       lastNotification = cssP->lastNotificationTime;
+      status           = cssP->status;
     }
     else
     {
       cssP->lastNotificationTime = lastNotification;
+      cssP->status               = status;
     }
   }
 
   setLastNotification(lastNotification, b);
+
+  if (subUp.statusProvided)
+  {
+    // If status was provided in the update subscription request, then it
+    // overrides the status that we may have from cache/DB
+    status = subUp.status;
+    if (cssP != NULL)
+    {
+      cssP->status = subUp.status;
+    }
+  }
+
+  setStatus(status, b);
 }
 
 
@@ -942,10 +951,12 @@ std::string mongoUpdateSubscription
 
       cssP->lastNotificationTime = subCacheP->lastNotificationTime;
       cssP->count                = subCacheP->count;
+      cssP->failsCounter         = subCacheP->failsCounter;
       cssP->lastFailure          = subCacheP->lastFailure;
       cssP->lastSuccess          = subCacheP->lastSuccess;
       cssP->lastFailureReason    = subCacheP->lastFailureReason;
       cssP->lastSuccessCode      = subCacheP->lastSuccessCode;
+      cssP->status               = subCacheP->status
     }
     else
     {
@@ -961,7 +972,7 @@ std::string mongoUpdateSubscription
   setMaxFailsLimit(subUp, subOrig, &b);
   setServicePath(servicePath, &b);
   setDescription(subUp, subOrig, &b);
-  setStatus(subUp, subOrig, &b);
+  //setStatus(subUp, subOrig, &b);
   setEntities(subUp, subOrig, &b);
   setAttrs(subUp, subOrig, &b);
   setMetadata(subUp, subOrig, &b);
@@ -977,7 +988,7 @@ std::string mongoUpdateSubscription
   // the cssP may be updated, if information from DB is newer
   setCount(subOrig, cssP, &b);
   setFailsCounter(subOrig, cssP, &b);
-  setLastNotification(subOrig, cssP, &b);
+  setLastNotificationAndStatus(subUp, subOrig, cssP, &b);
   setLastFailure(subOrig, cssP, &b);
   setLastSuccess(subOrig, cssP, &b);
 

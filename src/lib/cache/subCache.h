@@ -134,6 +134,7 @@ typedef struct CachedSubSaved
   int64_t      lastSuccess;
   std::string  lastFailureReason;
   int64_t      lastSuccessCode;
+  std::string  status;
 } CachedSubSaved;
 
 
