@@ -526,6 +526,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 {
   std::string  err;
 
+#if 0
   // FIXME #3774: previously this part was based in streamming instead of append()
 
   // condition
@@ -558,8 +559,21 @@ static void mongoSubCountersUpdateLastNotificationTime
   lastNotificationTimeB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
 
   update.append("$set", lastNotificationTimeB.obj());
+#endif
 
-  if (orion::collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
+  // Note we cannot apply this simplification for lastFailure or lastSucess due to
+  // in that case there is a side field (lastFailureReason or lastSuccess code) that
+  // needs to be updated at the same time and $max doesn't help in that case
+
+  orion::BSONObjBuilder id;
+  id.append("_id", orion::OID(subId));
+
+  orion::BSONObjBuilder update;
+  orion::BSONObjBuilder maxB;
+  maxB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+  update.append("$max", maxB.obj());
+
+  if (orion::collectionUpdate(db, collection, id.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }
