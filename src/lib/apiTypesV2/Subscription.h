@@ -68,8 +68,8 @@ struct Notification
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
   MqttInfo                 mqttInfo;
   NotificationType         type;
-  int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
-  int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
+  long long                lastFailure;
+  long long                lastSuccess;
   std::string              lastFailureReason;
   long long                lastSuccessCode;
 

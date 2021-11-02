@@ -123,24 +123,6 @@ struct CachedSubscription
 
 /* ****************************************************************************
 *
-* CachedSubSaved -
-*/
-typedef struct CachedSubSaved
-{
-  int64_t      lastNotificationTime;
-  int64_t      count;
-  int64_t      failsCounter;
-  int64_t      lastFailure;
-  int64_t      lastSuccess;
-  std::string  lastFailureReason;
-  int64_t      lastSuccessCode;
-  std::string  status;
-} CachedSubSaved;
-
-
-
-/* ****************************************************************************
-*
 * subCacheActive - 
 */
 extern bool                    subCacheActive;
