@@ -46,7 +46,7 @@ class SubscriptionUpdate : public Subscription
   bool  throttlingProvided;
   bool  blacklistProvided;
   bool  onlyChangedProvided;
-  bool  fromNgsiv1;
+  bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
   SubscriptionUpdate():
     subjectProvided(false),

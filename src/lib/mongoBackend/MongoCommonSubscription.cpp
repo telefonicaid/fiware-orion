@@ -350,9 +350,8 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 */
 void setConds
 (
-  const Subscription&              sub,
-  //const std::vector<std::string>&  notifAttributesV,
-  orion::BSONObjBuilder*           b
+  const Subscription&     sub,
+  orion::BSONObjBuilder*  b
 )
 {
   orion::BSONArrayBuilder conds;
