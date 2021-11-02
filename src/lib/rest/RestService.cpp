@@ -52,17 +52,6 @@
 #include "rest/RestService.h"
 
 
-/* ****************************************************************************
-*
-* badInputSeen - 
-*
-* badInputSeen is a variable to keep track of whether a BadInput has already been issued
-* for the current request.
-* We only want ONE Bad Input per request.
-*/
-__thread bool badInputSeen = true;
-
-
 
 /* ****************************************************************************
 *
@@ -704,7 +693,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // So, the 'Bad Input' alarm is cleared for this client.
     //
     //
-    if ((serviceV != restBadVerbV) && (!badInputSeen))
+    if ((serviceV != restBadVerbV) && (!alarmMgr.badInputSeen))
     {
       alarmMgr.badInputReset(clientIp);
     }
@@ -764,7 +753,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  answer;
 
   restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
-  badInputSeen = alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInputSeen = alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
 
   restReply(ciP, answer);

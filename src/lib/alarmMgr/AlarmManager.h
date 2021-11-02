@@ -73,6 +73,7 @@ class AlarmManager
   void         semTake(void);
   void         semGive(void);
   const char*  semGet(void);
+  int64_t      badInputSeen;
 
   bool dbError(const std::string& details);
   bool dbErrorReset(void);
