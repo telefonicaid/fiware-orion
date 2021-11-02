@@ -298,13 +298,14 @@ std::string mongoUpdateSubscription
   if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
   if (subUp.notificationProvided)  setAttrs(subUp, &setB);
   if (subUp.notificationProvided)  setMetadata(subUp, &setB);
+  if (subUp.notificationProvided)  setMaxFailsLimit(subUp, &setB);
   if (subUp.expiresProvided)       setExpiration(subUp, &setB);
   if (subUp.throttlingProvided)    setThrottling(subUp, &setB);
-  //if (subUp.statusProvided)        setStatus(subUp, &setB);
+  if (subUp.statusProvided)        setStatus(subUp.status, &setB);
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
-  //if (subUp.maxFailsLimitProvided) setMaxFailsLimit(subUp, &setB); // FIXME PR: what about removal of the field?
+
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)
