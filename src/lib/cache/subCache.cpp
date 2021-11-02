@@ -1043,6 +1043,23 @@ void subCacheRefresh(void)
 
 /* ****************************************************************************
 *
+* CachedSubSaved -
+*/
+typedef struct CachedSubSaved
+{
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      failsCounter;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
+} CachedSubSaved;
+
+
+
+/* ****************************************************************************
+*
 * subCacheSync -
 *
 * 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache (savedSubV)

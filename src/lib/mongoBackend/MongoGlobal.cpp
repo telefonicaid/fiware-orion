@@ -54,7 +54,6 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
-#include "apiTypesV2/ngsiWrappers.h"
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
@@ -2375,94 +2374,6 @@ StringList subToAttributeList(const orion::BSONObj& sub)
   }
 
   return attrL;
-}
-
-
-
-#if 0
-/* ****************************************************************************
-*
-* setOnSubscriptionMetadata -
-*
-* FIXME #920: disabled by the moment, maybe removed at the end
-*/
-static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
-{
-  for (unsigned int ix = 0; ix < cerVP->size(); ix++)
-  {
-    ContextElementResponse* cerP = (*cerVP)[ix];
-
-    for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); jx++)
-    {
-      ContextAttribute*  caP     = cerP->entity.attributeVector[jx];
-      Metadata*          newMdP  = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
-
-      caP->metadataVector.push_back(newMdP);
-    }
-  }
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*/
-static orion::BSONArray processConditionVector(NotifyConditionVector* ncvP)
-{
-  orion::BSONArrayBuilder conds;
-
-  for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
-  {
-    NotifyCondition* nc = (*ncvP)[ix];
-
-    if (nc->type == ON_CHANGE_CONDITION)
-    {
-      for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
-      {
-        conds.append(nc->condValueList[jx]);
-      }
-    }
-    else
-    {
-      LM_E(("Runtime Error (unknown condition type: '%s')", nc->type.c_str()));
-    }
-  }
-
-  return conds.arr();
-}
-
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*
-* This is a wrapper for the other vesion of processConditionVector(), for NGSIv2.
-* At the end, this version should be the actual one, once NGSIv1 is removed.
-*/
-orion::BSONArray processConditionVector
-(
-  const std::vector<std::string>&  condAttributesV,
-  const std::vector<EntID>&        entitiesV,
-  const std::vector<std::string>&  notifAttributesV
-)
-{
-  NotifyConditionVector ncV;
-  EntityIdVector        enV;
-  StringList            attrL;
-
-  attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
-  entIdStdVector2EntityIdVector(entitiesV, &enV);
-  attrL.fill(notifAttributesV);
-
-  orion::BSONArray arr = processConditionVector(&ncV);
-
-  enV.release();
-  ncV.release();
-
-  return arr;
 }
 
 

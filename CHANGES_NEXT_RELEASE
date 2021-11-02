@@ -2,4 +2,4 @@
 - Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
 - Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
 - Fix: avoid reset timesSent counter upon PATCH /v2/subscriptions/{subId} when csubs cache is in use
-- Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding crash situation (although very rare) accessing to csub cache (#3701)
+- Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
