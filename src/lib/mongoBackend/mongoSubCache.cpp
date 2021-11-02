@@ -277,7 +277,7 @@ int mongoSubCacheItemInsert
   long long              count,
   long long              failsCounter,
   long long              expirationTime,
-  const std::string&     status, // FIXME PR: remove. We get it through cssP
+  const std::string&     status,  // FIXME PR: remove. We get it through cssP
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
