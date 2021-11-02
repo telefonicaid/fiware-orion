@@ -348,8 +348,9 @@ int mongoSubCacheItemInsert
   }
 
 
+  // 04. Extract data from subP
   //
-  // 04. Fill fields
+  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);

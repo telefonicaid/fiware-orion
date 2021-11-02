@@ -196,7 +196,6 @@ static void updateInCache
   //
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
-
   long long    lastNotificationTime;
   long long    lastFailure;
   std::string  lastFailureReason;

@@ -408,7 +408,6 @@ bool orion::collectionFindAndModify
 
   if (success)
   {
-    // lastErrorObject.updatedExisting: false
     *reply = orion::BSONObj(&_reply);
     bson_destroy(&_reply);
     LM_T(LmtOldInfo, ("Database Operation Successful (findAndModify: <%s, %s>)", bsonQStr, bsonDocStr));
