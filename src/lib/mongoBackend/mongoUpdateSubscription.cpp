@@ -277,14 +277,17 @@ std::string mongoUpdateSubscription
 
   std::string      servicePath = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
 
-  // FIXME PR: explain this better
+  // Previous versions of the sub up logic calculate the final document mixing the
+  // existing one in DB plus the additions from cache. However, this is complex and involve
+  // more operations on MongoDB that the current approach, based in findAndModify and
+  // in $set and $unset operations
+  //
+  // Note also that "dynamic fields" that cannot be updated with PATCH subscription
+  // (count, lastNotification, etc.) are not touched: they have their own
+  // updating logic in other places of the code (in cache sync logic)
+
   orion::BSONObjBuilder setB;
   orion::BSONObjBuilder unsetB;
-
-  // Note that "dynamic fields" that cannot be updated with PATCH subscription
-  // (count, lastNotification, etc.) are not touched: they have their own
-  // updating logic in other places of the code (typically during notification
-  // processing or in cache sync logic)
 
   setServicePath(servicePath, &setB);
 
