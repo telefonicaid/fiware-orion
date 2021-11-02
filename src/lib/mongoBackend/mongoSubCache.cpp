@@ -267,7 +267,12 @@ int mongoSubCacheItemInsert
   const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
-  CachedSubSaved*        cssP,
+  long long              lastNotificationTime,
+  long long              lastFailure,
+  const std::string&     lastFailureReason,
+  long long              lastSuccess,
+  long long              lastSuccessCode,
+  long long              count,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -342,26 +347,11 @@ int mongoSubCacheItemInsert
     return -4;
   }
 
-  //
-  // 04. Use fresh data from CachedSubSaved
-  //
-  if (cssP != NULL)
-  {
-    cSubP->lastNotificationTime  = cssP->lastNotificationTime;
-    cSubP->lastFailure           = cssP->lastFailure;
-    cSubP->lastFailureReason     = cssP->lastFailureReason;
-    cSubP->lastSuccess           = cssP->lastSuccess;
-    cSubP->lastSuccessCode       = cssP->lastSuccessCode;
-    cSubP->count                 = cssP->count;  // actually is 0, as cssP->count is flushed in setCount()
-  }
-  else
-  {
-    // cssP cannot be NULL, as we have reached this point called by updateInCache()
-    // which, in sequence, is called from mongoUpdateSubscription(). That function
-    // has a guard that precules cssP to be NULL
-    LM_E(("Runtime Error (impossible NULL pointer situation)"));
-  }
 
+  // 04. Extract data from subP
+  //
+  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
+  //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
@@ -376,6 +366,13 @@ int mongoSubCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+
+  cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastFailure           = lastFailure;
+  cSubP->lastFailureReason     = lastFailureReason;
+  cSubP->lastSuccess           = lastSuccess;
+  cSubP->lastSuccessCode       = lastSuccessCode;
+  cSubP->count                 = count;
 
   //
   // httpInfo & mqttInfo
@@ -526,40 +523,19 @@ static void mongoSubCountersUpdateLastNotificationTime
 {
   std::string  err;
 
-  // FIXME #3774: previously this part was based in streamming instead of append()
+  // Note we cannot apply this simplification for lastFailure or lastSucess due to
+  // in that case there is a side field (lastFailureReason or lastSuccess code) that
+  // needs to be updated at the same time and $max doesn't help in that case
 
-  // condition
-  orion::BSONObjBuilder condition;
+  orion::BSONObjBuilder id;
+  id.append("_id", orion::OID(subId));
 
-  orion::BSONArrayBuilder  o;
-
-  // first or token
-  orion::BSONObjBuilder  or1;
-  orion::BSONObjBuilder  lastNotificationTimeFilter;
-  lastNotificationTimeFilter.append("$lt", lastNotificationTime);
-  or1.append(CSUB_LASTNOTIFICATION, lastNotificationTimeFilter.obj());
-
-  // second or token
-  orion::BSONObjBuilder  or2;
-  orion::BSONObjBuilder  exists;
-  exists.append("$exists", false);
-  or2.append(CSUB_LASTNOTIFICATION, exists.obj());
-
-  o.append(or1.obj());
-  o.append(or2.obj());
-
-  condition.append("_id", orion::OID(subId));
-  condition.append("$or", o.arr());
-
-  // update
   orion::BSONObjBuilder update;
+  orion::BSONObjBuilder maxB;
+  maxB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+  update.append("$max", maxB.obj());
 
-  orion::BSONObjBuilder lastNotificationTimeB;
-  lastNotificationTimeB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-
-  update.append("$set", lastNotificationTimeB.obj());
-
-  if (orion::collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
+  if (orion::collectionUpdate(db, collection, id.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }

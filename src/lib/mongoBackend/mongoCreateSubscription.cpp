@@ -151,7 +151,6 @@ std::string mongoCreateSubscription
   setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
   setServicePath(servicePath, &b);
-  setDescription(sub, &b);
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
@@ -159,12 +158,17 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
 
+  if (!sub.description.empty())
+  {
+    setDescription(sub, &b);
+  }
+
   if (!noCache)
   {
     insertInCache(sub, subId, tenant, servicePath);
   }
 
-  setConds(sub, sub.notification.attributes, &b);
+  setConds(sub, &b);
 
   setExpression(sub, &b);
   setFormat(sub, &b);
