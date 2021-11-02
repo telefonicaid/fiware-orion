@@ -166,7 +166,7 @@ static void updateInCache
   std::string         georel;
   RenderFormat        renderFormat = NGSI_V2_NORMALIZED;  // Default value
 
-  // 0. Field extraction from doc is done before cacheSemTake()
+  // 0. Field extraction from doc is done before cacheSemTake() to save some small time
   if (doc.hasField(CSUB_FORMAT))
   {
     renderFormat = stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT));
@@ -190,10 +190,6 @@ static void updateInCache
   CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
   char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
 
-  //
-  // Second lookup for the same in the mongo update subscription process.
-  // However, we have to do it, as the item in the cache could have been changed in the meanwhile.
-  //
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
   long long    lastNotificationTime;
