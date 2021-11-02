@@ -388,7 +388,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 458
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -404,9 +404,11 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         }, 
+        "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
-        "onlyChangedAttrs": false
+        "onlyChangedAttrs": false,
+        "timesSent": 1
     }, 
     "status": "oneshot", 
     "subject": {
