@@ -1146,12 +1146,14 @@ void subCacheSync(void)
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
+        // FIXME PR: why lastFailureReason
         // cssP->lastFailure is older than what's currently in DB => throw away
         cssP->lastFailure = -1;
       }
 
       if (cssP->lastSuccess < cSubP->lastSuccess)
       {
+        // FIXME PR: why lastSuccessCode is not taken into account here?
         // cssP->lastSuccess is older than what's currently in DB => throw away
         cssP->lastSuccess = -1;
       }
@@ -1184,6 +1186,7 @@ void subCacheSync(void)
                              cssP->lastSuccessCode);
 
       // Keeping lastFailure and lastSuccess in sub cache
+      // FIXME PR: why lastNotication is not taken into account here?
       cSubP->lastFailure       = cssP->lastFailure;
       cSubP->lastSuccess       = cssP->lastSuccess;
       cSubP->lastFailureReason = cssP->lastFailureReason;

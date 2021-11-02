@@ -60,9 +60,13 @@ When the broker starts, the subscription cache is populated with the subscriptio
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
+  bool                        onlyChanged;
   ngsiv2::HttpInfo            httpInfo;
+  ngsiv2::MqttInfo            mqttInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
+  std::string                 lastFailureReason;
+  int64_t                     lastSuccessCode;
   struct CachedSubscription*  next;         // The cache is a linked list of CachedSubscription ...
 ```
 
@@ -71,16 +75,16 @@ There are a few special fields that need special care when refreshing the cache:
 
 * `lastNotificationTime`
 * `count`
-* `lastFailure`
-* `lastSuccess`
+* `lastFailure` (and related field `lastFailureReason`)
+* `lastSuccess` (and related field `lastSuccessCode`)
 
 These fields have a special treatment inside the subscription cache, to avoid to write to the database each and every time these fields change, i.e. when an update triggering the subscription occurs). They are updated in the database only on refreshing the cache, like this:
 
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
 * `count` in the subscription cache is set to zero at each sub-cache-refresh, so the `count` that is in the cache simply is an accumulator and its accumulated value is added
   to the count in the database and then the *count in cache* is reset back to zero
-* `lastFailure`, like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
-* `lastSuccess`, like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
+* `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
+* `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
 
 All this is to ensure that the values are correct in the case of having more than one broker working against the database (so called [active-active configurations](#active-active-configurations)).
 
@@ -146,14 +150,16 @@ The refresher thread is simply an infinite loop that sleeps the amount of second
 ### `subCacheSync()`
 This is possibly the most important function of the entire subscription cache as it is the point where the subscription cache is merged with what's in the database and it leaves both the subscription cache and the database modified and synchronized.
 
-`subCacheSync()` saves the four special fields of the subscriptions, using a vector of the following struct:
+`subCacheSync()` saves the six special fields of the subscriptions, using a vector of the following struct:
 ```
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
-  int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
 } CachedSubSaved;
 ```
 
@@ -178,7 +184,7 @@ The simplest approach is used, which is to:
 * Completely delete the current contents in the subscription cache
 * Populate the subscription cache from the database content of each Service (mongo database)
 
-*Note that the subscription cache refresher thread saves the values of the four special fields before calling `subCacheRefresh()`*
+*Note that the subscription cache refresher thread saves the values of the six special fields before calling `subCacheRefresh()`*
 
 A more efficient approach would be to compare the content of the subscription cache to the content in the database during the refresh, but this would mean a lot more time spent implementing the subscription cache refreshing algorithm and this simpler (and slower) approach was chosen. 
 
@@ -223,7 +229,7 @@ _SC-02: Subscription propagation in active-active configuration_
 * In step 5, the subscription cache of **Orion 2** is merged with the database content and so "Sub-X" is now part of the subscription cache of **Orion 2**
 
 
-The case of the four [special fields](#special-subscription-fields) (`lastNotificationTime`, `count`, `lastFailure`, and `lastSuccess`) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
+The case of the six [special fields](#special-subscription-fields) (`lastNotificationTime`, `count`, `lastFailure`, and `lastSuccess`) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
 
 [Top](#top)
 
@@ -234,9 +240,11 @@ Note that the GET requests on subscriptions
 * `GET /v2/subscriptions`
 * `GET /v2/subscriptions/{subscription-id}`
 
-do not use the subscription cache, but attack the database directly.
+take the subscription from the DB but combine it with the information in the
+subscription cache (see `setNotification()` in `mongoGetSubscriptions.cpp` file for
+details).
 
-So, those four [special fields](#special-subscription-fields) may not seem coherent in GET poerations as they live in the subscription cache and are pushed to the database only on sub-cache-refresh.
+However, given that the subscription cache is local, those six [special fields](#special-subscription-fields) may not seem coherent in GET operations.
 
 [Top](#top)
 
