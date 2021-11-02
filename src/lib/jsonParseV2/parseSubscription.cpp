@@ -974,7 +974,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   if (!maxFailsLimitOpt.ok())
   {
     return badInput(ciP, maxFailsLimitOpt.error);
- }
+  }
   else if (maxFailsLimitOpt.given)
   {
     if (maxFailsLimitOpt.value <= 0)
