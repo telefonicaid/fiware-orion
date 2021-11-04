@@ -54,11 +54,6 @@
 #define NGSI_MD_ACTIONTYPE_APPEND  "append"
 #define NGSI_MD_ACTIONTYPE_DELETE  "delete"          // FIXME #1494: reserved for future use
 
-#if 0
-// FIXME #920: disabled by the moment, maybe removed at the end
-#define NGSI_MD_NOTIF_ONSUBCHANGE  "ngsi:onSubscriptionChange"
-#endif
-
 
 
 /* ****************************************************************************

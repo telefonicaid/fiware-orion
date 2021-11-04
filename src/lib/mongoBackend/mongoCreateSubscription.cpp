@@ -86,6 +86,9 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+
+  // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+  // lastNotification, lastFailure, lastSuccess and lastSuccessCode
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,
@@ -98,9 +101,9 @@ static void insertInCache
                      sub.expires,
                      sub.throttling,
                      sub.attrsFormat,
-                     0,
-                     0,
-                     0,
+                     -1,
+                     -1,
+                     -1,
                      -1,
                      "",
                      stringFilterP,
@@ -148,7 +151,6 @@ std::string mongoCreateSubscription
   setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
   setServicePath(servicePath, &b);
-  setDescription(sub, &b);
   setStatus(sub, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
@@ -156,12 +158,17 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
 
+  if (!sub.description.empty())
+  {
+    setDescription(sub, &b);
+  }
+
   if (!noCache)
   {
     insertInCache(sub, subId, tenant, servicePath);
   }
 
-  setConds(sub, sub.notification.attributes, &b);
+  setConds(sub, &b);
 
   setExpression(sub, &b);
   setFormat(sub, &b);

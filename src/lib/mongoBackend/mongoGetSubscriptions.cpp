@@ -171,7 +171,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 
   subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
+  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : 0;
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
@@ -192,22 +192,11 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
   if (cSubP)
   {
+    subP->notification.timesSent += cSubP->count;
+
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {
       subP->notification.lastNotification = cSubP->lastNotificationTime;
-    }
-
-    if (cSubP->count != 0)
-    {
-      //
-      // First, compensate for -1 in 'timesSent'
-      //
-      if (subP->notification.timesSent == -1)
-      {
-        subP->notification.timesSent = 0;
-      }
-
-      subP->notification.timesSent += cSubP->count;
     }
 
     if (cSubP->lastFailure > subP->notification.lastFailure)

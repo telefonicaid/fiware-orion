@@ -33,7 +33,6 @@
 #include "common/defaultValues.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/MongoGlobal.h"  // processConditionVector
 
 #include "mongoDriver/BSONArrayBuilder.h"
 
@@ -235,11 +234,8 @@ void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
 */
 void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  if (!sub.description.empty())
-  {
-    b->append(CSUB_DESCRIPTION, sub.description);
-    LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
-  }
+  b->append(CSUB_DESCRIPTION, sub.description);
+  LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
 }
 
 
@@ -262,7 +258,7 @@ void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1)
 {
   orion::BSONArrayBuilder entities;
 
@@ -311,6 +307,15 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
     entities.append(bob.obj());
   }
 
+  if ((fromNgsiv1) && (entities.arrSize() == 0))
+  {
+    // Special case: in NGSIv1 entities and condition attributes are not
+    // part of the same field (subject, in NGSIv2) so it may happen that
+    // subject only contains condition attributes and entities has to be
+    // left untouched in this case
+    return;
+  }
+
   orion::BSONArray entitiesArr = entities.arr();
 
   b->append(CSUB_ENTITIES, entitiesArr);
@@ -345,25 +350,20 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 */
 void setConds
 (
-  const Subscription&              sub,
-  const std::vector<std::string>&  notifAttributesV,
-  orion::BSONObjBuilder*           b
+  const Subscription&     sub,
+  orion::BSONObjBuilder*  b
 )
 {
-  //
-  // Note that we cannot use status, url and attrsFormat from sub.status, as sub object
-  // could correspond to an update and the fields be missing (in which case the one from
-  // the original subscription has to be taken; the caller deal with that)
-  //
+  orion::BSONArrayBuilder conds;
 
-  /* Conds vector */
+  for (unsigned int ix = 0; ix < sub.subject.condition.attributes.size(); ++ix)
+  {
+    conds.append(sub.subject.condition.attributes[ix]);
+  }
 
-  orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
-                                            sub.subject.entities,
-                                            notifAttributesV);
-
-  b->append(CSUB_CONDITIONS, conds);
-  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+  orion::BSONArray condsArr = conds.arr();
+  b->append(CSUB_CONDITIONS, condsArr);
+  LM_T(LmtMongo, ("Subscription conditions: %s", condsArr.toString().c_str()));
 }
 
 

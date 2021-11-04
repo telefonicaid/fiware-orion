@@ -343,21 +343,6 @@ extern StringList subToAttributeList(const orion::BSONObj& attrL);
 
 /* ****************************************************************************
 *
-* processConditionVector -
-*
-* NGSIv2 wrapper
-*/
-extern orion::BSONArray processConditionVector
-(
-  const std::vector<std::string>&    condAttributesV,
-  const std::vector<ngsiv2::EntID>&  entitiesV,
-  const std::vector<std::string>&    notifAttributesV
-);
-
-
-
-/* ****************************************************************************
-*
 * slashEscape - 
 *
 * When the 'to' buffer is full, slashEscape returns.

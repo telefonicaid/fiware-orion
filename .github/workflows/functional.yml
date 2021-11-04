@@ -40,6 +40,11 @@ jobs:
           - -e FT_FROM_IX=601 -e FT_TO_IX=900
           - -e FT_FROM_IX=901 -e FT_TO_IX=1200
           - -e FT_FROM_IX=1201
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=1201
 
     steps:
       - uses: actions/checkout@v2

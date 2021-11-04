@@ -1043,6 +1043,7 @@ typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
   int64_t      count;
+  // FIXME PR: should include failsCount in the future?
   int64_t      lastFailure;
   int64_t      lastSuccess;
   std::string  lastFailureReason;
@@ -1133,24 +1134,26 @@ void subCacheSync(void)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
+    // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+    // lastNotification, lastFailure and lastSuccess
     if (cssP != NULL)
     {
       if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
       {
         // cssP->lastNotificationTime is older than what's currently in DB => throw away
-        cssP->lastNotificationTime = 0;
+        cssP->lastNotificationTime = -1;
       }
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
         // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure = 0;
+        cssP->lastFailure = -1;
       }
 
       if (cssP->lastSuccess < cSubP->lastSuccess)
       {
         // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess = 0;
+        cssP->lastSuccess = -1;
       }
     }
 

@@ -267,7 +267,12 @@ int mongoSubCacheItemInsert
   const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
-  int                    lastNotificationTime,
+  long long              lastNotificationTime,
+  long long              lastFailure,
+  const std::string&     lastFailureReason,
+  long long              lastSuccess,
+  long long              lastSuccessCode,
+  long long              count,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -343,27 +348,16 @@ int mongoSubCacheItemInsert
   }
 
 
+  // 04. Extract data from subP
   //
-  // 04. Extract data from mongo sub
+  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
-  {
-    //
-    // If no lastNotificationTime is given to this function AND
-    // if the database objuect contains lastNotificationTime,
-    // then use the value from the database
-    //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
-  }
-
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->count                 = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
@@ -372,6 +366,13 @@ int mongoSubCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+
+  cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastFailure           = lastFailure;
+  cSubP->lastFailureReason     = lastFailureReason;
+  cSubP->lastSuccess           = lastSuccess;
+  cSubP->lastSuccessCode       = lastSuccessCode;
+  cSubP->count                 = count;
 
   //
   // httpInfo & mqttInfo
@@ -522,40 +523,19 @@ static void mongoSubCountersUpdateLastNotificationTime
 {
   std::string  err;
 
-  // FIXME #3774: previously this part was based in streamming instead of append()
+  // Note we cannot apply this simplification for lastFailure or lastSucess due to
+  // in that case there is a side field (lastFailureReason or lastSuccess code) that
+  // needs to be updated at the same time and $max doesn't help in that case
 
-  // condition
-  orion::BSONObjBuilder condition;
+  orion::BSONObjBuilder id;
+  id.append("_id", orion::OID(subId));
 
-  orion::BSONArrayBuilder  o;
-
-  // first or token
-  orion::BSONObjBuilder  or1;
-  orion::BSONObjBuilder  lastNotificationTimeFilter;
-  lastNotificationTimeFilter.append("$lt", lastNotificationTime);
-  or1.append(CSUB_LASTNOTIFICATION, lastNotificationTimeFilter.obj());
-
-  // second or token
-  orion::BSONObjBuilder  or2;
-  orion::BSONObjBuilder  exists;
-  exists.append("$exists", false);
-  or2.append(CSUB_LASTNOTIFICATION, exists.obj());
-
-  o.append(or1.obj());
-  o.append(or2.obj());
-
-  condition.append("_id", orion::OID(subId));
-  condition.append("$or", o.arr());
-
-  // update
   orion::BSONObjBuilder update;
+  orion::BSONObjBuilder maxB;
+  maxB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+  update.append("$max", maxB.obj());
 
-  orion::BSONObjBuilder lastNotificationTimeB;
-  lastNotificationTimeB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-
-  update.append("$set", lastNotificationTimeB.obj());
-
-  if (orion::collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
+  if (orion::collectionUpdate(db, collection, id.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }
