@@ -1279,9 +1279,12 @@ void subNotificationErrorStatus
   bool                error,
   long long           statusCode,
   const std::string&  failureReason,
-  bool                maxFailsReached
+  long long           failsCounter,
+  long long           maxFailsLimit
 )
 {
+  bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
+
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
@@ -1293,6 +1296,7 @@ void subNotificationErrorStatus
       std::string status = "";
       if (maxFailsReached)
       {
+        LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
         status = STATUS_INACTIVE;
       }
       // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
@@ -1331,6 +1335,7 @@ void subNotificationErrorStatus
     if (maxFailsReached)
     {
       // update the status to inactive
+      LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
       subP->status = STATUS_INACTIVE;
       LM_T(LmtSubCache, ("Update the status to %s", subP->status.c_str()));
     }

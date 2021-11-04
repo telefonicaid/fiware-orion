@@ -119,7 +119,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->maxFailsLimit > 0 && params->failsCounter >= params->maxFailsLimit);
+      subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->failsCounter, params->maxFailsLimit);
     }
   }
 
@@ -168,7 +168,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
   }
   else
   {
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->maxFailsLimit > 0 && params->failsCounter >= params->maxFailsLimit);
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
   }
 }
 

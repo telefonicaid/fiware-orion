@@ -334,7 +334,8 @@ extern void subNotificationErrorStatus
   bool                error,
   long long           statusCode,
   const std::string&  failureReason,
-  bool                maxFailsReached = false
+  long long           failsCounter = -1,
+  long long           maxFailsLimit = -1
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

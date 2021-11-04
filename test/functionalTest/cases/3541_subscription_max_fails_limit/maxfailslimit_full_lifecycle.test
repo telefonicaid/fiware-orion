@@ -58,6 +58,7 @@ accumulatorStart
 # 25. PATCH /v2/subscriptions/subId to set status=active again
 # 26. Upsert entity to trigger notification (ok)
 # 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5
+# 28. Get logs, see three deactivation traces (for steps 08, 14, 19)
 #
 
 
@@ -381,6 +382,16 @@ echo
 echo "27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5"
 echo "==================================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "28. Get logs, see three deactivation traces (for steps 08, 14, 19)"
+echo "=================================================================="
+# FIXME: the 'cut -c 39-' is to remove the 'Subscription 61839670a384ad32937692ab ', which can be problematic
+# due to REGEX([0-9a-f]{24}) has problems is parenthisis are used in other parts of the string
+# (current limitation in testDiff.py)
+cat /tmp/contextBroker.log | grep WARN | awk -F 'msg=' '{print $2}' | grep disabled | cut -c 39-
 echo
 echo
 
@@ -900,6 +911,13 @@ Date: REGEX(.*)
         ]
     }
 }
+
+
+28. Get logs, see three deactivation traces (for steps 08, 14, 19)
+==================================================================
+automatically disabled due to failsCounter (3) overpasses maxFailsLimit (2)
+automatically disabled due to failsCounter (4) overpasses maxFailsLimit (2)
+automatically disabled due to failsCounter (6) overpasses maxFailsLimit (5)
 
 
 --TEARDOWN--
