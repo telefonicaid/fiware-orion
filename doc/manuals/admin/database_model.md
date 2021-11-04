@@ -207,7 +207,7 @@ Fields:
 -   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
     registration expires.
 -   **fwdMode**: the forwarding mode supported by the provider, either: `all`, `query`, `update` or `none`.
-    If ommited (Orion versions previous to 2.6.0), `all` is assumed.
+    If omitted (Orion versions previous to 2.6.0), `all` is assumed.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of

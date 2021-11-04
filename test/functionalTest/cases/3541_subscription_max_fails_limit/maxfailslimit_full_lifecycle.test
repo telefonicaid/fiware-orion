@@ -33,7 +33,7 @@ accumulatorStart
 #
 # 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 # 02. Upsert entity to trigger notification (ok)
-# 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2
+# 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
 # 04. Stop accumulator
 # 05. Upsert entity to trigger notification (fail)
 # 06. Upsert entity to trigger notification (fail)
@@ -57,7 +57,7 @@ accumulatorStart
 # 24. Start accumulator
 # 25. PATCH /v2/subscriptions/subId to set status=active again
 # 26. Upsert entity to trigger notification (ok)
-# 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5
+# 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
 # 28. Get logs, see three deactivation traces (for steps 08, 14, 19)
 #
 
@@ -101,7 +101,7 @@ echo
 echo
 
 
-echo "03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2"
+echo "03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2"
 echo "==================================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -115,8 +115,8 @@ echo
 echo
 
 
-#FIXME: this seconds is to avoid having successfull and failing notifications in the
-# very same sencond, which would case status to be "active" instead of "failed"
+#FIXME #3989: this seconds is to avoid having successfull and failing notifications in the
+# very same second, which would case status to be "active" instead of "failed"
 # Looks for comments in Subscription::toJson() code for more detail
 sleep 1s
 
@@ -379,7 +379,7 @@ echo
 echo
 
 
-echo "27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5"
+echo "27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5"
 echo "==================================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -416,7 +416,7 @@ Date: REGEX(.*)
 
 
 
-03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (ommited), maxFailsLimit=2
+03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
 ===================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 390
@@ -873,7 +873,7 @@ Date: REGEX(.*)
 
 
 
-27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (ommited), maxFailsLimit=5
+27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
 ===================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 480
