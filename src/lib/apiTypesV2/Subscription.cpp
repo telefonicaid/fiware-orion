@@ -82,13 +82,12 @@ std::string Subscription::toJson(void)
 
   // Status inactive takes precedence over failed
   //
-  // FIXME P7: the if-clause check is somehow artificial. It would be better to
-  // use just jh.addString("status", this->status) in any case, adapting the CB logic
-  // to take into account "failed" in DB/cache
+  // FIXME #3989: the if-clause check is somehow artificial. Some alternatives described in the issue
   //
   // Moreover, this->notification.lastFailure > this->notification.lastSuccess condition is weak
   // as two notifications coud be sent in the same second (first one successfu, second one failing)
-  // and the status will end in "active" instead of "failing"
+  // and the status will end in "active" instead of "failed"
+  //
   // Remove the sleep 1s in maxfailslimit_full_lifecycle.test once this gets fixed
   //
   if ((this->status != "inactive") && (this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
