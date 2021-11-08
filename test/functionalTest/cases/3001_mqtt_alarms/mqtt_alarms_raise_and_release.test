@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. Get sub and see status:failed, timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 421
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
