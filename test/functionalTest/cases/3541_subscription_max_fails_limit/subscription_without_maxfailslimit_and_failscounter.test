@@ -35,7 +35,7 @@ brokerStart CB
 # 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
+# 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -121,8 +121,8 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed'
-echo '====================================================================================='
+echo '06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed'
+echo '===================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -199,10 +199,10 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
-=====================================================================================
+06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed
+====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 484
+Content-Length: 501
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,6 +215,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
