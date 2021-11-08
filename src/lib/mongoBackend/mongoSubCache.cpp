@@ -62,7 +62,7 @@
 *  -5:  Error parsing string filter
 *  -6:  Error parsing metadata string filter
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter' of the inserted subscription are set to ZERO.
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
@@ -259,7 +259,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter" of the inserted subscription are set to ZERO.
 * This is because the sub cache only counts the increments in these accumulating counters,
 * so that other CBs, operating on the same DB will not overwrite the value of these accumulators
 */
@@ -362,7 +362,6 @@ int mongoSubCacheItemInsert
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;
@@ -378,6 +377,7 @@ int mongoSubCacheItemInsert
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->count                 = count;
   cSubP->failsCounter          = failsCounter;
+  cSubP->status                = status;
 
   //
   // httpInfo & mqttInfo
@@ -495,32 +495,52 @@ static void mongoSubCountersUpdateCount
   const std::string&  collection,
   const std::string&  subId,
   long long           count,
-  long long           failsCounter
+  long long           fails,
+  const std::string&  status = ""
 )
 {
   orion::BSONObjBuilder  condition;
-  orion::BSONObjBuilder  update; 
-  orion::BSONObjBuilder  countB;
-  orion::BSONObjBuilder  updatefailsCounter;
-  orion::BSONObjBuilder  failsCounterB;
+  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  incB;
+  orion::BSONObjBuilder  setB;
 
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
-  countB.append(CSUB_COUNT, count);
-  update.append("$inc", countB.obj());
-
-  if (failsCounter > 0)
+  if (count > 0)
   {
-    condition.append("_id", orion::OID(subId));
-    failsCounterB.append(CSUB_FAILSCOUNTER, failsCounter);
-    updatefailsCounter.append("$inc", failsCounterB.obj());
-    collectionUpdate(db, collection, condition.obj(), updatefailsCounter.obj(), false, &err);
+    incB.append(CSUB_COUNT, count);
+  }
+
+  if (fails > 0)
+  {
+    incB.append(CSUB_FAILSCOUNTER, fails);
+  }
+  else
+  {
+    // no fails mean notification ok, thus reseting the counter
+    setB.append(CSUB_FAILSCOUNTER, 0);
+  }
+
+  if (!status.empty())
+  {
+    setB.append(CSUB_STATUS, status);
+  }
+
+  // by construction, at least one of incB or setB has a field and update object
+  // cannot be empty
+  if (incB.nFields() > 0)
+  {
+    update.append("$inc", incB.obj());
+  }
+  if (setB.nFields() > 0)
+  {
+    update.append("$set", setB.obj());
   }
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count' for a subscription)"));
+    LM_E(("Internal Error (error updating 'count', 'failsCounter' and/or 'status' for a subscription)"));
   }
 }
 
@@ -689,7 +709,8 @@ void mongoSubCountersUpdate
   long long           lastFailure,
   long long           lastSuccess,
   const std::string&  failureReason,
-  long long           statusCode
+  long long           statusCode,
+  const std::string&  status
 )
 {
   if (subId.empty())
@@ -700,10 +721,7 @@ void mongoSubCountersUpdate
 
   std::string db = composeDatabaseName(tenant);
 
-  if (count > 0)
-  {
-    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter);
-  }
+  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status);
 
   if (lastNotificationTime > 0)
   {

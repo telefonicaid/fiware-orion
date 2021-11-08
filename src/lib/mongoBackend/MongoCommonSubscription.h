@@ -78,7 +78,7 @@ extern void setMaxFailsLimit(const ngsiv2::Subscription& sub, orion::BSONObjBuil
 *
 * setFailsCounter -
 */
-extern void setFailsCounter(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setFailsCounter(long long failedCounter, orion::BSONObjBuilder* b);
 
 
 /* ****************************************************************************
@@ -101,7 +101,7 @@ extern void setDescription(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 *
 * setStatus -
 */
-extern void setStatus(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b);
 
 
 

@@ -207,7 +207,7 @@ Fields:
 -   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
     registration expires.
 -   **fwdMode**: the forwarding mode supported by the provider, either: `all`, `query`, `update` or `none`.
-    If ommited (Orion versions previous to 2.6.0), `all` is assumed.
+    If omitted (Orion versions previous to 2.6.0), `all` is assumed.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -305,7 +305,9 @@ Fields:
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
     (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
--   **status**: either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
+-   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
+    `oneshot` (for [oneshot subscriptions](../user/oneshot_subscription.md)). Note that NGSIv2 API consider additional states (e.g. `failed` or `expired`)
+    but they never hit the DB (they are managed by Orion).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **timeout** this field configures the maximum time the subscription waits for the response for http 
 notifications. It is a number between 0 and 1800000. If defined to 0 or omitted, the default timeout will be used.

@@ -197,7 +197,6 @@ extern void subCacheItemInsert
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expiration,
-  int64_t                            failsCounter,
   int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
@@ -332,9 +331,11 @@ extern void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors,
+  bool                error,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  long long           failsCounter = -1,
+  long long           maxFailsLimit = -1
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

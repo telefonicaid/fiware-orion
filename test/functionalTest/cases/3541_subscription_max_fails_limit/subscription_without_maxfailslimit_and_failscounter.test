@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-subscription_without_maxfailslimit_and_failscounter
+Subscription without maxFailsLimit and failsCounter
 
 --SHELL-INIT--
 dbInit CB
@@ -35,8 +35,7 @@ brokerStart CB
 # 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
-# 07. POST /v2/subscriptions, to create subscription without maxFailsLimit=foo and see error
+# 06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -122,49 +121,11 @@ echo
 echo
 
 
-# Await sub-cache contents to be dumped into database
-sleep 3.5
-
-
-echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
+echo '06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed'
 echo '====================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
-
-
-echo '07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error'
-echo '======================================================================================'
-payload='{
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [
-      "temperature"
-    ]
-  },
-  "maxFailsLimit" : "foo"
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-echo
-echo
-
 
 
 --REGEXPECT--
@@ -238,7 +199,7 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+06. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=failed
 =====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 484
@@ -263,7 +224,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "active",
+    "status": "failed",
     "subject": {
         "condition": {
             "attrs": [
@@ -277,20 +238,6 @@ Date: REGEX(.*)
             }
         ]
     }
-}
-
-
-07. POST /v2/subscriptions, to create subscription with maxFailsLimit=foo to see error
-======================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 66
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "maxFailsLimit is not an int",
-    "error": "BadRequest"
 }
 
 

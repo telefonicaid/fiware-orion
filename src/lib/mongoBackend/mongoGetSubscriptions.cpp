@@ -188,9 +188,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //
-  // NOTE: only 'lastNotificationTime' and 'count'
-  //
-  cacheSemTake(__FUNCTION__, "get lastNotification and count");
+  cacheSemTake(__FUNCTION__, "get notification info");
   CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
   if (cSubP)
   {
@@ -214,7 +212,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
     }
   }
-  cacheSemGive(__FUNCTION__, "get lastNotification and count");
+  cacheSemGive(__FUNCTION__, "get notification info");
 }
 
 
@@ -223,23 +221,29 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 *
 * setStatus -
 */
-static void setStatus(Subscription* s, const orion::BSONObj& r)
+static void setStatus(Subscription* s, const orion::BSONObj& r, const std::string& tenant)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
+  // Status
+  s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
 
   //
-  // Status
-  // FIXME P10: use an enum for active/inactive/expired
+  // Check values from subscription cache, update object from cache-values if necessary
   //
-  // NOTE:
-  //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
-  //   value of "-1 == never expires" is used.
+  // FIXME P3: maybe all the code accessing to the cache (see see setNotification())
+  // could be unified in mongoGetSubscription()/mongoGetSubscriptions()
   //
-  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  cacheSemTake(__FUNCTION__, "get status");
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
+  if (cSubP)
   {
-    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+    s->status = cSubP->status.empty() ? STATUS_ACTIVE : cSubP->status;
   }
-  else
+  cacheSemGive(__FUNCTION__, "get status");
+
+  // if the field CSUB_EXPIRATION is not present in the subscription, then the default
+  // value PERMANENT_EXPIRES_DATETIME is used
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : PERMANENT_EXPIRES_DATETIME;
+  if (s->expires < getCurrentTime())
   {
     s->status = "expired";
   }
@@ -322,7 +326,7 @@ void mongoListSubscriptions
     setNewSubscriptionId(&s, r);
     setDescription(&s, r);
     setSubject(&s, r);
-    setStatus(&s, r);
+    setStatus(&s, r, tenant);
     setNotification(&s, r, tenant);
 
     subs->push_back(s);
@@ -389,7 +393,7 @@ void mongoGetSubscription
     setDescription(sub, r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
-    setStatus(sub, r);
+    setStatus(sub, r, tenant);
   }
   else
   {

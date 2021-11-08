@@ -253,8 +253,6 @@ int httpRequestSend
    const std::string&                         content,
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
-   long long                                  maxFailsLimit,
-   long long                                  failsCounter,
    std::string*                               outP,
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
