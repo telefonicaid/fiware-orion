@@ -177,9 +177,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->httpStatusCode = SccOk;
       return MHD_YES;
     }
   }
