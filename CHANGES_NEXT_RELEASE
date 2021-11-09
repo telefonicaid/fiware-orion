@@ -1,3 +1,4 @@
+- Fix: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
 - Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
 - Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
 - Fix: avoid reset timesSent counter upon PATCH /v2/subscriptions/{subId} when csubs cache is in use
