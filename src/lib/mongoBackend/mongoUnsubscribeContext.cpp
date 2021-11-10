@@ -127,15 +127,13 @@ HttpStatusCode mongoUnsubscribeContext
   //
   // Removing subscription from mongo subscription cache
   //
-  if (!noCache)
-  {
-    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
-                       requestP->subscriptionId.get().c_str(),
-                       tenant.c_str()));
+  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
+                     requestP->subscriptionId.get().c_str(),
+                     tenant.c_str()));
 
-    cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+  cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
   if (cSubP != NULL)
   {
@@ -145,6 +143,6 @@ HttpStatusCode mongoUnsubscribeContext
   cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
-  }
+
   return SccOk;
 }
