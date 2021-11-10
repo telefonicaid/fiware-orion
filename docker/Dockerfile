@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos8.3.2011
+ARG  IMAGE_TAG=centos8.4.2105
 FROM centos:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -65,14 +65,14 @@ RUN \
     # from scratch (we have used 3.20.1, the last version by the time being). Once CentOS8
     # upgrade cmake to a version beyond 3.18.2, we can probably remove this hack and rely again in
     # yum-based installation
-    rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros && \
-    cd /opt && \
-    curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz && \
-    tar xvf cmake-3.20.1.tar.gz && \
-    cd cmake-3.20.1 && \
-    ./bootstrap && \
-    make && \
-    make install && \
+    #rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros && \
+    #cd /opt && \
+    #curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz && \
+    #tar xvf cmake-3.20.1.tar.gz && \
+    #cd cmake-3.20.1 && \
+    #./bootstrap && \
+    #make && \
+    #make install && \
     # Install libmicrohttpd from source
     cd /opt && \
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
