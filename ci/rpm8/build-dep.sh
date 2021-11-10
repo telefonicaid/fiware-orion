@@ -50,14 +50,14 @@ yum -y install \
 # from scratch (we have used 3.20.1, the last version by the time being). Once CentOS8
 # upgrade cmake to a version beyond 3.18.2, we can probably remove this hack and rely again in
 # yum-based installation
-rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros \
-&& cd /opt \
-&& curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz \
-&& tar xvf cmake-3.20.1.tar.gz \
-&& cd cmake-3.20.1 \
-&& ./bootstrap \
-&& make \
-&& make install
+#rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros \
+#&& cd /opt \
+#&& curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz \
+#&& tar xvf cmake-3.20.1.tar.gz \
+#&& cd cmake-3.20.1 \
+#&& ./bootstrap \
+#&& make \
+#&& make install
 
 # FIXME: review this with CentOS 8. Probably CentOS 8 uses Flask >0.10.1 but, anyway
 # using virtual env seems to be a good idea
