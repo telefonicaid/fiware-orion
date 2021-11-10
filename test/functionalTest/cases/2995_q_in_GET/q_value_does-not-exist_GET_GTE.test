@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Q filter in GET for GTE of non existing attribute 
+Q filter in GET for GTE of non existing attribute
 
 --SHELL-INIT--
 dbInit CB

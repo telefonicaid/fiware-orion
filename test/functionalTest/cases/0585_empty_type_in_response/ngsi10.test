@@ -129,22 +129,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "ID", 
-                                "type": "string", 
+                                "name": "ID",
+                                "type": "string",
                                 "value": "backup"
                             }
-                        ], 
-                        "name": "temperature", 
-                        "type": "degree", 
+                        ],
+                        "name": "temperature",
+                        "type": "degree",
                         "value": ""
                     }
-                ], 
-                "id": "Room", 
-                "isPattern": "false", 
+                ],
+                "id": "Room",
+                "isPattern": "false",
                 "type": "Room"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -166,22 +166,22 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
-                        "name": "ID", 
-                        "type": "string", 
+                        "name": "ID",
+                        "type": "string",
                         "value": "backup"
                     }
-                ], 
-                "name": "temperature", 
-                "type": "degree", 
+                ],
+                "name": "temperature",
+                "type": "degree",
                 "value": "20"
             }
-        ], 
-        "id": "Room", 
-        "isPattern": "false", 
+        ],
+        "id": "Room",
+        "isPattern": "false",
         "type": "Room"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -200,18 +200,18 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID", 
-                    "type": "string", 
+                    "name": "ID",
+                    "type": "string",
                     "value": "backup"
                 }
-            ], 
-            "name": "temperature", 
-            "type": "degree", 
+            ],
+            "name": "temperature",
+            "type": "degree",
             "value": "20"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -231,22 +231,22 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
-                        "name": "ID", 
-                        "type": "string", 
+                        "name": "ID",
+                        "type": "string",
                         "value": "backup"
                     }
-                ], 
-                "name": "temperature", 
-                "type": "degree", 
+                ],
+                "name": "temperature",
+                "type": "degree",
                 "value": "20"
             }
-        ], 
-        "id": "Room", 
-        "isPattern": "false", 
+        ],
+        "id": "Room",
+        "isPattern": "false",
         "type": "Room"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -265,18 +265,18 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID", 
-                    "type": "string", 
+                    "name": "ID",
+                    "type": "string",
                     "value": "backup"
                 }
-            ], 
-            "name": "temperature", 
-            "type": "degree", 
+            ],
+            "name": "temperature",
+            "type": "degree",
             "value": "20"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -298,22 +298,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "ID", 
-                                "type": "string", 
+                                "name": "ID",
+                                "type": "string",
                                 "value": "backup"
                             }
-                        ], 
-                        "name": "temperature", 
-                        "type": "degree", 
+                        ],
+                        "name": "temperature",
+                        "type": "degree",
                         "value": "20"
                     }
-                ], 
-                "id": "Room", 
-                "isPattern": "false", 
+                ],
+                "id": "Room",
+                "isPattern": "false",
                 "type": "Room"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -337,22 +337,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "ID", 
-                                "type": "string", 
+                                "name": "ID",
+                                "type": "string",
                                 "value": "backup"
                             }
-                        ], 
-                        "name": "temperature", 
-                        "type": "degree", 
+                        ],
+                        "name": "temperature",
+                        "type": "degree",
                         "value": "20"
                     }
-                ], 
-                "id": "Room", 
-                "isPattern": "false", 
+                ],
+                "id": "Room",
+                "isPattern": "false",
                 "type": "Room"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

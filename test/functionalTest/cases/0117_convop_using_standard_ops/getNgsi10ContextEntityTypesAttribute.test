@@ -193,8 +193,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "details": "entityId::type/attribute::name pair not found", 
+        "code": "404",
+        "details": "entityId::type/attribute::name pair not found",
         "reasonPhrase": "No context element found"
     }
 }
@@ -214,17 +214,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -246,17 +246,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -278,17 +278,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -310,17 +310,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -342,17 +342,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "B", 
-                        "type": "b", 
+                        "name": "B",
+                        "type": "b",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -374,17 +374,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -406,16 +406,16 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": {
                     "A": {
-                        "type": "a", 
+                        "type": "a",
                         "value": "1"
                     }
-                }, 
-                "id": "E1", 
-                "isPattern": "false", 
+                },
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -437,17 +437,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -469,17 +469,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "a", 
+                        "name": "A",
+                        "type": "a",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "ET1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -497,8 +497,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entity::type cannot be empty for this request", 
+        "code": "400",
+        "details": "entity::type cannot be empty for this request",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -514,8 +514,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "non-matching entity::types in URL", 
+        "code": "400",
+        "details": "non-matching entity::types in URL",
         "reasonPhrase": "Bad Request"
     }
 }

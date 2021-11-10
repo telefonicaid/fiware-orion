@@ -38,7 +38,7 @@ brokerStart CB
 echo "01. PATCH /v2/entities/E1, see 405 with payload"
 echo "==============================================="
 payload='{
-  "A1": 
+  "A1":
   {
     "value": 12
   }
@@ -51,7 +51,7 @@ echo
 echo "02. POST /v2/entities/E1, see 405 with payload"
 echo "=============================================="
 payload='{
-  "A1": 
+  "A1":
   {
     "value": 12
   }
@@ -64,7 +64,7 @@ echo
 echo "03. PUT /v2/entities/E1, see 405 with payload"
 echo "============================================="
 payload='{
-  "A1": 
+  "A1":
   {
     "value": 12
   }

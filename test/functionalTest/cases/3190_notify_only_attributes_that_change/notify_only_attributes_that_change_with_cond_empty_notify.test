@@ -67,7 +67,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "attrs": [
-      
+
     ],
     "onlyChangedAttrs":true
   }
@@ -253,29 +253,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 10
-            }, 
+            },
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 20
-            }, 
+            },
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 30
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 40
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -317,19 +317,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 24
-            }, 
+            },
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 32
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -359,19 +359,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 34
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 42
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -401,29 +401,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 40
-            }, 
+            },
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 30
-            }, 
+            },
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 20
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 10
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

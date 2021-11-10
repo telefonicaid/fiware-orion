@@ -34,7 +34,7 @@ brokerStart CB
 # '{"type": "house", "id": "bathroom", "temperature": "34"}' crashes the broker.
 # The payload is invalid, as the value of "temperature" would have to be a JSON object.
 # [ the same payload is valid if '?options=keyValues' is used ]
-# 
+#
 # 01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)
 # 02. GET the entity to make sure the creation did NOT work
 #

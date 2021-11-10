@@ -148,7 +148,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "http notification has attrs and exceptAttrs", 
+    "description": "http notification has attrs and exceptAttrs",
     "error": "BadRequest"
 }
 

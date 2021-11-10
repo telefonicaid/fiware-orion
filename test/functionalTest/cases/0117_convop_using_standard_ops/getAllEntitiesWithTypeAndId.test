@@ -196,13 +196,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
+        "code": "404",
+        "details": "Entity id: /E1/",
         "reasonPhrase": "No context element found"
     }
 }
@@ -222,17 +222,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "string", 
+                        "name": "A1",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -254,17 +254,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "string", 
+                        "name": "A2",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -284,17 +284,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "string", 
+                "name": "A1",
+                "type": "string",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -312,17 +312,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "string", 
+                "name": "A1",
+                "type": "string",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -338,13 +338,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "400", 
-        "details": "non-matching entity::types in URL", 
+        "code": "400",
+        "details": "non-matching entity::types in URL",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -362,17 +362,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A2", 
-                "type": "string", 
+                "name": "A2",
+                "type": "string",
                 "value": "2"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T2"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -388,13 +388,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "400", 
-        "details": "entity::type cannot be empty for this request", 
+        "code": "400",
+        "details": "entity::type cannot be empty for this request",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -412,17 +412,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "string", 
+                "name": "A1",
+                "type": "string",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -442,17 +442,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "string", 
+                        "name": "A1",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -472,17 +472,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "string", 
+                "name": "A1",
+                "type": "string",
                 "value": "E1-T1-/test"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -498,13 +498,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
+        "code": "404",
+        "details": "Entity id: /E1/",
         "reasonPhrase": "No context element found"
     }
 }
@@ -522,16 +522,16 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": {
             "A1": {
-                "type": "string", 
+                "type": "string",
                 "value": "1"
             }
-        }, 
-        "id": "E1", 
-        "isPattern": "false", 
+        },
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

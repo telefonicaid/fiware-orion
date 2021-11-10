@@ -40,7 +40,7 @@ accumulatorStart --pretty-print
 # 04. String/GE: Create subscription 4 for mq=A1.M1.s>=fest_string
 # 05. Create E1 with A1 with metadata M1 with compound value containing String, Integer and Float
 # 06. Dump and reset accumulator, see 4 notifications
-# 
+#
 
 echo "01. Integer/GT: Create subscription 1 for mq=A1.M1.i>9"
 echo "======================================================"
@@ -251,22 +251,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": {
                             "f": 3.14,
-                            "i": 10, 
-                            "modified": true, 
+                            "i": 10,
+                            "modified": true,
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -286,22 +286,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": {
                             "f": 3.14,
-                            "i": 10, 
-                            "modified": true, 
+                            "i": 10,
+                            "modified": true,
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -321,22 +321,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": {
                             "f": 3.14,
-                            "i": 10, 
-                            "modified": true, 
+                            "i": 10,
+                            "modified": true,
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -356,22 +356,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": {
                             "f": 3.14,
-                            "i": 10, 
-                            "modified": true, 
+                            "i": 10,
+                            "modified": true,
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

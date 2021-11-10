@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription sequence ONCHANGE without subCache 
+Subscription sequence ONCHANGE without subCache
 
 --SHELL-INIT--
 dbInit CB

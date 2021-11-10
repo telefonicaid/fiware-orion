@@ -135,11 +135,11 @@ Date: REGEX(.*)
 [
     {
         "A1": {
-            "metadata": {}, 
-            "type": "Text", 
+            "metadata": {},
+            "type": "Text",
             "value": "updated-3"
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T1"
     }
 ]

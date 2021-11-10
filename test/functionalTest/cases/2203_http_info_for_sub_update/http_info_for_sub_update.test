@@ -31,7 +31,7 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# This test was created to provoke the bug 2203, by commenting the call to 
+# This test was created to provoke the bug 2203, by commenting the call to
 #   cSubP->httpInfo.fill(sub)
 # in the mongoSubCacheItemInsert with MANY parameters, in mongoSubCache.cpp
 # WITHOUT that line, nothing is sent to the accumulator.
@@ -304,7 +304,7 @@ Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
-    "What": "PAYLOAD2", 
+    "What": "PAYLOAD2",
     "temp": "11"
 }
 =======================================

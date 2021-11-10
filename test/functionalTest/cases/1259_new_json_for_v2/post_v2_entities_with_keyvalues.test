@@ -86,7 +86,7 @@ brokerStart CB 0-255
 # }
 #
 # In keyValues mode, there are no metadata for attributes. If you need that, use the "normalized" method.
-# 
+#
 #
 # An example just for curiosity ...
 #

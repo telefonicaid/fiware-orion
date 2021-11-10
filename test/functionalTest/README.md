@@ -89,3 +89,11 @@ comes with Python 2.6 (the testHarness.sh program typically uses `python -mjson.
 
 The solution is easy: don't use Python 2.6. The recommended version is Python 2.7. Note that CentOS 6 comes with Python 2.6 at
 system level, but you can use [virtualenv](https://virtualenv.pypa.io/en/stable/) to use Python 2.7 in an easy way.
+
+## Miscelanea
+
+Useful command to remove trailing whitespace in all .test files (it makes comparison less noisy in the case of failing tests):
+
+```
+find cases/ -name *.test -exec sed -i 's/[[:space:]]*$//' {} \;
+```

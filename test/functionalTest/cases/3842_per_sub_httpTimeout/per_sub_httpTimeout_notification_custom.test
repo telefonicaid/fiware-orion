@@ -25,7 +25,7 @@ Per custom subscrition timeout
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0
-accumulatorStart --pretty-print 
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -38,7 +38,7 @@ accumulatorStart --pretty-print
 # 03. Create an entity (notification triggered)
 # 03. Wait 12 seconds
 # 04. Check if 1st sub notification succeed
-# 05. Check if 2nd sub notification failed 
+# 05. Check if 2nd sub notification failed
 #
 
 
@@ -178,30 +178,30 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
-            "payload": "Custom payload", 
-            "timeout": 12000, 
+            "payload": "Custom payload",
+            "timeout": 12000,
             "url": "http://localhost:9997/noresponse"
-        }, 
+        },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastSuccessCode": 200, 
-        "onlyChangedAttrs": false, 
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 1
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -218,31 +218,31 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
+        "attrs": [],
         "attrsFormat": "normalized",
         "failsCounter": 1,
         "httpCustom": {
-            "payload": "Custom payload", 
-            "timeout": 8000, 
+            "payload": "Custom payload",
+            "timeout": 8000,
             "url": "http://localhost:9997/noresponse"
-        }, 
+        },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Timeout was reached", 
+        "lastFailureReason": "Timeout was reached",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "onlyChangedAttrs": false, 
+        "onlyChangedAttrs": false,
         "timesSent": 1
-    }, 
-    "status": "failed", 
+    },
+    "status": "failed",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]

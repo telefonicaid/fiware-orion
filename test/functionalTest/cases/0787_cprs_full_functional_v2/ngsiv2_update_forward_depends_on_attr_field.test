@@ -46,9 +46,9 @@ brokerStart CP3
 # 08. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 # 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 # 10. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
-# 11. Query CP1 for E1/{} 
-# 12. Query CP2 for E1/{} 
-# 13. Query CP3 for E1/{} 
+# 11. Query CP1 for E1/{}
+# 12. Query CP2 for E1/{}
+# 13. Query CP3 for E1/{}
 #
 
 echo "01. Update/APPEND E1/A1 in CB"

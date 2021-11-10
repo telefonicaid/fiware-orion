@@ -23,7 +23,7 @@
 --NAME--
 Create a new regular entity, without specifying dateExpires attribute
 Update the entity with the dateExpires attribute, in order to make it transient
- 
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB

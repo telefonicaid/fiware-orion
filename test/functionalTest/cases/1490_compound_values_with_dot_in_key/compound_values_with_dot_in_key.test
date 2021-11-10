@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Compound values with a dot in a key 
+Compound values with a dot in a key
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -48,7 +48,7 @@ echo
 echo "02. Update E1/A1, with compound value with a dot in a key of a keyvalue"
 echo "======================================================================="
 payload='{
-  "value": { 
+  "value": {
     "rt.ty": "5678"
   }
 }'
