@@ -1,1 +1,1 @@
-- Fix: crash when updating attribute with empty JSON Object (#3995)
+- Fix: crash when updating attribute with empty JSON object or array (#3995)
