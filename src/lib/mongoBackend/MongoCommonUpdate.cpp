@@ -480,7 +480,7 @@ static void appendMetadata
 */
 static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
 {
-  if (caP->compoundValueP == NULL)
+  if ((caP->compoundValueP == NULL) || (caP->compoundValueP->childV.size() == 0))
   {
     return false;
   }
@@ -3066,7 +3066,7 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
 
-    if (attr->compoundValueP != NULL)
+    if ((attr->compoundValueP != NULL) && (attr->compoundValueP->childV.size() > 0))
     {
       CompoundValueNode* child0 = attr->compoundValueP->childV[0];
       if ((child0->name == op))
