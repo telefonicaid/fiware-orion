@@ -43,14 +43,6 @@ extern void httpRequestInit(long defaultTimeoutInMilliseconds);
 
 
 
-/***************************************************************************
-*
-* httpRequestConnect -
-*/
-extern int httpRequestConnect(const std::string& host, unsigned short port);
-
-
-
 /* ****************************************** **********************************
 *
 * httpRequestSend -

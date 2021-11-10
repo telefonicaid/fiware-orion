@@ -54,6 +54,8 @@ class TriggeredSubscription
 {
  public:
   long long                 throttling;
+  long long                 maxFailsLimit;
+  long long                 failsCounter;
   long long                 lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
@@ -74,6 +76,8 @@ class TriggeredSubscription
   }                        expression;      // Only used by NGSIv2 subscription
 
   TriggeredSubscription(long long                _throttling,
+                        long long                _maxFailsLimit,
+                        long long                _failsCounter,
                         long long                _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,

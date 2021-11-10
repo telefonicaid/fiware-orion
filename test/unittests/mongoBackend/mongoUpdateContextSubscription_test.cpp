@@ -149,7 +149,7 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 * - NotifyCondtions MUST not be 0 (OMA spec cardinallity allows this, but for us is an error)
 * - Duration MUST be included (our policy is so)
 * - ONCHANGE condValues MUST be 1 or more
-* - Restiction MUST be ommited
+* - Restiction MUST be omitted
 *
 */
 
