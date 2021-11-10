@@ -99,6 +99,7 @@ static void insertInCache
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
+                     sub.notification.maxFailsLimit,
                      sub.throttling,
                      sub.attrsFormat,
                      -1,
@@ -150,8 +151,9 @@ std::string mongoCreateSubscription
   setExpiration(sub, &b);
   setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
+  setMaxFailsLimit(sub, &b);
   setServicePath(servicePath, &b);
-  setStatus(sub, &b);
+  setStatus(sub.status, &b);
   setEntities(sub, &b);
   setAttrs(sub, &b);
   setMetadata(sub, &b);

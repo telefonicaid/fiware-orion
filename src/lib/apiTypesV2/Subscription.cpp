@@ -80,7 +80,17 @@ std::string Subscription::toJson(void)
     jh.addDate("expires", this->expires);
   }
 
-  if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
+  // Status inactive takes precedence over failed
+  //
+  // FIXME #3989: the if-clause check is somehow artificial. Some alternatives described in the issue
+  //
+  // Moreover, this->notification.lastFailure > this->notification.lastSuccess condition is weak
+  // as two notifications coud be sent in the same second (first one successfu, second one failing)
+  // and the status will end in "active" instead of "failed"
+  //
+  // Remove the sleep 1s in maxfailslimit_full_lifecycle.test once this gets fixed
+  //
+  if ((this->status != "inactive") && (this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
   {
     jh.addString("status", "failed");
   }
@@ -192,6 +202,16 @@ std::string Notification::toJson(const std::string& attrsFormat)
   if (this->lastSuccessCode != -1)
   {
     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
+  }
+
+  if (this->maxFailsLimit > 0)
+  {
+    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
+
+  if (this->failsCounter > 0)
+  {
+    jh.addNumber("failsCounter", this->failsCounter);
   }
 
   return jh.str();

@@ -1,3 +1,5 @@
+- Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
+- Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
 - Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
 - Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
 - Fix: avoid reset timesSent counter upon PATCH /v2/subscriptions/{subId} when csubs cache is in use

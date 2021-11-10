@@ -212,7 +212,7 @@ Date: REGEX(.*)
 06. Check if 2nd sub notification failed
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 486
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,7 +222,8 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})", 
     "notification": {
         "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrsFormat": "normalized",
+        "failsCounter": 1,
         "httpCustom": {
             "payload": "Custom payload", 
             "timeout": 8000, 
