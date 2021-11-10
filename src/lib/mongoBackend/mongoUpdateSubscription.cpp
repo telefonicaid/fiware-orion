@@ -198,6 +198,7 @@ static void updateInCache
   long long    lastSuccess;
   long long    lastSuccessCode;
   long long    count;
+  long long    failsCounter;
 
   if (subCacheP != NULL)
   {
@@ -207,6 +208,7 @@ static void updateInCache
     lastSuccess          = subCacheP->lastSuccess;
     lastSuccessCode      = subCacheP->lastSuccessCode;
     count                = subCacheP->count;
+    failsCounter         = subCacheP->failsCounter;
   }
   else
   {
@@ -216,6 +218,7 @@ static void updateInCache
     lastSuccess          = -1;
     lastSuccessCode      = -1;
     count                = 0;
+    failsCounter         = 0;
   }
 
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
@@ -228,6 +231,7 @@ static void updateInCache
                                           lastSuccess,
                                           lastSuccessCode,
                                           count,
+                                          failsCounter,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
@@ -297,12 +301,14 @@ std::string mongoUpdateSubscription
   if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
   if (subUp.notificationProvided)  setAttrs(subUp, &setB);
   if (subUp.notificationProvided)  setMetadata(subUp, &setB);
+  if (subUp.notificationProvided)  setMaxFailsLimit(subUp, &setB);
   if (subUp.expiresProvided)       setExpiration(subUp, &setB);
   if (subUp.throttlingProvided)    setThrottling(subUp, &setB);
-  if (subUp.statusProvided)        setStatus(subUp, &setB);
+  if (subUp.statusProvided)        setStatus(subUp.status, &setB);
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
+
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)
