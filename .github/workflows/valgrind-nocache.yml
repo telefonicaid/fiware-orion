@@ -1,0 +1,52 @@
+# Same as valgrind but with CB_NO_CACHE=ON activated
+# We use a separate .yml file because it is better in the case of re-launching due to glitches
+
+name: Valgrind Tests Nocache
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+env:
+   TEST_IMAGE_NAME: fiware/orion-ci:rpm8
+
+jobs:
+  valgrind:
+    runs-on: ubuntu-18.04
+    continue-on-error: true
+
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
+        
+    strategy:
+      matrix:
+        range:
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200
+          - -e CB_NO_CACHE=ON -e FT_FROM_IX=1201
+          
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run valgrind test
+        run: |
+          docker run  --privileged --network host -t --rm ${{ matrix.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind
