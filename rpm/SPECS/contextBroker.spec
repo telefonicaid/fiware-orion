@@ -193,6 +193,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Nov 11 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.3.1-1
+- Fix: crash when updating attribute with empty JSON object or array (#3995)
+
 * Mon Oct 25 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.3.0-1
 - Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
 - Add: support to user and password in MQTT subscriptions (#3914)
