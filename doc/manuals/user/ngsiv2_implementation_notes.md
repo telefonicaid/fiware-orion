@@ -416,7 +416,7 @@ Orion automatically passes the subscription to `inactive` state. A subscripiton 
 (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state
 `active` again).
 
-In addition, when Orion automatically disables a subscrpition, a log trace in WARN level is printed
+In addition, when Orion automatically disables a subscription, a log trace in WARN level is printed
 in this format:
 
 ```
