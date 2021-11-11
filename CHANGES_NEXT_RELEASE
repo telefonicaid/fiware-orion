@@ -1,1 +1,0 @@
-- Fix: crash when updating attribute with empty JSON object or array (#3995)
