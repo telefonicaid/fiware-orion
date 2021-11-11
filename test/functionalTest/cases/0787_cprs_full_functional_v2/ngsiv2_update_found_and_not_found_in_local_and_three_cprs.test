@@ -36,7 +36,7 @@ brokerStart CP3
 --SHELL--
 
 #
-# The purpose of this test is to verify that 'one FOUND and one NOT-FOUND' from each of the three 
+# The purpose of this test is to verify that 'one FOUND and one NOT-FOUND' from each of the three
 # Context Providers and in the local database works correctly.
 # So, all of them will have one attribute that exists and one that doesn't exist
 #   - CP1  A1 (+!A2)

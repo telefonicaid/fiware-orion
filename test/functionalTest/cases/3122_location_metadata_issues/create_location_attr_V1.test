@@ -114,9 +114,9 @@ Date: REGEX(.*)
                             "type": "string",
                             "value": "WGS84"
                         }
-                    ], 
-                    "name": "A", 
-                    "type": "whatever", 
+                    ],
+                    "name": "A",
+                    "type": "whatever",
                     "value": ""
                 }
             ],
@@ -126,8 +126,8 @@ Date: REGEX(.*)
             }
         }
     ],
-    "id": "E1", 
-    "isPattern": "false", 
+    "id": "E1",
+    "isPattern": "false",
     "type": "T"
 }
 
@@ -145,8 +145,8 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A", 
-                    "type": "whatever", 
+                    "name": "A",
+                    "type": "whatever",
                     "value": ""
                 }
             ],
@@ -156,8 +156,8 @@ Date: REGEX(.*)
             }
         }
     ],
-    "id": "E2", 
-    "isPattern": "false", 
+    "id": "E2",
+    "isPattern": "false",
     "type": "T"
 }
 

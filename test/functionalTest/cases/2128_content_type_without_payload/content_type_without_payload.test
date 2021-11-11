@@ -63,16 +63,16 @@ echo "================================================================"
 orionCurl --url /v2/entities/E1 --in application/json
 echo
 echo
- 
+
 
 echo "05. Send a DELETE with Content-Type application/json, see error 400"
 echo "==================================================================="
 orionCurl --url /v2/entities/E1 --in application/json -X DELETE
 echo
 echo
- 
 
---REGEXPECT-- 
+
+--REGEXPECT--
 01. Send a PUT /v2/entities/E1 without payload, see error 411
 =============================================================
 HTTP/1.1 411 Length Required

@@ -147,9 +147,9 @@ Date: REGEX(.*)
                             "type": "string",
                             "value": "WGS84"
                         }
-                    ], 
-                    "name": "A", 
-                    "type": "whatever", 
+                    ],
+                    "name": "A",
+                    "type": "whatever",
                     "value": ""
                 }
             ],
@@ -159,8 +159,8 @@ Date: REGEX(.*)
             }
         }
     ],
-    "id": "E2", 
-    "isPattern": "false", 
+    "id": "E2",
+    "isPattern": "false",
     "type": "T"
 }
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
             "type": "whatever",
             "value": "40, -3"
         },
-        "id": "E1", 
+        "id": "E1",
         "type": "T"
     },
     {
@@ -199,7 +199,7 @@ Date: REGEX(.*)
             "type": "whatever",
             "value": "39,-2"
         },
-        "id": "E2", 
+        "id": "E2",
         "type": "T"
     }
 ]
@@ -230,9 +230,9 @@ Date: REGEX(.*)
                         "type": "whatever",
                         "value": "40, -3"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T"
             },
             "statusCode": {
@@ -255,9 +255,9 @@ Date: REGEX(.*)
                         "type": "whatever",
                         "value": "39,-2"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "T"
             },
             "statusCode": {
@@ -279,17 +279,17 @@ Date: REGEX(.*)
 
 [
     {
-        "A": {		 
+        "A": {
             "metadata": {
                 "location": {
-                    "type": "string", 
+                    "type": "string",
                     "value": "WGS84"
                 }
-            }, 
-            "type": "whatever", 
+            },
+            "type": "whatever",
             "value": "39,-2"
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T"
     }
 ]
@@ -304,18 +304,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
-    {		
-        "A": {				 
+    {
+        "A": {
             "metadata": {
                 "location": {
-                    "type": "string", 
+                    "type": "string",
                     "value": "WGS84"
                 }
-            }, 
-            "type": "whatever", 
+            },
+            "type": "whatever",
             "value": "39,-2"
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T"
     }
 ]

@@ -245,17 +245,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -277,35 +277,35 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A2", 
+                        "name": "A2",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -327,35 +327,35 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A3",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T2"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -377,35 +377,35 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A2", 
+                        "name": "A2",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A3",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T2"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -427,53 +427,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A2", 
+                        "name": "A2",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A3",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T2"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -491,7 +491,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -511,53 +511,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A2", 
+                        "name": "A2",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A3",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T2"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -579,53 +579,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A2", 
+                        "name": "A2",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A3", 
+                        "name": "A3",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T2"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }

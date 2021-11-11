@@ -668,7 +668,7 @@ Date: REGEX(.*)
 14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 453
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -679,6 +679,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/givemeDelay"
         },
@@ -706,7 +707,7 @@ Date: REGEX(.*)
 15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 458
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -717,6 +718,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:6699/notify"
         },
@@ -744,7 +746,7 @@ Date: REGEX(.*)
 16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 468
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -755,6 +757,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://foo.bar.bar.com:1028/notify"
         },
@@ -782,7 +785,7 @@ Date: REGEX(.*)
 17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -793,6 +796,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://12.34.76.85:9999/giveme200"
         },

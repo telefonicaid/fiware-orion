@@ -41,6 +41,8 @@
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoDriver/connectionOperations.h"
 
 using std::map;
 
@@ -722,9 +724,8 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
 *
-* Note that 'count', which is the counter of how many times a notification has been
-* fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
-* has made a notification to be triggered/fired upon creation-time of the subscription.
+* Note that 'count' and 'failsCounter', which is the counter of how many times a notification has been
+* fired and has failed, are set to ZERO
 */
 void subCacheItemInsert
 (
@@ -738,6 +739,7 @@ void subCacheItemInsert
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
+  int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
   int64_t                            lastNotificationTime,
@@ -771,6 +773,7 @@ void subCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
+  cSubP->maxFailsLimit         = maxFailsLimit;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastNotificationFailureTime;
@@ -780,6 +783,7 @@ void subCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
@@ -1043,11 +1047,12 @@ typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
   int64_t      count;
-  // FIXME PR: should include failsCount in the future?
+  int64_t      failsCounter;
   int64_t      lastFailure;
   int64_t      lastSuccess;
   std::string  lastFailureReason;
   int64_t      lastSuccessCode;
+  std::string  status;
 } CachedSubSaved;
 
 
@@ -1108,6 +1113,7 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->failsCounter         = cSubP->failsCounter;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->lastFailureReason    = cSubP->lastFailureReason;
@@ -1121,7 +1127,7 @@ void subCacheSync(void)
 
 
   //
-  // 2. Refresh cache (count set to 0)
+  // 2. Refresh cache (count and failsCounter set to 0)
   //
   subCacheRefresh();
 
@@ -1177,6 +1183,7 @@ void subCacheSync(void)
       mongoSubCountersUpdate(tenant,
                              cSubP->subscriptionId,
                              cssP->count,
+                             cssP->failsCounter,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
                              cssP->lastSuccess,
@@ -1263,32 +1270,42 @@ extern bool noCache;
 * A timestamp for this last failure is set for the sub-item in the sub-cache  and
 * the consecutive number of notification errors for the subscription is incremented.
 *
-* If 'errors' == 0, then the subscription is marked as non-erroneous.
+* If error == true, then the subscription is marked as non-erroneous.
 */
 void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors,
+  bool                error,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  long long           failsCounter,
+  long long           maxFailsLimit
 )
 {
+  bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
+
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
 
     time_t now = time(NULL);
 
-    if (errors == 0)
+    if (error)
     {
-      // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now, "", statusCode);
+      std::string status = "";
+      if (maxFailsReached)
+      {
+        LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
+        status = STATUS_INACTIVE;
+      }
+      // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status);
     }
     else
     {
-      // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1, failureReason, -1);
+      // count == 0 (inc is done in another part), fails = 0, lastFailure == -1, failureReason == "", status == ""
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "");
     }
 
     return;
@@ -1309,15 +1326,26 @@ void subNotificationErrorStatus
     return;
   }
 
-  if (errors == 0)
+  if (error)
   {
-    subP->lastSuccess     = now;
-    subP->lastSuccessCode = statusCode;
+    subP->failsCounter++;
+    subP->lastFailure       = now;
+    subP->lastFailureReason = failureReason;
+
+    if (maxFailsReached)
+    {
+      // update the status to inactive
+      LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
+      subP->status = STATUS_INACTIVE;
+      LM_T(LmtSubCache, ("Update the status to %s", subP->status.c_str()));
+    }
   }
   else
   {
-    subP->lastFailure       = now;
-    subP->lastFailureReason = failureReason;
+    // no fails mean notification ok, thus reseting the counter
+    subP->failsCounter    = 0;
+    subP->lastSuccess     = now;
+    subP->lastSuccessCode = statusCode;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

@@ -62,7 +62,7 @@
 *  -5:  Error parsing string filter
 *  -6:  Error parsing metadata string filter
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter' of the inserted subscription are set to ZERO.
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
@@ -107,7 +107,8 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
@@ -116,6 +117,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
   cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->next                  = NULL;
 
@@ -257,7 +259,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no entity ids)
 *
 *
-* Note that the 'count' of the inserted subscription is set to ZERO.
+* Note that the 'count' and 'failsCounter" of the inserted subscription are set to ZERO.
 * This is because the sub cache only counts the increments in these accumulating counters,
 * so that other CBs, operating on the same DB will not overwrite the value of these accumulators
 */
@@ -273,6 +275,7 @@ int mongoSubCacheItemInsert
   long long              lastSuccess,
   long long              lastSuccessCode,
   long long              count,
+  long long              failsCounter,
   long long              expirationTime,
   const std::string&     status,
   const std::string&     q,
@@ -357,8 +360,8 @@ int mongoSubCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
-  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;
@@ -373,6 +376,8 @@ int mongoSubCacheItemInsert
   cSubP->lastSuccess           = lastSuccess;
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->count                 = count;
+  cSubP->failsCounter          = failsCounter;
+  cSubP->status                = status;
 
   //
   // httpInfo & mqttInfo
@@ -489,21 +494,53 @@ static void mongoSubCountersUpdateCount
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
-  long long           count
+  long long           count,
+  long long           fails,
+  const std::string&  status = ""
 )
 {
   orion::BSONObjBuilder  condition;
   orion::BSONObjBuilder  update;
-  orion::BSONObjBuilder  countB;
+  orion::BSONObjBuilder  incB;
+  orion::BSONObjBuilder  setB;
+
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
-  countB.append(CSUB_COUNT, count);
-  update.append("$inc", countB.obj());
+  if (count > 0)
+  {
+    incB.append(CSUB_COUNT, count);
+  }
+
+  if (fails > 0)
+  {
+    incB.append(CSUB_FAILSCOUNTER, fails);
+  }
+  else
+  {
+    // no fails mean notification ok, thus reseting the counter
+    setB.append(CSUB_FAILSCOUNTER, 0);
+  }
+
+  if (!status.empty())
+  {
+    setB.append(CSUB_STATUS, status);
+  }
+
+  // by construction, at least one of incB or setB has a field and update object
+  // cannot be empty
+  if (incB.nFields() > 0)
+  {
+    update.append("$inc", incB.obj());
+  }
+  if (setB.nFields() > 0)
+  {
+    update.append("$set", setB.obj());
+  }
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count' for a subscription)"));
+    LM_E(("Internal Error (error updating 'count', 'failsCounter' and/or 'status' for a subscription)"));
   }
 }
 
@@ -667,11 +704,13 @@ void mongoSubCountersUpdate
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
+  long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
   long long           lastSuccess,
   const std::string&  failureReason,
-  long long           statusCode
+  long long           statusCode,
+  const std::string&  status
 )
 {
   if (subId.empty())
@@ -682,10 +721,7 @@ void mongoSubCountersUpdate
 
   std::string db = composeDatabaseName(tenant);
 
-  if (count > 0)
-  {
-    mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count);
-  }
+  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status);
 
   if (lastNotificationTime > 0)
   {

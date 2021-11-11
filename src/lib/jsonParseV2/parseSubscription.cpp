@@ -969,6 +969,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     subsP->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
+  // MaxFailsLimit
+  Opt<int64_t> maxFailsLimitOpt = getInt64Opt(notification, "maxFailsLimit");
+  if (!maxFailsLimitOpt.ok())
+  {
+    return badInput(ciP, maxFailsLimitOpt.error);
+  }
+  else if (maxFailsLimitOpt.given)
+  {
+    if (maxFailsLimitOpt.value <= 0)
+    {
+      return badInput(ciP, "maxFailsLimit must be greater than zero");
+    }
+
+    subsP->notification.maxFailsLimit = maxFailsLimitOpt.value;
+  }
+
   return "";
 }
 

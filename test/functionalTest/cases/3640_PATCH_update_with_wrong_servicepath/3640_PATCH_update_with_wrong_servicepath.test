@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 
-# 
+#
 # 01. Create entity E1/T1/A1=1, with servicepath '/Level_1/'
 # 02. GET /v2/entities/E1, with servicepath '/Level_1/' to see E1/T1/A1=1
 # 03. Create entity E2/T2/A2=2, with servicepath '/Level_2/'
@@ -177,8 +177,8 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "Integer",
         "value": 1
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 
@@ -206,8 +206,8 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "Integer",
         "value": 2
-    }, 
-    "id": "E2", 
+    },
+    "id": "E2",
     "type": "T2"
 }
 
@@ -226,17 +226,17 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "Integer",
             "value": 1
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T1"
-    }, 
+    },
     {
         "A2": {
             "metadata": {},
             "type": "Integer",
             "value": 2
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T2"
     }
 ]
@@ -256,17 +256,17 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "Integer",
             "value": 1
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T1"
-    }, 
+    },
     {
         "A2": {
             "metadata": {},
             "type": "Integer",
             "value": 2
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T2"
     }
 ]
@@ -281,7 +281,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "servicepath with wildcard # is not allowed in patch update request", 
+    "description": "servicepath with wildcard # is not allowed in patch update request",
     "error": "BadRequest"
 }
 
@@ -295,7 +295,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "more than one servicepath in patch update request is not allowed", 
+    "description": "more than one servicepath in patch update request is not allowed",
     "error": "BadRequest"
 }
 
@@ -309,7 +309,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The requested entity has not been found. Check type and id", 
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
@@ -323,7 +323,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The requested entity has not been found. Check type and id", 
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 

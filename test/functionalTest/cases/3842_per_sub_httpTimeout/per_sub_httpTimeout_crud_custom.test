@@ -104,7 +104,7 @@ payload='
   }
 }'
 
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH 
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
 echo
 echo
 
@@ -139,7 +139,7 @@ payload='
   }
 }'
 
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH 
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
 echo
 echo
 
@@ -175,7 +175,7 @@ payload='
   }
 }'
 
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH 
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
 echo
 echo
 
@@ -189,7 +189,7 @@ echo
 
 echo "09. Delete the subscription, get 204"
 echo "===================================="
-orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X DELETE 
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X DELETE
 echo
 echo
 
@@ -330,26 +330,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
-            "payload": "Custom payload", 
-            "timeout": 1000, 
+            "payload": "Custom payload",
+            "timeout": 1000,
             "url": "http://localhost:1234"
-        }, 
+        },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -374,26 +374,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
-            "payload": "Custom payload", 
-            "timeout": 2000, 
+            "payload": "Custom payload",
+            "timeout": 2000,
             "url": "http://localhost:1234"
-        }, 
+        },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -418,25 +418,25 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
-            "payload": "Custom payload", 
+            "payload": "Custom payload",
             "url": "http://localhost:1234"
-        }, 
+        },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -461,26 +461,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
             "payload": "Custom payload",
-            "timeout": 1000, 
+            "timeout": 1000,
             "url": "http://localhost:1234"
-        }, 
+        },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -515,25 +515,25 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "httpCustom": {
-            "payload": "Custom payload", 
+            "payload": "Custom payload",
             "url": "http://localhost:1234"
-        }, 
+        },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -550,10 +550,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "timeout field must be an integer between 0 and 1800000", 
+    "description": "timeout field must be an integer between 0 and 1800000",
     "error": "BadRequest"
 }
- 
+
 
 13. Create a subscrition with a overranged timeout field, get 400
 =================================================================
@@ -564,7 +564,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "timeout field must be an integer between 0 and 1800000", 
+    "description": "timeout field must be an integer between 0 and 1800000",
     "error": "BadRequest"
 }
 
@@ -578,7 +578,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "timeout is not an int", 
+    "description": "timeout is not an int",
     "error": "BadRequest"
 }
 
