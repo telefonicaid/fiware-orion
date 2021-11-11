@@ -38,14 +38,14 @@ echo "01. POST /v2/entities"
 echo "=========================="
 payload='{
 
-    
+
       "id":   "8787GHY",
       "type": "Car",
-      "brand":{ 
+      "brand":{
             "type": "string",
             "value": "Mercedes Benz"
         },
-      "speed":{  
+      "speed":{
             "type": "number",
             "value" : "150"
         },

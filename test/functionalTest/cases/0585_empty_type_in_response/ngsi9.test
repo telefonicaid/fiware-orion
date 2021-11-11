@@ -142,17 +142,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }
@@ -174,17 +174,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }
@@ -206,22 +206,22 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
-                    }, 
+                    },
                     {
-                        "id": "OfficeRoom", 
-                        "isPattern": "false", 
+                        "id": "OfficeRoom",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }
@@ -243,22 +243,22 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
-                    }, 
+                    },
                     {
-                        "id": "OfficeRoom", 
-                        "isPattern": "false", 
+                        "id": "OfficeRoom",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }
@@ -280,17 +280,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }
@@ -312,17 +312,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "Room", 
-                        "isPattern": "false", 
+                        "id": "Room",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:1028/application"
             }
         }

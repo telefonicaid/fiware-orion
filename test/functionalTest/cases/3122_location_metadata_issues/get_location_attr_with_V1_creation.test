@@ -94,9 +94,9 @@ Date: REGEX(.*)
                             "type": "string",
                             "value": "WGS84"
                         }
-                    ], 
-                    "name": "A", 
-                    "type": "whatever", 
+                    ],
+                    "name": "A",
+                    "type": "whatever",
                     "value": ""
                 }
             ],
@@ -106,8 +106,8 @@ Date: REGEX(.*)
             }
         }
     ],
-    "id": "E1", 
-    "isPattern": "false", 
+    "id": "E1",
+    "isPattern": "false",
     "type": "T"
 }
 
@@ -126,22 +126,22 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
-                        "name": "location", 
-                        "type": "string", 
+                        "name": "location",
+                        "type": "string",
                         "value": "WGS84"
                     }
-                ], 
-                "name": "A", 
-                "type": "whatever", 
+                ],
+                "name": "A",
+                "type": "whatever",
                 "value": "40,-3"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -159,14 +159,14 @@ Date: REGEX(.*)
     "A": {
         "metadata": {
             "location": {
-                "type": "string", 
+                "type": "string",
                 "value": "WGS84"
             }
-        }, 
-        "type": "whatever", 
+        },
+        "type": "whatever",
         "value": "40,-3"
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T"
 }
 

@@ -88,7 +88,7 @@ echo
 
 echo "04. Empty entity-id: GET    /v2/entities//attrs"
 echo "==============================================="
-orionCurl --url /v2/entities//attrs/ 
+orionCurl --url /v2/entities//attrs/
 echo
 echo
 
@@ -126,7 +126,7 @@ echo
 
 echo "08. Empty entity-id: GET    /v2/entities//attrs/A1/value"
 echo "========================================================"
-orionCurl --url /v2/entities//attrs/A1/value 
+orionCurl --url /v2/entities//attrs/A1/value
 echo
 echo
 
@@ -141,7 +141,7 @@ echo
 
 echo "10. Empty attr-name: GET    /v2/entities/E1/attrs//value"
 echo "========================================================"
-orionCurl --url /v2/entities/E1/attrs//value 
+orionCurl --url /v2/entities/E1/attrs//value
 echo
 echo
 

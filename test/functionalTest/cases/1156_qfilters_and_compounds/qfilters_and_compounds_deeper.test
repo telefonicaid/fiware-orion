@@ -658,22 +658,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "L1": {
                         "L2": {
-                            "F": false, 
-                            "N": null, 
-                            "T": true, 
+                            "F": false,
+                            "N": null,
+                            "T": true,
                             "f": 3.14,
-                            "i": 10, 
+                            "i": 10,
                             "s": "test_string"
                         }
                     }
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

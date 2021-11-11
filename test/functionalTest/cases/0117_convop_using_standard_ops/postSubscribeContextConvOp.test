@@ -150,8 +150,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P5Y", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "P5Y"
     }
 }
@@ -171,17 +171,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "a", 
+                        "name": "A1",
+                        "type": "a",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -207,17 +207,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "a", 
+                        "name": "A1",
+                        "type": "a",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

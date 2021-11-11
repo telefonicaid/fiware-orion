@@ -30,8 +30,8 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities (without payload) 
-# 02. POST /v2/entities (empty payload) 
+# 01. POST /v2/entities (without payload)
+# 02. POST /v2/entities (empty payload)
 # 03. POST /v2/entities to create E1/A1=0
 # 04. PUT /v2/entities/E1/attrs (without payload)
 # 05. PUT /v2/entities/E1/attrs (empty payload)
@@ -122,7 +122,7 @@ echo
 echo "10. PUT /v2/entities/E1/attrs/A1 (without payload)"
 echo "=================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -137,7 +137,7 @@ echo
 echo "12. PUT /v2/entities/E1/attrs/A1 (empty payload)"
 echo "================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -151,7 +151,7 @@ echo
 echo "14. PATCH /v2/entities/E1/attrs/A1 (without payload)"
 echo "===================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -159,7 +159,7 @@ echo
 echo "15. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
 echo "=================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH
 echo
 echo
 

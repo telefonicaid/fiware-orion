@@ -279,14 +279,14 @@ Fiware-Correlator: CORRELATOR1; cbnotif=1
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "A1 of E1 in CB"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -304,14 +304,14 @@ Fiware-Correlator: CORRELATOR2; cbnotif=1
     "data": [
         {
             "A2": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "A2 of E2 in CPR1"
-            }, 
-            "id": "E2", 
+            },
+            "id": "E2",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -329,14 +329,14 @@ Fiware-Correlator: CORRELATOR3; cbfwd=1; cbnotif=1
     "data": [
         {
             "A2": {
-                "metadata": {}, 
-                "type": "string", 
+                "metadata": {},
+                "type": "string",
                 "value": "E2/A2 via CB"
-            }, 
-            "id": "E2", 
+            },
+            "id": "E2",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

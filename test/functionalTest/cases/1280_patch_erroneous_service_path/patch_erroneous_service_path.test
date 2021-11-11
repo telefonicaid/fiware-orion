@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Patch Erroneous Service Patch 
+Patch Erroneous Service Patch
 
 --SHELL-INIT--
 dbInit CB
@@ -32,14 +32,14 @@ brokerStart CB
 #
 # 01. PATCH /v2/ent=ities/E1 (invalid URI)
 # 02. PATCH /v2/entities/E1 (incorrect service path)
-# 03. PATCH /v2/entities/E1 (service path without /) 
+# 03. PATCH /v2/entities/E1 (service path without /)
 # 04. PATCH /v2/entities/E1 (unrecognized content type)
 
 
 echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
 echo "========================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/ent=ities/E1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/ent=ities/E1 --payload "$payload" -X PATCH
 echo
 echo
 

@@ -201,14 +201,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                         "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "a1", 
+                },
+                "type": "a1",
                 "value": 1
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -240,17 +240,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A1": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "a1", 
+                },
+                "type": "a1",
                 "value": 4
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -282,17 +282,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A1": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 6
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -323,23 +323,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Number", 
+                "type": "Number",
                 "value": 6
-            }, 
+            },
             "A2": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 8
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -370,33 +370,33 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Number", 
+                "type": "Number",
                 "value": 6
-            }, 
+            },
             "A2": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 10
             },
             "A3": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 11
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

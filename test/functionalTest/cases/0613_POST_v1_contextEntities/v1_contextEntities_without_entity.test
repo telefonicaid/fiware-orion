@@ -45,14 +45,14 @@ echo "01. POST /v1/contextEntities without entityId in JSON payload and see it f
 echo "============================================================================="
 payload='{
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" 
+orionCurl --url /v1/contextEntities --payload "${payload}"
 echo
 echo
 
@@ -64,7 +64,7 @@ payload='{
     "type": "ET",
     "isPattern": "false",
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
@@ -83,14 +83,14 @@ payload='{
     "type": "ET",
     "isPattern": "false",
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" 
+orionCurl --url /v1/contextEntities --payload "${payload}"
 echo
 echo
 
@@ -99,14 +99,14 @@ echo "04. POST /v1/contextEntities/EID without entityId in JSON payload OK"
 echo "===================================================================="
 payload='{
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/EID --payload "${payload}" 
+orionCurl --url /v1/contextEntities/EID --payload "${payload}"
 echo
 echo
 
@@ -118,14 +118,14 @@ payload='{
     "type": "ET",
     "isPattern": "false",
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" 
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
 echo
 echo
 
@@ -134,14 +134,14 @@ echo "06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payloa
 echo "=============================================================================="
 payload='{
     "attributes": [
-        {    
+        {
             "name": "A1",
             "type": "A1T",
             "value": "10"
         }
     ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" 
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
 echo
 echo
 
@@ -157,8 +157,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "invalid request: mandatory entityId::id missing", 
+        "code": "400",
+        "details": "invalid request: mandatory entityId::id missing",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -174,8 +174,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entityId::id differs in URL and payload", 
+        "code": "400",
+        "details": "entityId::id differs in URL and payload",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -194,19 +194,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "A1T", 
+                    "name": "A1",
+                    "type": "A1T",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "EID", 
-    "isPattern": "false", 
+    ],
+    "id": "EID",
+    "isPattern": "false",
     "type": "ET"
 }
 
@@ -224,19 +224,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "A1T", 
+                    "name": "A1",
+                    "type": "A1T",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "EID", 
-    "isPattern": "false", 
+    ],
+    "id": "EID",
+    "isPattern": "false",
     "type": "ET"
 }
 
@@ -251,8 +251,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "invalid payload: unknown fields", 
+        "code": "400",
+        "details": "invalid payload: unknown fields",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -271,19 +271,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "A1T", 
+                    "name": "A1",
+                    "type": "A1T",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
+    ],
+    "id": "E1",
+    "isPattern": "false",
     "type": "T1"
 }
 

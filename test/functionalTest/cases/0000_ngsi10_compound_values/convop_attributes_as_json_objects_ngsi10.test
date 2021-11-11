@@ -109,18 +109,18 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "A1": {
-                    "type": "Attr", 
+                    "type": "Attr",
                     "value": ""
                 }
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
+    ],
+    "id": "E1",
+    "isPattern": "false",
     "type": ""
 }
 
@@ -136,16 +136,16 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": {
             "A1": {
-                "type": "Attr", 
+                "type": "Attr",
                 "value": "1"
             }
-        }, 
-        "id": "E1", 
-        "isPattern": "false", 
+        },
+        "id": "E1",
+        "isPattern": "false",
         "type": ""
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -162,17 +162,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "Attr", 
+                "name": "A1",
+                "type": "Attr",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": ""
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -190,12 +190,12 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "A1": {
-                    "type": "Attr", 
+                    "type": "Attr",
                     "value": ""
                 }
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -213,12 +213,12 @@ Date: REGEX(.*)
 {
     "attributes": {
         "A1": {
-            "type": "Attr", 
+            "type": "Attr",
             "value": "99"
         }
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -234,13 +234,13 @@ Date: REGEX(.*)
 {
     "attributes": [
         {
-            "name": "A1", 
-            "type": "Attr", 
+            "name": "A1",
+            "type": "Attr",
             "value": "99"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

@@ -41,7 +41,7 @@ brokerStart CB
 # 01.04. Query with mq='A1.B1'.M1==M1, see E1
 # 01.05. Query with mq='A1.B1'.M1==M2, no hits
 # 01.06. Query with q='A1.B1'.M1, no hits, as M1 is a metadata, not inside a compound value
-# 
+#
 # 02.01. Create E2 with an attribute called A1.B1, with compound value { "C1": 21, "C2": 22 }
 # 02.02. Query with q=A1.B1.C1, no hits
 # 02.03. Query with q='A1.B1'.C1, see E2

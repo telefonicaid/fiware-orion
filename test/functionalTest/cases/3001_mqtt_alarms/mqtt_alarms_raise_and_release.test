@@ -37,9 +37,9 @@ brokerStart CB 0 IPV4
 #
 # 01. Create MQTT sub with wrong user/pass
 # 02. Upsert to trigger first MQTT notification, which fails and raises alarm
-# 03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)
+# 03. Get sub and see status:failed, timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 # 04. Upsert to trigger second MQTT notification, which fails but not re-raises alarm
-# 05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)
+# 05. Get sub and see status:failed, timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
 # 06. Update subscription to fix user/pass
 # 07. Upsert to trigger third MQTT notification, which is ok and releases alarm
 # 08. Get sub and see status:active, timesSent:3, lastFailure (old) and lastSuccess
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo "03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)"
-echo "==================================================================================="
+echo "03. Get sub and see status:failed, timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)"
+echo "==================================================================================================="
 sleep 1s
 orionCurl --url /v2/subscriptions
 echo
@@ -112,8 +112,8 @@ echo
 echo
 
 
-echo "05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)"
-echo "==================================================================================="
+echo "05. Get sub and see status:failed, timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)"
+echo "==================================================================================================="
 sleep 1s
 orionCurl --url /v2/subscriptions
 echo
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 
 
 
-03. Get sub and see status:failed, timesSent:1 and lastFailure (but no lastSuccess)
-===================================================================================
+03. Get sub and see status:failed, timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 421
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -201,6 +201,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 1,
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "mqtt": {
@@ -238,10 +239,10 @@ Date: REGEX(.*)
 
 
 
-05. Get sub and see status:failed, timesSent:2 and lastFailure (but no lastSuccess)
-===================================================================================
+05. Get sub and see status:failed, timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)
+===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 421
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -252,6 +253,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 2,
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "mqtt": {

@@ -36,7 +36,7 @@ brokerStart CP1
 # 02. Update/APPEND E1/A1=10 (POST /v1/updateContext)
 # 03. Update/UPDATE E1/A1=1 and see it work (PUT /v1/contextEntities/E1/attributes)
 # 04. Query CB for E1/A1
-# 05. Update/APPEND E2/A2=1 in CP1 
+# 05. Update/APPEND E2/A2=1 in CP1
 # 06. Register E2/A2 in CB with CP1 as providing application
 # 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2/attributes)
 # 08. Query CP1 for E2/A2
@@ -222,7 +222,7 @@ orionCurl --url /v1/queryContext --payload "$payload" --urlParams 'attributesFor
 echo
 echo
 
- 
+
 echo "10. Update/APPEND E3/A1=1 in CB, with type EEE in standard payload"
 echo "=================================================================="
 payload='{
@@ -292,8 +292,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "details": "E1", 
+        "code": "404",
+        "details": "E1",
         "reasonPhrase": "No context element found"
     }
 }
@@ -313,17 +313,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -344,13 +344,13 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "", 
+                    "name": "A1",
+                    "type": "",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -372,17 +372,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": "3"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -404,17 +404,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "A", 
+                        "name": "A2",
+                        "type": "A",
                         "value": ""
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -431,7 +431,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -449,13 +449,13 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A2", 
-                    "type": "A", 
+                    "name": "A2",
+                    "type": "A",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -477,17 +477,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "A", 
+                        "name": "A2",
+                        "type": "A",
                         "value": "22"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -509,16 +509,16 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": {
                     "A2": {
-                        "type": "A", 
+                        "type": "A",
                         "value": "22"
                     }
-                }, 
-                "id": "E2", 
-                "isPattern": "false", 
+                },
+                "id": "E2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -540,17 +540,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": ""
                     }
-                ], 
-                "id": "E3", 
-                "isPattern": "false", 
+                ],
+                "id": "E3",
+                "isPattern": "false",
                 "type": "EEE"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -571,13 +571,13 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "A", 
+                    "name": "A1",
+                    "type": "A",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -599,17 +599,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "A", 
+                        "name": "A1",
+                        "type": "A",
                         "value": "13"
                     }
-                ], 
-                "id": "E3", 
-                "isPattern": "false", 
+                ],
+                "id": "E3",
+                "isPattern": "false",
                 "type": "EEE"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

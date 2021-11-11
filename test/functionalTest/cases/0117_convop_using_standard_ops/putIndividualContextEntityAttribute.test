@@ -40,7 +40,7 @@ brokerStart CP1
 # 06. Register E2/T2/A2 in CB with CP1 as providing application
 # 07. Update/UPDATE E2/T2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2/attributes/A2?entity::type=T2)
 # 08. Query CP1 for E2/T2/A2
-# 
+#
 #
 
 echo "01. Update/UPDATE E1/T1/A1=1 and see it fail (PUT /v1/contextEntities/E1/attributes/A1?entity::type=T1)"
@@ -218,8 +218,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "404", 
-    "details": "E1", 
+    "code": "404",
+    "details": "E1",
     "reasonPhrase": "No context element found"
 }
 
@@ -238,17 +238,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -265,7 +265,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -286,22 +286,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m1", 
-                                "type": "M1", 
+                                "name": "m1",
+                                "type": "M1",
                                 "value": "mmmmm 1111"
                             }
-                        ], 
-                        "name": "A1", 
-                        "type": "AT1", 
+                        ],
+                        "name": "A1",
+                        "type": "AT1",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -323,17 +323,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "A", 
+                        "name": "A2",
+                        "type": "A",
                         "value": ""
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -350,7 +350,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -364,7 +364,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -385,22 +385,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m2", 
-                                "type": "M2", 
+                                "name": "m2",
+                                "type": "M2",
                                 "value": "mmmmm 2222"
                             }
-                        ], 
-                        "name": "A2", 
-                        "type": "AT2", 
+                        ],
+                        "name": "A2",
+                        "type": "AT2",
                         "value": "22"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

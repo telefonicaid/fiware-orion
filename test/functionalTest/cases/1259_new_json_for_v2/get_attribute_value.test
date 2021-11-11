@@ -40,7 +40,7 @@ brokerStart CB 0-255
 # 08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
 # 09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 # 10. GET /v2/entities/E1/attrs/A1/value as text: OK
-# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload 
+# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
 # 12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 # 13. GET /v2/entities/E1/attrs/A1/value as text: OK
 # 14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123

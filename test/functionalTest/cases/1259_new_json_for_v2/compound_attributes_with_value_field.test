@@ -67,7 +67,7 @@ echo
 
 echo "03. GET /v2/entities (E1/A1 is compound, E2/A1 is not compound)"
 echo "==============================================================="
-orionCurl --url /v2/entities?options=keyValues 
+orionCurl --url /v2/entities?options=keyValues
 echo
 echo
 

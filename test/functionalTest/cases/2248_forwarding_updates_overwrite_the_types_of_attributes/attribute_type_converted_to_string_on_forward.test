@@ -124,22 +124,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "", 
+                    "name": "A1",
+                    "type": "",
                     "value": {
-                        "str": "This is a string", 
-                        "x": 2, 
-                        "x2": 1.5, 
-                        "y": true, 
+                        "str": "This is a string",
+                        "x": 2,
+                        "x2": 1.5,
+                        "y": true,
                         "z": null
                     }
                 }
-            ], 
-            "id": "E1", 
-            "isPattern": "false", 
+            ],
+            "id": "E1",
+            "isPattern": "false",
             "type": "T1"
         }
-    ], 
+    ],
     "updateAction": "UPDATE"
 }
 =======================================

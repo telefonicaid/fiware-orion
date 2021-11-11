@@ -42,7 +42,7 @@ brokerStart CP1
 echo "01. Register E1/A1 using POST /v1/registry/contextEntities/E1/attributes/A1, CP1 as providing application"
 echo "========================================================================================================="
 payload='{
-  "duration": "PT1M", 
+  "duration": "PT1M",
   "providingApplication": "http://localhost:'$CP1_PORT'/v1"
 }'
 orionCurl --url /v1/registry/contextEntities/E1/attributes/A1 --payload "$payload"
@@ -134,7 +134,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT1M", 
+    "duration": "PT1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -153,17 +153,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": ""
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": ""
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d*)/v1"
             }
         }
@@ -185,17 +185,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "degree", 
+                        "name": "A1",
+                        "type": "degree",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -217,17 +217,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "degree", 
+                        "name": "A1",
+                        "type": "degree",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -249,17 +249,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "degree", 
+                        "name": "A1",
+                        "type": "degree",
                         "value": "30"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

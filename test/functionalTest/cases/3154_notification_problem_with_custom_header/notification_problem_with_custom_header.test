@@ -42,7 +42,7 @@ echo "01. Create custom subscription"
 echo "=============================="
 payload='{
   "description": "not custom",
-  "expires": "2040-01-01T14:00:00.00Z",                  
+  "expires": "2040-01-01T14:00:00.00Z",
   "subject": {
     "entities": [
       {
