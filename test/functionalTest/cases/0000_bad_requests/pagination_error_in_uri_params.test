@@ -93,16 +93,16 @@ Date: REGEX(.*)
 
 
 +++++ 3. URI param 'limit' == 0
-HTTP/1.1 400 Bad Request
-Content-Length: 135
+HTTP/1.1 200 OK
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orionError": {
+    "errorCode": {
         "code": "400",
-        "details": "Bad pagination limit: /000000/ [a value of ZERO is unacceptable]",
+        "details": "JSON Parse Error",
         "reasonPhrase": "Bad Request"
     }
 }
