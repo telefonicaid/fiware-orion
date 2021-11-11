@@ -39,7 +39,7 @@ brokerStart CB 0 IPv4
 # 05. POST /v1/queryContext to reset Bad Input
 # 06. One more error, just to show how it looks in the log file ...
 # 07. grep in log-file
-# 
+#
 
 echo "01. GET /v1/noService"
 echo "====================="

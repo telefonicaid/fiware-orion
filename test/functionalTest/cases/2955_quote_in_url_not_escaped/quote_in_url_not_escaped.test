@@ -42,9 +42,9 @@ Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{ 
+{
     "description": "Empty right-hand-side for URI param /foo&quot;/",
-    "error": "BadRequest"	
+    "error": "BadRequest"
 }
 
 

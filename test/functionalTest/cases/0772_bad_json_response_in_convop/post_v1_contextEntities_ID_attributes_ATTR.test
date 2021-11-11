@@ -40,7 +40,7 @@ echo "==========================================================================
 payload='{
   "value": "10"
 }'
-orionCurl --url /v1/contextEntities/EID/attributes/A --payload "$payload" 
+orionCurl --url /v1/contextEntities/EID/attributes/A --payload "$payload"
 echo
 echo
 
@@ -70,7 +70,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -89,17 +89,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A", 
-                        "type": "", 
+                        "name": "A",
+                        "type": "",
                         "value": "10"
                     }
-                ], 
-                "id": "EID", 
-                "isPattern": "false", 
+                ],
+                "id": "EID",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

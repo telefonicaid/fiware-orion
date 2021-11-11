@@ -237,10 +237,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -255,8 +255,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -272,10 +272,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -307,8 +307,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -324,8 +324,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -342,8 +342,8 @@ Date: REGEX(.*)
 {
     "subscribeError": {
         "errorCode": {
-            "code": "400", 
-            "details": "Illegal value for JSON field", 
+            "code": "400",
+            "details": "Illegal value for JSON field",
             "reasonPhrase": "Bad Request"
         }
     }

@@ -88,22 +88,22 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "test", 
+                        "name": "A1",
+                        "type": "test",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "A2", 
-                        "type": "test", 
+                        "name": "A2",
+                        "type": "test",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "Test"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -124,30 +124,30 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": {
                     "A1": {
-                        "type": "test", 
+                        "type": "test",
                         "value": {
                             "compound": {
-                                "a": "1", 
-                                "b": "2", 
+                                "a": "1",
+                                "b": "2",
                                 "c": "3"
                             }
                         }
-                    }, 
+                    },
                     "A2": {
-                        "type": "test", 
+                        "type": "test",
                         "value": [
-                            "a", 
-                            "b", 
+                            "a",
+                            "b",
                             "c"
                         ]
                     }
-                }, 
-                "id": "E1", 
-                "isPattern": "false", 
+                },
+                "id": "E1",
+                "isPattern": "false",
                 "type": "Test"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

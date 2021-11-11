@@ -34,7 +34,7 @@ brokerStart CB 0 IPv4 -logSummary 5
 #
 # Provoke a few transactions and badInputs and check log summary
 #
-# Note that when running under valgrind, an initial "GET /version" is received by the 
+# Note that when running under valgrind, an initial "GET /version" is received by the
 # broker and this message is a transaction as well, so always ONE MERE transaction when under valgrind.
 #
 # Also note that there can be only one REGEX per line and that REGEX has problems working with parenthesis.

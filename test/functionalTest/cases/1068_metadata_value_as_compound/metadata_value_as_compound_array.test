@@ -192,20 +192,20 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": [
-                            1, 
+                            1,
                             2
                         ]
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "01"
-            }, 
-            "id": "E2", 
+            },
+            "id": "E2",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -225,20 +225,20 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "StructuredValue", 
+                        "type": "StructuredValue",
                         "value": [
-                            1, 
+                            1,
                             2
                         ]
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "01"
-            }, 
-            "id": "E2", 
+            },
+            "id": "E2",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

@@ -79,7 +79,7 @@ brokerStart CB
 #   - forbiddenChars in string value (if a string ...)
 #   - more than one service path
 #   - other errors in service path
-#  
+#
 
 #
 # 00. GET /v2/entities

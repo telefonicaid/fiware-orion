@@ -216,19 +216,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
+    ],
+    "id": "E1",
+    "isPattern": "false",
     "type": "E"
 }
 
@@ -247,17 +247,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "AT", 
+                        "name": "A1",
+                        "type": "AT",
                         "value": "10"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "E"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -279,16 +279,16 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": {
                     "A1": {
-                        "type": "AT", 
+                        "type": "AT",
                         "value": "10"
                     }
-                }, 
-                "id": "E1", 
-                "isPattern": "false", 
+                },
+                "id": "E1",
+                "isPattern": "false",
                 "type": "E"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -306,8 +306,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entityId::type differs in URL and payload", 
+        "code": "400",
+        "details": "entityId::type differs in URL and payload",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -323,8 +323,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entityId::isPattern set to true in contextUpdate convenience operation", 
+        "code": "400",
+        "details": "entityId::isPattern set to true in contextUpdate convenience operation",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -343,19 +343,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E2", 
-    "isPattern": "false", 
+    ],
+    "id": "E2",
+    "isPattern": "false",
     "type": "E"
 }
 
@@ -374,17 +374,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "AT", 
+                        "name": "A1",
+                        "type": "AT",
                         "value": "10"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "E"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -405,19 +405,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E2", 
-    "isPattern": "false", 
+    ],
+    "id": "E2",
+    "isPattern": "false",
     "type": "E"
 }
 
@@ -436,17 +436,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "AT", 
+                        "name": "A1",
+                        "type": "AT",
                         "value": "200"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "E"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

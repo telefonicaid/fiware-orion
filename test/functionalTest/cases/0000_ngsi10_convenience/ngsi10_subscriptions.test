@@ -61,7 +61,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 # 2. Update the subscription
 echo "2: ++++++++++++++++++++"
-url="/v1/contextSubscriptions/$SUB_ID" 
+url="/v1/contextSubscriptions/$SUB_ID"
 payload='{
     "subscriptionId": "'$SUB_ID'",
     "duration": "P1Y",
