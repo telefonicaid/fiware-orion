@@ -62,7 +62,7 @@ echo
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 134
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -70,7 +70,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "Bad pagination limit: /abc/ [must be a decimal number]",
+        "details": "Bad pagination limit: /abc/ [must be a positive integer number]",
         "reasonPhrase": "Bad Request"
     }
 }
