@@ -263,8 +263,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "a component of ServicePath contains an illegal character", 
+        "code": "400",
+        "details": "a component of ServicePath contains an illegal character",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -279,7 +279,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -293,7 +293,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -307,7 +307,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -321,7 +321,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -340,71 +340,71 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E3", 
-                        "isPattern": "false", 
+                        "id": "E3",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E4", 
-                        "isPattern": "false", 
+                        "id": "E4",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
@@ -426,53 +426,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E3", 
-                        "isPattern": "false", 
+                        "id": "E3",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
@@ -494,35 +494,35 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
@@ -544,17 +544,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T"
                     }
-                ], 
+                ],
                 "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }

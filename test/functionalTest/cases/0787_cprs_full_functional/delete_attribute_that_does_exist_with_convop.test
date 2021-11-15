@@ -88,17 +88,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "string", 
+                        "name": "A1",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -115,7 +115,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 

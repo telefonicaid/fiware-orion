@@ -38,10 +38,10 @@ brokerStart CB
 echo "01. POST /v2/entities, create entity with A0:1"
 echo "==============================================="
 payload='{
-    
+
       "id":   "E1",
       "type": "T1",
-      "A0": { 
+      "A0": {
               "type": "number",
               "value": "1"
             }
@@ -54,14 +54,14 @@ echo
 echo "02. POST /v2/entities, create entity with A0:2"
 echo "==============================================="
 payload='{
-    
+
       "id":   "E1",
       "type": "T2",
-      "A0": { 
+      "A0": {
               "type": "number",
               "value": "1"
             }
-     
+
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo

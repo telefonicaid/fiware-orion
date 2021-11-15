@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update Patch Error Description 
+Update Patch Error Description
 
 --SHELL-INIT--
 dbInit CB

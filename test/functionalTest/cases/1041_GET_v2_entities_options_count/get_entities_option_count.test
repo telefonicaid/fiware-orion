@@ -49,7 +49,7 @@ echo
 echo "02. POST /v2/entities (E1)"
 echo "=========================="
 payload='{
-    
+
       "id":   "E1",
       "type": "Car",
       "model" : {

@@ -58,7 +58,7 @@ echo "+++++ 3. query +++++"
 orionCurl --url "/v1/contextEntities/Room1"
 
 echo "+++++ 4. put an entity without type +++++"
-url="/v1/contextEntities/Room1/attributes/temperature" 
+url="/v1/contextEntities/Room1/attributes/temperature"
 payload='{
   "value": "31"
 }'
@@ -78,7 +78,7 @@ echo "+++++ 7. query +++++"
 orionCurl --url "/v1/contextEntities/Room1/attributes/temperature"
 
 echo "+++++ 8. update with type +++++"
-url="/v1/contextEntities/Room1/attributes/temperature" 
+url="/v1/contextEntities/Room1/attributes/temperature"
 payload='{
   "type": "Fahrenheit",
   "value": "99"

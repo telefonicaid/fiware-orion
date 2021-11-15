@@ -199,7 +199,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -213,7 +213,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -234,22 +234,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m1", 
-                                "type": "M1", 
+                                "name": "m1",
+                                "type": "M1",
                                 "value": "mmmmm 1111"
                             }
-                        ], 
-                        "name": "A1", 
-                        "type": "AT1", 
+                        ],
+                        "name": "A1",
+                        "type": "AT1",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -273,22 +273,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m2", 
-                                "type": "M2", 
+                                "name": "m2",
+                                "type": "M2",
                                 "value": "mmmmm 2222"
                             }
-                        ], 
-                        "name": "A2", 
-                        "type": "AT2", 
+                        ],
+                        "name": "A2",
+                        "type": "AT2",
                         "value": "2"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -305,7 +305,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -319,7 +319,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -333,7 +333,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -354,72 +354,72 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m3", 
-                                "type": "M3", 
+                                "name": "m3",
+                                "type": "M3",
                                 "value": "mmmmm 3333"
                             }
-                        ], 
-                        "name": "A3", 
-                        "type": "AT3", 
+                        ],
+                        "name": "A3",
+                        "type": "AT3",
                         "value": "3"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
                         "metadatas": [
                             {
-                                "name": "m4", 
-                                "type": "M4", 
+                                "name": "m4",
+                                "type": "M4",
                                 "value": "mmmmm 4444"
                             }
-                        ], 
-                        "name": "A4", 
-                        "type": "AT4", 
+                        ],
+                        "name": "A4",
+                        "type": "AT4",
                         "value": "4"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
                         "metadatas": [
                             {
-                                "name": "m5", 
-                                "type": "M5", 
+                                "name": "m5",
+                                "type": "M5",
                                 "value": "mmmmm 5555"
                             }
-                        ], 
-                        "name": "A5", 
-                        "type": "AT5", 
+                        ],
+                        "name": "A5",
+                        "type": "AT5",
                         "value": "5"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -443,22 +443,22 @@ Date: REGEX(.*)
                     {
                         "metadatas": [
                             {
-                                "name": "m4", 
-                                "type": "M4", 
+                                "name": "m4",
+                                "type": "M4",
                                 "value": "mmmmm 4444"
                             }
-                        ], 
-                        "name": "A4", 
-                        "type": "AT4", 
+                        ],
+                        "name": "A4",
+                        "type": "AT4",
                         "value": "4"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

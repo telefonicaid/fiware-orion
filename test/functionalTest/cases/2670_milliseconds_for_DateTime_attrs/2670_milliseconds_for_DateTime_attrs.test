@@ -162,10 +162,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "value": "2020-07-03T09:24:04.456Z"
             },
             "ts2": {
-                "metadata": {}, 
-                "type": "DateTime", 
+                "metadata": {},
+                "type": "DateTime",
                 "value": "2020-07-03T08:24:04.456Z"
-            }, 
+            },
             "type": "Thing"
         }
     ],

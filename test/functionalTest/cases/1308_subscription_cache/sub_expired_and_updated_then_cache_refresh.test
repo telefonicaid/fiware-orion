@@ -48,9 +48,9 @@ accumulatorStart --pretty-print
 
 #
 # About "subCacheRefreshs": "REGEX((0|XXX))":
-# 
+#
 # The 0 comes from when broker is started with -noCache, as no refreshes are done
-# 
+#
 
 echo "01. Create entity E10, attribute A1"
 echo "==================================="

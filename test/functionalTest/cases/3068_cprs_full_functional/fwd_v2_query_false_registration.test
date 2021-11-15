@@ -116,7 +116,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -132,7 +132,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }

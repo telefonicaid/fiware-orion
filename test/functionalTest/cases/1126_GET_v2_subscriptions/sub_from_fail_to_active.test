@@ -178,7 +178,7 @@ Date: REGEX(.*)
 04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 444
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,6 +189,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },

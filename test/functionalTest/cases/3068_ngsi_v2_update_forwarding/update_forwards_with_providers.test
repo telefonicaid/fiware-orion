@@ -345,11 +345,11 @@ Date: REGEX(.*)
 [
     {
         "A1": {
-            "metadata": {}, 
-            "type": "Text", 
+            "metadata": {},
+            "type": "Text",
             "value": "updated-4"
-        }, 
-        "id": "E4", 
+        },
+        "id": "E4",
         "type": "T1"
     }
 ]
@@ -366,11 +366,11 @@ Date: REGEX(.*)
 [
     {
         "A2": {
-            "metadata": {}, 
-            "type": "Text", 
+            "metadata": {},
+            "type": "Text",
             "value": "updated-5"
-        }, 
-        "id": "E5", 
+        },
+        "id": "E5",
         "type": "T1"
     }
 ]
@@ -387,20 +387,20 @@ Date: REGEX(.*)
 [
     {
         "A3": {
-            "metadata": {}, 
-            "type": "Text", 
+            "metadata": {},
+            "type": "Text",
             "value": "updated-6"
-        }, 
-        "id": "E6", 
+        },
+        "id": "E6",
         "type": "T1"
-    }, 
+    },
     {
         "A4": {
-            "metadata": {}, 
-            "type": "Text", 
+            "metadata": {},
+            "type": "Text",
             "value": "untouched"
-        }, 
-        "id": "E7", 
+        },
+        "id": "E7",
         "type": "T1"
     }
 ]

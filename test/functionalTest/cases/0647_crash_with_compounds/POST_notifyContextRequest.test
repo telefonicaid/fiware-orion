@@ -80,7 +80,7 @@ Date: REGEX(.*)
 
 {
     "responseCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

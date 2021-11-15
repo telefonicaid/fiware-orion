@@ -24,6 +24,7 @@
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/doNotify.h"
 
+
 /* ****************************************************************************
 *
 * startSenderThread -

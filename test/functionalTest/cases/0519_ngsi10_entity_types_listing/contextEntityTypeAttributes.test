@@ -58,13 +58,13 @@ echo
 
 
 echo "1. Listing of Entity Type Attributes. Response in JSON"
-orionCurl --url /v1/contextTypes/Room 
+orionCurl --url /v1/contextTypes/Room
 echo
 echo
 
 
 echo "2. Listing of Entity Type Attributes. Response in JSON, details=on"
-orionCurl --url /v1/contextTypes/Room?details=on 
+orionCurl --url /v1/contextTypes/Room?details=on
 echo
 echo
 

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Case sensitivness in httpCustom notification headers  
+Case sensitivness in httpCustom notification headers
 
 --SHELL-INIT--
 dbInit CB

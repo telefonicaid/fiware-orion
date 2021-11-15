@@ -172,13 +172,13 @@ Date: REGEX(.*)
 {
     "attributes": [
         {
-            "name": "A1", 
-            "type": "", 
+            "name": "A1",
+            "type": "",
             "value": "1"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -193,8 +193,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "non-matching entity::types in URL", 
+    "code": "400",
+    "details": "non-matching entity::types in URL",
     "reasonPhrase": "Bad Request"
 }
 
@@ -208,7 +208,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -222,8 +222,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "entity::type cannot be empty for this request", 
+    "code": "400",
+    "details": "entity::type cannot be empty for this request",
     "reasonPhrase": "Bad Request"
 }
 
@@ -237,7 +237,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -253,13 +253,13 @@ Date: REGEX(.*)
 {
     "attributes": [
         {
-            "name": "A1", 
-            "type": "", 
+            "name": "A1",
+            "type": "",
             "value": "2"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -274,7 +274,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -290,13 +290,13 @@ Date: REGEX(.*)
 {
     "attributes": [
         {
-            "name": "A1", 
-            "type": "", 
+            "name": "A1",
+            "type": "",
             "value": "s1"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -313,13 +313,13 @@ Date: REGEX(.*)
 {
     "attributes": [
         {
-            "name": "A1", 
-            "type": "", 
+            "name": "A1",
+            "type": "",
             "value": "2"
         }
-    ], 
+    ],
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -339,35 +339,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": "2"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "", 
+                        "name": "A1",
+                        "type": "",
                         "value": "s1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

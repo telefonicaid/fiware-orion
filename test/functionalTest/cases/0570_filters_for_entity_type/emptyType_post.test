@@ -208,8 +208,8 @@ Date: REGEX(.*)
             }
         }
     ],
-    "id": "E1", 
-    "isPattern": "false", 
+    "id": "E1",
+    "isPattern": "false",
     "type": ""
 }
 

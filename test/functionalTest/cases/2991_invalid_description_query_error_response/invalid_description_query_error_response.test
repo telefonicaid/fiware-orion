@@ -35,15 +35,15 @@ brokerStart CB
 
 echo "01. Attempt to perform a batch query with invalid metadata field, and see it fail with a proper error description"
 echo "================================================================================================================="
-payload='{ 
-    "entities": [ 
-        { 
-            "idPattern": ".*", 
-            "type": ".*" 
-        } 
-    ], 
+payload='{
+    "entities": [
+        {
+            "idPattern": ".*",
+            "type": ".*"
+        }
+    ],
     "metadata": "*",
-    "attributes": [] 
+    "attributes": []
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
