@@ -1,3 +1,5 @@
+- Add: Partial success HTTP status codes (#3054)
+- Hardening: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
 - Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
 - Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
 - Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)

@@ -144,7 +144,7 @@ Date: REGEX(.*)
 
 04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
 ===========================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 207 Multi-Status
 Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

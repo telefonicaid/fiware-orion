@@ -185,7 +185,7 @@ Date: REGEX(.*)
 
 05. Try to UPDATE non-existing attribute A3, see error
 ======================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 207 Multi-Status
 Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

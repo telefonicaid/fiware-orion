@@ -115,7 +115,7 @@ Date: REGEX(.*)
 
 03. Try to create E1/T1 again, using POST /v2/entities/E1/attrs?options=append
 ==============================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 207 Multi-Status
 Content-Length: 111
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

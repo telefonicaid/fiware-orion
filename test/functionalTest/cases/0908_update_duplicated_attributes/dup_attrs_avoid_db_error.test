@@ -129,16 +129,16 @@ Date: REGEX(.*)
 02. Update entity using the same attribute name twice
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 105
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "422",
+        "code": "207",
         "details": "duplicated attribute /temperature/",
-        "reasonPhrase": "Invalid Modification"
+        "reasonPhrase": "Multi Status"
     }
 }
 

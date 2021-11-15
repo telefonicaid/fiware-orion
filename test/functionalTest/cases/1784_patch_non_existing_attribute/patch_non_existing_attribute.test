@@ -85,7 +85,7 @@ Date: REGEX(.*)
 
 02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)
 ================================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 207 Multi-Status
 Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

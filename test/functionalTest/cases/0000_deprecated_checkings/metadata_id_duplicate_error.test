@@ -80,7 +80,7 @@ echo
 01. Create entity with duplicated attributes using metadata ID and get error
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 287
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -108,9 +108,9 @@ Date: REGEX(.*)
                 "type": "T"
             },
             "statusCode": {
-                "code": "422",
+                "code": "207",
                 "details": "duplicated attribute /A/",
-                "reasonPhrase": "Invalid Modification"
+                "reasonPhrase": "Multi Status"
             }
         }
     ]
