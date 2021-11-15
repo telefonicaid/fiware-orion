@@ -137,14 +137,14 @@ HttpStatusCode mongoUnsubscribeContext
 
     CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-  if (cSubP != NULL)
-  {
-    subCacheItemRemove(cSubP);
+    if (cSubP != NULL)
+    {
+      subCacheItemRemove(cSubP);
+    }
   }
-
   cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
-  }
+
   return SccOk;
 }
