@@ -141,8 +141,10 @@ HttpStatusCode mongoUnsubscribeContext
     {
       subCacheItemRemove(cSubP);
     }
-  cacheSemGive(__FUNCTION__, "Removing subscription from cache");
+
+    cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   }
+
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
 
