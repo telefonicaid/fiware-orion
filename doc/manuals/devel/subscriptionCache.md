@@ -252,7 +252,7 @@ take the subscription from the DB but combine it with the information in the
 subscription cache (see `setNotification()` in `mongoGetSubscriptions.cpp` file for
 details).
 
-However, given that the subscription cache is local, those six [special fields](#special-subscription-fields) may not seem coherent in GET operations.
+However, given that the subscription cache is local, those seven [special fields](#special-subscription-fields) may not seem coherent in GET operations.
 
 [Top](#top)
 
