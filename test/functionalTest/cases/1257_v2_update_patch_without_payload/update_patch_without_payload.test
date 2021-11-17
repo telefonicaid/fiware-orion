@@ -45,7 +45,7 @@ echo
 echo "02. PATCH /v2/entities/E1 (without payload)"
 echo "==========================================="
 payload=''
-orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH
 echo
 echo
 

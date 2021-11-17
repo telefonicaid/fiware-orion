@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
+# 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT
 # 02. Create E1-A1
 # 03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
 # 04. Get entity

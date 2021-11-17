@@ -397,7 +397,7 @@ Date: REGEX(.*)
         {
             "contextElement": {
                 "attributes": [
-                    {                    
+                    {
                         "name": "location",
                         "type": "geo:point",
                         "value": ""

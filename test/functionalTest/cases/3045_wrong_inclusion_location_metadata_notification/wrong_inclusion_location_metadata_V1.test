@@ -22,7 +22,7 @@
 
 --NAME--
 Check "location" metadata is included in NGSIv1 notifications
-triggered by NGSIV1 subscription creation, update or attribute update 
+triggered by NGSIV1 subscription creation, update or attribute update
 
 --SHELL-INIT--
 dbInit CB
@@ -207,43 +207,43 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "name", 
-                        "type": "Text", 
+                        "name": "name",
+                        "type": "Text",
                         "value": "SD3"
-                    }, 
+                    },
                     {
-                        "name": "perimeter", 
-                        "type": "geo:json", 
+                        "name": "perimeter",
+                        "type": "geo:json",
                         "value": {
                             "coordinates": [
                                 [
                                     [
-                                        -13.806455, 
-                                        33.467278, 
+                                        -13.806455,
+                                        33.467278,
                                         0
-                                    ], 
+                                    ],
                                     [
-                                        -13.806708, 
-                                        33.467234, 
+                                        -13.806708,
+                                        33.467234,
                                         0
-                                    ], 
+                                    ],
                                     [
-                                        -13.806864, 
-                                        33.467206, 
+                                        -13.806864,
+                                        33.467206,
                                         0
-                                    ], 
+                                    ],
                                     [
-                                        -13.807017, 
-                                        33.467191, 
+                                        -13.807017,
+                                        33.467191,
                                         0
-                                    ], 
+                                    ],
                                     [
-                                        -13.806455, 
-                                        33.467278, 
+                                        -13.806455,
+                                        33.467278,
                                         0
                                     ]
                                 ]
-                            ], 
+                            ],
                             "type": "Polygon"
                         }
                     }
@@ -257,7 +257,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "reasonPhrase": "OK"
             }
         }
-    ], 
+    ],
     "originator": "localhost",
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
@@ -280,7 +280,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                         "name": "name",
                         "type": "string",
                         "value": "2"
-                    }, 
+                    },
                     {
                         "metadatas": [
                             {
@@ -288,9 +288,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                                 "type": "string",
                                 "value": "WGS84"
                             }
-                        ], 
-                        "name": "perimeter", 
-                        "type": "geo:json", 
+                        ],
+                        "name": "perimeter",
+                        "type": "geo:json",
                         "value": {
                             "coordinates": [
                                 [
@@ -298,22 +298,22 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                                         -13.806455,
                                         33.467278,
                                         0
-                                    ], 
+                                    ],
                                     [
                                         -13.806708,
                                         33.467234,
                                         0
-                                    ], 
+                                    ],
                                     [
                                         -13.806864,
                                         33.467206,
                                         0
-                                    ], 
+                                    ],
                                     [
                                         -13.807017,
                                         33.467191,
                                         0
-                                    ], 
+                                    ],
                                     [
                                         -13.806455,
                                         33.467278,
@@ -328,13 +328,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "id": "E",
                 "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
                 "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
+    ],
     "originator": "localhost",
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }

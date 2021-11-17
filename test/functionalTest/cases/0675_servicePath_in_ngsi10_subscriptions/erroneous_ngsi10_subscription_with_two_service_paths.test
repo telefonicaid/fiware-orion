@@ -77,8 +77,8 @@ Date: REGEX(.*)
 {
     "subscribeError": {
         "errorCode": {
-            "code": "400", 
-            "details": "max one service-path allowed for subscriptions", 
+            "code": "400",
+            "details": "max one service-path allowed for subscriptions",
             "reasonPhrase": "Bad Request"
         }
     }

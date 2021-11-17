@@ -76,19 +76,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "aa", 
-                    "type": "aa", 
+                    "name": "aa",
+                    "type": "aa",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
+    ],
+    "id": "E1",
+    "isPattern": "false",
     "type": "ET"
 }
 
@@ -105,17 +105,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "aa", 
-                "type": "aa", 
+                "name": "aa",
+                "type": "aa",
                 "value": "aa"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "ET"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

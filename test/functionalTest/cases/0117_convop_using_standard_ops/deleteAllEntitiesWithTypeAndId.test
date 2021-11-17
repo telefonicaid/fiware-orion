@@ -144,19 +144,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E1", 
-    "isPattern": "false", 
+    ],
+    "id": "E1",
+    "isPattern": "false",
     "type": "T1"
 }
 
@@ -174,19 +174,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A2", 
-                    "type": "AT", 
+                    "name": "A2",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E2", 
-    "isPattern": "false", 
+    ],
+    "id": "E2",
+    "isPattern": "false",
     "type": "T2"
 }
 
@@ -205,35 +205,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "AT", 
+                        "name": "A1",
+                        "type": "AT",
                         "value": "10"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "AT", 
+                        "name": "A2",
+                        "type": "AT",
                         "value": "20"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -250,8 +250,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "404", 
-    "details": "E4", 
+    "code": "404",
+    "details": "E4",
     "reasonPhrase": "No context element found"
 }
 
@@ -265,8 +265,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "non-matching entity::types in URL", 
+    "code": "400",
+    "details": "non-matching entity::types in URL",
     "reasonPhrase": "Bad Request"
 }
 
@@ -280,8 +280,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "400", 
-    "details": "entity::type cannot be empty for this request", 
+    "code": "400",
+    "details": "entity::type cannot be empty for this request",
     "reasonPhrase": "Bad Request"
 }
 
@@ -300,35 +300,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "AT", 
+                        "name": "A1",
+                        "type": "AT",
                         "value": "10"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "AT", 
+                        "name": "A2",
+                        "type": "AT",
                         "value": "20"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -345,7 +345,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -359,7 +359,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -374,7 +374,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }

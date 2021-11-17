@@ -100,7 +100,7 @@ echo
 
 echo '04. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: false is rendered'
 echo '====================================================================================================='
-orionCurl --url /v2/subscriptions/${subId} 
+orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
@@ -125,37 +125,37 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "A subscription to get info about Room1", 
-    "expires": "2040-01-01T14:00:00.000Z", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "A subscription to get info about Room1",
+    "expires": "2040-01-01T14:00:00.000Z",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "B", 
-            "C", 
+            "B",
+            "C",
             "D"
-        ], 
-        "attrsFormat": "normalized", 
+        ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1028/notify"
-        }, 
+        },
         "onlyChangedAttrs": true
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [
-                "A", 
-                "B", 
+                "A",
+                "B",
                 "C"
             ]
-        }, 
+        },
         "entities": [
             {
-                "id": "Room1", 
+                "id": "Room1",
                 "type": "Room"
             }
         ]
-    }, 
+    },
     "throttling": 5
 }
 
@@ -177,37 +177,37 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "A subscription to get info about Room1", 
-    "expires": "2040-01-01T14:00:00.000Z", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "A subscription to get info about Room1",
+    "expires": "2040-01-01T14:00:00.000Z",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "B", 
-            "C", 
+            "B",
+            "C",
             "D"
-        ], 
-        "attrsFormat": "normalized", 
+        ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1028/notify"
         },
         "onlyChangedAttrs": false
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [
-                "A", 
-                "B", 
+                "A",
+                "B",
                 "C"
             ]
-        }, 
+        },
         "entities": [
             {
-                "id": "Room1", 
+                "id": "Room1",
                 "type": "Room"
             }
         ]
-    }, 
+    },
     "throttling": 5
 }
 

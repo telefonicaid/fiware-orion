@@ -120,8 +120,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -140,19 +140,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E", 
-    "isPattern": "false", 
+    ],
+    "id": "E",
+    "isPattern": "false",
     "type": "T"
 }
 
@@ -170,19 +170,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "AT", 
+                    "name": "A1",
+                    "type": "AT",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "E", 
-    "isPattern": "false", 
+    ],
+    "id": "E",
+    "isPattern": "false",
     "type": "T"
 }
 

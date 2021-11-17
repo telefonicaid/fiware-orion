@@ -41,12 +41,12 @@ payload='{
 
       "id":   "E1",
       "type": "T1",
-      "A0" : 
+      "A0" :
         {
           "type": "number",
           "value" : 255
         }
-      
+
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo

@@ -62,7 +62,7 @@ echo
 
 echo "03. Get entity"
 echo "=============="
-orionCurl --url /v2/entities/apartment_3 
+orionCurl --url /v2/entities/apartment_3
 echo
 echo
 
