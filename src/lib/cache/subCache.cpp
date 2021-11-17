@@ -618,6 +618,12 @@ void subCacheDestroy(void)
 */
 static bool tenantMatch(const char* tenant1, const char* tenant2)
 {
+  if (!subCacheMultitenant)
+  {
+    // If no multitenant is in use, then tenant match always
+    return true;
+  }
+
   //
   // Removing complications with NULL, giving NULL tenants the value of an empty string;
   //
@@ -1052,7 +1058,7 @@ typedef struct CachedSubSaved
   int64_t      lastSuccess;
   std::string  lastFailureReason;
   int64_t      lastSuccessCode;
-  std::string  status;
+  // std::string  status;  FIXME PR: surprisingly, probably this is not needed
 } CachedSubSaved;
 
 
@@ -1061,15 +1067,14 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache (savedSubV)
-* 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents and:
-*    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
-*    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
-*        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-*    Same same with lastFailure and lastSuccess.
-* 4. Update 'count' for each item in savedSubV where non-zero
-* 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
+* 1. Save subscriptionId, lastNotificationTime, count, failsCounter, lastFailure, and lastSuccess for all items in cache (savedSubV)
+* 2. Refresh cache (count and failsCounter set to 0)
+* 3. Compare lastNotificationTime/Failure/Success in savedSubV with the new cache-contents and:
+*    3.1 Update cache-items where 'saved lastNotificationTime/Failure/Success' > 'cached lastNotificationTime/Failure/Success'
+*    3.2 Remember this more correct lastNotificationTime/Failure/Success (must be flushed to mongo) -
+*        by clearing out (set to -1) those lastNotificationTimes/Failure/Success that are newer in cache
+* 4. Update 'count' and 'failsCounter' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/Failure/Success' for each item in savedSubV where non -1
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1093,7 +1098,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, failsCounter, lastFailure, and lastSuccess for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1133,7 +1138,7 @@ void subCacheSync(void)
 
 
   //
-  // 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents
+  // 3. Compare lastNotificationTime/Failure/Success in savedSubV with the new cache-contents
   //
   cSubP = subCache.head;
   while (cSubP != NULL)
@@ -1152,7 +1157,7 @@ void subCacheSync(void)
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
-        // FIXME PR: why lastFailureReason
+        // FIXME PR: why lastSuccessCode is not taken into account here?
         // cssP->lastFailure is older than what's currently in DB => throw away
         cssP->lastFailure = -1;
       }
@@ -1170,8 +1175,8 @@ void subCacheSync(void)
 
 
   //
-  // 4. Update 'count' for each item in savedSubV where non-zero
-  // 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
+  // 4. Update 'count' and 'failsCounter' for each item in savedSubV where non-zero
+  // 5. Update 'lastNotificationTime/Failure/Success' for each item in savedSubV where non-zero
   //
   cSubP = subCache.head;
   while (cSubP != NULL)

@@ -444,9 +444,10 @@ int mongoSubCacheItemInsert
 *
 * mongoSubCacheRefresh -
 *
-* 1. Empty cache
-* 2. Lookup all subscriptions in the database
-* 3. Insert them again in the cache (with fresh data from database)
+* Cache has been emptied before calling this function
+*
+* 1. Lookup all subscriptions in the database
+* 2. Insert them again in the cache (with fresh data from database)
 *
 */
 void mongoSubCacheRefresh(const std::string& database)

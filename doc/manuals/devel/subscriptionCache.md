@@ -40,9 +40,11 @@ Note that in order to refresh the cache, [the semaphore that protects the subscr
 [Top](#top)
 
 ## Subscription cache fields
-In subscription creation/modification the subscription cache is write-through, i.e. updates to subscriptions are performed both in the subscription item in the subscription cache **and** in the database.
+In subscription creation/modification the subscription cache is write-through, i.e. updates to subscriptions are performed both in the subscription item in the subscription cache **and** in the database
+(except for some that dynamic fields [described next](#special-subscription-fields) that are not updated in DB upon subscription modification, has they are consolidate in DB at cache sync time)
 
-When the broker starts, the subscription cache is populated with the subscriptions found in the MongoDB database. A subscription in the subscription cache contains the following fields:
+When the broker starts, the subscription cache is populated with the subscriptions found in the MongoDB database. A subscription in the subscription cache contains the following fields
+(check code reference at subCache.h file):
 
 ```
   std::vector<EntityInfo*>    entityIdInfos;
@@ -52,6 +54,8 @@ When the broker starts, the subscription cache is populated with the subscriptio
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
+  int64_t                     failsCounter;
+  int64_t                     maxFailsLimit;
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
@@ -75,14 +79,16 @@ There are a few special fields that need special care when refreshing the cache:
 
 * `lastNotificationTime`
 * `count`
+* `failsCounter`
 * `lastFailure` (and related field `lastFailureReason`)
 * `lastSuccess` (and related field `lastSuccessCode`)
+* `status` **FIXME PR:** investigate this
 
 These fields have a special treatment inside the subscription cache, to avoid to write to the database each and every time these fields change, i.e. when an update triggering the subscription occurs). They are updated in the database only on refreshing the cache, like this:
 
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
-* `count` in the subscription cache is set to zero at each sub-cache-refresh, so the `count` that is in the cache simply is an accumulator and its accumulated value is added
-  to the count in the database and then the *count in cache* is reset back to zero
+* `count` and `failsCounter` in the subscription cache are set to zero at each sub-cache-refresh, so the `count` and `failsCounter` that are in the cache simply are accumulators and its accumulated values are added
+  to the counters in the database and then the *counters in cache* are reset back to zero
 * `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
 * `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
 
@@ -150,12 +156,14 @@ The refresher thread is simply an infinite loop that sleeps the amount of second
 ### `subCacheSync()`
 This is possibly the most important function of the entire subscription cache as it is the point where the subscription cache is merged with what's in the database and it leaves both the subscription cache and the database modified and synchronized.
 
-`subCacheSync()` saves the six special fields of the subscriptions, using a vector of the following struct:
+`subCacheSync()` saves the seven special fields of the subscriptions, using a vector of the following struct
+(check code reference at subCache.cpp file):
 ```
 typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
   int64_t      count;
+  int64_t      failsCounter;
   int64_t      lastFailure;
   int64_t      lastSuccess;
   std::string  lastFailureReason;
@@ -184,7 +192,7 @@ The simplest approach is used, which is to:
 * Completely delete the current contents in the subscription cache
 * Populate the subscription cache from the database content of each Service (mongo database)
 
-*Note that the subscription cache refresher thread saves the values of the six special fields before calling `subCacheRefresh()`*
+*Note that the subscription cache refresher thread saves the values of the seven special fields before calling `subCacheRefresh()`*
 
 A more efficient approach would be to compare the content of the subscription cache to the content in the database during the refresh, but this would mean a lot more time spent implementing the subscription cache refreshing algorithm and this simpler (and slower) approach was chosen. 
 
@@ -229,7 +237,7 @@ _SC-02: Subscription propagation in active-active configuration_
 * In step 5, the subscription cache of **Orion 2** is merged with the database content and so "Sub-X" is now part of the subscription cache of **Orion 2**
 
 
-The case of the six [special fields](#special-subscription-fields) (`lastNotificationTime`, `count`, `lastFailure`, and `lastSuccess`) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
+The case of the seven [special fields](#special-subscription-fields) (`lastNotificationTime`, `count`, `failsCounter`, `lastFailure`, `lastFailureReason`, `lastSuccess` and `lastSuccessReason`) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
 
 [Top](#top)
 
