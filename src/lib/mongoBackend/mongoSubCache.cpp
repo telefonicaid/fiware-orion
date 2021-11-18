@@ -111,6 +111,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
+  cSubP->statusLastChange      = sub.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(sub, CSUB_STATUS_LAST_CHANGE)      : -1;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
@@ -278,6 +279,7 @@ int mongoSubCacheItemInsert
   long long              failsCounter,
   long long              expirationTime,
   const std::string&     status,
+  double                 statusLastChange,
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
@@ -378,6 +380,7 @@ int mongoSubCacheItemInsert
   cSubP->count                 = count;
   cSubP->failsCounter          = failsCounter;
   cSubP->status                = status;
+  cSubP->statusLastChange      = statusLastChange;
 
   //
   // httpInfo & mqttInfo
@@ -526,6 +529,7 @@ static void mongoSubCountersUpdateCount
   if (!status.empty())
   {
     setB.append(CSUB_STATUS, status);
+    setB.append(CSUB_STATUS_LAST_CHANGE, getCurrentTime());
   }
 
   // by construction, at least one of incB or setB has a field and update object
@@ -541,7 +545,7 @@ static void mongoSubCountersUpdateCount
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count', 'failsCounter' and/or 'status' for a subscription)"));
+    LM_E(("Internal Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
   }
 }
 

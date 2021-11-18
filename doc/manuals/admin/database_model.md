@@ -308,6 +308,8 @@ Fields:
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
     `oneshot` (for [oneshot subscriptions](../user/oneshot_subscription.md)). Note that NGSIv2 API consider additional states (e.g. `failed` or `expired`)
     but they never hit the DB (they are managed by Orion).
+-   **statusLasChange**: last time status was updated (as decimal number, meaning seconds and fractions of seconds).
+    This is mainly to be used by the subscription cache update logic (so status in updated in DB from cache only if it is newer).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **timeout** this field configures the maximum time the subscription waits for the response for http 
 notifications. It is a number between 0 and 1800000. If defined to 0 or omitted, the default timeout will be used.
@@ -361,7 +363,8 @@ Example document:
                 "georel" : ""
         },
         "format" : "JSON",
-        "status" : "active"
+        "status" : "active",
+        "statusLastChange" : 1637226173.6940024
 }
 ```
 [Top](#top)

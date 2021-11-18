@@ -756,6 +756,7 @@ void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
+  double                             statusLastChange,
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
@@ -791,6 +792,7 @@ void subCacheItemInsert
   cSubP->count                 = 0;
   cSubP->failsCounter          = 0;
   cSubP->status                = status;
+  cSubP->statusLastChange      = statusLastChange;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
@@ -1058,7 +1060,8 @@ typedef struct CachedSubSaved
   int64_t      lastSuccess;
   std::string  lastFailureReason;
   int64_t      lastSuccessCode;
-  // std::string  status;  FIXME PR: surprisingly, probably this is not needed
+  std::string  status;
+  double       statusLastChange;
 } CachedSubSaved;
 
 
@@ -1123,6 +1126,8 @@ void subCacheSync(void)
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->lastFailureReason    = cSubP->lastFailureReason;
     cssP->lastSuccessCode      = cSubP->lastSuccessCode;
+    cssP->status               = cSubP->status;
+    cssP->statusLastChange     = cSubP->statusLastChange;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1157,7 +1162,7 @@ void subCacheSync(void)
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
-        // FIXME PR: why lastSuccessCode is not taken into account here?
+        // FIXME PR: why lastFailureReason is not taken into account here?
         // cssP->lastFailure is older than what's currently in DB => throw away
         cssP->lastFailure = -1;
       }
@@ -1167,6 +1172,12 @@ void subCacheSync(void)
         // FIXME PR: why lastSuccessCode is not taken into account here?
         // cssP->lastSuccess is older than what's currently in DB => throw away
         cssP->lastSuccess = -1;
+      }
+
+      if (cssP->statusLastChange < cSubP->statusLastChange)
+      {
+        // cssP->status is older than what's currently in DB => throw away
+        cssP->status = "";
       }
     }
 
@@ -1195,10 +1206,17 @@ void subCacheSync(void)
                              cssP->lastFailure,
                              cssP->lastSuccess,
                              cssP->lastFailureReason,
-                             cssP->lastSuccessCode);
+                             cssP->lastSuccessCode,
+                             cssP->status);
+
+      // FIXME PR: should status be part of this update? Otherwise, the status in
+      // cache will remain until next mongo update operation...
+      // How to know which state is fresher (from DB or csubcache)? Maybe based
+      // in cssP->lastNotificationTime
 
       // Keeping lastFailure and lastSuccess in sub cache
       // FIXME PR: why lastNotication is not taken into account here?
+      // FIXME PR: lastFailureReason and lasSuccessCode are correct here, I guess, but not mentioned in the commet
       cSubP->lastFailure       = cssP->lastFailure;
       cSubP->lastSuccess       = cssP->lastSuccess;
       cSubP->lastFailureReason = cssP->lastFailureReason;
@@ -1344,8 +1362,12 @@ void subNotificationErrorStatus
     {
       // update the status to inactive
       LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
+
+      double now = getCurrentTime();
       subP->status = STATUS_INACTIVE;
-      LM_T(LmtSubCache, ("Update the status to %s", subP->status.c_str()));
+      subP->statusLastChange = now;
+
+      LM_T(LmtSubCache, ("Update the status to %s (lastChange: %d)", subP->status.c_str(), now));
     }
   }
   else
