@@ -290,7 +290,7 @@ std::string getEntities
   {
     parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
   }
-  else 
+  else
   {
     //
     // More than one type listed in URI param 'type':
