@@ -87,7 +87,11 @@ std::string getAllSubscriptions
   }
 
   std::string out;
+
+  if (limit != 0)
+  {
   TIMED_RENDER(out = vectorToJson(subs));
+  }
 
   return out;
 }
