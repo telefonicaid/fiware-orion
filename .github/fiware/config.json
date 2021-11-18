@@ -1,0 +1,19 @@
+{
+    "enabler": "Orion-LD Context Broker",
+    "chapter": "core",
+    "academy": "/core/orion-ld",
+    "readthedocs": "fiware-orion-ld",
+    "helpdesk": "Orion-LD",
+    "coveralls": " https://coveralls.io/github/FIWARE/context.Orion-LD",
+    "github": ["FIWARE/context.Orion-LD"],
+    "dockerregistry": ["hub.docker.com"],
+    "docker": ["fiware/orion-ld"],
+    "email": "ken.zangelin@fiware.org",
+    "status": "incubating",
+    "compose": "https://raw.githubusercontent.com/FIWARE/context.Orion-LD/develop/docker/docker-compose.yml",
+    "exclude": ["mongo"],
+    "stackexchange": ["http://stackoverflow.com/questions/tagged/fiware-orion"],
+    "unit-test": "",
+    "smoke-test": "",
+    "dockerfile": "https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/Dockerfile"
+}
