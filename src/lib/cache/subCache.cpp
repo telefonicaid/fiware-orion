@@ -1207,12 +1207,8 @@ void subCacheSync(void)
                              cssP->lastSuccess,
                              cssP->lastFailureReason,
                              cssP->lastSuccessCode,
-                             cssP->status);
-
-      // FIXME PR: should status be part of this update? Otherwise, the status in
-      // cache will remain until next mongo update operation...
-      // How to know which state is fresher (from DB or csubcache)? Maybe based
-      // in cssP->lastNotificationTime
+                             cssP->status,
+                             cssP->statusLastChange);
 
       // Keeping lastFailure and lastSuccess in sub cache
       // FIXME PR: why lastNotication is not taken into account here?
@@ -1319,19 +1315,21 @@ void subNotificationErrorStatus
 
     if (error)
     {
-      std::string status = "";
+      std::string status           = "";
+      double      statusLastChange = -1;
       if (maxFailsReached)
       {
         LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
-        status = STATUS_INACTIVE;
+        status           = STATUS_INACTIVE;
+        statusLastChange = getCurrentTime();
       }
       // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status);
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status, statusLastChange);
     }
     else
     {
       // count == 0 (inc is done in another part), fails = 0, lastFailure == -1, failureReason == "", status == ""
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "");
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "", -1);
     }
 
     return;

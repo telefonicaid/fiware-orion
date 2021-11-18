@@ -500,7 +500,8 @@ static void mongoSubCountersUpdateCount
   const std::string&  subId,
   long long           count,
   long long           fails,
-  const std::string&  status = ""
+  const std::string&  status,
+  double              statusLastChange
 )
 {
   orion::BSONObjBuilder  condition;
@@ -529,7 +530,7 @@ static void mongoSubCountersUpdateCount
   if (!status.empty())
   {
     setB.append(CSUB_STATUS, status);
-    setB.append(CSUB_STATUS_LAST_CHANGE, getCurrentTime());
+    setB.append(CSUB_STATUS_LAST_CHANGE, statusLastChange);
   }
 
   // by construction, at least one of incB or setB has a field and update object
@@ -715,7 +716,8 @@ void mongoSubCountersUpdate
   long long           lastSuccess,
   const std::string&  failureReason,
   long long           statusCode,
-  const std::string&  status
+  const std::string&  status,
+  double              statusLastChange
 )
 {
   if (subId.empty())
@@ -726,7 +728,7 @@ void mongoSubCountersUpdate
 
   std::string db = composeDatabaseName(tenant);
 
-  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status);
+  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status, statusLastChange);
 
   if (lastNotificationTime > 0)
   {

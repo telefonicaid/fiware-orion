@@ -101,7 +101,8 @@ extern void mongoSubCountersUpdate
   long long           lastSuccess,
   const std::string&  failureReason,
   long long           statusCode,
-  const std::string&  status = ""
+  const std::string&  status,
+  double              statusLastChange
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_
