@@ -212,7 +212,6 @@ bool orionldRequestSend
 
   struct curl_slist* headers = NULL;
 
-
   if (contentType != NULL)  // then also payload and payloadLen is supplied
   {
     char contentTypeHeader[128];

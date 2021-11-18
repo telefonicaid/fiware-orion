@@ -93,12 +93,10 @@ void pgAttributeAppend
   char*            object
 )
 {
-  int         bufSize = 32 * 1024;
-  char*       buf     = kaAlloc(&orionldState.kalloc, bufSize);
+  char        localBuf[2 * 1024];
+  int         bufSize = sizeof(localBuf);
+  char*       buf     = localBuf;
   const char* comma   = (attributesBufferP->values != 0)? "," : "";
-
-  if (buf == NULL)
-    LM_X(1, ("out of memory allocating %d bytes", bufSize));
 
   observedAt = (observedAt == NULL)? (char*) "null" : pgQuotedString(observedAt);
   unitCode   = (unitCode   == NULL)? (char*) "null" : pgQuotedString(unitCode);
@@ -123,8 +121,35 @@ void pgAttributeAppend
     KjNode*      geoTypeNodeP     = kjLookup(valueNodeP, "type");
     KjNode*      coordinatesNodeP = kjLookup(valueNodeP, "coordinates");
     const char*  geoType          = geoTypeNodeP->value.s;
+    bool         point            = (strcmp(geoType, "Point") == 0);
+    char*        coordsString     = NULL;
+    int          coordsStringLen  = 0;
 
-    if (strcmp(geoType, "Point") == 0)
+    if (point == false)
+    {
+      coordsString = (char*) malloc(10 * 1024);
+      if (coordsString == NULL)
+      {
+        LM_E(("error allocating 10k for geo property coordinates"));
+        return;
+      }
+      coordsStringLen = 10 * 1024;
+
+      buf = (char*) malloc(11 * 1024);
+      if (buf == NULL)
+      {
+        LM_E(("error allocating 10k for geo property buffer"));
+        free(coordsString);
+        return;
+      }
+      bufSize = 11 * 1024;
+
+      // Free the two allocated buffers afterwards
+      orionldStateDelayedFreeEnqueue(coordsString);
+      orionldStateDelayedFreeEnqueue(buf);
+    }
+
+    if (point == true)
     {
       double longitude;
       double latitude;
@@ -137,44 +162,34 @@ void pgAttributeAppend
     }
     else if (strcmp(geoType, "MultiPoint") == 0)
     {
-      char*  coordsString = kaAlloc(&orionldState.kalloc, 2048);
-
-      kjGeoMultiPointExtract(coordinatesNodeP, coordsString, 2048);
+      kjGeoMultiPointExtract(coordinatesNodeP, coordsString, coordsStringLen);
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPoint', null, null, null, null, null, null, ST_GeomFromText('MULTIPOINT(%s)', 4326), null, null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "LineString") == 0)
     {
-      char*  coordsString = kaAlloc(&orionldState.kalloc, 10240);
-
-      kjGeoLineStringExtract(coordinatesNodeP, coordsString, 10240);
+      kjGeoLineStringExtract(coordinatesNodeP, coordsString, coordsStringLen);
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoLineString', null, null, null, null, null, null, null, null, null, ST_GeomFromText('LINESTRING(%s)', 4326), null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiLineString") == 0)
     {
-      char*  coordsString = kaAlloc(&orionldState.kalloc, 10240);
-
-      kjGeoMultiLineStringExtract(coordinatesNodeP, coordsString, 10240);
+      kjGeoMultiLineStringExtract(coordinatesNodeP, coordsString, coordsStringLen);
 
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiLineString', null, null, null, null, null, null, null, null, null, null, ST_GeomFromText('MULTILINESTRING(%s)', 4326), '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "Polygon") == 0)
     {
-      char* coordsString = kaAlloc(&orionldState.kalloc, 2048);
-
-      kjGeoPolygonExtract(coordinatesNodeP, coordsString, 2048);
+      kjGeoPolygonExtract(coordinatesNodeP, coordsString, coordsStringLen);
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoPolygon', null, null, null, null, null, null, null, ST_GeomFromText('POLYGON(%s)'), null, null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
     else if (strcmp(geoType, "MultiPolygon") == 0)
     {
-      char* coordsString = kaAlloc(&orionldState.kalloc, 4096);
-
-      kjGeoMultiPolygonExtract(coordinatesNodeP, coordsString, 4096);
+      kjGeoMultiPolygonExtract(coordinatesNodeP, coordsString, coordsStringLen);
       snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'GeoMultiPolygon', null, null, null, null, null, null, null, null, ST_GeomFromText('MULTIPOLYGON(%s)', 4326), null, null, '%s')",
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }

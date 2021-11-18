@@ -691,8 +691,6 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //   25. Cleanup
 //   26. DONE
 //
-//
-//
 MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;

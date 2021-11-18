@@ -49,6 +49,7 @@ SET (SOURCES
     kjEntityArrayErrorPurge.cpp
     kjTreeToCompoundValue.cpp
     kjStringArraySortedInsert.cpp
+    kjSort.cpp
 )
 
 # Include directories

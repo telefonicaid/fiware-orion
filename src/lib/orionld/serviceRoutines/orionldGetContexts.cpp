@@ -32,10 +32,12 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/contextCache/orionldContextCacheGet.h"         // orionldContextCacheGet
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 
@@ -46,6 +48,48 @@ extern "C"
 //
 bool orionldGetContexts(ConnectionInfo* ciP)
 {
+  if (orionldState.uriParams.location == true)
+  {
+    if (orionldState.uriParams.url == NULL)
+    {
+      LM_W(("Bad Input (URI param 'location' present but 'url' missing)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible URI parameters", "'location' present but 'url' missing");
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
+    //
+    // If both 'url' and 'location' URI params are present, then 'details' can't be there
+    //
+    if (orionldState.uriParams.details == true)
+    {
+      LM_W(("Bad Input (URI params 'location' and 'url' don't support URI param 'details')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible URI parameters", "'location' and 'url' don't support 'details'");
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
+    OrionldContext* contextP = orionldContextCacheLookup(orionldState.uriParams.url);
+
+    if (contextP == NULL)
+    {
+      LM_W(("Bad Input (context not found: '%s')", orionldState.uriParams.url));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.uriParams.url);
+      orionldState.httpStatusCode = 404;
+      return false;
+    }
+
+    httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/jsonldContexts/", contextP->id);
+    return true;
+  }
+  else if (orionldState.uriParams.url != NULL)
+  {
+    LM_W(("Bad Input (URI param 'url' present but 'location' missing)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible URI parameters", "'url' present but 'location' missing");
+    orionldState.httpStatusCode = 400;
+    return false;
+  }
+
   KjNode* contextTree = kjArray(orionldState.kjsonP, "contexts");
 
   orionldState.noLinkHeader = true;  // We don't want the Link header for context requests
