@@ -25,7 +25,7 @@ Inactive status changed due to maxFailsLimit keeps after csubs cache refresh
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 2
+brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 2 --cache
 
 --SHELL--
 
