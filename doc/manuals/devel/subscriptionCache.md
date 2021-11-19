@@ -280,12 +280,12 @@ that calculation was starting to get very complex when functionality related wit
 entered into play. Another advantage is that we only do an operation on MongoDb (`findAndModify`)
 instead of two ones (`findOne` + `update`).
 
-Important to remark is that [special dynamic fields](#special-subscription-fields) (`count`, `latNotification`, etc.)
+Important to remark is that [special dynamic fields](#special-subscription-fields) (`count`, `lastNotification`, etc.)
 are not updated in DB at subscription update time, as they are consolidated in DB at cache sync time.
 
 Due to the same reason, dynamic attributes are not updated in the cache from DB, i.e. the ones
 in cache remains until next cache refresh operation. **There is one expection**: the `status` field.
-This field may come in the PATCH request (different from `count`, `latNotification`, etc. that never commes),
+This field may come in the PATCH request (different from `count`, `lastNotification`, etc. that never commes),
 in which case the `status` in the cache gets updated with the `status` in PATCH/DB.
 
 [Top](#top)
