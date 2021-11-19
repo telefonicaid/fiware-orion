@@ -14,4 +14,4 @@
 * Issue #926  GET local location of a cached context using URI params location and url - to be able to refresh it in the context cache
 * Issue #926  DELETE /contexts/<contextId> now also accepts complete URL as "contextId"
 * Issue #926  DELETE /contexts/<contextId> able to reload contexts (URI param ?reload=true)
-
+* Issue #938  Query on Date-like strings or Datetime

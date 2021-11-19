@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity with TemporalProperty with compound value
+Entity with Property with compound value
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,7 +31,7 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with a TemporalProperty as a compound
+# 01. POST /ngsi-ld/v1/entities with a Property as a compound
 # 02. Check contents in database
 # 03. GET entity
 #
@@ -42,7 +42,7 @@ payload='{
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
   "TP1": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": {
       "@type": "DateTime",
       "@value": "2018-12-04T12:00:00"
@@ -94,12 +94,12 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/TP1" : {
-			"type" : "TemporalProperty",
+			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"@value" : 1543924800,
-				"@type" : "DateTime"
+				"@type" : "DateTime",
+				"@value" : "2018-12-04T12:00:00"
 			},
 			"mdNames" : [ ]
 		}
@@ -114,7 +114,7 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 175
+Content-Length: 178
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -123,10 +123,10 @@ Date: REGEX(.*)
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
   "TP1": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": {
-      "@value": 1543924800,
-      "@type": "DateTime"
+      "@type": "DateTime",
+      "@value": "2018-12-04T12:00:00"
     }
   }
 }

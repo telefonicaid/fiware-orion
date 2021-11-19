@@ -44,7 +44,7 @@ payload='{
   "id": "http://a.b.c/entity/E1",
   "type": "T",
   "A": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": "2018-11-21T08:00:00.00Z"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
@@ -60,7 +60,7 @@ payload='{
   "id": "http://a.b.c/entity/E2",
   "type": "T2",
   "A2": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": "2018-11-22T08:00:00.00Z"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
@@ -76,7 +76,7 @@ payload='{
   "id": "http://a.b.c/entity/E3",
   "type": "T",
   "A": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": "2018-11-23T08:00:00.00Z"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
@@ -92,7 +92,7 @@ payload='{
   "id": "http://a.b.c/entity/E4",
   "type": "T2",
   "A2": {
-    "type": "TemporalProperty",
+    "type": "Property",
     "value": "2018-11-24T08:00:00.00Z"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that has an attribute A equal to 2018-11-23T08:00:00.00Z - see E3
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 240
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -159,8 +159,8 @@ Date: REGEX(.*)
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A": {
-      "type": "TemporalProperty",
-      "value": 1542960000
+      "type": "Property",
+      "value": "2018-11-23T08:00:00.00Z"
     }
   }
 ]
