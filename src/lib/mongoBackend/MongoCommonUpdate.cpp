@@ -1830,14 +1830,14 @@ static unsigned int processSubscriptions
      */
 
     /* Check 1: timing (not expired and ok from throttling point of view) */
-    if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
+    if (tSubP->throttling > 0 && tSubP->lastNotification > -1)
     {
       long long  current               = getCurrentTime();
       long long  sinceLastNotification = current - tSubP->lastNotification;
 
       if (tSubP->throttling > sinceLastNotification)
       {
-        LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+        LM_T(LmtMongo, ("blocked due to throttling, current time is: %lld", current));
         LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
 
         continue;
