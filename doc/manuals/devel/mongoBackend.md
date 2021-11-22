@@ -361,7 +361,7 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` is invoked from a service routine (step 1). This can be from either `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/mongoBackend/mongoUpdateContextSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* An update request is build using MongoDB `$set`/`$unset` operators, then used to update the subscription in DB using `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
+* The subscription is updated in DB using MongoDB `$set`/`$unset` operators. This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
 * In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the subscription is updated in the subscription cache based in the result from `collectionFindAndModify()` in the previous step (step 5). `updateInCache()` uses the subscription cache semaphore internally.
 * If the request semaphore was taken in step 2, then it is released before returning (step 6).
 
