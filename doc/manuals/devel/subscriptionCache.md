@@ -93,7 +93,7 @@ These fields have a special treatment inside the subscription cache, to avoid to
   to the counters in the database and then the *counters in cache* are reset back to zero
 * `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
 * `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
-* `status`, is updated in the database only if it is a **later time** than the one stored in the database*. To check which one is newer the side field `statusLastChange` is used.
+* `status`, is updated in the database only if it is a **later time** than the one stored in the database. To check which one is newer the side field `statusLastChange` is used.
 
 All this is to ensure that the values are correct in the case of having more than one broker working against the database (so called [active-active configurations](#active-active-configurations)).
 
