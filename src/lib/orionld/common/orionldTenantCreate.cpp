@@ -66,7 +66,7 @@ OrionldTenant* orionldTenantCreate(const char* tenantName)
   snprintf(tenantP->entities,        sizeof(tenantP->entities),        "%s-%s.entities",      dbName, tenantName);
   snprintf(tenantP->subscriptions,   sizeof(tenantP->subscriptions),   "%s-%s.csubs",         dbName, tenantName);
   snprintf(tenantP->avSubscriptions, sizeof(tenantP->avSubscriptions), "%s-%s.casubs",        dbName, tenantName);
-  snprintf(tenantP->registrations,   sizeof(tenantP->registrations), "  %s-%s.registrations", dbName, tenantName);
+  snprintf(tenantP->registrations,   sizeof(tenantP->registrations),   "%s-%s.registrations", dbName, tenantName);
   snprintf(tenantP->troeDbName,      sizeof(tenantP->troeDbName),      "%s_%s",               dbName, tenantName);
 
   // Add new tenant to tenant list
