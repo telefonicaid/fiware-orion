@@ -611,7 +611,7 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
     bool found = false;
     char compoundPathEncoded[256];
 
-    strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded));
+    strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded) - 1);
     eqForDot(compoundPathEncoded);
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)

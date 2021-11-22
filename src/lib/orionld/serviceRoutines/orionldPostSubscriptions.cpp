@@ -130,10 +130,10 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
         return false;
       }
 
-      if (mqttUser     != NULL) strncpy(sub.notification.httpInfo.mqtt.username, mqttUser,     sizeof(sub.notification.httpInfo.mqtt.username));
-      if (mqttPassword != NULL) strncpy(sub.notification.httpInfo.mqtt.password, mqttPassword, sizeof(sub.notification.httpInfo.mqtt.password));
-      if (mqttHost     != NULL) strncpy(sub.notification.httpInfo.mqtt.host,     mqttHost,     sizeof(sub.notification.httpInfo.mqtt.host));
-      if (mqttTopic    != NULL) strncpy(sub.notification.httpInfo.mqtt.topic,    mqttTopic,    sizeof(sub.notification.httpInfo.mqtt.topic));
+      if (mqttUser     != NULL) strncpy(sub.notification.httpInfo.mqtt.username, mqttUser,     sizeof(sub.notification.httpInfo.mqtt.username) - 1);
+      if (mqttPassword != NULL) strncpy(sub.notification.httpInfo.mqtt.password, mqttPassword, sizeof(sub.notification.httpInfo.mqtt.password) - 1);
+      if (mqttHost     != NULL) strncpy(sub.notification.httpInfo.mqtt.host,     mqttHost,     sizeof(sub.notification.httpInfo.mqtt.host) - 1);
+      if (mqttTopic    != NULL) strncpy(sub.notification.httpInfo.mqtt.topic,    mqttTopic,    sizeof(sub.notification.httpInfo.mqtt.topic) - 1);
 
       sub.notification.httpInfo.mqtt.mqtts = mqtts;
       sub.notification.httpInfo.mqtt.port  = mqttPort;
@@ -157,7 +157,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
             if (strcmp(keyP->name, "MQTT-Version") == 0)
             {
               mqttVersion = valueP->value.s;
-              strncpy(sub.notification.httpInfo.mqtt.version, mqttVersion, sizeof(sub.notification.httpInfo.mqtt.version));
+              strncpy(sub.notification.httpInfo.mqtt.version, mqttVersion, sizeof(sub.notification.httpInfo.mqtt.version) - 1);
             }
             else if (strcmp(keyP->name, "MQTT-QoS") == 0)
             {

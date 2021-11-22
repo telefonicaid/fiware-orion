@@ -109,7 +109,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     orion::CompoundValueNode*  child         = children[ix];
     char                       effectiveName[256];
 
-    strncpy(effectiveName, child->name.c_str(), sizeof(effectiveName));
+    strncpy(effectiveName, child->name.c_str(), sizeof(effectiveName) - 1);
 
     dotForEq(effectiveName);
 

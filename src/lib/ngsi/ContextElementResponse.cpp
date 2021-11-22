@@ -181,7 +181,7 @@ ContextElementResponse::ContextElementResponse
 
     getObjectFieldF(&attr, &attrs, attrName);    
 
-    strncpy(aName, attrName, sizeof(aName));
+    strncpy(aName, attrName, sizeof(aName) - 1);
     delimiterP = strstr(aName, "()");
     if (delimiterP != NULL)
     {
@@ -295,7 +295,7 @@ ContextElementResponse::ContextElementResponse
         char    mdName[512];
 
         getObjectFieldF(&mdObj, &mds, currentMd);
-        strncpy(mdName, currentMd, sizeof(mdName));
+        strncpy(mdName, currentMd, sizeof(mdName) - 1);
         eqForDot(mdName);
 
         Metadata* mdP = new Metadata((const char*) mdName, &mdObj);

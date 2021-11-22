@@ -90,7 +90,7 @@ void contextDownloadListAdd(const char* url)
 {
   StringListItem* itemP = (StringListItem*) malloc(sizeof(StringListItem));
 
-  strncpy(itemP->name, url, sizeof(itemP->name));
+  strncpy(itemP->name, url, sizeof(itemP->name) - 1);
   itemP->next = contextDownloadList;
   contextDownloadList = itemP;
 }
