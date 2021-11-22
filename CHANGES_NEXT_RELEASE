@@ -15,3 +15,5 @@
 * Issue #926  DELETE /contexts/<contextId> now also accepts complete URL as "contextId"
 * Issue #926  DELETE /contexts/<contextId> able to reload contexts (URI param ?reload=true)
 * Issue #938  Query on Date-like strings or Datetime
+* Issue #925  Bigger char buffer for -troeHost CLI param
+* Issue #937  Fixed a Compilation Error in Ubuntu 20.04, RELEASE compilation
