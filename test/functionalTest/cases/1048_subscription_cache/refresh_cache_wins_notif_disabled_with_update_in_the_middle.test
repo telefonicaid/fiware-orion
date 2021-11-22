@@ -67,7 +67,7 @@ brokerStart CB 100,212 IPv4 -subCacheIval 5 --cache
 --SHELL--
 
 #
-# FIXME: regex expression for "the present" dates use 202* patter. Thus, this
+# FIXME: regex expression for "the present" dates use 202* pattern. Thus, this
 # test will be next a fix in January 1st, 2030 for the next ten years ;)
 #
 # Relevant fields in step 00
