@@ -1307,6 +1307,8 @@ void subNotificationErrorStatus
 {
   bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
 
+  // FIXME P5: the noCache block is missplaced: subCache.cpp should contain only the
+  // logic related with cache
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
