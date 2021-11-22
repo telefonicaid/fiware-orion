@@ -396,7 +396,7 @@ static void appendMetadata
   mdNamesBuilder->append(mdP->name);
 
   char effectiveName[256];
-  strncpy(effectiveName, mdP->name.c_str(), sizeof(effectiveName));
+  strncpy(effectiveName, mdP->name.c_str(), sizeof(effectiveName) - 1);
   dotForEq(effectiveName);
 
   //
@@ -665,7 +665,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       {
         char decodedMdName[256];
 
-        strncpy(decodedMdName, md.name.c_str(), sizeof(decodedMdName));
+        strncpy(decodedMdName, md.name.c_str(), sizeof(decodedMdName) - 1);
         eqForDot(decodedMdName);
         if (!hasMetadata(decodedMdName, md.type, caP))
         {
@@ -864,7 +864,7 @@ static bool updateAttribute
   char         effectiveName[512];
   const char*  metadataId = caP->getMetadataId();
 
-  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName) - 1);
   dotForEq(effectiveName);
 
   if (metadataId != NULL)
@@ -968,7 +968,7 @@ static bool appendAttribute
   char         effectiveName[512];
   const char*  metadataId = caP->getMetadataId();
 
-  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName) - 1);
   dotForEq(effectiveName);
 
   if (metadataId != NULL)
@@ -1156,7 +1156,7 @@ static bool deleteAttribute
   char         effectiveName[512];
   const char*  metadataId = caP->getMetadataId();
 
-  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName));
+  strncpy(effectiveName, caP->name.c_str(), sizeof(effectiveName) - 1);
   dotForEq(effectiveName);
 
   if (metadataId != NULL)
@@ -3152,7 +3152,7 @@ static bool createEntity
     char         effectiveName[512];
     const char*  metadataId = attrsV[ix]->getMetadataId();
 
-    strncpy(effectiveName, attrsV[ix]->name.c_str(), sizeof(effectiveName));
+    strncpy(effectiveName, attrsV[ix]->name.c_str(), sizeof(effectiveName) - 1);
     dotForEq(effectiveName);
 
     if (metadataId != NULL)

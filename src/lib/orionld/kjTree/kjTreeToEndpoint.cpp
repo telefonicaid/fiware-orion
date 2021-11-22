@@ -140,8 +140,8 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
 
     KeyValue* keyValueP = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
 
-    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key));
-    strncpy(keyValueP->value, value, sizeof(keyValueP->value));
+    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key) - 1);
+    strncpy(keyValueP->value, value, sizeof(keyValueP->value) - 1);
     httpInfoP->notifierInfo.push_back(keyValueP);
 
     //
@@ -156,7 +156,7 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
         return false;
       }
 
-      strncpy(httpInfoP->mqtt.version, value, sizeof(httpInfoP->mqtt.version));
+      strncpy(httpInfoP->mqtt.version, value, sizeof(httpInfoP->mqtt.version) - 1);
     }
     else if (strcmp(key, "MQTT-QoS") == 0)
     {

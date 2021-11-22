@@ -270,7 +270,7 @@ Metadata* MetadataVector::lookupByName(const char* _name)
 {
   char nameEncoded[256];
 
-  strncpy(nameEncoded, _name, sizeof(nameEncoded));
+  strncpy(nameEncoded, _name, sizeof(nameEncoded) - 1);
   eqForDot(nameEncoded);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
