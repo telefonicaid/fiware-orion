@@ -96,7 +96,7 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 # 01. GET /v2/subscriptions and see dynamic fields set A
 # 02. Set dynamic fields in DB to set B
 # 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
-# 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same except failsCounter that has been set to 0
+# 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 #
 
 echo "00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A"
@@ -137,8 +137,8 @@ orionCurl --url /v2/subscriptions
 echo
 echo
 
-echo "04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same except failsCounter that has been set to 0"
-echo "=========================================================================================================================================="
+echo "04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same"
+echo "==============================================================================================="
 sleep 2.5s
 orionCurl --url /v2/subscriptions
 echo
@@ -241,10 +241,10 @@ Date: REGEX(.*)
 ]
 
 
-04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same except failsCounter that has been set to 0
-==========================================================================================================================================
+04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 487
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,6 +255,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 8,
             "http": {
                 "url": "http://localhost:1028/accumulate"
             },
