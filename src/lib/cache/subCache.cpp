@@ -1162,16 +1162,16 @@ void subCacheSync(void)
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
-        // FIXME PR: why lastFailureReason is not taken into account here?
         // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure = -1;
+        cssP->lastFailure       = -1;
+        cssP->lastFailureReason = "";
       }
 
       if (cssP->lastSuccess < cSubP->lastSuccess)
       {
-        // FIXME PR: why lastSuccessCode is not taken into account here?
         // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess = -1;
+        cssP->lastSuccess     = -1;
+        cssP->lastSuccessCode = -1;
       }
 
       if (cssP->statusLastChange < cSubP->statusLastChange)
@@ -1210,13 +1210,14 @@ void subCacheSync(void)
                              cssP->status,
                              cssP->statusLastChange);
 
-      // Keeping lastFailure and lastSuccess in sub cache
-      // FIXME PR: why lastNotication is not taken into account here?
-      // FIXME PR: lastFailureReason and lasSuccessCode are correct here, I guess, but not mentioned in the commet
-      cSubP->lastFailure       = cssP->lastFailure;
-      cSubP->lastSuccess       = cssP->lastSuccess;
-      cSubP->lastFailureReason = cssP->lastFailureReason;
-      cSubP->lastSuccessCode   = cssP->lastSuccessCode;
+      // Keeping all the non-flushable fields (i.e. all except count and failsCounter) in the sub cache
+      cSubP->lastNotificationTime = cssP->lastNotificationTime;
+      cSubP->lastFailure          = cssP->lastFailure;
+      cSubP->lastSuccess          = cssP->lastSuccess;
+      cSubP->lastFailureReason    = cssP->lastFailureReason;
+      cSubP->lastSuccessCode      = cssP->lastSuccessCode;
+      cSubP->status               = cssP->status;
+      cSubP->statusLastChange     = cssP->statusLastChange;
     }
 
     cSubP = cSubP->next;
