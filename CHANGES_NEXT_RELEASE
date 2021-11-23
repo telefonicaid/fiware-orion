@@ -17,3 +17,4 @@
 * Issue #938  Query on Date-like strings or Datetime
 * Issue #925  Bigger char buffer for -troeHost CLI param
 * Issue #937  Fixed a Compilation Error in Ubuntu 20.04, RELEASE compilation
+* Issue #280  Changed values of HTTP header 'Ngsiv2-Attrsformat' from e.g. 'x-ngsiv2-normalized' to just 'normalized'

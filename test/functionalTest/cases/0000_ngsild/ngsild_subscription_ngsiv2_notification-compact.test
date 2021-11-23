@@ -398,7 +398,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Fiware-Servicepath: /
 Content-Length: 146
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -452,7 +452,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub02
 Fiware-Servicepath: /
 Content-Length: 147
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -506,7 +506,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub03
 Fiware-Servicepath: /
 Content-Length: 148
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -560,7 +560,7 @@ POST http://localhost:9997/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 193
 User-Agent: REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: localhost:9997
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -640,7 +640,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 343
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -700,7 +700,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 491
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
+Ngsiv2-Attrsformat: normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

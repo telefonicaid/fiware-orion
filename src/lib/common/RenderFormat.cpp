@@ -49,10 +49,10 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_V2_CUSTOM:                    return "custom";
   case NGSI_LD_V1_NORMALIZED:             return "normalized";
   case NGSI_LD_V1_KEYVALUES:              return "keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED:          return "x-ngsiv2-normalized";
-  case NGSI_LD_V1_V2_KEYVALUES:           return "x-nsgiv2-keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "x-ngsiv2-normalized-compacted";
-  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "x-nsgiv2-keyValues-compacted";
+  case NGSI_LD_V1_V2_NORMALIZED:          return "normalized";
+  case NGSI_LD_V1_V2_KEYVALUES:           return "keyValues";
+  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "normalized-compacted";
+  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "keyValues-compacted";
   case NO_FORMAT:
     if (noDefault == true)
     {
