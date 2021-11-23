@@ -370,12 +370,9 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、 `lib/serviceRoutinesV2/patchSubscription.cpp` の `patchSubscription()` または ` lib/mongoBackend/mongoUpdateContextSubscription.cpp` の `mongoUpdateContextSubscription()` のいずれかです
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* 更新されるサブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得されます (ステップ3と4)
-* サブスクリプション・キャッシュが有効な場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュのオブジェクトは `cache` モジュールの `subCacheItemLoopkup()` を使用してサブスクリプション・キャッシュから取得されます (ステップ5)
-* 最終的なサブスクリプションの BSON オブジェクトは、元のサブスクリプションの BSON オブジェクトに基づいて、サブスクリプションの作成の場合 (`setExpiration()`, `setHttpInfo()`　等) と同様のさまざまな `set*()` 関数を使用して構築されます。(ステップ6)
-* 更新されたサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionUpdate()` を使用してデータベースで更新されます (ステップ7 および 8)
-* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュで更新されます (ステップ9)。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します
-* リクエスト・セマフォがステップ2 で取得された場合は、戻る前に解放されます (ステップ10)
+* サブスクリプションは、MongoDB の `$set`/`$unset` 演算子を使用して DB で更新されます。この操作は、`connectionOperations` モジュールの関数 `colletionFindAndModify()` で実行されます (ステップ3および4)
+* サブスクリプションキャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプションは、前のステップ (ステップ5) の `collectionFindAndModify()` の結果に基づいてサブスクリプション・キャッシュで更新されます。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します。
+* リクエスト・セマフォがステップ2で取得された場合、戻る前に解放されます (ステップ6)
 
 潜在的な通知は、データベース/キャッシュ内のサブスクリプションを更新する前に送信されるため、最後の通知時間とカウントに関する正しい情報が考慮されます。
 
