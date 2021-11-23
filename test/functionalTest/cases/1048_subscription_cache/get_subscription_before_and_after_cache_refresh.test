@@ -177,7 +177,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 10
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []

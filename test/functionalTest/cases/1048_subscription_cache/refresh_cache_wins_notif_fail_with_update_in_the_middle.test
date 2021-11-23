@@ -190,7 +190,7 @@ Date: REGEX(.*)
             "lastNotification": "2019-01-01T10:10:10.000Z",
             "onlyChangedAttrs": false
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []
@@ -240,7 +240,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []
@@ -364,7 +364,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []

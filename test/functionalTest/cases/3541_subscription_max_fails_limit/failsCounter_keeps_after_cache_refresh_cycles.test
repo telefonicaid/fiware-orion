@@ -152,7 +152,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -190,7 +190,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -228,7 +228,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
