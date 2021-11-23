@@ -268,8 +268,8 @@ This is the operation
 
 The strategy used to update the subscription is as follows:
 
-1. Update the sub in DB based in `$set`/`$unset` MongoDB operators with the data extrated from the
-   PATCH requests.
+1. Update the sub in DB based in `$set`/`$unset` MongoDB operators with the data extracted from
+   the PATCH requests.
 2. Update cache sub based in the resulting document in MongoDB (`findAndModify` MongoDB operation
    is used in previous step to achieve, so we can update sub in DB and get the resulting document
    in the same atomical operation on the DB)
