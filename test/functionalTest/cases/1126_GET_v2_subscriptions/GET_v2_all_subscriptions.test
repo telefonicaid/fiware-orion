@@ -319,7 +319,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": [

@@ -121,7 +121,7 @@ echo
 echo
 
 
-echo "04. GET /v2/subscriptions and see status failed (as cache data is older), timesSent 2, failsCounter 2"
+echo "04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2"
 echo "====================================================================================================="
 orionCurl --url /v2/subscriptions
 echo
@@ -233,7 +233,7 @@ Date: REGEX(.*)
 
 
 
-04. GET /v2/subscriptions and see status failed (as cache data is older), timesSent 2, failsCounter 2
+04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2
 =====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 436
@@ -258,7 +258,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 2
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []
@@ -379,7 +379,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 2
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []

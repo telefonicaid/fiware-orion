@@ -36,9 +36,9 @@ accumulatorStart --pretty-print
 # 01. Create a sub with timeout=12000
 # 02. Create a sub with timeout=8000
 # 03. Create an entity (notification triggered)
-# 03. Wait 12 seconds
-# 04. Check if 1st sub notification succeed
-# 05. Check if 2nd sub notification failed
+# 04. Wait 12 seconds
+# 05. Check if 1st sub notification succeed
+# 06. Check if 2nd sub notification has failsCounter: 1
 #
 
 
@@ -124,8 +124,8 @@ echo
 echo
 
 
-echo "06. Check if 2nd sub notification failed"
-echo "========================================"
+echo "06. Check if 2nd sub notification has failsCounter: 1"
+echo "====================================================="
 orionCurl --url "/v2/subscriptions/${idSubscription2}"
 echo
 echo
@@ -206,8 +206,8 @@ Date: REGEX(.*)
 }
 
 
-06. Check if 2nd sub notification failed
-========================================
+06. Check if 2nd sub notification has failsCounter: 1
+=====================================================
 HTTP/1.1 200 OK
 Content-Length: 453
 Content-Type: application/json
@@ -231,7 +231,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
