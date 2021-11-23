@@ -106,6 +106,7 @@
 #define CSUB_COUNT                   "count"
 #define CSUB_FORMAT                  "format"
 #define CSUB_STATUS                  "status"
+#define CSUB_STATUS_LAST_CHANGE      "statusLastChange"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
 #define CSUB_TIMEOUT                 "timeout"

@@ -111,6 +111,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
+  cSubP->statusLastChange      = sub.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(sub, CSUB_STATUS_LAST_CHANGE)      : -1;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
   cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
   cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
@@ -278,6 +279,7 @@ int mongoSubCacheItemInsert
   long long              failsCounter,
   long long              expirationTime,
   const std::string&     status,
+  double                 statusLastChange,
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
@@ -378,6 +380,7 @@ int mongoSubCacheItemInsert
   cSubP->count                 = count;
   cSubP->failsCounter          = failsCounter;
   cSubP->status                = status;
+  cSubP->statusLastChange      = statusLastChange;
 
   //
   // httpInfo & mqttInfo
@@ -444,9 +447,10 @@ int mongoSubCacheItemInsert
 *
 * mongoSubCacheRefresh -
 *
-* 1. Empty cache
-* 2. Lookup all subscriptions in the database
-* 3. Insert them again in the cache (with fresh data from database)
+* Cache has been emptied before calling this function
+*
+* 1. Lookup all subscriptions in the database
+* 2. Insert them again in the cache (with fresh data from database)
 *
 */
 void mongoSubCacheRefresh(const std::string& database)
@@ -496,7 +500,8 @@ static void mongoSubCountersUpdateCount
   const std::string&  subId,
   long long           count,
   long long           fails,
-  const std::string&  status = ""
+  const std::string&  status,
+  double              statusLastChange
 )
 {
   orion::BSONObjBuilder  condition;
@@ -516,19 +521,27 @@ static void mongoSubCountersUpdateCount
   {
     incB.append(CSUB_FAILSCOUNTER, fails);
   }
-  else
+  else if ((noCache) || (count > 0))
   {
     // no fails mean notification ok, thus reseting the counter
+    // in noCache case, this is always done. In cache case, the the count > 0 check is needed
+    // to ensure that at least one notification has been sent in since last cache refresh
+    // see cases/3541_subscription_max_fails_limit/failsCounter_keeps_after_cache_refresh_cycles.test
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
   if (!status.empty())
   {
     setB.append(CSUB_STATUS, status);
+    setB.append(CSUB_STATUS_LAST_CHANGE, statusLastChange);
   }
 
-  // by construction, at least one of incB or setB has a field and update object
-  // cannot be empty
+  if ((incB.nFields() == 0) && (setB.nFields() == 0))
+  {
+    // no info to update
+    return;
+  }
+
   if (incB.nFields() > 0)
   {
     update.append("$inc", incB.obj());
@@ -540,7 +553,7 @@ static void mongoSubCountersUpdateCount
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count', 'failsCounter' and/or 'status' for a subscription)"));
+    LM_E(("Internal Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
   }
 }
 
@@ -710,7 +723,8 @@ void mongoSubCountersUpdate
   long long           lastSuccess,
   const std::string&  failureReason,
   long long           statusCode,
-  const std::string&  status
+  const std::string&  status,
+  double              statusLastChange
 )
 {
   if (subId.empty())
@@ -721,7 +735,7 @@ void mongoSubCountersUpdate
 
   std::string db = composeDatabaseName(tenant);
 
-  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status);
+  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status, statusLastChange);
 
   if (lastNotificationTime > 0)
   {

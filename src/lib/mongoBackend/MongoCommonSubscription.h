@@ -101,7 +101,7 @@ extern void setDescription(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 *
 * setStatus -
 */
-extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b);
+extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now);
 
 
 

@@ -1,9 +1,12 @@
 - Hardening: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
 - Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
 - Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
+- Add: statusLastChange field in csbus collection (as now status is in the csubs cache and we need this field to know if status in the cache or DB is fresher)
 - Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
 - Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
 - Fix: avoid reset timesSent counter upon PATCH /v2/subscriptions/{subId} when csubs cache is in use
 - Fix: crash when updating attribute with empty JSON object or array (#3995)
+- Fix: csubs cache logic has to ignore fiware-sevice information if -multiservice is not used
+- Fix: subscription throttling was not working with value 1 second
 - Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
 - Upgrade Dockerfile base image from centos8.3.2011 to centos8.4.2105
