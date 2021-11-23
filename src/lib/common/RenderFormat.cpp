@@ -51,8 +51,8 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_LD_V1_KEYVALUES:              return "keyValues";
   case NGSI_LD_V1_V2_NORMALIZED:          return "normalized";
   case NGSI_LD_V1_V2_KEYVALUES:           return "keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "normalized-compacted";
-  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "keyValues-compacted";
+  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "normalized";
+  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "keyValues";
   case NO_FORMAT:
     if (noDefault == true)
     {
