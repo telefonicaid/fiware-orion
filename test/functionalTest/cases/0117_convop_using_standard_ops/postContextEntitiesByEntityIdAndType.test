@@ -311,7 +311,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -326,7 +326,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT1H", 
+    "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -345,11 +345,11 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part02"
             }
         }
@@ -366,7 +366,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2H", 
+    "duration": "PT2H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -385,11 +385,11 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part04"
             }
         }
@@ -407,10 +407,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entity::type cannot be empty for this request", 
+        "code": "400",
+        "details": "entity::type cannot be empty for this request",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -424,7 +424,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2H", 
+    "duration": "PT2H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -439,10 +439,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "non-matching entity::types in URL", 
+        "code": "400",
+        "details": "non-matching entity::types in URL",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -456,7 +456,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2H", 
+    "duration": "PT2H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -470,7 +470,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2H", 
+    "duration": "PT2H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -484,7 +484,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2H", 
+    "duration": "PT2H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -503,47 +503,47 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part07"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part09"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part10"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part11"
             }
         }
@@ -565,47 +565,47 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part07"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part09"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part10"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part11"
             }
         }
@@ -627,23 +627,23 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part07"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part09"
             }
         }
@@ -665,11 +665,11 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part10"
             }
         }
@@ -691,11 +691,11 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part11"
             }
         }
@@ -713,7 +713,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -733,23 +733,23 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part10"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "entities": [
                     {
-                        "id": "E2", 
-                        "isPattern": "false", 
+                        "id": "E2",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/part11"
             }
         }

@@ -10,10 +10,11 @@
 * [Subscription cache refresh](#subscription-cache-refresh)
 * [Propagation of subscriptions in active-active configurations](#propagation-of-subscriptions-in-active-active-configurations)
 * [GET subscription operations](#get-subscription-operations)
+* [PATCH subscription operation](#patch-subscription-operation)
 * [Subscription lookup on entity/attribute creation/modification](#subscription-lookup-on-entityattribute-creationmodification)
 
 ## Introduction
-To gain performance, NGSI10 context subscriptions (but **not** NGSI9 registration subscriptions) are kept in a list in RAM. Please refer to [this section in the Orion administration manual](../admin/perf_tuning.md#subscription-cache) for an user-perspective of the cache.
+To gain performance, subscriptions are kept in a list in RAM. Please refer to [this section in the Orion administration manual](../admin/perf_tuning.md#subscription-cache) for an user-perspective of the cache.
 
 The implementation of the subscription cache in found in src/lib/cache/subCache.cpp, and the cache is initialized from the main program. I.e. `subCacheInit()` in `lib/cache/subCache.cpp` is called from `main()` in `app/contextBroker/contextBroker.cpp`.
 
@@ -40,9 +41,11 @@ Note that in order to refresh the cache, [the semaphore that protects the subscr
 [Top](#top)
 
 ## Subscription cache fields
-In subscription creation/modification the subscription cache is write-through, i.e. updates to subscriptions are performed both in the subscription item in the subscription cache **and** in the database.
+In subscription creation/modification the subscription cache is write-through, i.e. updates to subscriptions are performed both in the subscription item in the subscription cache **and** in the database
+(except for some that dynamic fields [described next](#special-subscription-fields) that are not updated in DB upon subscription modification, has they are consolidate in DB at cache sync time)
 
-When the broker starts, the subscription cache is populated with the subscriptions found in the MongoDB database. A subscription in the subscription cache contains the following fields:
+When the broker starts, the subscription cache is populated with the subscriptions found in the MongoDB database. A subscription in the subscription cache contains the following fields
+(check code reference at subCache.h file):
 
 ```
   std::vector<EntityInfo*>    entityIdInfos;
@@ -52,17 +55,24 @@ When the broker starts, the subscription cache is populated with the subscriptio
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
+  int64_t                     failsCounter;
+  int64_t                     maxFailsLimit;
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   std::string                 status;
+  double                      statusLastChange;
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
+  bool                        onlyChanged;
   ngsiv2::HttpInfo            httpInfo;
+  ngsiv2::MqttInfo            mqttInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
+  std::string                 lastFailureReason;
+  int64_t                     lastSuccessCode;
   struct CachedSubscription*  next;         // The cache is a linked list of CachedSubscription ...
 ```
 
@@ -71,16 +81,19 @@ There are a few special fields that need special care when refreshing the cache:
 
 * `lastNotificationTime`
 * `count`
-* `lastFailure`
-* `lastSuccess`
+* `failsCounter`
+* `lastFailure` (and related field `lastFailureReason`)
+* `lastSuccess` (and related field `lastSuccessCode`)
+* `status`
 
 These fields have a special treatment inside the subscription cache, to avoid to write to the database each and every time these fields change, i.e. when an update triggering the subscription occurs). They are updated in the database only on refreshing the cache, like this:
 
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
-* `count` in the subscription cache is set to zero at each sub-cache-refresh, so the `count` that is in the cache simply is an accumulator and its accumulated value is added
-  to the count in the database and then the *count in cache* is reset back to zero
-* `lastFailure`, like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
-* `lastSuccess`, like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
+* `count` and `failsCounter` in the subscription cache are set to zero at each sub-cache-refresh, so the `count` and `failsCounter` that are in the cache simply are accumulators and its accumulated values are added
+  to the counters in the database and then the *counters in cache* are reset back to zero
+* `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
+* `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
+* `status`, is updated in the database only if it is a **later time** than the one stored in the database. To check which one is newer the side field `statusLastChange` is used.
 
 All this is to ensure that the values are correct in the case of having more than one broker working against the database (so called [active-active configurations](#active-active-configurations)).
 
@@ -92,7 +105,7 @@ Orion is capable of working with different databases in a single instance of Ori
 
 Every Service (or Tenant) has its own MongoDB database (in the same MongoDB instance), as described in [the administration manual](../admin/database_admin.md#multiservicemultitenant-database-separation). 
 
-Each of these Services may have context subscriptions. However, while databases are per-service, the  
+Each of these Services may have subscriptions. However, while databases are per-service, the
 subscription cache is unique in an instance of Orion, so it contains **all subscriptions of all Services**.  
 If you go back and take a look at the `CachedSubscription` struct, you will see a field `char* tenant`. That is where the Service/Tenant is stored for each subscription in the subscription cache.  
 
@@ -106,7 +119,6 @@ If the CLI option **-noCache** is set, then nothing at all is done about the sub
 
 The [main program](sourceCode.md#srcappcontextbroker) calls `subCacheInit()` and then, if sub-cache-refresh is *turned off* (the interval is zero), `subCacheRefresh()` is called, just to populate the cache with the entire collection of subscriptions from the database.
 
-Remember, only **context subscriptions** (NGSI10), not registration subscriptions (NGSI9).
 The corresponding collection in MongoDB database is [`csub`](../admin/database_model.md#csubs-collection).  
 
 If sub-cache-refresh is *turned on*, then a separate thread is started by calling the function `subCacheStart()`. This thread periodically (depending on the value of `subCacheInterval` which holds the seconds for the periodicity of subscription cache refreshes) refreshes the subscription cache. It starts by populating the cache from the database.
@@ -133,7 +145,7 @@ _SC-01: Subscription cache refresh_
 * In step 4, the special fields that live in the subscription cache are saved before the cub-cache is emptied. See more about this in the section on [special subscription fields](#special-subscription-fields).
 * When subscriptions are created or modified, apart from modifying the subscription cache, the changes are saved to the database, so it is safe to completely clear the subscription cache, once the special fields are saved and this is the first step in `subCacheRefresh()`, step 6 in the figure.
 * To populate the subscription cache again, the first thing needed is a list of all services (tenants) in the system. `getOrionDatabases()` offers that service (step 7-9)
-* Steps 10 to 14 are about filling the subscription cache wit the contents from the database (from the collection with context subscriptions, called [`csub`](../admin/database_model.md#csubs-collection)). This is a loop that is executed once per service (tenant) in the system.
+* Steps 10 to 14 are about filling the subscription cache wit the contents from the database (from the collection with subscriptions, called [`csub`](../admin/database_model.md#csubs-collection)). This is a loop that is executed once per service (tenant) in the system.
 * After populating the subscription cache from the database content, the special fields are restored to the subscription cache **and** to the database (again, see [special subscription fields](#special-subscription-fields) for more info). This is steps 15 and 16 in the figure.
 * Finally, in step 17 and the end of the figure, the subscription cache semaphore is released and the flow goes back to the beginning of the infinite loop.
 
@@ -146,14 +158,20 @@ The refresher thread is simply an infinite loop that sleeps the amount of second
 ### `subCacheSync()`
 This is possibly the most important function of the entire subscription cache as it is the point where the subscription cache is merged with what's in the database and it leaves both the subscription cache and the database modified and synchronized.
 
-`subCacheSync()` saves the four special fields of the subscriptions, using a vector of the following struct:
+`subCacheSync()` saves the nine special fields of the subscriptions, using a vector of the following struct
+(check code reference at subCache.cpp file):
 ```
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
-  int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      failsCounter;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
+  std::string  status;
+  double       statusLastChange;
 } CachedSubSaved;
 ```
 
@@ -178,7 +196,7 @@ The simplest approach is used, which is to:
 * Completely delete the current contents in the subscription cache
 * Populate the subscription cache from the database content of each Service (mongo database)
 
-*Note that the subscription cache refresher thread saves the values of the four special fields before calling `subCacheRefresh()`*
+*Note that the subscription cache refresher thread saves the values of the nine special fields before calling `subCacheRefresh()`*
 
 A more efficient approach would be to compare the content of the subscription cache to the content in the database during the refresh, but this would mean a lot more time spent implementing the subscription cache refreshing algorithm and this simpler (and slower) approach was chosen. 
 
@@ -223,7 +241,7 @@ _SC-02: Subscription propagation in active-active configuration_
 * In step 5, the subscription cache of **Orion 2** is merged with the database content and so "Sub-X" is now part of the subscription cache of **Orion 2**
 
 
-The case of the four [special fields](#special-subscription-fields) (`lastNotificationTime`, `count`, `lastFailure`, and `lastSuccess`) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
+The case of the `lastNotificationTime`, `count`, `failsCounter`, `lastFailure`, `lastFailureReason`, `lastSuccess` and `lastSuccessReason` [special fields](#special-subscription-fields) is a bit more complex as the *most recent* information of these fields lives **only** in the subscription cache. So, to propagate for instance `lastNotificationTime` from one Orion (Orion1) to another (Orion2), first Orion1 needs to refresh its subscription cache and **after that**, Orion2 must refresh *its* subscription cache. Not before this happens, in that order, Orion2 will be aware of the `lastNotificationTime` coming from Orion1.
 
 [Top](#top)
 
@@ -234,9 +252,41 @@ Note that the GET requests on subscriptions
 * `GET /v2/subscriptions`
 * `GET /v2/subscriptions/{subscription-id}`
 
-do not use the subscription cache, but attack the database directly.
+take the subscription from the DB but combine it with the information in the
+subscription cache (see `setNotification()` in `mongoGetSubscriptions.cpp` file for
+details).
 
-So, those four [special fields](#special-subscription-fields) may not seem coherent in GET poerations as they live in the subscription cache and are pushed to the database only on sub-cache-refresh.
+However, given that the subscription cache is local, `lastNotificationTime`, `count`, `failsCounter`, `lastFailure`, `lastFailureReason`, `lastSuccess` and `lastSuccessReason` [special fields](#special-subscription-fields) may not seem coherent in GET operations.
+
+[Top](#top)
+
+## PATCH subscription operation
+
+This is the operation
+
+* `PATCH /v2/subscriptions/{subscription-id}`
+
+The strategy used to update the subscription is as follows:
+
+1. Update the sub in DB based in `$set`/`$unset` MongoDB operators with the data extracted from
+   the PATCH requests.
+2. Update cache sub based in the resulting document in MongoDB (`findAndModify` MongoDB operation
+   is used in previous step to achieve, so we can update sub in DB and get the resulting document
+   in the same atomical operation on the DB)
+
+This is better than an strategy based on taking the sub from DB, combine it with cache in a single document,
+then update in MongoDB the resulting document. This was done in the past (Orion 3.3.0 and before) but
+that calculation was starting to get very complex when functionality related with `failsCounter`/`maxFailsLimit`
+entered into play. Another advantage is that we only do an operation on MongoDb (`findAndModify`)
+instead of two ones (`findOne` + `update`).
+
+Important to remark is that [special dynamic fields](#special-subscription-fields) (`count`, `lastNotification`, etc.)
+are not updated in DB at subscription update time, as they are consolidated in DB at cache sync time.
+
+Due to the same reason, dynamic attributes are not updated in the cache from DB, i.e. the ones
+in cache remains until next cache refresh operation. **There is one expection**: the `status` field.
+This field may come in the PATCH request (different from `count`, `lastNotification`, etc. that never commes),
+in which case the `status` in the cache gets updated with the `status` in PATCH/DB.
 
 [Top](#top)
 

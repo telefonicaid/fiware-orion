@@ -59,7 +59,7 @@ payload='
 	"A1": {
       "type": "geo:point",
        "value": "2, -4"
-    }	
+    }
 }
 '
 orionCurl --url '/v2/entities/E1/attrs' --payload "$payload" -X PUT

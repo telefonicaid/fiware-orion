@@ -422,8 +422,8 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234567])
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A3": "13",
     "step": "03"
 }
@@ -531,8 +531,8 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234567])
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A3": "13"
 }
 =======================================
@@ -552,8 +552,8 @@ Content-Type: user-specified
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234567])
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A4": ""
 }
 =======================================

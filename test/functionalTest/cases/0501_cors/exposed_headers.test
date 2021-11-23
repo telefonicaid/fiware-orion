@@ -46,7 +46,7 @@ HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location 
+Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

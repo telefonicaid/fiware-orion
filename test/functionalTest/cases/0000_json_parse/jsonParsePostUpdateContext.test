@@ -168,17 +168,17 @@ Date: REGEX(.*)
                                 "value": "3"
                             }
                         ],
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree",
                         "value": ""
                     }
-                ], 
-                "id": "ConferenceRoom", 
-                "isPattern": "false", 
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
                 "type": "Room"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -225,17 +225,17 @@ Date: REGEX(.*)
                                 "value": "3"
                             }
                         ],
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree",
                         "value": ""
                     }
-                ], 
-                "id": "ConferenceRoom", 
-                "isPattern": "false", 
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
                 "type": "Room"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

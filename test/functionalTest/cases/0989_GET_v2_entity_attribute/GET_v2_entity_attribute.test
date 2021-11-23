@@ -43,12 +43,12 @@ payload='{
     "id": "8787GHY",
     "type": "Car",
     "brand":{
-    
+
             "type": "string",
             "value": "Mercedes Benz"
         },
     "speed":{
-    
+
             "type": "number",
             "value" : "150"
         },
@@ -66,14 +66,14 @@ payload='{
           "type": "a",
           "value": "E1/T1/A3/M1",
           "metadata": {
-            "m1": 
+            "m1":
               {
                 "value": "M1"
               }
             }
         }
 
-   
+
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
@@ -139,7 +139,7 @@ Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "myString", 
+    "type": "myString",
     "value": "Klasse C"
 }
 
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": "number", 
+    "type": "number",
     "value": "150"
 }
 
@@ -174,7 +174,7 @@ Date: REGEX(.*)
             "value": "M1"
         }
     },
-    "type": "a", 
+    "type": "a",
     "value": "E1/T1/A3/M1"
 }
 

@@ -34,15 +34,15 @@ accumulatorStart --pretty-print
 # 01. Create sub (with valid url), matching E1
 # 02. Create entity E1
 #     Sleep 3.5 seconds to get a sub-cache-refresh
-# 03. GET subscription, see lastSuccess but not lastFailure and status==active
+# 03. GET subscription, see lastSuccess but not lastFailure or failsCounter
 # 04. Stop accumulator
 # 05. Update E1, to provoke notification that now fails
 #     Sleep 3.5 seconds to get a sub-cache-refresh
-# 06. GET subscription, see lastFailure GT lastSuccess and status==failed
+# 06. GET subscription, see lastFailure GT lastSuccess and failsCounter==1
 # 07. Start accumulator again
 # 08. Update E1, to provoke notification that now works
 #     Sleep 3.5 seconds to get a sub-cache-refresh
-# 09. GET subscription, see lastSuccess GT lastFailure and status==active
+# 09. GET subscription, see lastSuccess GT lastFailure and but no failsCounter
 #
 
 echo "01. Create sub (with valid url), matching E1"
@@ -87,8 +87,8 @@ echo
 sleep 3.5
 
 
-echo "03. GET subscription, see lastSuccess but not lastFailure and status==active"
-echo "============================================================================"
+echo "03. GET subscription, see lastSuccess but not lastFailure or failsCounter"
+echo "========================================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -115,8 +115,8 @@ echo
 sleep 3.5
 
 
-echo "06. GET subscription, see lastFailure GT lastSuccess and status==failed"
-echo "======================================================================="
+echo "06. GET subscription, see lastFailure GT lastSuccess and failsCounter==1"
+echo "========================================================================"
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -142,8 +142,8 @@ echo
 # Await sub-cache contents to be dumped into database
 sleep 3.5
 
-echo "09. GET subscription, see lastSuccess GT lastFailure and status==active"
-echo "======================================================================="
+echo "09. GET subscription, see lastSuccess GT lastFailure but no failsCounter"
+echo "========================================================================"
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -170,8 +170,8 @@ Date: REGEX(.*)
 
 
 
-03. GET subscription, see lastSuccess but not lastFailure and status==active
-============================================================================
+03. GET subscription, see lastSuccess but not lastFailure or failsCounter
+=========================================================================
 HTTP/1.1 200 OK
 Content-Length: 364
 Content-Type: application/json
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 
 
 
-06. GET subscription, see lastFailure GT lastSuccess and status==failed
-=======================================================================
+06. GET subscription, see lastFailure GT lastSuccess and failsCounter==1
+========================================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 471
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -234,6 +234,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 1,
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
@@ -245,7 +246,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 2
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []
@@ -273,8 +274,8 @@ Date: REGEX(.*)
 
 
 
-09. GET subscription, see lastSuccess GT lastFailure and status==active
-=======================================================================
+09. GET subscription, see lastSuccess GT lastFailure but no failsCounter
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 454
 Content-Type: application/json

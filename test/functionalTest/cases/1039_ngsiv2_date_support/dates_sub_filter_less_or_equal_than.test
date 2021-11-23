@@ -169,14 +169,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "birthday": {
-                "metadata": {}, 
-                "type": "DateTime", 
+                "metadata": {},
+                "type": "DateTime",
                 "value": "2016-02-23T10:00:00.000Z"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "T"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -194,14 +194,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "birthday": {
-                "metadata": {}, 
-                "type": "DateTime", 
+                "metadata": {},
+                "type": "DateTime",
                 "value": "2016-02-24T10:00:00.000Z"
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "T"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

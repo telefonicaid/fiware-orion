@@ -32,7 +32,7 @@ brokerStart CP1 0
 --SHELL--
 
 #
-# 
+#
 # 01. Create entity with geodata and string object
 # 02. Check entity in CB
 # 03. Get entity from mongodb

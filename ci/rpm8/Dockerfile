@@ -1,4 +1,4 @@
-FROM centos:centos8.3.2011
+FROM centos:centos8.4.2105
 
 ADD mongodb.repo /etc/yum.repos.d/
 ADD build.sh /opt/bin/

@@ -32,9 +32,9 @@ brokerStart CB
 #
 # 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 # 02. Upsert entity to trigger notification (fail)
-# 03. GET /v2/subscriptions/subId, to check the status=failed, timesSent=1, failsCounter=1, maxFailsLimit=2
+# 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=1, maxFailsLimit=2
 # 04. Upsert entity to trigger notification (fail)
-# 05. GET /v2/subscriptions/subId, to check the status=failed, timesSent=2, failsCounter=2, maxFailsLimit=2
+# 05. GET /v2/subscriptions/subId, to check the status=active, timesSent=2, failsCounter=2, maxFailsLimit=2
 # 06. Upsert entity to trigger notification (fail that causes change to status=inactive)
 # 07. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=3, failsCounter=3, maxFailsLimit=2
 # 08. Start accumulator
@@ -84,7 +84,7 @@ echo
 echo
 
 
-echo "03. GET /v2/subscriptions/subId, to check the status=failed, timesSent=1, failsCounter=1, maxFailsLimit=2"
+echo "03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=1, maxFailsLimit=2"
 echo "========================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -105,7 +105,7 @@ echo
 echo
 
 
-echo "05. GET /v2/subscriptions/subId, to check the status=failed, timesSent=2, failsCounter=2, maxFailsLimit=2"
+echo "05. GET /v2/subscriptions/subId, to check the status=active, timesSent=2, failsCounter=2, maxFailsLimit=2"
 echo "========================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -203,7 +203,7 @@ Date: REGEX(.*)
 
 
 
-03. GET /v2/subscriptions/subId, to check the status=failed, timesSent=1, failsCounter=1, maxFailsLimit=2
+03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=1, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 434
@@ -227,7 +227,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -251,7 +251,7 @@ Date: REGEX(.*)
 
 
 
-05. GET /v2/subscriptions/subId, to check the status=failed, timesSent=2, failsCounter=2, maxFailsLimit=2
+05. GET /v2/subscriptions/subId, to check the status=active, timesSent=2, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 434
@@ -275,7 +275,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []

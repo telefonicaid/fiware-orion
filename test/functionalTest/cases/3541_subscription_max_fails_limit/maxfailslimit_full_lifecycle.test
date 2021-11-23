@@ -37,7 +37,7 @@ accumulatorStart
 # 04. Stop accumulator
 # 05. Upsert entity to trigger notification (fail)
 # 06. Upsert entity to trigger notification (fail)
-# 07. GET /v2/subscriptions/subId, to check the status=failed, timesSent=3, failsCounter=2, maxFailsLimit=2
+# 07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
 # 08. Upsert entity to trigger notification (fail that causes change to status=inactive)
 # 09. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2
 # 10. Upsert entity to trigger notification (not triggered due to status=inactive)
@@ -48,7 +48,7 @@ accumulatorStart
 # 15. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=5, failsCounter=4, maxFailsLimit=2
 # 16. PATCH /v2/subscriptions/subId to enlarge maxFailLimit to 5 and set status=active again
 # 17. Upsert entity to trigger notification (fail)
-# 18. GET /v2/subscriptions/subId, to check the status=failed, timesSent=6, failsCounter=5, maxFailsLimit=5
+# 18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5
 # 19. Upsert entity to trigger notification (fail that causes change to status=inactive)
 # 20. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5
 # 21. Upsert entity to trigger notification (not triggered due to status=inactive)
@@ -115,12 +115,6 @@ echo
 echo
 
 
-#FIXME #3989: this seconds is to avoid having successfull and failing notifications in the
-# very same second, which would case status to be "active" instead of "failed"
-# Looks for comments in Subscription::toJson() code for more detail
-sleep 1s
-
-
 echo "05. Upsert entity to trigger notification (fail)"
 echo "================================================"
 payload='{
@@ -151,7 +145,7 @@ echo
 echo
 
 
-echo "07. GET /v2/subscriptions/subId, to check the status=failed, timesSent=3, failsCounter=2, maxFailsLimit=2"
+echo "07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2"
 echo "========================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -280,7 +274,7 @@ echo
 echo
 
 
-echo "18. GET /v2/subscriptions/subId, to check the status=failed, timesSent=6, failsCounter=5, maxFailsLimit=5"
+echo "18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5"
 echo "========================================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -476,7 +470,7 @@ Date: REGEX(.*)
 
 
 
-07. GET /v2/subscriptions/subId, to check the status=failed, timesSent=3, failsCounter=2, maxFailsLimit=2
+07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 497
@@ -502,7 +496,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 3
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -701,7 +695,7 @@ Date: REGEX(.*)
 
 
 
-18. GET /v2/subscriptions/subId, to check the status=failed, timesSent=6, failsCounter=5, maxFailsLimit=5
+18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5
 =========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 497
@@ -727,7 +721,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 6
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []

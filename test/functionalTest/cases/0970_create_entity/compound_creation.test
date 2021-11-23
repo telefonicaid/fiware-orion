@@ -85,8 +85,8 @@ Date: REGEX(.*)
             "number": 2,
             "string": "1"
         }
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

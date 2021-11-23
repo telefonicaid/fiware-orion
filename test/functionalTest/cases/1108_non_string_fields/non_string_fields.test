@@ -103,7 +103,7 @@ echo "===================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": 14 } } 
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": 14 } }
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo

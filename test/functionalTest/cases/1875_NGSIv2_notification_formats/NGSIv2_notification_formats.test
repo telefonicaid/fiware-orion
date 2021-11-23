@@ -42,14 +42,14 @@ accumulatorStart --pretty-print
 # 09. Update sub2, setting attrsFormat to keyValues
 # 10. Update E1/A3, to see notification in sub2
 # 11. Dump accumulator to see notification of (A1, A3) with keyValues
-# 
+#
 
 
 echo "01. Create NGSIv1 subscription for E1/A1 (A1, A2)"
 echo "================================================="
 payload='{
   "entities": [
-    {  
+    {
       "id": "E1",
       "type": "none"
     }
@@ -123,7 +123,7 @@ payload='
     },
     "attrs": [ "A1", "A4", "sub3_with_normalized" ],
     "attrsFormat": "normalized"
-  },  
+  },
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -152,7 +152,7 @@ payload='
     },
     "attrs": [ "A1", "A5", "sub4_with_keyValues" ],
     "attrsFormat": "keyValues"
-  },  
+  },
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -181,7 +181,7 @@ payload='
     },
     "attrs": [ "A1", "A6", "sub5_with_values" ],
     "attrsFormat": "values"
-  },  
+  },
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -341,26 +341,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "Number", 
+                        "name": "A1",
+                        "type": "Number",
                         "value": 1
-                    }, 
+                    },
                     {
-                        "name": "A2", 
-                        "type": "Number", 
+                        "name": "A2",
+                        "type": "Number",
                         "value": 2
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "none"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
+    ],
     "originator": "localhost",
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
@@ -379,19 +379,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 1
-            }, 
+            },
             "A3": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 3
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "none"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -409,19 +409,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 1
-            }, 
+            },
             "A4": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 4
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "none"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -438,12 +438,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 {
     "data": [
         {
-            "A1": 1, 
-            "A5": 5, 
-            "id": "E1", 
+            "A1": 1,
+            "A5": 5,
+            "id": "E1",
             "type": "none"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -460,12 +460,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 {
     "data": [
         [
-            1, 
+            1,
             6
         ]
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
-} 
+}
 =======================================
 #SORT_END
 
@@ -505,12 +505,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A1": 1, 
-            "A3": 31, 
-            "id": "E1", 
+            "A1": 1,
+            "A3": 31,
+            "id": "E1",
             "type": "none"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

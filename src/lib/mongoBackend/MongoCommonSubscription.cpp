@@ -268,12 +268,14 @@ void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setStatus -
 */
-void setStatus(const std::string& _status, orion::BSONObjBuilder* b)
+void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 {
   std::string  status = (_status.empty())? STATUS_ACTIVE : _status;
 
   b->append(CSUB_STATUS, status);
+  b->append(CSUB_STATUS_LAST_CHANGE, now);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
+  LM_T(LmtMongo, ("Subscription status last change: %f", now));
 }
 
 

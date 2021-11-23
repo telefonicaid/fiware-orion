@@ -123,12 +123,12 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -147,12 +147,12 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -168,7 +168,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -184,12 +184,12 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

@@ -192,8 +192,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "details": "E1", 
+        "code": "404",
+        "details": "E1",
         "reasonPhrase": "No context element found"
     }
 }
@@ -209,13 +209,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
+        "code": "404",
+        "details": "Entity id: /E1/",
         "reasonPhrase": "No context element found"
     }
 }
@@ -234,19 +234,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "degree", 
+                    "name": "A1",
+                    "type": "degree",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
     ],
-    "id": "E1", 
-    "isPattern": "false", 
+    "id": "E1",
+    "isPattern": "false",
     "type": "T1"
 }
 
@@ -264,13 +264,13 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A1", 
-                    "type": "degree", 
+                    "name": "A1",
+                    "type": "degree",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -290,17 +290,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "degree", 
+                "name": "A1",
+                "type": "degree",
                 "value": "2"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -319,19 +319,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "A2", 
-                    "type": "degree", 
+                    "name": "A2",
+                    "type": "degree",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
     ],
-    "id": "E1", 
-    "isPattern": "false", 
+    "id": "E1",
+    "isPattern": "false",
     "type": "T2"
 }
 
@@ -350,35 +350,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "degree", 
+                        "name": "A1",
+                        "type": "degree",
                         "value": "2"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "degree", 
+                        "name": "A2",
+                        "type": "degree",
                         "value": "1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -398,17 +398,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A1", 
-                "type": "degree", 
+                "name": "A1",
+                "type": "degree",
                 "value": "2"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -426,17 +426,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A2", 
-                "type": "degree", 
+                "name": "A2",
+                "type": "degree",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T2"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -451,7 +451,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "200", 
+    "code": "200",
     "reasonPhrase": "OK"
 }
 
@@ -465,8 +465,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "code": "404", 
-    "details": "E1", 
+    "code": "404",
+    "details": "E1",
     "reasonPhrase": "No context element found"
 }
 
@@ -481,13 +481,13 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
+        "id": "E1",
+        "isPattern": "false",
         "type": "T1"
-    }, 
+    },
     "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
+        "code": "404",
+        "details": "Entity id: /E1/",
         "reasonPhrase": "No context element found"
     }
 }
@@ -505,17 +505,17 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "A2", 
-                "type": "degree", 
+                "name": "A2",
+                "type": "degree",
                 "value": "1"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
+        ],
+        "id": "E1",
+        "isPattern": "false",
         "type": "T2"
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

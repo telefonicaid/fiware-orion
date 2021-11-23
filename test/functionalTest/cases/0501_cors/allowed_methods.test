@@ -21,8 +21,8 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 # CORS functionality is tested with a collection of test files in this directory.
-# This CORS test focuses on the Access-Control-Allow-Methods header. Other CORS 
-# related headers in this test file use REGEX(.*) as value since they are being 
+# This CORS test focuses on the Access-Control-Allow-Methods header. Other CORS
+# related headers in this test file use REGEX(.*) as value since they are being
 # tested in their respective test files.
 
 --NAME--

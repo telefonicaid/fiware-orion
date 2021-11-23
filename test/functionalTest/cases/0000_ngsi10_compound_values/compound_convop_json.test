@@ -112,19 +112,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "att", 
-                    "type": "compound", 
+                    "name": "att",
+                    "type": "compound",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "id": "EVector", 
-    "isPattern": "false", 
+    ],
+    "id": "EVector",
+    "isPattern": "false",
     "type": ""
 }
 2: +++++++++ create object compound +++++++++++
@@ -139,19 +139,19 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "name": "att", 
-                    "type": "compound", 
+                    "name": "att",
+                    "type": "compound",
                     "value": ""
                 }
-            ], 
+            ],
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
     ],
-    "id": "EObject", 
-    "isPattern": "false", 
+    "id": "EObject",
+    "isPattern": "false",
     "type": ""
 }
 3: ++++++++++ query for vector compound in JSON ++++++++++
@@ -167,30 +167,30 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att", 
-                        "type": "compound", 
+                        "name": "att",
+                        "type": "compound",
                         "value": [
-                            "22", 
+                            "22",
                             {
                                 "x": [
-                                    "x1", 
+                                    "x1",
                                     "x2"
-                                ], 
+                                ],
                                 "y": "3"
-                            }, 
+                            },
                             [
-                                "z1", 
+                                "z1",
                                 "z2"
                             ]
                         ]
                     }
-                ], 
-                "id": "EVector", 
-                "isPattern": "false", 
+                ],
+                "id": "EVector",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -209,26 +209,26 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att", 
-                        "type": "compound", 
+                        "name": "att",
+                        "type": "compound",
                         "value": {
                             "x": {
-                                "x1": "a", 
+                                "x1": "a",
                                 "x2": "b"
-                            }, 
+                            },
                             "y": [
-                                "y1", 
+                                "y1",
                                 "y2"
                             ]
                         }
                     }
-                ], 
-                "id": "EObject", 
-                "isPattern": "false", 
+                ],
+                "id": "EObject",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -245,30 +245,30 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "att", 
-                "type": "compound", 
+                "name": "att",
+                "type": "compound",
                 "value": [
-                    "22", 
+                    "22",
                     {
                         "x": [
-                            "x1", 
+                            "x1",
                             "x2"
-                        ], 
+                        ],
                         "y": "3"
-                    }, 
+                    },
                     [
-                        "z1", 
+                        "z1",
                         "z2"
                     ]
                 ]
             }
-        ], 
-        "id": "EVector", 
-        "isPattern": "false", 
+        ],
+        "id": "EVector",
+        "isPattern": "false",
         "type": ""
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
@@ -283,26 +283,26 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "name": "att", 
-                "type": "compound", 
+                "name": "att",
+                "type": "compound",
                 "value": {
                     "x": {
-                        "x1": "a", 
+                        "x1": "a",
                         "x2": "b"
-                    }, 
+                    },
                     "y": [
-                        "y1", 
+                        "y1",
                         "y2"
                     ]
                 }
             }
-        ], 
-        "id": "EObject", 
-        "isPattern": "false", 
+        ],
+        "id": "EObject",
+        "isPattern": "false",
         "type": ""
-    }, 
+    },
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }

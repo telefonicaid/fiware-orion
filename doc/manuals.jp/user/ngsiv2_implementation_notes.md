@@ -21,6 +21,7 @@
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
@@ -372,6 +373,30 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 これらの2つのフィールドは HTTP サブスクリプションに含まれていますが、MQTT サブスクリプションには
 含まれていないことに注意してください。詳細については、[MQTT 通知ドキュメント](#mqtt_notifications.md)
 を参照してください。
+
+[トップ](#top)
+
+<a name="failscounter-and-maxfailslimit-subscriptions-fields"></a>
+## `failsCounter` と `maxFailsLimit` サブスクリプション・フィールド
+
+`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの NGSIv2 仕様で説明されている
+サブスクリプション・フィールドとは別に、Orion は `notification` フィールド内の `failsCounter` フィールドを
+サポートします。このフィールドの値は、サブスクリプションに関連付けられた連続して失敗した通知の数です。
+`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます
+(この場合、`failsCounter` は省略されます)。
+
+連続した失敗の最大許容数を確立するオプションのフィールド `maxFailsLimit` (これも `notification` フィールド内)
+もあります。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、特定の瞬間に `failsCounter` が `maxFailsLimit`
+より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効に
+するには (状態を再び `active` に設定)、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です。
+
+さらに、Orion がサブスクリプションを自動的に無効にすると、WARN レベルのログトレースがこの形式で出力されます:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
+
+[Top](#top)
 
 [トップ](#top)
 

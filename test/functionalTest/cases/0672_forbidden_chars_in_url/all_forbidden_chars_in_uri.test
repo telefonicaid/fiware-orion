@@ -116,8 +116,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -133,8 +133,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -150,8 +150,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -167,8 +167,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -184,8 +184,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -201,8 +201,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -218,8 +218,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -235,8 +235,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "invalid character in URI", 
+        "code": "400",
+        "details": "invalid character in URI",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -252,8 +252,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "Service not found. Check your URL as probably it is wrong.", 
+        "code": "400",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
