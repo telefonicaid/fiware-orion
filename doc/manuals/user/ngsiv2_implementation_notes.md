@@ -22,7 +22,7 @@
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
-* [Ambiguous subscription status `failed` not supported](#ambiguous-subscription-status-failed-not-supported)
+* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
@@ -445,7 +445,7 @@ The following requests can use the flowControl URI param option:
 
 [Top](#top)
 
-## Ambiguous subscription status `failed` not supported
+## Ambiguous subscription status `failed` not used
 
 NGSIv2 specification describes `failed` value for `status` field in subscriptions:
 
