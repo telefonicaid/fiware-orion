@@ -10,11 +10,12 @@
 * [サブスクリプション・キャッシュのリフレッシュ](#subscription-cache-refresh)
 * [アクティブ/アクティブ構成におけるサブスクリプションの伝播](#propagation-of-subscriptions-in-active-active-configurations)
 * [サブスクリプションの GET オペレーション](#get-subscription-operations)
+* [PATCH サブスクリプション・オペレーション](#patch-subscription-operation)
 * [エンティティ/属性の作成/修正に関するサブスクリプション検索](#subscription-lookup-on-entityattribute-creationmodification)
 
 <a name="introduction"></a>
 ## イントロダクション
-パフォーマンスを得るために、NGSI10 コンテキスト・サブスクリプション (NGSI9 レジストレーション・サブスクリプションではない) は RAM のリストに保持されます。キャッシュのユーザ視点については、[Orion 管理マニュアルのこのセクション](../admin/perf_tuning.md#subscription-cache)を参照してください。
+パフォーマンスを向上させるために、サブスクリプションは RAM 内のリストに保持されます。キャッシュのユーザの観点については、[Orion 管理マニュアルのこのセクション](../admin/perf_tuning.md#subscription-cache)を参照してください。
 
 サブスクリプション・キャッシュの実装は src/lib/cache/subCache.cpp にあり、キャッシュはメイン・プログラムから初期化されます。つまり、`lib/cache/subCache.cpp` の `subCacheInit()` は、`app/contextBroker/contextBroker.cpp` の `main()` から呼び出されます。
 
@@ -42,9 +43,11 @@ Broker が [CLI オプション](../admin/cli.md) -noCache で起動されてい
 
 <a name="subscription-cache-fields"></a>
 ## サブスクリプション・キャッシュ・フィールド
-サブスクリプションの作成/変更では、サブスクリプション・キャッシュはライト・スルーです。つまり、サブスクリプションへの更新はサブスクリプション・キャッシュのサブスクリプション・アイテムとデータベースの両方で実行されます。
+サブスクリプションの作成/変更では、サブスクリプション・キャッシュはライトスルーです。つまり、サブスクリプションの更新は、サブスクリプション・キャッシュ**と**データベースの両方のサブスクリプション・アイテムで実行されます。
+(サブスクリプションの変更時に DB で更新されない、[次に説明する](#special-subscription-fields)動的フィールドの一部を除き、キャッシュの同期時に DB に統合されます)
 
-Broker が起動すると、サブスクリプション・キャッシュには MongoDB データベースにあるサブスクリプションが読み込まれます。サブスクリプション・キャッシュ内のサブスクリプションには、次のフィールドがあります。
+Broker が起動すると、サブスクリプション・キャッシュには、MongoDB データベースで見つかったサブスクリプションが入力されます。 サブスクリプション・キャッシュ内のサブスクリプションには、次のフィールドが含まれます
+(subCache.h ファイルのコード参照を確認してください):
 
 ```
   std::vector<EntityInfo*>    entityIdInfos;
@@ -54,17 +57,24 @@ Broker が起動すると、サブスクリプション・キャッシュには 
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
+  int64_t                     failsCounter;
+  int64_t                     maxFailsLimit;
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   std::string                 status;
+  double                      statusLastChange;
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
+  bool                        onlyChanged;
   ngsiv2::HttpInfo            httpInfo;
+  ngsiv2::MqttInfo            mqttInfo;
   int64_t                     lastFailure;  // timestamp of last notification failure
   int64_t                     lastSuccess;  // timestamp of last successful notification
+  std::string                 lastFailureReason;
+  int64_t                     lastSuccessCode;
   struct CachedSubscription*  next;         // The cache is a linked list of CachedSubscription ...
 ```
 
@@ -74,15 +84,19 @@ Broker が起動すると、サブスクリプション・キャッシュには 
 
 * `lastNotificationTime`
 * `count`
-* `lastFailure`
-* `lastSuccess`
+* `failsCounter`
+* `lastFailure` (and related field `lastFailureReason`)
+* `lastSuccess` (and related field `lastSuccessCode`)
+* `status`
 
 これらのフィールドは、サブスクリプション・キャッシュ内で特別な処理を行い、これらのフィールドが変更されるたびに (サブスクリプションをトリガするアップデートが発生するたびに) データベースに書き込まないようにします。これらは、次のようにキャッシュをリフレッシュする場合にのみデータベース内で更新されます :
 
 * `lastNotificationTime` は、*データベースに格納されている、`lastNotificationTime`* より **遅い時間** の場合のみデータベースで更新されます。他のブローカが最新の値で更新した可能性があります。
-* サブスクリプション・キャッシュ内の `count` は各サブキャッシュのリフレッシュ時にゼロに設定されているので、キャッシュ内の `count` は単にアキュムレータであり、その累積値がデータベースのカウントに加算され、次に*キャッシュのカウント*をゼロにリセットされます
-* `lastFailure` は、`lastNotificationTime` のように、*データベース内の `lastFailure`* より大きい値を設定します
-* `lastSuccess` は、`lastNotificationTime` のように、*データベース内の `lastSuccess`* より大きい値を設定します
+* サブスクリプション・キャッシュの `count` と `failsCounter` は、サブキャッシュの更新ごとにゼロに設定されるため、キャッシュにある `count` と `failsCounter` は単にアキュムレータであり、
+  その累積値がカウンタに追加されます。データベース内にあると、*キャッシュ内のカウンター*がゼロにリセットされます
+* `lastFailure` (および `lastFailureReason`) は、`lastNotificationTime` のように、データベース内の *`lastFailure` より大きい場合に設定されます*
+* `lastSuccess` (および `lastSuccessCode`) は、`lastNotificationTime` のように、データベース内の *`lastSuccess` より大きい場合に設定されます*
+* `status` は、データベースに保存されている時間よりも**遅い時間**である場合にのみデータベースで更新されます。どちらが新しいかを確認するには、サイドフィールド `statusLastChange` を使用します
 
 すべてこれは、複数の Broker がデータベースに対して作業している場合 (つまり、[アクティブ - アクティブ構成](#active-active-configurations)と呼ばれます) に値が正しいことを保証するためです。
 
@@ -94,7 +108,7 @@ Orionは、Orion の単一のインスタンスで異なるデータベースで
 
 すべてのサービス、またはテナントは、[管理マニュアル](../admin/database_admin.md#multiservicemultitenant-database-separation)に記載されているように、同じ MongoDB インスタンス内に、独自の MongoDB データベースを持っています。
 
-これらのサービスのそれぞれは、コンテキスト・サブスクリプションを持つことができます。ただし、データベースはサービスごとですが、サブスクリプション・キャッシュは Orion のインスタンスで一意であるため、**すべてのサービスのすべてのサブスクリプション**が含まれています。
+これらのサービスのそれぞれは、サブスクリプションを持つことができます。ただし、データベースはサービスごとですが、サブスクリプション・キャッシュは Orion のインスタンスで一意であるため、**すべてのサービスのすべてのサブスクリプション**が含まれています。
 `CachedSubscription` 構造体を見てみると、`char* tenant` というフィールドがあります。それはサービス/テナントがサブスクリプション・キャッシュ内の各サブスクリプションごとに格納される場所です。
 
 したがって、サブスクリプション・キャッシュを作成して更新するときは、Orion インスタンス内のすべてのサービスを終了する必要があります。サービスは "オンザフライ" で作成されるため、新しいサブスクリプションに新しいサービスが登録された場合、このサービスはサブスクリプション・キャッシュに追加され、アクティブ - アクティブ設定の場合、新しいサービスのサブスクリプションは2番目の Orion がデータベースでサブスクリプション・キャッシュをリフレッシュすると、2番目の Orion に伝播します。
@@ -107,7 +121,7 @@ CLI オプション **-noCache** が設定されている場合、サブスク�
 
 [メイン・プログラム](sourceCode.md#srcappcontextbroker)が、`subCacheInit()` を呼び出し、サブ・キャッシュ・リフレッシュが*オフ*になっている場合 (間隔がゼロの場合)、`subCacheRefresh()` が呼び出され、データベースからサブスクリプションのコレクション全体をキャッシュに取り込みます。
 
-レジストレーション・サブスクリプション (NGSI9) ではなく、コンテキスト・サブスクリプション (NGSI10) のみを覚えておいてください。MongoDB データベースの対応するコレクションは [`csub`](../admin/database_model.md#csubs-collection) です。
+MongoDB データベースの対応するコレクションは [`csub`](../admin/database_model.md#csubs-collection) です。
 
 サブ・キャッシュ・リフレッシュがオンになっている場合は、`subCacheStart()` 関数を呼び出すことによって別のスレッドが開始されます。このスレッドは定期的に (サブスクリプション・キャッシュのリフレッシュの周期性のために秒を保持する `subCacheInterval` 値に応じて)、サブスクリプション・キャッシュをリフレッシュします。まず、データベースからキャッシュにデータを入力します。
 
@@ -134,7 +148,7 @@ _SC-01: サブスクリプション・キャッシュのリフレッシュ_
 * ステップ4では、サブスクリプション・キャッシュに存在する特殊フィールドは、cub-cache が空になる前に保存されます。詳細については、[特別なサブスクリプション・フィールドのセクション](#special-subscription-fields)を参照してください
 * サブスクリプションが作成または変更されると、サブスクリプション・キャッシュの変更とは別に、その変更がデータベースに保存されるので、特別なフィールドが保存されるとサブスクリプション・キャッシュを完全にクリアすることができます。これは `subCacheRefresh()` の最初のステップです。図のステップ6
 * サブスクリプション・キャッシュを再度設定するには、まずシステム内のすべてのサービス(テナント)のリストが必要です。`getOrionDatabases()` は、そのサービスを提供します (ステップ7-9)
-* ステップ10から14は、サブスクリプション・キャッシュをデータベースから ([`csub`](../admin/database_model.md#csubs-collection) と呼ばれる、コンテキスト・サブスクリプションを有するコレクションから) 作成することです。これは、システム内でサービス (テナント)ごとに1回実行されるループです
+* ステップ10から14は、サブスクリプション・キャッシュをデータベースから ([`csub`](../admin/database_model.md#csubs-collection) と呼ばれる、サブスクリプションを有するコレクションから) 作成することです。これは、システム内でサービス (テナント)ごとに1回実行されるループです
 * サブスクリプション・キャッシュをデータベース・コンテンツから作成した後、特別なフィールドはサブスクリプション・キャッシュ**と**データベースに復元されます。詳細は、[特別なサブスクリプション・フィールド](#special-subscription-fields)を参照してください。これは、図のステップ15および16です
 * 最後に、ステップ17および図の最後で、サブスクリプション・キャッシュのセマフォが解放され、フローは無限ループの始めに戻ります。
 
@@ -146,15 +160,20 @@ _SC-01: サブスクリプション・キャッシュのリフレッシュ_
 ### `subCacheSync()`
 これはサブスクリプション・キャッシュがデータベース内のものとマージされ、サブスクリプション・キャッシュとデータベースの両方が変更されて同期化されるため、サブスクリプション・キャッシュ全体の中で最も重要な機能です。
 
-`subCacheSync()` は、次の構造体のベクトルを使用して、サブスクリプションの4つの特別なフィールドを保存します :
+`subCacheSync()` は、次の構造体のベクトルを使用して、サブスクリプションの9つの特別なフィールドを保存します :
 
 ```
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
-  int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  int64_t      lastNotificationTime;
+  int64_t      count;
+  int64_t      failsCounter;
+  int64_t      lastFailure;
+  int64_t      lastSuccess;
+  std::string  lastFailureReason;
+  int64_t      lastSuccessCode;
+  std::string  status;
+  double       statusLastChange;
 } CachedSubSaved;
 ```
 
@@ -179,7 +198,7 @@ typedef struct CachedSubSaved
 * サブスクリプション・キャッシュ内の現在のコンテンツを完全に削除します
 * 各サービス (mongo データベース) のデータベース・コンテンツからサブスクリプション・キャッシュを読み込む
 
-*サブスクリプション・キャッシュ・リフレッシャー・スレッドは、`subCacheRefresh()` 呼び出す前に4つの特殊フィールドの値を保存することに注意してください*
+*サブスクリプション・キャッシュ・リフレッシャー・スレッドは、`subCacheRefresh()` 呼び出す前に9つの特殊フィールドの値を保存することに注意してください*
 
 より効率的なアプローチは、リフレッシュ中にサブスクリプション・キャッシュの内容とデータベースの内容を比較することですが、サブスクリプション・キャッシュのリフレッシュ・アルゴリズムを実装するのに多くの時間がかかることになり、この単純な(そして遅い)アプローチが選択されました。
 
@@ -224,7 +243,7 @@ _SC-02: アクティブ - アクティブ構成におけるサブスクリプシ
     * そして、ステップ5に : 
 * ステップ5では、Orion2 のサブスクリプション・キャッシュがデータベース・コンテンツとマージされるので、"Sub-X" は Orion2 のサブスクリプション・キャッシュの一部になります
 
-4つの[特別なフィールド](#special-subscription-fields) (`lastNotificationTime`, `count`, `lastFailure`, `lastSuccess`) の場合は、これらのフィールドの*最新の*情報がサブスクリプション・キャッシュに**のみ**存在するため、少し複雑です。したがって、あるOrion (Orion1) から別のもの (Orion2) に `lastNotificationTime` を伝播させるには、最初に Orion1 がそのサブスクリプション・キャッシュをリフレッシュする必要があります。**その後**、Orion2 はサブスクリプション・キャッシュをリフレッシュする必要があります。これが起こる前では、Orion2 は Orion1 から来る `lastNotificationTime` を認識します。
+`lastNotificationTime`, `count`, `failsCounter`, `lastFailure`, `lastFailureReason`, `lastSuccess` および `lastSuccessReason` の[特別なフィールド](#special-subscription-fields) の場合は、これらのフィールドの*最新の*情報がサブスクリプション・キャッシュに**のみ**存在するため、少し複雑です。したがって、たとえば `lastNotificationTime` をあるOrion (Orion1) から別のもの (Orion2) に伝播させるには、最初に Orion1 がそのサブスクリプション・キャッシュをリフレッシュする必要があります。**その後**、Orion2 はサブスクリプション・キャッシュをリフレッシュする必要があります。これが起こる前では、Orion2 は Orion1 から来る `lastNotificationTime` を認識します。
 
 [トップ](#top)
 
@@ -235,9 +254,41 @@ _SC-02: アクティブ - アクティブ構成におけるサブスクリプシ
 * `GET /v2/subscriptions`
 * `GET /v2/subscriptions/{subscription-id}`
 
-サブスクリプション・キャッシュを使用しないで、データベースを直接攻撃してください。
+DB からサブスクリプションを取得しますが、サブスクリプション・キャッシュ内の情報と組み合わせます
+(詳細については、`mongoGetSubscriptions.cpp` ファイルの `setNotification()` を参照してください)
 
-したがって、これらの4つの[特別なフィールド](#special-subscription-fields)は、サブスクリプション・キャッシュに存在し、サブキャッシュ更新時にのみデータベースにプッシュされるため、GET オペレーションで一貫性がないように見える場合があります。
+ただし、サブスクリプションキャッシュがローカルである場合、`lastNotificationTime`, `count`, `failsCounter`, `lastFailure`, `lastFailureReason`, `lastSuccess` および `lastSuccessReason` [特別なフィールド](#special-subscription-fields) は GET オペレーションで一貫性がないように見える場合があります。
+
+[トップ](#top)
+
+<a name="patch-subscription-operation"></a>
+## PATCH サブスクリプション・オペレーション
+
+これがオペレーションです。
+
+* `PATCH /v2/subscriptions/{subscription-id}`
+
+サブスクリプションの更新に使用される戦略は次のとおりです:
+
+1. `$set`/`$unset` MongoDB 演算子に基づく DB のサブ (sub) を、PATCH リクエストから抽出された
+   データで更新します
+2. MongoDB の結果のドキュメントに基づいてキャッシュ・サブ (cache sub) を更新します (`findAndModify`
+   MongoDB 操作は前のステップで達成するために使用されるため、DB のサブを更新し、DB の同じアトミック
+   操作で結果のドキュメントを取得できます)
+
+これは、DB からサブ (sub) を取得し、それを単一のドキュメントのキャッシュと組み合わせて、結果のドキュメントを
+MongoDB で更新することに基づく戦略よりも優れています。これは過去 (Orion 3.3.0 以前) に行われていましたが、
+`failsCounter`/`maxFailsLimit` に関連する機能が機能するようになると、その計算は非常に複雑になり始めていました。
+もう1つの利点は、2つの操作 (`findOne` + `update`) ではなく、MongoDb (`findAndModify`) でのみ操作を実行すること
+です。
+
+[特別な動的フィールド](#special-subscription-fields) (`count`, `lastNotification` など) は、キャッシュの
+同期時に DB に統合されるため、サブスクリプションの更新時に DB で更新されないことに注意してください。
+
+同じ理由で、動的属性は DB からキャッシュ内で更新されません。つまり、キャッシュ内の属性は次のキャッシュ更新操作
+まで残ります。** 1つの期待があります**: `status` フィールド。このフィールドは PATCH リクエストに含まれる場合が
+あります (`count`, `lastNotification` などとは異なります)。この場合、キャッシュ内の `status` は PATCH/DB 内の
+`status` で更新されます。
 
 [トップ](#top)
 
