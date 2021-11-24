@@ -68,9 +68,9 @@ kz@ubuntu:~$ curl localhost:1026/ngsi-ld/ex/v1/version
 {
   "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "branch": "develop",
-  "kbase version": "0.2",
-  "kalloc version": "0.2",
-  "kjson version": "0.2",
+  "kbase version": "0.8",
+  "kalloc version": "0.8",
+  "kjson version": "0.8",
   "boost version": "1_65_1",
   "microhttpd version": "0.9.48-0",
   "openssl version": "OpenSSL 1.0.2n  7 Dec 2017",
