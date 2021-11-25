@@ -855,7 +855,12 @@ static void requestCompleted
     float            allF;
 
     kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
-    kTimeDiff(&timestamps.dbStart,  &timestamps.dbEnd,  &mongo, &mongoF);
+
+    if (timestamps.dbStart.tv_sec != 0)
+      kTimeDiff(&timestamps.dbStart,           &timestamps.dbEnd,           &mongo, &mongoF);
+    else
+      kTimeDiff(&timestamps.mongoBackendStart, &timestamps.mongoBackendEnd, &mongo, &mongoF);
+
     LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
     LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", timestamps.mongoConnectAccumulated, timestamps.getMongoConnectionCalls));
   }

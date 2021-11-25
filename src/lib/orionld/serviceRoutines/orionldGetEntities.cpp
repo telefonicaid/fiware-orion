@@ -462,7 +462,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     orionldState.onlyCount = true;
 
   PERFORMANCE(mongoBackendStart);
-
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenantP,
