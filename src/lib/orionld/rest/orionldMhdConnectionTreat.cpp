@@ -58,6 +58,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -735,10 +736,22 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       orionldState.tenantP = orionldTenantLookup(orionldState.tenantName);
       if (orionldState.tenantP == NULL)
       {
-        LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenantName));
-        orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName);
-        orionldState.httpStatusCode = 404;
-        goto respond;
+        //
+        // Tenant does not exist in the tenant cache of this broker
+        // However, some other broker (load balancer) might have created the tenant!
+        //
+        if (dbTenantExists(orionldState.tenantName) == false)
+        {
+          LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenantName));
+          orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName);
+          orionldState.httpStatusCode = 404;
+          goto respond;
+        }
+        else
+        {
+          // Add tenant to the tenant cache
+          orionldState.tenantP = orionldTenantCreate(orionldState.tenantName);
+        }
       }
     }
     else
@@ -1080,4 +1093,4 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 #endif
 
   return MHD_YES;
-}
+  }

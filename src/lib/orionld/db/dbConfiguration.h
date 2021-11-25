@@ -96,6 +96,7 @@ typedef bool    (*DbGeoIndexCreate)(OrionldTenant* tenantP, const char* attrName
 typedef bool    (*DbIdIndexCreate)(OrionldTenant* tenantP);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 typedef KjNode* (*DbDatasetGet)(const char* entityId, const char* attributeNameExpandedEq, const char* datasetId);
+typedef bool    (*DbTenantExists)(const char* tenantName);
 
 
 
@@ -135,5 +136,6 @@ extern DbGeoIndexCreate                          dbGeoIndexCreate;
 extern DbIdIndexCreate                           dbIdIndexCreate;
 extern DbEntitiesQuery                           dbEntitiesQuery;
 extern DbDatasetGet                              dbDatasetGet;
+extern DbTenantExists                            dbTenantExists;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_
