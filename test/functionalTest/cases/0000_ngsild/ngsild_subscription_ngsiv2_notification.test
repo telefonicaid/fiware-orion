@@ -398,7 +398,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Fiware-Servicepath: /
 Content-Length: 236
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -451,7 +451,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub02
 Fiware-Servicepath: /
 Content-Length: 237
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -504,7 +504,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub03
 Fiware-Servicepath: /
 Content-Length: 238
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -557,7 +557,7 @@ POST http://localhost:9997/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 238
 User-Agent: REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -636,7 +636,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 388
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -695,7 +695,7 @@ POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub04
 Fiware-Servicepath: /
 Content-Length: 536
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8

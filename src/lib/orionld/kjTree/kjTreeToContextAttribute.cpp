@@ -514,7 +514,9 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
         if (orionldState.geoAttrs >= orionldState.geoAttrMax)
         {
-          KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax + 100);
+          orionldState.geoAttrMax += 100;
+
+          KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax);
 
           if (tmp == NULL)
           {
@@ -525,8 +527,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
           memcpy(tmp, orionldState.geoAttrV, sizeof(KjNode*) * orionldState.geoAttrs);
           orionldState.geoAttrV = tmp;
-
-          orionldState.geoAttrMax += 100;
         }
 
         orionldState.geoAttrV[orionldState.geoAttrs++] = kNodeP;

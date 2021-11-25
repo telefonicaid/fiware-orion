@@ -393,10 +393,10 @@ extern bool              multitenancy;             // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
-extern char              troeHost[64];             // From orionld.cpp
+extern char              troeHost[256];            // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
-extern char              troeUser[64];             // From orionld.cpp
-extern char              troePwd[64];              // From orionld.cpp
+extern char              troeUser[256];            // From orionld.cpp
+extern char              troePwd[256];             // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
 extern char              pgPortString[16];
 extern bool              forwarding;               // From orionld.cpp

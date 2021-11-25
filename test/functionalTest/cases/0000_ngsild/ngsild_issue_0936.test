@@ -1,0 +1,126 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create a Subscription without id in v2
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. A subscription without ID is created - according to issue #936
+# 02. Query subscriptions, make sure the sub from step 01 has an identifier
+#
+
+
+echo "01. A subscription without ID is created - according to issue #936"
+echo "=================================================================="
+payload='{
+  "description": "Subscription for Sensor 0FNABC",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Device:0FNABC",
+      "type": "Device"
+    }
+  ],
+  "watchedAttributes": [
+    "Water level"
+  ],
+  "notification": {
+    "attributes": [
+      "Water level"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://my.endpoint.org/notify",
+      "accept": "application/json"
+    }
+  },
+  "expires": "2040-01-01T14:00:00.00Z"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Query subscriptions, make sure the sub from step 01 has an identifier"
+echo "========================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. A subscription without ID is created - according to issue #936
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. Query subscriptions, make sure the sub from step 01 has an identifier
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 412
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "description": "Subscription for Sensor 0FNABC",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:Device:0FNABC",
+                "type": "Device"
+            }
+        ],
+        "expires": "2040-01-01T14:00:00.000Z",
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "notification": {
+            "attributes": [
+                "Water level"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://my.endpoint.org/notify"
+            },
+            "format": "keyValues"
+        },
+        "type": "Subscription",
+        "watchedAttributes": [
+            "Water level"
+        ]
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
