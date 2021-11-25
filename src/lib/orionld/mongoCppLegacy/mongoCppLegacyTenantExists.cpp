@@ -22,23 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strdup
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
+#include <string.h>                                                  // strdup
+#include <string>                                                    // std::string
+#include <vector>                                                    // std::vector
 
-#include "mongo/client/dbclient.h"                             // mongo legacy driver
+#include "mongo/client/dbclient.h"                                   // mongo legacy driver
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                           // LM_*
+#include "logMsg/traceLevels.h"                                      // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
+#include "mongoBackend/MongoGlobal.h"                                // getMongoConnection
 
-#include "orionld/common/orionldState.h"                       // orionldState, dbName
-#include "orionld/common/orionldTenantCreate.h"                // orionldTenantCreate
-#include "orionld/common/orionldTenantLookup.h"                // orionldTenantLookup
+#include "orionld/common/orionldState.h"                             // orionldState, dbName
+#include "orionld/common/orionldTenantCreate.h"                      // orionldTenantCreate
+#include "orionld/common/orionldTenantLookup.h"                      // orionldTenantLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"   // mongoCppLegacyDbStringFieldGet
-#include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"   // mongoCppLegacyDbFieldGet
-#include "orionld/mongoCppLegacy/mongoCppLegacyTenantExists.h" // Own interface
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"         // mongoCppLegacyDbFieldGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyTenantExists.h"       // Own interface
 
 
 
