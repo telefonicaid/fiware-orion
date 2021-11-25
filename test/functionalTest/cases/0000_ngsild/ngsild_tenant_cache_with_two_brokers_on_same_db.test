@@ -49,6 +49,7 @@ brokerStart CB2 0-255 IPv4 -multiservice
 # 
 # 01. Create an entity urn:ngsi-ld:entity:E1 on tenant T1, on broker CB1
 # 02. Query broker CB2 for entity E1 on tenant T1
+# 03. Query broker CB2 for entity E1 on tenant T2 - see error
 #
 
 echo "01. Create an entity urn:ngsi-ld:entity:E1 on tenant T1, on broker CB1"
@@ -65,6 +66,13 @@ echo
 echo "02. Query broker CB2 for entity E1 on tenant T1"
 echo "==============================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T --port $CB2_PORT --tenant t1
+echo
+echo
+
+
+echo "03. Query broker CB2 for entity E1 on tenant T2 - see error"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --port $CB2_PORT --tenant t2
 echo
 echo
 
@@ -93,6 +101,20 @@ Date: REGEX(.*)
         "type": "T"
     }
 ]
+
+
+03. Query broker CB2 for entity E1 on tenant T2 - see error
+===========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "t2",
+    "title": "No such tenant",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/NonExistingTenant"
+}
 
 
 --TEARDOWN--
