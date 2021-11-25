@@ -1415,7 +1415,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  query.readPref(mongo::ReadPreference_PrimaryPreferred, mongo::BSONArray());  // TEST ALSO: mongo::ReadPreference_Nearest
+  query.readPref(mongo::ReadPreference_Nearest, mongo::BSONArray());  // TEST ALSO: mongo::ReadPreference_PrimaryPreferred
   if (!collectionRangedQuery(connection, tenantP->entities, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
