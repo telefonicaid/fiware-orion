@@ -40,6 +40,7 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # Ports
 #
 # o CB_PORT          - port where the main contextBroker listens for connections
+# o CB2_PORT         - port where the second contextBroker (on the same DB) listens for connections
 #
 # o CP1_PORT         - port where the first contextProvider listens for connections
 # o CP2_PORT         - port where the second contextProvider listens for connections
@@ -55,6 +56,7 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o MQTT_BROKER_HOST - host of the MQTT Broker
 
 export CB_PORT=${CB_PORT:-9999}
+export CB2_PORT=${CB2_PORT:-8999}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
 export CP3_PORT=${CP3_PORT:-9803}
@@ -73,6 +75,7 @@ export MQTT_BROKER_HOST=${MQTT_BROKER_HOST:-localhost}
 # Log directories
 #
 # o CB_LOG_DIR        - directory where the 'main' broker keeps its log file
+# o CB2_LOG_DIR       - directory where the second broker keeps its log file
 # o CP1_LOG_DIR       - directory where contextProvider1 keeps its log file
 # o CP2_LOG_DIR       - directory where contextProvider2 keeps its log file
 # o CP3_LOG_DIR       - directory where contextProvider3 keeps its log file
@@ -80,6 +83,7 @@ export MQTT_BROKER_HOST=${MQTT_BROKER_HOST:-localhost}
 # o CP5_LOG_DIR       - directory where contextProvider5 keeps its log file
 #
 export CB_LOG_DIR=${CB_LOG_DIR:-/var/log/contextBroker}
+export CB2_LOG_DIR=${CB2_LOG_DIR:-/tmp/orion/logs/contextBroker2}
 export CP1_LOG_DIR=${CP1_LOG_DIR:-/tmp/orion/logs/contextProvider1}
 export CP2_LOG_DIR=${CP2_LOG_DIR:-/tmp/orion/logs/contextProvider2}
 export CP3_LOG_DIR=${CP3_LOG_DIR:-/tmp/orion/logs/contextProvider3}
@@ -93,6 +97,7 @@ export CP5_LOG_DIR=${CP5_LOG_DIR:-/tmp/orion/logs/contextProvider5}
 # PID files
 #
 # o CB_PID_FILE       - path to pid file for the main broker
+# o CB2_PID_FILE      - path to pid file for the second broker
 #
 # o CP1_PID_FILE      - path to pid file for the first context provider
 # o CP2_PID_FILE      - path to pid file for the second context provider
@@ -101,6 +106,7 @@ export CP5_LOG_DIR=${CP5_LOG_DIR:-/tmp/orion/logs/contextProvider5}
 # o CP5_PID_FILE      - path to pid file for the fifth context provider
 #
 export CB_PID_FILE=${CB_PID_FILE:-/tmp/orion_${CB_PORT}.pid}
+export CB2_PID_FILE=${CB2_PID_FILE:-/tmp/orion_${CB2_PORT}.pid}
 export CP1_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP1_PORT}.pid}
 export CP2_PID_FILE=${CP2_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
 export CP3_PID_FILE=${CP3_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}

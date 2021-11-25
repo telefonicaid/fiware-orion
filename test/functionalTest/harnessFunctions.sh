@@ -83,6 +83,9 @@ function dbInit()
   if [ "$role" == "CB" ]
   then
     baseDbName=${CB_DB_NAME}
+  elif [ "$role" == "CB2" ]
+  then
+    baseDbName=${CB_DB_NAME}
   elif [ "$role" == "CP1" ]
   then
     baseDbName=${CP1_DB_NAME}
@@ -369,6 +372,11 @@ function localBrokerStart()
   then
     port=$CB_PORT
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+  elif [ "$role" == "CB2" ]
+  then
+    mkdir -p $CB2_LOG_DIR
+    port=$CB2_PORT
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB2_PORT  -pidpath $CB2_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CB2_LOG_DIR $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
@@ -482,6 +490,9 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
+  elif [ "$role" == "CB2" ]
+  then
+    port=$CB2_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -638,6 +649,10 @@ function brokerStop
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+  elif [ "$role" == "CB2" ]
+  then
+    pidFile=$CB2_PID_FILE
+    port=$CB2_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
