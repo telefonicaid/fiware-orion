@@ -60,6 +60,7 @@ SET (SOURCES
     mongoCppLegacyEntitiesAttributeLookup.cpp
     mongoCppLegacyDatasetGet.cpp
     mongoCppLegacyEntityTypeGet.cpp
+    mongoCppLegacyTenantExists.cpp
 )
 
 # Include directories

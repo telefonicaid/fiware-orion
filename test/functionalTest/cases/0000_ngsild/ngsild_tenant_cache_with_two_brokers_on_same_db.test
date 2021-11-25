@@ -1,0 +1,103 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Tenant Cache and the 'tenant exist check' for retrieve ops
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB tn1
+dbResetAll
+brokerStart CB 0-255 IPv4 -multiservice
+brokerStart CB2 0-255 IPv4 -multiservice
+
+--SHELL--
+
+#
+# Tenants are created on the fly upon creation of entities, and the list of existing tenants
+# are maintained in a cache in RAM - populated on startup and added to when new tenants are created "on the fly".
+#
+# However, what if we have two brokers, CB1 and CB2, running against the same DB, and an entity E1 is created in CB1 on tenant T1.
+# Tenant T1 will be created and added to the tenant cache of broker CB1. Broker CB2 will not know about this new tenant.
+#
+# So instead of blindly checking the tenant cache, if not found, we'll have to ask the DB.
+# 
+# In this test, we start TWO brokers against the same mongo database.
+# We create entity E1 on Tenant T1 on broker CB1.
+# And, then we query broker CB2 for E1.
+#
+# 
+# 01. Create an entity urn:ngsi-ld:entity:E1 on tenant T1, on broker CB1
+# 02. Query broker CB2 for entity E1 on tenant T1
+#
+
+echo "01. Create an entity urn:ngsi-ld:entity:E1 on tenant T1, on broker CB1"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "02. Query broker CB2 for entity E1 on tenant T1"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --port $CB2_PORT --tenant t1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:entity:E1 on tenant T1, on broker CB1
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Query broker CB2 for entity E1 on tenant T1
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CB2
+accumulatorStop
+dbDrop CB
+dbDrop CB t1
