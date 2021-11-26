@@ -3103,7 +3103,7 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
 *
 * calculateSetOperator -
 *
-* {A: {value: {$set: {X: <V1>, Y: <V2>, ...}} -> {attrs.A.value.X: <V1>, attrs.A.value.Y: <V2> ... }
+* {A: {value: {$set: {X: <V1>, Y: <V2>, ...}}} -> {attrs.A.value.X: <V1>, attrs.A.value.Y: <V2>, ... }
 *
 * Return bool if some content has been added to the BSONObjBuilders passed as parameter
 */
@@ -3502,7 +3502,7 @@ static unsigned int updateEntity
 
     // $set is special, as it is shared with regular (without update operator) attribute modification
     bool calculatedSet = calculateSetOperator(notifyCerP, &toSet);
-    if (calculatedSet || (toSet.nFields() > 0))
+    if (toSet.nFields() > 0)
     {
       updatedEntity.append("$set", toSet.obj());
     }
@@ -3523,7 +3523,7 @@ static unsigned int updateEntity
       bobEach.append("$each", attrNamesAdd.arr());
       toAddToSet.append(ENT_ATTRNAMES, bobEach.obj());
     }
-    if (calculatedAddToSet || (attrNamesAdd.arrSize() > 0))
+    if (toAddToSet.nFields() > 0)
     {
       updatedEntity.append("$addToSet", toAddToSet.obj());
     }
@@ -3538,7 +3538,7 @@ static unsigned int updateEntity
     {
       toPullAll.append(ENT_ATTRNAMES, attrNamesRemove.arr());
     }
-    if (calculatedPullAll || (attrNamesRemove.arrSize() > 0))
+    if (toPullAll.nFields() > 0)
     {
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
