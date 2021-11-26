@@ -75,6 +75,10 @@ payload='{
   "A8": {
     "value": [ 1, 2, 3, 4],
     "type": "StructuredValue"
+  },
+  "A9": {
+    "value": {"X": 1, "Y": 2},
+    "type": "StructuredValue"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -138,6 +142,10 @@ payload='{
   "A8": {
     "value": { "$pullAll": [2, 4] },
     "type": "StructuredValue"
+  },
+  "A9": {
+    "value": { "$set": {"Y": 20, "Z": 30} },
+    "type": "StructuredValue"
   }
 }'
 orionCurl --url /v2/entities/E/attrs --payload "$payload"
@@ -191,7 +199,7 @@ Date: REGEX(.*)
 04. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 462
+Content-Length: 538
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -249,6 +257,15 @@ Date: REGEX(.*)
             3
         ]
     },
+    "A9": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "X": 1,
+            "Y": 20,
+            "Z": 30
+        }
+    },
     "id": "E",
     "type": "T"
 }
@@ -258,7 +275,7 @@ Date: REGEX(.*)
 ====================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 517
+Content-Length: 593
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -320,6 +337,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                     1,
                     3
                 ]
+            },
+            "A9": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": {
+                    "X": 1,
+                    "Y": 20,
+                    "Z": 30
+                }
             },
             "id": "E",
             "type": "T"
