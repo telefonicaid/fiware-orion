@@ -227,7 +227,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **values** (最後の3つは NGSIv2 形式で使用されます) です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
     または `oneshot` ([oneshot サブスクリプション](../user/oneshot_subscription.md) の場合) のいずれか。 NGSIv2 API
-    は追加の状態 (`failed` or `expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
+    は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
 -   **description** (オプションフィールド) : サブスクリプションを説明するフリーテキスト文字列。最大長は1024です
 -   **custom** : このサブスクリプションがカスタマイズされた通知 (NGSIv2 API の機能) を使用するかどうかを指定するブール値フィールドです。このフィールドが存在し、その値が "true" であれば、カスタマイズされた通知が使用されていて、`headers`, `qs`, `method` および `payload` フィールドは考慮されています
 -   **headers** : NGSIv2 の通知カスタマイズ機能の HTTP ヘッダーキーマップを格納するためのオプションのフィールドです
