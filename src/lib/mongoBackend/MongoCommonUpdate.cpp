@@ -493,9 +493,10 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
     }
   }
 
-  // $addToSet and $pullAll are not included in UPDATE_OPERATORS, so they
+  // $set, addToSet and $pullAll are not included in UPDATE_OPERATORS, so they
   // are checked separartelly
-  if ((caP->compoundValueP->childV[0]->name == "$addToSet") ||
+  if ((caP->compoundValueP->childV[0]->name == "$set")      ||
+      (caP->compoundValueP->childV[0]->name == "$addToSet") ||
       (caP->compoundValueP->childV[0]->name == "$pullAll"))
   {
     return true;
@@ -3100,6 +3101,85 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
 
 /* ****************************************************************************
 *
+* calculateSetOperator -
+*
+* {A: {value: {$set: {X: <V1>, Y: <V2>, ...}} -> {attrs.A.value.X: <V1>, attrs.A.value.Y: <V2> ... }
+*
+* Return bool if some content has been added to the BSONObjBuilders passed as parameter
+*/
+static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBuilder* b)
+{
+  bool r = false;
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
+  {
+    ContextAttribute* attr = cerP->entity.attributeVector[ix];
+
+    if ((attr->compoundValueP != NULL) && (attr->compoundValueP->childV.size() > 0))
+    {
+      CompoundValueNode* child0 = attr->compoundValueP->childV[0];
+      if ((child0->name == "$set"))
+      {
+        // Process the children of child0
+        for (unsigned int jx = 0; jx < child0->childV.size(); ++jx)
+        {
+          CompoundValueNode* child = child0->childV[jx];
+
+          // FIXME PR: check this with arrays. Not sure what child->name be in that case...
+          std::string valueKey = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE + "." + child->name;
+
+          if (child->valueType == orion::ValueTypeString)
+          {
+            b->append(valueKey, child->stringValue);
+          }
+          else if (child->valueType == orion::ValueTypeNumber)
+          {
+            b->append(valueKey, child->numberValue);
+          }
+          else if (child->valueType == orion::ValueTypeBoolean)
+          {
+            b->append(valueKey, child->boolValue);
+          }
+          else if (child->valueType == orion::ValueTypeNull)
+          {
+            b->appendNull(valueKey);
+          }
+          else if (child->valueType == orion::ValueTypeVector)
+          {
+            orion::BSONArrayBuilder ba;
+            compoundValueBson(child->childV, ba);
+            b->append(valueKey, ba.arr());
+          }
+          else if (child->valueType == orion::ValueTypeObject)
+          {
+            orion::BSONObjBuilder bo;
+            compoundValueBson(child->childV, bo);
+            b->append(valueKey, bo.obj());
+          }
+          else if (child->valueType == orion::ValueTypeNotGiven)
+          {
+            LM_E(("Runtime Error (value not given in calculateOperator)"));
+            return false;
+          }
+          else
+          {
+            LM_E(("Runtime Error (Unknown type in calculateOperator)"));
+            return false;
+          }
+
+          r = true;
+        }
+      }
+    }
+  }
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
 * updateEntity -
 *
 * Returns the number of notifications sent as consecuence of the update (used by the
@@ -3419,11 +3499,15 @@ static unsigned int updateEntity
   else
   {
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
-    if (toSet.nFields() > 0)
+
+    // $set is special, as it is shared with regular (without update operator) attribute modification
+    bool calculatedSet = calculateSetOperator(notifyCerP, &toSet);
+    if (calculatedSet || (toSet.nFields() > 0))
     {
       updatedEntity.append("$set", toSet.obj());
     }
 
+    // FIXME PR: operator for $unset
     if (toUnset.nFields() > 0)
     {
       updatedEntity.append("$unset", toUnset.obj());
@@ -3460,7 +3544,7 @@ static unsigned int updateEntity
     }
 
     // useFindAndModify is set to true if calculation was done
-    useFindAndModify = calculatedAddToSet || calculatedPullAll;
+    useFindAndModify = calculatedSet || calculatedAddToSet || calculatedPullAll;
 
     // Note we call calculateOperator() function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
