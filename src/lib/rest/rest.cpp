@@ -635,9 +635,9 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     else
     {
       // Tenant used when tenant is not supported by the broker
-      LM_E(("tenant in use but tenant support is not enable for the broker"));
+      LM_E(("tenant in use but tenant support is not enabled for the broker"));
       orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enable for the broker");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
     }
   }
   else if (strcasecmp(key, "NGSILD-Path") == 0)
