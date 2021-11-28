@@ -11,7 +11,7 @@ RUN  apt-get update
 RUN  apt-get install -y mongodb-org
 
 RUN  apt-get install -y python2.7
-RUN  ln -s /usr/bin/python2.7 /usr/bin/python
+RUN  ln --force -s /usr/bin/python2.7 /usr/bin/python
 RUN  apt-get install -y python-openssl
 
 RUN  wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
