@@ -2,27 +2,34 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
 
-RUN yum install -y https://pkgs.dyn.su/el8/base/x86_64/raven-release-1.0-2.el8.noarch.rpm
-
-
-RUN  yum install -y https://rpmfind.net/linux/openmandriva/cooker/repository/x86_64/main/release/lcov-1.15-1-omv4050.noarch.rpm
+RUN  wget http://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
+RUN tar -xf lcov-1.14.tar.gz
+WORKDIR lcov-1.14
+RUN make install
+WORKDIR ${PATH_TO_SRC}
 
 RUN  yum install -y gnupg
-RUN  wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
-RUN  echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-RUN  yum install -y mongodb-org
 
-RUN  yum install -y python2.7
-RUN  ln --force -s /usr/bin/python2.7 /usr/bin/python
-RUN  yum install -y python-openssl
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-database-tools-100.4.1.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-database-tools-extra-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-tools-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-shell-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-server-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-mongos-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-4.4.9-1.el8.x86_64.rpm
+RUN yum install -y mongodb-org
 
-RUN  wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-RUN  python2.7 get-pip.py
-RUN  pip2.7 install Flask
-RUN  pip2.7 install paho-mqtt
+RUN yum install -y python2
+RUN ln --force -s /usr/bin/python2.7 /usr/bin/python
+RUN yum install -y openssl-devel libffi-devel
 
-RUN  yum install -y netcat
-RUN  yum install -y bc
+RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+RUN python2.7 get-pip.py
+RUN pip2.7 install Flask
+RUN pip2.7 install paho-mqtt
+
+RUN yum install -y netcat
+RUN yum install -y bc
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
