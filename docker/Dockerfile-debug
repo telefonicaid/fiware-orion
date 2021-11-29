@@ -2,8 +2,10 @@ FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 
+
 RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
 RUN rm -r /usr/local/lib/
+RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 
 COPY . ${PATH_TO_SRC}
 
