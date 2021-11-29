@@ -1,4 +1,4 @@
-FROM fiware/orion-ld-base:ubi AS build-stage
+FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 
@@ -11,7 +11,7 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 RUN make release install
-# trigger build
+
 RUN strip /usr/bin/orionld
 
 FROM registry.access.redhat.com/ubi8/ubi:8.4
