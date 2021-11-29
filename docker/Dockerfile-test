@@ -2,6 +2,9 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
 
+RUN yum install -y https://pkgs.dyn.su/el8/base/x86_64/raven-release-1.0-2.el8.noarch.rpm
+
+
 RUN  yum install -y lcov
 
 RUN  yum install -y gnupg
