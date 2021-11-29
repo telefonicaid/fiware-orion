@@ -3,8 +3,7 @@ FROM fiware/orion-ld:${BASE_VERSION}
 
 ADD ./docker/debug/gdbinit gdbinit
 
-RUN apt-get update
-RUN apt-get -y install gdb
+RUN yum -y install gdb
 
 ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
