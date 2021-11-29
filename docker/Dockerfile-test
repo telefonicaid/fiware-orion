@@ -30,7 +30,7 @@ RUN python2.7 get-pip.py
 RUN pip2.7 install Flask
 RUN pip2.7 install paho-mqtt
 
-RUN yum install -y gmock
+RUN yum install --nogpgcheck -y gmock-devel
 RUN yum install -y gtest
 RUN yum install -y netcat
 RUN yum install -y bc
