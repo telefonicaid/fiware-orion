@@ -21,8 +21,9 @@ RUN yum install -y mongodb-org
 
 RUN yum install -y python2
 RUN ln --force -s /usr/bin/python2.7 /usr/bin/python
-RUN yum install -y http://repo.okay.com.mx/centos/8/x86_64/release/gnutls-devel-3.6.5-2.el8.x86_64.rpm
-RUN yum install -y openssl-devel libffi-devel gnutls
+RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
+
+RUN yum install -y openssl-devel libffi-devel
 
 RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 RUN python2.7 get-pip.py
