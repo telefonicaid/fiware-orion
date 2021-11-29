@@ -1,6 +1,7 @@
 FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 
 RUN  wget http://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
 RUN tar -xf lcov-1.14.tar.gz
@@ -31,6 +32,7 @@ RUN pip2.7 install Flask
 RUN pip2.7 install paho-mqtt
 
 RUN yum install --nogpgcheck -y gmock-devel
+RUN yum install -y procps
 
 RUN wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
 RUN tar xf release-1.8.0.tar.gz
