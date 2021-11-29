@@ -47,8 +47,12 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN yum install -y netcat
 RUN yum install -y bc
+RUN yum -y install hostname
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
+
+ADD ./docker/debug/gdbinit gdbinit
+
 
 ENTRYPOINT ["docker/build.sh"]
