@@ -21,7 +21,7 @@ RUN yum install -y mongodb-org
 
 RUN yum install -y python2
 RUN ln --force -s /usr/bin/python2.7 /usr/bin/python
-RUN yum install -y openssl-devel libffi-devel
+RUN yum install -y openssl-devel libffi-devel gnutls
 
 RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 RUN python2.7 get-pip.py
