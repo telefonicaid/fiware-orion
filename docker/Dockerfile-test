@@ -30,6 +30,7 @@ RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 RUN python2.7 get-pip.py
 RUN pip2.7 install Flask
 RUN pip2.7 install paho-mqtt
+RUN pip2.7 install pyopenssl
 
 RUN yum install --nogpgcheck -y gmock-devel
 RUN yum install -y procps
