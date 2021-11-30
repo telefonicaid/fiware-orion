@@ -981,24 +981,3 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* tenCompounds -
-*
-*/
-TEST(compoundValue, tenCompounds)
-{
-  ParseData                  reqData;
-  UpdateContextRequest*      upcrP;
-  std::string                rendered;
-
-  utInit();
-
-  upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(V1, false);
-
-  utExit();
-}
