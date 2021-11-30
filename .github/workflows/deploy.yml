@@ -98,6 +98,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
+          oci: true
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
             ./docker/Dockerfile-ubi
@@ -118,6 +119,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-GDB
+          oci: true
           dockerfiles: |
             ./docker/Dockerfile-gdb
           build-args: |
@@ -148,6 +150,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          oci: true
           dockerfiles: |
             ./docker/Dockerfile-debug
 
