@@ -2,7 +2,7 @@ blank_issues_enabled: true
 contact_links:
   - name: Orion documentation
     url: https://fiware-orion.readthedocs.io/en/master/
-    about: check the documentation first
+    about: check the documentation before asking help or reporting a bug.
   - name: Community Support
     url: https://stackoverflow.com/questions/ask?tags=fiware-orion+fiware
-    about: Please ask and answer questions here and use the tag fiware-orion
+    about: Please ask and answer questions in StackOverflow and use the tag fiware-orion.

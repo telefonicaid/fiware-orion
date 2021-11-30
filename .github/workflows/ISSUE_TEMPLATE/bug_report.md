@@ -2,37 +2,30 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: 'bug_report'
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Bug description**
+A clear and concise description of what the bug is. Please do not forget to add:
+- Orion version: X.Y.Z
+- MongoDB version X.Y
+- Env variables or CLI parameters
+- Operating System or Docker Image used
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**How to reproduce it**
+Steps to reproduce the behavior (as an example)
+1. Send `GET /version`
+2. Create a subscription `POST /v2/subscriptions ...`
+3. Check the log '....'
+4. See error in the request response
+
+It is extremely useful to add `curl` request examples for each step steps to reproduce the problem.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**Additional information**
+Add any other information about the problem here like screenshots, logs or outputs, response code, errors, a MongoDB dump, network 
+configuration etc.

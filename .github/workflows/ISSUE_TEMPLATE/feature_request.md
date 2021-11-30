@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: 'feature_request'
 assignees: ''
 
 ---
@@ -16,5 +16,15 @@ A clear and concise description of what you want to happen. Try to be as precise
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Describe why you need this feature**
+- To approach a new use case.
+- To integrate a new Generic Enabler / component.
+- To improve or simplify an scenario.
+
+**Additional information**
+Add any other information, diagrams or screenshots about the feature request here.
+
+**Do you have the intention to implement the solution**
+- [ ] Yes, I have the knowledge to implement this new feature.
+- [ ] Yes, but I will need help.
+- [ ] No, I do not have the skills.
