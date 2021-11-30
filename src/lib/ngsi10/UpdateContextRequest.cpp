@@ -46,6 +46,7 @@
 */
 UpdateContextRequest::UpdateContextRequest()
 {
+  updateActionType = ActionTypeUpdate;
 }
 
 
@@ -58,7 +59,9 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
 {
   contextProvider = _contextProvider;
   contextElementVector.push_back(new ContextElement(eP));
+  updateActionType = ActionTypeUpdate;
 }
+
 
 
 /* ****************************************************************************
