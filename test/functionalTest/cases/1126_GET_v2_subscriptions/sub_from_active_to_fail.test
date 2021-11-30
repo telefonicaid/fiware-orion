@@ -38,7 +38,7 @@ accumulatorStart --pretty-print
 # 04. Get subscription see status: active, lastSuccessCode: 200
 # 05. Teardown endpoint
 # 06. Update entity (triggering notification)
-# 07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
+# 07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
 #
 
 echo "01. Create sub"
@@ -113,8 +113,8 @@ echo
 echo
 
 
-echo "07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)"
-echo "========================================================================================================================="
+echo "07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)"
+echo "=========================================================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -225,8 +225,8 @@ Date: REGEX(.*)
 
 
 
-07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
-=========================================================================================================================
+07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
+==========================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 507
 Content-Type: application/json
@@ -251,7 +251,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []

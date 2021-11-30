@@ -226,6 +226,8 @@ static void setStatus(Subscription* s, const orion::BSONObj& r, const std::strin
   // Status
   s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
 
+  double statusLastChangeAtDb = r.hasField(CSUB_STATUS_LAST_CHANGE) ? getNumberFieldF(r, CSUB_STATUS_LAST_CHANGE) : -1;
+
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //
@@ -234,7 +236,7 @@ static void setStatus(Subscription* s, const orion::BSONObj& r, const std::strin
   //
   cacheSemTake(__FUNCTION__, "get status");
   CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
-  if (cSubP)
+  if ((cSubP) && (cSubP->statusLastChange > statusLastChangeAtDb))
   {
     s->status = cSubP->status.empty() ? STATUS_ACTIVE : cSubP->status;
   }

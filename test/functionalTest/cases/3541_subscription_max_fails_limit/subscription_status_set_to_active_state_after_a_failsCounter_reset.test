@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription status sest to active after a failsCounter reset
+Subscription status keeps active after a failsCounter reset
 
 --SHELL-INIT--
 dbInit CB
@@ -35,9 +35,9 @@ brokerStart CB
 # 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=1
+# 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 # 07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 08. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=2
+# 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 # 09. Start accumulator
 # 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 # 11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=0
@@ -127,7 +127,7 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=1'
+echo '06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -151,7 +151,7 @@ echo
 echo
 
 
-echo '08. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=2'
+echo '08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -262,7 +262,7 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=1
+06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 519
@@ -289,7 +289,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [
@@ -314,7 +314,7 @@ Date: REGEX(.*)
 
 
 
-08. GET /v2/subscriptions/subscription_id, to check the status=failed and failsCounter=2
+08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 519
@@ -341,7 +341,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [
