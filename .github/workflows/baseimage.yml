@@ -11,10 +11,38 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: fiware/orion-ld-base:latest
+  IMAGE_NAME: fiware/orion-ld-base
+  IMAGE_TAG: latest
 
 jobs:
-  deploy:
+  deploy-quay:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG }}
+          dockerfiles: |
+            ./docker/Dockerfile-ubi-base
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/fiware
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+
+  deploy-dockerhub:
 
     runs-on: ubuntu-18.04
 
@@ -38,5 +66,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           file: docker/Dockerfile-ubi-base
