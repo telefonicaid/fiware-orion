@@ -124,7 +124,7 @@ jobs:
             BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
 
       - name: Push To quay.io
-        id: push-to-quay
+        id: push-gdb-to-quay
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-image-gdb.outputs.image }}
@@ -152,7 +152,7 @@ jobs:
             ./docker/Dockerfile-debug
 
       - name: Push To quay.io
-        id: push-to-quay
+        id: push-debug-to-quay
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-image.outputs.image }}
