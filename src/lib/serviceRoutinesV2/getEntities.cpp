@@ -86,7 +86,6 @@ std::string getEntities
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
   std::string  id          = ciP->uriParam["id"];
-  int          limit       = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  idPattern   = ciP->uriParam["idPattern"];
   std::string  type        = ciP->uriParam["type"];
   std::string  typePattern = ciP->uriParam["typePattern"];
@@ -305,13 +304,12 @@ std::string getEntities
   }
 
   // Get attrs and metadata filters from URL params
-   setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
-   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
-  // 02. Call standard op postQueryContext
-  if (limit != 0)
-  {
-    answer = postQueryContext(ciP, components, compV, parseDataP);
-  }
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
+  setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
+
+  // 02. Call standard op postQueryContext 
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
   // 03. Check Internal Errors
   if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
   {

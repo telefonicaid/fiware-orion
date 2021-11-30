@@ -1,4 +1,4 @@
-- Fix: Using limit=0 and options=count to get only the count of elements (#1492)
+- Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
 - Hardening: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
 - Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
 - Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
