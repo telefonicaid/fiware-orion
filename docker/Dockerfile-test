@@ -35,14 +35,12 @@ RUN pip2.7 install pyopenssl
 RUN yum install --nogpgcheck -y gmock-devel
 RUN yum install -y procps
 
-RUN wget https://github.com/google/googletest/archive/release-1.5.0.tar.gz
-RUN tar xf release-1.5.0.tar.gz
-WORKDIR googletest-release-1.5.0
-RUN cmake -DBUILD_SHARED_LIBS=ON .
+RUN wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
+RUN tar xfvj gmock-1.5.0.tar.bz2
+WORKDIR gmock-1.5.0
+RUN ./configure
 RUN make
-RUN cp -a googletest/include/gtest /usr/include
-RUN cp -a googlemock/gtest/libgtest_main.so googlemock/gtest/libgtest.so /usr/lib/
-RUN ldconfig -v | grep gtest
+RUN make install
 WORKDIR ${PATH_TO_SRC}
 
 RUN yum install -y netcat
