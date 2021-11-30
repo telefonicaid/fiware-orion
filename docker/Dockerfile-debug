@@ -8,15 +8,13 @@ RUN rm -r /usr/local/lib/
 RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 
 ADD ./docker/debug/gdbinit gdbinit
-RUN yum -y install gdb
+RUN yum -y --nogpgcheck install gdb
 
 COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
 
-RUN  make debug install
-
-
+RUN make debug install
 
 ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 

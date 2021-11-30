@@ -11,7 +11,7 @@ env:
   IMAGE_TAG_PRE: 0.9-PRE-${{ github.run_number }}
 
 jobs:
-  deploy-release:
+  deploy-release-dockerhub:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
@@ -54,7 +54,7 @@ jobs:
           file: docker/Dockerfile-gdb
           no-cache: true
 
-  deploy-debug:
+  deploy-debug-dockerhub:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
@@ -82,3 +82,81 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
           file: docker/Dockerfile-debug
           no-cache: true
+
+  # quay.io
+
+  deploy-release-quay:
+
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
+          dockerfiles: |
+            ./docker/Dockerfile-ubi
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/fiware
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Build with gdb
+        id: build-image-gdb
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}-GDB
+          dockerfiles: |
+            ./docker/Dockerfile-gdb
+          build-args: |
+            BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image-gdb.outputs.image }}
+          tags: ${{ steps.build-image-gdb.outputs.tags }}
+          registry: quay.io/fiware
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+
+  deploy-debug-quay:
+
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          dockerfiles: |
+            ./docker/Dockerfile-debug
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/fiware
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
