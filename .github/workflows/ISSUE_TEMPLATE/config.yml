@@ -5,4 +5,4 @@ contact_links:
     about: check the documentation before asking help or reporting a bug.
   - name: Community Support
     url: https://stackoverflow.com/questions/ask?tags=fiware-orion+fiware
-    about: If you have  actually a question about functionality rather than a bug report or feature request, please consider to ask using StackOverflow using the tag fiware-orion instead of opening an issue in the Orion repository.
+    about: If you have actually a question about functionality rather than a bug report or feature request, please consider to ask using StackOverflow using the tag fiware-orion instead of opening an issue in the Orion repository.
