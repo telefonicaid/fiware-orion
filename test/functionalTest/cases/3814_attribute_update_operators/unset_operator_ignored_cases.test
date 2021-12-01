@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute update operator: set (as regular update)
+Attribute update operator: unset (ignored cases)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,21 +32,21 @@ accumulatorStart --pretty-print
 
 #
 # Note there is no case for object type. Object type has the special
-# behaviour shown in set_operator.test and set_operator_all_types.test
+# behaviour shown in unset_operator.test
 #
 # 01. Create entity E with A={X:1, Y:2}
 # 02. Create sub for entity E
-# 03. Update A with $set: "foo"
-# 04. Get entity, see E-A="foo"
-# 05. Update A with $set: 10
-# 06. Get entity, see E-A=10
-# 07. Update A with $set: true
-# 08. Get entity, see E-A=true
-# 09. Update A with $set: null
-# 10. Get entity, see E-A=null
-# 11. Update A with $set: <array>
-# 12. Get entity, see E-A=<array>
-# 13. Dump accumulator, see 5 notifications E-A-X being a string, number, boolean, null and array
+# 03. Update A with $unset: "foo"
+# 04. Get entity, see E-A={X:1, Y:2}
+# 05. Update A with $unset: 10
+# 06. Get entity, see E-A={X:1, Y:2}
+# 07. Update A with $unset: true
+# 08. Get entity, see E-A={X:1, Y:2}
+# 09. Update A with $unset: null
+# 10. Get entity, see E-A={X:1, Y:2}
+# 11. Update A with $unset: <array>
+# 12. Get entity, see E-A={X:1, Y:2}
+# 13. Dump accumulator, see 5 notifications all them with original entity
 #
 
 
@@ -87,11 +87,11 @@ echo
 echo
 
 
-echo '03. Update A with $set:"foo"'
-echo '============================'
+echo '03. Update A with $unset:"foo"'
+echo '=============================='
 payload='{
   "A": {
-    "value": { "$set": "foo" },
+    "value": { "$unset": "foo" },
     "type": "Object"
   }
 }'
@@ -100,18 +100,18 @@ echo
 echo
 
 
-echo '04. Get entity, see E-A="foo"'
-echo '============================='
+echo '04. Get entity, see E-A={X:1, Y:2}'
+echo '=================================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '05. Update A with $set: 10'
-echo '=========================='
+echo '05. Update A with $unset: 10'
+echo '============================'
 payload='{
   "A": {
-    "value": { "$set": 10 },
+    "value": { "$unset": 10 },
     "type": "Object"
   }
 }'
@@ -120,18 +120,18 @@ echo
 echo
 
 
-echo '06. Get entity, see E-A=10'
-echo '=========================='
+echo '06. Get entity, see E-A={X:1, Y:2}'
+echo '=================================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '07. Update A with $set: true'
-echo '============================'
+echo '07. Update A with $unset: true'
+echo '=============================='
 payload='{
   "A": {
-    "value": { "$set": true },
+    "value": { "$unset": true },
     "type": "Object"
   }
 }'
@@ -140,18 +140,18 @@ echo
 echo
 
 
-echo '08. Get entity, see E-A=true'
-echo '============================'
+echo '08. Get entity, see E-A={X:1, Y:2}'
+echo '=================================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '09. Update A with $set: null'
-echo '============================'
+echo '09. Update A with $unset: null'
+echo '=============================='
 payload='{
   "A": {
-    "value": { "$set": null },
+    "value": { "$unset": null },
     "type": "Object"
   }
 }'
@@ -160,19 +160,19 @@ echo
 echo
 
 
-echo '10. Get entity, see E-A=null'
-echo '============================'
+echo '10. Get entity, see E-A={X:1, Y:2}'
+echo '=================================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '11. Update A with $set: <array>'
-echo '==============================='
+echo '11. Update A with $unset: <array>'
+echo '================================='
 payload='{
   "A": {
     "value": {
-      "$set": [
+      "$unset": [
         "22",
         {
           "x" : [ "x1", "x2" ],
@@ -189,15 +189,15 @@ echo
 echo
 
 
-echo '12. Get entity, see E-A=<array>'
-echo '==============================='
+echo '12. Get entity, see E-A={X:1, Y:2}'
+echo '=================================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '13. Dump accumulator, see 6 notifications E-A-X being a string, number, boolean, null, array and object'
-echo '======================================================================================================='
+echo '13. Dump accumulator, see 5 notifications all them with original entity'
+echo '======================================================================='
 accumulatorDump
 echo
 echo
@@ -224,18 +224,18 @@ Date: REGEX(.*)
 
 
 
-03. Update A with $set:"foo"
-============================
+03. Update A with $unset:"foo"
+==============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-04. Get entity, see E-A="foo"
-=============================
+04. Get entity, see E-A={X:1, Y:2}
+==================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -244,25 +244,28 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Object",
-        "value": "foo"
+        "value": {
+            "X": 1,
+            "Y": 2
+        }
     },
     "id": "E",
     "type": "T"
 }
 
 
-05. Update A with $set: 10
-==========================
+05. Update A with $unset: 10
+============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. Get entity, see E-A=10
-==========================
+06. Get entity, see E-A={X:1, Y:2}
+==================================
 HTTP/1.1 200 OK
-Content-Length: 68
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -271,25 +274,28 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Object",
-        "value": 10
+        "value": {
+            "X": 1,
+            "Y": 2
+        }
     },
     "id": "E",
     "type": "T"
 }
 
 
-07. Update A with $set: true
-============================
+07. Update A with $unset: true
+==============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-08. Get entity, see E-A=true
-============================
+08. Get entity, see E-A={X:1, Y:2}
+==================================
 HTTP/1.1 200 OK
-Content-Length: 70
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -298,25 +304,28 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Object",
-        "value": true
+        "value": {
+            "X": 1,
+            "Y": 2
+        }
     },
     "id": "E",
     "type": "T"
 }
 
 
-09. Update A with $set: null
-============================
+09. Update A with $unset: null
+==============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-10. Get entity, see E-A=null
-============================
+10. Get entity, see E-A={X:1, Y:2}
+==================================
 HTTP/1.1 200 OK
-Content-Length: 70
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -325,25 +334,28 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Object",
-        "value": null
+        "value": {
+            "X": 1,
+            "Y": 2
+        }
     },
     "id": "E",
     "type": "T"
 }
 
 
-11. Update A with $set: <array>
-===============================
+11. Update A with $unset: <array>
+=================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-12. Get entity, see E-A=<array>
-===============================
+12. Get entity, see E-A={X:1, Y:2}
+==================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 79
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -352,31 +364,21 @@ Date: REGEX(.*)
     "A": {
         "metadata": {},
         "type": "Object",
-        "value": [
-            "22",
-            {
-                "x": [
-                    "x1",
-                    "x2"
-                ],
-                "y": 3
-            },
-            [
-                "z1",
-                "z2"
-            ]
-        ]
+        "value": {
+            "X": 1,
+            "Y": 2
+        }
     },
     "id": "E",
     "type": "T"
 }
 
 
-13. Dump accumulator, see 6 notifications E-A-X being a string, number, boolean, null, array and object
-=======================================================================================================
+13. Dump accumulator, see 5 notifications all them with original entity
+=======================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 126
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -390,7 +392,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A": {
                 "metadata": {},
                 "type": "Object",
-                "value": "foo"
+                "value": {
+                    "X": 1,
+                    "Y": 2
+                }
             },
             "id": "E",
             "type": "T"
@@ -401,7 +406,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 123
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -415,7 +420,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A": {
                 "metadata": {},
                 "type": "Object",
-                "value": 10
+                "value": {
+                    "X": 1,
+                    "Y": 2
+                }
             },
             "id": "E",
             "type": "T"
@@ -426,7 +434,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 125
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -440,7 +448,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A": {
                 "metadata": {},
                 "type": "Object",
-                "value": true
+                "value": {
+                    "X": 1,
+                    "Y": 2
+                }
             },
             "id": "E",
             "type": "T"
@@ -451,7 +462,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 125
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -465,7 +476,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A": {
                 "metadata": {},
                 "type": "Object",
-                "value": null
+                "value": {
+                    "X": 1,
+                    "Y": 2
+                }
             },
             "id": "E",
             "type": "T"
@@ -476,7 +490,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 163
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -490,20 +504,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A": {
                 "metadata": {},
                 "type": "Object",
-                "value": [
-                    "22",
-                    {
-                        "x": [
-                            "x1",
-                            "x2"
-                        ],
-                        "y": 3
-                    },
-                    [
-                        "z1",
-                        "z2"
-                    ]
-                ]
+                "value": {
+                    "X": 1,
+                    "Y": 2
+                }
             },
             "id": "E",
             "type": "T"
