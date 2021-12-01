@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute update operator: set
+Attribute update operator: set (with all possible types)
 
 --SHELL-INIT--
 dbInit CB
