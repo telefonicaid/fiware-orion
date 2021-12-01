@@ -3122,100 +3122,113 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
 
-    if ((attr->compoundValueP != NULL) && (attr->compoundValueP->childV.size() > 0))
+    if (attr->compoundValueP == NULL)
     {
-      CompoundValueNode* child0 = attr->compoundValueP->childV[0];
-      if ((child0->name == "$set"))
+      continue;
+    }
+
+    // Look fo the $set element in the childs (if any)
+    int childIx = -1;
+    for (unsigned int jx = 0; jx < attr->compoundValueP->childV.size(); ++jx)
+    {
+      if (attr->compoundValueP->childV[jx]->name == "$set")
       {
+        childIx = jx;
         r = true;
+      }
+    }
 
-        std::string baseKey = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
+    if (childIx == -1)
+    {
+      continue;
+    }
 
-        // Maybe be needed and we cannot declare it in "case orion::ValueTypeVector" (compilation error)
-        orion::BSONArrayBuilder ba;
+    CompoundValueNode* theChild = attr->compoundValueP->childV[childIx];
+    std::string        baseKey  = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
 
-        switch (child0->valueType)
+    // Maybe be needed and we cannot declare it in "case orion::ValueTypeVector" (compilation error)
+    orion::BSONArrayBuilder ba;
+
+    switch (theChild->valueType)
+    {
+    case orion::ValueTypeObject:
+      // In this case $set is being used to "edit" an object. Process the
+      // childs of theChild
+      for (unsigned int jx = 0; jx < theChild->childV.size(); ++jx)
+      {
+        CompoundValueNode* child = theChild->childV[jx];
+
+        std::string valueKey = baseKey + "." + child->name;
+
+        if (child->valueType == orion::ValueTypeString)
         {
-        case orion::ValueTypeObject:
-          // In this case $set is being used to "edit" an object. Process the
-          // childs of child0
-          for (unsigned int jx = 0; jx < child0->childV.size(); ++jx)
-          {
-            CompoundValueNode* child = child0->childV[jx];
-
-            std::string valueKey = baseKey + "." + child->name;
-
-            if (child->valueType == orion::ValueTypeString)
-            {
-              b->append(valueKey, child->stringValue);
-            }
-            else if (child->valueType == orion::ValueTypeNumber)
-            {
-              b->append(valueKey, child->numberValue);
-            }
-            else if (child->valueType == orion::ValueTypeBoolean)
-            {
-              b->append(valueKey, child->boolValue);
-            }
-            else if (child->valueType == orion::ValueTypeNull)
-            {
-              b->appendNull(valueKey);
-            }
-            else if (child->valueType == orion::ValueTypeVector)
-            {
-              orion::BSONArrayBuilder ba;
-              compoundValueBson(child->childV, ba);
-              b->append(valueKey, ba.arr());
-            }
-            else if (child->valueType == orion::ValueTypeObject)
-            {
-              orion::BSONObjBuilder bo;
-              compoundValueBson(child->childV, bo);
-              b->append(valueKey, bo.obj());
-            }
-            else if (child->valueType == orion::ValueTypeNotGiven)
-            {
-              LM_E(("Runtime Error (value not given in calculateOperator)"));
-            }
-            else
-            {
-              LM_E(("Runtime Error (Unknown type in calculateOperator)"));
-            }
-          }
-          break;
-
-        // From now on, all the cases are $set being use in "replace" mode
-        // i.e. as regular update
-        case orion::ValueTypeString:
-          b->append(baseKey, child0->stringValue);
-          break;
-
-        case orion::ValueTypeNumber:
-          b->append(baseKey, child0->numberValue);
-          break;
-
-        case orion::ValueTypeBoolean:
-          b->append(baseKey, child0->boolValue);
-          break;
-
-        case orion::ValueTypeNull:
-          b->appendNull(baseKey);
-          break;
-
-        case orion::ValueTypeVector:
-          compoundValueBson(child0->childV, ba);
-          b->append(baseKey, ba.arr());
-          break;
-
-        case orion::ValueTypeNotGiven:
+          b->append(valueKey, child->stringValue);
+        }
+        else if (child->valueType == orion::ValueTypeNumber)
+        {
+          b->append(valueKey, child->numberValue);
+        }
+        else if (child->valueType == orion::ValueTypeBoolean)
+        {
+          b->append(valueKey, child->boolValue);
+        }
+        else if (child->valueType == orion::ValueTypeNull)
+        {
+          b->appendNull(valueKey);
+        }
+        else if (child->valueType == orion::ValueTypeVector)
+        {
+          orion::BSONArrayBuilder ba;
+          compoundValueBson(child->childV, ba);
+          b->append(valueKey, ba.arr());
+        }
+        else if (child->valueType == orion::ValueTypeObject)
+        {
+          orion::BSONObjBuilder bo;
+          compoundValueBson(child->childV, bo);
+          b->append(valueKey, bo.obj());
+        }
+        else if (child->valueType == orion::ValueTypeNotGiven)
+        {
           LM_E(("Runtime Error (value not given in calculateOperator)"));
-          break;
-
-        default:
+        }
+        else
+        {
           LM_E(("Runtime Error (Unknown type in calculateOperator)"));
-          break;
         }
       }
+      break;
+
+      // From now on, all the cases are $set being use in "replace" mode
+      // i.e. as regular update
+    case orion::ValueTypeString:
+      b->append(baseKey, theChild->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      b->append(baseKey, theChild->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      b->append(baseKey, theChild->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      b->appendNull(baseKey);
+      break;
+
+    case orion::ValueTypeVector:
+      compoundValueBson(theChild->childV, ba);
+      b->append(baseKey, ba.arr());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in calculateOperator)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (Unknown type in calculateOperator)"));
+      break;
     }
   }
 
@@ -3244,27 +3257,43 @@ static bool calculateUnsetOperator(ContextElementResponse* cerP, orion::BSONObjB
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
 
-    if ((attr->compoundValueP != NULL) && (attr->compoundValueP->childV.size() > 0))
+    if (attr->compoundValueP == NULL)
     {
-      CompoundValueNode* child0 = attr->compoundValueP->childV[0];
-      if (child0->name == "$unset")
+      continue;
+    }
+
+    // Look fo the $unset element in the childs (if any)
+    int childIx = -1;
+    for (unsigned int jx = 0; jx < attr->compoundValueP->childV.size(); ++jx)
+    {
+      if (attr->compoundValueP->childV[jx]->name == "$unset")
       {
+        childIx = jx;
         r = true;
-
-        if (child0->valueType == orion::ValueTypeObject)
-        {
-          std::string baseKey = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
-
-          // Process the childs of child0
-          for (unsigned int jx = 0; jx < child0->childV.size(); ++jx)
-          {
-            CompoundValueNode* child = child0->childV[jx];
-
-            std::string valueKey = baseKey + "." + child->name;
-            b->append(valueKey, 1);
-          }
-        }
       }
+    }
+
+    if (childIx == -1)
+    {
+      continue;
+    }
+
+    CompoundValueNode* theChild = attr->compoundValueP->childV[childIx];
+    std::string        baseKey  = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
+
+    if (theChild->valueType != orion::ValueTypeObject)
+    {
+      // Non-object values for $unset are ignored
+      continue;
+    }
+
+    // Process the childs of child0
+    for (unsigned int jx = 0; jx < theChild->childV.size(); ++jx)
+    {
+      CompoundValueNode* child = theChild->childV[jx];
+
+      std::string valueKey = baseKey + "." + child->name;
+      b->append(valueKey, 1);
     }
   }
 
