@@ -37,16 +37,16 @@ jobs:
     strategy:
       matrix:
         payload:
-          - { order: 1, range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
-          - { order: 2, range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
-          - { order: 3, range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
-          - { order: 4, range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
-          - { order: 5, range: '-e FT_FROM_IX=1201' }
-          - { order: 6, range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
-          - { order: 7, range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
-          - { order: 8, range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
-          - { order: 9, range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
-          - { order: 10, range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
+          - { order: '1wc', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { order: '2wc', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { order: '3wc', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { order: '4wc', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { order: '5wc', range: '-e FT_FROM_IX=1201' }
+          - { order: '1nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { order: '2nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { order: '3nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { order: '4nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { order: '5nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
 
     steps:
       - uses: actions/checkout@v2
