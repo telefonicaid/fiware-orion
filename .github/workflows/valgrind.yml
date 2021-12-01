@@ -32,18 +32,20 @@ jobs:
         ports:
         - 1884:1883
         
+    name: valgrind - ${{ matrix.payload.name }}
+    
     strategy:
       matrix:
-        range:
-          - -e FT_FROM_IX=0 -e FT_TO_IX=300
-          - -e FT_FROM_IX=301 -e FT_TO_IX=600
-          - -e FT_FROM_IX=601 -e FT_TO_IX=900
-          - -e FT_FROM_IX=901 -e FT_TO_IX=1200
-          - -e FT_FROM_IX=1201
+        payload:
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300'}
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600'}
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900'}
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200'}
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201'}
           
     steps:
       - uses: actions/checkout@v2
 
       - name: Run valgrind test
         run: |
-          docker run  --privileged --network host -t --rm ${{ matrix.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind
+          docker run  --privileged --network host -t --rm ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind
