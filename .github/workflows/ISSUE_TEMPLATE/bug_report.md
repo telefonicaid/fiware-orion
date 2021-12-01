@@ -41,8 +41,8 @@ Steps to reproduce the behavior (as an example)
 It is extremely useful to add `curl` request examples for each step to reproduce the problem (as in the above example, 
 the `curl` to do the `POST /v2/entities` in step 1)
 
-Note that information requested above can contains sensitive information (e.g. public IP addresses, api keys/tokens, 
-passwords, etc.). Please change it before opening the issue 
+> Note that information requested above can contains sensitive information (e.g. public IP addresses, api keys/tokens, 
+> passwords, etc.). Please change it before opening the issue 
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
