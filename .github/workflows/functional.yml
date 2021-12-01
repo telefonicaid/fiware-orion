@@ -32,21 +32,21 @@ jobs:
         ports:
         - 1884:1883
 
-    name: functional - ${{ matrix.payload.order }}
+    name: functional - ${{ matrix.payload.name }}
 
     strategy:
       matrix:
         payload:
-          - { order: '1wc', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
-          - { order: '2wc', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
-          - { order: '3wc', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
-          - { order: '4wc', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
-          - { order: '5wc', range: '-e FT_FROM_IX=1201' }
-          - { order: '1nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
-          - { order: '2nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
-          - { order: '3nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
-          - { order: '4nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
-          - { order: '5nc', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201' }
+          - { name: 'batch 1 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
 
     steps:
       - uses: actions/checkout@v2
