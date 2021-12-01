@@ -37,7 +37,9 @@ accumulatorStart --pretty-print
 # 04. Get entity, see E-A={X:1, Z:3}
 # 05. Update A with $unset: {X:"foo"}
 # 06. Get entity, see E-A={Z:3}
-# 07. Dump accumulator, see E-A={X:1, Z:3} and E-A={Z:3}
+# 07. Update A with $unset: {W: 1}
+# 08. Get entity, see E-A={Z:3}
+# 09. Dump accumulator, see E-A={X:1, Z:3}, E-A={Z:3} and E-A={Z:3}
 #
 
 
@@ -82,7 +84,7 @@ echo '03. Update A with $unset: {Y:1}'
 echo '==============================='
 payload='{
   "A": {
-    "value": { "$unset": {"Y": 1}},
+    "value": { "$unset": {"Y": 1} },
     "type": "Number"
   }
 }'
@@ -111,15 +113,35 @@ echo
 echo
 
 
-echo '05. Get entity, see E-A={Z:3}'
+echo '06. Get entity, see E-A={Z:3}'
 echo '============================='
 orionCurl --url /v2/entities/E
 echo
 echo
 
 
-echo '07. Dump accumulator, see E-A={X:1, Z:3} and E-A={Z:3}'
-echo '======================================================'
+echo '07. Update A with $unset: {W: 1}'
+echo '================================'
+payload='{
+  "A": {
+    "value": { "$unset": {"W": 1 }},
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '08. Get entity, see E-A={Z:3}'
+echo '============================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '09. Dump accumulator, see E-A={X:1, Z:3}, E-A={Z:3} and E-A={Z:3}'
+echo '================================================================='
 accumulatorDump
 echo
 echo
@@ -184,7 +206,7 @@ Date: REGEX(.*)
 
 
 
-05. Get entity, see E-A={Z:3}
+06. Get entity, see E-A={Z:3}
 =============================
 HTTP/1.1 200 OK
 Content-Length: 73
@@ -205,8 +227,37 @@ Date: REGEX(.*)
 }
 
 
-07. Dump accumulator, see E-A={X:1, Z:3} and E-A={Z:3}
-======================================================
+07. Update A with $unset: {W: 1}
+================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Get entity, see E-A={Z:3}
+=============================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": {
+            "Z": 3
+        }
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+09. Dump accumulator, see E-A={X:1, Z:3}, E-A={Z:3} and E-A={Z:3}
+=================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 134
@@ -225,6 +276,33 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "Number",
                 "value": {
                     "X": 1,
+                    "Z": 3
+                }
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 128
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": {
                     "Z": 3
                 }
             },
