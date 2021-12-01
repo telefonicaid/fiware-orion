@@ -1,4 +1,5 @@
 - Hardening: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
+- Add: $set and $unset attribute update operators (#3814, continuation)
 - Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
 - Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
 - Add: statusLastChange field in csbus collection (as now status is in the csubs cache and we need this field to know if status in the cache or DB is fresher)

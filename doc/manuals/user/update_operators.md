@@ -244,6 +244,76 @@ POST /v2/entities/E/attrs/A
 
 would change the value of attribute A to `[1]`.
 
+### `$set`
+
+To be used with attributes which value is an object to add/update a sub-key in the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30} },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to `{"X": 1, "Y": 20, "Z": 30}`.
+
+For consistence, `$set` can be used with values that are not an object, such as:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": "foo" },
+  "type": "Number"
+}
+```
+
+which has the same effect than a regular update, i.e.:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": "foo",
+  "type": "Number"
+}
+```
+
+### `$unset`
+
+To be used with attributes which value is an object to remove a sub-key from the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": 1} },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to `{"Y": 20}`.
+
+The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
+for simplity but the following request would also work and would be equivalent to the one above:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": null} },
+  "type": "Number"
+}
+```
+
+Note that if the value of `$unset` is not an object, it will be ignored. Not existing sub-keys
+are also ignored.
+
 ## How Orion deals with operators
 
 Orion doesn't execute the operation itself, but pass it to MongoDB, which is the one actually
@@ -298,14 +368,30 @@ POST /v2/entities/E/attrs/A
 }
 ```
 
-
 you will get (randomly, in principle) one among this ones:
 
 * A gets increased its value by 1
 * A gets multiply its value by 10
 * A gets is value updated to (literally) this JSON object: `{ "x": 1, "$inc": 1, "$mul": 10 }`
 
-So be careful of avoiding this situations.
+Or even not so weird things... the following request could make sense, to add/update a
+sub-key `X` to attribute `A` and remove a sub-key `Y` in the same operation:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": {
+    "$set": {"X": 10},
+    "$unset": {"Y": 1}
+  },
+  "type": "Number"
+}
+```
+
+but the result would be that only one of them (i.e. either `X` is added/updated or `Y` is removed
+but not both at the same time).
+
+So be careful of avoiding these situations.
 
 ## Current limitations
 
