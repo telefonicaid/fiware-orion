@@ -21,7 +21,7 @@ Steps to reproduce the behavior (as an example)
 3. Check the log '....'
 4. See error in the request response
 
-It is extremely useful to add `curl` request examples for each step steps to reproduce the problem.
+It is extremely useful to add `curl` request examples for each step steps to reproduce the problem (i.e. in the above example, the `curl` to reproduce `POST /v2/entities` in step 1)
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
