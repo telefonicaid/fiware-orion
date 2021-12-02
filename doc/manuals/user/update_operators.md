@@ -178,7 +178,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$push": 3 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -194,7 +194,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 4 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -204,7 +204,7 @@ would change the value of attribute A to `[1, 2, 3, 4]`. However, the following 
 POST /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 3 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -221,7 +221,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$pull": 2 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -238,7 +238,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$pullAll": [2, 3] },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -256,7 +256,7 @@ following request:
 POST /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30} },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -268,7 +268,7 @@ For consistence, `$set` can be used with values that are not an object, such as:
 POST /v2/entities/E/attrs/A
 {
   "value": { "$set": "foo" },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -278,7 +278,7 @@ which has the same effect than a regular update, i.e.:
 POST /v2/entities/E/attrs/A
 {
   "value": "foo",
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -294,7 +294,7 @@ following request:
 POST /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": 1} },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -307,7 +307,7 @@ for simplity but the following request would also work and would be equivalent t
 POST /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": null} },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -325,7 +325,7 @@ following request:
 POST /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
@@ -338,7 +338,7 @@ the other way around. For instance the following request:
 POST /v2/entities/E/attrs/A
 {
   "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
-  "type": "Number"
+  "type": "Object"
 }
 ```
 
