@@ -702,7 +702,7 @@ static char* loadFile(char* path)
   if (buf == NULL)
   {
     close(fd);
-    LM_E(("HTTPS Error (out of memory - unable to allcate %d bytes for out-buffer of key/cert file)", statBuf.st_size + 1));
+    LM_E(("HTTPS Error (out of memory - unable to allocate %d bytes for out-buffer of key/cert file)", statBuf.st_size + 1));
     return NULL;
   }
 
@@ -712,7 +712,7 @@ static char* loadFile(char* path)
   if (nb == -1)
   {
     LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
   if (nb != statBuf.st_size)
