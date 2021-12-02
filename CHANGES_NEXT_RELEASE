@@ -19,3 +19,4 @@
 * Issue #937  Fixed a Compilation Error in Ubuntu 20.04, RELEASE compilation
 * Issue #280  Changed values of HTTP header 'Ngsiv2-Attrsformat' from e.g. 'x-ngsiv2-normalized' to just 'normalized'
 * Issue #280  Fixed a problem with the tenant cache for when more than one broker runs against the same DB
+* Issue #280  Issue #4012 of Orion repo - HTTPS Key/Certificate max size
