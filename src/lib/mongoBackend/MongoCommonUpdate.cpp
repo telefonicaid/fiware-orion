@@ -3287,7 +3287,7 @@ static bool calculateUnsetOperator(ContextElementResponse* cerP, orion::BSONObjB
       continue;
     }
 
-    // Process the childs of child0
+    // Process the childs of theChild
     for (unsigned int jx = 0; jx < theChild->childV.size(); ++jx)
     {
       CompoundValueNode* child = theChild->childV[jx];
