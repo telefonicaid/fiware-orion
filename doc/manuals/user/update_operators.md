@@ -314,6 +314,36 @@ POST /v2/entities/E/attrs/A
 Note that if the value of `$unset` is not an object, it will be ignored. Not existing sub-keys
 are also ignored.
 
+### Combining `$set` and `$unset`
+
+You can combine the usage of `$set` and `$unset` in the same attribute update.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to `{"Y": 20}`.
+
+The sub-keys in the `$set` value cannot be at the same time in the `$unset` value or
+the other way around. For instance the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Number"
+}
+```
+
+would result in error.
+
 ## How Orion deals with operators
 
 Orion doesn't execute the operation itself, but pass it to MongoDB, which is the one actually
@@ -374,24 +404,10 @@ you will get (randomly, in principle) one among this ones:
 * A gets multiply its value by 10
 * A gets is value updated to (literally) this JSON object: `{ "x": 1, "$inc": 1, "$mul": 10 }`
 
-Or even not so weird things... the following request could make sense, to add/update a
-sub-key `X` to attribute `A` and remove a sub-key `Y` in the same operation:
-
-```
-POST /v2/entities/E/attrs/A
-{
-  "value": {
-    "$set": {"X": 10},
-    "$unset": {"Y": 1}
-  },
-  "type": "Number"
-}
-```
-
-but the result would be that only one of them (i.e. either `X` is added/updated or `Y` is removed
-but not both at the same time).
-
 So be careful of avoiding these situations.
+
+The only exception to "use only one operator" rule is the case of `$set` and
+`$unset`, that can be used together [as described above](#combining-set-and-unset).
 
 ## Current limitations
 
