@@ -718,7 +718,7 @@ static char* loadFile(char* path)
   if (nb != statBuf.st_size)
   {
     LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
-    return -1;
+    return NULL;
   }
 
   buf[statBuf.st_size] = 0;  // Zero-terminate the string
