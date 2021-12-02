@@ -282,6 +282,8 @@ POST /v2/entities/E/attrs/A
 }
 ```
 
+We don't recommend this usage, as the regular update is simpler.
+
 ### `$unset`
 
 To be used with attributes which value is an object to remove a sub-key from the
