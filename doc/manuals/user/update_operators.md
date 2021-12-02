@@ -300,7 +300,7 @@ POST /v2/entities/E/attrs/A
 }
 ```
 
-would change the value of attribute A to `{"Y": 20}`.
+would change the value of attribute A to `{"Y": 2}`.
 
 The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
 for simplicity but the following request would also work and would be equivalent to the one above:
