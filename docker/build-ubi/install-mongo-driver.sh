@@ -23,9 +23,6 @@
 
 set -e
 
-echo
-
-yum -y install http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
 yum -y install boost-devel scons
 
 echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"

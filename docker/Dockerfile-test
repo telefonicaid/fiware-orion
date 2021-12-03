@@ -22,7 +22,6 @@ RUN yum install -y mongodb-org
 
 RUN yum install -y python2
 RUN ln --force -s /usr/bin/python2.7 /usr/bin/python
-RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 
 RUN yum install -y openssl-devel libffi-devel
 

@@ -9,7 +9,6 @@ COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
 
-RUN ln -s /usr/lib64/libgnutls.so.30 /usr/lib64/libgnutls.so
 RUN make release install
 
 RUN strip /usr/bin/orionld

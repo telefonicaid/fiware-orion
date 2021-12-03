@@ -45,7 +45,6 @@ BUILD_TOOLS=(
  'dirmngr' \
  'git' \
  'make' \
- 'gnutls' \
 )
 
 yum -y --nogpgcheck  install \
