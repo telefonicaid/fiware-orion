@@ -64,6 +64,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
   url = endpoint + params->resource;
 
   int r =  httpRequestSend(curl,
+                       "subId: " + params->subscriptionId,
                        params->from,
                        params->ip,
                        params->port,

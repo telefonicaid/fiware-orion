@@ -8,6 +8,7 @@
 - Fix: crash when updating attribute with empty JSON object or array (#3995)
 - Fix: csubs cache logic has to ignore fiware-sevice information if -multiservice is not used
 - Fix: subscription throttling was not working with value 1 second
+- Fix: add subId/regId in "response NOT OK" WARN log traces (#4013)
 - Remove: status "failed" in subscriptions (use failsCounter greater than 0 instead)
 - Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
 - Upgrade Dockerfile base image from centos8.3.2011 to centos8.4.2105
