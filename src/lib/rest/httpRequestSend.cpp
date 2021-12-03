@@ -240,6 +240,7 @@ static int contentLenParse(char* s)
 int httpRequestSend
 (
    CURL*                                      _curl,
+   const std::string&                         idStringForLogs,
    const std::string&                         from,
    const std::string&                         _ip,
    unsigned short                             port,
@@ -644,11 +645,11 @@ int httpRequestSend
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, statusCodeP);
     if ((*statusCodeP < 300) && (*statusCodeP > 199))
     {
-      LM_T(LmtOldInfo, ("Notification response OK, http code: %d", *statusCodeP));
+      LM_T(LmtOldInfo, ("Notification (%s) response OK, http code: %d", idStringForLogs.c_str(), *statusCodeP));
     }
     else
     {
-      LM_W(("Notification response NOT OK, http code: %d", *statusCodeP));
+      LM_W(("Notification (%s) response NOT OK, http code: %d", idStringForLogs.c_str(), *statusCodeP));
     }
   }
 
