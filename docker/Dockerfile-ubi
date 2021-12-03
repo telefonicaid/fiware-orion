@@ -26,7 +26,8 @@ LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 RUN mkdir -p /var/{log,run}/orionld
 
-COPY --from=build-stage {PATH_TO_SRC}/LICENSE /licenses/LICENSE
+RUN mkdir /licenses
+COPY ./LICENSE /licenses/LICENSE
 
 COPY --from=build-stage /etc/ssl/ /etc/ssl/
 COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
