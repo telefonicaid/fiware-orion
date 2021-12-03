@@ -41,7 +41,6 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
 
-
   deploy-dockerhub:
 
     runs-on: ubuntu-18.04
