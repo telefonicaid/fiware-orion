@@ -188,7 +188,7 @@ static KjNode* getEntityTypesResponse(KjNode* sortedArrayP)
 {
   char entityTypesId[64];
 
-  strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
+  strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId) - 1);
   uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
 
   KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
@@ -465,7 +465,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
   {
     char entityTypesId[64];
 
-    strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
+    strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId) - 1);
     uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
 
     KjNode* noTypesObject = kjObject(orionldState.kjsonP,  NULL);

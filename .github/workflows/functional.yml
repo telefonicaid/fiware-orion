@@ -5,7 +5,7 @@ on:
 
 env:
   IMAGE_NAME: localhost:5000/orion-ld-test:latest
-  IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test 0000_ipv6_support/ipv4_ipv6_both.test'
+  IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test 0000_ipv6_support/ipv4_ipv6_both.test 0740_crash_with_json_object_for_attributes/json_object_format.test'
 
 jobs:
   build-test-image:
@@ -47,7 +47,7 @@ jobs:
         ports:
           - 5432:5432
       mongodb:
-        image: mongo:4.0
+        image: mongo:4.4
         ports:
           - 27017:27017
       context-server:
@@ -58,9 +58,9 @@ jobs:
           - 7080:8080
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        test: [ 'functional_0_431','functional_432_746', 'functional_747_1105', 'functional_1106_end', 'unit' ]
+        test: [ 'functional_0_431','functional_432_746', 'functional_747_1105', 'functional_1106_end', 'unit']
 
     steps:
       - uses: actions/checkout@v2

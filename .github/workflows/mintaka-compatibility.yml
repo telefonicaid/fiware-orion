@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile
+          file: docker/Dockerfile-ubi
           tags:  localhost:5000/orion-ld:latest
 
       - uses: actions/checkout@v2

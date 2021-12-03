@@ -46,7 +46,6 @@ extern "C"
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
 
-#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
@@ -57,6 +56,8 @@ extern "C"
 #include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
 #include "orionld/common/duplicatedInstances.h"                // duplicatedInstances
+#include "orionld/common/performance.h"                        // PERFORMANCE
+#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -283,6 +284,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
   UpdateContextResponse mongoResponse;
 
+  PERFORMANCE(mongoBackendStart);
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
@@ -293,6 +295,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                                                    ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
+  PERFORMANCE(mongoBackendEnd);
 
   if (orionldState.httpStatusCode == SccOk)
   {

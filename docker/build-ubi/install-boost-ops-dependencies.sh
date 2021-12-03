@@ -20,10 +20,22 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+
 set -e
 
-apt-get update && apt-get install -y lsb-release && apt-get clean all
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
-apt-get update
-apt-get -y install libpq-dev postgresql-12 postgresql-client-12 postgis postgresql-12-postgis-3 postgresql-12-postgis-3-scripts
+OPS_DEPS_CORE=(
+  'libcurl4' \
+  'libssl1.1' \
+  'ca-certificates' \
+)
+
+yum install -y http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
+yum install -y  boost-devel
+
+
+yum install -y ${TO_INSTALL[@]}
+
+echo
+echo -e "\e[1;32m Builder: installing core ops deps \e[0m"
+ yum -y install  \
+    ${OPS_DEPS_CORE[@]}

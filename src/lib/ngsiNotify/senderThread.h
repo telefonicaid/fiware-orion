@@ -55,7 +55,7 @@ typedef struct SenderThreadParams
   std::string                        resource;
   std::string                        content_type;
   std::string                        content;
-  char                               transactionId[64];
+  char                               transactionId[68];
   MimeType                           mimeType;
   char*                              toFree;             // Payload Data buffer has been allocated
   std::string                        renderFormat;
@@ -65,9 +65,9 @@ typedef struct SenderThreadParams
   std::string                        subscriptionId;
   bool                               registration;
   int                                mqttQoS;
-  char                               mqttVersion[16];
-  char                               mqttUserName[128];
-  char                               mqttPassword[128];
+  char                               mqttVersion[18];
+  char                               mqttUserName[130];
+  char                               mqttPassword[130];
 } SenderThreadParams;
 
 

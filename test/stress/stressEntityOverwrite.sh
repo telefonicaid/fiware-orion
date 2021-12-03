@@ -29,7 +29,6 @@ threads=$2
 entities=$3
 attributes=$4
 
-
 echo "2.1. Creating $entities entities E1-E$entities, with attributes P1 and R1"
 echo "======================================================================"
 typeset -i eNo
@@ -115,11 +114,9 @@ echo
 
 echo "13. Running Apache HTTP server benchmarking tool (ab) with $threads threads and a total of $requests requests overwriting the entity"
 echo "============================================================================================================================="
-ab -c $threads -d -n $requests -T application/json -p /tmp/body.json   http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
+ab -c $threads -d -n $requests -T application/json -p /tmp/body.json -m POST  http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
 r=$?
 echo
 echo
 
-
-rm -f /tmp/body.json
 exit $r

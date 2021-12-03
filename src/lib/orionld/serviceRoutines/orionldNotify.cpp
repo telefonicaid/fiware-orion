@@ -184,7 +184,7 @@ void orionldNotify(void)
 
     notificationTree = kjObject(orionldState.kjsonP, NULL);
 
-    strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId));
+    strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);
     uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
 
     ipPortAndRest(niP->reference, &ip, &port, &rest);

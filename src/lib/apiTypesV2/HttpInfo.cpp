@@ -154,8 +154,8 @@ void HttpInfo::fill(const BSONObj* boP)
       const char*  value = be.String().c_str();
       KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));  // FIXME: what about initial cache fill?
 
-      strncpy(kvP->key,   key,   sizeof(kvP->key));
-      strncpy(kvP->value, value, sizeof(kvP->value));
+      strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
+      strncpy(kvP->value, value, sizeof(kvP->value) - 1);
 
       notifierInfo.push_back(kvP);
     }

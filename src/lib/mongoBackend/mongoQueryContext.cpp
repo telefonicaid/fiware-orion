@@ -26,6 +26,11 @@
 #include <vector>
 #include <map>
 
+extern "C"
+{
+#include "kbase/kTime.h"                                       // kTimeGet, kTimeDiff
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -38,6 +43,7 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "orionld/common/orionldState.h"
+#include "orionld/common/performance.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 
@@ -370,6 +376,9 @@ HttpStatusCode mongoQueryContext
   }
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+
+  PERFORMANCE_BEGIN(0, "entitiesQuery");
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->metadataList,
@@ -385,6 +394,8 @@ HttpStatusCode mongoQueryContext
                      countP,
                      sortOrderList,
                      apiVersion);
+
+  PERFORMANCE_END(0, NULL);
 
   if (!ok)
   {

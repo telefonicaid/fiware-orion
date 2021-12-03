@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
-#include <postgresql/libpq-fe.h>                               // For Postgres
+#include </usr/pgsql-12/include/libpq-fe.h>                               // For Postgres
 
 
 

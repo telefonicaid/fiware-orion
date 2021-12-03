@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -23,11 +23,21 @@
 
 set -e
 
-echo
-echo -e "\e[1;32m Builder: installing libmicrohttpd \e[0m"
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz | tar xzC ${ROOT_FOLDER}
-cd ${ROOT_FOLDER}/libmicrohttpd-0.9.72
-./configure --disable-messages --disable-postprocessor --disable-dauth
-make
+yum install --nogpgcheck -y openssl-devel
+
+wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz
+tar zxvf cmake-3.*
+cd cmake-3.12.3
+./bootstrap --prefix=/usr/local
+make -j$(nproc)
 make install
-cd ${ROOT_FOLDER} && rm -Rf libmicrohttpd-0.9.72
+
+echo
+echo -e "\e[1;32m Builder: installing mongo c driver \e[0m"
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
+tar xzf mongo-c-driver-1.17.5.tar.gz
+cd mongo-c-driver-1.17.5
+mkdir cmake-build
+cd cmake-build
+cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+make install

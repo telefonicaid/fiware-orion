@@ -20,34 +20,14 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+
 set -e
 
-BUILD_DEPS=(
- 'libboost-all-dev' \
- 'libcurl4-openssl-dev' \
- 'libgcrypt-dev' \
- 'libgnutls28-dev' \
- 'libsasl2-dev' \
- 'libssl-dev' \
- 'uuid-dev' \
-)
-
-BUILD_TOOLS=(
- 'apt-transport-https' \
- 'bzip2' \
- 'ca-certificates' \
- 'cmake' \
- 'curl' \
- 'wget' \
- 'dirmngr' \
- 'g++' \
- 'gcc' \
- 'git' \
- 'gnupg' \
- 'make' \
- 'scons' \
-)
-
-apt-get -y install -f --no-install-recommends \
-    ${BUILD_TOOLS[@]} \
-    ${BUILD_DEPS[@]}
+echo
+echo -e "\e[1;32m Builder: installing libmicrohttpd \e[0m"
+curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz | tar xzC ${ROOT_FOLDER}
+cd ${ROOT_FOLDER}/libmicrohttpd-0.9.72
+./configure --disable-postprocessor --disable-dauth --enable-https
+make
+make install
+cd ${ROOT_FOLDER} && rm -Rf libmicrohttpd-0.9.72

@@ -24,11 +24,11 @@
 */
 #include <stdio.h>                                             // popen, fgets
 #include <semaphore.h>                                         // sem_init, sem_take, ...
-#include <postgresql/libpq-fe.h>                               // PGconn
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/common/orionldState.h"                       // troePort
 #include "orionld/troe/pgConnectionPoolInit.h"                 // pgConnectionPoolInit
 #include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare

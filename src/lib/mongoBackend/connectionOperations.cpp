@@ -26,9 +26,11 @@
 
 #include "mongo/client/dbclient.h"
 #include "mongo/client/index_spec.h"
+#include "mongo/client/dbclientinterface.h"              // QueryOption_SlaveOk
 
 #include "orionld/types/OrionldTenant.h"
 #include "orionld/common/orionldState.h"
+#include "orionld/common/performance.h"
 
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
@@ -51,6 +53,15 @@ using mongo::BSONObj;
 using mongo::DBException;
 using mongo::Query;
 using mongo::WriteConcern;
+
+
+
+//
+// FIXME
+//
+// Should be defined in mongo/client/dbclientinterface.h
+//
+#define QueryOption_SlaveOk (1 << 2)
 
 
 
@@ -83,7 +94,7 @@ bool collectionQuery
 
   try
   {
-    *cursor = connection->query(col, q);
+    *cursor = connection->query(col, q, 0, 0, 0, QueryOption_SlaveOk);
 
     // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
     // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
@@ -144,6 +155,8 @@ bool collectionRangedQuery
   std::string*                    err
 )
 {
+  PERFORMANCE(dbStart);
+
   if (connection == NULL)
   {
     LM_E(("Fatal Error (null DB connection)"));
@@ -167,7 +180,7 @@ bool collectionRangedQuery
 
     if (orionldState.onlyCount == false)
     {
-      *cursor = connection->query(col, q, limit, offset);
+      *cursor = connection->query(col, q, limit, offset, 0, QueryOption_SlaveOk);
 
       //
       // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -206,6 +219,9 @@ bool collectionRangedQuery
   }
 
   alarmMgr.dbErrorReset();
+
+  PERFORMANCE(dbEnd);
+
   return true;
 }
 

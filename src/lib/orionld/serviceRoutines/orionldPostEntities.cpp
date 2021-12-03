@@ -55,7 +55,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
@@ -391,9 +391,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (datasets->value.firstChildP != NULL)  // Not Empty
     orionldState.datasets = datasets;
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbStart);
-#endif
+  PERFORMANCE(dbStart);
 
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
@@ -406,9 +404,8 @@ bool orionldPostEntities(ConnectionInfo* ciP)
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbEnd);
-#endif
+  PERFORMANCE(dbEnd);
+
   mongoRequest.release();
   mongoResponse.release();
 

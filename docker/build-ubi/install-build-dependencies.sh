@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -20,15 +20,33 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-
 set -e
 
-echo
-echo -e "\e[1;32m Builder: installing mongo c driver \e[0m"
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
-tar xzf mongo-c-driver-1.17.5.tar.gz
-cd mongo-c-driver-1.17.5
-mkdir cmake-build
-cd cmake-build
-cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
-make install
+BUILD_DEPS=(
+  'libcurl-devel' \
+  'libgcrypt-devel' \
+  'gcc-c++' \
+  'zlib-devel' \
+  'openssl-devel' \
+  'libuuid-devel' \
+  'cyrus-sasl-devel' \
+  'libicu' \
+  'libicu-devel' \
+)
+
+BUILD_TOOLS=(
+ 'bzip2' \
+ 'ca-certificates' \
+ 'python3' \
+ 'python2' \
+ 'cmake' \
+ 'curl' \
+ 'wget' \
+ 'dirmngr' \
+ 'git' \
+ 'make' \
+)
+
+yum -y --nogpgcheck  install \
+    ${BUILD_TOOLS[@]} \
+    ${BUILD_DEPS[@]}

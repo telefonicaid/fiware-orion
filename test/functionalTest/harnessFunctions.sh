@@ -195,10 +195,11 @@ function dbResetAll()
   then
     port="27017"
   fi
-  
+
   all=$(echo show dbs | mongo mongodb://$host:$port --quiet | grep ftest | awk '{ print $1 }')
   for db in $all
   do
+    echo Dropping mongo database $db
     dbDrop $db
   done
 }
@@ -435,6 +436,7 @@ function localBrokerStart()
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
     #
     # Use the CLI --gen-suppressions=all for valgrind to get suppressions (to put in suppressions.supp)
+    #   valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp --gen-suppressions=all $CB_START_CMD > /tmp/valgrind.out 2>&1 &
     valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
   fi
 
@@ -1314,15 +1316,15 @@ function orionCurl()
   if [ "$_xtra"        != "" ]; then  command=${command}' '${_xtra};        fi
 
   command=${command}' --header "Expect:"'
-  command=${command}' -s -S --dump-header /tmp/httpHeaders.out'
+  command=${command}' -k -s -S --dump-header /tmp/httpHeaders.out'
   logMsg command: $command
 
 
   #
   # Execute the command
   #
-  logMsg Executing the curl-command
-  eval $command > /tmp/orionCurl.response 2> /dev/null
+  logMsg Executing the curl-command: $command
+  eval $command > /tmp/orionCurl.response 2> /tmp/curl-stderr
   _response=$(cat /tmp/orionCurl.response)
 
   if [ ! -f /tmp/httpHeaders.out ]

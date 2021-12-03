@@ -1,0 +1,10 @@
+ARG BASE_VERSION=latest
+FROM fiware/orion-ld:${BASE_VERSION}
+
+ADD ./docker/debug/gdbinit gdbinit
+
+RUN yum -y install gdb
+
+ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+
+EXPOSE 1026

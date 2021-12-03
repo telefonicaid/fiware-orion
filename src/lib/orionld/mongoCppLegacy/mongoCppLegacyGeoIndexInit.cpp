@@ -56,11 +56,6 @@ void mongoCppLegacyGeoIndexInit(void)
   OrionldTenant* tenantP = &tenant0;  // tenant0->next == tenantList :)
   tenant0.next = tenantList;          // Better safe than sorry!
 
-  while (tenantP != NULL)
-  {
-    tenantP = tenantP->next;
-  }
-
   tenantP = &tenant0;
   while (tenantP != NULL)
   {

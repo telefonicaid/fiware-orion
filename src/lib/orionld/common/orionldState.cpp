@@ -55,9 +55,6 @@ extern "C"
 const char* orionldVersion = ORIONLD_VERSION;
 
 
-#ifdef REQUEST_PERFORMANCE
-const bool performanceTestInluded = true;
-#endif
 
 // -----------------------------------------------------------------------------
 //
@@ -65,6 +62,12 @@ const bool performanceTestInluded = true;
 //
 __thread OrionldConnectionState orionldState;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// timestamps -
+//
 #ifdef REQUEST_PERFORMANCE
 __thread Timestamps timestamps;
 #endif

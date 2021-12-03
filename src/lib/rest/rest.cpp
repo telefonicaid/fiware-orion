@@ -34,7 +34,7 @@
 
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
 #include "kalloc/kaBufferReset.h"                                // kaBufferReset
 #include "kjson/kjFree.h"                                        // kjFree
 }
@@ -77,7 +77,7 @@ extern "C"
 #include "rest/rest.h"
 
 
-#ifdef REQUEST_PERFORMANCE
+
 // -----------------------------------------------------------------------------
 //
 // TIME_REPORT -
@@ -88,10 +88,8 @@ extern "C"
   float           diffF;                                 \
                                                          \
   kTimeDiff(&start, &end, &diff, &diffF);                \
-  if (diffF > 0)                                         \
-    LM_TMP(("TPUT: %s %f", text, diffF));                \
+  LM_TMP(("TPUT: %s %f", text, diffF));                  \
 }
-#endif
 
 
 
@@ -637,9 +635,9 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     else
     {
       // Tenant used when tenant is not supported by the broker
-      LM_E(("tenant in use but tenant support is not enable for the broker"));
+      LM_E(("tenant in use but tenant support is not enabled for the broker"));
       orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enable for the broker");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
     }
   }
   else if (strcasecmp(key, "NGSILD-Path") == 0)
@@ -713,9 +711,7 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.requestCompletedStart);
-#endif
+  PERFORMANCE(requestCompletedStart);
 
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   const char*      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
@@ -723,15 +719,9 @@ static void requestCompleted
 
   if (orionldState.notify == true)
   {
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.notifStart);
-#endif
-
+    PERFORMANCE(notifStart);
     orionldNotify();
-
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.notifEnd);
-#endif
+    PERFORMANCE(notifEnd);
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -822,39 +812,58 @@ static void requestCompleted
 
   delete(ciP);
 
-#ifdef ORIONLD
   kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
 
   if ((orionldState.responseTree != NULL) && (orionldState.kjsonP == NULL))
     kjFree(orionldState.responseTree);
-#endif
 
   *con_cls = NULL;
 
+  ++reqNo;
+  if (reqNo % 1000 == 0)
+    LM_TMP(("reqNo: %d", reqNo));
+
 #ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.reqEnd);
+  if (reqNo % 100 == 0)
+  {
+    PERFORMANCE(reqEnd);
 
-  TIME_REPORT(timestamps.reqStart,            timestamps.serviceRoutineStart,    "Before Service Routine:    ");
-  TIME_REPORT(timestamps.serviceRoutineStart, timestamps.serviceRoutineEnd,      "During Service Routine:    ");
-  TIME_REPORT(timestamps.serviceRoutineEnd,   timestamps.reqEnd,                 "After Service Routine:     ");
-  TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting Mongo:            ");
-  TIME_REPORT(timestamps.parseStart,          timestamps.parseEnd,               "Payload Parse:             ");
-  TIME_REPORT(timestamps.renderStart,         timestamps.renderEnd,              "Rendering Response:        ");
-  TIME_REPORT(timestamps.restReplyStart,      timestamps.restReplyEnd,           "Sending Response:          ");
-  TIME_REPORT(timestamps.forwardStart,        timestamps.forwardEnd,             "Forwarding:                ");
-  TIME_REPORT(timestamps.forwardDbStart,      timestamps.forwardDbEnd,           "DB Query for Forwarding:   ");
-  TIME_REPORT(timestamps.reqStart,            timestamps.reqEnd,                 "Entire request:            ");
-  TIME_REPORT(timestamps.troeStart,           timestamps.troeEnd,                "TRoE Processing:           ");
-  TIME_REPORT(timestamps.requestPartEnd,      timestamps.requestCompletedStart,  "MHD Delay (send response): ");
+    TIME_REPORT(timestamps.reqStart,            timestamps.serviceRoutineStart,    "Before Service Routine:    ");
+    TIME_REPORT(timestamps.serviceRoutineStart, timestamps.serviceRoutineEnd,      "During Service Routine:    ");
+    TIME_REPORT(timestamps.serviceRoutineEnd,   timestamps.reqEnd,                 "After Service Routine:     ");
+    TIME_REPORT(timestamps.parseStart,          timestamps.parseEnd,               "Payload Parse:             ");
+    TIME_REPORT(timestamps.renderStart,         timestamps.renderEnd,              "Rendering Response:        ");
+    TIME_REPORT(timestamps.restReplyStart,      timestamps.restReplyEnd,           "Sending Response:          ");
+    TIME_REPORT(timestamps.forwardStart,        timestamps.forwardEnd,             "Forwarding:                ");
+    TIME_REPORT(timestamps.forwardDbStart,      timestamps.forwardDbEnd,           "DB Query for Forwarding:   ");
+    TIME_REPORT(timestamps.reqStart,            timestamps.reqEnd,                 "Entire request:            ");
+    TIME_REPORT(timestamps.troeStart,           timestamps.troeEnd,                "TRoE Processing:           ");
+    TIME_REPORT(timestamps.requestPartEnd,      timestamps.requestCompletedStart,  "MHD Delay (send response): ");
 
-  struct timespec  all;
-  struct timespec  mongo;
-  float            allF;
-  float            mongoF;
+    TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting DB:               ");
+    TIME_REPORT(timestamps.mongoBackendStart,   timestamps.mongoBackendEnd,        "Awaiting MongoBackend:     ");
 
-  kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
-  kTimeDiff(&timestamps.dbStart,  &timestamps.dbEnd,  &mongo, &mongoF);
-  LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+    for (int ix = 0; ix < 50; ix++)
+    {
+      if (timestamps.srDesc[ix] != NULL)
+        TIME_REPORT(timestamps.srStart[ix], timestamps.srEnd[ix], timestamps.srDesc[ix]);
+    }
+
+    struct timespec  all;
+    struct timespec  mongo;
+    float            mongoF;
+    float            allF;
+
+    kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
+
+    if (timestamps.dbStart.tv_sec != 0)
+      kTimeDiff(&timestamps.dbStart,           &timestamps.dbEnd,           &mongo, &mongoF);
+    else
+      kTimeDiff(&timestamps.mongoBackendStart, &timestamps.mongoBackendEnd, &mongo, &mongoF);
+
+    LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+    LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", timestamps.mongoConnectAccumulated, timestamps.getMongoConnectionCalls));
+  }
 #endif
 }
 
@@ -1081,7 +1090,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     // This was previously an LM_T trace, but we have "promoted" it to INFO due to
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
-    LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
 

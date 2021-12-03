@@ -731,7 +731,7 @@ void paHelp(void)
   memset(paResultString, 0, sizeof(paResultString));
   paExitOnUsage = false;
   paUsage();
-  strncpy(usageString, paResultString, sizeof(usageString));
+  strncpy(usageString, paResultString, sizeof(usageString) - 1);
   memset(paResultString, 0, sizeof(paResultString));
 
   if (paHelpFile != NULL)
@@ -775,9 +775,9 @@ void paHelp(void)
             LM_T(LmtHelp, ("found variable '%s'", helpVar[ix].varName));
             ++changes;
 
-            strncpy(end, &tmp[strlen(helpVar[ix].varName)], sizeof(end));
+            strncpy(end, &tmp[strlen(helpVar[ix].varName)], sizeof(end) - 1);
             *tmp = 0;
-            strncpy(start, line, sizeof(start));
+            strncpy(start, line, sizeof(start) - 1);
             snprintf(line, sizeof(line), "%s%s%s", start, helpVar[ix].varP, end);
           }
         }

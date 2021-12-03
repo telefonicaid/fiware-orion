@@ -29,7 +29,7 @@ sudo apt-get install aptitude
 Tools needed for compilation and testing:
 
 ```bash
-sudo aptitude install build-essential cmake scons curl
+sudo aptitude install build-essential cmake curl
 ```
 
 Libraries that aren't built from source code:
@@ -37,7 +37,7 @@ Libraries that aren't built from source code:
 ```bash
 sudo aptitude install libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
                       libgcrypt-dev uuid-dev libboost1.67-dev libboost-regex1.67-dev libboost-thread1.67-dev \
-                      libboost-filesystem1.67-dev libz-dev
+                      libboost-filesystem1.67-dev libz-dev libmongoclient-dev
 
 ```
 
@@ -68,17 +68,43 @@ And, as `git` will be used, we might as well install it right away:
 sudo aptitude install git
 ```
 
+
 ### Mongo C++ Driver
 As Orion-LD is based on Orion, and Orion uses the old Legacy C++ driver of the mongo client library, Orion-LD also uses that old library.
 Plans are to migrate, at least all the NGSI-LD requests to the newest C driver of the mongo client, but that work has still not commenced.
 
-To download, build and install:
+### libmicrohttpd
+*libmicrohttpd* is the library that takes care of incoming connections and http/https.
+
+To install libmicrohttpd, a directory under /opt is used, and as 'root' is the owner of /opt, you need 'sudo privileges' and to know your user and group id.
+Your user id you already have in the env var `USER`. Your GROUP you will have to look up.
+Normally the group id is the same as the user id (but, you can be in more than one group).
+See your group using the command `id`:
 
 ```bash
-sudo aptitude install libmongoclient-dev
+$ id
+uid=1000(kz) gid=1000(kz) groups=1000(kz),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),120(lpadmin),131(lxd),132(sambashare)
 ```
+As you can see in this example, my USER is 'kz' and my group is also 'kz', only, I'm in a few more groups as well.
+The first one is the one we'll use: `groups=1000(kz)`.
+To use it we'll create an env var:
+```bash
+export GROUP=kz  # *
+```
+(*): Please don't blindly use 'kz' - use the group that `id` gave you!
 
-After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* under `/usr/local/include/`.
+This is how you install libmicrohttpd from source code:
+```bash
+sudo mkdir /opt/libmicrohttpd
+sudo chown $USER:$GROUP /opt/libmicrohttpd
+cd /opt/libmicrohttpd
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
+tar xvf libmicrohttpd-0.9.72.tar.gz
+cd libmicrohttpd-0.9.72
+./configure --disable-messages --disable-postprocessor --disable-dauth
+make
+sudo make install
+```
 
 ### Mongo C driver
 The idea is to leave the old mongo legacy driver in the dust and new stuff is implemented using the new C driver.
@@ -98,23 +124,6 @@ cmake --build .
 sudo cmake --build . --target install
 ```
 
-### libmicrohttpd
-
-*libmicrohttpd* is the library that takes care of incoming connections and http/https.
-This is how you install libmicrohttpd from source code:
-
-```bash
-sudo mkdir /opt/libmicrohttpd
-sudo chown $USER:$GROUP /opt/libmicrohttpd
-cd /opt/libmicrohttpd
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
-tar xvf libmicrohttpd-0.9.72.tar.gz
-cd libmicrohttpd-0.9.72
-./configure --disable-messages --disable-postprocessor --disable-dauth
-make
-sudo make install
-```
-
 ### rapidjson
 
 *rapidjson* is the JSON parser used by the NGSI APIv2 implementation.
@@ -131,6 +140,26 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
+### Mongo C driver
+Orion-LD uses a mix of the old (deprecated) mongo C++ legacy driver and the new mongo C driver.
+The idea is to migrate all to the new C driver, but right now, the old legacy driver is still needed.
+
+To install version 1.17.5 of the mongo C driver:
+```bash
+sudo mkdir /opt/mongo-c-driver
+sudo chown $USER:$GROUP /opt/mongo-c-driver
+cd /opt/mongo-c-driver
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
+tar xzf mongo-c-driver-1.17.5.tar.gz
+cd mongo-c-driver-1.17.5
+mkdir cmake-build
+cd cmake-build
+cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+export LD_LIBRARY_PATH=/usr/local/lib
+sudo make install
+```
+
+
 ### kbase
 
 *kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
@@ -140,7 +169,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -153,7 +182,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -170,7 +199,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -185,7 +214,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.5
+git checkout release/0.8.1
 make install
 ```
 
@@ -198,7 +227,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.5
+git checkout release/0.8
 make install
 ```
 
@@ -244,6 +273,52 @@ sudo systemctl enable mosquitto
 ```
 
 
+### Postgres 12
+
+Add the postgres repo
+```bash
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+```
+
+#### Install Postgres
+```bash
+sudo apt update
+sudo apt -y install postgresql-12 postgresql-client-12
+sudo apt install postgis postgresql-12-postgis-3
+sudo apt-get install postgresql-12-postgis-3-scripts
+```
+
+Add Postgres development libraries
+```bash
+sudo apt-get install libpq-dev
+```
+
+Add timescale db and posgis
+```bash
+sudo add-apt-repository ppa:timescale/timescaledb-ppa
+sudo apt-get update
+sudo apt install timescaledb-postgresql-12
+```
+
+Command for checking postgres
+```bash
+systemctl status postgresql.service
+systemctl status postgresql@12-main.service 
+systemctl is-enabled postgresql
+```
+
+Edit postgresql.conf
+```bash
+sudo nano /etc/postgresql/12/main/postgresql.conf
+```
+Add this line at then end of the file and save it
+```bash
+shared_preload_libraries = 'timescaledb'
+```
+That's it - no need to send any signals nor restart anything.
+
+
 ## Source code of Orion-LD
 
 Now that we have all the dependencies installed, it's time to clone the Orion-LD repository:
@@ -257,24 +332,8 @@ cd context.Orion-LD
 At the end of `make install`, the makefile wants to copy the executable (orionld) to /usr/bin, and more files under /usr.
 Unless we do something, this will fail, as privileges are needed to create/modify files in system directories.
 What we will do is to create the files by hand, using `sudo` and then set ourselves as owner of the files.
-For this you need to know your user and group id.
-Your user id you already have in the env var `USER`. Your GROUP you have to look up.
-Normally the group id is the same as the user id (but, you can be in more than one group).
-See your group using the command `id`:
+The GROUP env var previously defined is used here:
 
-```bash
-$ id
-uid=1000(kz) gid=1000(kz) groups=1000(kz),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),120(lpadmin),131(lxd),132(sambashare)
-```
-As you can see in this example, my USER is 'kz' and my group is also 'kz', only, I'm in a few more groups as well.
-The first one is the one we'll use: `groups=1000(kz)`.
-To use it we'll create an env var:
-```bash
-export GROUP=kz  # *
-```
-(*): Please don't blindly use 'kz' - use the group that `id` gave you!
-
-After that, we create and change owner of three files:
 ```bash
 sudo touch /usr/bin/orionld
 sudo chown $USER:$GROUP /usr/bin/orionld

@@ -43,11 +43,13 @@ fi
 # In some other cases we have found that the /etc/redhat-release content uses the following pattern:
 #
 #  Red Hat Enterprise Linux Server release 6.7 (Santiago)
+#  Red Hat Enterprise Linux release 8.4 (Ootpa)
 #
 # The check in the next line ensures that the distro version is correctly detected in this case.
 if [ "$centos_distro" = "Enterprise" ]
 then
-	centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $7}')
+	redhat_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $6}')
+  unset centos_distro
 fi
 
 fedora_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $1}')
@@ -69,6 +71,10 @@ then
 elif [ "$centos_distro" != "" ]
 then
   distro=CentOS_$centos_distro 
+elif [ "$redhat_distro" != "" ]
+then
+  distro=RedHat_$redhat_distro
 fi
+
 
 echo -n $distro

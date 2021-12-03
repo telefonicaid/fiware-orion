@@ -23,29 +23,13 @@
 
 set -e
 
-OPS_DEPS_CORE=(
-  'libcurl3' \
-  'libssl1.1' \
-  'ca-certificates' \
-)
+yum -y install http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
+yum -y install boost-devel scons
 
-OPS_DEPS_BOOST=(
- 'libboost-filesystem' \
- 'libboost-regex' \
- 'libboost-thread' \
-)
+echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"
+git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT_FOLDER}/mongo-cxx-driver
+cd ${ROOT_FOLDER}/mongo-cxx-driver
+scons --disable-warnings-as-errors --use-sasl-client --ssl
+scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
+cd ${ROOT_FOLDER} && rm -Rf mongo-cxx-driver
 
-apt-get -y update
-
-apt-get -y install -f --no-install-recommends 'libboost-all-dev'
-
-BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)
-echo
-echo -e "\e[1;32m Builder: installing boost ops deps \e[0m"
-for i in ${OPS_DEPS_BOOST[@]}; do TO_INSTALL="${TO_INSTALL} ${i}${BOOST_VER}"; done
-apt-get install -y ${TO_INSTALL[@]}
-
-echo
-echo -e "\e[1;32m Builder: installing core ops deps \e[0m"
-apt-get -y install --no-install-recommends \
-    ${OPS_DEPS_CORE[@]}

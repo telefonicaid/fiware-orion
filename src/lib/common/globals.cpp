@@ -181,7 +181,7 @@ void orionInit
   timingStatistics     = _timingStatistics;
   notifQueueStatistics = _notifQueueStatistics;
 
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(transactionId, "N/A", sizeof(transactionId) - 1);
 
   checkIdv1 = _checkIdv1;
 }

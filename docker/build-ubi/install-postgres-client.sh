@@ -19,27 +19,24 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
-
-
 set -e
 
-echo
-echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"
-git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT_FOLDER}/mongo-cxx-driver
-cd ${ROOT_FOLDER}/mongo-cxx-driver
-scons --disable-warnings-as-errors --use-sasl-client --ssl
-scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
-cd ${ROOT_FOLDER} && rm -Rf mongo-cxx-driver
+echo "Yum utils"
+yum -y install yum-utils
 
-echo
-echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
-apt-get -y install --reinstall systemd  # force reinstall systemd
-service dbus start
+echo "Add repo rpms"
+yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+yum -y --nogpgcheck install postgresql12 postgresql12-contrib
 
-echo
-echo -e "\e[1;32m Builder: installing mongo \e[0m"
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+echo "Add repos"
+yum-config-manager --add-repo http://mirror.centos.org/centos/8/AppStream/x86_64/os/
+yum-config-manager --add-repo http://mirror.centos.org/centos/8/PowerTools/x86_64/os/
+yum update -y --nogpgcheck
 
-echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
-apt-get -y update
-apt-get -y install mongodb-org mongodb-org-shell
+
+echo "Install libs"
+yum -y --nogpgcheck install hdf5 xerces-c gdal-libs
+
+echo "Install  postgres"
+yum -y install libpqxx-devel postgresql12-devel postgresql12-libs

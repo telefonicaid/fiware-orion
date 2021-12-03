@@ -168,7 +168,7 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
   else
   {
     ciP->port = 0;
-    strncpy(clientIp, "IP unknown", sizeof(clientIp));
+    strncpy(clientIp, "IP unknown", sizeof(clientIp) - 1);
   }
 }
 
@@ -549,13 +549,8 @@ MHD_Result orionldMhdConnectionInit
 {
   ++requestNo;
 
-  //
-  // This call to LM_K should not be removed.
-  // At most, commented out
-  //
-#ifndef REQUEST_PERFORMANCE
-  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
-#endif
+  if (requestNo % 1000 == 0)
+    LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 1. Prepare connectionInfo

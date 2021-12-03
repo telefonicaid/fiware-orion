@@ -29,15 +29,15 @@ ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName
 extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
 
 export BROKER_AWAIT_SLEEP_TIME=6
-brokerStart CB 0-255 IPV4 "$extraParams"
+brokerStart CB 0 IPv4 "$extraParams"
 unset BROKER_AWAIT_SLEEP_TIME
 
 --SHELL--
 #
 # Register a Sensor of temperature
 #
-echo "+++ 1: Register a Sensor of temperature"
-url="/v1/registry/registerContext"
+echo "01. Register a Sensor of temperature"
+echo "===================================="
 payload='{
   "contextRegistrations": [
     {
@@ -59,16 +59,15 @@ payload='{
   ],
   "duration": "PT1H"
 }'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
-
+orionCurl --host "https://localhost" --url /v1/registry/registerContext --payload "${payload}" "--cacert /tmp/harnessTest.pem"
 echo
 echo
 
 #
 # Discovery
 #
-echo "+++ 2: Discover the Sensor of temperature"
-url="/v1/registry/discoverContextAvailability"
+echo "02. Discover the Sensor of temperature"
+echo "======================================"
 payload='{
   "entities": [
     {
@@ -81,11 +80,13 @@ payload='{
     "temperature"
   ]
 }'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
-
+orionCurl --host "https://localhost" --url /v1/registry/discoverContextAvailability --payload "${payload}" "--cacert /tmp/harnessTest.pem"
+echo
+echo
 
 --REGEXPECT--
-+++ 1: Register a Sensor of temperature
+01. Register a Sensor of temperature
+====================================
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
@@ -98,7 +99,8 @@ Date: REGEX(.*)
 }
 
 
-+++ 2: Discover the Sensor of temperature
+02. Discover the Sensor of temperature
+======================================
 HTTP/1.1 200 OK
 Content-Length: 232
 Content-Type: application/json
@@ -128,6 +130,8 @@ Date: REGEX(.*)
         }
     ]
 }
+
+
 --TEARDOWN--
 brokerStop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

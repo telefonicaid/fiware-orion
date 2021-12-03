@@ -1,0 +1,34 @@
+FROM registry.access.redhat.com/ubi8/ubi:8.5
+
+ENV ROOT_FOLDER='/opt'
+ENV PAHO_VERSION='v1.3.1'
+
+RUN mkdir /tmp/build
+
+COPY ./docker/build-ubi/install-build-dependencies.sh /tmp/build/install-build-dependencies.sh
+RUN /tmp/build/install-build-dependencies.sh
+
+COPY ./docker/build-ubi/install-gnutls.sh /tmp/build/install-gnutls.sh
+RUN /tmp/build/install-gnutls.sh
+
+COPY ./docker/build-ubi/install-lib-microhttp.sh /tmp/build/install-lib-microhttp.sh
+RUN /tmp/build/install-lib-microhttp.sh
+
+COPY ./docker/build-ubi/install-paho-client.sh /tmp/build/install-paho-client.sh
+RUN /tmp/build/install-paho-client.sh
+
+COPY ./docker/build-ubi/install-k-libs.sh /tmp/build/install-k-libs.sh
+RUN /tmp/build/install-k-libs.sh
+
+COPY ./docker/build-ubi/install-mongo-driver.sh /tmp/build/install-mongo-driver.sh
+RUN /tmp/build/install-mongo-driver.sh
+
+COPY ./docker/build-ubi/install-mongoc-driver.sh /tmp/build/install-mongoc-driver.sh
+RUN /tmp/build/install-mongoc-driver.sh
+
+COPY ./docker/build-ubi/install-postgres-client.sh /tmp/build/install-postgres-client.sh
+RUN /tmp/build/install-postgres-client.sh
+
+COPY ./docker/build-ubi/install-rapid-json.sh /tmp/build/install-rapid-json.sh
+RUN /tmp/build/install-rapid-json.sh
+

@@ -68,7 +68,7 @@ char avSubscriptionsCollection[128];
 
 void setDbPrefix(const char* prefix)
 {
-  strncpy(dbPrefix, prefix, sizeof(dbPrefix));
+  strncpy(dbPrefix, prefix, sizeof(dbPrefix) - 1);
 }
 
 void setRegistrationsCollectionName(const char* colName)
