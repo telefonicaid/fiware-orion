@@ -21,8 +21,7 @@ LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan
       vendor="FIWARE Foundation e.V." \
       documentation="https://github.com/FIWARE/context.Orion-LD/tree/develop/doc" \
       name="FIWARE Orion-LD" \
-      summary="Contains Orion-LD context broker." \
-
+      summary="Contains Orion-LD context broker."
 
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 RUN mkdir -p /var/{log,run}/orionld
