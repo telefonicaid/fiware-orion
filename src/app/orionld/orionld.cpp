@@ -623,48 +623,42 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 *
 * loadFile -
 */
-static int loadFile(char* path, char* out, int outSize)
+static char* loadFile(char* path)
 {
   struct stat  statBuf;
   int          nb;
   int          fd = open(path, O_RDONLY);
+  char*        buf;
 
   if (fd == -1)
-  {
-    LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
-    LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
-    return -1;
+    LM_RE(NULL, ("HTTPS Error (stat '%s': %s)", path, strerror(errno)));
   }
 
-  if (statBuf.st_size > outSize)
+  buf = (char*) malloc(statBuf.st_size + 1);
+
+  if (buf == NULL)
   {
     close(fd);
-    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
-    return -1;
+    LM_RE(NULL, ("HTTPS Error (out of memory allocating room for https key/cert file of %d bytes)", statBuf.st_size + 1));
   }
 
-  nb = read(fd, out, statBuf.st_size);
+  nb = read(fd, buf, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
-  {
-    LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
 
   if (nb != statBuf.st_size)
-  {
-    LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
 
-  return 0;
+  buf[statBuf.st_size] = 0;  // Zero-terminate the buffer
+
+  return buf;
 }
 
 
@@ -1029,15 +1023,20 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    char* httpsPrivateServerKey = loadFile(httpsKeyFile);
+    char* httpsCertificate      = loadFile(httpsCertFile);
 
-    if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
+    if (httpsPrivateServerKey == NULL)
     {
+      if (httpsCertificate != NULL)
+        free(httpsCertificate);
       LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
     }
-    if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
+
+    if (httpsCertificate == NULL)
     {
+      if (httpsPrivateServerKey != NULL)
+        free(httpsPrivateServerKey);
       LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
     }
 
