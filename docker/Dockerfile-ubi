@@ -15,8 +15,19 @@ RUN strip /usr/bin/orionld
 
 FROM registry.access.redhat.com/ubi8/ubi:8.4
 
+LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan.wiedemann@fiware.org" \
+      description="Orion-LD is a Context Broker which supports both the NGSI-LD and the NGSI-v2 APIs." \
+      maintainer="ken.zangelin@fiware.org,stefan.wiedemann@fiware.org" \
+      vendor="FIWARE Foundation e.V." \
+      documentation="https://github.com/FIWARE/context.Orion-LD/tree/develop/doc" \
+      name="FIWARE Orion-LD" \
+      summary="Contains Orion-LD context broker."
+
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 RUN mkdir -p /var/{log,run}/orionld
+
+RUN mkdir /licenses
+COPY ./LICENSE /licenses/LICENSE
 
 COPY --from=build-stage /etc/ssl/ /etc/ssl/
 COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
