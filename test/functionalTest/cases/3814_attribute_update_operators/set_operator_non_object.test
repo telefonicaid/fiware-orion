@@ -124,7 +124,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Database Error &#40;collection: ftest.entities - REGEX(.*) - exception: Plan executor error during findAndModify :: caused by :: Cannot create field &#39;Y&#39; in element {value: &quot;foo&quot;}&#41;",
+    "description": "Database Error &#40;collection: ftest.entities - REGEX(.*) Cannot create field &#39;Y&#39; in element {value: &quot;foo&quot;}&#41;",
     "error": "InternalServerError"
 }
 
