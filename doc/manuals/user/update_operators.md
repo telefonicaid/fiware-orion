@@ -284,6 +284,14 @@ POST /v2/entities/E/attrs/A
 
 We don't recommend this usage, as the regular update is simpler.
 
+Some additiona notes:
+
+* `$set` will work if the previous attribute value is an empty object (i.e. `{}`)
+* `$set+ will work if the attribute doesn't previously exist in the entity (although the entity
+  itself has to exist, as explained [here](#create-or-replace-entities))
+* `$set` will not work if the previous value of the attribute is not an object (i.e. a context
+  string like `"foo"`). An `InternalServerError` will be raised in this case.
+
 ### `$unset`
 
 To be used with attributes which value is an object to remove a sub-key from the
