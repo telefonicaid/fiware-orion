@@ -178,7 +178,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$push": 3 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -194,7 +194,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 4 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -204,7 +204,7 @@ would change the value of attribute A to `[1, 2, 3, 4]`. However, the following 
 POST /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 3 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -221,7 +221,7 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$pull": 2 },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
@@ -238,11 +238,121 @@ For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]`
 POST /v2/entities/E/attrs/A
 {
   "value": { "$pullAll": [2, 3] },
-  "type": "Number"
+  "type": "Array"
 }
 ```
 
 would change the value of attribute A to `[1]`.
+
+### `$set`
+
+To be used with attributes which value is an object to add/update a sub-key in the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"X": 1, "Y": 20, "Z": 30}`.
+
+For consistence, `$set` can be used with values that are not an object, such as:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": "foo" },
+  "type": "Object"
+}
+```
+
+which has the same effect than a regular update, i.e.:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": "foo",
+  "type": "Object"
+}
+```
+
+We don't recommend this usage, as the regular update is simpler.
+
+Some additiona notes:
+
+* `$set` will work if the previous attribute value is an empty object (i.e. `{}`)
+* `$set` will work if the attribute doesn't previously exist in the entity (although the entity
+  itself has to exist, as explained [here](#create-or-replace-entities))
+* `$set` will not work if the previous value of the attribute is not an object (i.e. a context
+  string like `"foo"`). An `InternalServerError` will be raised in this case.
+
+### `$unset`
+
+To be used with attributes which value is an object to remove a sub-key from the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 2}`.
+
+The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
+for simplicity but the following request would also work and would be equivalent to the one above:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": null} },
+  "type": "Object"
+}
+```
+
+Note that if the value of `$unset` is not an object, it will be ignored. Not existing sub-keys
+are also ignored.
+
+### Combining `$set` and `$unset`
+
+You can combine the usage of `$set` and `$unset` in the same attribute update.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 20}`.
+
+The sub-keys in the `$set` value cannot be at the same time in the `$unset` value or
+the other way around. For instance the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would result in error.
 
 ## How Orion deals with operators
 
@@ -298,14 +408,16 @@ POST /v2/entities/E/attrs/A
 }
 ```
 
-
 you will get (randomly, in principle) one among this ones:
 
 * A gets increased its value by 1
 * A gets multiply its value by 10
 * A gets is value updated to (literally) this JSON object: `{ "x": 1, "$inc": 1, "$mul": 10 }`
 
-So be careful of avoiding this situations.
+So be careful of avoiding these situations.
+
+The only exception to "use only one operator" rule is the case of `$set` and
+`$unset`, that can be used together [as described above](#combining-set-and-unset).
 
 ## Current limitations
 
