@@ -28,21 +28,19 @@ jobs:
           password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
 
 
-#      - name: Build image
-#        uses: redhat-actions/buildah-build@v2
-#        id: build-image
-#        with:
-#          image: ${{ env.IMAGE_NAME }}
-#          tags: ${{ env.IMAGE_TAG_PRE }}
-#          containerfiles: |
-#            ./docker/Dockerfile-ubi
+      - name: Build image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}
+          containerfiles: |
+            ./docker/Dockerfile-ubi
             
       - name: Push To certification registry
         id: push-to-cert
-        run: |
-          docker pull fiware/orion-ld:latest
-          docker tag fiware/orion-ld:latest orion:test        
-          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/orion:test
+        run: |      
+          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
   
   
 
