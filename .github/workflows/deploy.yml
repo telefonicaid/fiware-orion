@@ -28,7 +28,6 @@ jobs:
           username: unused
           password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
 
-
       - name: Build image
         uses: redhat-actions/buildah-build@v2
         id: build-image
