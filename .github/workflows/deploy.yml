@@ -20,24 +20,29 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build image
-        uses: redhat-actions/buildah-build@v2
-        id: build-image
-        with:
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.IMAGE_TAG_PRE }} latest
-          containerfiles: |
-            ./docker/Dockerfile-ubi
+      - name: Login to podman
+        uses: redhat-actions/podman-login@v1
+        registry: scan.connect.redhat.com
+        username: unused
+        password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
+
+
+#      - name: Build image
+#        uses: redhat-actions/buildah-build@v2
+#        id: build-image
+#        with:
+#          image: ${{ env.IMAGE_NAME }}
+#          tags: ${{ env.IMAGE_TAG_PRE }}
+#          containerfiles: |
+#            ./docker/Dockerfile-ubi
             
       - name: Push To certification registry
         id: push-to-cert
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/
-          username: unused
-          password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
+        run: |
+          docker tag fiware/orion-ld:1.0.0-PRE-345 orion:test        
+          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/orion:test
+  
+  
 
   # push to dockerhub
   deploy-release-dockerhub:
