@@ -11,40 +11,35 @@ env:
   IMAGE_TAG_PRE: 1.0.0-PRE-${{ github.run_number }}
 
 jobs:
-  test:
+
+  # push to redhat's certification scan registry
+  deploy-to-redhat-scan:
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Log in to certification registry
-        uses: redhat-actions/podman-login@v1
-        with:
-          username: unused
-          password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
-          registry: scan.connect.redhat.com
-
-      - name: Buildah Action
-        uses: redhat-actions/buildah-build@v2
-        id: build-image
-        with:
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.IMAGE_TAG_PRE }} latest
-          containerfiles: |
-            ./docker/Dockerfile-ubi
+#
+#      - name: Build image
+#        uses: redhat-actions/buildah-build@v2
+#        id: build-image
+#        with:
+#          image: ${{ env.IMAGE_NAME }}
+#          tags: ${{ env.IMAGE_TAG_PRE }} latest
+#          containerfiles: |
+#            ./docker/Dockerfile-ubi
             
-      - name: Push To quay.io
-        id: push-to-quay
+      - name: Push To certification registry
+        id: push-to-cert
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: scan.connect.redhat.com
+          image: quay.io/fiware/orion-ld #${{ steps.build-image.outputs.image }}
+          tags: 0.9-PRE-342-debug #${{ steps.build-image.outputs.tags }}
+          registry: scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/
           username: unused
           password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
 
-
+  # push to dockerhub
   deploy-release-dockerhub:
 
     runs-on: ubuntu-18.04
