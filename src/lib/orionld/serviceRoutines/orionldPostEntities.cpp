@@ -409,9 +409,15 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   mongoRequest.release();
   mongoResponse.release();
 
-  if (orionldState.httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != 200)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
+    return false;
+  }
+  else if ((mongoResponse.oe.code != 200) && (mongoResponse.oe.code != 0))
+  {
+    LM_E(("mongoUpdateContext: mongo responds with error %d: '%s'", mongoResponse.oe.code, mongoResponse.oe.details));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }

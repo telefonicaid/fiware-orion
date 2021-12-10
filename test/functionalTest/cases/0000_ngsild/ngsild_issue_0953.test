@@ -1,0 +1,226 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo-Query and problem with index in MongoDB - see issue #953
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity urn:ngsi-ld:test123:99 with a location property
+# 02. Attempt to create an entity with an invalid polygon having 4 identical points - see error
+# 03. Query using geometry URL params
+#
+
+echo "01. Create an entity urn:ngsi-ld:test123:99 with a location property"
+echo "===================================================================="
+payload='{
+  "id" : "urn:ngsi-ld:test123:99",
+  "type" : "testtype",
+  "brandName" : {
+    "type" : "Property",
+    "address" : {
+      "type" : "Property",
+      "value" : {
+        "city" : "Berlin",
+        "street" : "Ulrich Strasse"
+      }
+    },
+    "value" : [ 
+      {
+        "bla1" : "Mercedes"
+      },
+      {
+        "bla2" : "Audi"
+      }
+    ],
+    "unitCode" : "EUR"
+  },
+  "isParked" : {
+    "type" : "Relationship",
+    "providedBy" : {
+      "type" : "Relationship",
+      "object" : "urn:ngsi-ld:Person:Bob"
+    },
+    "object" :"urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt" : "2017-07-29T12:00:04Z"
+  },
+  "location" : {
+    "type" : "GeoProperty",
+    "value" : {
+      "type" : "Point",
+      "coordinates" : [ 8.6447165, 49.4184066 ] 
+    },
+    "observedAt" :"2021-07-19T12:01:12.466Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create an entity with an invalid polygon having 4 identical points - see error"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:6",
+  "type" : "testtype",
+  "brandName": {
+    "type" : "Property",
+    "address" : {
+      "type" : "Property",
+      "value" : {
+        "city" : "Berlin",
+        "street" : "Ulrich Strasse"
+      }
+    },
+    "value" : [
+      {
+       "bla1" : "Mercedes"
+      },
+      {
+        "bla2" : "Audi"
+      }
+    ],
+    "unitCode" : "EUR"
+  },
+  "isParked" : {
+    "type" : "Relationship",
+      "providedBy" : {
+        "type" : "Relationship",
+        "object" : "urn:ngsi-ld:Person:Bob"
+      },
+    "object" :"urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt" : "2017-07-29T12:00:04Z"
+  },
+  "location" : {
+    "type" : "GeoProperty",
+    "value" : {
+      "type" : "Polygon",
+      "coordinates" : [ [
+        [ 8.6447165, 49.4184066 ],
+        [ 8.6447165, 49.4184066 ],
+        [ 8.6447165, 49.4184066 ],
+        [ 8.6447165, 49.4184066 ] 
+      ] ]
+    },
+    "observedAt" :"2021-07-19T12:01:12.466Z"  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Query using geometry URL params"
+echo "==================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=testtype&geoproperty=location&georel=near;maxDistance==1500&geometry=Point&coordinates=%5B8.6447165,49.4184066%5D&limit=500'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:test123:99 with a location property
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test123:99
+Date: REGEX(.*)
+
+
+
+02. Attempt to create an entity with an invalid polygon having 4 identical points - see error
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Error from Mongo-DB backend",
+    "title": "Internal Error",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Query using geometry URL params
+===================================
+HTTP/1.1 200 OK
+Content-Length: 558
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "brandName": {
+            "address": {
+                "type": "Property",
+                "value": {
+                    "city": "Berlin",
+                    "street": "Ulrich Strasse"
+                }
+            },
+            "type": "Property",
+            "unitCode": "EUR",
+            "value": [
+                {
+                    "bla1": "Mercedes"
+                },
+                {
+                    "bla2": "Audi"
+                }
+            ]
+        },
+        "id": "urn:ngsi-ld:test123:99",
+        "isParked": {
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04.000Z",
+            "providedBy": {
+                "object": "urn:ngsi-ld:Person:Bob",
+                "type": "Relationship"
+            },
+            "type": "Relationship"
+        },
+        "location": {
+            "observedAt": "2021-07-19T12:01:12.466Z",
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    8.644716,
+                    49.418407
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "testtype"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
