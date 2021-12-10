@@ -28,6 +28,10 @@ jobs:
 #          tags: ${{ env.IMAGE_TAG_PRE }} latest
 #          containerfiles: |
 #            ./docker/Dockerfile-ubi
+
+      - name: PULL
+        run:
+          docker pull quay.io/fiware/orion-ld:0.9-PRE-342-debug
             
       - name: Push To certification registry
         id: push-to-cert
