@@ -284,7 +284,7 @@ POST /v2/entities/E/attrs/A
 
 We don't recommend this usage, as the regular update is simpler.
 
-Some additiona notes:
+Some additional notes:
 
 * `$set` will work if the previous attribute value is an empty object (i.e. `{}`)
 * `$set` will work if the attribute doesn't previously exist in the entity (although the entity
