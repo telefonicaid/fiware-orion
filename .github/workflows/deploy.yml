@@ -22,9 +22,9 @@ jobs:
 
       - name: Login to podman
         uses: redhat-actions/podman-login@v1
-        registry: scan.connect.redhat.com
-        username: unused
-        password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
 
 
 #      - name: Build image
