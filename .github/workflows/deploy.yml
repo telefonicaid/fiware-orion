@@ -22,6 +22,7 @@ jobs:
 
       - name: Login to podman
         uses: redhat-actions/podman-login@v1
+        with:
           registry: scan.connect.redhat.com
           username: unused
           password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
