@@ -5,12 +5,45 @@ on:
     branches:
 
 env:
-  IMAGE_NAME: fiware/orion-ld
+  IMAGE_ORG: fiware
+  IMAGE_NAME: orion-ld
   IMAGE_TAG_LATEST:  latest
   IMAGE_TAG_DEBUG: debug
-  IMAGE_TAG_PRE: 0.9-PRE-${{ github.run_number }}
+  IMAGE_TAG_PRE: 1.0.0-PRE-${{ github.run_number }}
 
 jobs:
+
+  # push to redhat's certification scan registry
+  deploy-to-redhat-scan:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to podman
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
+
+      - name: Build image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}
+          containerfiles: |
+            ./docker/Dockerfile-ubi
+            
+      - name: Push To certification registry
+        id: push-to-cert
+        run: |
+          podman tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }} scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+
+  # push to dockerhub
   deploy-release-dockerhub:
 
     runs-on: ubuntu-18.04
@@ -37,8 +70,8 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile-ubi
           no-cache: true
 
@@ -48,7 +81,7 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-GDB
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-GDB
           build-args: |
             BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile-gdb
@@ -79,7 +112,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          tags: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
           file: docker/Dockerfile-debug
           no-cache: true
 
@@ -97,7 +130,7 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           oci: true
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
@@ -117,7 +150,7 @@ jobs:
         id: build-image-gdb
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-GDB
           oci: true
           dockerfiles: |
@@ -148,7 +181,7 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
           oci: true
           dockerfiles: |
