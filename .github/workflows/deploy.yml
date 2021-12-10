@@ -39,7 +39,8 @@ jobs:
             
       - name: Push To certification registry
         id: push-to-cert
-        run: |      
+        run: |
+          podman tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_TAG_PRE }} scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
   
   
