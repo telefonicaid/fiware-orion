@@ -1,4 +1,4 @@
-name: Publish pre Image from master
+name: Publish rpm from master
 
 on:
   push:
