@@ -38,8 +38,8 @@ jobs:
         uses: sonatype-nexus-community/nexus-repo-github-action@master
           with:
             serverUrl: https://nexus.lab.fiware.org
-            username: admin
-            password: ${{ secrets.password }}
+            username: telefonica-github
+            password: ${{ secret.NEXUS_PASSWORD }}
             format: rpm
             repository: repository/el/8/x86_64/nightly
             filename: ./rpm/RPMS/x86_64/contextBroker-${{ steps.get_version.outputs.version }}-nightly.x86_64.rpm
