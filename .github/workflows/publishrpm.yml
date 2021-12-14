@@ -1,0 +1,46 @@
+name: Publish pre Image from master
+
+on:
+  push:
+    branches:
+      - master
+
+# will produce tags in format fiware/orion:<SEMVER>-PRE-<INCREASING-NUMBER>, f.e. fiware/orion:2.6.0-PRE-12
+env:
+  CI_IMAGE: fiware/orion-ci:rpm8
+
+jobs:
+  build-rpm:
+
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Build
+        id: rpm_build
+        run: |
+          docker run -e BROKER_RELEASE=nightly -v $(pwd):/opt/orion --workdir=/opt/orion fiware/orion-ci:rpm8 make rpm
+
+      - name: Get version
+        id: get_version
+        run: |
+          version=$(cat /src/app/contextBroker/version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g')
+          echo "::set-output name=version::${version}"
+
+      - name: Push
+        id: push
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+          with:
+            serverUrl: https://nexus.lab.fiware.org
+            username: admin
+            password: ${{ secrets.password }}
+            format: rpm
+            repository: repository/el/8/x86_64/nightly
+            filename: ./rpm/RPMS/x86_64/contextBroker-${{ steps.get_version.outputs.version }}-nightly.x86_64.rpm
+
