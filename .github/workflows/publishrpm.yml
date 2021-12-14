@@ -39,6 +39,7 @@ jobs:
           username: telefonica-github
           password: ${{ secrets.NEXUS_PASSWORD }}
           format: rpm
+          assets: extension=rpm
           coordinates: directory=8/x86_64/nightly
           repository: el
           filename: ./rpm/RPMS/x86_64/contextBroker-${{ steps.get_version.outputs.version }}-nightly.x86_64.rpm
