@@ -25,5 +25,6 @@ jobs:
         run: |
           docker run -e BROKER_RELEASE=nightly -v $(pwd):/opt/orion --workdir=/opt/orion fiware/orion-ci:rpm8 make rpm
           version=$(cat /src/app/contextBroker/version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g')
+          echo ${version}
           curl -v -f -u telefonica-github:${{ secrets.NEXUS_PASSWORD }} --upload-file $(pwd)/rpm/RPMS/x86_64/contextBroker-${version}-nightly.x86_64.rpm https://nexus.lab.fiware.org/repository/el/8/x86_64/nightly/contextBroker-${version}-nightly.x86_64.rpm
 
