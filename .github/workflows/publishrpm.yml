@@ -23,5 +23,5 @@ jobs:
       - name: Build & Push
         id: rpm_build
         run: |
-          ./.github/build-and-push-rpm.sh
+          ./.github/build-and-push-rpm.sh ${{ secrets.NEXUS_PASSWORD }} 
           
