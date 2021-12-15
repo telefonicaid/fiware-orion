@@ -1,0 +1,1 @@
+Fix: POST v2/subscriptions in notification/attrs the subsc is created with attribute names equals (#2101)
