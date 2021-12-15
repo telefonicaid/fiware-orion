@@ -1,1 +1,1 @@
-Fix: POST v2/subscriptions in notification/attrs the subsc is created with attribute names equals (#2101)
+Fix: avoid duplicated attributes in arrays in POST v2/subscriptions (#2101)
