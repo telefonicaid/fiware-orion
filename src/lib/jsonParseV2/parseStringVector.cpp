@@ -70,16 +70,16 @@ bool parseStringVector
     std::string value = iter->GetString();
 
    // We start the loop in next position of the vector (note the iter+1), so check that in the elements "to the right" there aren't duplicates
-   for (rapidjson::Value::ConstValueIterator iter_new = iter+1; iter_new != jsonVector.End(); ++iter_new)
-   {
-     std::string val = iter_new->GetString();
+    for (rapidjson::Value::ConstValueIterator iter_new = iter+1; iter_new != jsonVector.End(); ++iter_new)
+    {
+      std::string val = iter_new->GetString();
 
-     if (value == val)
-     {
-       *errorStringP = "duplicated attribute /" + value + "/";
-       return false;
-     }
-   }
+      if (value == val)
+      {
+        *errorStringP = "duplicated attribute /" + value + "/";
+        return false;
+      }
+    }
 
     if (forbiddenIdCharsV2(value.c_str()))
     {
