@@ -54,7 +54,7 @@ jobs:
 
       - name: Clair Scan
         run: |
-          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ env.IMAGE_TAG_PRE }}
 
       - name: Push To certification registry
         id: push-to-cert
@@ -102,7 +102,7 @@ jobs:
 
       - name: Clair Scan
         run: |
-          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ needs.generate-version.outputs.version }}
+          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ env.IMAGE_TAG_PRE }}
 
       - name: Push
         id: docker_push
@@ -194,7 +194,7 @@ jobs:
 
       - name: Clair Scan
         run: |
-          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ env.IMAGE_TAG_PRE }}
 
       - name: Push To quay.io
         id: push-to-quay

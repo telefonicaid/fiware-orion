@@ -15,6 +15,12 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event_name == 'push'
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
       - name: Extract branch name
         shell: bash
@@ -35,6 +41,19 @@ jobs:
           tags: ${{ steps.split.outputs._1 }}
           containerfiles: |
             ./docker/Dockerfile-ubi
+            
+      - name: Push to local
+        id: push-local
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: localhost:5000
+          tls-verify: false
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
 
       - name: Push To certification registry
         id: push-to-cert
@@ -47,6 +66,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'push'
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v2
 
@@ -70,6 +94,19 @@ jobs:
           dockerfiles: |
             ./docker/Dockerfile-ubi
 
+      - name: Push to local
+        id: push-local
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: localhost:5000
+          tls-verify: false
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ steps.split.outputs._1 }}
+          
       - name: Push To quay.io
         id: push-to-quay
         uses: redhat-actions/push-to-registry@v2
@@ -111,15 +148,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build
         id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          tags: |
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
+          file: docker/Dockerfile-ubi
+          no-cache: true
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ steps.split.outputs._1 }}
+
+      - name: Push
+        id: docker_push
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: |
             ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
           file: docker/Dockerfile-ubi
-          no-cache: true
+          no-cache: false
 
       - name: Deploy new global instance based on the new release
         uses: fjogeleit/http-request-action@master
