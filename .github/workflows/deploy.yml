@@ -37,11 +37,12 @@ jobs:
           containerfiles: |
             ./docker/Dockerfile-ubi
             
-      - uses: azure/container-scan@v0.1
+      - name: Scan image
+        uses: anchore/scan-action@v3
         with:
-          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          run-quality-checks: true
-          severity-threshold: MEDIUM
+          image: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          fail-build: true
+          severity-cutoff: "medium"
 
       - name: Push To certification registry
         id: push-to-cert
@@ -81,11 +82,12 @@ jobs:
           file: docker/Dockerfile-ubi
           no-cache: true
 
-      - uses: azure/container-scan@v0.1
+      - name: Scan image
+        uses: anchore/scan-action@v3
         with:
-          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          run-quality-checks: true
-          severity-threshold: MEDIUM
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          fail-build: true
+          severity-cutoff: "medium"
 
       - name: Push
         id: docker_push
@@ -159,11 +161,12 @@ jobs:
           dockerfiles: |
             ./docker/Dockerfile-ubi
 
-      - uses: azure/container-scan@v0.1
+      - name: Scan image
+        uses: anchore/scan-action@v3
         with:
-          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          run-quality-checks: true
-          severity-threshold: MEDIUM
+          image: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          fail-build: true
+          severity-cutoff: "medium"
 
       - name: Push To quay.io
         id: push-to-quay
