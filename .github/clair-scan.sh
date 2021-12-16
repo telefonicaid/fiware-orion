@@ -9,6 +9,16 @@ docker run -d --network host -v $(pwd)/.github/config.yaml:/config/config.yaml q
 timetorun=30
 stoptime=$((timetorun + $(date +%s)))
 
+function checkClairStatus() {
+    DONE=$(docker logs -n 1000 clair 2>&1 | jq 'select(.message=="starting background updates")' -)
+
+    if [ -z "$DONE" ]; then
+	return 0;
+    else
+        return 1;
+    fi
+}
+
 echo "Checking clair status..."
 while [ true ]
 do
