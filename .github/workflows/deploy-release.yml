@@ -106,7 +106,7 @@ jobs:
       - name: Clair Scan
         run: |
           ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ steps.split.outputs._1 }}
-          
+
       - name: Push To quay.io
         id: push-to-quay
         uses: redhat-actions/push-to-registry@v2
