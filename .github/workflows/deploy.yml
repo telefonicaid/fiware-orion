@@ -37,6 +37,10 @@ jobs:
           containerfiles: |
             ./docker/Dockerfile-ubi
             
+      - uses: azure/container-scan@v0.1
+        with:
+          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+
       - name: Push To certification registry
         id: push-to-cert
         run: |
@@ -64,7 +68,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          tags: |
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          file: docker/Dockerfile-ubi
+          no-cache: true
+
+      - uses: azure/container-scan@v0.1
+        with:
+          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+
+      - name: Push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -73,7 +92,7 @@ jobs:
             ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
             ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile-ubi
-          no-cache: true
+          no-cache: false
 
       - name: Build and push with gdb
         id: docker_build_gdb
@@ -136,6 +155,10 @@ jobs:
           dockerfiles: |
             ./docker/Dockerfile-ubi
 
+      - uses: azure/container-scan@v0.1
+        with:
+          image-name: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+
       - name: Push To quay.io
         id: push-to-quay
         uses: redhat-actions/push-to-registry@v2
@@ -196,3 +219,5 @@ jobs:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
+
+
