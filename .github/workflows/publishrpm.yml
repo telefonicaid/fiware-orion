@@ -6,7 +6,7 @@ on:
     - cron: '0 1 * * *'
   push:
     tags:
-      - '*.*.*'
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 env:
   CI_IMAGE: fiware/orion-ci:rpm8
