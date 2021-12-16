@@ -36,13 +36,6 @@ jobs:
           tags: ${{ env.IMAGE_TAG_PRE }}
           containerfiles: |
             ./docker/Dockerfile-ubi
-            
-      - name: Scan image
-        uses: anchore/scan-action@v3
-        with:
-          image: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          fail-build: true
-          severity-cutoff: "medium"
 
       - name: Push To certification registry
         id: push-to-cert
@@ -82,12 +75,14 @@ jobs:
           file: docker/Dockerfile-ubi
           no-cache: true
 
-      - name: Scan image
-        uses: anchore/scan-action@v3
+      - name: Clair Scan
+        uses: santander-group/clair-scan-action@main
         with:
           image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          fail-build: true
-          severity-cutoff: "medium"
+          local: no
+          report_format: json
+          report_path: clair-report.json
+          updater: rhel
 
       - name: Push
         id: docker_push
@@ -160,13 +155,6 @@ jobs:
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
             ./docker/Dockerfile-ubi
-
-      - name: Scan image
-        uses: anchore/scan-action@v3
-        with:
-          image: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          fail-build: true
-          severity-cutoff: "medium"
 
       - name: Push To quay.io
         id: push-to-quay
