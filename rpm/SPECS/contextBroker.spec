@@ -195,6 +195,40 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Dec 14 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.4.0-1
+- Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
+- Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)
+- Add: $set and $unset attribute update operators (#3814, continuation)
+- Add: statusLastChange field in csbus collection (as now status is in the csubs cache and we need this field to know if status in the cache or DB is fresher)
+- Fix: throttling misbehaviour after subscription update when csubs cache is in use (#3981)
+- Fix: lastNotification missed some times in GET /v2/subscriptions/{id} and GET /v2/subscriptions
+- Fix: avoid reset timesSent counter upon PATCH /v2/subscriptions/{subId} when csubs cache is in use
+- Fix: crash when updating attribute with empty JSON object or array (#3995)
+- Fix: csubs cache logic has to ignore fiware-sevice information if -multiservice is not used
+- Fix: subscription throttling was not working with value 1 second
+- Fix: add subId/regId in "response NOT OK" WARN log traces (#4013)
+- Remove: status "failed" in subscriptions (use failsCounter greater than 0 instead)
+- Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
+- Hardening: noCache flag should be check before removing csub from cache in mongoUnsubscribeContext() (#2879)
+- Upgrade Dockerfile base image from centos8.3.2011 to centos8.4.2105
+
+* Mon Oct 25 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.3.0-1
+- Add: attribute update computed values based in operators: $inc, $min, $max, $mul, $push, $addToSet, $pull, $pullAll (#3814)
+- Add: support to user and password in MQTT subscriptions (#3914)
+- Add: new alarm MqttConnectionError
+- Add: per sub notification.http.timeout (#3842)
+- Add: hard limit for -requestTimeout to 1800000 millliseconds (30 min)
+- Fix: service path ignored in GET /v2/subscriptions/{subId} (#3945)
+- Fix: service path ignored in GET /v2/registrations/{regId} (#3945)
+- Fix: legacyForwarding rendering in GET /v2/registrations and GET /v2/registrations/{regId} calls (#3944)
+- Fix: deleted attribute incorrectly included in notifications (#3956)
+- Fix: return 400 instead of 500 when GeoJSON syntax error occur in ?options=upsert operations (#3949)
+- Fix: change -mqttMaxAge from seconds to minutes
+- Fix: ForwardingError alarm included in log summary traces
+- Fix: lastFailure, lastSuccess and status correct management in MQTT subscriptions
+- Hardening: improve MQTT connection logic
+- Hardening: upgrade libmosquitto dependency from 2.0.11 to 2.0.12
+
 * Tue Sep 07 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.2.0-1
 - Add: MQTT notifications (#3001)
 - Fix: TextUnrestricted recursively applies to JSON objects and array (#3867)

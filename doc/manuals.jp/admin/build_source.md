@@ -11,7 +11,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * libcurl: 7.61.1
 * openssl: 1.1.1g
 * libuuid: 2.32.1
-* libmosquitto: 2.0.11 (ソースから)
+* libmosquitto: 2.0.12 (ソースから)
 * Mongo C driver: 1.17.4 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
@@ -54,11 +54,11 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.11/ の下の config.mk ファイルを変更してビルドを微調整できます)
+* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.12/ の下の config.mk ファイルを変更してビルドを微調整できます)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
-        tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11
+        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        tar xvf mosquitto-2.0.12.tar.gz
+        cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -126,7 +126,7 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -172,7 +172,7 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
-* libmosquitto: 2.0.11 (ソースから)
+* libmosquitto: 2.0.12 (ソースから)
 * Mongo C driver: 1.17.4 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (only for `make unit_test` building target): 1.5 (ソースから)
@@ -217,11 +217,11 @@ aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.11/ の下の config.mk ファイルを変更してビルドを微調整できます)
+* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.12/ の下の config.mk ファイルを変更してビルドを微調整できます)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
-        tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11
+        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        tar xvf mosquitto-2.0.12.tar.gz
+        cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -303,7 +303,7 @@ aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 

@@ -60,7 +60,8 @@ static void insertInCache
   const Subscription&  sub,
   const std::string&   subId,
   const std::string&   tenant,
-  const std::string&   servicePath
+  const std::string&   servicePath,
+  double               now
 )
 {
   //
@@ -86,6 +87,9 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+
+  // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+  // lastNotification, lastFailure, lastSuccess and lastSuccessCode
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,
@@ -96,16 +100,18 @@ static void insertInCache
                      sub.subject.condition.attributes,
                      subId.c_str(),
                      sub.expires,
+                     sub.notification.maxFailsLimit,
                      sub.throttling,
                      sub.attrsFormat,
-                     0,
-                     0,
-                     0,
+                     -1,
+                     -1,
+                     -1,
                      -1,
                      "",
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
+                     now,
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
@@ -142,26 +148,32 @@ std::string mongoCreateSubscription
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty()  ? SERVICE_PATH_ALL : servicePathV[0];
   const std::string      subId            = setNewSubscriptionId(&b);
+  double                 now              = getCurrentTime();
 
   // Build the BSON object to insert
   setExpiration(sub, &b);
   setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
+  setMaxFailsLimit(sub, &b);
   setServicePath(servicePath, &b);
-  setDescription(sub, &b);
-  setStatus(sub, &b);
+  setStatus(sub.status, &b, now);
   setEntities(sub, &b);
   setAttrs(sub, &b);
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
 
-  if (!noCache)
+  if (!sub.description.empty())
   {
-    insertInCache(sub, subId, tenant, servicePath);
+    setDescription(sub, &b);
   }
 
-  setConds(sub, sub.notification.attributes, &b);
+  if (!noCache)
+  {
+    insertInCache(sub, subId, tenant, servicePath, now);
+  }
+
+  setConds(sub, &b);
 
   setExpression(sub, &b);
   setFormat(sub, &b);

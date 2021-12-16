@@ -135,7 +135,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {                        
+                    {
                         "name": "ATTRIBUTE_01",
                         "type": ""
                     }
@@ -175,7 +175,7 @@ Date: REGEX(.*)
         {
             "contextRegistration": {
                 "attributes": [
-                    {                        
+                    {
                         "name": "ATTRIBUTE_01",
                         "type": ""
                     }

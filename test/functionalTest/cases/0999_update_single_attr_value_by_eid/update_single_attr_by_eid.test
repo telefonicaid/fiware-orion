@@ -53,7 +53,7 @@ payload='{ "a": 1 }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT
 echo
 echo
- 
+
 
 echo "02. POST /v2/entities to create E1/A1=2"
 echo "======================================="

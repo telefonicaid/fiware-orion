@@ -345,6 +345,95 @@ bool orion::collectionFindOne
 
 /* ****************************************************************************
 *
+* orion::collectionFindAndModify -
+*/
+bool orion::collectionFindAndModify
+(
+  const std::string&     db,
+  const std::string&     col,
+  const orion::BSONObj&  _q,
+  const orion::BSONObj&  _doc,
+  bool                   _new,
+  orion::BSONObj*        reply,
+  std::string*           err
+)
+{
+  TIME_STAT_MONGO_WRITE_WAIT_START();
+
+  std::string ns = db + "." + col;
+
+  // Getting & checking connection
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (connection.isNull())
+  {
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+
+    orion::releaseMongoConnection(connection);
+    return false;
+  }
+
+  // Get log level driver objects
+  const bson_t* q   = _q.get();
+  const bson_t* doc = _doc.get();
+  char* bsonQStr    = bson_as_relaxed_extended_json(q, NULL);
+  char* bsonDocStr  = bson_as_relaxed_extended_json(doc, NULL);
+
+  LM_T(LmtMongo, ("findAndModify() in '%s' collection: query='%s' doc='%s', new=%s",
+                  ns.c_str(),
+                  bsonQStr,
+                  bsonDocStr,
+                  FT(_new)));
+
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
+
+  bson_error_t error;
+  bson_t       _reply;
+  bool success = mongoc_collection_find_and_modify(collection,
+                                                   q,
+                                                   NULL,
+                                                   doc,
+                                                   NULL,
+                                                   false,
+                                                   false,
+                                                   _new,
+                                                   &_reply,
+                                                   &error);
+
+  mongoc_collection_destroy(collection);
+  orion::releaseMongoConnection(connection);
+  TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
+  if (success)
+  {
+    *reply = orion::BSONObj(&_reply);
+    bson_destroy(&_reply);
+    LM_T(LmtOldInfo, ("Database Operation Successful (findAndModify: <%s, %s>)", bsonQStr, bsonDocStr));
+    alarmMgr.dbErrorReset();
+  }
+  else
+  {
+    bson_destroy(&_reply);
+    std::string msg = std::string("collection: ") + ns.c_str() +
+      " - findAndModify(): <" + bsonQStr + "," + bsonDocStr + ">" +
+      " - exception: " + error.message;
+
+    *err = "Database Error (" + msg + ")";
+    alarmMgr.dbError(msg);
+  }
+
+  bson_free(bsonQStr);
+  bson_free(bsonDocStr);
+
+  return success;
+}
+
+
+
+/* ****************************************************************************
+*
 * orion::collectionInsert -
 */
 bool orion::collectionInsert

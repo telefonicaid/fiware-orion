@@ -33,6 +33,10 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 --SHELL--
 
 #
+# Hint: use this to run the MQTT broker needed for this .test:
+#
+#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#
 # 01. Create MQTT custom sub for entity E with topic sub/{$id} payload A:{$A}
 # 02. Create entity E1 with A=1
 # 03. Create entity E2 with A=2
@@ -40,6 +44,7 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 # 05. Update E1 with A=10
 # 06. Update E2 with A=20
 # 07. Dump and reset accumulator, see: 1 MQTT sub/E1 E A:10, 1 MQTT sub/E2 A:20
+# 08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
 #
 
 echo '01. Create MQTT custom sub for entity E with topic sub/${id} payload A:${A}'
@@ -152,6 +157,13 @@ echo
 echo
 
 
+echo "08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess"
+echo "============================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
 --REGEXPECT--
 01. Create MQTT custom sub for entity E with topic sub/${id} payload A:${A}
 ===========================================================================
@@ -225,6 +237,48 @@ MQTT message at topic sub/E2:
     "A": "20"
 }
 =======================================
+
+
+08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 448
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "description": "MQTT sub",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "mqttCustom": {
+                "payload": "{ %22A%22: %22${A}%22 }",
+                "qos": 0,
+                "topic": "sub/${id}",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false,
+            "timesSent": 4
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
 
 
 --TEARDOWN--

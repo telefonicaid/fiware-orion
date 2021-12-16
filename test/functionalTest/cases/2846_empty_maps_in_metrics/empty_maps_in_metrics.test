@@ -45,7 +45,7 @@ echo
 
 echo "02. Ask for trace levels, using tenant t2"
 echo "========================================="
-orionCurl --url /log/trace --tenant t2 
+orionCurl --url /log/trace --tenant t2
 echo
 echo
 

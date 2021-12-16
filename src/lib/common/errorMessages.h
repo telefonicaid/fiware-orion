@@ -86,6 +86,7 @@
 #define ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM                  "attribute render format /custom/ not supported for notifications"
 #define ERROR_DESC_BAD_REQUEST_FORMAT_INVALID                 "invalid render format for notifications"
 #define ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND              "Service not found. Check your URL as probably it is wrong."
+#define ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON                  "Wrong GeoJson"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
@@ -94,6 +95,11 @@
 #define ERROR_DESC_NOT_FOUND_ATTRIBUTE                "The entity does not have such an attribute"
 #define ERROR_DESC_NOT_FOUND_SUBSCRIPTION             "The requested subscription has not been found. Check id"
 #define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
+
+#define ERROR_UNPROCESSABLE                           "Unprocessable"
+#define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
+
+#define ERROR_INTERNAL_ERROR                          "InternalError"
 
 #define ERROR_TOO_MANY                                "TooManyResults"
 #define ERROR_DESC_TOO_MANY_ENTITIES                  "More than one matching entity. Please refine your query"

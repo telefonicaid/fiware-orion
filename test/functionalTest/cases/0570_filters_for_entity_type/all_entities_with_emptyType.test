@@ -439,35 +439,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "A2T", 
+                        "name": "A2",
+                        "type": "A2T",
                         "value": "a1"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A4", 
-                        "type": "A4T", 
+                        "name": "A4",
+                        "type": "A4T",
                         "value": "a1"
                     }
-                ], 
-                "id": "E4", 
-                "isPattern": "false", 
+                ],
+                "id": "E4",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -489,35 +489,35 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "A1T", 
+                        "name": "A1",
+                        "type": "A1T",
                         "value": "a1"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
-                        "type": "A3T", 
+                        "name": "A3",
+                        "type": "A3T",
                         "value": "a1"
                     }
-                ], 
-                "id": "E3", 
-                "isPattern": "false", 
+                ],
+                "id": "E3",
+                "isPattern": "false",
                 "type": "T3"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

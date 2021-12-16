@@ -157,7 +157,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "entity id length: 0, min length supported: 1", 
+    "description": "entity id length: 0, min length supported: 1",
     "error": "BadRequest"
 }
 
@@ -185,7 +185,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid JSON type for entity id", 
+    "description": "Invalid JSON type for entity id",
     "error": "BadRequest"
 }
 
@@ -199,7 +199,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid JSON type for entity id", 
+    "description": "Invalid JSON type for entity id",
     "error": "BadRequest"
 }
 
@@ -213,7 +213,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid JSON type for entity type", 
+    "description": "Invalid JSON type for entity type",
     "error": "BadRequest"
 }
 
@@ -227,7 +227,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid JSON type for entity type", 
+    "description": "Invalid JSON type for entity type",
     "error": "BadRequest"
 }
 
@@ -255,7 +255,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Errors found in incoming JSON buffer", 
+    "description": "Errors found in incoming JSON buffer",
     "error": "ParseError"
 }
 
@@ -269,7 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Errors found in incoming JSON buffer", 
+    "description": "Errors found in incoming JSON buffer",
     "error": "ParseError"
 }
 

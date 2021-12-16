@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Forbidden characters](#forbidden-characters)
+* [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
@@ -18,7 +19,10 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
+* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
@@ -45,6 +49,27 @@ Note that you can use "TextUnrestricted" attribut type (and special attribute ty
 the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
 in the attribute value. However, it could have security implications (possible script
 injections attacks) so use it at your own risk!
+
+[Top](#top)
+
+## Update operators for attribute values
+
+Some attribute value updates has special semantics, beyond the ones described in the
+NGSIv2 specification. In particular we can do requests like this one:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+which means *"increase the value of attribute A by 3"*.
+
+This functionality is usefeul to reduce the complexity of applications and avoid
+race conditions in applications that access simultaneously to the same piece of
+context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
 
@@ -344,6 +369,19 @@ if `onlyChangedAttrs` is `true` and the triggering update only modified A then o
 
 [Top](#top)
 
+## `timeout` subscriptions option
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
+field. This field specifies the maximum time the subscription waits for the response when using HTTP
+notifications in milliseconds.
+
+The maximum value allowed for this parameter is 1800000 (30 minutes). If 
+`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
+[Command line options](../admin/cli.md#command-line-options) for more details.
+
+[Top](#top)
+
 ## `lastFailureReason` and `lastSuccessCode` subscriptions fields
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
@@ -358,6 +396,33 @@ field:
 Both can be used to analyze possible problems with notifications. See section in the
 [problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
 for more details.
+
+Note these two fields are included in HTTP subscriptions, but not in MQTT ones. See
+[MQTT notifications document](#mqtt_notifications.md) for more detail.
+
+[Top](#top)
+
+## `failsCounter` and `maxFailsLimit` subscriptions fields
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports a `failsCounter` field within the `notification`
+field. The value of this field is the number of consecutive failing notifications associated
+to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset
+to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).
+
+There is also an optional field `maxFailsLimit` (also within `notification` field) which establishes
+a maximum allowed number of consecutive fails. If the number of fails overpasses the value of
+`maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then
+Orion automatically passes the subscription to `inactive` state. A subscripiton update operation
+(`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state
+`active` again).
+
+In addition, when Orion automatically disables a subscription, a log trace in WARN level is printed
+in this format:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
 
 [Top](#top)
 
@@ -377,6 +442,31 @@ The following requests can use the flowControl URI param option:
 * `PUT /v2/entities/E/attrs/A?options=flowControl`
 * `PUT /v2/entities/E/attrs/A/value?options=flowControl`
 * `PATCH /v2/entities/E/attrs?options=flowControl`
+
+[Top](#top)
+
+## Ambiguous subscription status `failed` not used
+
+NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
 
 [Top](#top)
 

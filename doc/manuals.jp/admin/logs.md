@@ -6,7 +6,7 @@
 * [アラーム](#alarms)
 * [サマリ・トレース](#summary-traces)
 * [ログ・ローテーション](#log-rotation)
-* [通知トランザクションのログの例](#log-examples-for-notification-transactions)
+* [HTTP 通知トランザクションのログの例](#log-examples-for-http-notification-transactions)
 * [ログに関連するコマンドライン・オプション](#command-line-options-related-with-logs)
 
 <a name="log-file"></a>
@@ -124,13 +124,13 @@ time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df
   異なる値を持ちます
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
 ```
 
 * MQTT 通知の場合、上記のトレースの `msg` フィールドはわずかに異なります:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2
 ```
 
 * [コンテキスト・プロバイダ](../user/context_providers.md) (クエリまたは更新) にフォワードされたリクエスト
@@ -154,7 +154,7 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
   または接続の問題が発生した場合の文字列のいずれかになります。 例えば:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: Couldn't connect to server
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: Couldn't connect to server
 ```
 
 * クライアント・リクエストがコンテキスト・プロバイダへのフォワーディングをトリガーすると、最初に転送された
@@ -187,7 +187,9 @@ time=2020-10-22T19:51:03.602Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 | 2          | CRITICAL   | 'msg' フィールドには、次の ERROR テキストが表示されます : "Runtime Error(`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | ランタイム・エラー。`<detail>` テキストは、詳細情報を含んでいます                                        | Orion Context Broker を再起動します。それが持続する場合 (例えば、新しいランタイムエラーが次の1時間以内に現れる場合)、問題を開発チームにエスカレーションしてください
 | 3          | CRITICAL   | 'msg' フィールドには、次の ERROR テキストが、表示されます : "Raising alarm DatabaseError:`<detail>`"                    | 'msg' フィールドには、次の ERROR テキストが表示されます : "Releasing alarm DatabaseError"。Orion は、DB が再び正常であることを検出すると、このトレースを出力します                                                                                       | データベースエラー。 `<detail>` テキストは詳細な情報を含んでいます                                        | Orion が MongoDB データベースにアクセスできません、かつ/または MongoDB データベースが正常に動作していません。データベース接続とデータベースの状態を確認してください。データベースの修復や Orion への接続が完了したら、問題は解消されます (Orion サービスの再起動は必要ありません)。 Orion Context Broker サービスで特定のアクションを実行する必要はありません
 | 4          | WARNING    | 次の WARN テキストが 'msg' フィールドに表示されます : "Raising alarm BadInput `<ip>`: `<detail>`".                   | 次の WARN テキストが 'msg' フィールドに表示されます : "Releasing alarm BadInput `<ip>`"。どこがアラームを引き起こしたのか。Orion は、そのクライアントから正しい要求を受け取ったときにこのトレースを出力します                 | 不正な入力。`<detail>` テキストに詳細情報が含まれています                                             | クライアントが API 仕様に準拠していないリクエストを Orion に送信しました。不正な URL、不正なペイロード、リクエストの構文/意味エラーなどが含まれます。IP に応じて、プラットフォームクライアントまたは外部のサードパーティのクライアントに対応できます。 いずれにしても、問題を把握し修正するためにクライアントの所有者に報告する必要があります。Orion Context Broker サービスで特定のアクションを実行する必要はありません
-| 5          | WARNING    | 次の WARN テキストが 'msg' フィールドに表示されます : "Raising alarm NotificationError  `<url>`:  `<detail>`"        | 次の WARN テキストが 'msg' フィールドに表示されます : "Releasing alarm NotificationError "。どこがアラームを引き起こしたのか。Orion は、この URL に通知を送信すると、このトレースを出力します        | 通知の失敗。 `<detail>` テキストに詳細情報が含まれています                                   | Orion は通知をレシーバに送信しようとしていますが、問題が発生しています。これは、ネットワーク接続性またはレシーバの問題、例えばレシーバがダウンしています。第2のケースでは、通知のレシーバの所有者が報告されるべきです。Orion Context Broker サービスで特定のアクションを実行する必要はありません
+| 5          | WARNING    | 次の WARN テキストが 'msg' フィールドに表示されます : "Raising alarm NotificationError `<url>`: `<detail>`".        | 次の WARN テキストが 'msg' フィールドに表示されます : "Releasing alarm NotificationError `<url>`", ここで、 `<url>` は、アラームをトリガーしたものと同じです。 Orion は、その URL に通知を正常に送信すると、このトレースを出力します | 通知の失敗。`<detail>` テキストには詳細情報が含まれています | Orion が特定の受信者に HTTP 通知を送信しようとしていますが、何らかの問題が発生しています。ネットワーク接続または受信機の問題が原因である可能性があります。レシーバーがダウンしています。2番目のケースでは、通知の受信者の所有者を報告する必要があります。Orion ContextBroker サービスで特定のアクションを実行する必要はありません
+| 6          | WARNING    | 次の WARN テキストが 'msg' フィールドに表示されます : "Raising alarm ForwardingError `<url>`": `<detail>`".          | 次の WARN テキストが 'msg' フィールドに表示されます : "Releasing alarm ForwardingError `<url>`", ここで `<url>` はアラームをトリガーしたものと同じです。Orion は コンテキスト・プロバイダ と正常に対話したときにこのトレースをその URL に出力します | フォワーディング・エラー。`<detail>` テキストには詳細情報が含まれています | Orion が コンテキスト・プロバイダ と対話しようとしていますが、何らかの問題が発生しています。転送されたクエリに対する コンテキスト・プロバイダ のレスポンスが原因であるか、更新が空である可能性があります。Orion Context Broker サービスで特定のアクションを実行する必要はありません
+| 7          | WARNING    | 次の WARN テキストが 'msg' フィールドに表示されます : "Raising alarm MqttConnectionError `<endpoint>`": `<detail>`". | 次の WARN テキストが 'msg' フィールドに表示されます : "Releasing alarm MqttConnectionError `<endpoint>`", ここで `<endpoint>` はアラームをトリガーしたものと同じです。Orion はその URL への コンテキスト・プロバイダ との対話に成功すると、このトレースを出力します | MQTT ブローカーへの接続エラー。`<detail>` テキストには詳細が含まれています | Orion が (サブスクリプションに関連付けられた) MQTT ブローカーに接続しようとしましたが、何らかの問題が発生しました。いくつかの理由が考えられます: MQTT ブローカーに到達できない、ユーザー/パスワードが間違っているなど。特定のアクションは必要ありません。Orion Context Broker サービスで実行されますが、MQTT ブローカー構成または関連するサブスクリプションで実行される可能性があります。
 
 デフォルトでは、Orion はアラームの起源 (すなわち上げる) と終わり(すなわち解放) をトレースするだけです :
 
@@ -202,6 +204,12 @@ time=... | lvl=WARN  | ... Releasing alarm BadInput 10.0.0.1
 
 time=... | lvl=WARN  | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
 time=... | lvl=WARN  | ... Releasing alarm NotificationError localhost:1028/accumulate
+...
+time=... | lvl=WARN  | ... Raising alarm ForwardingError localhost:9999/cpr/op/update: forwarding failure for sender-thread: Couldn't connect to server
+time=... | lvl=WARN  | ... Releasing alarm ForwardingError localhost:9999/v2/op/update
+...
+time=... | lvl=WARN  | ... Raising alarm MqttConnectionError localhost:1883: Connection Refused: not authorised.
+time=... | lvl=WARN  | ... Releasing alarm MqttConnectionError localhost:1883
 ```
 
 これは、アラームメッセージを発生させてから解除するまでにアラームをトリガした条件。たとえば、10.0.0.1 クライアントからの新しい無効な要求)が再び発生した場合、再度トレースされないことを意味します。ただし、この動作は `-relogAlarms CLI` パラメータを使用して変更できます。`-relogAlarms` を使用する と、トリガー条件が発生するたびにログトレースが出力されます。たとえば :
@@ -225,20 +233,23 @@ time=... | lvl=WARN | ... Releasing alarm BadInput 0.0.0.0
 
 `-logSummary` [CLI パラメータ](cli.md)を使用してログ・サマリ・トレースを有効にすることができます。この値は、サマリ・レポートの期間 (秒単位) です。例えば、`-logSummary 5` は、サマリ・トレースは5秒ごとに出力されます (`-logLevel' がどのログレベルに設定されていても)。
 
-次のように、4つのトレースが毎回出力されます (わかりやすくするために、いくつかのフィールドを除いて、行を省略しています) :
+次のように、6つのトレースが毎回出力されます (わかりやすくするために、いくつかのフィールドを除いて、行を省略しています) :
 
 ```
 time=... | lvl=SUMMARY | ... Transactions: 2345 (new: 45)
 time=... | lvl=SUMMARY | ... DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+time=... | lvl=SUMMARY | ... Forwarding failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+time=... | lvl=SUMMARY | ... MQTT connection failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new: 1), released: (total: 7, new: 2)
 ```
 
 * 最初の行 (トランザクション) には、最新のサマリ・レポート期間における現在のトランザクション数と新しいトランザクション数が表示されます
 * 2行目は [DB アラーム](#alarms)に関するものです。現在の DB ステータス("OK" または "erroneous")、発生した DB アラームの数 (Orion が開始してからの合計と最後のサマリ・レポート期間の両方)、および解放された DB アラームの数 (Orion が開始してからの合計と最後のサマリ・レポート期間の両方)
-* 3行目は [通知失敗のアラーム](#alarms)です
-これは、アクティブ・通知失敗アラームの現在の数、通知された通知失敗アラームの数 (Orion が開始してからの合計と最後のサマリ・レポート期間の両方)、およびリリースされた通知失敗アラームの数です (Orion が開始してからの合計と最後のサマリ・レポート期間の両方)
-* 4行目は、[不正入力アラーム](#alarms)です。現在の不正な入力アラーム数、不正な入力アラームの発生数 (Orion が開始してからの合計と最後の要約レポート期間の両方)、およびリリースされた不良入力アラームの数です (Orion が開始してからの合計と最後の要約レポート期間の両方)
+* 3行目は[HTTP 通知失敗アラーム](＃alarms)についてです。アクティブな HTTP 通知失敗アラームの現在の数、発生した HTTP 通知失敗アラームの数 (Orion の開始以降と最後の要約レポート期間の両方)、およびリリースされた通知失敗アラームの数が表示されます (Orion の開始以降と最後の要約レポート期間の両方)
+* 4行目は[転送障害アラーム](＃alarms)に関するものです。アクティブな転送失敗アラームの現在の数、発生した転送失敗アラームの数 (Orion の開始以降と最後の要約レポート期間の両方)、およびリリースされた通知失敗アラームの数 (Orion の開始以降と最後の要約レポート期間の両方) が表示されます
+* 5行目は、[MQTT 接続障害アラーム](#alarms) に関するものです。アクティブな MQTT 接続障害アラームの現在の数、発生した MQTT 接続障害アラームの数 (Orion の開始以降と最後の要約レポート期間の両方)、およびリリースされた MQTT 接続障害アラームの数 (Orion の開始以降の合計と最後の要約レポート期間)
+* 6行目は[不正な入力アラーム](#alarms)に関するものです。これは、現在の不良入力アラームの数、発生した不良入力アラームの数 (Orion の開始以降と最後の要約レポート期間の両方)、およびリリースされた不良入力アラームの数 (Orion の開始以降と最後の要約レポート期間の両方) を示します
 
 [トップ](#top)
 
@@ -257,7 +268,7 @@ Logrotate は、contextBroker とともに RPM としてインストールされ
 [トップ](#top)
 
 <a name="log-examples-for-notification-transactions"></a>
-## 通知トランザクションのログの例
+## HTTP 通知トランザクションのログの例
 
 このセクションでは、通知トランザクションに対応するログの例をいくつか示します。
 これは Orion 2.5.0 リリースで生成されたものであり、将来大きな変更は予定されていませんが、
@@ -272,56 +283,56 @@ contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool
 送信成功 (レスポンス・コード 200) :
 
 ```
-time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, response code: 200
 ```
 
 400 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
-time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
+time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e1fdb14e7532482ac795) response NOT OK, http code: 400
+time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
 ```
 
 404 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
-time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
+time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e27cb14e7532482ac796) response NOT OK, http code: 404
+time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
 ```
 
 500 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
-time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
+time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e2cfb14e7532482ac797) response NOT OK, http code: 500
+time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
 ```
 
 10 秒以内にエンドポイントが応答しない、またはその他の何らかの接続エラーが発生しました (アラームは WARN レベルで発生します) :
 
 ```
 time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
-time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, response code: Timeout was reached
+time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, response code: Timeout was reached
 ```
 
 応答しないポートのエンドポイント。例えば、localhost：9999 (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
-time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, response code: Couldn't connect to server
+time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, response code: Couldn't connect to server
 ```
 
 解決できない名前のエンドポイント。例えば、foo.bar.bar.com (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
-time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, response code: Couldn't resolve host name
+time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, response code: Couldn't resolve host name
 ```
 
 到達不能な IP のエンドポイント。例えば、12.34.56.87 (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
-time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, response code: Timeout was reached
+time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, response code: Timeout was reached
 ```
 
 [トップ](#top)

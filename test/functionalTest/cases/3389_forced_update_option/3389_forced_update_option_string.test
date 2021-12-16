@@ -258,14 +258,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -295,14 +295,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -344,14 +344,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -381,14 +381,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -418,14 +418,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -455,14 +455,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

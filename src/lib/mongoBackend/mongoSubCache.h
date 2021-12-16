@@ -32,6 +32,7 @@
 
 #include "common/RenderFormat.h"
 #include "rest/StringFilter.h"
+#include "cache/subCache.h"
 
 #include "mongoDriver/BSONObj.h"
 
@@ -55,9 +56,16 @@ extern int mongoSubCacheItemInsert
   const orion::BSONObj&  sub,
   const char*            subscriptionId,
   const char*            servicePath,
-  int                    lastNotificationTime,
+  long long              lastNotificationTime,
+  long long              lastFailure,
+  const std::string&     lastFailureReason,
+  long long              lastSuccess,
+  long long              lastSuccessCode,
+  long long              count,
+  long long              failsCounter,
   long long              expirationTime,
   const std::string&     status,
+  double                 statusLastChange,
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
@@ -87,11 +95,14 @@ extern void mongoSubCountersUpdate
   const std::string&  tenant,
   const std::string&  subId,
   long long           count,
+  long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
   long long           lastSuccess,
   const std::string&  failureReason,
-  long long           statusCode
+  long long           statusCode,
+  const std::string&  status,
+  double              statusLastChange
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

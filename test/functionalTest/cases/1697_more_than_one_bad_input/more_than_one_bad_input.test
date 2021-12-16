@@ -63,8 +63,8 @@ echo
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
 # Sometimes (see https://github.com/telefonicaid/fiware-orion/issues/3828) we can get an initial
-# summary at the start of the test. Thus, we take only the last four lines for the test
-tail -n 4 /tmp/contextBroker.log | grep 'SUMMARY' | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+# summary at the start of the test. Thus, we take only the last five lines for the test
+tail -n 6 /tmp/contextBroker.log | grep 'SUMMARY' | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -131,6 +131,8 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
@@ -140,7 +142,7 @@ Raising alarm BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): service '/v2/noService' not 
 Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): JSON parse error
 Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): bad verb for url '/v2/entities', method 'GETT'
 Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
- 
+
 
 --TEARDOWN--
 brokerStop CB

@@ -34,10 +34,10 @@ brokerStart CB 0 IPv4
 # 01. Create sub
 # 02. Get subscription (no last* field)
 # 03. Create entity  (triggering notification)
-# 04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
+# 04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
 # 05. Start endpoint
 # 06. Update entity (triggering notification)
-# 07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
+# 07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
 #
 
 echo "01. Create sub"
@@ -83,8 +83,8 @@ echo
 echo
 
 
-echo "04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server"
-echo "======================================================================================"
+echo "04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server"
+echo "======================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -113,8 +113,8 @@ echo
 echo
 
 
-echo "07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)"
-echo "================================================================================================"
+echo "07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)"
+echo "====================================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -175,10 +175,10 @@ Date: REGEX(.*)
 
 
 
-04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
-======================================================================================
+04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
+=======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 444
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,6 +189,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -198,7 +199,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -226,8 +227,8 @@ Date: REGEX(.*)
 
 
 
-07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
-================================================================================================
+07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
+=====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 490
 Content-Type: application/json

@@ -404,24 +404,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -442,24 +442,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -480,24 +480,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -518,24 +518,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -556,24 +556,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -594,24 +594,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -632,24 +632,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -670,24 +670,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "D": "2017-07-22T10:42:42.000Z",
-                    "F": false, 
-                    "N": null, 
-                    "T": true, 
+                    "F": false,
+                    "N": null,
+                    "T": true,
                     "f": 3.14,
-                    "i": 10, 
+                    "i": 10,
                     "s": "test_string"
                 }
-            }, 
+            },
             "A2": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 23
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

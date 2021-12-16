@@ -1,6 +1,7 @@
 # <a name="top"></a>NGSIv2 実装ノート (NGSIv2 Implementation Notes)
 
 * [禁止されている文字](#forbidden-characters)
+* [属性値の更新演算子](#update-operators-for-attribute-values)
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
@@ -18,8 +19,11 @@
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
+* [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`skipForwarding` オプション](#skipforwarding-option)
@@ -42,6 +46,29 @@ Orion に適用される追加の制限事項は、マニュアルの [禁止さ
 NGSIv2 仕様で定義されているもの以外の特別な属性タイプ) を使用できることに注意してください。
 ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性がある
 ため、自己責任で使用してください!
+
+[トップ](#top)
+
+<a name="update-operators-for-attribute-values"></a>
+
+## 属性値の更新演算子
+
+一部の属性値の更新には、NGSIv2 仕様で説明されているもの以外に特別なセマンティクスが
+あります。特に、このようなリクエストを行うことができます:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+これは、*"属性Aの値を3増やす"* ことを意味します。
+
+この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
+アプリケーションの競合状態を回避するために役立ちます。
+詳細は[このドキュメント](update_operators.md)を参照してください。
 
 [トップ](#top)
 
@@ -318,6 +345,15 @@ A のみを修正した場合、A, B, C が通知されます(つまり、トリ
 
 [トップ](#top)
 
+<a name="timeout-subscriptions-option"></a>
+## `timeout` サブスクリプション・オプション
+
+`GET/v2/subscriptions` および `GET/v2/subsets/subId` リクエストの NGSIv2 仕様で説明されているサブスクリプションフィールドとは別に、Orion は `http` または `httpCustom` フィールド内の `timeout` 追加パラメータをサポートします。このフィールドは、HTTP 通知を使用するときにサブスクリプションがレスポンスを待機する最大時間をミリ秒単位で指定します。
+
+このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に設定されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](../admin/cli.md#command-line-options)のセクションを参照してください。
+
+[トップ](#top)
+
 <a name="lastfailurereason-and-lastsuccesscode-subscriptions-fields"></a>
 ## `lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド
 
@@ -334,6 +370,34 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 どちらも通知に関する問題の分析に使用できます。 詳しくは、
 [問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
 のセクションを参照してください。
+
+これらの2つのフィールドは HTTP サブスクリプションに含まれていますが、MQTT サブスクリプションには
+含まれていないことに注意してください。詳細については、[MQTT 通知ドキュメント](#mqtt_notifications.md)
+を参照してください。
+
+[トップ](#top)
+
+<a name="failscounter-and-maxfailslimit-subscriptions-fields"></a>
+## `failsCounter` と `maxFailsLimit` サブスクリプション・フィールド
+
+`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの NGSIv2 仕様で説明されている
+サブスクリプション・フィールドとは別に、Orion は `notification` フィールド内の `failsCounter` フィールドを
+サポートします。このフィールドの値は、サブスクリプションに関連付けられた連続して失敗した通知の数です。
+`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます
+(この場合、`failsCounter` は省略されます)。
+
+連続した失敗の最大許容数を確立するオプションのフィールド `maxFailsLimit` (これも `notification` フィールド内)
+もあります。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、特定の瞬間に `failsCounter` が `maxFailsLimit`
+より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効に
+するには (状態を再び `active` に設定)、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です。
+
+さらに、Orion がサブスクリプションを自動的に無効にすると、WARN レベルのログトレースがこの形式で出力されます:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
+
+[Top](#top)
 
 [トップ](#top)
 
@@ -355,6 +419,33 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 * `PUT /v2/entities/E/attrs/A?options=flowControl`
 * `PUT /v2/entities/E/attrs/A/value?options=flowControl`
 * `PATCH /v2/entities/E/attrs?options=flowControl`
+
+[トップ](#top)
+
+<a name="ambiguous-subscription-status-failed-not-used"></a>
+## あいまいなサブスクリプション・ステータス `failed` は使用されない
+
+NGSIv2 仕様では、サブスクリプションの `status` フィールドの `failed` 値について説明しています:
+
+> `status`: [...] また、通知で問題が発生しているサブスクリプションの場合、ステータスは `failed` に
+> 設定されます。通知が再び機能し始めるとすぐに、ステータスは `active` に戻ります。
+
+ステータス `failed` は、あいまいなため、Orion3.4.0 で削除されました。
+
+* `failed` は、最後に送信された通知が失敗したアクティブなサブスクリプション (つまり、エンティティの
+  更新時に通知をトリガーするサブスクリプション) を指す場合があります
+* `failed` は、過去にアクティブであり、アクティブなときに送信された最後の通知が失敗した非アクティブな
+  サブスクリプション (つまり、エンティティの更新時に通知をトリガーしないサブスクリプション)
+  を指す場合があります
+
+つまり、ステータス `failed` を確認しても、サブスクリプションが現在アクティブであるか非アクティブで
+あるかを知ることはできません。
+
+したがって、`failed` は Orion Context Broker によって使用されず、サブスクリプションのステータスは、
+サブスクリプションが `active` (`failed` バリアント [`oneshot`](#oneshot-subscriptions) を含む) か
+`inactive` (バリアント `expired` を含む）かを常に明確に指定します。サブスクリプションが最後の通知で
+失敗したかどうかを知るために、`failsCounter` の値をチェックできます (つまり、`failedCounter` が
+0より大きいことをチェックします)。
 
 [トップ](#top)
 

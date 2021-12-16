@@ -565,7 +565,7 @@ payload='{
     ],
     "attrs": [ "A1", "A2" ]
   },
-  "provider": 7  
+  "provider": 7
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -1514,7 +1514,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "typePattern is not supported", 
+    "description": "typePattern is not supported",
     "error": "NotImplemented"
 }
 

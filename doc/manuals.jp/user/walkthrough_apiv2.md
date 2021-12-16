@@ -91,8 +91,8 @@ broker を再起動するには、*root* として実行するか、`sudo` コ�
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-このスクリプトには Flask version 1.0.2 と pyOpenSSL version 19.0.0 が必要です。
-これらは `pip install Flask==1.0.2` と `pip install pyOpenSSL==19.0.0` を使って
+このスクリプトには Flask version 1.0.2, pyOpenSSL version 19.0.0 と paho-mqtt version 1.5.1 が必要です。
+これらは `pip install Flask==1.0.2`, `pip install pyOpenSSL==19.0.0` と `pip install paho-mqtt==1.5.1` を使って
 インストールできます。さらに、Python 2.7 を使用することをお勧めします。
 ベースのオペレーティング・システムの Python インストールと競合する場合は、
 [virtualenv](https://virtualenv.pypa.io/en/latest/) を使用することをお勧めします。
@@ -500,6 +500,10 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-
 エンティティ作成の場合と同様に、属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値は別として、複雑な構造やカスタム・メタデータを使用することもできます。これらは高度なトピックで、[このセクション](structured_attribute_valued.md#structured-attribute-values)と[別のセクション](metadata.md#custom-attribute-metadata)でそれぞれ説明します。
 
 属性の追加/削除の詳細について は、マニュアルの [このセクション](update_action_types.md)を参照してください。
+
+このウォークスルーの例では、`26.5` などの特定の値で属性を更新します。ただし、*"温度を2.5度上げる"* などの
+更新を行うこともできます。この種の更新は高度なトピックであり、[このドキュメント](update_operators.md)
+で説明されています。
 
 [トップ](#top)
 

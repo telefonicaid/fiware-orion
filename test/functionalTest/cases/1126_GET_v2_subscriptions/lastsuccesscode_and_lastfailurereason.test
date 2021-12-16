@@ -44,14 +44,14 @@ accumulatorStart --pretty-print
 # 07. Create sub7 for host not found endpoint
 # 08. Create sub8 for wrong IP endpoint
 # 09. Create entity (triggering all subscriptions)
-# 10. Get sub1 see status: active, lastSuccessCode: 200
-# 11. Get sub2 see status: active, lastSuccessCode: 400
-# 12. Get sub3 see status: active, lastSuccessCode: 404
-# 13. Get sub4 see status: active, lastSuccessCode: 500
-# 14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
-# 15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
-# 16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
-# 17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
+# 10. Get sub1 see lastSuccessCode: 200 but not failsCounter
+# 11. Get sub2 see lastSuccessCode: 400 but not failsCounter
+# 12. Get sub3 see lastSuccessCode: 404 but not failsCounter
+# 13. Get sub4 see lastSuccessCode: 500 but not failsCounter
+# 14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached
+# 15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
+# 16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
+# 17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached
 #
 
 echo "01. Create sub1 for 200 endpoint"
@@ -326,57 +326,57 @@ orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 3s
 
 
-echo "10. Get sub1 see status: active, lastSuccessCode: 200"
-echo "====================================================="
+echo "10. Get sub1 see lastSuccessCode: 200 but not failsCounter"
+echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
 
 
-echo "11. Get sub2 see status: active, lastSuccessCode: 400"
-echo "====================================================="
+echo "11. Get sub2 see lastSuccessCode: 400 but not failsCounter"
+echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID2
 echo
 echo
 
 
-echo "12. Get sub3 see status: active, lastSuccessCode: 404"
-echo "====================================================="
+echo "12. Get sub3 see lastSuccessCode: 404 but not failsCounter"
+echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID3
 echo
 echo
 
 
-echo "13. Get sub4 see status: active, lastSuccessCode: 500"
-echo "====================================================="
+echo "13. Get sub4 see lastSuccessCode: 500 but not failsCounter"
+echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID4
 echo
 echo
 
 
-echo "14. Get sub5 see status: failed, lastFailureReason: Timeout was reached"
-echo "======================================================================="
+echo "14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached"
+echo "========================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID5
 echo
 echo
 
 
-echo "15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server"
-echo "=============================================================================="
+echo "15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server"
+echo "==============================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID6
 echo
 echo
 
 
-echo "16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name"
-echo "=============================================================================="
+echo "16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name"
+echo "==============================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID7
 echo
 echo
 
 
-echo "17. Get sub8 see status: failed, lastFailureReason: Timeout was reached"
-echo "======================================================================="
+echo "17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached"
+echo "========================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID8
 echo
 echo
@@ -513,8 +513,8 @@ Location: /v2/entities/E8?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-10. Get sub1 see status: active, lastSuccessCode: 200
-=====================================================
+10. Get sub1 see lastSuccessCode: 200 but not failsCounter
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
@@ -551,8 +551,8 @@ Date: REGEX(.*)
 }
 
 
-11. Get sub2 see status: active, lastSuccessCode: 400
-=====================================================
+11. Get sub2 see lastSuccessCode: 400 but not failsCounter
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
@@ -589,8 +589,8 @@ Date: REGEX(.*)
 }
 
 
-12. Get sub3 see status: active, lastSuccessCode: 404
-=====================================================
+12. Get sub3 see lastSuccessCode: 404 but not failsCounter
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
@@ -627,8 +627,8 @@ Date: REGEX(.*)
 }
 
 
-13. Get sub4 see status: active, lastSuccessCode: 500
-=====================================================
+13. Get sub4 see lastSuccessCode: 500 but not failsCounter
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
@@ -665,10 +665,10 @@ Date: REGEX(.*)
 }
 
 
-14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
-=======================================================================
+14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached
+========================================================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 453
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -679,6 +679,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/givemeDelay"
         },
@@ -688,7 +689,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -703,10 +704,10 @@ Date: REGEX(.*)
 }
 
 
-15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
-==============================================================================
+15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
+===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 458
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -717,6 +718,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:6699/notify"
         },
@@ -726,7 +728,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -741,10 +743,10 @@ Date: REGEX(.*)
 }
 
 
-16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
-==============================================================================
+16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
+===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 468
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -755,6 +757,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://foo.bar.bar.com:1028/notify"
         },
@@ -764,7 +767,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
@@ -779,10 +782,10 @@ Date: REGEX(.*)
 }
 
 
-17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
-=======================================================================
+17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached
+========================================================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -793,6 +796,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
             "url": "http://12.34.76.85:9999/giveme200"
         },
@@ -802,7 +806,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []

@@ -55,7 +55,7 @@ Date: REGEX(.*)
 {
     "subscribeResponse": {
         "duration": "PT24H",
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT5H"
     }
 }

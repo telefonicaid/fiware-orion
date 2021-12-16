@@ -106,7 +106,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -121,8 +121,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "details": "invalid context provider response", 
+        "code": "404",
+        "details": "invalid context provider response",
         "reasonPhrase": "No context element found"
     }
 }

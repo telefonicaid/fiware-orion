@@ -11,7 +11,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.61.1
 * openssl: 1.1.1g
 * libuuid: 2.32.1
-* libmosquitto: 2.0.11 (from source)
+* libmosquitto: 2.0.12 (from source)
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -55,11 +55,11 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
-        tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11
+        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        tar xvf mosquitto-2.0.12.tar.gz
+        cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -126,7 +126,7 @@ In the case of the aarch64 architecture, additionally install python2-devel, rpm
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python2
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
@@ -172,7 +172,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
-* libmosquitto: 2.0.11 (from source)
+* libmosquitto: 2.0.12 (from source)
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -217,11 +217,11 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.11/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz
-        tar xvf mosquitto-2.0.11.tar.gz
-        cd mosquitto-2.0.11
+        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        tar xvf mosquitto-2.0.12.tar.gz
+        cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -290,7 +290,7 @@ In the case of the aarch64 architecture, additionally install `python2-dev` and 
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
 
 * Run test harness (it takes some time, please be patient). Before starting test by make command, apply the following patch to avoid test failing.
 

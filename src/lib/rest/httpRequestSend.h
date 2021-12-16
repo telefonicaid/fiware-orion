@@ -43,49 +43,14 @@ extern void httpRequestInit(long defaultTimeoutInMilliseconds);
 
 
 
-/***************************************************************************
+/* ****************************************** **********************************
 *
-* httpRequestConnect -
-*/
-extern int httpRequestConnect(const std::string& host, unsigned short port);
-
-
-
-/* ****************************************************************************
-*
-* httpRequestSend - 
+* httpRequestSend -
 */
 extern int httpRequestSend
 (
-  const std::string&                         from,
-  const std::string&                         ip,
-  unsigned short                             port,
-  const std::string&                         protocol,
-  const std::string&                         verb,
-  const std::string&                         tenant,
-  const std::string&                         servicePath,
-  const std::string&                         xauthToken,
-  const std::string&                         resource,
-  const std::string&                         content_type,
-  const std::string&                         content,
-  const std::string&                         fiwareCorrelation,
-  const std::string&                         ngisv2AttrFormat,
-  std::string*                               outP,
-  long long*                                 statusCodeP,
-  const std::map<std::string, std::string>&  extraHeaders,
-  const std::string&                         acceptFormat          = "",
-  long                                       timeoutInMilliseconds = -1
-);
-
-
-
-/* ****************************************** **********************************
-*
-* httpRequestSendWithCurl -
-*/
-extern int httpRequestSendWithCurl
-(
   CURL*                                      curl,
+  const std::string&                         idStringForLogs,
   const std::string&                         from,
   const std::string&                         ip,
   unsigned short                             port,

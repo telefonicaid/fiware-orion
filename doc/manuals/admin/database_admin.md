@@ -23,8 +23,11 @@ site](https://education.mongodb.com/)). Otherwise, we recommend to be very caref
 The usual procedure for MongoDB databases is used.
 
 Use mongobackup command to get a backup of the Orion Context Broker
-database. It is strongly recommended that you stop the broker before
-doing a backup.
+database, due to several operational reasons:
+
+* From a point of view of MongoDB, if you are using a sharded cluster, you could backup inconsistent data, depending of your backup strategy/tool. MongoDB administration is out of the scope of this documentation, but you can have a look to [official MongoDB documentation](https://docs.mongodb.com/manual/administration/backup-sharded-clusters/) about this topic.
+
+* From a point of view of Context Broker, your backup could end in a intermediate state. For instance, if CB is processing a `POST /v2/op/update` operation with an array of three entities [E1, E2, E3] and you don't stop the CB and take the backup in the middle, maybe the backup includes E1 changes, but not changes for E2 and E3. The backup doesn't ensure "transactional consistency" during `POST /v2/op/update` (i.e. all the three entities or none of them updated).
 
 ```
 mongodump --host <dbhost> --db <db>

@@ -22,6 +22,7 @@ pages:
       - 'MQTT notifications': 'user/mqtt_notifications.md'
       - 'Transient Entities': 'user/transient_entities.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
+      - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
       - 'Attribute Metadata': 'user/metadata.md'
       - 'Filtering': 'user/filtering.md'

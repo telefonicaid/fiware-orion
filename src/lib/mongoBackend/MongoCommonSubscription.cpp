@@ -33,7 +33,6 @@
 #include "common/defaultValues.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/MongoGlobal.h"  // processConditionVector
 
 #include "mongoDriver/BSONArrayBuilder.h"
 
@@ -162,11 +161,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   if (sub.notification.type == ngsiv2::HttpNotification)
   {
-    b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-    b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
+    b->append(CSUB_REFERENCE,     sub.notification.httpInfo.url);
+    b->append(CSUB_CUSTOM,        sub.notification.httpInfo.custom);
+    b->append(CSUB_TIMEOUT,   sub.notification.httpInfo.timeout);
 
-    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription reference:   %s", sub.notification.httpInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:      %s", sub.notification.httpInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription timeout: %d", sub.notification.httpInfo.timeout));
+
 
     if (sub.notification.httpInfo.custom)
     {
@@ -184,6 +186,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
     LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
+
+    if (sub.notification.mqttInfo.providedAuth)
+    {
+      b->append(CSUB_USER,   sub.notification.mqttInfo.user);
+      b->append(CSUB_PASSWD, sub.notification.mqttInfo.passwd);
+      LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.mqttInfo.user.c_str()));
+      LM_T(LmtMongo, ("Subscription passwd: *****"));
+    }
 
     if (sub.notification.mqttInfo.custom)
     {
@@ -208,6 +218,30 @@ void setThrottling(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setMaxfailsLimit -
+*/
+void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_MAXFAILSLIMIT, sub.notification.maxFailsLimit);
+  LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", sub.notification.maxFailsLimit));
+}
+
+
+
+/* ****************************************************************************
+*
+* setFailsCounter -
+*/
+void setFailsCounter(long long failedCounter, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_FAILSCOUNTER, failedCounter);
+  LM_T(LmtMongo, ("Subscription failsCounter: %lu", failedCounter));
+}
+
+
+
+/* ****************************************************************************
+*
 * setServicePath -
 */
 void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
@@ -224,11 +258,8 @@ void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
 */
 void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  if (!sub.description.empty())
-  {
-    b->append(CSUB_DESCRIPTION, sub.description);
-    LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
-  }
+  b->append(CSUB_DESCRIPTION, sub.description);
+  LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
 }
 
 
@@ -237,12 +268,14 @@ void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setStatus -
 */
-void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
+void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 {
-  std::string  status = (sub.status.empty())? STATUS_ACTIVE : sub.status;
+  std::string  status = (_status.empty())? STATUS_ACTIVE : _status;
 
   b->append(CSUB_STATUS, status);
+  b->append(CSUB_STATUS_LAST_CHANGE, now);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
+  LM_T(LmtMongo, ("Subscription status last change: %f", now));
 }
 
 
@@ -251,7 +284,7 @@ void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1)
 {
   orion::BSONArrayBuilder entities;
 
@@ -300,6 +333,15 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
     entities.append(bob.obj());
   }
 
+  if ((fromNgsiv1) && (entities.arrSize() == 0))
+  {
+    // Special case: in NGSIv1 entities and condition attributes are not
+    // part of the same field (subject, in NGSIv2) so it may happen that
+    // subject only contains condition attributes and entities has to be
+    // left untouched in this case
+    return;
+  }
+
   orion::BSONArray entitiesArr = entities.arr();
 
   b->append(CSUB_ENTITIES, entitiesArr);
@@ -334,25 +376,20 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 */
 void setConds
 (
-  const Subscription&              sub,
-  const std::vector<std::string>&  notifAttributesV,
-  orion::BSONObjBuilder*           b
+  const Subscription&     sub,
+  orion::BSONObjBuilder*  b
 )
 {
-  //
-  // Note that we cannot use status, url and attrsFormat from sub.status, as sub object
-  // could correspond to an update and the fields be missing (in which case the one from
-  // the original subscription has to be taken; the caller deal with that)
-  //
+  orion::BSONArrayBuilder conds;
 
-  /* Conds vector */
+  for (unsigned int ix = 0; ix < sub.subject.condition.attributes.size(); ++ix)
+  {
+    conds.append(sub.subject.condition.attributes[ix]);
+  }
 
-  orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
-                                            sub.subject.entities,
-                                            notifAttributesV);
-
-  b->append(CSUB_CONDITIONS, conds);
-  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+  orion::BSONArray condsArr = conds.arr();
+  b->append(CSUB_CONDITIONS, condsArr);
+  LM_T(LmtMongo, ("Subscription conditions: %s", condsArr.toString().c_str()));
 }
 
 

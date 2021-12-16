@@ -105,7 +105,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -120,7 +120,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT1H", 
+    "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -139,17 +139,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "attr01", 
+                        "name": "attr01",
                         "type": ""
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "entity01", 
-                        "isPattern": "false", 
+                        "id": "entity01",
+                        "isPattern": "false",
                         "type": "ET1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }

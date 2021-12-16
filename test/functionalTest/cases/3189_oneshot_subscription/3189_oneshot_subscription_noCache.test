@@ -261,28 +261,28 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "A subscription to get info about Room1", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "A subscription to get info about Room1",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
             "temperature"
-        ], 
-        "attrsFormat": "normalized", 
+        ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "onlyChangedAttrs": false
-    }, 
-    "status": "oneshot", 
+    },
+    "status": "oneshot",
     "subject": {
         "condition": {
             "attrs": [
                 "pressure"
             ]
-        }, 
+        },
         "entities": [
             {
-                "id": "Room1", 
+                "id": "Room1",
                 "type": "Room"
             }
         ]
@@ -321,15 +321,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "Room1", 
+            "id": "Room1",
             "temperature": {
-                "metadata": {}, 
-                "type": "Float", 
+                "metadata": {},
+                "type": "Float",
                 "value": 24
-            }, 
+            },
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -344,32 +344,32 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "A subscription to get info about Room1", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "A subscription to get info about Room1",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
             "temperature"
-        ], 
-        "attrsFormat": "normalized", 
+        ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
-        }, 
-        "lastNotification": "REGEX(.*)", 
-        "lastSuccess": "REGEX(.*)", 
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 1
-    }, 
-    "status": "inactive", 
+    },
+    "status": "inactive",
     "subject": {
         "condition": {
             "attrs": [
                 "pressure"
             ]
-        }, 
+        },
         "entities": [
             {
-                "id": "Room1", 
+                "id": "Room1",
                 "type": "Room"
             }
         ]
@@ -388,36 +388,38 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 458
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "A subscription to get info about Room1", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "A subscription to get info about Room1",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
             "temperature"
-        ], 
-        "attrsFormat": "normalized", 
+        ],
+        "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
-        }, 
+        },
+        "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
-        "onlyChangedAttrs": false
-    }, 
-    "status": "oneshot", 
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "oneshot",
     "subject": {
         "condition": {
             "attrs": [
                 "pressure"
             ]
-        }, 
+        },
         "entities": [
             {
-                "id": "Room1", 
+                "id": "Room1",
                 "type": "Room"
             }
         ]
@@ -456,15 +458,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "Room1", 
+            "id": "Room1",
             "temperature": {
-                "metadata": {}, 
-                "type": "Float", 
+                "metadata": {},
+                "type": "Float",
                 "value": 26
-            }, 
+            },
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

@@ -22,7 +22,7 @@
 
 --NAME--
 Check "location" metadata is not wrongly included in NGSIv2 notifications
-triggered by a NGSIV2 subscription creation, update or attribute update 
+triggered by a NGSIV2 subscription creation, update or attribute update
 
 --SHELL-INIT--
 dbInit CB
@@ -161,48 +161,48 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "E", 
+            "id": "E",
             "name": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "SD3"
-            }, 
+            },
             "perimeter": {
-                "metadata": {}, 
-                "type": "geo:json", 
+                "metadata": {},
+                "type": "geo:json",
                 "value": {
                     "coordinates": [
                         [
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806708, 
-                                33.467234, 
+                                -13.806708,
+                                33.467234,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806864, 
-                                33.467206, 
+                                -13.806864,
+                                33.467206,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.807017, 
-                                33.467191, 
+                                -13.807017,
+                                33.467191,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
                             ]
                         ]
-                    ], 
+                    ],
                     "type": "Polygon"
                 }
-            }, 
+            },
             "type": "T"
         }
     ],
@@ -222,48 +222,48 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "E", 
+            "id": "E",
             "name": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "SD1"
-            }, 
+            },
             "perimeter": {
-                "metadata": {}, 
-                "type": "geo:json", 
+                "metadata": {},
+                "type": "geo:json",
                 "value": {
                     "coordinates": [
                         [
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806708, 
-                                33.467234, 
+                                -13.806708,
+                                33.467234,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806864, 
-                                33.467206, 
+                                -13.806864,
+                                33.467206,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.807017, 
-                                33.467191, 
+                                -13.807017,
+                                33.467191,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
                             ]
                         ]
-                    ], 
+                    ],
                     "type": "Polygon"
                 }
-            }, 
+            },
             "type": "T"
         }
     ],

@@ -34,7 +34,7 @@ brokerStart CB 0 IPv4 -logSummary 5
 #
 # Provoke a few transactions and badInputs and check log summary
 #
-# Note that when running under valgrind, an initial "GET /version" is received by the 
+# Note that when running under valgrind, an initial "GET /version" is received by the
 # broker and this message is a transaction as well, so always ONE MERE transaction when under valgrind.
 #
 # Also note that there can be only one REGEX per line and that REGEX has problems working with parenthesis.
@@ -206,6 +206,8 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
@@ -229,10 +231,14 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 Transactions: REGEX((5 _new: 1_|6 _new: 1_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
 
 
@@ -259,14 +265,20 @@ Date: REGEX(.*)
 Transactions: REGEX((4 _new: 4_|5 _new: 5_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 Transactions: REGEX((5 _new: 1_|6 _new: 1_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new: 1_
 Transactions: REGEX((6 _new: 1_|7 _new: 1_))
 DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+Forwarding failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+MQTT connection failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
 Bad input active alarms: 1, raised: _total: 2, new: 1_, released: _total: 1, new: 0_
 
 

@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos8.3.2011
+ARG  IMAGE_TAG=centos8.4.2105
 FROM centos:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -58,21 +58,6 @@ RUN \
       tar \
       which \
       cyrus-sasl-devel && \
-    # FIXME: this is a temporary hack due to the cmake version that comes with CentOS8
-    # at the present moment (June 9th, 2021) is 3.18.2. Unfortunatelly, this version seems
-    # to have problems to build the mongo C driver (see https://jira.mongodb.org/browse/CDRIVER-4020),
-    # probably due to a bug already solved in 3.18.3. Thus, the solution is to build cmake
-    # from scratch (we have used 3.20.1, the last version by the time being). Once CentOS8
-    # upgrade cmake to a version beyond 3.18.2, we can probably remove this hack and rely again in
-    # yum-based installation
-    rpm -e cmake cmake-data cmake-filesystem cmake-rpm-macros && \
-    cd /opt && \
-    curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz && \
-    tar xvf cmake-3.20.1.tar.gz && \
-    cd cmake-3.20.1 && \
-    ./bootstrap && \
-    make && \
-    make install && \
     # Install libmicrohttpd from source
     cd /opt && \
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
@@ -84,9 +69,9 @@ RUN \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.11.tar.gz && \
-    tar xvf mosquitto-2.0.11.tar.gz && \
-    cd mosquitto-2.0.11 && \
+    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz && \
+    tar xvf mosquitto-2.0.12.tar.gz && \
+    cd mosquitto-2.0.12 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
     sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
@@ -127,8 +112,8 @@ RUN \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
            /opt/libmicrohttpd-0.9.70 \
-           /opt/mosquitto-2.0.11.tar.gz \
-           /opt/mosquitto-2.0.11 \
+           /opt/mosquitto-2.0.12.tar.gz \
+           /opt/mosquitto-2.0.12 \
            /opt/mongo-c-driver-1.17.4.tar.gz \
            /opt/mongo-c-driver-1.17.4 \
            /usr/local/include/mongo \
@@ -173,6 +158,7 @@ RUN \
     # Clean yum data
     yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
     # Rebuild rpm data files. FIXME: disabled step, doesn't work in CentOS8 ?
+    # check https://github.com/telefonicaid/fiware-cygnus/issues/2113 (seems to be the same problem)
     #rm -f /var/lib/rpm/__db* && rpm -vv --rebuilddb && \
     # Delete unused locales. Only preserve en_US and the locale aliases
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \

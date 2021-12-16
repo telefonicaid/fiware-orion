@@ -58,11 +58,11 @@ extern void mongoListSubscriptions
 */
 extern void mongoGetSubscription
 (
-  ngsiv2::Subscription*                sub,
-  OrionError*                          oe,
-  const std::string&                   idSub,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
+  ngsiv2::Subscription*  sub,
+  OrionError*            oe,
+  const std::string&     idSub,
+  const std::string&     servicePath,
+  const std::string&     tenant
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H_

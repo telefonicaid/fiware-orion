@@ -82,17 +82,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "a", 
+                        "name": "A1",
+                        "type": "a",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -110,8 +110,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "Service not found. Check your URL as probably it is wrong.", 
+        "code": "400",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }

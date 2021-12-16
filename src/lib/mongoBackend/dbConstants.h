@@ -26,7 +26,7 @@
 * Author: Fermín Galán
 */
 
-
+#include <string>
 
 /* ***************************************************************************
 *
@@ -94,6 +94,8 @@
 #define CSUB_EXPR_GEOREL             "georel"
 
 #define CSUB_THROTTLING              "throttling"
+#define CSUB_MAXFAILSLIMIT           "maxFailsLimit"
+#define CSUB_FAILSCOUNTER            "failsCounter"
 #define CSUB_ENTITIES                "entities"
 #define CSUB_ATTRS                   "attrs"
 #define CSUB_METADATA                "metadata"
@@ -104,8 +106,10 @@
 #define CSUB_COUNT                   "count"
 #define CSUB_FORMAT                  "format"
 #define CSUB_STATUS                  "status"
+#define CSUB_STATUS_LAST_CHANGE      "statusLastChange"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
+#define CSUB_TIMEOUT                 "timeout"
 #define CSUB_METHOD                  "method"
 #define CSUB_HEADERS                 "headers"
 #define CSUB_QS                      "qs"
@@ -120,14 +124,28 @@
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"
 
+#define CSUB_USER                    "user"
+#define CSUB_PASSWD                  "passwd"
+
 
 
 /* ****************************************************************************
 *
 * Constant strings for field values acting as keywords
+*
+* FIXME P10: use an enum for active/inactive/expired instead of strings
 */
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"
 #define STATUS_ONESHOT       "oneshot"
+
+
+
+/* ****************************************************************************
+*
+* Attribute update operators (except $addToSet and $pullAll, which are special ones)
+*/
+#define UPDATE_OPERATORS_NUMBER 6
+const std::string UPDATE_OPERATORS[UPDATE_OPERATORS_NUMBER] = { "$inc", "$min", "$max", "$mul", "$push", "$pull" };
 
 #endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

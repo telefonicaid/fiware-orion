@@ -47,7 +47,7 @@ brokerStart CB
 # 15. GET /v1/registry/contextEntities/type/T1/id/E1 without Service-Path
 # 16. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /#
 # 17. GET /v1/registry/contextEntities/type/T1/id/E1 with Service-Path /
-# 
+#
 
 echo "01. GET /v1/registry/contextEntities/type/T1/id/E1 and see it fail"
 echo "========================================================================"
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -257,7 +257,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -276,17 +276,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -308,17 +308,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -340,17 +340,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -368,7 +368,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -384,7 +384,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -400,8 +400,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "non-matching entity::types in URL", 
+        "code": "400",
+        "details": "non-matching entity::types in URL",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -417,8 +417,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entity::type cannot be empty for this request", 
+        "code": "400",
+        "details": "entity::type cannot be empty for this request",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -433,7 +433,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -447,7 +447,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -466,17 +466,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s1"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -498,17 +498,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s2"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -526,7 +526,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -546,53 +546,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s1"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s2"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -614,53 +614,53 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s1"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "s2"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }
@@ -682,17 +682,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": "slash"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/abc"
             }
         }

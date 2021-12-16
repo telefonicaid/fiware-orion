@@ -208,7 +208,9 @@ static bool updateForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
-  r = httpRequestSend(fromIp,   // thread variable
+  r = httpRequestSend(NULL,
+                      "regId: " + regId,
+                      fromIp,   // thread variable
                       ip,
                       port,
                       protocol,
@@ -755,7 +757,7 @@ std::string postUpdateContext
   bool forwardOk = true;
 
   // Note that queryForward() (due to internal calls to httpRequestSend())
-  // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+  // change coordid= and transid= so we need to preserve them and restore once forwarding loop has ended
   // FIXME P5: maybe this is not the right place to store&recover old transaction.
   // What about inside httpRequestSend?
 

@@ -93,17 +93,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att", 
-                        "type": "compound", 
+                        "name": "att",
+                        "type": "compound",
                         "value": ""
                     }
-                ], 
-                "id": "E", 
-                "isPattern": "false", 
+                ],
+                "id": "E",
+                "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -125,19 +125,19 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att", 
-                        "type": "compound", 
+                        "name": "att",
+                        "type": "compound",
                         "value": {
                             "a": "3"
                         }
                     }
-                ], 
-                "id": "E", 
-                "isPattern": "false", 
+                ],
+                "id": "E",
+                "isPattern": "false",
                 "type": "T"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
