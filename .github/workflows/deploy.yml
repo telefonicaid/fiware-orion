@@ -100,18 +100,9 @@ jobs:
           file: docker/Dockerfile-ubi
           no-cache: true
 
-      - name: Push to local
-        id: push-local
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: localhost:5000
-          tls-verify: false
-
       - name: Clair Scan
         run: |
-          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
+          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ needs.generate-version.outputs.version }}
 
       - name: Push
         id: docker_push
