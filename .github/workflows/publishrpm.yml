@@ -5,8 +5,8 @@ on:
     # every night at one
     - cron: '0 1 * * *'
   push:
-    branches:
-      - master
+    tags:
+      - '*.*.*'
 
 env:
   CI_IMAGE: fiware/orion-ci:rpm8
