@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
       - uses: actions/checkout@v2
 
@@ -37,6 +43,19 @@ jobs:
           containerfiles: |
             ./docker/Dockerfile-ubi
 
+      - name: Push to local
+        id: push-local
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: localhost:5000
+          tls-verify: false
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
+
       - name: Push To certification registry
         id: push-to-cert
         run: |
@@ -48,6 +67,12 @@ jobs:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
 
     steps:
       - uses: actions/checkout@v2
@@ -75,14 +100,18 @@ jobs:
           file: docker/Dockerfile-ubi
           no-cache: true
 
-      - name: Clair Scan
-        uses: santander-group/clair-scan-action@main
+      - name: Push to local
+        id: push-local
+        uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          local: no
-          report_format: json
-          report_path: clair-report.json
-          updater: rhel
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: localhost:5000
+          tls-verify: false
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
 
       - name: Push
         id: docker_push
@@ -143,6 +172,12 @@ jobs:
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
       - uses: actions/checkout@v2
 
@@ -155,6 +190,20 @@ jobs:
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
             ./docker/Dockerfile-ubi
+
+
+      - name: Push to local
+        id: push-local
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: localhost:5000
+          tls-verify: false
+
+      - name: Clair Scan
+        run: |
+          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ needs.generate-version.outputs.version }}
 
       - name: Push To quay.io
         id: push-to-quay

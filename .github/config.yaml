@@ -1,0 +1,33 @@
+
+introspection_addr: 0.0.0.0:8089
+http_listen_addr: 0.0.0.0:6060
+log_level: info
+indexer:
+  connstring: host=localhost port=5432 user=clair password=clair dbname=clair sslmode=disable
+  scanlock_retry: 10
+  layer_scan_concurrency: 5
+  migrations: true
+matcher:
+  indexer_addr: "localhost:8080"
+  connstring: host=localhost port=5432 user=clair password=clair dbname=clair sslmode=disable
+  max_conn_pool: 100
+  run: ""
+  migrations: true
+  updater_sets:
+  - "alpine"
+  - "debian"
+  - "rhel"
+matchers:
+  names:
+  - "alpine"
+  - "debian"
+  - "rhel"
+  - "ubuntu"
+      
+notifier:
+  indexer_addr: http://clair-indexer:8080/
+  matcher_addr: http://clair-matcher:8080/
+  connstring: host=localhost port=5432 user=clair password=clair dbname=clair sslmode=disable
+  migrations: true
+  delivery_interval: 1m
+  poll_interval: 5m
