@@ -27,7 +27,7 @@ jobs:
       - name: Build & Push
         id: rpm_build
         run: |
-          ./.github/build-and-push-rpm.sh ${{ secrets.NEXUS_PASSWORD }} release
+          ./.github/build-and-push-rpm.sh ${{ secrets.FIWARE_NEXUS_PASSWORD }} release
 
   build-rpm-nightly:
 
@@ -44,4 +44,4 @@ jobs:
       - name: Build & Push
         id: rpm_build
         run: |
-          ./.github/build-and-push-rpm.sh ${{ secrets.NEXUS_PASSWORD }} nightly
+          ./.github/build-and-push-rpm.sh ${{ secrets.FIWARE_NEXUS_PASSWORD }} nightly
