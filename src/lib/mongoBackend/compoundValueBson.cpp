@@ -42,8 +42,10 @@
 * strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
 * strings are converted to numbers (strings are not allowed in GeoJSON)
 *
+* encode set to true only in the calculateOperator functions, eg. to avoid that
+* "$each" get replaced by ">each" (see https://github.com/telefonicaid/fiware-orion/issues/744#issuecomment-996752938)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool strings2numbers)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool strings2numbers, bool encode)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -77,14 +79,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
     {
       orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba, strings2numbers);
+      compoundValueBson(child->childV, ba, strings2numbers, encode);
       b.append(ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
       orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo, strings2numbers);
+      compoundValueBson(child->childV, bo, strings2numbers, encode);
       b.append(bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
@@ -106,13 +108,16 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
 *
 * strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
 * strings are converted to numbers (strings are not allowed in GeoJSON)
+*
+* encode set to true only in the calculateOperator functions, eg. to avoid that
+* "$each" get replaced by ">each" (see https://github.com/telefonicaid/fiware-orion/issues/744#issuecomment-996752938)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool strings2numbers)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool strings2numbers, bool encode)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
     orion::CompoundValueNode*  child         = children[ix];
-    std::string                effectiveName = dbEncode(child->name);
+    std::string                effectiveName = encode? dbEncode(child->name) : child->name;
 
     if (child->valueType == orion::ValueTypeString)
     {
@@ -142,14 +147,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
     {
       orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba, strings2numbers);
+      compoundValueBson(child->childV, ba, strings2numbers, encode);
       b.append(effectiveName, ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
       orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo, strings2numbers);
+      compoundValueBson(child->childV, bo, strings2numbers, encode);
       b.append(effectiveName, bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
