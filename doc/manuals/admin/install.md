@@ -59,7 +59,7 @@ Sometimes the above commands fails due to yum cache. In that case, run
 
 ### Using RPM file
 
-Download the package directly from the [FIWARE Yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) (both types of packages are provided).
+Download the package directly from the [FIWARE Yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/8/x86_64/) (both types of packages are provided).
 
 Next, install the package using the rpm command (as root):
 
@@ -107,7 +107,7 @@ yum install contextBroker
 Sometimes the above commands fails due to yum cache. In that case, run
 `yum clean all` and try again.
 
-If you are upgrading using the RPM file, then first download the new package from the [FIWARE yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) (both types of packages are provided).
+If you are upgrading using the RPM file, then first download the new package from the [FIWARE yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/8/x86_64/) (both types of packages are provided).
 
 Then upgrade the package using the rpm command (as root):
 
