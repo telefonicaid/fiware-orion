@@ -18,12 +18,6 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-
     steps:
       - uses: actions/checkout@v2
 
@@ -43,19 +37,6 @@ jobs:
           containerfiles: |
             ./docker/Dockerfile-ubi
 
-      - name: Push to local
-        id: push-local
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: localhost:5000
-          tls-verify: false
-
-      - name: Clair Scan
-        run: |
-          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ env.IMAGE_TAG_PRE }}
-
       - name: Push To certification registry
         id: push-to-cert
         run: |
@@ -67,12 +48,6 @@ jobs:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
 
     steps:
       - uses: actions/checkout@v2
@@ -89,23 +64,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build
+      - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          push: false
-          tags: |
-            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
-            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          file: docker/Dockerfile-ubi
-          no-cache: true
-
-      - name: Clair Scan
-        run: |
-          ./.github/clair-scan.sh medium ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}:${{ env.IMAGE_TAG_PRE }}
-
-      - name: Push
-        id: docker_push
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -113,7 +73,7 @@ jobs:
             ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
             ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile-ubi
-          no-cache: false
+          no-cache: true
 
       - name: Build and push with gdb
         id: docker_build_gdb
@@ -156,18 +116,19 @@ jobs:
           file: docker/Dockerfile-debug
           no-cache: true
 
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+
   # quay.io
 
   deploy-release-quay:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
 
     steps:
       - uses: actions/checkout@v2
@@ -181,20 +142,6 @@ jobs:
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
             ./docker/Dockerfile-ubi
-
-
-      - name: Push to local
-        id: push-local
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: localhost:5000
-          tls-verify: false
-
-      - name: Clair Scan
-        run: |
-          ./.github/clair-scan.sh medium localhost:5000/${{ steps.build-image.outputs.image }}:${{ env.IMAGE_TAG_PRE }}
 
       - name: Push To quay.io
         id: push-to-quay
