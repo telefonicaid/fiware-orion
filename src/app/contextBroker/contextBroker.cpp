@@ -579,7 +579,7 @@ void exitFunc(void)
   }
 
   mqttMgr.teardown();
-  
+
   curl_context_cleanup();
   curl_global_cleanup();
 
@@ -664,7 +664,7 @@ static void contextBrokerInit(void)
 
   /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
-  
+
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
    {
@@ -678,48 +678,52 @@ static void contextBrokerInit(void)
 *
 * loadFile -
 */
-static int loadFile(char* path, char* out, int outSize)
+static char* loadFile(char* path)
 {
   struct stat  statBuf;
   int          nb;
   int          fd = open(path, O_RDONLY);
+  char*        buf;
 
   if (fd == -1)
   {
     LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
     LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
-  if (statBuf.st_size > outSize)
+  buf = (char*) malloc(statBuf.st_size + 1);
+  if (buf == NULL)
   {
     close(fd);
-    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
-    return -1;
+    LM_E(("HTTPS Error (out of memory - unable to allocate %d bytes for out-buffer of key/cert file)", statBuf.st_size + 1));
+    return NULL;
   }
 
-  nb = read(fd, out, statBuf.st_size);
+  nb = read(fd, buf, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
   {
     LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
   if (nb != statBuf.st_size)
   {
     LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
-    return -1;
+    return NULL;
   }
 
-  return 0;
+  buf[statBuf.st_size] = 0;  // Zero-terminate the string
+
+  return buf;
 }
 
 
@@ -1035,13 +1039,13 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
-  
+
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
   if (paIsSet(argC, argV, (PaArgument*) paArgs, "-fg"))
   {
-    paConfig("log to screen",                 (void*) true);  
+    paConfig("log to screen",                 (void*) true);
     if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
     {
       paConfig("screen line format", (void*) "TYPE@DATE  FILE[LINE]: TEXT");
@@ -1053,12 +1057,12 @@ int main(int argC, char* argV[])
   }
 
   //
-  // disable file logging if the corresponding option is set. 
+  // disable file logging if the corresponding option is set.
   //
   if (paIsSet(argC, argV, (PaArgument *) paArgs, "-disableFileLog"))
   {
     paConfig("log to file", (void*) false);
-  } 
+  }
   else
   {
     paConfig("log to file", (void*) true);
@@ -1239,20 +1243,26 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    // FIXME P3: we suspect that loadFile() is not working well as it doesn't include the
-    // char terminator \0 at the end, thus causing valgrind errors. Using calloc will ensure
-    // that all the buffer is initialized with \0, thus avoiding the problem, although it would
-    // be better to fix loadFile()
-    // See issue https://github.com/telefonicaid/fiware-orion/issues/3925 for more detail
-    char* httpsPrivateServerKey = (char*) calloc(2048, 1);
-    char* httpsCertificate      = (char*) calloc(2048, 1);
+    char* httpsPrivateServerKey = loadFile(httpsKeyFile);
+    char* httpsCertificate      = loadFile(httpsCertFile);
 
-    if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
+    if (httpsPrivateServerKey == NULL)
     {
+      if (httpsCertificate != NULL)
+      {
+        free(httpsCertificate);
+      }
+
       LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
     }
-    if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
+
+    if (httpsCertificate == NULL)
     {
+      if (httpsPrivateServerKey != NULL)
+      {
+        free(httpsPrivateServerKey);
+      }
+
       LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
     }
 
@@ -1271,7 +1281,7 @@ int main(int argC, char* argV[])
                           reqTimeout,
                           httpsPrivateServerKey,
                           httpsCertificate);
-    
+
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }

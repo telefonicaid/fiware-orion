@@ -1,0 +1,1 @@
+- Fix: allow HTTPS certificates larger than 2048 bytes (#4012)
