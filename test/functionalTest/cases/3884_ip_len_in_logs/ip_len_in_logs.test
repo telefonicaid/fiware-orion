@@ -33,7 +33,8 @@ brokerStart CP1
 # 01. Register entity E1 for CP1 in CB
 # 02. Create E1 in CP1
 # 03. GET /entities/E1 from CB to provoke a forwarded request to CP1, to provoke the bug
-# 04. GET /entities/E1 from CP1 to make sure it-s still alive
+# 04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK
+# 05. GET /entities/E1 from CP1 to make sure it-s still alive
 #
 
 echo "01. Register entity E1 for CP1 in CB"
@@ -81,7 +82,14 @@ echo
 echo
 
 
-echo "04. GET /entities/E1 from CP1 to make sure it-s still alive"
+echo "04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK"
+echo "============================================================================"
+cat /tmp/contextBroker.log | grep "Starting forwarding for" | awk -F \| '{ print $5 }'
+echo
+echo
+
+
+echo "05. GET /entities/E1 from CP1 to make sure it-s still alive"
 echo "==========================================================="
 orionCurl --url /v2/entities/E1 --port $CP1_PORT
 echo
@@ -129,7 +137,12 @@ Date: REGEX(.*)
 }
 
 
-04. GET /entities/E1 from CP1 to make sure it-s still alive
+04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK
+============================================================================
+ from=www.qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+
+
+05. GET /entities/E1 from CP1 to make sure it-s still alive
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 68
