@@ -11,3 +11,4 @@
 - Remove: status "failed" in subscriptions (use failsCounter greater than 0 instead)
 - Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
 - Upgrade Dockerfile base image from centos8.3.2011 to centos8.4.2105
+- Fix: Allow HTTPS certificates larger than 2048 bytes (#4012)
