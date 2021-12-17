@@ -87,6 +87,15 @@ jobs:
           file: docker/Dockerfile-gdb
           no-cache: true
 
+
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_PRE }}
+
+
   deploy-debug-dockerhub:
 
     runs-on: ubuntu-18.04
@@ -115,13 +124,6 @@ jobs:
           tags: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
           file: docker/Dockerfile-debug
           no-cache: true
-
-      - name: Run Snyk to check Docker image for vulnerabilities
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
 
   # quay.io
 
