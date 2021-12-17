@@ -1,1 +1,3 @@
-Fix: avoid duplicated attributes in arrays in POST v2/subscriptions (#2101)
+- Fix: avoid duplicated attributes and metadata in arrays in POST /v2/subscriptions (#2101)
+- Fix: $each usage with $push operator to add several items to array (#744)
+- Fix: allow HTTPS certificates larger than 2048 bytes (#4012)
