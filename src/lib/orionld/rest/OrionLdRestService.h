@@ -41,7 +41,7 @@ typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
 //
 // OrionldTroeRoutine -
 //
-typedef bool (*OrionldTroeRoutine)(ConnectionInfo* ciP);
+typedef bool (*OrionldTroeRoutine)(void);
 
 
 

@@ -124,7 +124,7 @@ void troeEntityExpand(KjNode* entityP)
 //
 // troePostEntities -
 //
-bool troePostEntities(ConnectionInfo* ciP)
+bool troePostEntities(void)
 {
   char*    entityId    = (orionldState.payloadIdNode   != NULL)? orionldState.payloadIdNode->value.s   : NULL;
   char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;

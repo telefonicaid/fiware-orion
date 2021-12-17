@@ -32,7 +32,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
@@ -54,7 +53,7 @@ extern "C"
 //
 // troeDeleteAttribute -
 //
-bool troeDeleteAttribute(ConnectionInfo* ciP)
+bool troeDeleteAttribute(void)
 {
   char* entityId      = orionldState.wildcard[0];
   char* attributeName = orionldState.wildcard[1];

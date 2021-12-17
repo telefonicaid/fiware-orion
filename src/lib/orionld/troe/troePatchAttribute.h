@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
@@ -33,6 +32,6 @@
 //
 // troePatchAttribute -
 //
-extern bool troePatchAttribute(ConnectionInfo* ciP);
+extern bool troePatchAttribute(void);
 
 #endif  // SRC_LIB_ORIONLD_TROE_TROEPATCHATTRIBUTE_H_

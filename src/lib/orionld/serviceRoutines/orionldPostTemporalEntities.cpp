@@ -135,7 +135,7 @@ bool orionldPostTemporalEntities(ConnectionInfo* ciP)
   //
   numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
   orionldState.troeOpMode = TROE_ENTITY_REPLACE;
-  bool troeOk = troePostEntities(ciP);
+  bool troeOk = troePostEntities();
 
   if (troeOk == true)
   {

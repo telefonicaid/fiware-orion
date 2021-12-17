@@ -32,7 +32,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
@@ -52,7 +51,7 @@ extern "C"
 //
 // troePostBatchUpdate -
 //
-bool troePostBatchUpdate(ConnectionInfo* ciP)
+bool troePostBatchUpdate(void)
 {
   PgAppendBuffer  attributes;
   PgAppendBuffer  subAttributes;

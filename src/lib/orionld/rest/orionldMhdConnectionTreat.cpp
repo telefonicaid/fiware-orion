@@ -1054,7 +1054,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         // If the incoming request an empty array/object, then don't call the TRoE routine
         //
         if ((orionldState.verb == DELETE) || ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL)))
-          orionldState.serviceP->troeRoutine(ciP);
+          orionldState.serviceP->troeRoutine();
 
         PERFORMANCE(troeEnd);
       }

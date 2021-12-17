@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
@@ -33,6 +32,6 @@
 //
 // troeDeleteEntity -
 //
-extern bool troeDeleteEntity(ConnectionInfo* ciP);
+extern bool troeDeleteEntity(void);
 
 #endif  // SRC_LIB_ORIONLD_TROE_TROEDELETEENTITY_H_
