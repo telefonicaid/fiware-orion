@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
@@ -33,6 +32,6 @@
 //
 // troePostBatchUpdate -
 //
-extern bool troePostBatchUpdate(ConnectionInfo* ciP);
+extern bool troePostBatchUpdate(void);
 
 #endif  // SRC_LIB_ORIONLD_TROE_TROEPOSTBATCHUPDATE_H_

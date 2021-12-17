@@ -30,7 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
@@ -48,7 +47,7 @@ extern "C"
 //
 // troePostBatchCreate -
 //
-bool troePostBatchCreate(ConnectionInfo* ciP)
+bool troePostBatchCreate(void)
 {
   PgAppendBuffer  entities;
   PgAppendBuffer  attributes;

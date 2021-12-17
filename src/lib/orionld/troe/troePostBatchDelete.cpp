@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START
@@ -42,7 +41,7 @@
 //
 // troePostBatchDelete -
 //
-bool troePostBatchDelete(ConnectionInfo* ciP)
+bool troePostBatchDelete(void)
 {
   PgAppendBuffer  entitiesBuffer;
 

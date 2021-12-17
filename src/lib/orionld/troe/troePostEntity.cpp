@@ -31,7 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 
@@ -51,7 +50,7 @@ extern "C"
 //
 // troePostEntity -
 //
-bool troePostEntity(ConnectionInfo* ciP)
+bool troePostEntity(void)
 {
   //
   // The service routine leaves us with the attributes expanded but the sub attributes NOT expanded
