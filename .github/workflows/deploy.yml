@@ -94,7 +94,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_PRE }}
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           args: --file=Dockerfile
 
       - name: Upload result to GitHub Code Scanning
