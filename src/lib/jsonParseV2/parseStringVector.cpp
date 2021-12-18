@@ -77,7 +77,7 @@ bool parseStringVector
 
       if (value == val)
       {
-        *errorStringP = "duplicated attribute /" + value + "/";
+        *errorStringP = "duplicated item /" + value + "/" + " in array";
         return false;
       }
     }

@@ -33,10 +33,10 @@ brokerStart CB
 # 01. POST /v2/subscriptions, to create subscription with N attributes with the same name in attrs and see error
 # 02. POST /v2/subscriptions, to create subscription with N attributes with the same name in condition and see error
 # 03. POST /v2/subscriptions, to create subscription with N attributes with the same name in exceptAttrs and see error
-# 04. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error
-# 05. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error
-# 06. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and see no error
-# 07. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error
+# 04. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error
+# 05. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error
+# 06. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error
+# 07. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and see no error
 # 08. POST /v2/subscriptions, to create subscription with N attributes with different name in metadata and see no error
 #
 
@@ -73,6 +73,7 @@ echo
 echo
 
 
+
 echo '02. POST /v2/subscriptions, to create subscription with N attributes with the same name in condition and see error'
 echo '=================================================================================================================='
 payload='{
@@ -103,6 +104,7 @@ payload='{
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
+
 
 
 echo '03. POST /v2/subscriptions, to create subscription with N attributes with the same name in exceptAttrs and see error'
@@ -137,7 +139,44 @@ echo
 echo
 
 
-echo '04. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error'
+
+echo '04. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error'
+echo '================================================================================================================='
+payload='{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature"
+    ],
+    "metadata": [
+      "temperature",
+      "temperature"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+
+echo '05. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error'
 echo '=================================================================================================================='
 payload='{
   "description": "A subscription to get info about Room1",
@@ -169,7 +208,8 @@ echo
 echo
 
 
-echo '05. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error'
+
+echo '06. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error'
 echo '======================================================================================================================'
 payload='{
   "description": "A subscription to get info about Room1",
@@ -201,8 +241,9 @@ echo
 echo
 
 
-echo '06. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and no error'
-echo '===================================================================================================================='
+
+echo '07. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and see no error'
+echo '========================================================================================================================'
 payload='{
   "description": "A subscription to get info about Room1",
   "subject": {
@@ -226,42 +267,6 @@ payload='{
           "temperature",
           "pressure"
         ]
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-
-echo '07. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error'
-echo '================================================================================================================='
-payload='{
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "attrs": [
-      "temperature"
-    ],
-    "metadata": [
-      "temperature",
-      "temperature"
-    ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -310,13 +315,13 @@ echo
 01. POST /v2/subscriptions, to create subscription with N attributes with the same name in attrs and see error
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "duplicated attribute /temperature/",
+    "description": "duplicated item /temperature/ in array",
     "error": "BadRequest"
 }
 
@@ -324,13 +329,13 @@ Date: REGEX(.*)
 02. POST /v2/subscriptions, to create subscription with N attributes with the same name in condition and see error
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
+Content-Length: 74
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "duplicated attribute /pressure/",
+    "description": "duplicated item /pressure/ in array",
     "error": "BadRequest"
 }
 
@@ -338,18 +343,32 @@ Date: REGEX(.*)
 03. POST /v2/subscriptions, to create subscription with N attributes with the same name in exceptAttrs and see error
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "duplicated attribute /temperature/",
+    "description": "duplicated item /temperature/ in array",
     "error": "BadRequest"
 }
 
 
-04. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error
+04. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "duplicated item /temperature/ in array",
+    "error": "BadRequest"
+}
+
+
+05. POST /v2/subscriptions, to create subscription with N attributes with different name in attrs and see no error
 ==================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -359,7 +378,7 @@ Date: REGEX(.*)
 
 
 
-05. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error
+06. POST /v2/subscriptions, to create subscription with N attributes with different name in condition and see no error
 ======================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -369,28 +388,14 @@ Date: REGEX(.*)
 
 
 
-06. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and no error
-====================================================================================================================
+07. POST /v2/subscriptions, to create subscription with N attributes with different name in exceptAttrs and see no error
+========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-
-
-07. POST /v2/subscriptions, to create subscription with N attributes with the same name in metadata and see error
-=================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "duplicated attribute /temperature/",
-    "error": "BadRequest"
-}
 
 
 08. POST /v2/subscriptions, to create subscription with N attributes with different name in metadata and see no error
