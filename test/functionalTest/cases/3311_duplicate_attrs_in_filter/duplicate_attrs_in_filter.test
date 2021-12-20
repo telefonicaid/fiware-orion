@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET entities with duplicated items in attrs filter
+GET entities with duplicated items in metadata filter
 
 --SHELL-INIT--
 dbInit CB
@@ -30,26 +30,33 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity E with atributes A and B
-# 02. GET /v2/entities?attrs=A,A,A should return A only one time
-# 03. GET /v2/entities/E?attrs=A,A,A should return A only one time
-# 04. GET /v2/entities/E/attrs?attrs=A,A,A should return A only one time
-# 05. GET /v2/op/query with attrs: A,A,A should return A only one time
+# 01. Create entity E with atribute A with metadata MD1 and MD2
+# 02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time
 #
 
 
-echo "01. Create entity E with atributes A and B"
-echo "=========================================="
+echo "01. Create entity E with atribute A with metadata MD1 and MD2"
+echo "============================================================="
 payload='{
   "id": "E",
   "type": "T",
   "A":{
-    "type": "Number",
-    "value": 1
-  },
-  "B":{
-    "type": "Number",
-    "value" : 2
+    "type": "Text",
+    "value": "foo",
+    "metadata": {
+      "MD1": {
+        "type": "Number",
+        "value": 1
+      },
+      "MD2": {
+        "type": "Number",
+        "value": 2
+      }
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -57,29 +64,36 @@ echo
 echo
 
 
-echo "02. GET /v2/entities?attrs=A,A,A should return A only one time"
-echo "=============================================================="
-orionCurl --url /v2/entities?attrs=A,A,A --noPayloadCheck
+echo "02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "========================================================================="
+orionCurl --url /v2/entities?metadata=MD1,MD1,MD1 --noPayloadCheck
 echo
 echo
 
 
-echo "03. GET /v2/entities/E?attrs=A,A,A should return A only one time"
-echo "================================================================"
-orionCurl --url /v2/entities/E?attrs=A,A,A --noPayloadCheck
+echo "03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "==========================================================================="
+orionCurl --url /v2/entities/E?metadata=MD1,MD1,MD1 --noPayloadCheck
 echo
 echo
 
 
-echo "04. GET /v2/entities/E/attrs?attrs=A,A,A should return A only one time"
-echo "======================================================================"
-orionCurl --url /v2/entities/E/attrs?attrs=A,A,A --noPayloadCheck
+echo "04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "================================================================================="
+orionCurl --url /v2/entities/E/attrs?metadata=MD1,MD1,MD1 --noPayloadCheck
 echo
 echo
 
 
-echo "05. GET /v2/op/query with attrs: A,A,A should return A only one time"
-echo "===================================================================="
+echo "05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "==================================================================================="
+orionCurl --url /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 --noPayloadCheck
+echo
+echo
+
+
+echo "06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time"
+echo "==============================================================================="
 payload='{
   "entities": [
     {
@@ -87,7 +101,7 @@ payload='{
       "type": "T"
     }
   ],
-  "attrs": [ "A","A", "A" ]
+  "metadata": [ "MD1","MD1", "MD1" ]
 }'
 orionCurl --url /v2/op/query --payload "$payload" --noPayloadCheck
 echo
@@ -95,8 +109,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with atributes A and B
-==========================================
+01. Create entity E with atribute A with metadata MD1 and MD2
+=============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
@@ -105,48 +119,59 @@ Date: REGEX(.*)
 
 
 
-02. GET /v2/entities?attrs=A,A,A should return A only one time
-==============================================================
+02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time
+=========================================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 104
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]
+[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
 
 
-03. GET /v2/entities/E?attrs=A,A,A should return A only one time
-================================================================
+03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time
+===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}
+{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
 
 
-04. GET /v2/entities/E/attrs?attrs=A,A,A should return A only one time
-======================================================================
+04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time
+=================================================================================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 82
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{"A":{"type":"Number","value":1,"metadata":{}}}
+{"A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
 
 
-05. GET /v2/op/query with attrs: A,A,A should return A only one time
-====================================================================
+05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time
+===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]
+{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}
+
+
+06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
 
 
 --TEARDOWN--
