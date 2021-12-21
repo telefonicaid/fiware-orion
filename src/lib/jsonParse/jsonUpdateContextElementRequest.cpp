@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
@@ -217,5 +219,5 @@ void jsonUcerRelease(ParseData* reqData)
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
+  return reqData->ucer.res.check(orionldState.apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }

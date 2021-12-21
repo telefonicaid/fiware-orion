@@ -530,7 +530,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
+      payloadString = ncrP->render(V2, asJsonObject);
     }
 #ifdef ORIONLD
     else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))

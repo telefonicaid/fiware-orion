@@ -557,9 +557,6 @@ MHD_Result orionldMhdConnectionInit
   //
   ConnectionInfo* ciP = new ConnectionInfo();
 
-  // Mark connection as NGSI-LD V1
-  ciP->apiVersion = NGSI_LD_V1;
-
   // Remember ciP for consequent connection callbacks from MHD
   *con_cls = ciP;
 

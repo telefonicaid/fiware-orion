@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -124,7 +126,7 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AttributeValueInstance));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, AttributeValueInstance));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();

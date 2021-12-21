@@ -328,7 +328,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
                                                      ciP->httpHeaders.xauthToken.c_str(),
                                                      ciP->httpHeaders.correlator.c_str(),
                                                      ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
-                                                     ciP->apiVersion,
+                                                     orionldState.apiVersion,
                                                      NGSIV2_NO_FLAVOUR);
 
     ucRequest.release();

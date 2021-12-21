@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -136,7 +138,7 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextElementResponse));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, RtContextElementResponse));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

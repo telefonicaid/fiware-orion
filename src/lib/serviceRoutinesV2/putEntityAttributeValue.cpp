@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/errorMessages.h"
 
@@ -65,8 +67,8 @@ std::string putEntityAttributeValue
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(),      NULL) ||
-      forbiddenIdChars(ciP->apiVersion, attributeName.c_str(), NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, entityId.c_str(),      NULL) ||
+      forbiddenIdChars(orionldState.apiVersion, attributeName.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -78,7 +80,7 @@ std::string putEntityAttributeValue
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
   parseDataP->av.attribute.onlyValue = true;
 
-  std::string err = parseDataP->av.attribute.check(ciP->apiVersion, ciP->requestType);
+  std::string err = parseDataP->av.attribute.check(orionldState.apiVersion, ciP->requestType);
   if (err != "OK")
   {
     OrionError oe(SccBadRequest, err, "BadRequest");

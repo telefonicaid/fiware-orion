@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "orionTypes/areas.h"
 #include "ngsi/ContextAttribute.h"
@@ -446,5 +448,5 @@ void jsonUpcrsRelease(ParseData* reqDataP)
 std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqDataP->upcrs.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
+  return reqDataP->upcrs.res.check(orionldState.apiVersion, asJsonObject, reqDataP->errorString);
 }

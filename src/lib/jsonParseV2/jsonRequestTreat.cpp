@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
@@ -80,7 +82,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
     }
     break;
 
@@ -95,7 +97,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
     }
     break;
 
@@ -108,10 +110,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(ciP->apiVersion, EntityAttributeRequest)) != "OK")
+    if ((answer = parseDataP->attr.attribute.check(orionldState.apiVersion, EntityAttributeRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
     }
     break;
 

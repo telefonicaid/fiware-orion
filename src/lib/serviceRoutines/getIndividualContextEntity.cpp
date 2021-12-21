@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -115,7 +117,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
 
 
   // 6. Cleanup and return result

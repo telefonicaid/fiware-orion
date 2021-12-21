@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -75,7 +77,7 @@ std::string getEntity
     return oe.toJson();
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, entityId.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;

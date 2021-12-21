@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 
 #include "logMsg/logMsg.h"
@@ -422,5 +424,5 @@ void jsonNcrRelease(ParseData* parseDataP)
 */
 std::string jsonNcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncr.res.check(ciP->apiVersion, parseDataP->errorString);
+  return parseDataP->ncr.res.check(orionldState.apiVersion, parseDataP->errorString);
 }

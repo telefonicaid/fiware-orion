@@ -143,7 +143,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // FIXME: Forwards are done using NGSIv1 only, for now
   //        This will hopefully change soon ...
   //        Once we implement forwards in NGSIv2, this render() should be like this:
-  //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //        TIMED_RENDER(payload = upcrP->render(orionldState.apiVersion, asJsonObject, ""));
   //
   TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
 
@@ -464,7 +464,7 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
     upcrP->release();
 
     return answer;
@@ -479,7 +479,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -501,7 +501,7 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.xauthToken.c_str(),
                                                   ciP->httpHeaders.correlator.c_str(),
                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
-                                                  ciP->apiVersion,
+                                                  orionldState.apiVersion,
                                                   ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
@@ -521,7 +521,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -674,7 +674,7 @@ std::string postUpdateContext
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
-  if (ciP->apiVersion == V2)
+  if (orionldState.apiVersion == V2)
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
@@ -731,7 +731,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject));
   }
 
   //
