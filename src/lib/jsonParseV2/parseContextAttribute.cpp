@@ -28,6 +28,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/errorMessages.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
@@ -260,7 +262,7 @@ std::string parseContextAttribute
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || ciP->apiVersion == V2)
+    if (iter->value.HasMember("value") || orionldState.apiVersion == V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")
@@ -283,7 +285,7 @@ std::string parseContextAttribute
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  std::string r = caP->check(ciP->apiVersion, ciP->requestType);
+  std::string r = caP->check(orionldState.apiVersion, ciP->requestType);
   if (r != "OK")
   {
     alarmMgr.badInput(clientIp, r);

@@ -26,6 +26,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
@@ -162,7 +164,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
         eP->id = iter->value.GetString();
 
-        if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
+        if (forbiddenIdChars(orionldState.apiVersion, eP->id.c_str(), ""))
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, "BadRequest");
 
@@ -208,7 +210,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
+      if (forbiddenIdChars(orionldState.apiVersion, eP->type.c_str(), ""))
       {
         OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, "BadRequest");
 

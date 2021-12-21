@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -40,6 +42,7 @@
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
+
 
 
 /* ****************************************************************************
@@ -69,7 +72,7 @@ std::string postEntity
   eP->id   = compV[2];
   eP->type = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;

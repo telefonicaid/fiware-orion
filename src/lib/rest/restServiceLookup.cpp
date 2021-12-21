@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 
 #include "rest/ConnectionInfo.h"
@@ -66,7 +68,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
         continue;
       }
 
-      if (ciP->apiVersion == V1)
+      if (orionldState.apiVersion == V1)
       {
         if (strcasecmp(component, ciP->urlCompV[compNo].c_str()) != 0)
         {

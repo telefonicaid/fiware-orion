@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -58,7 +60,7 @@ std::string badVerbGetOnly
   ciP->httpHeader.push_back(HTTP_ALLOW);
   std::string headerValue = "GET";
   // OPTIONS verb is only available for V2 API
-  if ((corsEnabled == true) && (ciP->apiVersion == V2))
+  if ((corsEnabled == true) && (orionldState.apiVersion == V2))
   {
     headerValue = headerValue + ", OPTIONS";
   }
@@ -67,7 +69,7 @@ std::string badVerbGetOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  ciP->answer = oe.smartRender(ciP->apiVersion);
+  ciP->answer = oe.smartRender(orionldState.apiVersion);
 
   return ciP->answer;
 }

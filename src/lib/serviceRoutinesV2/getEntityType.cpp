@@ -77,7 +77,7 @@ std::string getEntityType
                                            ciP->servicePathV,
                                            ciP->uriParam,
                                            noAttrDetail,
-                                           ciP->apiVersion));
+                                           orionldState.apiVersion));
 
   if (response.entityType.count == 0)
   {

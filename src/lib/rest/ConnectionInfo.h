@@ -97,7 +97,6 @@ public:
   ParseData*                 parseDataP;
   unsigned short             port;
   std::string                ip;
-  ApiVersion                 apiVersion;
   RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics

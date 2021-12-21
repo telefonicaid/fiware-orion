@@ -27,6 +27,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -157,7 +158,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

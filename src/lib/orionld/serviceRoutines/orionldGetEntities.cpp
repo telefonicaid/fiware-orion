@@ -289,7 +289,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         coordinates[len - 1] = 0;
     }
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coordinates, georel, &errorString) != 0)
+    if (scopeP->fill(orionldState.apiVersion, geometry, coordinates, georel, &errorString) != 0)
     {
       scopeP->release();
       delete scopeP;
@@ -469,7 +469,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                                   ciP->uriParam,
                                                   ciP->uriParamOptions,
                                                   countP,
-                                                  ciP->apiVersion);
+                                                  orionldState.apiVersion);
   PERFORMANCE(mongoBackendEnd);
 
   //

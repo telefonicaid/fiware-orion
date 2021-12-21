@@ -87,7 +87,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
-    if (ciP->apiVersion != NGSI_LD_V1)
+    if (orionldState.apiVersion != NGSI_LD_V1)
     {
       if (metricsMgr.isOn())
         metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
@@ -108,7 +108,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answerLen > 0)
   {
-    if (ciP->apiVersion != NGSI_LD_V1)
+    if (orionldState.apiVersion != NGSI_LD_V1)
     {
       if (metricsMgr.isOn())
         metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
@@ -150,7 +150,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
   {
     // Only GET method is supported for V1 API
-    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
+    if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && ciP->verb == GET))
     {
       bool originAllowed = true;
 
@@ -254,7 +254,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     QueryContextResponse  qcr(errorCode);
     bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
-    *outStringP = qcr.render(ciP->apiVersion, asJsonObject);
+    *outStringP = qcr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
   {
@@ -275,7 +275,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     UpdateContextResponse ucr(errorCode);
     bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
-    *outStringP = ucr.render(ciP->apiVersion, asJsonObject);
+    *outStringP = ucr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)
   {
@@ -288,6 +288,6 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
 
     LM_E(("Unknown request type: '%d'", ciP->restServiceP->request));
     ciP->httpStatusCode = oe.code;
-    *outStringP = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &ciP->httpStatusCode);
+    *outStringP = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &ciP->httpStatusCode);
   }
 }

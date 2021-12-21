@@ -81,7 +81,7 @@ std::string getEntityAllTypes
                                  orionldState.tenantP,
                                  ciP->servicePathV,
                                  ciP->uriParam,
-                                 ciP->apiVersion,
+                                 orionldState.apiVersion,
                                  totalTypesP,
                                  noAttrDetail));
   }

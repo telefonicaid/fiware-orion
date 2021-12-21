@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -97,7 +99,7 @@ std::string getNgsi10ContextEntityTypes
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(orionldState.apiVersion, asJsonObject));
 
     parseDataP->qcr.res.release();
     return answer;
@@ -107,7 +109,7 @@ std::string getNgsi10ContextEntityTypes
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(orionldState.apiVersion, asJsonObject));
 
     parseDataP->qcr.res.release();
     return answer;
@@ -127,7 +129,7 @@ std::string getNgsi10ContextEntityTypes
   {
     parseDataP->qcrs.res.errorCode.details = std::string("entityId::type /") + typeName + "/ non-existent";
 
-    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(orionldState.apiVersion, asJsonObject));
   }
 
 

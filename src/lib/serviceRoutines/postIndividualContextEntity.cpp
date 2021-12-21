@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -112,7 +114,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
     return out;
   }
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
@@ -125,7 +127,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
     return out;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
@@ -139,7 +141,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
     return out;
   }
 
@@ -151,7 +153,7 @@ std::string postIndividualContextEntity
     alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
-    TIMED_RENDER(out = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+    TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
     return out;
   }
 
@@ -173,7 +175,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntity));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
 
   response.release();
   parseDataP->upcr.res.release();

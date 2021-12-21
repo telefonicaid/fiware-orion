@@ -187,7 +187,7 @@ std::string payloadParse
 
   if (ciP->inMimeType == JSON)
   {
-    if (ciP->apiVersion == V2)
+    if (orionldState.apiVersion == V2)
     {
       //
       // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
@@ -550,11 +550,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError oe;
 
-    if (compErrorDetect(ciP->apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
+    if (compErrorDetect(orionldState.apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
       ciP->httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      restReply(ciP, oe.smartRender(orionldState.apiVersion));
       return "URL PATH component error";
     }
   }
@@ -580,7 +580,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (jsonReqP != NULL)
         jsonReqP->release(&parseData);
 
-      if (ciP->apiVersion == V2)
+      if (orionldState.apiVersion == V2)
       {
         delayedRelease(&jsonRelease);
       }
@@ -608,7 +608,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError  oe(SccBadRequest, result);
 
-    std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    std::string  response = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
 
     alarmMgr.badInput(clientIp, result);
 
@@ -619,7 +619,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       jsonReqP->release(&parseData);
     }
 
-    if (ciP->apiVersion == V2)
+    if (orionldState.apiVersion == V2)
     {
       delayedRelease(&jsonRelease);
     }
@@ -647,7 +647,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     jsonReqP->release(&parseData);
   }
 
-  if (ciP->apiVersion == V2)
+  if (orionldState.apiVersion == V2)
   {
     delayedRelease(&jsonRelease);
   }

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
@@ -291,15 +293,15 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
-  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  if ((orionldState.apiVersion == V2) && (ciP->uriParamOptions["count"]))
   {
     countP = &count;
   }
-  else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
+  else if ((orionldState.apiVersion == V1) && (ciP->uriParam["details"] == "on"))
   {
     countP = &count;
   }
-  else if ((ciP->apiVersion == NGSI_LD_V1) && (ciP->uriParamOptions["count"]))
+  else if ((orionldState.apiVersion == NGSI_LD_V1) && (ciP->uriParamOptions["count"]))
     countP = &count;
 
 
@@ -315,7 +317,7 @@ std::string postQueryContext
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,
                                                       countP,
-                                                      ciP->apiVersion));
+                                                      orionldState.apiVersion));
 
   if (qcrsP->errorCode.code == SccBadRequest)
   {
@@ -331,7 +333,7 @@ std::string postQueryContext
   //
   // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
   //
-  if (((ciP->apiVersion == V2) || (ciP->apiVersion == NGSI_LD_V1)) && (countP != NULL))
+  if (((orionldState.apiVersion == V2) || (orionldState.apiVersion == NGSI_LD_V1)) && (countP != NULL))
   {
     char cV[32];
 
@@ -354,7 +356,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIMED_RENDER(answer = qcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = qcrsP->render(orionldState.apiVersion, asJsonObject));
 
     qcrP->release();
     return answer;
@@ -530,7 +532,7 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIMED_RENDER(answer = responseV.render(ciP->apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.render(orionldState.apiVersion, asJsonObject, details, qcrsP->errorCode.details));
 
 
   //

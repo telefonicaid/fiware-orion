@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -182,7 +184,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    if (scopeP->fill(orionldState.apiVersion, geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, "BadRequest");
 

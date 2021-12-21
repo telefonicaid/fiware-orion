@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -60,5 +62,5 @@ std::string badVerbAllFive
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
+  return (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)? "" :  oe.smartRender(orionldState.apiVersion);
 }

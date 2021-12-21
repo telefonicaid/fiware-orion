@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 
 #include "orionld/common/orionldState.h"            // orionldState
+
 #include "common/defaultValues.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -74,7 +75,7 @@ std::string postRegistration
   {
     oe.fill(SccNotImplemented, "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true");
     ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
+    TIMED_RENDER(answer = oe.smartRender(orionldState.apiVersion));
     return answer;
   }
 
@@ -85,7 +86,7 @@ std::string postRegistration
   {
     oe.fill(SccNotImplemented, "non-supported Forwarding Mode");
     ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
+    TIMED_RENDER(answer = oe.smartRender(orionldState.apiVersion));
     return answer;
   }
 
@@ -94,7 +95,7 @@ std::string postRegistration
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
+    TIMED_RENDER(answer = oe.smartRender(orionldState.apiVersion));
   }
   else
   {

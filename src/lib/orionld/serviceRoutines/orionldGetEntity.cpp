@@ -442,7 +442,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
                                                   ciP->uriParam,
                                                   ciP->uriParamOptions,
                                                   NULL,
-                                                  ciP->apiVersion);
+                                                  orionldState.apiVersion);
 
   if (response.errorCode.code == SccBadRequest)
   {

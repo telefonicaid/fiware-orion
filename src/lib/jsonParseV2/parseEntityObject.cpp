@@ -26,6 +26,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -81,7 +83,7 @@ std::string parseEntityObject
 
       eP->id = iter->value.GetString();
 
-      if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str(), ""))
+      if (forbiddenIdChars(orionldState.apiVersion, eP->id.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
@@ -118,7 +120,7 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
-      if (forbiddenIdChars(ciP->apiVersion, eP->type.c_str(), ""))
+      if (forbiddenIdChars(orionldState.apiVersion, eP->type.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
