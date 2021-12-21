@@ -1,0 +1,179 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET entities with duplicated items in metadata filter
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with atribute A with metadata MD1 and MD2
+# 02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time
+# 06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time
+#
+
+
+echo "01. Create entity E with atribute A with metadata MD1 and MD2"
+echo "============================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A":{
+    "type": "Text",
+    "value": "foo",
+    "metadata": {
+      "MD1": {
+        "type": "Number",
+        "value": 1
+      },
+      "MD2": {
+        "type": "Number",
+        "value": 2
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "========================================================================="
+orionCurl --url /v2/entities?metadata=MD1,MD1,MD1 --noPayloadCheck
+echo
+echo
+
+
+echo "03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "==========================================================================="
+orionCurl --url /v2/entities/E?metadata=MD1,MD1,MD1 --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "================================================================================="
+orionCurl --url /v2/entities/E/attrs?metadata=MD1,MD1,MD1 --noPayloadCheck
+echo
+echo
+
+
+echo "05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time"
+echo "==================================================================================="
+orionCurl --url /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 --noPayloadCheck
+echo
+echo
+
+
+echo "06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time"
+echo "==============================================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E",
+      "type": "T"
+    }
+  ],
+  "metadata": [ "MD1","MD1", "MD1" ]
+}'
+orionCurl --url /v2/op/query --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with atribute A with metadata MD1 and MD2
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
+
+
+03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
+
+
+04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
+
+
+05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}
+
+
+06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
