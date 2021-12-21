@@ -94,6 +94,8 @@
 #define CSUB_EXPR_GEOREL             "georel"
 
 #define CSUB_THROTTLING              "throttling"
+#define CSUB_MAXFAILSLIMIT           "maxFailsLimit"
+#define CSUB_FAILSCOUNTER            "failsCounter"
 #define CSUB_ENTITIES                "entities"
 #define CSUB_ATTRS                   "attrs"
 #define CSUB_METADATA                "metadata"
@@ -104,6 +106,7 @@
 #define CSUB_COUNT                   "count"
 #define CSUB_FORMAT                  "format"
 #define CSUB_STATUS                  "status"
+#define CSUB_STATUS_LAST_CHANGE      "statusLastChange"
 #define CSUB_SERVICE_PATH            "servicePath"
 #define CSUB_CUSTOM                  "custom"
 #define CSUB_TIMEOUT                 "timeout"
@@ -129,6 +132,8 @@
 /* ****************************************************************************
 *
 * Constant strings for field values acting as keywords
+*
+* FIXME P10: use an enum for active/inactive/expired instead of strings
 */
 #define STATUS_ACTIVE        "active"
 #define STATUS_INACTIVE      "inactive"

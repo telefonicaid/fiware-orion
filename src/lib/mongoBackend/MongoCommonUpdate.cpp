@@ -480,7 +480,7 @@ static void appendMetadata
 */
 static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
 {
-  if (caP->compoundValueP == NULL)
+  if ((caP->compoundValueP == NULL) || (caP->compoundValueP->childV.size() == 0))
   {
     return false;
   }
@@ -493,9 +493,11 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
     }
   }
 
-  // $addToSet and $pullAll are not included in UPDATE_OPERATORS, so they
+  // $set, $unset, $addToSet and $pullAll are not included in UPDATE_OPERATORS, so they
   // are checked separartelly
-  if ((caP->compoundValueP->childV[0]->name == "$addToSet") ||
+  if ((caP->compoundValueP->childV[0]->name == "$set")      ||
+      (caP->compoundValueP->childV[0]->name == "$unset")    ||
+      (caP->compoundValueP->childV[0]->name == "$addToSet") ||
       (caP->compoundValueP->childV[0]->name == "$pullAll"))
   {
     return true;
@@ -1110,6 +1112,8 @@ static bool addTriggeredSubscriptions_withCache
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           cSubP->maxFailsLimit,
+                                                           cSubP->failsCounter,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
@@ -1529,6 +1533,8 @@ static bool addTriggeredSubscriptions_noCache
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long         maxFailsLimit      = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
+      long long         failsCounter       = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)     : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
@@ -1550,6 +1556,8 @@ static bool addTriggeredSubscriptions_noCache
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
+          maxFailsLimit,
+          failsCounter,
           lastNotification,
           renderFormat,
           httpInfo,
@@ -1706,6 +1714,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      subId,
   RenderFormat                     renderFormat,
   std::string                      tenant,
+  long long                        maxFailsLimit,
+  long long                        failsCounter,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
@@ -1772,6 +1782,8 @@ static bool processOnChangeConditionForUpdateContext
   getNotifier()->sendNotifyContextRequest(ncr,
                                           notification,
                                           tenant,
+                                          maxFailsLimit,
+                                          failsCounter,
                                           xauthToken,
                                           fiwareCorrelator,
                                           correlatorCounter,
@@ -1820,14 +1832,14 @@ static unsigned int processSubscriptions
      */
 
     /* Check 1: timing (not expired and ok from throttling point of view) */
-    if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
+    if (tSubP->throttling > 0 && tSubP->lastNotification > -1)
     {
       long long  current               = getCurrentTime();
       long long  sinceLastNotification = current - tSubP->lastNotification;
 
       if (tSubP->throttling > sinceLastNotification)
       {
-        LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+        LM_T(LmtMongo, ("blocked due to throttling, current time is: %lld", current));
         LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
 
         continue;
@@ -1917,6 +1929,8 @@ static unsigned int processSubscriptions
                                                                 mapSubId,
                                                                 tSubP->renderFormat,
                                                                 tenant,
+                                                                tSubP->maxFailsLimit,
+                                                                tSubP->failsCounter,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
@@ -1996,6 +2010,7 @@ static unsigned int processSubscriptions
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
             orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
             cSubP->status = STATUS_INACTIVE;
+            cSubP->statusLastChange = getCurrentTime();
 
             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
           }
@@ -3020,7 +3035,8 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 *
 * calculateOperator -
 *
-* Return bool if some content has been added to the BSONObjBuilders passed as parameter
+* Return bool if calculated operator has been found (so caller can select to use findAndModify
+* instead of usual update)
 */
 static bool calculateOperator(ContextElementResponse* cerP, const std::string& op, orion::BSONObjBuilder* b)
 {
@@ -3030,7 +3046,7 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
   {
     ContextAttribute* attr = cerP->entity.attributeVector[ix];
 
-    if (attr->compoundValueP != NULL)
+    if ((attr->compoundValueP != NULL) && (attr->compoundValueP->childV.size() > 0))
     {
       CompoundValueNode* child0 = attr->compoundValueP->childV[0];
       if ((child0->name == op))
@@ -3055,13 +3071,13 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
         else if (child0->valueType == orion::ValueTypeVector)
         {
           orion::BSONArrayBuilder ba;
-          compoundValueBson(child0->childV, ba);
+          compoundValueBson(child0->childV, ba, false, false);
           b->append(valueKey, ba.arr());
         }
         else if (child0->valueType == orion::ValueTypeObject)
         {
           orion::BSONObjBuilder bo;
-          compoundValueBson(child0->childV, bo);
+          compoundValueBson(child0->childV, bo, false, false);
           b->append(valueKey, bo.obj());
         }
         else if (child0->valueType == orion::ValueTypeNotGiven)
@@ -3077,6 +3093,207 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
 
         r = true;
       }
+    }
+  }
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* calculateSetOperator -
+*
+* For objects:
+*   {A: {value: {$set: {X: <V1>, Y: <V2>, ...}}} -> {attrs.A.value.X: <V1>, attrs.A.value.Y: <V2>, ... }
+*
+* For no objects (as regular update):
+*   {A: {value: {$set: foo}} -> {attrs.A.value: foo }
+*
+* Return bool if calculated operator has been found (so caller can select to use findAndModify
+* instead of usual update)
+*/
+static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBuilder* b)
+{
+  bool r = false;
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
+  {
+    ContextAttribute* attr = cerP->entity.attributeVector[ix];
+
+    if (attr->compoundValueP == NULL)
+    {
+      continue;
+    }
+
+    // Look fo the $set element in the childs (if any)
+    int childIx = -1;
+    for (unsigned int jx = 0; jx < attr->compoundValueP->childV.size(); ++jx)
+    {
+      if (attr->compoundValueP->childV[jx]->name == "$set")
+      {
+        childIx = jx;
+        r = true;
+      }
+    }
+
+    if (childIx == -1)
+    {
+      continue;
+    }
+
+    CompoundValueNode* theChild = attr->compoundValueP->childV[childIx];
+    std::string        baseKey  = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
+
+    // Maybe be needed and we cannot declare it in "case orion::ValueTypeVector" (compilation error)
+    orion::BSONArrayBuilder ba;
+
+    switch (theChild->valueType)
+    {
+    case orion::ValueTypeObject:
+      // In this case $set is being used to "edit" an object. Process the
+      // childs of theChild
+      for (unsigned int jx = 0; jx < theChild->childV.size(); ++jx)
+      {
+        CompoundValueNode* child = theChild->childV[jx];
+
+        std::string valueKey = baseKey + "." + child->name;
+
+        if (child->valueType == orion::ValueTypeString)
+        {
+          b->append(valueKey, child->stringValue);
+        }
+        else if (child->valueType == orion::ValueTypeNumber)
+        {
+          b->append(valueKey, child->numberValue);
+        }
+        else if (child->valueType == orion::ValueTypeBoolean)
+        {
+          b->append(valueKey, child->boolValue);
+        }
+        else if (child->valueType == orion::ValueTypeNull)
+        {
+          b->appendNull(valueKey);
+        }
+        else if (child->valueType == orion::ValueTypeVector)
+        {
+          orion::BSONArrayBuilder ba;
+          compoundValueBson(child->childV, ba, false, false);
+          b->append(valueKey, ba.arr());
+        }
+        else if (child->valueType == orion::ValueTypeObject)
+        {
+          orion::BSONObjBuilder bo;
+          compoundValueBson(child->childV, bo, false, false);
+          b->append(valueKey, bo.obj());
+        }
+        else if (child->valueType == orion::ValueTypeNotGiven)
+        {
+          LM_E(("Runtime Error (value not given in calculateOperator)"));
+        }
+        else
+        {
+          LM_E(("Runtime Error (Unknown type in calculateOperator)"));
+        }
+      }
+      break;
+
+      // From now on, all the cases are $set being use in "replace" mode
+      // i.e. as regular update
+    case orion::ValueTypeString:
+      b->append(baseKey, theChild->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      b->append(baseKey, theChild->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      b->append(baseKey, theChild->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      b->appendNull(baseKey);
+      break;
+
+    case orion::ValueTypeVector:
+      compoundValueBson(theChild->childV, ba);
+      b->append(baseKey, ba.arr());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in calculateOperator)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (Unknown type in calculateOperator)"));
+      break;
+    }
+  }
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* calculateUnsetOperator -
+*
+* For objects:
+*   {A: {value: {$unset: {X: <V1>, Y: <V2>, ...}}} -> {attrs.A.value.X: 1, attrs.A.value.Y: 1, ... }
+*
+* For no objects (as regular update): ignored
+*
+* Return bool if calculated operator has been found (so caller can select to use findAndModify
+* instead of usual update)
+*/
+static bool calculateUnsetOperator(ContextElementResponse* cerP, orion::BSONObjBuilder* b)
+{
+  bool r = false;
+
+  for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ++ix)
+  {
+    ContextAttribute* attr = cerP->entity.attributeVector[ix];
+
+    if (attr->compoundValueP == NULL)
+    {
+      continue;
+    }
+
+    // Look fo the $unset element in the childs (if any)
+    int childIx = -1;
+    for (unsigned int jx = 0; jx < attr->compoundValueP->childV.size(); ++jx)
+    {
+      if (attr->compoundValueP->childV[jx]->name == "$unset")
+      {
+        childIx = jx;
+        r = true;
+      }
+    }
+
+    if (childIx == -1)
+    {
+      continue;
+    }
+
+    CompoundValueNode* theChild = attr->compoundValueP->childV[childIx];
+    std::string        baseKey  = std::string(ENT_ATTRS) + "." + attr->name + "." + ENT_ATTRS_VALUE;
+
+    if (theChild->valueType != orion::ValueTypeObject)
+    {
+      // Non-object values for $unset are ignored
+      continue;
+    }
+
+    // Process the childs of theChild
+    for (unsigned int jx = 0; jx < theChild->childV.size(); ++jx)
+    {
+      CompoundValueNode* child = theChild->childV[jx];
+
+      std::string valueKey = baseKey + "." + child->name;
+      b->append(valueKey, 1);
     }
   }
 
@@ -3406,11 +3623,16 @@ static unsigned int updateEntity
   else
   {
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
+
+    // $set is special, as it is shared with regular (without update operator) attribute modification
+    bool calculatedSet = calculateSetOperator(notifyCerP, &toSet);
     if (toSet.nFields() > 0)
     {
       updatedEntity.append("$set", toSet.obj());
     }
 
+    // $unset is special, as it is shared with regular (without update operator) attribute modification
+    bool calculatedUnset = calculateUnsetOperator(notifyCerP, &toUnset);
     if (toUnset.nFields() > 0)
     {
       updatedEntity.append("$unset", toUnset.obj());
@@ -3426,7 +3648,7 @@ static unsigned int updateEntity
       bobEach.append("$each", attrNamesAdd.arr());
       toAddToSet.append(ENT_ATTRNAMES, bobEach.obj());
     }
-    if (calculatedAddToSet || (attrNamesAdd.arrSize() > 0))
+    if (toAddToSet.nFields() > 0)
     {
       updatedEntity.append("$addToSet", toAddToSet.obj());
     }
@@ -3441,13 +3663,13 @@ static unsigned int updateEntity
     {
       toPullAll.append(ENT_ATTRNAMES, attrNamesRemove.arr());
     }
-    if (calculatedPullAll || (attrNamesRemove.arrSize() > 0))
+    if (toPullAll.nFields() > 0)
     {
       updatedEntity.append("$pullAll", toPullAll.obj());
     }
 
     // useFindAndModify is set to true if calculation was done
-    useFindAndModify = calculatedAddToSet || calculatedPullAll;
+    useFindAndModify = calculatedSet || calculatedUnset || calculatedAddToSet || calculatedPullAll;
 
     // Note we call calculateOperator() function using notifyCerP instead than eP, given that
     // eP doesn't contain any compound (as they are "stolen" by notifyCerP during the update
@@ -3497,14 +3719,17 @@ static unsigned int updateEntity
     orion::BSONObj reply;
     success = collectionFindAndModify(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, true, &reply, &err);
 
-    // update the entity in memory for notifications with the result from DB, as the
-    // usage of update operators requires the DB to evaluate the result
-    // Note the actual value is not in reply itself, but in the key "value", see
-    // https://jira.mongodb.org/browse/CDRIVER-4173
-    notifyCerP->release();
-    delete notifyCerP;
+    if (success)
+    {
+      // In success case, update the entity in memory for notifications with the result from DB, as the
+      // usage of update operators requires the DB to evaluate the result
+      // Note the actual value is not in reply itself, but in the key "value", see
+      // https://jira.mongodb.org/browse/CDRIVER-4173
+      notifyCerP->release();
+      delete notifyCerP;
 
-    notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+      notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+    }
   }
   else
   {

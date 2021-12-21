@@ -198,6 +198,9 @@ static void updateInCache
   long long    lastSuccess;
   long long    lastSuccessCode;
   long long    count;
+  long long    failsCounter;
+  std::string  status;
+  double       statusLastChange;
 
   if (subCacheP != NULL)
   {
@@ -207,6 +210,9 @@ static void updateInCache
     lastSuccess          = subCacheP->lastSuccess;
     lastSuccessCode      = subCacheP->lastSuccessCode;
     count                = subCacheP->count;
+    failsCounter         = subCacheP->failsCounter;
+    status               = subCacheP->status;
+    statusLastChange     = subCacheP->statusLastChange;
   }
   else
   {
@@ -216,7 +222,18 @@ static void updateInCache
     lastSuccess          = -1;
     lastSuccessCode      = -1;
     count                = 0;
+    failsCounter         = 0;
+    status               = "";
+    statusLastChange     = -1;
   }
+
+  // different for other fields grabbed from the cache, status could be included in the sub update
+  // thus, effective status is the newest one in cache or in DB
+  double statusLastChangeAtDb = doc.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(doc, CSUB_STATUS_LAST_CHANGE) : -1;
+  std::string statusAtDb      = doc.hasField(CSUB_STATUS)?             getStringFieldF(doc, CSUB_STATUS)             : "";
+
+  std::string effectiveStatus      = statusLastChange > statusLastChangeAtDb ? status           : statusAtDb;
+  double effectiveStatusLastChante = statusLastChange > statusLastChangeAtDb ? statusLastChange : statusLastChangeAtDb;
 
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           doc,
@@ -228,8 +245,10 @@ static void updateInCache
                                           lastSuccess,
                                           lastSuccessCode,
                                           count,
+                                          failsCounter,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          effectiveStatus,
+                                          effectiveStatusLastChante,
                                           q,
                                           mq,
                                           geom,
@@ -276,15 +295,19 @@ std::string mongoUpdateSubscription
   reqSemTake(__FUNCTION__, "ngsiv2 update subscription request", SemWriteOp, &reqSemTaken);
 
   std::string      servicePath = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
+  double           now         = getCurrentTime();
 
-  // FIXME PR: explain this better
+  // Previous versions of the sub up logic calculate the final document mixing the
+  // existing one in DB plus the additions from cache. However, this is complex and involve
+  // more operations on MongoDB that the current approach, based in findAndModify and
+  // in $set and $unset operations
+  //
+  // Note also that "dynamic fields" that cannot be updated with PATCH subscription
+  // (count, lastNotification, etc.) are not touched: they have their own
+  // updating logic in other places of the code (in cache sync logic)
+
   orion::BSONObjBuilder setB;
   orion::BSONObjBuilder unsetB;
-
-  // Note that "dynamic fields" that cannot be updated with PATCH subscription
-  // (count, lastNotification, etc.) are not touched: they have their own
-  // updating logic in other places of the code (typically during notification
-  // processing or in cache sync logic)
 
   setServicePath(servicePath, &setB);
 
@@ -294,12 +317,14 @@ std::string mongoUpdateSubscription
   if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
   if (subUp.notificationProvided)  setAttrs(subUp, &setB);
   if (subUp.notificationProvided)  setMetadata(subUp, &setB);
+  if (subUp.notificationProvided)  setMaxFailsLimit(subUp, &setB);
   if (subUp.expiresProvided)       setExpiration(subUp, &setB);
   if (subUp.throttlingProvided)    setThrottling(subUp, &setB);
-  if (subUp.statusProvided)        setStatus(subUp, &setB);
+  if (subUp.statusProvided)        setStatus(subUp.status, &setB, now);
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
+
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)

@@ -224,7 +224,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 388
+Content-Length: 405
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -235,6 +235,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 1,
             "http": {
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
@@ -244,7 +245,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []
@@ -331,14 +332,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 6
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "T1"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -363,7 +364,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 468
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -374,6 +375,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "failsCounter": 1,
             "http": {
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
@@ -385,7 +387,7 @@ Date: REGEX(.*)
             "onlyChangedAttrs": false,
             "timesSent": 3
         },
-        "status": "failed",
+        "status": "active",
         "subject": {
             "condition": {
                 "attrs": []

@@ -80,14 +80,7 @@ std::string Subscription::toJson(void)
     jh.addDate("expires", this->expires);
   }
 
-  if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
-  {
-    jh.addString("status", "failed");
-  }
-  else
-  {
-    jh.addString("status", this->status);
-  }
+  jh.addString("status", this->status);
 
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
@@ -192,6 +185,16 @@ std::string Notification::toJson(const std::string& attrsFormat)
   if (this->lastSuccessCode != -1)
   {
     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
+  }
+
+  if (this->maxFailsLimit > 0)
+  {
+    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
+
+  if (this->failsCounter > 0)
+  {
+    jh.addNumber("failsCounter", this->failsCounter);
   }
 
   return jh.str();

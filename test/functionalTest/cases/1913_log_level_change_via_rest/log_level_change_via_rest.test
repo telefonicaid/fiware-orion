@@ -50,7 +50,7 @@ echo
 
 echo "02. PUT /admin/log and see error 'log level missing'"
 echo "===================================================="
-orionCurl --url /admin/log -X PUT 
+orionCurl --url /admin/log -X PUT
 echo
 echo
 

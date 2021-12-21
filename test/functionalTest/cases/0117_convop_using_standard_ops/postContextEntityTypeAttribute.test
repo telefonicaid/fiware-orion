@@ -62,7 +62,7 @@ echo "03. Update registration using POST /v1/registry/contextEntityTypes/ET/attr
 echo "==============================================================================================="
 payload='{
   "duration": "PT2M",
-  "providingApplication": "some", 
+  "providingApplication": "some",
   "registrationId": "'$REG_ID'"
 }'
 orionCurl --url /v1/registry/contextEntityTypes/ET/attributes/A1 --payload "$payload"
@@ -87,7 +87,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT1M", 
+    "duration": "PT1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -106,17 +106,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": ""
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "", 
-                        "isPattern": "false", 
+                        "id": "",
+                        "isPattern": "false",
                         "type": "ET"
                     }
-                ], 
+                ],
                 "providingApplication": "none"
             }
         }
@@ -133,7 +133,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "duration": "PT2M", 
+    "duration": "PT2M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -152,17 +152,17 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "A1", 
+                        "name": "A1",
                         "type": ""
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "", 
-                        "isPattern": "false", 
+                        "id": "",
+                        "isPattern": "false",
                         "type": "ET"
                     }
-                ], 
+                ],
                 "providingApplication": "some"
             }
         }

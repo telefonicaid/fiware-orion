@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 # 02. Check statistics, see ONE entry in subCache
 # 03. Update S1
 # 04. Check statistics, see ONE entry in subCache
-# 05. Create subscription S2 - with pattern 's0.*' 
+# 05. Create subscription S2 - with pattern 's0.*'
 # 06. Check statistics, see TWO entries in subCache
 # 07. Create subscription S3 - without pattern
 # 08. Check statistics, see THREE subCacheItems in subCache

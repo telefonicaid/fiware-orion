@@ -21,7 +21,9 @@
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [`flowControl` オプション](#flowcontrol-option)
+* [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`skipForwarding` オプション](#skipforwarding-option)
@@ -375,6 +377,30 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 
 [トップ](#top)
 
+<a name="failscounter-and-maxfailslimit-subscriptions-fields"></a>
+## `failsCounter` と `maxFailsLimit` サブスクリプション・フィールド
+
+`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの NGSIv2 仕様で説明されている
+サブスクリプション・フィールドとは別に、Orion は `notification` フィールド内の `failsCounter` フィールドを
+サポートします。このフィールドの値は、サブスクリプションに関連付けられた連続して失敗した通知の数です。
+`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます
+(この場合、`failsCounter` は省略されます)。
+
+連続した失敗の最大許容数を確立するオプションのフィールド `maxFailsLimit` (これも `notification` フィールド内)
+もあります。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、特定の瞬間に `failsCounter` が `maxFailsLimit`
+より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効に
+するには (状態を再び `active` に設定)、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です。
+
+さらに、Orion がサブスクリプションを自動的に無効にすると、WARN レベルのログトレースがこの形式で出力されます:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
+
+[Top](#top)
+
+[トップ](#top)
+
 <a name="flowcontrol-option"></a>
 ## `flowControl` オプション
 
@@ -393,6 +419,33 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 * `PUT /v2/entities/E/attrs/A?options=flowControl`
 * `PUT /v2/entities/E/attrs/A/value?options=flowControl`
 * `PATCH /v2/entities/E/attrs?options=flowControl`
+
+[トップ](#top)
+
+<a name="ambiguous-subscription-status-failed-not-used"></a>
+## あいまいなサブスクリプション・ステータス `failed` は使用されない
+
+NGSIv2 仕様では、サブスクリプションの `status` フィールドの `failed` 値について説明しています:
+
+> `status`: [...] また、通知で問題が発生しているサブスクリプションの場合、ステータスは `failed` に
+> 設定されます。通知が再び機能し始めるとすぐに、ステータスは `active` に戻ります。
+
+ステータス `failed` は、あいまいなため、Orion3.4.0 で削除されました。
+
+* `failed` は、最後に送信された通知が失敗したアクティブなサブスクリプション (つまり、エンティティの
+  更新時に通知をトリガーするサブスクリプション) を指す場合があります
+* `failed` は、過去にアクティブであり、アクティブなときに送信された最後の通知が失敗した非アクティブな
+  サブスクリプション (つまり、エンティティの更新時に通知をトリガーしないサブスクリプション)
+  を指す場合があります
+
+つまり、ステータス `failed` を確認しても、サブスクリプションが現在アクティブであるか非アクティブで
+あるかを知ることはできません。
+
+したがって、`failed` は Orion Context Broker によって使用されず、サブスクリプションのステータスは、
+サブスクリプションが `active` (`failed` バリアント [`oneshot`](#oneshot-subscriptions) を含む) か
+`inactive` (バリアント `expired` を含む）かを常に明確に指定します。サブスクリプションが最後の通知で
+失敗したかどうかを知るために、`failsCounter` の値をチェックできます (つまり、`failedCounter` が
+0より大きいことをチェックします)。
 
 [トップ](#top)
 

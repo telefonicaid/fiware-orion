@@ -55,7 +55,6 @@ payload='{
   ],
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "P1M",
-  "throttling": "PT1S",
   "notifyConditions": [
     {
         "type": "ONCHANGE",
@@ -111,7 +110,6 @@ echo "================================================"
 payload='{
   "duration": "P1Y",
   "subscriptionId": "'$SUB_ID'",
-  "throttling": "PT1S",
   "notifyConditions": [
     {
       "type": "ONCHANGE",
@@ -158,16 +156,15 @@ echo
 01. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token at01
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
-        "throttling": "PT1S"
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
 
@@ -253,16 +250,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Update subscription, using X-Auth-Token at03
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 104
+Content-Length: 84
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1Y", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
-        "throttling": "PT1S"
+        "duration": "P1Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
 

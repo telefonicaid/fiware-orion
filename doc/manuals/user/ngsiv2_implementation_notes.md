@@ -21,6 +21,8 @@
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
+* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
@@ -400,6 +402,30 @@ Note these two fields are included in HTTP subscriptions, but not in MQTT ones. 
 
 [Top](#top)
 
+## `failsCounter` and `maxFailsLimit` subscriptions fields
+
+Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
+`GET /v2/subscriptions/subId` requests, Orion supports a `failsCounter` field within the `notification`
+field. The value of this field is the number of consecutive failing notifications associated
+to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset
+to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).
+
+There is also an optional field `maxFailsLimit` (also within `notification` field) which establishes
+a maximum allowed number of consecutive fails. If the number of fails overpasses the value of
+`maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then
+Orion automatically passes the subscription to `inactive` state. A subscripiton update operation
+(`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state
+`active` again).
+
+In addition, when Orion automatically disables a subscription, a log trace in WARN level is printed
+in this format:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
+
+[Top](#top)
+
 ## `flowControl` option
 As extra URI param option to the ones included in the NGSIv2 specification, Orion implements flowControl,
 than can be used to specify that an update operation have to use flow control, which can improve performance
@@ -416,6 +442,31 @@ The following requests can use the flowControl URI param option:
 * `PUT /v2/entities/E/attrs/A?options=flowControl`
 * `PUT /v2/entities/E/attrs/A/value?options=flowControl`
 * `PATCH /v2/entities/E/attrs?options=flowControl`
+
+[Top](#top)
+
+## Ambiguous subscription status `failed` not used
+
+NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
 
 [Top](#top)
 

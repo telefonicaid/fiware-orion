@@ -167,8 +167,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "a component of ServicePath contains an illegal character", 
+        "code": "400",
+        "details": "a component of ServicePath contains an illegal character",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -184,10 +184,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Bad Character in Service-Path", 
+        "code": "400",
+        "details": "Bad Character in Service-Path",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -202,10 +202,10 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "more than one service path for notification", 
+        "code": "400",
+        "details": "more than one service path for notification",
         "reasonPhrase": "Bad Request"
-    }, 
+    },
     "registrationId": "000000000000000000000000"
 }
 
@@ -220,8 +220,8 @@ Date: REGEX(.*)
 
 {
     "orionError": {
-        "code": "400", 
-        "details": "a component of ServicePath contains an illegal character", 
+        "code": "400",
+        "details": "a component of ServicePath contains an illegal character",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -237,7 +237,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }

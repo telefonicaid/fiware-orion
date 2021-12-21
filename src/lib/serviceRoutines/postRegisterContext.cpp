@@ -39,7 +39,6 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 
 

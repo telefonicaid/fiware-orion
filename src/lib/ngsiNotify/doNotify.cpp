@@ -64,6 +64,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
   url = endpoint + params->resource;
 
   int r =  httpRequestSend(curl,
+                       "subId: " + params->subscriptionId,
                        params->from,
                        params->ip,
                        params->port,
@@ -103,7 +104,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
+      subNotificationErrorStatus(params->tenant, params->subscriptionId, false, statusCode, "");
     }
   }
   else
@@ -119,7 +120,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
+      subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->failsCounter, params->maxFailsLimit);
     }
   }
 
@@ -164,11 +165,11 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
     logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str());
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, -1, "");
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
   {
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, "");
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
   }
 }
 
@@ -207,7 +208,7 @@ void doNotify
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****",
+    LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****, maxFailsLimit=%lu, failsCounter=%lu",
                        logPrefix,
                        params->ip.c_str(),
                        params->port,
@@ -219,7 +220,9 @@ void doNotify
                        params->content_type.c_str(),
                        params->qos,
                        params->timeout,
-                       params->user.c_str()));
+                       params->user.c_str(),
+                       params->maxFailsLimit,
+                       params->failsCounter));
 
     LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 

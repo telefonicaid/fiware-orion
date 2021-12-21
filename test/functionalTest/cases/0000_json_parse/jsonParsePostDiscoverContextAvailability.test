@@ -182,22 +182,22 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "ConferenceRoom", 
-                        "isPattern": "false", 
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
                         "type": "Room"
-                    }, 
+                    },
                     {
-                        "id": "OfficeRoom", 
-                        "isPattern": "false", 
+                        "id": "OfficeRoom",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://192.168.100.1:70/application"
             }
         }
@@ -228,21 +228,21 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "name": "temperature", 
+                        "name": "temperature",
                         "type": "degree"
-                    }, 
+                    },
                     {
-                        "name": "pressure", 
+                        "name": "pressure",
                         "type": "bar"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "BathRoom", 
-                        "isPattern": "false", 
+                        "id": "BathRoom",
+                        "isPattern": "false",
                         "type": "Room"
                     }
-                ], 
+                ],
                 "providingApplication": "http://192.168.100.1:70/application"
             }
         }

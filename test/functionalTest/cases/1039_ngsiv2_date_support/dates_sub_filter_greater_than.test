@@ -172,7 +172,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "DateTime",
                 "value": "2016-02-25T10:00:00.000Z"
-            }, 
+            },
             "id": "E1",
             "type": "T"
         }

@@ -25,7 +25,7 @@ Per subscrition timeout
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0
-accumulatorStart --pretty-print 
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -36,9 +36,9 @@ accumulatorStart --pretty-print
 # 01. Create a sub with timeout=12000
 # 02. Create a sub with timeout=8000
 # 03. Create an entity (notification triggered)
-# 03. Wait 12 seconds
-# 04. Check if 1st sub notification succeed
-# 05. Check if 2nd sub notification failed 
+# 04. Wait 12 seconds
+# 05. Check if 1st sub notification succeed
+# 06. Check if 2nd sub notification has failsCounter: 1
 #
 
 
@@ -124,8 +124,8 @@ echo
 echo
 
 
-echo "06. Check if 2nd sub notification failed"
-echo "========================================"
+echo "06. Check if 2nd sub notification has failsCounter: 1"
+echo "====================================================="
 orionCurl --url "/v2/subscriptions/${idSubscription2}"
 echo
 echo
@@ -176,29 +176,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
         "http": {
-            "timeout": 12000, 
+            "timeout": 12000,
             "url": "http://localhost:9997/noresponse"
-        }, 
+        },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastSuccessCode": 200, 
-        "onlyChangedAttrs": false, 
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 1
-    }, 
-    "status": "active", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]
@@ -206,38 +206,39 @@ Date: REGEX(.*)
 }
 
 
-06. Check if 2nd sub notification failed
-========================================
+06. Check if 2nd sub notification has failsCounter: 1
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 453
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "HTTP sub", 
-    "id": "REGEX([0-9a-f]{24})", 
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attrs": [], 
-        "attrsFormat": "normalized", 
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "failsCounter": 1,
         "http": {
-            "timeout": 8000, 
+            "timeout": 8000,
             "url": "http://localhost:9997/noresponse"
-        }, 
+        },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Timeout was reached", 
+        "lastFailureReason": "Timeout was reached",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "onlyChangedAttrs": false, 
+        "onlyChangedAttrs": false,
         "timesSent": 1
-    }, 
-    "status": "failed", 
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": []
-        }, 
+        },
         "entities": [
             {
-                "id": "E", 
+                "id": "E",
                 "type": "T"
             }
         ]

@@ -79,15 +79,15 @@ orionCurl --url ${url} --payload "${payload}"
 
 # Now try the GET method
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes"
 
 # And a GET that fails
 echo "6: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID2/attributes" 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID2/attributes"
 
 # DELETE and PUT should give errors
 echo "7: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" -X "DELETE" 
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID/attributes" -X "DELETE"
 
 echo "8: ++++++++++++++++++++"
 url="/v1/registry/contextEntities/ENTITY_ID/attributes"

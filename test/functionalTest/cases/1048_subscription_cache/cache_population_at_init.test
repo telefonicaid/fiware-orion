@@ -79,7 +79,7 @@ payload='{
     {
         "id":   "E3",
         "type": "T1"
-    }    
+    }
   ],
   "attributes": [
     "A1",
@@ -120,7 +120,7 @@ payload='{
         "id":   "E5.*",
         "isPattern": "true",
         "type": "T1"
-    }    
+    }
   ],
   "attributes": [
     "A1",

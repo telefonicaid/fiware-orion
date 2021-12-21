@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 Only 
+IPv6 Only
 
 --SHELL-INIT--
 dbInit CB

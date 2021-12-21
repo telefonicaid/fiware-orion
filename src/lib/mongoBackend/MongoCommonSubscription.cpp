@@ -218,6 +218,30 @@ void setThrottling(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setMaxfailsLimit -
+*/
+void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_MAXFAILSLIMIT, sub.notification.maxFailsLimit);
+  LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", sub.notification.maxFailsLimit));
+}
+
+
+
+/* ****************************************************************************
+*
+* setFailsCounter -
+*/
+void setFailsCounter(long long failedCounter, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_FAILSCOUNTER, failedCounter);
+  LM_T(LmtMongo, ("Subscription failsCounter: %lu", failedCounter));
+}
+
+
+
+/* ****************************************************************************
+*
 * setServicePath -
 */
 void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
@@ -244,12 +268,14 @@ void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setStatus -
 */
-void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
+void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 {
-  std::string  status = (sub.status.empty())? STATUS_ACTIVE : sub.status;
+  std::string  status = (_status.empty())? STATUS_ACTIVE : _status;
 
   b->append(CSUB_STATUS, status);
+  b->append(CSUB_STATUS_LAST_CHANGE, now);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
+  LM_T(LmtMongo, ("Subscription status last change: %f", now));
 }
 
 

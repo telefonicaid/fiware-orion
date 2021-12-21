@@ -39,7 +39,7 @@ brokerStart CB
 #   6: ;
 #   7: (
 #   8: )
-# 
+#
 # 01. GET /v2/entities/E1 with illegal char 1 in URI param 'w1' - error
 # 02. GET /v2/entities/E1 with illegal char 2 in URI param 'w2' - error
 # 03. GET /v2/entities/E1 with illegal char 3 in URI param 'w3' - error
@@ -109,7 +109,7 @@ echo
 
 echo "09. GET /v2/entities/E1 with ALL illegal char in URI param 'q' - ok"
 echo "==================================================================="
-orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\' 
+orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\'
 echo
 echo
 

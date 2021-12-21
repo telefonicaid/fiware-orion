@@ -63,7 +63,7 @@ payload='
 	"A1": {
       "type": "TA1",
        "value": "noLoc"
-   }	
+   }
 }
 '
 orionCurl --url '/v2/entities/E1/attrs' --payload "$payload" -X PUT
