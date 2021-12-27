@@ -218,6 +218,9 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   ParseData parseData;
 
+  // Overriding original verb to be a POST, now that this service routine has been invoked
+  orionldState.verb = POST;
+
   parseData.upcrs.res.errorCode.fill(SccOk);
 
   s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);

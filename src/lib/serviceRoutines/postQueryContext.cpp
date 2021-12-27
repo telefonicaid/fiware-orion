@@ -179,6 +179,9 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   ParseData parseData;
 
+  // Overriding original verb to be a POST, now that this service routine has been invoked
+  orionldState.verb = POST;
+
   // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies ciP->httpStatusCode
   // Thus, we need to preserve it before (and recover after) in order a fail in the CB-to-CPr interaction doesn't
   // "corrupt" the status code in the client-to-CB interaction.
