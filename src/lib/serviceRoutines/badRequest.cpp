@@ -51,7 +51,7 @@ std::string badRequest
   std::string  answer;
   std::string  details = std::string("service '") + ciP->url + "' not found";
 
-  alarmMgr.badInput(ciP->ip, details);
+  alarmMgr.badInput(clientIp, details);
 
   restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
 
