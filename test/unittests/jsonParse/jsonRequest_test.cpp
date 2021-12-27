@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"
+
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -58,6 +60,8 @@ TEST(jsonRequest, jsonTreat)
   ci.outMimeType  = JSON;
 
   ci.restServiceP = &restService;
+
+  orionldState.apiVersion = V1;
 
   out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, NULL);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
