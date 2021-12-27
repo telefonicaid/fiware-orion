@@ -1748,6 +1748,7 @@ static MHD_Result connectionTreat
 
     orionldStateInit();
     orionldState.apiVersion = apiVersionGet(url);
+    orionldState.verbString = (char*) method;
     orionldState.verb       = verbGet(method);
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);

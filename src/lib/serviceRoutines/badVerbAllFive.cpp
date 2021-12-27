@@ -53,7 +53,7 @@ std::string badVerbAllFive
   ParseData*                 parseDataP
 )
 {
-  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + verbName(orionldState.verb) + "'";
+  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + orionldState.verbString + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back(HTTP_ALLOW);

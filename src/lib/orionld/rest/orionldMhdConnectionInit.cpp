@@ -611,7 +611,8 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // 3. Check invalid verb
-  orionldState.verb = verbGet(method);
+  orionldState.verbString = (char*) method;
+  orionldState.verb       = verbGet(method);
 
   if (orionldState.verb == NOVERB)
   {
