@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                    // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -62,12 +64,12 @@ std::string logTraceTreat
       path += "/";
   }
 
-  if ((components == 2) && (ciP->method == "DELETE"))
+  if ((components == 2) && (orionldState.verb == DELETE))
   {
     lmTraceSet(NULL);
     out = orionLogReply(ciP, "tracelevels", "all trace levels off");
   }
-  else if ((components == 3) && (ciP->method == "DELETE"))
+  else if ((components == 3) && (orionldState.verb == DELETE))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
@@ -78,13 +80,13 @@ std::string logTraceTreat
     lmTraceSub(compV[2].c_str());
     out = orionLogReply(ciP, "tracelevels_removed", compV[2]);
   }
-  else if ((components == 2) && (ciP->method == "GET"))
+  else if ((components == 2) && (orionldState.verb == GET))
   {
     char tLevels[256];
     lmTraceGet(tLevels, sizeof(tLevels));
     out = orionLogReply(ciP, "tracelevels", tLevels);
   }
-  else if ((components == 3) && (ciP->method == "PUT"))
+  else if ((components == 3) && (orionldState.verb == PUT))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
@@ -98,7 +100,7 @@ std::string logTraceTreat
   }
   else
   {
-    OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + ciP->method + " " + path);
+    OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + verbName(orionldState.verb) + " " + path);
 
     TIMED_RENDER(out = error.render());
   }

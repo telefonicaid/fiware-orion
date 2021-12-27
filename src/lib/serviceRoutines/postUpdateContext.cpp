@@ -218,9 +218,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   ParseData parseData;
 
-  ciP->verb   = POST;
-  ciP->method = "POST";
-
   parseData.upcrs.res.errorCode.fill(SccOk);
 
   s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
@@ -374,7 +371,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   //
   // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (ciP->method != "DELETE")
+  if (orionldState.verb != DELETE)
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {

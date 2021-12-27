@@ -24,6 +24,7 @@
 */
 #include <stdio.h>                                   // printf
 
+#include "rest/Verb.h"                               // Verb
 #include "orionld/rest/OrionLdRestService.h"         // OrionLdRestServiceVector
 #include "orionld/rest/orionldServiceInitPresent.h"  // Own Interface
 

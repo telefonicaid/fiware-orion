@@ -1371,7 +1371,7 @@ ConnectionInfo* connectionTreatInit
   orionldState.responseTree = NULL;
   orionldState.notify       = false;
 
-  *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
+  *retValP = MHD_YES;  // MHD_NO only if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
   if (metricsMgr.isOn())
@@ -1437,7 +1437,7 @@ ConnectionInfo* connectionTreatInit
   //
   // Also, is ciP->ip really used?
   //
-  if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
+  if ((ciP = new ConnectionInfo(url, version, connection)) == NULL)
   {
     LM_E(("Runtime Error (error allocating ConnectionInfo)"));
     // No METRICS here ... Without ConnectionInfo we have no service/subService ...
@@ -1566,7 +1566,7 @@ ConnectionInfo* connectionTreatInit
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
   else if ((ciP->httpHeaders.contentLength == 0) &&
-      ((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) &&
+      ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
       (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
       (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
   {
@@ -1667,6 +1667,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
 
 
 
+extern Verb verbGet(const char* method);
 /* ****************************************************************************
 *
 * connectionTreat -
@@ -1745,8 +1746,11 @@ static MHD_Result connectionTreat
   if (*con_cls == NULL)
   {
     MHD_Result retVal;
+
     orionldStateInit();
     orionldState.apiVersion = apiVersionGet(url);
+    orionldState.verb       = verbGet(method);
+
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;
   }
@@ -1865,7 +1869,7 @@ static MHD_Result connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
+  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);

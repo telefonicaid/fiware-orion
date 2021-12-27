@@ -150,7 +150,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
   {
     // Only GET method is supported for V1 API
-    if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && ciP->verb == GET))
+    if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
     {
       bool originAllowed = true;
 
@@ -176,7 +176,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
         // Add Access-Control-Expose-Headers to the response
         MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
-        if (ciP->verb == OPTIONS)
+        if (orionldState.verb == OPTIONS)
         {
           MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
 

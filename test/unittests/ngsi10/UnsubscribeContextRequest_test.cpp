@@ -41,15 +41,18 @@
 TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile   = "ngsi10.unsubscribeContextRequest.badSubscriptionId.invalid.json";
   std::string     out;
   const char*     outfile2 = "ngsi10.unsubscribeContextResponse.badSubscriptionId2.valid.json";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
+  orionldState.verb = POST;
+
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
+
   lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);
   lmTraceLevelSet(LmtDump, false);

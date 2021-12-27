@@ -49,12 +49,14 @@
 TEST(UpdateContextRequest, ok_json)
 {
    ParseData       reqData;
-   ConnectionInfo  ci("", "POST", "1.1");
+   ConnectionInfo  ci("", "1.1");
    const char*     infile = "ngsi10.updateContext.ok.valid.json";
 
    utInit();
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+
+   orionldState.verb = POST;
 
    ci.inMimeType  = JSON;
    ci.outMimeType = JSON;
@@ -83,13 +85,14 @@ TEST(UpdateContextRequest, ok_json)
 TEST(UpdateContextRequest, badIsPattern_json)
 {
    ParseData       parseData;
-   ConnectionInfo  ci("", "POST", "1.1");
+   ConnectionInfo  ci("", "1.1");
    const char*     infile  = "ngsi10.updateContextRequest.badIsPattern.invalid.json";
    const char*     outfile = "ngsi10.updateContextResponse.badIsPattern.invalid.json";
    JsonRequest*    reqP;
 
    utInit();
 
+   orionldState.verb = POST;
    ci.inMimeType  = JSON;
    ci.outMimeType = JSON;
 

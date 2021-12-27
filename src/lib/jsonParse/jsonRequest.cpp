@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                    // orionldState
+
 #include "common/limits.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
@@ -139,8 +141,10 @@ static JsonRequest jsonRequest[] =
 *
 * jsonRequestGet -
 */
-static JsonRequest* jsonRequestGet(RequestType request, std::string method)
+static JsonRequest* jsonRequestGet(RequestType request, Verb verb)
 {
+  std::string method = verbName(verb);
+
   for (unsigned int ix = 0; ix < sizeof(jsonRequest) / sizeof(jsonRequest[0]); ++ix)
   {
     if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
@@ -177,7 +181,7 @@ std::string jsonTreat
 )
 {
   std::string   res   = "OK";
-  JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
+  JsonRequest*  reqP  = jsonRequestGet(request, orionldState.verb);
 
   //
   // FIXME P4 #1862:
