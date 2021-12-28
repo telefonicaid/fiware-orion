@@ -67,7 +67,6 @@ static const char* validOptions[] =
 */
 ConnectionInfo::ConnectionInfo():
   connection             (NULL),
-  badVerb                (false),
   inMimeType             (JSON),
   outMimeType            (JSON),
   restServiceP           (NULL),
@@ -76,7 +75,6 @@ ConnectionInfo::ConnectionInfo():
   callNo                 (1),
   parseDataP             (NULL),
   port                   (0),
-  ip                     (""),
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
@@ -93,7 +91,6 @@ ConnectionInfo::ConnectionInfo():
 */
 ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   connection             (NULL),
-  badVerb                (false),
   inMimeType             (JSON),
   outMimeType            (_outMimeType),
   restServiceP           (NULL),
@@ -102,7 +99,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
   callNo                 (1),
   parseDataP             (NULL),
   port                   (0),
-  ip                     (""),
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
@@ -119,7 +115,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
 */
 ConnectionInfo::ConnectionInfo(std::string _url, std::string _version, MHD_Connection* _connection):
   connection             (_connection),
-  badVerb                (false),
   inMimeType             (JSON),
   outMimeType            (JSON),
   url                    (_url),
@@ -130,7 +125,6 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _version, MHD_Conne
   callNo                 (1),
   parseDataP             (NULL),
   port                   (0),
-  ip                     (""),
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
@@ -144,11 +138,9 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _version, MHD_Conne
       (orionldState.verb != PATCH)   &&
       (orionldState.verb != OPTIONS))
   {
-    badVerb           = true;
-    orionldState.verb = NOVERB;
+    orionldState.badVerb = true;
+    orionldState.verb    = NOVERB;
   }
-  else
-    badVerb = false;
 }
 
 

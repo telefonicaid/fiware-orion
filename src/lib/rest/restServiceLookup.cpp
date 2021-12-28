@@ -34,6 +34,7 @@
 #include "serviceRoutines/badVerbPostOnly.h"
 
 
+
 /* ****************************************************************************
 *
 * restServiceLookup -
@@ -98,8 +99,8 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   {
     if (serviceV == restBadVerbV)
     {
-      ciP->httpStatusCode = SccBadVerb;
-      ciP->badVerb        = true;
+      ciP->httpStatusCode  = SccBadVerb;
+      orionldState.badVerb = true;
     }
 
     return &serviceV[serviceIx];

@@ -1458,7 +1458,6 @@ ConnectionInfo* connectionTreatInit
   // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
   LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
   ciP->port    = port;
-  ciP->ip      = ip;
   ciP->callNo  = reqNo;
 
   ++reqNo;
@@ -1536,12 +1535,7 @@ ConnectionInfo* connectionTreatInit
     lmTransactionSetFrom(ip);
   }
 
-  char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
-
-  if (orionldState.tenantP->tenant != NULL)
-    ciP->tenantFromHttpHeader = strToLower(tenant, orionldState.tenantP->tenant, sizeof(tenant));
-
-  ciP->outMimeType          = mimeTypeSelect(ciP);
+  ciP->outMimeType = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -1579,7 +1573,7 @@ ConnectionInfo* connectionTreatInit
 
     return ciP;
   }
-  else if (ciP->badVerb == true)
+  else if (orionldState.badVerb == true)
   {
     std::vector<std::string> compV;
 
