@@ -227,6 +227,7 @@ typedef struct OrionldConnectionState
   char*                   wildcard[2];
   char*                   urlPath;
   Verb                    verb;
+  bool                    badVerb;     // ToDo: verb == NOVERB should cover this
   char*                   verbString;
   bool                    acceptJson;
   bool                    acceptJsonld;

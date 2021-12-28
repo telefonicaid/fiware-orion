@@ -1535,12 +1535,7 @@ ConnectionInfo* connectionTreatInit
     lmTransactionSetFrom(ip);
   }
 
-  char tenant[DB_AND_SERVICE_NAME_MAX_LEN];
-
-  if (orionldState.tenantP->tenant != NULL)
-    ciP->tenantFromHttpHeader = strToLower(tenant, orionldState.tenantP->tenant, sizeof(tenant));
-
-  ciP->outMimeType          = mimeTypeSelect(ciP);
+  ciP->outMimeType = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -1578,7 +1573,7 @@ ConnectionInfo* connectionTreatInit
 
     return ciP;
   }
-  else if (ciP->badVerb == true)
+  else if (orionldState.badVerb == true)
   {
     std::vector<std::string> compV;
 

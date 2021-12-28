@@ -75,7 +75,6 @@ public:
   ~ConnectionInfo();
 
   MHD_Connection*            connection;
-  bool                       badVerb;
   MimeType                   inMimeType;
   MimeType                   outMimeType;
   std::string                url;
@@ -83,7 +82,6 @@ public:
   std::vector<std::string>   urlCompV;
   std::string                version;
   std::string                charset;
-  std::string                tenantFromHttpHeader;
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
