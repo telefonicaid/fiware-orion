@@ -263,7 +263,7 @@ int httpRequestSendWithCurl
 )
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
-  static unsigned long long       callNo             = 0;
+  static unsigned long long       sendReqNo          = 0;
   std::string                     ip                 = _ip;
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
@@ -277,7 +277,7 @@ int httpRequestSendWithCurl
   if (metricsMgr.isOn())
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
-  ++callNo;
+  ++sendReqNo;
 
   // For content-type application/json we add charset=utf-8
   if ((orig_content_type == "application/json") || (orig_content_type == "text/plain"))
@@ -561,7 +561,7 @@ int httpRequestSendWithCurl
   // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
   // to check logs in a .test case (case 000 notification_different_sizes.test)
   //
-  LM_K(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  LM_K(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", sendReqNo, outgoingMsgSize));
 
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)

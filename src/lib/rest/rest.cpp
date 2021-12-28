@@ -1446,8 +1446,6 @@ ConnectionInfo* connectionTreatInit
 
   // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
   LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-  ciP->port    = port;
-  ciP->callNo  = reqNo;
 
   ++reqNo;
 

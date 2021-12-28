@@ -85,9 +85,7 @@ public:
   char*                      payload;
   int                        payloadSize;
   std::string                answer;
-  int                        callNo;
   ParseData*                 parseDataP;
-  unsigned short             port;
   RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics
