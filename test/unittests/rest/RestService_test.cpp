@@ -84,7 +84,7 @@ RestService badVerbs2[] =
 */
 TEST(RestService, payloadParse)
 {
-  ConnectionInfo            ci("/ngsi9/registerContext", "1.1");
+  ConnectionInfo            ci("1.1");
   ParseData                 parseData;
   const char*               infile1  = "ngsi9.registerContext.ok.valid.json";
   std::string               out;
@@ -140,7 +140,7 @@ TEST(RestService, payloadParse)
 */
 TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 {
-  ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "1.1");
+  ConnectionInfo ci("1.1");
   ci.servicePathV.push_back("");
 
   const char*    infile      = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";

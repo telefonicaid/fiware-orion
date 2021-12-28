@@ -45,7 +45,7 @@
 */
 TEST(jsonRequest, jsonTreat)
 {
-  ConnectionInfo  ci("/ngsi9/registerContext", "1.1");
+  ConnectionInfo  ci("1.1");
   ParseData       parseData;
   std::string     out;
   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
