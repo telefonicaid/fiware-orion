@@ -71,7 +71,7 @@ class ConnectionInfo
 public:
   ConnectionInfo();
   ConnectionInfo(MimeType _outMimeType);
-  ConnectionInfo(std::string _version, MHD_Connection* _connection = NULL);
+  ConnectionInfo(MHD_Connection* _connection);
   ~ConnectionInfo();
 
   MHD_Connection*            connection;
@@ -79,8 +79,6 @@ public:
   MimeType                   outMimeType;
   int                        urlComponents;
   std::vector<std::string>   urlCompV;
-  std::string                version;
-  std::string                charset;
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;

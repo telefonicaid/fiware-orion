@@ -226,6 +226,7 @@ typedef struct OrionldConnectionState
   OrionLdRestService*     serviceP;
   char*                   wildcard[2];
   char*                   urlPath;
+  char*                   httpVersion;
   Verb                    verb;
   bool                    badVerb;     // ToDo: verb == NOVERB should cover this
   char*                   verbString;

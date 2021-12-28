@@ -571,7 +571,8 @@ MHD_Result orionldMhdConnectionInit
   // 2. Prepare orionldState
   //
   orionldStateInit();
-  orionldState.ciP = ciP;
+  orionldState.ciP         = ciP;
+  orionldState.httpVersion = (char*) version;
 
 
   // By default, no whitespace in output

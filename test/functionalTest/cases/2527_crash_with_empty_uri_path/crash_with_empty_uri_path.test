@@ -44,7 +44,7 @@ echo
 01. Request with empty URL - see Bad Request
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 139
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -52,7 +52,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "The Orion Context Broker is a REST service, not a &#39;web page&#39;",
         "reasonPhrase": "Bad Request"
     }
 }

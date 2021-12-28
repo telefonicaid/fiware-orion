@@ -113,11 +113,10 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
 *
 * ConnectionInfo::ConnectionInfo - 
 */
-ConnectionInfo::ConnectionInfo(std::string _version, MHD_Connection* _connection):
+ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
   connection             (_connection),
   inMimeType             (JSON),
   outMimeType            (JSON),
-  version                (_version),
   restServiceP           (NULL),
   payload                (NULL),
   payloadSize            (0),
