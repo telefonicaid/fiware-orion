@@ -92,6 +92,8 @@ TEST(rest, servicePathSplit)
   ConnectionInfo  ci5;
   int             r;
 
+  orionldState.apiVersion = V1;
+
   // 1. OK - as no Service Path has been received ...
   LM_M(("---- 1 -----"));
   ci1.httpHeaders.servicePath = "";

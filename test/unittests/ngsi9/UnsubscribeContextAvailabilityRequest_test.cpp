@@ -70,11 +70,13 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi9.unsubscribeContextAvailabilityRequest.badSubscriptionId.invalid.json";
   const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.badSubscriptionId.valid.json";
 
   utInit();
+
+  orionldState.verb = POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

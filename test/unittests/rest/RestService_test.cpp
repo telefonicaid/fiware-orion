@@ -84,7 +84,7 @@ RestService badVerbs2[] =
 */
 TEST(RestService, payloadParse)
 {
-  ConnectionInfo            ci("/ngsi9/registerContext", "POST", "1.1");
+  ConnectionInfo            ci("/ngsi9/registerContext", "1.1");
   ParseData                 parseData;
   const char*               infile1  = "ngsi9.registerContext.ok.valid.json";
   std::string               out;
@@ -95,6 +95,8 @@ TEST(RestService, payloadParse)
   compV.push_back("registerContext");
 
   utInit();
+
+  orionldState.verb = POST;
 
   //
   // 1. JSON
@@ -138,7 +140,7 @@ TEST(RestService, payloadParse)
 */
 TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 {
-  ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
+  ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "1.1");
   ci.servicePathV.push_back("");
 
   const char*    infile      = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
@@ -148,6 +150,8 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
   RestService    restService = { DiscoverContextAvailability, 2, { "ngsi9", "discoverContextAvailability" }, NULL };
 
   utInit();
+
+  orionldState.verb = POST;
 
   // No such service
   EXPECT_EQ("OK", testDataFromFile(testBuf,

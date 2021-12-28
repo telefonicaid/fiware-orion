@@ -71,8 +71,9 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.ok2.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -94,8 +95,9 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noRestrictions.ok.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -116,8 +118,9 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdList.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityRequest.noEntityIdListResponse.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -140,8 +143,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdList.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdListResponse.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -164,8 +168,9 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.isPatternValue.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityRequest.isPatternValueResponse.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -188,9 +193,10 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.unsupportedAttributeForEntityId.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   RestService     restService = { DiscoverContextAvailability, 1, { "" }, NULL };
 
+  orionldState.verb = POST;
   ci.inMimeType   = JSON;
   ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
@@ -213,8 +219,9 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.twoEntityIds.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -235,8 +242,9 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.entityIdTwoTypes.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -257,8 +265,9 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.entityIdTwoIsPatterns.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -279,8 +288,9 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.twoEntityIdTypes.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -302,8 +312,9 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.overrideEntityIdIsPattern.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.overrideEntityIdIsPattern.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -325,8 +336,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.valid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyEntityIdId.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -348,8 +360,9 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noEntityIdId.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -371,8 +384,9 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.json";
   const char*     expect   = "OK";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -394,8 +408,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.json";
   const char*     expect   = "OK";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -417,8 +432,9 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeType.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -440,8 +456,9 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeValue.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -463,8 +480,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeType.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -486,8 +504,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeValue.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 
@@ -508,9 +527,10 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 {
   ParseData       reqData;
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.parseError.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   RestService     restService = { InvalidRequest, 1, { "" }, NULL };
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
   ci.restServiceP = &restService;
@@ -532,8 +552,9 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeName.invalid.json";
   const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyAttributeName.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
+  orionldState.verb = POST;
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
 

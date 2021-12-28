@@ -218,8 +218,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   ParseData parseData;
 
-  ciP->verb   = POST;
-  ciP->method = "POST";
+  // Overriding original verb to be a POST, now that this service routine has been invoked
+  orionldState.verb = POST;
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
@@ -374,7 +374,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   //
   // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (ciP->method != "DELETE")
+  if (orionldState.verb != DELETE)
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {

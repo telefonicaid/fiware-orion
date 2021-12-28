@@ -45,7 +45,7 @@
 */
 TEST(jsonRequest, jsonTreat)
 {
-  ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi9/registerContext", "1.1");
   ParseData       parseData;
   std::string     out;
   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
@@ -53,7 +53,12 @@ TEST(jsonRequest, jsonTreat)
 
   utInit();
 
+  orionldState.verb        = POST;
+  orionldState.apiVersion  = V1;
+
+
   ci.outMimeType  = JSON;
+
   ci.restServiceP = &restService;
 
   orionldState.apiVersion = V1;

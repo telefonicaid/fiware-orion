@@ -589,7 +589,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-  // LM_TMP(("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+  // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), ciP->url.c_str())); // Sacred - used in 'heavyTest'
   if (ciP->payloadSize == 0)
   {
     ciP->inMimeType = NOMIMETYPE;
@@ -671,12 +671,12 @@ namespace orion
 */
 std::string requestServe(ConnectionInfo* ciP)
 {
-  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
-  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
-  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
-  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
-  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
-  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  if      ((orionldState.verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((orionldState.verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((orionldState.verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((orionldState.verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((orionldState.verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((orionldState.verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
   else                                                             return restService(ciP, restBadVerbV);
 }
 

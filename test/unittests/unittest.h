@@ -35,6 +35,8 @@
 #include "unittests/commonMocks.h"
 #include "unittests/testInit.h"
 
+#include "orionld/common/orionldState.h"  // orionldState
+
 
 
 /* ****************************************************************************

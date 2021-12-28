@@ -87,7 +87,7 @@ extern MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 //
 // verbGet
 //
-static Verb verbGet(const char* method)
+Verb verbGet(const char* method)
 {
   int sLen = strlen(method);
 
@@ -611,8 +611,9 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // 3. Check invalid verb
-  orionldState.verb = verbGet(method);
-  ciP->verb = orionldState.verb;  // FIXME: to be removed
+  orionldState.verbString = (char*) method;
+  orionldState.verb       = verbGet(method);
+
   if (orionldState.verb == NOVERB)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);  // FIXME: do this after setting prettyPrint

@@ -40,12 +40,14 @@
 TEST(SubscribeContextRequest, ok_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile = "ngsi10.subscribeContextRequest.ok.valid.json";
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -74,7 +76,7 @@ TEST(SubscribeContextRequest, ok_json)
 TEST(SubscribeContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.subscribeContextRequest.badIsPattern.invalid.json";
   const char*     outfile = "ngsi10.subscribeContextResponse.badIsPattern.valid.json";
 
@@ -82,6 +84,8 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -101,7 +105,7 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 TEST(SubscribeContextRequest, invalidDuration_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.subscribeContextRequest.duration.invalid.json";
   const char*     outfile = "ngsi10.subscribeContextResponse.durationInvalid.valid.json";
 
@@ -109,6 +113,8 @@ TEST(SubscribeContextRequest, invalidDuration_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -129,10 +135,12 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -154,10 +162,12 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -180,10 +190,12 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleInvertedBadValue.invalid.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.circleInvertedBadValue.ok.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -207,10 +219,12 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -233,10 +247,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -258,10 +274,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -284,10 +302,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -311,10 +331,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedNoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -338,10 +360,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedOneVertex.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -365,10 +389,12 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonTwoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;

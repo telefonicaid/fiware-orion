@@ -101,7 +101,7 @@ extern "C"
 //
 static bool contentTypeCheck(ConnectionInfo* ciP)
 {
-  if ((ciP->verb != POST) && (ciP->verb != PATCH))
+  if ((orionldState.verb != POST) && (orionldState.verb != PATCH))
     return true;
 
   if (orionldState.requestTree == NULL)
@@ -759,7 +759,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 03. Check for empty payload for POST/PATCH/PUT
   //
-  if (((ciP->verb == POST) || (ciP->verb == PATCH) || (ciP->verb == PUT)) && (payloadEmptyCheck(ciP) == false))
+  if (((orionldState.verb == POST) || (orionldState.verb == PATCH) || (orionldState.verb == PUT)) && (payloadEmptyCheck(ciP) == false))
     goto respond;
 
 

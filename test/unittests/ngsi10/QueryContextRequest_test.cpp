@@ -68,7 +68,7 @@
 TEST(QueryContextRequest, ok_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest_ok.valid.json";
   const char*     outfile = "ngsi10.queryContextRequest_ok.expected.valid.json";
   std::string     rendered;
@@ -76,6 +76,8 @@ TEST(QueryContextRequest, ok_json)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -110,11 +112,13 @@ TEST(QueryContextRequest, ok_json)
 TEST(QueryContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.badIsPattern.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.badIsPattern.valid.json";
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -136,11 +140,13 @@ TEST(QueryContextRequest, badIsPattern_json)
 TEST(QueryContextRequest, emptyAttribute_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttribute.valid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttribute.valid.json";
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -162,11 +168,13 @@ TEST(QueryContextRequest, emptyAttribute_json)
 TEST(QueryContextRequest, emptyAttributeExpression_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttributeExpression.valid.json";
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -189,10 +197,12 @@ TEST(QueryContextRequest, scopeGeolocationCircleOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -214,10 +224,12 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -240,10 +252,12 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleInvertedBadValue.postponed.json";
   const char*     outFile = "ngsi10.queryContextRequest.circleInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -267,10 +281,12 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleZeroRadius.postponed.json";
   const char*     outFile = "ngsi10.queryContextRequest.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -293,10 +309,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -318,10 +336,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     result;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -344,10 +364,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonInvertedBadValue.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -372,10 +394,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonNoVertices.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonNoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -400,10 +424,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonOneVertex.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonOneVertex.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;
@@ -428,10 +454,12 @@ TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonTwoVertices.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonTwoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci("/ngsi10/queryContext", "1.1");
   std::string     out;
 
   utInit();
+
+  orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
   ci.outMimeType = JSON;

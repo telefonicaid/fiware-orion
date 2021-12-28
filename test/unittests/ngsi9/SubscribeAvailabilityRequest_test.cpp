@@ -63,10 +63,11 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
   utInit();
 
+  orionldState.verb = POST;
   ci.inMimeType      = JSON;
   ci.outMimeType     = JSON;
 
@@ -90,10 +91,11 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.badIsPattern.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
   utInit();
 
+  orionldState.verb = POST;
   ci.inMimeType      = JSON;
   ci.outMimeType     = JSON;
 
@@ -116,10 +118,11 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noEntityId.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noEntityId.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
   utInit();
 
+  orionldState.verb = POST;
   ci.inMimeType      = JSON;
   ci.outMimeType     = JSON;
 
@@ -143,10 +146,11 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.badDuration.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.badDuration.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci("", "1.1");
 
   utInit();
 
+  orionldState.verb = POST;
   ci.inMimeType      = JSON;
   ci.outMimeType     = JSON;
 
