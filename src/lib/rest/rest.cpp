@@ -1283,7 +1283,7 @@ static ApiVersion apiVersionGet(const char* path)
 */
 static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
 {
-  char* eopath = (char*) ciP->url.c_str();
+  char* eopath = orionldState.urlPath;
   int   urllen = strlen(eopath);
 
   if (urllen > 6)
@@ -1362,15 +1362,6 @@ ConnectionInfo* connectionTreatInit
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
 
-  //
-  // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
-  //
-  kTimeGet(&orionldState.timestamp);
-
-  orionldState.requestTime  = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-  orionldState.responseTree = NULL;
-  orionldState.notify       = false;
-
   *retValP = MHD_YES;  // MHD_NO only if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
@@ -1435,9 +1426,7 @@ ConnectionInfo* connectionTreatInit
   // We would save the call to new/free for each and every request.
   // Once we *really* look to scratch some efficiency, this change should be made.
   //
-  // Also, is ciP->ip really used?
-  //
-  if ((ciP = new ConnectionInfo(url, version, connection)) == NULL)
+  if ((ciP = new ConnectionInfo(version, connection)) == NULL)
   {
     LM_E(("Runtime Error (error allocating ConnectionInfo)"));
     // No METRICS here ... Without ConnectionInfo we have no service/subService ...
@@ -1544,7 +1533,7 @@ ConnectionInfo* connectionTreatInit
 
   ciP->restServiceP = restServiceLookup(ciP, &badVerb);
 
-  if (urlCheck(ciP, ciP->url) == false)
+  if (urlCheck(ciP, orionldState.urlPath) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");
   }
@@ -1561,8 +1550,8 @@ ConnectionInfo* connectionTreatInit
   //
   else if ((ciP->httpHeaders.contentLength == 0) &&
       ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
-      (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) &&
-      (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0))
+      (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
+      (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
   {
     std::string errorMsg;
 
@@ -1741,10 +1730,18 @@ static MHD_Result connectionTreat
   {
     MHD_Result retVal;
 
+    //
+    // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
+    //
+    kTimeGet(&orionldState.timestamp);
     orionldStateInit();
-    orionldState.apiVersion = apiVersionGet(url);
-    orionldState.verbString = (char*) method;
-    orionldState.verb       = verbGet(method);
+    orionldState.apiVersion   = apiVersionGet(url);
+    orionldState.verbString   = (char*) method;
+    orionldState.verb         = verbGet(method);
+    orionldState.requestTime  = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    orionldState.responseTree = NULL;
+    orionldState.notify       = false;
+    orionldState.urlPath      = (char*) url;
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;

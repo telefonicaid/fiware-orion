@@ -535,7 +535,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   JsonDelayedRelease        jsonRelease;
 
   // FIXME P2: this empty url check seems not necessary ... 
-  if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
+  if ((orionldState.urlPath == NULL) || (orionldState.urlPath[0] == 0) || ((orionldState.urlPath[0] == '/') && (orionldState.urlPath[1] == 0)))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render();
@@ -589,7 +589,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-  // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+  // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), orionldState.urlPath)); // Sacred - used in 'heavyTest'
   if (ciP->payloadSize == 0)
   {
     ciP->inMimeType = NOMIMETYPE;
