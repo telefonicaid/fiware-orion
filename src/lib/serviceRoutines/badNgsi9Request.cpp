@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"        // orionldState
+
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -48,7 +50,7 @@ std::string badNgsi9Request
   ParseData*                 parseDataP
 )
 {
-  std::string details = std::string("service '") + ciP->url + "' not found";
+  std::string details = std::string("service '") + orionldState.urlPath + "' not found";
   std::string answer;
 
   alarmMgr.badInput(clientIp, details);

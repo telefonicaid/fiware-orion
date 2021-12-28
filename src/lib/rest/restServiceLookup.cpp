@@ -47,7 +47,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   bool          match     = false;
 
   // Split URI PATH into components
-  ciP->urlComponents = stringSplit(ciP->url.c_str(), '/', ciP->urlCompV, true);
+  ciP->urlComponents = stringSplit(orionldState.urlPath, '/', ciP->urlCompV, true);
 
   while (serviceV[serviceIx].request != InvalidRequest)
   {

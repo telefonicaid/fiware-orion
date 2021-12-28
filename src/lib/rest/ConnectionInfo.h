@@ -71,13 +71,12 @@ class ConnectionInfo
 public:
   ConnectionInfo();
   ConnectionInfo(MimeType _outMimeType);
-  ConnectionInfo(std::string _url, std::string _version, MHD_Connection* _connection = NULL);
+  ConnectionInfo(std::string _version, MHD_Connection* _connection = NULL);
   ~ConnectionInfo();
 
   MHD_Connection*            connection;
   MimeType                   inMimeType;
   MimeType                   outMimeType;
-  std::string                url;
   int                        urlComponents;
   std::vector<std::string>   urlCompV;
   std::string                version;

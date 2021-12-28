@@ -41,7 +41,7 @@
 TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
-  ConnectionInfo  ci("", "1.1");
+  ConnectionInfo  ci("1.1");
   const char*     infile   = "ngsi10.unsubscribeContextRequest.badSubscriptionId.invalid.json";
   std::string     out;
   const char*     outfile2 = "ngsi10.unsubscribeContextResponse.badSubscriptionId2.valid.json";

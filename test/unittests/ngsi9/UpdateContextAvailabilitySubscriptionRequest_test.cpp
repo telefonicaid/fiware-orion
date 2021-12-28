@@ -40,7 +40,7 @@
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 {
-  ConnectionInfo  ci("", "1.1");
+  ConnectionInfo  ci("1.1");
   ParseData       parseData;
   const char*     infile    = "ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.json";
   const char*     outfile1  = "ngsi9.updateContextAvailabilitySubscriptionRequest.expected1.valid.json";
@@ -91,7 +91,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
   ParseData       reqData;
   const char*     infile  = "updateContextAvailabilitySubscriptionRequest_invalidIsPattern.json";
   const char*     outfile = "ngsi9.updateContextAvailabilitySubscriptionResponse.invalidIsPattern.valid.json";
-  ConnectionInfo  ci("", "1.1");
+  ConnectionInfo  ci("1.1");
 
   utInit();
 

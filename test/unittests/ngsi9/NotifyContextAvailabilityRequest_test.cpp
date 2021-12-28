@@ -41,7 +41,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 {
   ParseData       parseData;
   const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok2.valid.json";
-  ConnectionInfo  ci("", "1.1");
+  ConnectionInfo  ci("1.1");
   std::string     out;
 
   utInit();

@@ -41,7 +41,7 @@ TEST(compoundValue, updateNoCompoundValue)
 {
   ParseData         reqData;
   const char*       inFileJson  = "ngsi10.updateContextRequest.updateNoCompoundValue.valid.json";
-  ConnectionInfo    ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo    ci("1.1");
   ContextAttribute* caP;
   std::string       result;
 
@@ -71,7 +71,7 @@ TEST(compoundValue, updateUnknownPath)
   ParseData       reqData;
   const char*     inFileJson  = "ngsi10.updateContextRequest.updateUnknownPath.invalid.json";
   const char*     outFileJson = "ngsi10.updateContextResponse.updateUnknownPath.valid.json";
-  ConnectionInfo  ciJson("/ngsi10/updateContext", "1.1");
+  ConnectionInfo  ciJson("1.1");
   std::string     result;
   RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
@@ -102,7 +102,7 @@ TEST(compoundValue, updateOneStringJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateOneString.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -171,7 +171,7 @@ TEST(compoundValue, updateTwoStringsJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateTwoStrings.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -255,7 +255,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.json";
   const char*     outFile = "ngsi10.updateContextResponse.updateTwoItemsSameNameInStruct.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo  ci("1.1");
   RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
@@ -286,7 +286,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorOneItem.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -354,7 +354,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItems.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -427,7 +427,7 @@ TEST(compoundValue, updateTwoStructsJson)
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.valid.json";
   const char*                renderedFile  = "ngsi.contextAttribute.updateTwoStructsRendered.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   std::string                rendered;
   RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
@@ -582,7 +582,7 @@ TEST(compoundValue, sixLevelsJson)
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.sixLevels.valid.json";
   const char*                renderedFile  = "ngsi.contextAttribute.updateSixLevelsRendered.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   std::string                rendered;
   RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
@@ -901,7 +901,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateOneStringAndOneVectorInSeparateContextValues.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "1.1");
+  ConnectionInfo             ci("1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
