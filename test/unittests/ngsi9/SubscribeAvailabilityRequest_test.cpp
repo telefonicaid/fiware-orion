@@ -63,7 +63,7 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
@@ -91,7 +91,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.badIsPattern.invalid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
@@ -118,7 +118,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noEntityId.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noEntityId.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
@@ -146,7 +146,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.badDuration.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.badDuration.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
 
   utInit();
 

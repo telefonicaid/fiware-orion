@@ -45,7 +45,7 @@
 #define TEST_SIZE (4 * 1024 * 1024)
 TEST(restReply, MHD_create_response_from_data_error)
 {
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   char*           answer = (char*) malloc(TEST_SIZE);
 
   utInit();
@@ -72,7 +72,7 @@ TEST(restReply, MHD_create_response_from_data_error)
 */
 TEST(restReply, json)
 {
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
 
   utInit();
 

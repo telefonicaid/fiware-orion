@@ -55,7 +55,7 @@ TEST(RegisterProviderRequest, json_ok)
   std::string     result;
   std::string     rendered;
   std::string     checked;
-  ConnectionInfo  ci("", "1.1");
+  ConnectionInfo  ci;
 
   orionldState.verb = POST;
 

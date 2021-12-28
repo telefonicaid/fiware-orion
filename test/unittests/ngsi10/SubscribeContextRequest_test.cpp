@@ -40,7 +40,7 @@
 TEST(SubscribeContextRequest, ok_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   const char*     infile = "ngsi10.subscribeContextRequest.ok.valid.json";
 
   utInit();
@@ -76,7 +76,7 @@ TEST(SubscribeContextRequest, ok_json)
 TEST(SubscribeContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.subscribeContextRequest.badIsPattern.invalid.json";
   const char*     outfile = "ngsi10.subscribeContextResponse.badIsPattern.valid.json";
 
@@ -105,7 +105,7 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 TEST(SubscribeContextRequest, invalidDuration_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.subscribeContextRequest.duration.invalid.json";
   const char*     outfile = "ngsi10.subscribeContextResponse.durationInvalid.valid.json";
 
@@ -135,7 +135,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleOk.postponed.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -162,7 +162,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleInverted.postponed.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -190,7 +190,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleInvertedBadValue.invalid.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.circleInvertedBadValue.ok.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -219,7 +219,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -247,7 +247,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -274,7 +274,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -302,7 +302,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedBadValue.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -331,7 +331,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedNoVertices.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -360,7 +360,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedOneVertex.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
@@ -389,7 +389,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   ParseData       parseData;
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.json";
   const char*     outFile = "ngsi10.subscribeContextResponse.polygonTwoVertices.valid.json";
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();

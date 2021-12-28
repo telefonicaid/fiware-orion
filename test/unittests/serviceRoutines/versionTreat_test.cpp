@@ -50,7 +50,7 @@ static RestService getV[] =
 */
 TEST(versionTreat, ok)
 {
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   std::string     out;
   RestService     restService = { VersionRequest, 1, { "version" }, NULL };
   char            urlPath[]   = { '/', 'v', 'e', 'r', 's', 'i', 'o', 'n', 0 };

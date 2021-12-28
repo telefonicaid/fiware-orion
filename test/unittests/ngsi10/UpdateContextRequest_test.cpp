@@ -49,7 +49,7 @@
 TEST(UpdateContextRequest, ok_json)
 {
    ParseData       reqData;
-   ConnectionInfo  ci("1.1");
+   ConnectionInfo  ci;
    const char*     infile = "ngsi10.updateContext.ok.valid.json";
 
    utInit();
@@ -85,7 +85,7 @@ TEST(UpdateContextRequest, ok_json)
 TEST(UpdateContextRequest, badIsPattern_json)
 {
    ParseData       parseData;
-   ConnectionInfo  ci("1.1");
+   ConnectionInfo  ci;
    const char*     infile  = "ngsi10.updateContextRequest.badIsPattern.invalid.json";
    const char*     outfile = "ngsi10.updateContextResponse.badIsPattern.invalid.json";
    JsonRequest*    reqP;
