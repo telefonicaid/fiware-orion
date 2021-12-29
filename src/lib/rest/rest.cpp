@@ -1426,7 +1426,7 @@ ConnectionInfo* connectionTreatInit
   // We would save the call to new/free for each and every request.
   // Once we *really* look to scratch some efficiency, this change should be made.
   //
-  if ((ciP = new ConnectionInfo(version, connection)) == NULL)
+  if ((ciP = new ConnectionInfo(connection)) == NULL)
   {
     LM_E(("Runtime Error (error allocating ConnectionInfo)"));
     // No METRICS here ... Without ConnectionInfo we have no service/subService ...
@@ -1446,8 +1446,6 @@ ConnectionInfo* connectionTreatInit
 
   // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
   LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-  ciP->port    = port;
-  ciP->callNo  = reqNo;
 
   ++reqNo;
 
@@ -1735,6 +1733,7 @@ static MHD_Result connectionTreat
     //
     kTimeGet(&orionldState.timestamp);
     orionldStateInit();
+    orionldState.httpVersion  = (char*) version;
     orionldState.apiVersion   = apiVersionGet(url);
     orionldState.verbString   = (char*) method;
     orionldState.verb         = verbGet(method);

@@ -71,7 +71,7 @@ class ConnectionInfo
 public:
   ConnectionInfo();
   ConnectionInfo(MimeType _outMimeType);
-  ConnectionInfo(std::string _version, MHD_Connection* _connection = NULL);
+  ConnectionInfo(MHD_Connection* _connection);
   ~ConnectionInfo();
 
   MHD_Connection*            connection;
@@ -79,17 +79,13 @@ public:
   MimeType                   outMimeType;
   int                        urlComponents;
   std::vector<std::string>   urlCompV;
-  std::string                version;
-  std::string                charset;
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;
   std::string                answer;
-  int                        callNo;
   ParseData*                 parseDataP;
-  unsigned short             port;
   RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics

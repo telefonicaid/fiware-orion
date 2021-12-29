@@ -29,7 +29,6 @@
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/Metadata.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

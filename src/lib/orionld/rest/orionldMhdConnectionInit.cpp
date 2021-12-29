@@ -53,7 +53,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// clientIp - from src/lib/rest.cpp
+// clientIp - move to orionldState
 //
 extern __thread char  clientIp[IP_LENGTH_MAX + 1];
 
@@ -158,7 +158,6 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
   {
     struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
 
-    ciP->port = (addr->sa_data[0] << 8) + addr->sa_data[1];
     snprintf(clientIp, sizeof(clientIp), "%d.%d.%d.%d",
              addr->sa_data[2] & 0xFF,
              addr->sa_data[3] & 0xFF,
@@ -166,10 +165,7 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
              addr->sa_data[5] & 0xFF);
   }
   else
-  {
-    ciP->port = 0;
     strncpy(clientIp, "IP unknown", sizeof(clientIp) - 1);
-  }
 }
 
 
@@ -571,7 +567,8 @@ MHD_Result orionldMhdConnectionInit
   // 2. Prepare orionldState
   //
   orionldStateInit();
-  orionldState.ciP = ciP;
+  orionldState.ciP         = ciP;
+  orionldState.httpVersion = (char*) version;
 
 
   // By default, no whitespace in output

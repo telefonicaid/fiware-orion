@@ -65,7 +65,7 @@ RestService badVerbV[] =
 */
 TEST(Convenience, emptyPath)
 {
-  ConnectionInfo            ci("", "GET", "1.1");
+  ConnectionInfo            ci;
   std::string               response;
   std::string               expected = "Empty URL";
 

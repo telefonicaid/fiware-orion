@@ -45,7 +45,7 @@
 */
 TEST(jsonRequest, jsonTreat)
 {
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   ParseData       parseData;
   std::string     out;
   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";

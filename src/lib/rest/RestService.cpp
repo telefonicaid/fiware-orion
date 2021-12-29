@@ -534,7 +534,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
-  // FIXME P2: this empty url check seems not necessary ... 
   if ((orionldState.urlPath == NULL) || (orionldState.urlPath[0] == 0) || ((orionldState.urlPath[0] == '/') && (orionldState.urlPath[1] == 0)))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
@@ -542,6 +541,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     ciP->httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
+    ciP->httpStatusCode = SccBadRequest;
     restReply(ciP, response);
 
     return std::string("Empty URL");

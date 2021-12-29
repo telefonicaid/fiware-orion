@@ -67,7 +67,7 @@ static RestService badVerbV[] =
 */
 TEST(statisticsTreat, delete)
 {
-  ConnectionInfo ci("1.1");
+  ConnectionInfo ci;
   std::string    out;
   RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
   utInit();

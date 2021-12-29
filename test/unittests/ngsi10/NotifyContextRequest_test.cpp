@@ -43,7 +43,7 @@
 TEST(NotifyContextRequest, json_ok)
 {
   ParseData              reqData;
-  ConnectionInfo         ci("1.1");
+  ConnectionInfo         ci;
   NotifyContextRequest*  ncrP      = &reqData.ncr.res;
   const char*            infile    = "notifyContextRequest_ok.json";
   const char*            outfile   = "ngsi10.notifyContextRequest_ok.expected1.valid.json";
@@ -86,7 +86,7 @@ TEST(NotifyContextRequest, json_ok)
 TEST(NotifyContextRequest, json_badIsPattern)
 {
   ParseData       reqData;
-  ConnectionInfo  ci("1.1");
+  ConnectionInfo  ci;
   const char*     infile   = "ngsi10.notifyContextRequest.badIsPattern.invalid.json";
   const char*     outfile  = "ngsi10.notifyContextResponse.badIsPattern.valid.json";
 

@@ -52,8 +52,8 @@ static RestService badVerbV[] =
 */
 TEST(badVerbAllFour, error)
 {
-  ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
-  ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
+  ConnectionInfo ci1();
+  ConnectionInfo ci2();
   std::string    out;
   RestService    restService1 = { VersionRequest, 3, { "ngsi10", "contextEntities", "123" }, NULL };
   RestService    restService2 = { VersionRequest, 2, { "ngsi10", "contextEntities" },        NULL };
