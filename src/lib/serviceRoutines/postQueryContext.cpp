@@ -314,7 +314,6 @@ std::string postQueryContext
                                                       qcrsP,
                                                       orionldState.tenantP,
                                                       ciP->servicePathV,
-                                                      ciP->uriParam,
                                                       ciP->uriParamOptions,
                                                       countP,
                                                       orionldState.apiVersion));

@@ -146,6 +146,7 @@ typedef struct OrionldUriParams
   bool      reload;
   char*     notExists;
   char*     metadata;
+  char*     orderBy;
 } OrionldUriParams;
 
 

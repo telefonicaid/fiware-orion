@@ -473,6 +473,10 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.metadata = (char*) value;
   }
+  else if (SCOMPARE8(key, 'o', 'r', 'd', 'e', 'r', 'B', 'y', 0))
+  {
+    orionldState.uriParams.orderBy = (char*) value;
+  }
   else
   {
     LM_W(("Bad Input (unknown URI parameter: '%s')", key));
