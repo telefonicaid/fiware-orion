@@ -340,7 +340,6 @@ void mongoListSubscriptions
 (
   std::vector<Subscription>*           subs,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParam,
   OrionldTenant*                       tenantP,
   const std::string&                   servicePath,  // FIXME P4: vector of strings and not just a single string? See #3100
   int                                  limit,
@@ -433,7 +432,6 @@ void mongoGetSubscription
   ngsiv2::Subscription*               subP,
   OrionError*                         oe,
   const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
   OrionldTenant*                      tenantP
 )
 {
@@ -627,18 +625,7 @@ bool mongoGetLdSubscriptions
   OrionError*                         oeP
 )
 {
-  bool      reqSemTaken = false;
-  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int       limit;
-
-  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-  {
-    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
-    if (limit <= 0)
-      limit = DEFAULT_PAGINATION_LIMIT_INT;
-  }
-  else
-    limit = DEFAULT_PAGINATION_LIMIT_INT;
+  bool reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "Mongo GET Subscriptions", SemReadOp, &reqSemTaken);
 
@@ -665,8 +652,8 @@ bool mongoGetLdSubscriptions
   if (!collectionRangedQuery(connection,
                              tenantP->subscriptions,
                              q,
-                             limit,
-                             offset,
+                             orionldState.uriParams.limit,
+                             orionldState.uriParams.offset,
                              &cursor,
                              countP,
                              &err))

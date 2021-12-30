@@ -65,7 +65,6 @@ std::string getAllSubscriptions
 
   TIMED_MONGO(mongoListSubscriptions(&subs,
                                      &oe,
-                                     ciP->uriParam,
                                      orionldState.tenantP,
                                      ciP->servicePathV[0],
                                      limit,

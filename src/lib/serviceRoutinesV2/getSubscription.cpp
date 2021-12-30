@@ -70,7 +70,7 @@ std::string getSubscription
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, orionldState.tenantP));
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, orionldState.tenantP));
 
   if (oe.code != SccOk)
   {
