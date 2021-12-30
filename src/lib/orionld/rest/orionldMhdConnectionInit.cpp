@@ -188,12 +188,17 @@ static void optionsParse(const char* options)
 
       *cP = 0;  // Zero-terminate
 
-      if      (strcmp(optionStart, "update")      == 0)  orionldState.uriParamOptions.update      = true;
-      else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
-      else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
-      else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
-      else if (strcmp(optionStart, "sysAttrs")    == 0)  orionldState.uriParamOptions.sysAttrs    = true;
-      else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParams.count             = true;  // NGSIv2 compatibility
+      if      (strcmp(optionStart, "update")        == 0)  orionldState.uriParamOptions.update        = true;
+      else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
+      else if (strcmp(optionStart, "noOverwrite")   == 0)  orionldState.uriParamOptions.noOverwrite   = true;
+      else if (strcmp(optionStart, "keyValues")     == 0)  orionldState.uriParamOptions.keyValues     = true;
+      else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
+      else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "count")         == 0)  orionldState.uriParams.count               = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "values")        == 0)  orionldState.uriParamOptions.values        = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "unique")        == 0)  orionldState.uriParamOptions.uniqueValues  = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "dateCreated")   == 0)  orionldState.uriParamOptions.dateCreated   = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "dateModified")  == 0)  orionldState.uriParamOptions.dateModified  = true;  // NGSIv2 compatibility
       else
       {
         LM_W(("Unknown 'options' value: %s", optionStart));
@@ -232,7 +237,7 @@ static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
 //
 // orionldUriArgumentGet -
 //
-static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (SCOMPARE3(key, 'i', 'd', 0))
   {
@@ -398,6 +403,8 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
       orionldState.uriParams.details = true;
     else if (strcmp(value, "false") == 0)
       orionldState.uriParams.details = false;
+    else if (strcmp(value, "on") == 0)
+      orionldState.uriParams.details = true;
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'details'", value);
@@ -456,6 +463,28 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
   {
     orionldState.uriParams.reload = true;
     orionldState.uriParams.mask  |= ORIONLD_URIPARAM_RELOAD;
+  }
+  else if (SCOMPARE7(key, '!', 'e', 'x', 'i', 's', 't', 0))
+  {
+    orionldState.uriParams.notExists = (char*) value;
+    orionldState.uriParams.mask  |= ORIONLD_URIPARAM_NOTEXISTS;
+  }
+  else if (SCOMPARE9(key, 'm', 'e', 't', 'a', 'd', 'a', 't', 'a', 0))
+  {
+    orionldState.uriParams.metadata = (char*) value;
+  }
+  else if (SCOMPARE8(key, 'o', 'r', 'd', 'e', 'r', 'B', 'y', 0))
+  {
+    orionldState.uriParams.orderBy = (char*) value;
+  }
+  else if (SCOMPARE9(key, 'c', 'o', 'l', 'l', 'a', 'p', 's', 'e', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.collapse = true;
+  }
+  else if (SCOMPARE16(key, 'a', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 'F', 'o', 'r', 'm', 'a', 't', 0))
+  {
+    orionldState.uriParams.attributeFormat = (char*) value;
   }
   else
   {

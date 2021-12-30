@@ -1649,6 +1649,8 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
 
 
 extern Verb verbGet(const char* method);
+extern MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value);
+
 /* ****************************************************************************
 *
 * connectionTreat -
@@ -1741,6 +1743,8 @@ static MHD_Result connectionTreat
     orionldState.responseTree = NULL;
     orionldState.notify       = false;
     orionldState.urlPath      = (char*) url;
+
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;

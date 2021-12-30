@@ -277,7 +277,7 @@ extern bool entitiesQuery
   int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
   bool*                            limitReached   = NULL,
   long long*                       countP         = NULL,
-  const std::string&               sortOrderList  = "",
+  char*                            sortOrderList  = NULL,
   ApiVersion                       apiVersion     = V1
 );
 

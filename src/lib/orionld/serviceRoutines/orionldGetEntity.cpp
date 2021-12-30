@@ -439,7 +439,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
                                                   &response,
                                                   orionldState.tenantP,
                                                   ciP->servicePathV,
-                                                  ciP->uriParam,
                                                   ciP->uriParamOptions,
                                                   NULL,
                                                   orionldState.apiVersion);

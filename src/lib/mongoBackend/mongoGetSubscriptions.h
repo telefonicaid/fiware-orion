@@ -43,7 +43,6 @@ extern void mongoListSubscriptions
 (
   std::vector<ngsiv2::Subscription>*   vec,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParam,
   OrionldTenant*                       tenantP,
   const std::string&                   servicePath,
   int                                  limit,
@@ -62,7 +61,6 @@ extern void mongoGetSubscription
   ngsiv2::Subscription*                sub,
   OrionError*                          oe,
   const std::string&                   idSub,
-  std::map<std::string, std::string>&  uriParam,
   OrionldTenant*                       tenantP
 );
 
@@ -90,7 +88,7 @@ extern bool mongoGetLdSubscription
 */
 extern bool mongoGetLdSubscriptions
 (
-  ConnectionInfo*                     ciP,
+  const char*                         servicePath,
   std::vector<ngsiv2::Subscription>*  subVecP,
   OrionldTenant*                      tenantP,
   long long*                          countP,

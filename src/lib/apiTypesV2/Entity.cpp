@@ -28,6 +28,9 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
+#include "orionld/common/orionldState.h"
+
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
@@ -74,8 +77,8 @@ Entity::~Entity()
 */
 std::string Entity::render
 (
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam,
+  std::map<std::string, bool>&         uriParamOptionsObsolete,  // not to be used
+  std::map<std::string, std::string>&  uriParamObsolete,         // not to be used
   bool                                 comma
 )
 {
@@ -86,27 +89,24 @@ std::string Entity::render
 
   RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
-  if      (uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
+  if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (orionldState.uriParamOptions.values       == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (orionldState.uriParamOptions.uniqueValues == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   std::string               out;
   std::vector<std::string>  metadataFilter;
   std::vector<std::string>  attrsFilter;
 
-  if (uriParam[URI_PARAM_METADATA] != "")
-  {
-    stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter);
-  }
+  if (orionldState.uriParams.metadata != NULL)
+    stringSplit(orionldState.uriParams.metadata, ',', metadataFilter);
 
-  if (uriParam[URI_PARAM_ATTRS] != "")
-  {
-    stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter);
-  }
+  if (orionldState.uriParams.attrs != NULL)
+    stringSplit(orionldState.uriParams.attrs, ',', attrsFilter);
+
 
   // Add special attributes representing entity dates
   // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
-  if ((creDate != 0) && (uriParamOptions[DATE_CREATED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
+  if ((creDate != 0) && ((orionldState.uriParamOptions.dateCreated == true) || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
   {
     ContextAttribute* creDateAttrP = attributeVector.lookup(DATE_CREATED);
     if (creDateAttrP == NULL)
@@ -121,7 +121,7 @@ std::string Entity::render
       // creDateAttrP->numberValue = creDate;
     }
   }
-  if ((modDate != 0) && (uriParamOptions[DATE_MODIFIED] || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
+  if ((modDate != 0) && ((orionldState.uriParamOptions.dateModified == true) || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_MODIFIED) != attrsFilter.end())))
   {
     ContextAttribute* modDateAttrP = attributeVector.lookup(DATE_MODIFIED);
 
@@ -168,7 +168,7 @@ std::string Entity::render
 
     //
     // Note that just attributeVector.size() != 0 (used in previous versions) cannot be used
-    // as ciP->uriParam["attrs"] filter could remove all the attributes
+    // as uri-param "attrs" could remove all of the attributes
     //
     if (attrsOut != "")
     {

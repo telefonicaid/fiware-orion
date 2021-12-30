@@ -79,7 +79,7 @@ std::string postEntity
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true)  // pure-append
+  if (orionldState.uriParamOptions.append == true)  // pure-append
   {
     op     = ActionTypeAppendStrict;
     flavor = NGSIV2_FLAVOUR_ONUPDATE;

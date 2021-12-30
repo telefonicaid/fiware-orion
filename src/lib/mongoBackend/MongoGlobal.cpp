@@ -1199,7 +1199,7 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  const std::string&               sortOrderList,
+  char*                            sortOrderList,
   ApiVersion                       apiVersion
 )
 {
@@ -1373,11 +1373,11 @@ bool entitiesQuery
 
   Query  query(finalQuery.obj());
 
-  if (sortOrderList == "")
+  if (sortOrderList == NULL)
   {
     query.sort(BSON(ENT_CREATION_DATE << 1));
   }
-  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  else if (strcmp(sortOrderList, ORDER_BY_PROXIMITY) == 0)
   {
     // In this case the solution is not setting any query.sort(), as the $near operator will do the
     // sorting itself. Of course, using orderBy=geo:distance without using georel=near will return

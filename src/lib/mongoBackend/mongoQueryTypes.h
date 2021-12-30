@@ -60,7 +60,6 @@ extern HttpStatusCode mongoEntityTypes
   EntityTypeVectorResponse*            responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
@@ -77,7 +76,6 @@ extern HttpStatusCode mongoEntityTypesValues
   EntityTypeVectorResponse*            responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   unsigned int*                        totalTypesP
 );
 
@@ -93,7 +91,6 @@ extern HttpStatusCode mongoAttributesForEntityType
   EntityTypeResponse*                  responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   bool                                 noAttrDetail,
   ApiVersion                           apiVersion
 );

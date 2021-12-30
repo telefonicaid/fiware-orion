@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -75,8 +77,11 @@ std::string postBatchQuery
   // However, the implementation is cleaner and no more code is needed for this, just to set the
   // URI param with the value of the metadata filter from the payload.
   //
-  ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();
-  ciP->uriParam[URI_PARAM_ATTRS]    = bqP->attrsV.toString();
+  orionldState.uriParams.metadata = (char*) bqP->metadataV.toString().c_str();
+  orionldState.uriParams.attrs    = (char*) bqP->attrsV.toString().c_str();
+
+  ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();  // To be removed
+  ciP->uriParam[URI_PARAM_ATTRS]    = bqP->attrsV.toString();     // To be removed
 
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
