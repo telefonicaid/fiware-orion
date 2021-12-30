@@ -477,6 +477,15 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.orderBy = (char*) value;
   }
+  else if (SCOMPARE9(key, 'c', 'o', 'l', 'l', 'a', 'p', 's', 'e', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.collapse = true;
+  }
+  else if (SCOMPARE16(key, 'a', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 'F', 'o', 'r', 'm', 'a', 't', 0))
+  {
+    orionldState.uriParams.attributeFormat = (char*) value;
+  }
   else
   {
     LM_W(("Bad Input (unknown URI parameter: '%s')", key));

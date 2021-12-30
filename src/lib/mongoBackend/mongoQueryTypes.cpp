@@ -240,12 +240,9 @@ HttpStatusCode mongoEntityTypesValues
   EntityTypeVectorResponse*            responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   unsigned int*                        totalTypesP
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
@@ -297,8 +294,8 @@ HttpStatusCode mongoEntityTypesValues
     BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
     BSON("$group" << BSON("_id" << groupCond)) <<
     BSON("$sort"  << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+    BSON("$skip" << orionldState.uriParams.offset) <<
+    BSON("$limit" << orionldState.uriParams.limit));
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
@@ -383,14 +380,11 @@ HttpStatusCode mongoEntityTypes
   EntityTypeVectorResponse*            responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
@@ -474,8 +468,8 @@ HttpStatusCode mongoEntityTypes
     BSON("$group" << BSON("_id"   << groupCond <<
                           "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
     BSON("$sort" << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+    BSON("$skip" << orionldState.uriParams.offset) <<
+    BSON("$limit" << orionldState.uriParams.limit));
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
@@ -523,7 +517,7 @@ HttpStatusCode mongoEntityTypes
     if (totalTypesP != NULL)
     {
       char detailsMsg[256];
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, orionldState.uriParams.offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
@@ -620,29 +614,22 @@ HttpStatusCode mongoAttributesForEntityType
   EntityTypeResponse*                   responseP,
   OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
   bool                                  noAttrDetail,
   ApiVersion                            apiVersion
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
   bool           count          = false;
 
   // Count only makes sense for this operation in the case of NGSIv1
   if (apiVersion == V1)
-  {
-    std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-
-    count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  }
+    count = orionldState.uriParams.details;
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
 
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (count == true)? "true" : "false"));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", orionldState.uriParams.offset, orionldState.uriParams.limit, (count == true)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
@@ -719,7 +706,8 @@ HttpStatusCode mongoAttributesForEntityType
   }
 
   /* See comment above in the other method regarding this strategy to implement pagination */
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  unsigned int total = orionldState.uriParams.offset + orionldState.uriParams.limit;
+  for (unsigned int ix = orionldState.uriParams.offset; ix < MIN(resultsArray.size(), total); ++ix)
   {
     BSONObj      result  = resultsArray[ix].embeddedObject();
     BSONElement  idField = getFieldF(&result, "_id");
@@ -791,7 +779,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (count)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), orionldState.uriParams.offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

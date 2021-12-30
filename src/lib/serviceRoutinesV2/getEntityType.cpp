@@ -75,7 +75,6 @@ std::string getEntityType
                                            &response,
                                            orionldState.tenantP,
                                            ciP->servicePathV,
-                                           ciP->uriParam,
                                            noAttrDetail,
                                            orionldState.apiVersion));
 
