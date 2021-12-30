@@ -88,7 +88,7 @@ extern bool mongoGetLdSubscription
 */
 extern bool mongoGetLdSubscriptions
 (
-  ConnectionInfo*                     ciP,
+  const char*                         servicePath,
   std::vector<ngsiv2::Subscription>*  subVecP,
   OrionldTenant*                      tenantP,
   long long*                          countP,
