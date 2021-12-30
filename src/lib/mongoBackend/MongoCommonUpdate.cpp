@@ -3895,7 +3895,6 @@ void processContextElement
   ActionType                           action,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
@@ -3931,7 +3930,7 @@ void processContextElement
   // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
   // of URI filter into mongoBackend
   //
-  if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+  if ((orionldState.uriParams.notExists != NULL) && (strcmp(orionldState.uriParams.notExists, SCOPE_VALUE_ENTITY_TYPE) == 0))
   {
     std::string  entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
     BSONObj      b                = BSON(entityTypeString << BSON("$exists" << false));

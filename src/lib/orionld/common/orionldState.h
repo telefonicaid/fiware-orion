@@ -99,6 +99,11 @@ typedef struct OrionldUriParamOptions
   bool update;
   bool replace;
   bool keyValues;
+  bool values;         // Only NGSIv2
+  bool uniqueValues;   // Only NGSIv2
+  bool dateCreated;    // Only NGSIv2
+  bool dateModified;   // Only NGSIv2
+  bool append;         // Only NGSIv2
   bool sysAttrs;
 } OrionldUriParamOptions;
 
@@ -139,6 +144,8 @@ typedef struct OrionldUriParams
   bool      location;
   char*     url;
   bool      reload;
+  char*     notExists;
+  char*     metadata;
 } OrionldUriParams;
 
 

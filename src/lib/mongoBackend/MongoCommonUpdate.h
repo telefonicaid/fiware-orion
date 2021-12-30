@@ -48,7 +48,6 @@ extern void processContextElement
   ActionType                           action,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePath,
-  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,

@@ -386,7 +386,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
                                                    &mongoResponse,
                                                    orionldState.tenantP,
                                                    ciP->servicePathV,
-                                                   ciP->uriParam,
                                                    ciP->httpHeaders.xauthToken.c_str(),
                                                    ciP->httpHeaders.correlator.c_str(),
                                                    ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

@@ -131,14 +131,9 @@ HttpStatusCode mongoDiscoverContextAvailability
   DiscoverContextAvailabilityRequest*   requestP,
   DiscoverContextAvailabilityResponse*  responseP,
   OrionldTenant*                        tenantP,
-  std::map<std::string, std::string>&   uriParams,
   const std::vector<std::string>&       servicePathV
 )
 {
-  int          offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int          limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
   bool         reqSemTaken;
 
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request", SemReadOp, &reqSemTaken);
@@ -148,9 +143,9 @@ HttpStatusCode mongoDiscoverContextAvailability
   HttpStatusCode hsCode = processDiscoverContextAvailability(requestP,
                                                              responseP,
                                                              tenantP,
-                                                             offset,
-                                                             limit,
-                                                             details,
+                                                             orionldState.uriParams.offset,
+                                                             orionldState.uriParams.limit,
+                                                             orionldState.uriParams.details,
                                                              servicePathV);
   if (hsCode != SccOk)
   {

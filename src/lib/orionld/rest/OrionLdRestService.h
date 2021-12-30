@@ -140,7 +140,7 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_LOCATION             (1 << 25)
 #define ORIONLD_URIPARAM_URL                  (1 << 27)
 #define ORIONLD_URIPARAM_RELOAD               (1 << 28)
-
+#define ORIONLD_URIPARAM_NOTEXISTS            (1 << 29)
 
 
 // -----------------------------------------------------------------------------
