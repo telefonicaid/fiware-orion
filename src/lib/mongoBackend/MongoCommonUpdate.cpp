@@ -58,7 +58,6 @@ extern "C"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
-#include "rest/uriParamNames.h"
 
 #include "orionld/types/OrionldTenant.h"                           // OrionldTenant
 #include "orionld/types/AttributeType.h"                           // AttributeType

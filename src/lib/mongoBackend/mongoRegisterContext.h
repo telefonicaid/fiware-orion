@@ -44,7 +44,6 @@ extern HttpStatusCode mongoRegisterContext
 (
   RegisterContextRequest*              requestP,
   RegisterContextResponse*             responseP,
-  std::map<std::string, std::string>&  uriParam,
   const std::string&                   fiwareCorrelator = "no correlator",
   OrionldTenant*                       tenantP          = NULL,
   const std::string&                   servicePath      = ""
