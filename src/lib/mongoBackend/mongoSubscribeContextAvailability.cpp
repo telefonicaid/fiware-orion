@@ -40,7 +40,6 @@
 #include "mongoBackend/dbConstants.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
-#include "rest/uriParamNames.h"
 
 
 
@@ -62,7 +61,6 @@ HttpStatusCode mongoSubscribeContextAvailability
 (
   SubscribeContextAvailabilityRequest*   requestP,
   SubscribeContextAvailabilityResponse*  responseP,
-  std::map<std::string, std::string>&    uriParam,
   const std::string&                     fiwareCorrelator,
   OrionldTenant*                         tenantP
 )

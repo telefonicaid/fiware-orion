@@ -89,7 +89,7 @@ std::string postNotifyContextAvailability
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
   TIMED_RENDER(answer = ncar.render());
 
   return answer;

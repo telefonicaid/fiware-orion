@@ -56,7 +56,6 @@ std::string postSubscribeContextAvailability
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res,
                                                                       &scar,
-                                                                      ciP->uriParam,
                                                                       ciP->httpHeaders.correlator,
                                                                       orionldState.tenantP));
   TIMED_RENDER(answer = scar.render());

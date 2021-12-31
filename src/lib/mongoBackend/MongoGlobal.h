@@ -35,6 +35,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "rest/uriParamNames.h"                // Default values for URI parameters
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -49,7 +50,6 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsiNotify/Notifier.h"
-#include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/TriggeredSubscription.h"
