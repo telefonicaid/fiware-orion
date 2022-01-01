@@ -59,7 +59,7 @@ std::string postNotifyContextAvailability
 {
   NotifyContextAvailabilityResponse  ncar;
   std::string                        answer;
-
+  const char* servicePath = (ciP->servicePathV[0] == "")? NULL : ciP->servicePathV[0].c_str();
   //
   // If more than ONE service-path is input, an error is returned as response.
   // If NO service-path is issued, then the default service-path "/" is used.
@@ -89,7 +89,7 @@ std::string postNotifyContextAvailability
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->httpHeaders.correlator, orionldState.tenantP, servicePath));
   TIMED_RENDER(answer = ncar.render());
 
   return answer;

@@ -640,8 +640,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
     }
   }
-  else if (strcasecmp(key, "NGSILD-Path") == 0)
-    orionldState.servicePath = (char*) value;
   else if (strcasecmp(key, "X-Auth-Token") == 0)
   {
     orionldState.xauthHeader    = (char*) value;

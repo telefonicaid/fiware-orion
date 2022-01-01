@@ -47,7 +47,7 @@ extern HttpStatusCode processRegisterContext
   RegisterContextResponse*  responseP,
   mongo::OID*               id,
   OrionldTenant*            tenantP,
-  const std::string&        servicePath,
+  const char*               servicePath,
   const std::string&        format,
   const std::string&        fiwareCorrelator
 );

@@ -901,7 +901,7 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder      b;
-  std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  const char*         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0].c_str();
   bool                notificationDone = false;
   double              lastNotification = 0;
   double              lastFailure      = 0;

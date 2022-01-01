@@ -186,7 +186,7 @@ std::string mongoCreateSubscription
   setExpiration(sub, &b);
   setHttpInfo(sub, &b);
   setThrottling(sub, &b);
-  setServicePath(servicePath, &b);
+  setServicePath(servicePath.c_str(), &b);
   setDescription(sub, &b);
   setStatus(sub, &b);
   setEntities(sub, &b);

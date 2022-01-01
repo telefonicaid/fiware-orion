@@ -323,6 +323,12 @@ typedef struct OrionldConnectionState
   KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
 
 
+  //
+  // NGSI-LD Scope (or NGSIv2 ServicePath)
+  //
+  char* scopeV[10];
+  int   scopes;
+
   // Error Handling
   OrionldProblemDetails   pd;
 } OrionldConnectionState;
