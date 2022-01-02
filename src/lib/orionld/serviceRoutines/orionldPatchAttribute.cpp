@@ -852,7 +852,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
                                                    servicePathV,
                                                    ciP->httpHeaders.xauthToken.c_str(),
                                                    ciP->httpHeaders.correlator.c_str(),
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                   orionldState.attrsFormat,
                                                    orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 

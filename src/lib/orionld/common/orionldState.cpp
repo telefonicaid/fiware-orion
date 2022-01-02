@@ -158,6 +158,9 @@ void orionldStateInit(void)
   // GeoProperty array
   orionldState.geoAttrMax = K_VEC_SIZE(orionldState.geoAttr);
   orionldState.geoAttrV   = orionldState.geoAttr;
+
+  //  Default values for HTTP headers
+  orionldState.attrsFormat = (char*) "normalized";
 }
 
 

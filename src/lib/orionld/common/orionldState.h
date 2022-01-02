@@ -324,12 +324,19 @@ typedef struct OrionldConnectionState
 
 
   //
-  // NGSI-LD Scope (or NGSIv2 ServicePath)
+  // Incoming HTTP headers
   //
+
+  // NGSI-LD Scope (or NGSIv2 ServicePath)
   char* scopeV[10];
   int   scopes;
 
+  // Attribute Format
+  char* attrsFormat;
+
+  //
   // Error Handling
+  //
   OrionldProblemDetails   pd;
 } OrionldConnectionState;
 

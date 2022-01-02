@@ -286,6 +286,10 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
       orionldState.httpStatusCode = 400;
     }
   }
+  else if (strcmp(key, "Ngsiv2-AttrsFormat") == 0)  // FIXME: This header name needs to change for NGSI-LD
+  {
+    orionldState.attrsFormat = (char*) value;
+  }
 
   return MHD_YES;
 }
