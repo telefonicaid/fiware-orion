@@ -282,13 +282,15 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   }
 
 
-  UpdateContextResponse mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   PERFORMANCE(mongoBackendStart);
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
+                                                   servicePathV,
                                                    ciP->httpHeaders.xauthToken.c_str(),
                                                    ciP->httpHeaders.correlator.c_str(),
                                                    ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

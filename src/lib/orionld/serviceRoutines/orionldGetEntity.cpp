@@ -428,17 +428,18 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
 
 #ifdef USE_MONGO_BACKEND
-  bool                  keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId              entityId(orionldState.wildcard[0], "", "false", false);
-  QueryContextRequest   request;
-  QueryContextResponse  response;
+  bool                      keyValues = orionldState.uriParamOptions.keyValues;
+  EntityId                  entityId(orionldState.wildcard[0], "", "false", false);
+  QueryContextRequest       request;
+  QueryContextResponse      response;
+  std::vector<std::string>  servicePathV;
 
   request.entityIdVector.push_back(&entityId);
 
   orionldState.httpStatusCode = mongoQueryContext(&request,
                                                   &response,
                                                   orionldState.tenantP,
-                                                  ciP->servicePathV,
+                                                  servicePathV,
                                                   ciP->uriParamOptions,
                                                   NULL,
                                                   orionldState.apiVersion);

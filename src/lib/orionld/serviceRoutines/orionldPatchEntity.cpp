@@ -318,12 +318,14 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
 
     // 8. Call mongoBackend to do the REPLACE of the entity
-    UpdateContextResponse  ucResponse;
+    UpdateContextResponse    ucResponse;
+    std::vector<std::string> servicePathV;
+    servicePathV.push_back("/");
 
     orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
                                                      &ucResponse,
                                                      orionldState.tenantP,
-                                                     ciP->servicePathV,
+                                                     servicePathV,
                                                      ciP->httpHeaders.xauthToken.c_str(),
                                                      ciP->httpHeaders.correlator.c_str(),
                                                      ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

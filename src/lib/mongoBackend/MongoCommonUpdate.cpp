@@ -3193,7 +3193,8 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? SERVICE_PATH_ROOT : servicePathV[0]);
+  const char* servicePath = (servicePathV[0] == "")? SERVICE_PATH_ROOT : servicePathV[0].c_str();
+  bsonId.append(ENT_SERVICE_PATH, servicePath);
 
   BSONObjBuilder insertedDoc;
 

@@ -380,12 +380,14 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 08. Call mongoBackend - to create/modify the entities
   //     In case of REPLACE, all entities have been removed from the DB prior to this call, so, they will all be created.
   //
-  UpdateContextResponse mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
+                                                   servicePathV,
                                                    ciP->httpHeaders.xauthToken.c_str(),
                                                    ciP->httpHeaders.correlator.c_str(),
                                                    ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

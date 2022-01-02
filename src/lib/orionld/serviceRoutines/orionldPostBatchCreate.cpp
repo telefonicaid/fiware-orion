@@ -263,12 +263,14 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   orionldState.noDbUpdate = mongoRequest.contextElementVector.size() <= 0;
   if (orionldState.noDbUpdate == false)
   {
-    UpdateContextResponse mongoResponse;
+    UpdateContextResponse    mongoResponse;
+    std::vector<std::string> servicePathV;
+    servicePathV.push_back("/");
 
     orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                      &mongoResponse,
                                                      orionldState.tenantP,
-                                                     ciP->servicePathV,
+                                                     servicePathV,
                                                      ciP->httpHeaders.xauthToken.c_str(),
                                                      ciP->httpHeaders.correlator.c_str(),
                                                      ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

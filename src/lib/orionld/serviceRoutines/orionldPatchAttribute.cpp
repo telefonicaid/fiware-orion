@@ -841,13 +841,15 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // 11. Call mongoBackend
   //
-  UpdateContextResponse  mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   ucr.updateActionType        = ActionTypeUpdate;
   orionldState.httpStatusCode = mongoUpdateContext(&ucr,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
+                                                   servicePathV,
                                                    ciP->httpHeaders.xauthToken.c_str(),
                                                    ciP->httpHeaders.correlator.c_str(),
                                                    ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),

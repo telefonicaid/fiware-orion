@@ -462,10 +462,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     orionldState.onlyCount = true;
 
   PERFORMANCE(mongoBackendStart);
+  std::vector<std::string>  servicePathV;
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenantP,
-                                                  ciP->servicePathV,
+                                                  servicePathV,
                                                   ciP->uriParamOptions,
                                                   countP,
                                                   orionldState.apiVersion);

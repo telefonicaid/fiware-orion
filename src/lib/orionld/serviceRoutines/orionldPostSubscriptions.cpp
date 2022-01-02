@@ -189,8 +189,8 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   if (subIdP != NULL)
   {
-    ngsiv2::Subscription  subscription;
-    char*                 details;
+    ngsiv2::Subscription      subscription;
+    char*                     details;
 
     // mongoGetLdSubscription takes the req semaphore
     if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenantP, &orionldState.httpStatusCode, &details) == true)
@@ -204,10 +204,13 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
+
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   orionldState.tenantP,
-                                  ciP->servicePathV,
+                                  servicePathV,
                                   ciP->httpHeaders.xauthToken,
                                   ciP->httpHeaders.correlator,
                                   sub.ldContext);
