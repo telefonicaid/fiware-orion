@@ -294,6 +294,10 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   {
     orionldState.xAuthToken = (char*) value;
   }
+  else if (strcmp(key, "Fiware-Correlator") == 0)
+  {
+    orionldState.correlator = (char*) value;
+  }
 
   return MHD_YES;
 }

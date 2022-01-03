@@ -64,7 +64,7 @@ HttpStatusCode mongoNotifyContext
     UpdateContextResponse               ucr;        // Unused, necessary for processContextElement()
     ContextElement*                     ceP = &requestP->contextElementResponseVector[ix]->contextElement;
 
-    processContextElement(ceP, &ucr, ActionTypeAppend, tenantP, servicePathV, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat);
+    processContextElement(ceP, &ucr, ActionTypeAppend, tenantP, servicePathV, xauthToken, fiwareCorrelator.c_str(), ngsiV2AttrsFormat);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);

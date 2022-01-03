@@ -212,7 +212,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   orionldState.tenantP,
                                   servicePathV,
                                   orionldState.xAuthToken,
-                                  ciP->httpHeaders.correlator,
+                                  orionldState.correlator,
                                   sub.ldContext);
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 

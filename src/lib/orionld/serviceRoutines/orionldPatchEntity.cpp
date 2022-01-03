@@ -61,7 +61,7 @@ extern "C"
 //   * PATCH /entities/*/attrs
 //   * etc
 //
-bool attributeCheck(ConnectionInfo* ciP, KjNode* attrNodeP, char** titleP, char** detailP)
+static bool attributeCheck(KjNode* attrNodeP, char** titleP, char** detailP)
 {
   if (attrNodeP->type != KjObject)
   {
@@ -261,7 +261,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
 
     // Is the attribute in the incoming payload a valid attribute?
-    if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
+    if (attributeCheck(newAttrP, &title, &detail) == false)
     {
       LM_E(("attributeCheck: %s: %s", title, detail));
       attributeNotUpdated(notUpdatedP, shortName, detail);
@@ -327,7 +327,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
                                                      orionldState.tenantP,
                                                      servicePathV,
                                                      orionldState.xAuthToken,
-                                                     ciP->httpHeaders.correlator.c_str(),
+                                                     orionldState.correlator,
                                                      orionldState.attrsFormat,
                                                      orionldState.apiVersion,
                                                      NGSIV2_NO_FLAVOUR);

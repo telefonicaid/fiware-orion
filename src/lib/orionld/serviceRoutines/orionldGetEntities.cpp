@@ -467,7 +467,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                                   &mongoResponse,
                                                   orionldState.tenantP,
                                                   servicePathV,
-                                                  ciP->uriParamOptions,
                                                   countP,
                                                   orionldState.apiVersion);
   PERFORMANCE(mongoBackendEnd);

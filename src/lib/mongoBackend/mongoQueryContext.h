@@ -47,7 +47,6 @@ extern HttpStatusCode mongoQueryContext
   QueryContextResponse*                 responseP,
   OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, bool>&          options,
   long long*                            countP        = NULL,
   ApiVersion                            apiVersion    = V1
 );

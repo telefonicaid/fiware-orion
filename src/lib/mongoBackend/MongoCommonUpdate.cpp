@@ -1835,7 +1835,7 @@ static bool processOnChangeConditionForUpdateContext
   RenderFormat                     renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
-  const std::string&               fiwareCorrelator,
+  const char*                      fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
@@ -2145,7 +2145,7 @@ static bool processSubscriptions
   std::string*                                   err,
   OrionldTenant*                                 tenantP,
   const char*                                    xauthToken,
-  const std::string&                             fiwareCorrelator
+  const char*                                    fiwareCorrelator
 )
 {
   bool ret = true;
@@ -3069,7 +3069,7 @@ static bool createEntity
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   ApiVersion                       apiVersion,
-  const std::string&               fiwareCorrelator,
+  const char*                      fiwareCorrelator,
   OrionError*                      oeP
 )
 {
@@ -3235,7 +3235,10 @@ static bool createEntity
   }
 
   // Correlator (for notification loop detection logic)
-  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  if (fiwareCorrelator != NULL)
+    insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  else
+    insertedDoc.append(ENT_LAST_CORRELATOR, "");
 
   if (orionldState.datasets != NULL)
   {
@@ -3423,7 +3426,7 @@ static void updateEntity
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
   ApiVersion                      apiVersion,
-  const std::string&              fiwareCorrelator,
+  const char*                     fiwareCorrelator,
   const std::string&              ngsiV2AttrsFormat
 )
 {
@@ -3543,7 +3546,7 @@ static void updateEntity
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (bobP->hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (strcmp(getStringFieldF(bobP, ENT_LAST_CORRELATOR), fiwareCorrelator.c_str()) == 0);
+    loopDetected = (strcmp(getStringFieldF(bobP, ENT_LAST_CORRELATOR), fiwareCorrelator) == 0);
   }
 
   if (!processContextAttributeVector(ceP,
@@ -3896,7 +3899,7 @@ void processContextElement
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
   const char*                          xauthToken,
-  const std::string&                   fiwareCorrelator,
+  const char*                          fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour

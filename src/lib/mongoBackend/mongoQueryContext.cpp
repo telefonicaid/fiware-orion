@@ -315,7 +315,6 @@ HttpStatusCode mongoQueryContext
   QueryContextResponse*                responseP,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, bool>&         options,
   long long*                           countP,
   ApiVersion                           apiVersion
 )
@@ -344,7 +343,7 @@ HttpStatusCode mongoQueryContext
   // Note that we check for attr list emptyness, as in that case the "*" needs
   // to be added to print also user attributes
   //
-  if (options[DATE_CREATED])
+  if (orionldState.uriParamOptions.dateCreated)
   {
     if (requestP->attributeList.size() == 0)
     {
@@ -354,7 +353,7 @@ HttpStatusCode mongoQueryContext
     requestP->attributeList.push_back(DATE_CREATED);
   }
 
-  if (options[DATE_MODIFIED])
+  if (orionldState.uriParamOptions.dateModified)
   {
     if (requestP->attributeList.size() == 0)
     {

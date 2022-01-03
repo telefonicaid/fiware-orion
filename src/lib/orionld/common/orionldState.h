@@ -336,6 +336,8 @@ typedef struct OrionldConnectionState
   // X-Auth-Token
   char* xAuthToken;
 
+  // FIWARE Correlator
+  char* correlator;
 
   //
   // Error Handling

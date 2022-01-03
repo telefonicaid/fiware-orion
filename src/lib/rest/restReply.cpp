@@ -92,7 +92,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       if (metricsMgr.isOn())
         metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
     }
-    
+
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
 
 #ifdef ORIONLD
@@ -101,7 +101,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       free(orionldState.responsePayload);
       orionldState.responsePayload = NULL;
     }
-#endif    
+#endif
 
     return;
   }
@@ -124,8 +124,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     //
     // For error-responses, never respond with application/ld+json
+    // Same same for 207
     //
     if ((ciP->httpStatusCode >= 400) && (ciP->outMimeType == JSONLD))
+      ciP->outMimeType = JSON;
+    if (orionldState.httpStatusCode == 207)
       ciP->outMimeType = JSON;
 
     if (orionldState.acceptGeojson == true)
@@ -198,7 +201,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     free(orionldState.responsePayload);
     orionldState.responsePayload = NULL;
   }
-#endif    
+#endif
 }
 
 

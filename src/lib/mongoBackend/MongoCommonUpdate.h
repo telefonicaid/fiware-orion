@@ -49,7 +49,7 @@ extern void processContextElement
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePath,
   const char*                          xauthToken,
-  const std::string&                   fiwareCorrelator,
+  const char*                          fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion       = V1,
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR

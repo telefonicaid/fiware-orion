@@ -472,7 +472,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
                                 orionldState.tenantP,
                                 servicePathV,
                                 orionldState.xAuthToken,
-                                ciP->httpHeaders.correlator.c_str(),
+                                orionldState.correlator,
                                 orionldState.attrsFormat,
                                 orionldState.apiVersion,
                                 NGSIV2_NO_FLAVOUR);

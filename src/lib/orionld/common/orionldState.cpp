@@ -161,6 +161,7 @@ void orionldStateInit(void)
 
   //  Default values for HTTP headers
   orionldState.attrsFormat = (char*) "normalized";
+  orionldState.correlator  = (char*) "";
 }
 
 

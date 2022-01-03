@@ -347,7 +347,6 @@ static bool kjTreeToMetadataValue(Metadata* metadataP, KjNode* valueP)
 //
 static bool orionldForwardPatchAttribute
 (
-  ConnectionInfo*  ciP,
   KjNode*          registrationP,
   const char*      entityId,
   const char*      attrName,
@@ -682,7 +681,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
         dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
 
       orionldState.noDbUpdate = true;  // No TRoE for data that is not local in the broker
-      return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, inAttribute);
+      return orionldForwardPatchAttribute(regArray->value.firstChildP, entityId, attrName, inAttribute);
     }
   }
 
@@ -851,7 +850,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
                                                    orionldState.tenantP,
                                                    servicePathV,
                                                    orionldState.xAuthToken,
-                                                   ciP->httpHeaders.correlator.c_str(),
+                                                   orionldState.correlator,
                                                    orionldState.attrsFormat,
                                                    orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);

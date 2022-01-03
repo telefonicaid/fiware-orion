@@ -1741,6 +1741,7 @@ static MHD_Result connectionTreat
     orionldState.notify       = false;
     orionldState.urlPath      = (char*) url;
     orionldState.attrsFormat  = (char*) "normalized";
+    orionldState.correlator   = (char*) "";
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 

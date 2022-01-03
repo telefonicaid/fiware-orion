@@ -411,7 +411,7 @@ void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
 //  }
 // }
 //
-static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patchTree, KjNode* dbRegistrationP)
+static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegistrationP)
 {
   KjNode* informationP         = NULL;
   KjNode* endpointP            = NULL;
@@ -628,7 +628,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
   fixDbRegistration(dbRegistrationP);
 
   // Convert the patch-payload to valid APIv1 Database model
-  ngsildRegistrationToAPIv1Datamodel(ciP, orionldState.requestTree, dbRegistrationP);
+  ngsildRegistrationToAPIv1Datamodel(orionldState.requestTree, dbRegistrationP);
 
   // Now we're ready to merge to patch into what's already there ...
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);
