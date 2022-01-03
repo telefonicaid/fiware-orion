@@ -90,7 +90,7 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
+static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
@@ -551,7 +551,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // modified.
   // ngsildSubscriptionPatch() performs that modification
   //
-  if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
+  if (ngsildSubscriptionPatch(dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
   // Update modifiedAt

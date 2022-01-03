@@ -91,7 +91,7 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
 
   for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
   {
-    KjNode* registrationNodeP = kjTreeFromRegistration(ciP, &registrationVec[ix]);
+    KjNode* registrationNodeP = kjTreeFromRegistration(&registrationVec[ix]);
     kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
 

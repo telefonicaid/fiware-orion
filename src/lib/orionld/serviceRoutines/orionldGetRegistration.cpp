@@ -53,7 +53,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
 
   // Transform to KjNode tree
   orionldState.httpStatusCode  = SccOk;
-  orionldState.responseTree    = kjTreeFromRegistration(ciP, &registration);
+  orionldState.responseTree    = kjTreeFromRegistration(&registration);
 
   return true;
 }
