@@ -268,10 +268,10 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     ++header;
   }
 
-  if (orionldState.xauthHeader != NULL)
+  if (orionldState.xAuthToken != NULL)
   {
     headerV[header].type  = HttpHeaderXauth;
-    headerV[header].value = orionldState.xauthHeader;
+    headerV[header].value = orionldState.xAuthToken;
     ++header;
   }
 
@@ -299,7 +299,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 //
 // orionldForwardGetEntity -
 //
-static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
+static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
 {
   //
   // Treat all hits from the registrations
@@ -540,7 +540,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
+    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
   }
 
   return true;

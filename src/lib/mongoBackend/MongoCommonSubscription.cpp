@@ -340,7 +340,7 @@ void setCondsAndInitialNotify
   RenderFormat                     attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone

@@ -290,6 +290,10 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   {
     orionldState.attrsFormat = (char*) value;
   }
+  else if (strcmp(key, "X-Auth-Token") == 0)
+  {
+    orionldState.xAuthToken = (char*) value;
+  }
 
   return MHD_YES;
 }

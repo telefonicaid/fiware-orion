@@ -88,7 +88,7 @@ void Notifier::sendNotifyContextRequest
     NotifyContextRequest*            ncrP,
     const ngsiv2::HttpInfo&          httpInfo,
     const std::string&               tenant,
-    const std::string&               xauthToken,
+    const char*                      xauthToken,
     const std::string&               fiwareCorrelator,
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsOrder,
@@ -209,7 +209,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const ContextElementResponseVector&  cv,
     const ngsiv2::HttpInfo&              httpInfo,
     const std::string&                   tenant,
-    const std::string&                   xauthToken,
+    const char*                          xauthToken,
     const std::string&                   fiwareCorrelator,
     RenderFormat                         renderFormat,
     const std::vector<std::string>&      attrsOrder,
@@ -219,6 +219,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
   std::vector<SenderThreadParams*>*  paramsV;
 
   paramsV = new std::vector<SenderThreadParams*>;
+
+  if (xauthToken == NULL)
+    xauthToken = "";
 
   for (unsigned ix = 0; ix < cv.size(); ix++)
   {
@@ -438,7 +441,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   NotifyContextRequest*            ncrP,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
@@ -602,7 +605,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->verb             = verbName(verb);
     params->tenant           = tenant;
     params->servicePath      = spathList;
-    params->xauthToken       = xauthToken;
+    params->xauthToken       = (xauthToken == NULL)? "" : xauthToken;
     params->resource         = uriPath;
     params->content_type     = contentType;
     params->content          = payloadString;

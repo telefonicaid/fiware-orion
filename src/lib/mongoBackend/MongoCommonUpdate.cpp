@@ -1834,7 +1834,7 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      subId,
   RenderFormat                     renderFormat,
   OrionldTenant*                   tenantP,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   const std::vector<std::string>&  attrsOrder,
   const ngsiv2::HttpInfo&          httpInfo,
@@ -2144,7 +2144,7 @@ static bool processSubscriptions
   ContextElementResponse*                        notifyCerP,
   std::string*                                   err,
   OrionldTenant*                                 tenantP,
-  const std::string&                             xauthToken,
+  const char*                                    xauthToken,
   const std::string&                             fiwareCorrelator
 )
 {
@@ -3417,7 +3417,7 @@ static void updateEntity
   ActionType                      action,
   OrionldTenant*                  tenantP,
   const std::vector<std::string>& servicePathV,
-  const std::string&              xauthToken,
+  const char*                     xauthToken,
   ContextElement*                 ceP,
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
@@ -3895,7 +3895,7 @@ void processContextElement
   ActionType                           action,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  const std::string&                   xauthToken,
+  const char*                          xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion,

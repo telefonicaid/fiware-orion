@@ -248,7 +248,7 @@ int httpRequestSendWithCurl
    const std::string&                         verb,
    const char*                                tenant,
    const std::string&                         servicePath,
-   const std::string&                         xauthToken,
+   const char*                                xauthToken,
    const std::string&                         resource,
    const std::string&                         orig_content_type,
    const std::string&                         content,
@@ -399,7 +399,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
-  if (xauthToken != "")
+  if ((xauthToken != NULL) && (xauthToken[0] != 0))
   {
     std::string xauthTokenHeaderValue = xauthToken;
     httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -637,7 +637,7 @@ int httpRequestSend
    const std::string&                         verb,
    const char*                                tenant,
    const std::string&                         servicePath,
-   const std::string&                         xauthToken,
+   const char*                                xauthToken,
    const std::string&                         resource,
    const std::string&                         orig_content_type,
    const std::string&                         content,

@@ -357,7 +357,7 @@ extern mongo::BSONArray processConditionVector
   bool*                              notificationDone,
   RenderFormat                       renderFormat,
   OrionldTenant*                     tenantP,
-  const std::string&                 xauthToken,
+  const char*                        xauthToken,
   const std::vector<std::string>&    servicePathV,
   const Restriction*                 resP,
   const std::string&                 status,

@@ -48,7 +48,7 @@ extern void processContextElement
   ActionType                           action,
   OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePath,
-  const std::string&                   xauthToken,
+  const char*                          xauthToken,
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   ApiVersion                           apiVersion       = V1,

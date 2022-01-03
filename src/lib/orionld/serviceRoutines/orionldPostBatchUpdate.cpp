@@ -291,7 +291,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                                                    &mongoResponse,
                                                    orionldState.tenantP,
                                                    servicePathV,
-                                                   ciP->httpHeaders.xauthToken.c_str(),
+                                                   orionldState.xAuthToken,
                                                    ciP->httpHeaders.correlator.c_str(),
                                                    orionldState.attrsFormat,
                                                    orionldState.apiVersion,

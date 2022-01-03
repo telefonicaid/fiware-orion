@@ -642,7 +642,7 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   }
   else if (strcasecmp(key, "X-Auth-Token") == 0)
   {
-    orionldState.xauthHeader    = (char*) value;
+    orionldState.xAuthToken     = (char*) value;
     headerP->xauthToken         = value;
   }
   else if (strcasecmp(key, "Authorization") == 0)

@@ -48,7 +48,7 @@ HttpStatusCode mongoNotifyContext
   NotifyContextRequest*            requestP,
   NotifyContextResponse*           responseP,
   OrionldTenant*                   tenantP,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
   const std::string&               fiwareCorrelator,
   const std::string&               ngsiV2AttrsFormat
