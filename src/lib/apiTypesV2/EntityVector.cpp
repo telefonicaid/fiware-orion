@@ -44,11 +44,7 @@
 *
 * EntityVector::render -
 */
-std::string EntityVector::render
-(
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
-)
+std::string EntityVector::render(void)
 {
   if (vec.size() == 0)
   {
@@ -61,7 +57,7 @@ std::string EntityVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(uriParamOptions, uriParam, ix != vec.size() - 1);
+    out += vec[ix]->render(ix != vec.size() - 1);
   }
 
   out += "]";
