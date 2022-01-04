@@ -28,6 +28,7 @@
 #include <time.h>                                                // struct timespec
 #include <semaphore.h>                                           // sem_t
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
+#include <microhttpd.h>                                          // MHD_Connection
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -191,7 +192,8 @@ typedef enum OrionldPhase
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
-  ConnectionInfo*         ciP;
+  MHD_Connection*         mhdConnection;
+  ConnectionInfo*         ciP;                    // To Be Removed
   struct timespec         timestamp;              // The time when the request entered
   double                  requestTime;            // Same same, but at a floating point
   char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
@@ -213,7 +215,6 @@ typedef struct OrionldConnectionState
   bool                    linkHeaderAdded;
   bool                    noLinkHeader;
   char*                   preferHeader;
-  char*                   xauthHeader;
   char*                   authorizationHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
@@ -323,7 +324,26 @@ typedef struct OrionldConnectionState
   KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
 
 
+  //
+  // Incoming HTTP headers
+  //
+
+  // NGSI-LD Scope (or NGSIv2 ServicePath)
+  char* scopeV[10];
+  int   scopes;
+
+  // Attribute Format
+  char* attrsFormat;
+
+  // X-Auth-Token
+  char* xAuthToken;
+
+  // FIWARE Correlator
+  char* correlator;
+
+  //
   // Error Handling
+  //
   OrionldProblemDetails   pd;
 } OrionldConnectionState;
 
@@ -437,7 +457,7 @@ extern sem_t                 mongoContextsSem;
 //
 // orionldStateInit - initialize the thread-local variable orionldState
 //
-extern void orionldStateInit(void);
+extern void orionldStateInit(MHD_Connection* connection);
 
 
 

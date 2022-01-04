@@ -91,7 +91,7 @@ static void* workerFunc(void* pSyncQ)
   }
 
   // Initialize kjson and kalloc libs - needed for MQTT
-  orionldStateInit();
+  orionldStateInit(NULL);
   orionldState.kjson.spacesPerIndent    = 0;
   orionldState.kjson.stringBeforeColon  = (char*) "";
   orionldState.kjson.stringAfterColon   = (char*) "";
@@ -175,7 +175,7 @@ static void* workerFunc(void* pSyncQ)
                                     params->verb,
                                     params->tenant.c_str(),
                                     params->servicePath,
-                                    params->xauthToken,
+                                    params->xauthToken.c_str(),
                                     params->resource,
                                     params->content_type,
                                     params->content,

@@ -50,7 +50,7 @@ extern "C"
 //
 // kjTreeFromRegistration -
 //
-KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* registrationP)
+KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP)
 {
   KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*          objectP;

@@ -66,9 +66,7 @@ class Entity
   Entity();
   ~Entity();
 
-  std::string  render(std::map<std::string, bool>&         uriParamOptions,
-                      std::map<std::string, std::string>&  uriParam,
-                      bool                                 comma = false);
+  std::string  render(bool comma = false);
 
   std::string  check(RequestType requestType);
   void         release(void);

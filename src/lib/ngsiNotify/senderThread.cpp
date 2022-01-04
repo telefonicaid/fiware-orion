@@ -77,7 +77,7 @@ void* startSenderThread(void* p)
                           params->verb,
                           params->tenant.c_str(),
                           params->servicePath,
-                          params->xauthToken,
+                          params->xauthToken.c_str(),
                           params->resource,
                           params->content_type,
                           params->content,

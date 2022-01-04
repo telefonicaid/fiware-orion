@@ -133,7 +133,6 @@ typedef struct HttpHeaders
   std::string   origin;
   std::string   tenant;
   std::string   servicePath;
-  std::string   xauthToken;
   std::string   xrealIp;
   std::string   xforwardedFor;
   std::string   correlator;

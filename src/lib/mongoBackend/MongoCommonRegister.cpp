@@ -321,7 +321,7 @@ HttpStatusCode processRegisterContext
   RegisterContextResponse*  responseP,
   OID*                      id,
   OrionldTenant*            tenantP,
-  const std::string&        servicePath,
+  const char*               servicePath,
   const std::string&        format,
   const std::string&        fiwareCorrelator
 )
@@ -356,7 +356,7 @@ HttpStatusCode processRegisterContext
   reg.append(REG_EXPIRATION, expiration);
 
   // FIXME P4: See issue #3078
-  reg.append(REG_SERVICE_PATH, servicePath == "" ? SERVICE_PATH_ROOT : servicePath);
+  reg.append(REG_SERVICE_PATH, (servicePath == NULL)? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
 

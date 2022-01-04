@@ -53,7 +53,7 @@ HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityResponse*   responseP,
   const std::string&                   fiwareCorrelator,
   OrionldTenant*                       tenantP,
-  const std::string&                   servicePath
+  const char*                          servicePath
 )
 {
   if (tenantP == NULL)

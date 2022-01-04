@@ -27,13 +27,14 @@
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_FT
+#include "kbase/kMacros.h"                                       // K_FT, K_VEC_SIZE
 #include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "common/wsStrip.h"                                      // wsStrip
 #include "rest/Verb.h"                                           // Verb
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
@@ -150,9 +151,9 @@ Verb verbGet(const char* method)
 //
 // ipAddressAndPort -
 //
-static void ipAddressAndPort(ConnectionInfo* ciP)
+static void ipAddressAndPort(void)
 {
-  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(orionldState.mhdConnection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
 
   if (mciP != NULL)
   {
@@ -219,17 +220,87 @@ static void optionsParse(const char* options)
 }
 
 
-#if 0
+
+// -----------------------------------------------------------------------------
+//
+// strSplit -
+//
+static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
+{
+  if (s == NULL)
+    return 0;
+
+  if (*s == 0)
+    return 0;
+
+  int   outIx = 0;
+  char* start = s;
+
+  //
+  // Loop over 's':
+  // - Search for the delimiter
+  // - zero-terminate
+  // - assign and
+  // - continue
+  //
+  while (*s != 0)
+  {
+    if (*s == delimiter)
+    {
+      *s = 0;
+      outV[outIx] = wsStrip(start);
+      start = &s[1];
+
+      // Check that the scope starts with a slash, etc ...
+      // if (scopeCheck(outV[outIx]) == false) ...
+
+      if (++outIx > outMaxItems)
+        return -1;
+    }
+
+    ++s;
+  }
+
+  outV[outIx] = wsStrip(start);
+
+  ++outIx;
+
+  return outIx;
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // orionldHttpHeaderGet -
 //
-static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
-  if (strcmp(key, "NGSILD-Tenant") == 0)
-    orionldState.httpHeaders.tenant = value;
+  if (strcmp(key, "NGSILD-Scope") == 0)
+  {
+    orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
+    if (orionldState.scopes == -1)
+    {
+      LM_W(("Bad Input (too many scopes)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value);
+      orionldState.httpStatusCode = 400;
+    }
+  }
+  else if (strcmp(key, "Ngsiv2-AttrsFormat") == 0)  // FIXME: This header name needs to change for NGSI-LD
+  {
+    orionldState.attrsFormat = (char*) value;
+  }
+  else if (strcmp(key, "X-Auth-Token") == 0)
+  {
+    orionldState.xAuthToken = (char*) value;
+  }
+  else if (strcmp(key, "Fiware-Correlator") == 0)
+  {
+    orionldState.correlator = (char*) value;
+  }
+
+  return MHD_YES;
 }
-#endif
 
 
 
@@ -585,20 +656,15 @@ MHD_Result orionldMhdConnectionInit
   // Remember ciP for consequent connection callbacks from MHD
   *con_cls = ciP;
 
-  // The 'connection', as given by MHD is very important. No responses can be sent without it
-  ciP->connection = connection;
-
-
-  // IP Address and port of caller
-  ipAddressAndPort(ciP);
-
   //
   // 2. Prepare orionldState
   //
-  orionldStateInit();
+  orionldStateInit(connection);
   orionldState.ciP         = ciP;
   orionldState.httpVersion = (char*) version;
 
+  // IP Address and port of caller
+  ipAddressAndPort();
 
   // By default, no whitespace in output
   orionldState.kjsonP->spacesPerIndent   = 0;
@@ -703,8 +769,14 @@ MHD_Result orionldMhdConnectionInit
     orionldState.httpStatusCode = 400;
   }
 
+  //
   // Get HTTP Headers
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
+  // First we call the Orion-LD function 'orionldHttpHeaderGet' and then the Orion/NGSIv2 function 'httpHeaderGet'
+  // Any header cannot be part of both functions.
+  // The idea is to move all headers from httpHeaderGet to orionldHttpHeaderGet
+  //
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderGet, NULL);
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
   //
   // Any error detected during httpHeaderGet calls?

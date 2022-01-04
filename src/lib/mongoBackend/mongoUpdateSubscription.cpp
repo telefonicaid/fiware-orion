@@ -288,7 +288,7 @@ static void setCondsAndInitialNotifyNgsiv1
   RenderFormat                     attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
@@ -371,7 +371,7 @@ static void setCondsAndInitialNotify
   const BSONObj*                   subOrigP,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
@@ -847,7 +847,7 @@ std::string mongoUpdateSubscription
   OrionError*                      oe,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator
 )
 {
@@ -901,7 +901,7 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder      b;
-  std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  const char*         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0].c_str();
   bool                notificationDone = false;
   double              lastNotification = 0;
   double              lastFailure      = 0;

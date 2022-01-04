@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
+
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
@@ -61,7 +64,7 @@ extern "C"
 //   * PATCH /entities/*/attrs
 //   * etc
 //
-bool attributeCheck(ConnectionInfo* ciP, KjNode* attrNodeP, char** titleP, char** detailP)
+static bool attributeCheck(KjNode* attrNodeP, char** titleP, char** detailP)
 {
   if (attrNodeP->type != KjObject)
   {
@@ -233,8 +236,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   while (newAttrP != NULL)
   {
     KjNode*  dbAttrP;
-    char*    title;
-    char*    detail;
+    char*    title     = (char*) "No Title";
+    char*    detail    = (char*) "No Detail";
     char*    shortName = newAttrP->name;
 
     next = newAttrP->next;
@@ -261,7 +264,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
 
     // Is the attribute in the incoming payload a valid attribute?
-    if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
+    if (attributeCheck(newAttrP, &title, &detail) == false)
     {
       LM_E(("attributeCheck: %s: %s", title, detail));
       attributeNotUpdated(notUpdatedP, shortName, detail);
@@ -318,15 +321,17 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
 
     // 8. Call mongoBackend to do the REPLACE of the entity
-    UpdateContextResponse  ucResponse;
+    UpdateContextResponse    ucResponse;
+    std::vector<std::string> servicePathV;
+    servicePathV.push_back("/");
 
     orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
                                                      &ucResponse,
                                                      orionldState.tenantP,
-                                                     ciP->servicePathV,
-                                                     ciP->httpHeaders.xauthToken.c_str(),
-                                                     ciP->httpHeaders.correlator.c_str(),
-                                                     ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                     servicePathV,
+                                                     orionldState.xAuthToken,
+                                                     orionldState.correlator,
+                                                     orionldState.attrsFormat,
                                                      orionldState.apiVersion,
                                                      NGSIV2_NO_FLAVOUR);
 

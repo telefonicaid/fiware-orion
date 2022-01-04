@@ -640,12 +640,9 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
     }
   }
-  else if (strcasecmp(key, "NGSILD-Path") == 0)
-    orionldState.servicePath = (char*) value;
   else if (strcasecmp(key, "X-Auth-Token") == 0)
   {
-    orionldState.xauthHeader    = (char*) value;
-    headerP->xauthToken         = value;
+    orionldState.xAuthToken     = (char*) value;
   }
   else if (strcasecmp(key, "Authorization") == 0)
     orionldState.authorizationHeader = (char*) value;
@@ -1734,7 +1731,7 @@ static MHD_Result connectionTreat
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //
     kTimeGet(&orionldState.timestamp);
-    orionldStateInit();
+    orionldStateInit(connection);
     orionldState.httpVersion  = (char*) version;
     orionldState.apiVersion   = apiVersionGet(url);
     orionldState.verbString   = (char*) method;
@@ -1743,6 +1740,8 @@ static MHD_Result connectionTreat
     orionldState.responseTree = NULL;
     orionldState.notify       = false;
     orionldState.urlPath      = (char*) url;
+    orionldState.attrsFormat  = (char*) "normalized";
+    orionldState.correlator   = (char*) "";
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 

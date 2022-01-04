@@ -75,12 +75,7 @@ Entity::~Entity()
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
 */
-std::string Entity::render
-(
-  std::map<std::string, bool>&         uriParamOptionsObsolete,  // not to be used
-  std::map<std::string, std::string>&  uriParamObsolete,         // not to be used
-  bool                                 comma
-)
+std::string Entity::render(bool comma)
 {
   if ((oe.details != "") || ((oe.reasonPhrase != "OK") && (oe.reasonPhrase != "")))
   {
@@ -105,10 +100,10 @@ std::string Entity::render
 
 
   // Add special attributes representing entity dates
-  // Note 'uriParamOptions[DATE_CREATED/DATE_MODIFIED] ||' is needed due to backward compability
   if ((creDate != 0) && ((orionldState.uriParamOptions.dateCreated == true) || (std::find(attrsFilter.begin(), attrsFilter.end(), DATE_CREATED) != attrsFilter.end())))
   {
     ContextAttribute* creDateAttrP = attributeVector.lookup(DATE_CREATED);
+
     if (creDateAttrP == NULL)
     {
       // If not found - create it

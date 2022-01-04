@@ -46,7 +46,7 @@ extern HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityResponse*   responseP,
   const std::string&                   fiwareCorrelator = "no correlator",
   OrionldTenant*                       tenantP          = NULL,
-  const std::string&                   servicePath      = ""
+  const char*                          servicePath      = NULL
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXTAVAILABILITY_H_

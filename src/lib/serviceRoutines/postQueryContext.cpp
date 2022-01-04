@@ -131,7 +131,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       verb,
                       orionldState.tenantP->tenant,
                       servicePath,
-                      ciP->httpHeaders.xauthToken,
+                      orionldState.xAuthToken,
                       resource,
                       mimeType,
                       payload,
@@ -293,15 +293,15 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
-  if ((orionldState.apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  if ((orionldState.apiVersion == V2) && (orionldState.uriParams.count == true))
   {
     countP = &count;
   }
-  else if ((orionldState.apiVersion == V1) && (ciP->uriParam["details"] == "on"))
+  else if ((orionldState.apiVersion == V1) && (orionldState.uriParams.details == true))
   {
     countP = &count;
   }
-  else if ((orionldState.apiVersion == NGSI_LD_V1) && (ciP->uriParamOptions["count"]))
+  else if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParams.count == true))
     countP = &count;
 
 
@@ -314,7 +314,6 @@ std::string postQueryContext
                                                       qcrsP,
                                                       orionldState.tenantP,
                                                       ciP->servicePathV,
-                                                      ciP->uriParamOptions,
                                                       countP,
                                                       orionldState.apiVersion));
 
@@ -528,10 +527,7 @@ std::string postQueryContext
     }
   }
 
-  std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
-  bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-
-  TIMED_RENDER(answer = responseV.render(orionldState.apiVersion, asJsonObject, details, qcrsP->errorCode.details));
+  TIMED_RENDER(answer = responseV.render(orionldState.apiVersion, asJsonObject, orionldState.uriParams.details, qcrsP->errorCode.details));
 
 
   //

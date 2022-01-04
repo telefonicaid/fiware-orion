@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>                                              // std::string
+#include <vector>                                              // std::vector
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
@@ -92,9 +93,11 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   // Create the Registration
   //
+  std::vector<std::string>  servicePathV;
+
   mongoRegistrationCreate(&reg,
                           orionldState.tenantP,
-                          ciP->servicePathV[0],
+                          "/",
                           &regId,
                           &oError);
 

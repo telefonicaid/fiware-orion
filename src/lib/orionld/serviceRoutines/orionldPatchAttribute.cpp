@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
+
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
@@ -347,7 +350,6 @@ static bool kjTreeToMetadataValue(Metadata* metadataP, KjNode* valueP)
 //
 static bool orionldForwardPatchAttribute
 (
-  ConnectionInfo*  ciP,
   KjNode*          registrationP,
   const char*      entityId,
   const char*      attrName,
@@ -682,7 +684,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
         dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
 
       orionldState.noDbUpdate = true;  // No TRoE for data that is not local in the broker
-      return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, inAttribute);
+      return orionldForwardPatchAttribute(regArray->value.firstChildP, entityId, attrName, inAttribute);
     }
   }
 
@@ -841,16 +843,18 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // 11. Call mongoBackend
   //
-  UpdateContextResponse  mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   ucr.updateActionType        = ActionTypeUpdate;
   orionldState.httpStatusCode = mongoUpdateContext(&ucr,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
-                                                   ciP->httpHeaders.xauthToken.c_str(),
-                                                   ciP->httpHeaders.correlator.c_str(),
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                   servicePathV,
+                                                   orionldState.xAuthToken,
+                                                   orionldState.correlator,
+                                                   orionldState.attrsFormat,
                                                    orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 

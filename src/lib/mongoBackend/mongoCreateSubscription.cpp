@@ -162,7 +162,7 @@ std::string mongoCreateSubscription
   OrionError*                      oe,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator
 #ifdef ORIONLD
   , const std::string&             ldContext
@@ -186,7 +186,7 @@ std::string mongoCreateSubscription
   setExpiration(sub, &b);
   setHttpInfo(sub, &b);
   setThrottling(sub, &b);
-  setServicePath(servicePath, &b);
+  setServicePath(servicePath.c_str(), &b);
   setDescription(sub, &b);
   setStatus(sub, &b);
   setEntities(sub, &b);

@@ -25,14 +25,14 @@
 *
 * Author: Larysse Savanna
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Registration.h"                           // Registration
+
 
 
 // -----------------------------------------------------------------------------
 //
 // kjTreeFromRegistration -
 //
-extern KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* registrationP);
+extern KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMREGISTRATION_H_

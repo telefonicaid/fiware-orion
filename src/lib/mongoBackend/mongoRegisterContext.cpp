@@ -86,7 +86,7 @@ HttpStatusCode mongoRegisterContext
   /* Check if new registration */
   if (requestP->registrationId.isEmpty())
   {
-    HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenantP, sPath, "JSON", fiwareCorrelator);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenantP, sPath.c_str(), "JSON", fiwareCorrelator);
 
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
@@ -139,7 +139,7 @@ HttpStatusCode mongoRegisterContext
     return SccOk;
   }
 
-  HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenantP, sPath, "JSON", fiwareCorrelator);
+  HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenantP, sPath.c_str(), "JSON", fiwareCorrelator);
   reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
   return result;
 }

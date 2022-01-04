@@ -104,7 +104,7 @@ std::string postBatchQuery
   {
     entities.fill(&parseDataP->qcrs.res);
 
-    TIMED_RENDER(answer = entities.render(ciP->uriParamOptions, ciP->uriParam));
+    TIMED_RENDER(answer = entities.render());
   }
 
   // 04. Cleanup and return result

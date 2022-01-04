@@ -206,10 +206,10 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 *
 * setServicePath -
 */
-void setServicePath(const std::string& servicePath, BSONObjBuilder* b)
+void setServicePath(const char* servicePath, BSONObjBuilder* b)
 {
   b->append(CSUB_SERVICE_PATH, servicePath);
-  LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath.c_str()));
+  LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath));
 }
 
 
@@ -340,7 +340,7 @@ void setCondsAndInitialNotify
   RenderFormat                     attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone

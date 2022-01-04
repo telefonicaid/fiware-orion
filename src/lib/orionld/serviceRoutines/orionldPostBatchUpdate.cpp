@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin, Gabriel Quaresma
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -282,16 +285,18 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   }
 
 
-  UpdateContextResponse mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   PERFORMANCE(mongoBackendStart);
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
-                                                   ciP->httpHeaders.xauthToken.c_str(),
-                                                   ciP->httpHeaders.correlator.c_str(),
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                   servicePathV,
+                                                   orionldState.xAuthToken,
+                                                   orionldState.correlator,
+                                                   orionldState.attrsFormat,
                                                    orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
   PERFORMANCE(mongoBackendEnd);

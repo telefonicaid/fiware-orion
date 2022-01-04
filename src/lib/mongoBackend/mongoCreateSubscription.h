@@ -50,7 +50,7 @@ extern std::string mongoCreateSubscription
   OrionError*                      oe,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator
 #ifdef ORIONLD
   , const std::string&             ldContext = ""

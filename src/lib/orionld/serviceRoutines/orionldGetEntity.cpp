@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
@@ -268,10 +271,10 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     ++header;
   }
 
-  if (orionldState.xauthHeader != NULL)
+  if (orionldState.xAuthToken != NULL)
   {
     headerV[header].type  = HttpHeaderXauth;
-    headerV[header].value = orionldState.xauthHeader;
+    headerV[header].value = orionldState.xAuthToken;
     ++header;
   }
 
@@ -299,7 +302,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 //
 // orionldForwardGetEntity -
 //
-static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
+static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
 {
   //
   // Treat all hits from the registrations
@@ -428,18 +431,18 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
 
 #ifdef USE_MONGO_BACKEND
-  bool                  keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId              entityId(orionldState.wildcard[0], "", "false", false);
-  QueryContextRequest   request;
-  QueryContextResponse  response;
+  bool                      keyValues = orionldState.uriParamOptions.keyValues;
+  EntityId                  entityId(orionldState.wildcard[0], "", "false", false);
+  QueryContextRequest       request;
+  QueryContextResponse      response;
+  std::vector<std::string>  servicePathV;
 
   request.entityIdVector.push_back(&entityId);
 
   orionldState.httpStatusCode = mongoQueryContext(&request,
                                                   &response,
                                                   orionldState.tenantP,
-                                                  ciP->servicePathV,
-                                                  ciP->uriParamOptions,
+                                                  servicePathV,
                                                   NULL,
                                                   orionldState.apiVersion);
 
@@ -539,7 +542,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
+    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
   }
 
   return true;

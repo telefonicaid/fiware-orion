@@ -22,6 +22,9 @@
 *
 * Author: Gabriel Quaresma and Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -380,15 +383,17 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 08. Call mongoBackend - to create/modify the entities
   //     In case of REPLACE, all entities have been removed from the DB prior to this call, so, they will all be created.
   //
-  UpdateContextResponse mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenantP,
-                                                   ciP->servicePathV,
-                                                   ciP->httpHeaders.xauthToken.c_str(),
-                                                   ciP->httpHeaders.correlator.c_str(),
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                   servicePathV,
+                                                   orionldState.xAuthToken,
+                                                   orionldState.correlator,
+                                                   orionldState.attrsFormat,
                                                    orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
