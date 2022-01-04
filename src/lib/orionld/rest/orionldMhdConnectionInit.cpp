@@ -232,7 +232,7 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
 
   if (*s == 0)
     return 0;
-  
+
   int   outIx = 0;
   char* start = s;
 

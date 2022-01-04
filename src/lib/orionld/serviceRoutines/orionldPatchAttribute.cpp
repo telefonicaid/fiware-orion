@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
+
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                                     // kaStrdup

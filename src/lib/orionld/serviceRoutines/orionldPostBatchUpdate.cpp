@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin, Gabriel Quaresma
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT

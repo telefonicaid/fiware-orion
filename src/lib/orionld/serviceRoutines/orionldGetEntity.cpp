@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
