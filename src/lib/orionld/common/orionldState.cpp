@@ -163,6 +163,54 @@ void orionldStateInit(MHD_Connection* connection)
   //  Default values for HTTP headers
   orionldState.attrsFormat = (char*) "normalized";
   orionldState.correlator  = (char*) "";
+
+  // Outgoing HTTP headers
+  orionldState.outHttpHeader     = orionldState.outHttpHeaderV;
+  orionldState.outHttpHeaderSize = K_VEC_SIZE(orionldState.outHttpHeaderV);
+  orionldState.outHttpHeaderIx   = 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldOutHeaderAdd -
+//
+void orionldOutHeaderAdd(char* key, char* sValue, int iValue)
+{
+  if (orionldState.outHttpHeaderIx >= orionldState.outHttpHeaderSize)
+  {
+    char** oldArray = orionldState.outHttpHeader;
+
+    orionldState.outHttpHeaderSize += 5;
+    orionldState.outHttpHeader      = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * orionldState.outHttpHeaderSize);
+    if (orionldState.outHttpHeader == NULL)
+      LM_X(1, ("Out of memory trying to allocate room for %d outgoing HTTP headers", orionldState.outHttpHeaderSize));
+
+    // Copying the already existing header pointers to the new buffer
+    memcpy(orionldState.outHttpHeader, oldArray, orionldState.outHttpHeaderSize - 5);
+  }
+
+  int size = strlen(key) + 2;  // 2: colon + end-of-string
+
+  if (sValue != NULL)
+    size += strlen(sValue);
+  else
+    size += 16;  // 16: plenty of room for an integer
+
+  char* header = kaAlloc(&orionldState.kalloc, size);
+
+  if (header == NULL)
+    LM_X(1, ("Out of memory trying to allocate %d bytes for an outgoing HTTP header", size));
+
+  orionldState.outHttpHeader[orionldState.outHttpHeaderIx] = header;
+
+  if (sValue != NULL)
+    snprintf(header, size - 1, "%s:%s", key, sValue);
+  else
+    snprintf(header, size - 1, "%s:%d", key, iValue);
+
+  ++orionldState.outHttpHeaderIx;
 }
 
 

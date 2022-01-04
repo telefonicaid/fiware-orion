@@ -325,8 +325,13 @@ typedef struct OrionldConnectionState
 
 
   //
-  // Incoming HTTP headers
+  // Outgoing HTTP headers
   //
+  char*  outHttpHeaderV[10];    // Buffer, to be used if less than 10 headers
+  char** outHttpHeader;         // Points to outHttpHeaderV, reallocated if necessary
+  int    outHttpHeaderSize;     // Max number of headers (reallocation if necessary)
+  int    outHttpHeaderIx;       // Current index of outHttpHeader
+
 
   // NGSI-LD Scope (or NGSIv2 ServicePath)
   char* scopeV[10];
