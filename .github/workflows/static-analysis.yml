@@ -1,7 +1,7 @@
 name: Static code analysis
 
 on:
-  push:
+  pull_request:
 
 jobs:
   build:
@@ -22,6 +22,7 @@ jobs:
         with:
           check_name: cppcheck
           linter_output_path: cppcheck_report.txt
+          commit_sha: ${{ github.event.pull_request.head.sha }}
 
       - name: Upload report
         uses: actions/upload-artifact@v2
