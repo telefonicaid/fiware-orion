@@ -151,9 +151,9 @@ Verb verbGet(const char* method)
 //
 // ipAddressAndPort -
 //
-static void ipAddressAndPort(ConnectionInfo* ciP)
+static void ipAddressAndPort(void)
 {
-  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+  const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(orionldState.mhdConnection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
 
   if (mciP != NULL)
   {
@@ -656,20 +656,15 @@ MHD_Result orionldMhdConnectionInit
   // Remember ciP for consequent connection callbacks from MHD
   *con_cls = ciP;
 
-  // The 'connection', as given by MHD is very important. No responses can be sent without it
-  ciP->connection = connection;
-
-
-  // IP Address and port of caller
-  ipAddressAndPort(ciP);
-
   //
   // 2. Prepare orionldState
   //
-  orionldStateInit();
+  orionldStateInit(connection);
   orionldState.ciP         = ciP;
   orionldState.httpVersion = (char*) version;
 
+  // IP Address and port of caller
+  ipAddressAndPort();
 
   // By default, no whitespace in output
   orionldState.kjsonP->spacesPerIndent   = 0;

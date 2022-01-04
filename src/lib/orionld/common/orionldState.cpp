@@ -119,7 +119,7 @@ sem_t                 mongoContextsSem;
 //
 // orionldStateInit - initialize the thread-local variable orionldState
 //
-void orionldStateInit(void)
+void orionldStateInit(MHD_Connection* connection)
 {
   //
   // NOTE
@@ -134,6 +134,7 @@ void orionldStateInit(void)
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 64 * 1024, NULL, "Thread KAlloc buffer");
 
   kTimeGet(&orionldState.timestamp);
+  orionldState.mhdConnection           = connection;
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;

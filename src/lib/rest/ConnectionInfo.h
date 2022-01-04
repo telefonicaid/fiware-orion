@@ -74,7 +74,6 @@ public:
   ConnectionInfo(MHD_Connection* _connection);
   ~ConnectionInfo();
 
-  MHD_Connection*            connection;
   MimeType                   inMimeType;
   MimeType                   outMimeType;
   int                        urlComponents;

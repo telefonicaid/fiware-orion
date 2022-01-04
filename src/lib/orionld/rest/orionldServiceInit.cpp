@@ -574,7 +574,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);
 
-  orionldStateInit();
+  orionldStateInit(NULL);  // This is the "global instance" of orionldState
 
   //
   // Initialize the @context handling

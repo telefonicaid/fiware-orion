@@ -192,7 +192,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
-  MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
+  MHD_queue_response(orionldState.mhdConnection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 
 #ifdef ORIONLD

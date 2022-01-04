@@ -1731,7 +1731,7 @@ static MHD_Result connectionTreat
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //
     kTimeGet(&orionldState.timestamp);
-    orionldStateInit();
+    orionldStateInit(connection);
     orionldState.httpVersion  = (char*) version;
     orionldState.apiVersion   = apiVersionGet(url);
     orionldState.verbString   = (char*) method;

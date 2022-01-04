@@ -66,7 +66,6 @@ static const char* validOptions[] =
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
-  connection             (NULL),
   inMimeType             (JSON),
   outMimeType            (JSON),
   restServiceP           (NULL),
@@ -88,7 +87,6 @@ ConnectionInfo::ConnectionInfo():
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
-  connection             (NULL),
   inMimeType             (JSON),
   outMimeType            (_outMimeType),
   restServiceP           (NULL),
@@ -110,7 +108,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
-  connection             (_connection),
   inMimeType             (JSON),
   outMimeType            (JSON),
   restServiceP           (NULL),
@@ -123,6 +120,8 @@ ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
   compoundValueRoot      (NULL),
   httpStatusCode         (SccOk)
 {
+  orionldState.mhdConnection = _connection;
+
   if ((orionldState.verb != POST)    &&
       (orionldState.verb != PUT)     &&
       (orionldState.verb != GET)     &&

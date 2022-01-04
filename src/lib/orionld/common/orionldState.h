@@ -28,6 +28,7 @@
 #include <time.h>                                                // struct timespec
 #include <semaphore.h>                                           // sem_t
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
+#include <microhttpd.h>                                          // MHD_Connection
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -191,7 +192,8 @@ typedef enum OrionldPhase
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
-  ConnectionInfo*         ciP;
+  MHD_Connection*         mhdConnection;
+  ConnectionInfo*         ciP;                    // To Be Removed
   struct timespec         timestamp;              // The time when the request entered
   double                  requestTime;            // Same same, but at a floating point
   char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
@@ -455,7 +457,7 @@ extern sem_t                 mongoContextsSem;
 //
 // orionldStateInit - initialize the thread-local variable orionldState
 //
-extern void orionldStateInit(void);
+extern void orionldStateInit(MHD_Connection* connection);
 
 
 
