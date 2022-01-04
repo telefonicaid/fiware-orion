@@ -162,7 +162,7 @@ int main(int argC, char** argV)
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   setupDatabase();
-  orionldStateInit();
+  orionldStateInit(NULL);
   orionldState.tenantP = &tenant0;
 
   // To not disturb NGSIv2 unit tests ...
