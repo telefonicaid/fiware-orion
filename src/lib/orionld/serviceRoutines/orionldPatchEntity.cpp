@@ -236,8 +236,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   while (newAttrP != NULL)
   {
     KjNode*  dbAttrP;
-    char*    title     = "No Title";
-    char*    detail    = "No Detail";
+    char*    title     = (char*) "No Title";
+    char*    detail    = (char*) "No Detail";
     char*    shortName = newAttrP->name;
 
     next = newAttrP->next;
