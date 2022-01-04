@@ -17,6 +17,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN}}
           inline_suppression: enable
 
+      - name: Add annotations
+        uses: pytorch/add-annotations-github-action@master
+        with:
+          check_name: cppcheck
+          linter_output_path: cppcheck_report.txt
+
       - name: Upload report
         uses: actions/upload-artifact@v2
         with:
