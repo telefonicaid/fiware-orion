@@ -80,6 +80,7 @@ function usage()
   echo "$empty [-dryrun (don't execute any tests)]"
   echo "$empty [-dryLeaks (simulate leaks and functest errors)]"
   echo "$empty [-fromIx <index of test where to start>]"
+  echo "$empty [-toIx <index of test to end with>]"
   echo "$empty [-ixList <list of testNo indexes>]"
   echo "$empty [test case file]"
 
@@ -185,12 +186,14 @@ fi
 # Parsing parameters
 #
 typeset -i fromIx
+typeset -i toIx
 verbose=off
 TEST_FILTER=${TEST_FILTER:-"*.*test"}
 dryrun=off
 leakTest=off
 dryLeaks=off
 fromIx=0
+toIx=0
 ixList=""
 file=""
 vMsg "parsing options"
@@ -205,6 +208,7 @@ do
   elif [ "$1" == "-dryrun" ];   then dryrun=on;
   elif [ "$1" == "-dryLeaks" ]; then dryLeaks=on;
   elif [ "$1" == "-fromIx" ];   then  shift; fromIx=$1;
+  elif [ "$1" == "-toIx" ];     then  shift; toIx=$1;
   elif [ "$1" == "-ixList" ];   then  shift; ixList=$1;
   else
     if [ "$file" == "" ]
@@ -614,6 +618,14 @@ then
         continue
       fi
     fi
+    if [ $toIx != 0 ]
+    then
+      if [ $testNo -gt $toIx ]
+      then
+        vgDebug "Skipping $file (after toIx)"
+        continue
+      fi
+    fi
 
     if [ "$ixList" != "" ]
     then
@@ -655,7 +667,7 @@ then
     echo -n $init" "
 
     # In the case of harness test, we check that the test is implemented checking
-    # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
+    # that the word VALGRIND_READY appears in the .test file (usually, in a commented line)
     grep VALGRIND_READY $SRC_TOP/test/functionalTest/cases/$directory/$file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
