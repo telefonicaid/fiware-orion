@@ -1,12 +1,11 @@
 name: Valgrind check
 
 on:
-  push:
-#  schedule:
-#    # every night at one
-#    - cron: '0 1 * * *'
-#  # or on a manual trigger
-#  workflow_dispatch:
+  schedule:
+    # every night at one
+    - cron: '0 1 * * *'
+  # or on a manual trigger
+  workflow_dispatch:
 
 jobs:
   valgrind-suite:
