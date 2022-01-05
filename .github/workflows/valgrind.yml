@@ -14,11 +14,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        testIndexToStartAt: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
+        testIndexToStartAt: [0, 5]
+        #, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
     steps:
 
       - uses: actions/checkout@v2
 
       - name: Execute valgrind
         run: |
-          ./test/valgrind/valgrindTestSuite.sh -fromIx ${{ matrix.testIndexToStartAt }} -toIx ${{ matrix.testIndexToStartAt }}+99
+          ./test/valgrind/valgrindTestSuite.sh -fromIx ${{ matrix.testIndexToStartAt }} -toIx ${{ matrix.testIndexToStartAt }}+5
