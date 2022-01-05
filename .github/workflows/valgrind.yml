@@ -1,0 +1,16 @@
+name: Valgrind check
+
+on:
+  push:
+
+jobs:
+  valgrind-suite:
+    runs-on: ubuntu-18.04
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Execute valgrind
+        run: | 
+          ./test/valgrind/valgrindTestSuite.sh
