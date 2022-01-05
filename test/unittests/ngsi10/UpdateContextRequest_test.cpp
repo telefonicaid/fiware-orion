@@ -59,7 +59,6 @@ TEST(UpdateContextRequest, ok_json)
    orionldState.verb = POST;
 
    ci.inMimeType  = JSON;
-   ci.outMimeType = JSON;
 
    lmTraceLevelSet(LmtDump, true);
    std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -94,7 +93,6 @@ TEST(UpdateContextRequest, badIsPattern_json)
 
    orionldState.verb = POST;
    ci.inMimeType  = JSON;
-   ci.outMimeType = JSON;
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile;

@@ -33,7 +33,6 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "orionld/common/numberToDate.h"                       // numberToDate
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext

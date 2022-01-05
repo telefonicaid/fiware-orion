@@ -80,7 +80,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
 
   // 01. Get values from URL (entityId::type, esist, !exist)

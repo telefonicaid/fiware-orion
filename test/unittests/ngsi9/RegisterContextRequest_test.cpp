@@ -89,7 +89,6 @@ TEST(RegisterContextRequest, json_ok)
   orionldState.verb = POST;
 
   ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -118,7 +117,6 @@ TEST(RegisterContextRequest, json_noContextRegistration)
   ConnectionInfo  ci;
 
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   orionldState.verb = POST;
 
@@ -144,7 +142,6 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -168,7 +165,6 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -192,7 +188,6 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 
   orionldState.verb = POST;
   ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -216,7 +211,6 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
 
   orionldState.verb = POST;
   ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -238,7 +232,6 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -261,7 +254,6 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 
   orionldState.verb = POST;
   ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -285,7 +277,6 @@ TEST(RegisterContextRequest, json_reregistration)
 
   orionldState.verb = POST;
   ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 

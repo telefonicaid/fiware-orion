@@ -448,6 +448,7 @@ void jsonQcrsRelease(ParseData* reqDataP)
 */
 std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
+
   return reqDataP->qcrs.res.check(orionldState.apiVersion, asJsonObject, reqDataP->errorString);
 }

@@ -106,7 +106,6 @@ TEST(RestService, payloadParse)
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inMimeType     = JSON;
-  ci.outMimeType    = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
@@ -122,7 +121,6 @@ TEST(RestService, payloadParse)
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inMimeType     = NOMIMETYPE;
-  ci.outMimeType    = JSON;
   ci.payload        = (char*) "123";
   ci.payloadSize    = strlen(ci.payload);
 
@@ -161,7 +159,6 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
@@ -179,7 +176,6 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  ci.outMimeType    = JSON;
   ci.inMimeType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);

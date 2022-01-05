@@ -100,7 +100,7 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
   //
   // 01. Check that total input in consistent and correct

@@ -87,7 +87,7 @@ std::string getAttributeValueInstanceWithTypeAndId
   std::string              entityTypeFromParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   EntityTypeInfo           typeInfo             = EntityTypeEmptyOrNotEmpty;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)

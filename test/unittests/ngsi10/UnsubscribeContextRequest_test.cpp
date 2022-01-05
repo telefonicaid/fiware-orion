@@ -51,7 +51,6 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   orionldState.verb = POST;
 
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);

@@ -102,7 +102,7 @@ std::string getEntityAttributeValue
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    if (ciP->outMimeType == JSON)
+    if (orionldState.out.contentType == JSON)
     {
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
@@ -110,8 +110,8 @@ std::string getEntityAttributeValue
       TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
                                              ciP->httpHeaders.accepted("application/json"),
                                              ciP->httpHeaders.outformatSelect(),
-                                             &(ciP->outMimeType),
-                                             &(ciP->httpStatusCode),
+                                             &orionldState.out.contentType,
+                                             &ciP->httpStatusCode,
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
                                              ciP->uriParam[URI_PARAM_METADATA],
                                              EntityAttributeValueRequest,

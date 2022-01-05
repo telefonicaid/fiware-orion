@@ -174,9 +174,9 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
-    orionldState.acceptJson   = true;   // Default Accepted MIME-type is application/json
-    orionldState.acceptJsonld = false;
-    ciP->outMimeType          = JSON;
+    orionldState.acceptJson       = true;   // Default Accepted MIME-type is application/json
+    orionldState.acceptJsonld     = false;
+    orionldState.out.contentType  = JSON;
   }
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
@@ -236,7 +236,7 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
   }
 
   if (orionldState.acceptJsonld == true)
-    ciP->outMimeType = JSONLD;
+    orionldState.out.contentType = JSONLD;
 
   return true;
 }

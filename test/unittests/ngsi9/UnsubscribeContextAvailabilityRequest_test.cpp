@@ -82,7 +82,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+
   lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());

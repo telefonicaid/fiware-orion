@@ -110,7 +110,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   int              port;
   std::string      prefix;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -133,11 +133,11 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // 2. Render the string of the request we want to forward
   //
-  MimeType     outMimeType = ciP->outMimeType;
+  MimeType     savedContentType = orionldState.out.contentType;
   std::string  payload;
   char*        cleanPayload;
 
-  ciP->outMimeType  = JSON;
+  orionldState.out.contentType  = JSON;
 
   //
   // FIXME: Forwards are done using NGSIv1 only, for now
@@ -147,8 +147,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
 
-  ciP->outMimeType  = outMimeType;
-  cleanPayload      = (char*) payload.c_str();
+  orionldState.out.contentType = savedContentType;
+  cleanPayload                 = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -449,7 +449,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
   //
   // 01. Check service-path consistency

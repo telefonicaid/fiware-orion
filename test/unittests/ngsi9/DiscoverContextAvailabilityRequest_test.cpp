@@ -75,7 +75,6 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -99,7 +98,6 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -122,7 +120,6 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -147,7 +144,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -172,7 +168,6 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -198,7 +193,6 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 
   orionldState.verb = POST;
   ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
@@ -223,7 +217,6 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -246,7 +239,6 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -269,7 +261,6 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -292,7 +283,6 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -316,7 +306,6 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -340,7 +329,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -364,7 +352,6 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -388,7 +375,6 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -412,7 +398,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -436,7 +421,6 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -460,7 +444,6 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -484,7 +467,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -508,7 +490,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -532,7 +513,6 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
   ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
@@ -556,7 +536,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";

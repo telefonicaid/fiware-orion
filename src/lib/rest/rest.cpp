@@ -521,7 +521,9 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   {
     ciP->acceptHeaderError = "qvalue in accept header is not a number";
     ciP->httpStatusCode    = SccBadRequest;
-    ciP->outMimeType       = mimeTypeSelect(ciP);
+
+    orionldState.out.contentType = mimeTypeSelect(ciP);
+
     delete acceptHeaderP;
     return false;
   }
@@ -1519,7 +1521,7 @@ ConnectionInfo* connectionTreatInit
     lmTransactionSetFrom(ip);
   }
 
-  ciP->outMimeType = mimeTypeSelect(ciP);
+  orionldState.out.contentType = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -1722,6 +1724,10 @@ static MHD_Result connectionTreat
   }
 #endif
 
+  //
+  //  NOT NGSI-LD
+  //
+
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
@@ -1836,14 +1842,6 @@ static MHD_Result connectionTreat
     return MHD_YES;
   }
 
-
-  //
-  // Note that ciP->outMimeType is not set here.
-  // Why?
-  // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
-  // then application/json is used for the error
-  // If all goes well, the proper service routine will set ciP->outMimeType to text/plain
-  //
   if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");

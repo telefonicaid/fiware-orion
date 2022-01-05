@@ -165,9 +165,11 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.correlator  = (char*) "";
 
   // Outgoing HTTP headers
-  orionldState.outHttpHeader     = orionldState.outHttpHeaderV;
-  orionldState.outHttpHeaderSize = K_VEC_SIZE(orionldState.outHttpHeaderV);
-  orionldState.outHttpHeaderIx   = 0;
+  orionldState.out.httpHeader     = orionldState.out.httpHeaderV;
+  orionldState.out.httpHeaderSize = K_VEC_SIZE(orionldState.out.httpHeaderV);
+  orionldState.out.httpHeaderIx   = 0;
+
+  orionldState.out.contentType    = JSON;  // Default outgoing Content-Type
 }
 
 
@@ -178,17 +180,17 @@ void orionldStateInit(MHD_Connection* connection)
 //
 void orionldOutHeaderAdd(char* key, char* sValue, int iValue)
 {
-  if (orionldState.outHttpHeaderIx >= orionldState.outHttpHeaderSize)
+  if (orionldState.out.httpHeaderIx >= orionldState.out.httpHeaderSize)
   {
-    char** oldArray = orionldState.outHttpHeader;
+    char** oldArray = orionldState.out.httpHeader;
 
-    orionldState.outHttpHeaderSize += 5;
-    orionldState.outHttpHeader      = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * orionldState.outHttpHeaderSize);
-    if (orionldState.outHttpHeader == NULL)
-      LM_X(1, ("Out of memory trying to allocate room for %d outgoing HTTP headers", orionldState.outHttpHeaderSize));
+    orionldState.out.httpHeaderSize += 5;
+    orionldState.out.httpHeader      = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * orionldState.out.httpHeaderSize);
+    if (orionldState.out.httpHeader == NULL)
+      LM_X(1, ("Out of memory trying to allocate room for %d outgoing HTTP headers", orionldState.out.httpHeaderSize));
 
     // Copying the already existing header pointers to the new buffer
-    memcpy(orionldState.outHttpHeader, oldArray, orionldState.outHttpHeaderSize - 5);
+    memcpy(orionldState.out.httpHeader, oldArray, orionldState.out.httpHeaderSize - 5);
   }
 
   int size = strlen(key) + 2;  // 2: colon + end-of-string
@@ -203,14 +205,14 @@ void orionldOutHeaderAdd(char* key, char* sValue, int iValue)
   if (header == NULL)
     LM_X(1, ("Out of memory trying to allocate %d bytes for an outgoing HTTP header", size));
 
-  orionldState.outHttpHeader[orionldState.outHttpHeaderIx] = header;
+  orionldState.out.httpHeader[orionldState.out.httpHeaderIx] = header;
 
   if (sValue != NULL)
     snprintf(header, size - 1, "%s:%s", key, sValue);
   else
     snprintf(header, size - 1, "%s:%d", key, iValue);
 
-  ++orionldState.outHttpHeaderIx;
+  ++orionldState.out.httpHeaderIx;
 }
 
 

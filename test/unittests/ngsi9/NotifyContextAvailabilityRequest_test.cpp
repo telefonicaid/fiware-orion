@@ -48,7 +48,6 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   orionldState.verb = POST;
   ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 

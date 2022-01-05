@@ -218,6 +218,7 @@ void jsonUcerRelease(ParseData* reqData)
 */
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
+
   return reqData->ucer.res.check(orionldState.apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }

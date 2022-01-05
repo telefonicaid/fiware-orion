@@ -93,8 +93,8 @@ std::string getEntityAttribute
   TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
                                          ciP->httpHeaders.accepted("application/json"),
                                          ciP->httpHeaders.outformatSelect(),
-                                         &(ciP->outMimeType),
-                                         &(ciP->httpStatusCode),
+                                         &orionldState.out.contentType,
+                                         &ciP->httpStatusCode,
                                          ciP->uriParamOptions[OPT_KEY_VALUES],
                                          ciP->uriParam[URI_PARAM_METADATA],
                                          EntityAttributeResponse));

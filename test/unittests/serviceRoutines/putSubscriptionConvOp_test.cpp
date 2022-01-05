@@ -67,7 +67,6 @@ TEST(putSubscriptionConvOp, put)
 
   utInit();
 
-  ci1.outMimeType    = JSON;
   ci1.inMimeType     = JSON;
   ci1.payload        = NULL;
   ci1.payloadSize    = 0;

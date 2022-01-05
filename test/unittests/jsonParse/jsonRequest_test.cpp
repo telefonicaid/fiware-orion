@@ -56,9 +56,6 @@ TEST(jsonRequest, jsonTreat)
   orionldState.verb        = POST;
   orionldState.apiVersion  = V1;
 
-
-  ci.outMimeType  = JSON;
-
   ci.restServiceP = &restService;
 
   orionldState.apiVersion = V1;

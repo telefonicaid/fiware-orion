@@ -50,8 +50,6 @@ TEST(OrionError, all)
   const char*   outfile3 = "orion.orionError.all4.valid.json";
   ConnectionInfo ci;
 
-  ci.outMimeType = JSON;
-
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);
   EXPECT_EQ("",      e0.details);
@@ -67,8 +65,6 @@ TEST(OrionError, all)
   EXPECT_EQ(SccOk,          e4.code);
   EXPECT_EQ("OK",           e4.reasonPhrase);
   EXPECT_EQ("Good Request", e4.details);
-
-  ci.outMimeType = JSON;
 
   out = e1.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,

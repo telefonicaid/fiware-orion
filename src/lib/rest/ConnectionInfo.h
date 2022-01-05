@@ -70,12 +70,10 @@ class ConnectionInfo
 {
 public:
   ConnectionInfo();
-  ConnectionInfo(MimeType _outMimeType);
   ConnectionInfo(MHD_Connection* _connection);
   ~ConnectionInfo();
 
   MimeType                   inMimeType;
-  MimeType                   outMimeType;
   int                        urlComponents;
   std::vector<std::string>   urlCompV;
   RestService*               restServiceP;

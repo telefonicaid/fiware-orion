@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState

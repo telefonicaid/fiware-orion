@@ -47,6 +47,8 @@ void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value)
 #ifdef ORIONLD
 #include "orionld/context/orionldCoreContext.h" // orionldCoreContext
 
+
+
 // -----------------------------------------------------------------------------
 //
 // httpHeaderLocationAdd -
