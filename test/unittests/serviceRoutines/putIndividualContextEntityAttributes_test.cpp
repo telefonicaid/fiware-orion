@@ -74,7 +74,7 @@ TEST(putIndividualContextEntityAttributes, notFound)
                                    sizeof(expectedBuf),
                                    outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.inMimeType     = JSON;
+  orionldState.in.contentType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 

@@ -170,6 +170,9 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.out.httpHeaderIx   = 0;
 
   orionldState.out.contentType    = JSON;  // Default outgoing Content-Type
+
+  // Incoming HTTP headers
+  orionldState.in.contentType    = JSON;  // Default incoming Content-Type
 }
 
 

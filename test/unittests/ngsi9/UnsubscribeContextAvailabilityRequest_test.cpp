@@ -81,7 +81,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, NULL);

@@ -73,7 +73,6 @@ public:
   ConnectionInfo(MHD_Connection* _connection);
   ~ConnectionInfo();
 
-  MimeType                   inMimeType;
   int                        urlComponents;
   std::vector<std::string>   urlCompV;
   RestService*               restServiceP;

@@ -68,7 +68,7 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
   utInit();
 
   orionldState.verb = POST;
-  ci.inMimeType      = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -95,7 +95,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
   utInit();
 
   orionldState.verb = POST;
-  ci.inMimeType      = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -121,7 +121,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   utInit();
 
   orionldState.verb = POST;
-  ci.inMimeType      = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -148,7 +148,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   utInit();
 
   orionldState.verb = POST;
-  ci.inMimeType      = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

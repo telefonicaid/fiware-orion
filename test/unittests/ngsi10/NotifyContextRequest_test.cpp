@@ -55,7 +55,7 @@ TEST(NotifyContextRequest, json_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
@@ -94,7 +94,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());

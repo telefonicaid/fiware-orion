@@ -1546,9 +1546,9 @@ ConnectionInfo* connectionTreatInit
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
   else if ((ciP->httpHeaders.contentLength == 0) &&
-      ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
-      (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
-      (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
+           ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
+           (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
+           (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
   {
     std::string errorMsg;
 
@@ -1561,19 +1561,8 @@ ConnectionInfo* connectionTreatInit
   }
   else if (orionldState.badVerb == true)
   {
-    std::vector<std::string> compV;
-
-    // Not ready to answer here - must wait until all payload has been read
+    // Not ready to answer here - must wait until all the payload has been read
     ciP->httpStatusCode = SccBadVerb;
-  }
-  else
-  {
-    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
-
-    if (ciP->httpStatusCode != SccOk)
-    {
-      alarmMgr.badInput(clientIp, "error in URI parameters");
-    }
   }
 
   return ciP;

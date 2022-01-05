@@ -110,39 +110,3 @@ const char* mimeTypeToLongString(MimeType mimeType)
 
   return "NOMIMETYPE";
 }
-
-
-
-/* ****************************************************************************
-*
-* mimeTypeParse -
-*/
-MimeType mimeTypeParse(const std::string& mimeTypeString, std::string* charsetP)
-{
-  char* s;
-  char* cP = (char*) mimeTypeString.c_str();
-
-  if ((s = strstr(cP, ";")) != NULL)
-  {
-    *s = 0;
-    ++s;
-    s = wsStrip(s);
-    if (strncmp(s, "charset=", 8) == 0)
-    {
-      if (charsetP != NULL)
-        *charsetP = std::string(&s[8]);
-    }
-  }
-
-  std::string mimeType(wsStrip(cP));
-
-  if      (mimeType == "*/*")                               return JSON;
-  else if (mimeType == "text/json")                         return JSON;
-  else if (mimeType == "application/json")                  return JSON;
-  else if (mimeType == "application/ld+json")               return JSONLD;
-  else if (mimeType == "application/geo+json")              return GEOJSON;
-  else if (mimeType == "application/html")                  return HTML;
-  else if (mimeType == "text/plain")                        return TEXT;
-
-  return JSON;
-}

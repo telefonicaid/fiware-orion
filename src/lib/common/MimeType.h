@@ -77,12 +77,4 @@ extern const char* mimeTypeToString(MimeType mimeType);
 extern MimeType stringToMimeType(const std::string& s);
 extern MimeType longStringToMimeType(const char* s);
 
-
-
-/* ****************************************************************************
-*
-* mimeTypeParse - 
-*/
-extern MimeType mimeTypeParse(const std::string& mimeType, std::string* charsetP);
-
 #endif  // SRC_LIB_COMMON_MIMETYPE_H_

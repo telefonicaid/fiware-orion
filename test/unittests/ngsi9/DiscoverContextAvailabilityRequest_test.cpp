@@ -73,8 +73,8 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
   const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.ok2.valid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.verb            = POST;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -97,7 +97,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -119,7 +119,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -143,7 +143,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -167,7 +167,7 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -192,7 +192,7 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
   RestService     restService = { DiscoverContextAvailability, 1, { "" }, NULL };
 
   orionldState.verb = POST;
-  ci.inMimeType   = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
@@ -216,7 +216,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -238,7 +238,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -260,7 +260,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -282,7 +282,7 @@ TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -305,7 +305,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -328,7 +328,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -351,7 +351,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -374,7 +374,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -397,7 +397,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -420,7 +420,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -443,7 +443,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -466,7 +466,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -489,7 +489,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -512,7 +512,7 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
   RestService     restService = { InvalidRequest, 1, { "" }, NULL };
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
   ci.restServiceP = &restService;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
@@ -535,7 +535,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
   ConnectionInfo  ci;
 
   orionldState.verb = POST;
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";

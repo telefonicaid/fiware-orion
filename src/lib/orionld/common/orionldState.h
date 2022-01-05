@@ -177,6 +177,7 @@ typedef enum OrionldPhase
 } OrionldPhase;
 
 
+
 // -----------------------------------------------------------------------------
 //
 // OrionldStateOut - data for the response
@@ -193,6 +194,16 @@ typedef struct OrionldStateOut
 } OrionldStateOut;
 
 
+
+// -----------------------------------------------------------------------------
+//
+// OrionldStateIn - data of the request
+//
+typedef struct OrionldStateIn
+{
+  // Incoming HTTP headers
+  MimeType  contentType;
+} OrionldStateIn;
 
 // -----------------------------------------------------------------------------
 //
@@ -341,6 +352,7 @@ typedef struct OrionldConnectionState
 
 
   OrionldStateOut out;
+  OrionldStateIn  in;
 
   // NGSI-LD Scope (or NGSIv2 ServicePath)
   char* scopeV[10];

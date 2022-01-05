@@ -49,7 +49,7 @@ TEST(SubscribeContextRequest, ok_json)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
@@ -86,7 +86,7 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -114,7 +114,7 @@ TEST(SubscribeContextRequest, invalidDuration_json)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -139,7 +139,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -165,7 +165,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -192,7 +192,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -220,7 +220,7 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -247,7 +247,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
@@ -273,7 +273,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, NULL);
@@ -300,7 +300,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -328,7 +328,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -356,7 +356,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -384,7 +384,7 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   orionldState.verb = POST;
 
-  ci.inMimeType  = JSON;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";

@@ -66,7 +66,6 @@ static const char* validOptions[] =
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
-  inMimeType             (JSON),
   restServiceP           (NULL),
   payload                (NULL),
   payloadSize            (0),
@@ -86,7 +85,6 @@ ConnectionInfo::ConnectionInfo():
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
-  inMimeType             (JSON),
   restServiceP           (NULL),
   payload                (NULL),
   payloadSize            (0),
