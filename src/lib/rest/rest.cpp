@@ -600,6 +600,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
 
 
+extern MimeType contentTypeParse(const char* contentType, char** charsetP);
 /* ****************************************************************************
 *
 * httpHeaderGet -
@@ -620,6 +621,8 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
+    orionldState.in.contentType = contentTypeParse(value, NULL);
+
     headerP->contentType = value;
 
     if (strcmp(value, "application/ld+json") == 0)
