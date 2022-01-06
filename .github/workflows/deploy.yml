@@ -36,7 +36,7 @@ jobs:
           tags: ${{ env.IMAGE_TAG_PRE }}
           containerfiles: |
             ./docker/Dockerfile-ubi
-            
+
       - name: Push To certification registry
         id: push-to-cert
         run: |
@@ -86,6 +86,21 @@ jobs:
             BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile-gdb
           no-cache: true
+
+
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          args: --file=docker/Dockerfile-ubi
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
 
   deploy-debug-dockerhub:
 
@@ -196,3 +211,5 @@ jobs:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
+
+
