@@ -282,7 +282,7 @@ std::string postQueryContext
   long long                   count = 0;
   long long*                  countP = NULL;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
   //
   // 00. Count or not count? That is the question ...

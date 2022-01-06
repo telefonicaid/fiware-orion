@@ -105,8 +105,7 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inMimeType     = JSON;
-  ci.outMimeType    = JSON;
+  orionldState.in.contentType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 
@@ -121,13 +120,12 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inMimeType     = NOMIMETYPE;
-  ci.outMimeType    = JSON;
+  orionldState.in.contentType     = NOMIMETYPE;
   ci.payload        = (char*) "123";
   ci.payloadSize    = strlen(ci.payload);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
-  EXPECT_EQ("Bad inMimeType", out);
+  EXPECT_EQ("Bad Input", out);
 
   utExit();
 }
@@ -161,8 +159,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci.outMimeType    = JSON;
-  ci.inMimeType     = JSON;
+  orionldState.in.contentType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
   ci.restServiceP   = &restService;
@@ -179,8 +176,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  ci.outMimeType    = JSON;
-  ci.inMimeType     = JSON;
+  orionldState.in.contentType     = JSON;
   ci.payload        = testBuf;
   ci.payloadSize    = strlen(testBuf);
 

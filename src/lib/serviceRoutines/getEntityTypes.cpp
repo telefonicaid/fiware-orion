@@ -62,7 +62,7 @@ std::string getEntityTypes
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
 
   response.statusCode.fill(SccOk);
 
@@ -83,7 +83,7 @@ std::string getEntityTypes
   std::string rendered;
   TIMED_RENDER(rendered = response.render(orionldState.apiVersion,
                                           asJsonObject,
-                                          ciP->outMimeType == JSON,
+                                          orionldState.out.contentType == JSON,
                                           ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
 
   response.release();

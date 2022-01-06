@@ -57,7 +57,7 @@ class Attribute
   std::string  render(bool                acceptedTextPlain,
                       bool                acceptedJson,
                       MimeType            outFormatSelection,
-                      MimeType*           outMimeTypeP,
+                      MimeType*           outContentTypeP,
                       HttpStatusCode*     scP,
                       bool                keyValues,
                       const std::string&  metadataList,

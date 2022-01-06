@@ -78,7 +78,6 @@ TEST(restReply, json)
 
   orionldState.verb = GET;
 
-  ci.outMimeType = JSON;
   restReply(&ci, "123");
 
   utExit();

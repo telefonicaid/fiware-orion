@@ -521,7 +521,9 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   {
     ciP->acceptHeaderError = "qvalue in accept header is not a number";
     ciP->httpStatusCode    = SccBadRequest;
-    ciP->outMimeType       = mimeTypeSelect(ciP);
+
+    orionldState.out.contentType = mimeTypeSelect(ciP);
+
     delete acceptHeaderP;
     return false;
   }
@@ -598,6 +600,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
 
 
+extern MimeType contentTypeParse(const char* contentType, char** charsetP);
 /* ****************************************************************************
 *
 * httpHeaderGet -
@@ -618,6 +621,8 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
+    orionldState.in.contentType = contentTypeParse(value, NULL);
+
     headerP->contentType = value;
 
     if (strcmp(value, "application/ld+json") == 0)
@@ -1519,7 +1524,7 @@ ConnectionInfo* connectionTreatInit
     lmTransactionSetFrom(ip);
   }
 
-  ciP->outMimeType = mimeTypeSelect(ciP);
+  orionldState.out.contentType = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -1544,9 +1549,9 @@ ConnectionInfo* connectionTreatInit
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
   else if ((ciP->httpHeaders.contentLength == 0) &&
-      ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
-      (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
-      (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
+           ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
+           (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
+           (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
   {
     std::string errorMsg;
 
@@ -1559,19 +1564,8 @@ ConnectionInfo* connectionTreatInit
   }
   else if (orionldState.badVerb == true)
   {
-    std::vector<std::string> compV;
-
-    // Not ready to answer here - must wait until all payload has been read
+    // Not ready to answer here - must wait until all the payload has been read
     ciP->httpStatusCode = SccBadVerb;
-  }
-  else
-  {
-    ciP->inMimeType = mimeTypeParse(ciP->httpHeaders.contentType, NULL);
-
-    if (ciP->httpStatusCode != SccOk)
-    {
-      alarmMgr.badInput(clientIp, "error in URI parameters");
-    }
   }
 
   return ciP;
@@ -1722,6 +1716,10 @@ static MHD_Result connectionTreat
   }
 #endif
 
+  //
+  //  NOT NGSI-LD
+  //
+
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
@@ -1836,14 +1834,6 @@ static MHD_Result connectionTreat
     return MHD_YES;
   }
 
-
-  //
-  // Note that ciP->outMimeType is not set here.
-  // Why?
-  // If text/plain is asked for and accepted ('*/value' operations) but something goes wrong,
-  // then application/json is used for the error
-  // If all goes well, the proper service routine will set ciP->outMimeType to text/plain
-  //
   if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");

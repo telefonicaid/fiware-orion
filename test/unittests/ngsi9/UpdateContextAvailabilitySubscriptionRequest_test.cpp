@@ -52,8 +52,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
   orionldState.verb = POST;
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf,     sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -97,8 +96,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 
   orionldState.verb = POST;
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

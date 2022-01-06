@@ -185,7 +185,7 @@ std::string payloadParse
 
   ciP->requestType = service->request;
 
-  if (ciP->inMimeType == JSON)
+  if (orionldState.in.contentType == JSON)
   {
     if (orionldState.apiVersion == V2)
     {
@@ -202,14 +202,14 @@ std::string payloadParse
       result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
     }
   }
-  else if (ciP->inMimeType == TEXT)
+  else if (orionldState.in.contentType == TEXT)
   {
     result = textRequestTreat(ciP, parseDataP, service->request);
   }
   else
   {
     alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
-    return "Bad inMimeType";
+    return "Bad Input";
   }
 
   if (result != "OK")
@@ -593,9 +593,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), orionldState.urlPath)); // Sacred - used in 'heavyTest'
   if (ciP->payloadSize == 0)
   {
-    ciP->inMimeType = NOMIMETYPE;
+    orionldState.in.contentType = NOMIMETYPE;
   }
-  statisticsUpdate(ciP->restServiceP->request, ciP->inMimeType);
+  statisticsUpdate(ciP->restServiceP->request, orionldState.in.contentType);
 
   // Tenant to connectionInfo
   lmTransactionSetService(orionldState.tenantP->tenant);

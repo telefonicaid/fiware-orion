@@ -35,6 +35,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "common/wsStrip.h"                                      // wsStrip
+#include "common/MimeType.h"                                     // mimeTypeParse
 #include "rest/Verb.h"                                           // Verb
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
@@ -270,6 +271,40 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
 
 
 
+/* ****************************************************************************
+*
+* contentTypeParse -
+*/
+MimeType contentTypeParse(const char* contentType, char** charsetP)
+{
+  char* s;
+  char* cP = (char*) contentType;
+
+  if ((s = strstr(cP, ";")) != NULL)
+  {
+    *s = 0;
+    ++s;
+    s = wsStrip(s);
+
+    if ((charsetP != NULL) && (strncmp(s, "charset=", 8) == 0))
+      *charsetP = &s[8];
+  }
+
+  cP = wsStrip(cP);
+
+  if      (strcmp(cP, "*/*") == 0)                  return JSON;
+  else if (strcmp(cP, "text/json") == 0)            return JSON;
+  else if (strcmp(cP, "application/json") == 0)     return JSON;
+  else if (strcmp(cP, "application/ld+json") == 0)  return JSONLD;
+  else if (strcmp(cP, "application/geo+json") == 0) return GEOJSON;
+  else if (strcmp(cP, "application/html") == 0)     return HTML;
+  else if (strcmp(cP, "text/plain") == 0)           return TEXT;
+
+  return JSON;
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // orionldHttpHeaderGet -
@@ -297,6 +332,10 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   else if (strcmp(key, "Fiware-Correlator") == 0)
   {
     orionldState.correlator = (char*) value;
+  }
+  else if (strcmp(key, "Content-Type") == 0)
+  {
+    orionldState.in.contentType = contentTypeParse(value, NULL);
   }
 
   return MHD_YES;

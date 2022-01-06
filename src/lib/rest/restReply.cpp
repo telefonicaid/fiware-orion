@@ -126,27 +126,33 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     // For error-responses, never respond with application/ld+json
     // Same same for 207
     //
-    if ((ciP->httpStatusCode >= 400) && (ciP->outMimeType == JSONLD))
-      ciP->outMimeType = JSON;
+    if ((ciP->httpStatusCode >= 400) && (orionldState.out.contentType == JSONLD))
+      orionldState.out.contentType = JSON;
     if (orionldState.httpStatusCode == 207)
-      ciP->outMimeType = JSON;
+      orionldState.out.contentType = JSON;
+
+    LM_TMP(("KZ: orionldState.acceptGeojson:   %s", (orionldState.acceptGeojson == true)? "true" : "false"));
+    LM_TMP(("KZ: orionldState.out.contentType: %d", orionldState.out.contentType));
+    LM_TMP(("KZ: ciP->httpHeaders.accept:      %s", ciP->httpHeaders.accept.c_str()));
 
     if (orionldState.acceptGeojson == true)
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/geo+json");
-    else if (ciP->outMimeType == JSON)
+    else if (orionldState.out.contentType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
 #ifdef ORIONLD
-    else if ((ciP->outMimeType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
+    else if ((orionldState.out.contentType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
     }
 #endif
-    else if (ciP->outMimeType == TEXT)
+    else if (orionldState.out.contentType == TEXT)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
     }
+    else
+      LM_TMP(("KZ: no contentType header"));
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
@@ -256,7 +262,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
+    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
     *outStringP = qcr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
@@ -277,7 +283,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
+    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
     *outStringP = ucr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)

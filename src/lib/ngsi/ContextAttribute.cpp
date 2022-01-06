@@ -939,7 +939,7 @@ std::string ContextAttribute::toJsonAsValue
   bool             acceptedTextPlain,   // in parameter
   bool             acceptedJson,        // in parameter
   MimeType         outFormatSelection,  // in parameter
-  MimeType*        outMimeTypeP,        // out parameter
+  MimeType*        outContentTypeP,     // out parameter
   HttpStatusCode*  scP                  // out parameter
 )
 {
@@ -951,7 +951,7 @@ std::string ContextAttribute::toJsonAsValue
     {
       char buf[64];
 
-      *outMimeTypeP = TEXT;
+      *outContentTypeP = TEXT;
 
       switch (valueType)
       {
@@ -1015,7 +1015,7 @@ std::string ContextAttribute::toJsonAsValue
     }
     else
     {
-      *outMimeTypeP = outFormatSelection;
+      *outContentTypeP = outFormatSelection;
 
       if (compoundValueP->isVector())
       {

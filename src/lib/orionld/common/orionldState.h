@@ -180,6 +180,33 @@ typedef enum OrionldPhase
 
 // -----------------------------------------------------------------------------
 //
+// OrionldStateOut - data for the response
+//
+typedef struct OrionldStateOut
+{
+  // Outgoing HTTP headers
+  MimeType  contentType;
+
+  char*     httpHeaderV[10];    // Buffer to be used if less than 10 headers
+  char**    httpHeader;         // Points to httpHeaderV, reallocated if necessary
+  int       httpHeaderSize;     // Max number of headers (reallocation if necessary)
+  int       httpHeaderIx;       // Current index of 'httpHeader'
+} OrionldStateOut;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldStateIn - data of the request
+//
+typedef struct OrionldStateIn
+{
+  // Incoming HTTP headers
+  MimeType  contentType;
+} OrionldStateIn;
+
+// -----------------------------------------------------------------------------
+//
 // OrionldConnectionState - the state of the connection
 //
 // This struct contains all the state of a connection, like the Kjson pointer, the pointer to
@@ -324,9 +351,8 @@ typedef struct OrionldConnectionState
   KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
 
 
-  //
-  // Incoming HTTP headers
-  //
+  OrionldStateOut out;
+  OrionldStateIn  in;
 
   // NGSI-LD Scope (or NGSIv2 ServicePath)
   char* scopeV[10];

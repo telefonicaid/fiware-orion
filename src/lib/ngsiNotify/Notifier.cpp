@@ -39,7 +39,6 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/httpHeaderAdd.h"
 
 #ifdef ORIONLD
@@ -449,7 +448,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   bool                             blackList
 )
 {
-    ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
@@ -526,16 +524,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       spathList = "";
     }
 
-    ci.outMimeType = JSON;
-
     std::string payloadString;
 
     if (renderFormat == NGSI_V1_LEGACY)
-    {
-      bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(V2, asJsonObject);
-    }
-#ifdef ORIONLD
+      payloadString = ncrP->render(V2, false);
     else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))
     {
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
@@ -567,7 +559,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       payloadString = buf;
       toFree        = buf;
     }
-#endif
     else
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
 

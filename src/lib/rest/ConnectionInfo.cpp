@@ -66,29 +66,6 @@ static const char* validOptions[] =
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
-  inMimeType             (JSON),
-  outMimeType            (JSON),
-  restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
-  parseDataP             (NULL),
-  transactionStart       { 0, 0 },
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
-{
-}
-
-
-
-/* ****************************************************************************
-*
-* ConnectionInfo::ConnectionInfo - 
-*/
-ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
-  inMimeType             (JSON),
-  outMimeType            (_outMimeType),
   restServiceP           (NULL),
   payload                (NULL),
   payloadSize            (0),
@@ -108,8 +85,6 @@ ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
-  inMimeType             (JSON),
-  outMimeType            (JSON),
   restServiceP           (NULL),
   payload                (NULL),
   payloadSize            (0),
