@@ -39,7 +39,6 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/httpHeaderAdd.h"
 
 #ifdef ORIONLD
@@ -449,7 +448,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   bool                             blackList
 )
 {
-  // ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
