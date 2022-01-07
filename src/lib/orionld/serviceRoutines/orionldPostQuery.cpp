@@ -316,7 +316,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP) == false)
     return false;
 
-  int      count;
+  int      count  = 0;
   int      limit  = orionldState.uriParams.limit;
   int      offset = orionldState.uriParams.offset;
   int*     countP = (orionldState.uriParams.count == true)? &count : NULL;

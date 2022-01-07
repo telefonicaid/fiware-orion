@@ -1030,14 +1030,16 @@ int main(int argC, char* argV[])
     {
       if (httpsCertificate != NULL)
         free(httpsCertificate);
-      LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
+      LM_E(("Fatal Error (loading private server key from '%s')", httpsKeyFile));
+      exit(1);
     }
 
     if (httpsCertificate == NULL)
     {
       if (httpsPrivateServerKey != NULL)
         free(httpsPrivateServerKey);
-      LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
+      LM_E(("Fatal Error (loading certificate from '%s')", httpsCertFile));
+      exit(1);
     }
 
     orionRestServicesInit(ipVersion,

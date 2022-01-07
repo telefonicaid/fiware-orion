@@ -199,8 +199,6 @@ std::string jsonTreat
 
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
-  ciP->parseDataP = parseDataP;
-
   if (reqP == NULL)
   {
     std::string  errorReply;

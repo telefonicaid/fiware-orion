@@ -49,7 +49,8 @@ PgConnectionPool* pgConnectionPoolCreate(const char* db, int poolSize)
   if (poolP->connectionV == NULL)
   {
     free(poolP);
-    LM_RE(NULL, ("Out of memory (unable to allocate room for the connections of a postgres connection pool)"));
+    LM_E(("Out of memory (unable to allocate room for the connections of a postgres connection pool)"));
+    return NULL;
   }
 
   if (db != NULL)
@@ -59,7 +60,8 @@ PgConnectionPool* pgConnectionPoolCreate(const char* db, int poolSize)
     {
       free(poolP->connectionV);
       free(poolP);
-      LM_RE(NULL, ("Out of memory (unable to allocate room for the DB-name of a postgres connection pool)"));
+      LM_E(("Out of memory (unable to allocate room for the DB-name of a postgres connection pool)"));
+      return NULL;
     }
   }
   else
