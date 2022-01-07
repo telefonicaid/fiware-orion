@@ -568,9 +568,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string  response;
     const char*  spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
 
-    ciP->parseDataP = &parseData;
     metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
-
     response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
 
     if (response != "OK")

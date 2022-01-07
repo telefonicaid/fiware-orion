@@ -974,17 +974,18 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 *
 * removeTrailingSlash -
 */
-static char* removeTrailingSlash(std::string path)
+static char* removeTrailingSlash(char* path)
 {
-  char* cpath = (char*) path.c_str();
+  int len = strlen(path);
 
-  /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
-  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  // len > 1 ensures that root service path "/" is not touched
+  while ((len > 1) && (path[len - 1] == '/'))
   {
-    cpath[strlen(cpath) - 1] = 0;
+    path[len - 1] = 0;
+    --len;
   }
 
-  return cpath;
+  return path;
 }
 
 
@@ -1029,22 +1030,6 @@ bool isOriginAllowedForCORS(const std::string& requestOrigin)
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
-#if 0
-  //
-  // Special case: empty service-path
-  //
-  // FIXME P4: We're not sure what this 'fix' really fixes.
-  //           Must implement a functest to reproduce this situation.
-  //           And, if that is not possible, just remove the whole thing
-  //
-  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->httpHeaders.servicePath == ""))
-  {
-    OrionError e(SccBadRequest, "empty service path");
-    ciP->answer = e.render();
-    alarmMgr.badInput(clientIp, "empty service path");
-    return -1;
-  }
-#endif
   char* servicePathCopy = NULL;
   int   servicePaths    = 0;
 
@@ -1084,7 +1069,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    std::string stripped = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    char* stripped = wsStrip((char*) ciP->servicePathV[ix].c_str());
 
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 

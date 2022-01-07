@@ -22,7 +22,20 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                            // NULL
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "logMsg/logMsg.h"                                     // LM_*
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi/ContextElement.h"                               // ContextElement
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+
+#include "orionld/common/orionldState.h"                       // orionldState
 
 
 // -----------------------------------------------------------------------------
