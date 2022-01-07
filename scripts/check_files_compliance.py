@@ -284,6 +284,8 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'test/stress' in filename:
             is_orionld = True
+        elif 'archive/orionldPostEntityOverwrite.cpp' in filename:
+            is_orionld = True
         else:
             is_orionld = False
 
