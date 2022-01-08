@@ -290,6 +290,7 @@ def record_request(request):
 
     global ac, t0, times
     s = ''
+    times = []
 
     # First request? Then, set reference datetime. Otherwise, add the
     # timedelta to the list
@@ -465,7 +466,7 @@ def dump():
 
 
 @app.route('/times', methods=['GET'])
-def times():
+def times_():
     return ', '.join(map(str, times)) + '\n'
 
 
