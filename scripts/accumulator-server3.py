@@ -83,9 +83,7 @@ def usage():
     """
 
     print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --url <server url> --pretty-print -v -u")
-    print(
-        r"""
-        Parameters:'
+    print("""\nParameters:
           --host <host>: host to use database to use (default is '0.0.0.0')"
           --port <port>: port to use (default is 1028)"
           --mqttHost <host>: mqtt broker host to use (if not defined MQTT listening is not enabled)"
