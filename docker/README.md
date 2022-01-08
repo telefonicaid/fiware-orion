@@ -26,16 +26,20 @@ Follow these steps:
 1. Create a directory on your system on which to work (for example, `~/fiware`).
 2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
 	
-		mongo:
-		  image: mongo:4.4
-		  command: --nojournal
-		orion:
-		  image: fiware/orion
-		  links:
-		    - mongo
-		  ports:
-		    - "1026:1026"
-		  command: -dbhost mongo
+		version: "3" 
+
+		services:
+		  orion:
+		    image: fiware/orion
+		    ports:
+		      - "1026:1026"
+		    depends_on:
+		      - mongo
+		    command: -dbhost mongo
+		
+		  mongo:
+		    image: mongo:4.4
+		    command: --nojournal
 
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
 
