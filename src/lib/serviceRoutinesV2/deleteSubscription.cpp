@@ -72,12 +72,10 @@ std::string deleteSubscription
   if (uncr.oe.code != SccNone )
   {
     TIMED_RENDER(answer = uncr.oe.toJson());
-    ciP->httpStatusCode = uncr.oe.code;
+    orionldState.httpStatusCode = uncr.oe.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   return answer;
 }

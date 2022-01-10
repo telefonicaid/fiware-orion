@@ -107,7 +107,7 @@ public:
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outContentTypeP,
-                             HttpStatusCode*  scP);
+                             int*             scP);
   void         release(void);
   std::string  getName(void);
 

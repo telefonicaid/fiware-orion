@@ -1270,12 +1270,13 @@ function orionCurl()
   fi
 
   # Note that payloadCheckFormat is also json in the case of --in xml, as the CB also returns error in JSON in this case
-  if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='json'
-  elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
-  elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
-  elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
-  elif [ "$_out" == "EMPTY" ]; then _outFormat='--header "Accept:"'
-  elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
+  if   [ "$_out" == "xml" ];    then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='json'
+  elif [ "$_out" == "json" ];   then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "jsonld" ]; then _outFormat='--header "Accept: application/ld+json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "text" ];   then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
+  elif [ "$_out" == "any" ];    then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
+  elif [ "$_out" == "EMPTY" ];  then _outFormat='--header "Accept:"'
+  elif [ "$_out" != "" ];       then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
   if [ "$_payloadCheck" != "" ]

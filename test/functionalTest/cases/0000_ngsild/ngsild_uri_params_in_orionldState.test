@@ -36,6 +36,7 @@ brokerStart CB 31
 #
 # 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
 # 02. GET Entity with 'id=' - no value for id
+# 03. GET Entities without URI params - too broad request
 #
 
 echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values"
@@ -49,6 +50,13 @@ echo
 echo "02. GET Entity with 'id=' - no value for id"
 echo "==========================================="
 orionCurl --url "/ngsi-ld/v1/entities?id="
+echo
+echo
+
+
+echo "03. GET Entities without URI params - too broad request"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities
 echo
 echo
 
@@ -70,6 +78,20 @@ Date: REGEX(.*)
 
 02. GET Entity with 'id=' - no value for id
 ===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Empty right-hand-side for URI param /id/",
+    "title": "Error in URI param",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET Entities without URI params - too broad request
+=======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 183
 Content-Type: application/json

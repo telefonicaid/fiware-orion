@@ -165,18 +165,24 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.correlator  = (char*) "";
 
   // Outgoing HTTP headers
+#if 0
   orionldState.out.httpHeader     = orionldState.out.httpHeaderV;
   orionldState.out.httpHeaderSize = K_VEC_SIZE(orionldState.out.httpHeaderV);
   orionldState.out.httpHeaderIx   = 0;
+#endif
 
   orionldState.out.contentType    = JSON;  // Default outgoing Content-Type
 
   // Incoming HTTP headers
   orionldState.in.contentType    = JSON;  // Default incoming Content-Type
+
+
+  // Default response status code is 200 OK
+  orionldState.httpStatusCode = 200;
 }
 
 
-
+#if 0
 // -----------------------------------------------------------------------------
 //
 // orionldOutHeaderAdd -
@@ -217,7 +223,7 @@ void orionldOutHeaderAdd(char* key, char* sValue, int iValue)
 
   ++orionldState.out.httpHeaderIx;
 }
-
+#endif
 
 
 // -----------------------------------------------------------------------------

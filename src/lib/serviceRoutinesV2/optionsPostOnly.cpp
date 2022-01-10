@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpHeaders.h"
@@ -52,7 +54,7 @@ std::string optionsPostOnly
     ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("POST, OPTIONS");
   }
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
   return "";
 }

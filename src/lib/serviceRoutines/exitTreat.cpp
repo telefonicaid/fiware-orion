@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                        // orionldState
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/ParseData.h"
@@ -59,7 +61,7 @@ std::string exitTreat
   {
     OrionError orionError(SccBadRequest, "no such service");
 
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     out = orionError.render();
     return out;
   }
@@ -72,13 +74,13 @@ std::string exitTreat
   if (components == 1)
   {
     OrionError orionError(SccBadRequest, "Password requested");
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     out = orionError.render();
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     out = orionError.render();
   }
   else

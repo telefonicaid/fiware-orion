@@ -62,7 +62,7 @@ std::string getEntityAllTypes
   EntityTypeVectorResponse  response;
   std::string               answer;
   unsigned int              totalTypes   = 0;
-  bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
+  bool                      noAttrDetail = orionldState.uriParamOptions.noAttrDetail;
   unsigned int*             totalTypesP  = NULL;
 
   // NGSIv2 uses options=count to request count

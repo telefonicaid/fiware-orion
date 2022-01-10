@@ -105,6 +105,8 @@ typedef struct OrionldUriParamOptions
   bool dateCreated;    // Only NGSIv2
   bool dateModified;   // Only NGSIv2
   bool append;         // Only NGSIv2
+  bool noAttrDetail;   // Only NGSIv2
+  bool upsert;         // Only NGSIv2
   bool sysAttrs;
 } OrionldUriParamOptions;
 
@@ -118,6 +120,7 @@ typedef struct OrionldUriParams
 {
   char*     id;
   char*     type;
+  char*     typePattern;
   char*     idPattern;
   char*     attrs;
   char*     options;
@@ -125,6 +128,7 @@ typedef struct OrionldUriParams
   int       limit;
   bool      count;
   char*     q;
+  char*     mq;
   char*     geometry;
   char*     coordinates;
   char*     georel;
@@ -145,11 +149,14 @@ typedef struct OrionldUriParams
   bool      location;
   char*     url;
   bool      reload;
+  char*     exists;
   char*     notExists;
   char*     metadata;
   char*     orderBy;
   bool      collapse;
+  bool      reset;
   char*     attributeFormat;
+  char*     level;
 } OrionldUriParams;
 
 
@@ -187,10 +194,12 @@ typedef struct OrionldStateOut
   // Outgoing HTTP headers
   MimeType  contentType;
 
+#if 0
   char*     httpHeaderV[10];    // Buffer to be used if less than 10 headers
   char**    httpHeader;         // Points to httpHeaderV, reallocated if necessary
   int       httpHeaderSize;     // Max number of headers (reallocation if necessary)
   int       httpHeaderIx;       // Current index of 'httpHeader'
+#endif
 } OrionldStateOut;
 
 

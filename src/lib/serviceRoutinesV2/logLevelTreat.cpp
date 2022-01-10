@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -52,40 +54,35 @@ std::string changeLogLevel
   ParseData*                 parseDataP
 )
 {
-  std::string  level   = ciP->uriParam[URI_PARAM_LEVEL];
-  const char*  levelP  = level.c_str();
-
-  if (level == "")
+  if (orionldState.uriParams.level == NULL)
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "no log level in URI param");
     return "{\"error\":\"log level missing\"}";
   }
 
   //
   // Internally, the broker does not support "warn", nor "fatal".
-  // However, to easy the task for our users, the broker accepts both of them:
+  // However, to ease the task for our users, the broker accepts both of them:
   //  - "fatal" is translated into the internal "None", meaning complete silence.
   //  - "warn" is translated into "Warning" which is accepted internally.
   //
-  if ((strcasecmp(levelP, "none")    == 0) ||
-      (strcasecmp(levelP, "fatal")   == 0) ||
-      (strcasecmp(levelP, "error")   == 0) ||
-      (strcasecmp(levelP, "warning") == 0) ||
-      (strcasecmp(levelP, "warn")    == 0) ||
-      (strcasecmp(levelP, "info")    == 0) ||
-      (strcasecmp(levelP, "debug")   == 0))
+  if ((strcasecmp(orionldState.uriParams.level, "none")    == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "fatal")   == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "error")   == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "warning") == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "warn")    == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "info")    == 0) ||
+      (strcasecmp(orionldState.uriParams.level, "debug")   == 0))
   {
-    if (strcasecmp(levelP, "warning") == 0)
-    {
-      level = "WARN";
-    }
+    if (strcasecmp(orionldState.uriParams.level, "warning") == 0)
+      orionldState.uriParams.level = (char*) "WARN";
 
-    lmLevelMaskSetString((char*) level.c_str());
+    lmLevelMaskSetString(orionldState.uriParams.level);
   }
   else
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "invalid log level in URI param");
     return "{\"error\":\"invalid log level\"}";
   }

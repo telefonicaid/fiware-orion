@@ -66,7 +66,7 @@ std::string getEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  type   = ciP->uriParam["type"];
+  char*        type   = orionldState.uriParams.type;
   std::string  answer;
   Attribute    attribute;
 
@@ -74,7 +74,7 @@ std::string getEntityAttribute
       forbiddenIdChars(orionldState.apiVersion, compV[4].c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
@@ -94,23 +94,23 @@ std::string getEntityAttribute
                                          ciP->httpHeaders.accepted("application/json"),
                                          ciP->httpHeaders.outformatSelect(),
                                          &orionldState.out.contentType,
-                                         &ciP->httpStatusCode,
+                                         &orionldState.httpStatusCode,
                                          ciP->uriParamOptions[OPT_KEY_VALUES],
                                          ciP->uriParam[URI_PARAM_METADATA],
                                          EntityAttributeResponse));
 
   if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)
   {
-    ciP->httpStatusCode = SccConflict;
+    orionldState.httpStatusCode = SccConflict;
   }
   else if (attribute.oe.reasonPhrase == ERROR_NOT_FOUND)
   {
-    ciP->httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
+    orionldState.httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
   }
   else
   {
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    orionldState.httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 
   // 04. Cleanup and return result

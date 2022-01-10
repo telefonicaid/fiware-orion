@@ -58,7 +58,7 @@ std::string badVerbPutOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   ciP->httpHeaderValue.push_back("PUT");
-  ciP->httpStatusCode = SccBadVerb;
+  orionldState.httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);
 

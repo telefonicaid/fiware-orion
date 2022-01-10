@@ -82,12 +82,10 @@ std::string patchSubscription
   if (beError.code != SccNone)
   {
     TIMED_RENDER(answer = beError.toJson());
-    ciP->httpStatusCode = beError.code;
+    orionldState.httpStatusCode = beError.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   return answer;
 }

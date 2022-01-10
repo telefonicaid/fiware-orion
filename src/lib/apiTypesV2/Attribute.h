@@ -58,7 +58,7 @@ class Attribute
                       bool                acceptedJson,
                       MimeType            outFormatSelection,
                       MimeType*           outContentTypeP,
-                      HttpStatusCode*     scP,
+                      int*                scP,
                       bool                keyValues,
                       const std::string&  metadataList,
                       RequestType         requestType,

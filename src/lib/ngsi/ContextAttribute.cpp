@@ -940,7 +940,7 @@ std::string ContextAttribute::toJsonAsValue
   bool             acceptedJson,        // in parameter
   MimeType         outFormatSelection,  // in parameter
   MimeType*        outContentTypeP,     // out parameter
-  HttpStatusCode*  scP                  // out parameter
+  int*             scP                  // out parameter
 )
 {
   std::string  out;

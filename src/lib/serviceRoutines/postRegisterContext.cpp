@@ -77,7 +77,7 @@ std::string postRegisterContext
         OrionError   oe(SccBadRequest, details);
 
         alarmMgr.badInput(clientIp, details);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return oe.render();
       }
     }
@@ -111,7 +111,7 @@ std::string postRegisterContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
   TIMED_RENDER(answer = rcr.render());
 
   return answer;

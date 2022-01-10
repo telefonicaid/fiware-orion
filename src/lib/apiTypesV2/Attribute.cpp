@@ -44,8 +44,8 @@ std::string Attribute::render
   bool                acceptedTextPlain,   // in parameter (pass-through)
   bool                acceptedJson,        // in parameter (pass-through)
   MimeType            outFormatSelection,  // in parameter (pass-through)
-  MimeType*           outContentTypeP,        // out parameter (pass-through)
-  HttpStatusCode*     scP,                 // out parameter (pass-through)
+  MimeType*           outContentTypeP,     // out parameter (pass-through)
+  int*                scP,                 // out parameter (pass-through)
   bool                keyValues,           // in parameter
   const std::string&  metadataList,        // in parameter
   RequestType         requestType,         // in parameter

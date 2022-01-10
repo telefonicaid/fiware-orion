@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -55,7 +57,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // If so, mark as erroneous
   if (status != "OK")
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
     alarmMgr.badInput(clientIp, ciP->answer);
   }

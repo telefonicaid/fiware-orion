@@ -72,8 +72,7 @@ ConnectionInfo::ConnectionInfo():
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
+  compoundValueRoot      (NULL)
 {
 }
 
@@ -90,8 +89,7 @@ ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
+  compoundValueRoot      (NULL)
 {
   orionldState.mhdConnection = _connection;
 

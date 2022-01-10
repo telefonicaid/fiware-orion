@@ -58,7 +58,7 @@ std::string badVerbGetPostDeleteOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   ciP->httpHeaderValue.push_back("GET, POST, DELETE");
-  ciP->httpStatusCode = SccBadVerb;
+  orionldState.httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);
 

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -59,12 +61,11 @@ std::string getMetrics
   {
     OrionError oe(SccBadRequest, "metrics desactivated");
 
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 
-  bool         doReset  = (ciP->uriParam["reset"] == "true")? true : false;
-  std::string  payload  = metricsMgr.toJson(doReset);
+  std::string  payload = metricsMgr.toJson(orionldState.uriParams.reset);
 
   return payload;
 }

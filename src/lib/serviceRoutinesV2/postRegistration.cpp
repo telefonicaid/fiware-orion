@@ -74,7 +74,7 @@ std::string postRegistration
   if (parseDataP->reg.provider.legacyForwardingMode == false)
   {
     oe.fill(SccNotImplemented, "Only NGSIv1-based forwarding supported at the present moment. Set explictely legacyForwarding to true");
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     TIMED_RENDER(answer = oe.smartRender(orionldState.apiVersion));
     return answer;
   }
@@ -85,13 +85,13 @@ std::string postRegistration
   if (parseDataP->reg.provider.supportedForwardingMode != ngsiv2::ForwardAll)
   {
     oe.fill(SccNotImplemented, "non-supported Forwarding Mode");
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     TIMED_RENDER(answer = oe.smartRender(orionldState.apiVersion));
     return answer;
   }
 
   TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, orionldState.tenantP, servicePath, &regId, &oe));
-  ciP->httpStatusCode = oe.code;
+  orionldState.httpStatusCode = oe.code;
 
   if (oe.code != SccOk)
   {
@@ -104,7 +104,7 @@ std::string postRegistration
     ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
-    ciP->httpStatusCode = SccCreated;
+    orionldState.httpStatusCode = SccCreated;
   }
 
   return answer;

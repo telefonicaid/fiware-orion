@@ -250,8 +250,8 @@ std::string jsonTreat
     std::string answer;
     
     alarmMgr.badInput(clientIp, details);
-    ciP->httpStatusCode = SccBadRequest;
-    restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
+    orionldState.httpStatusCode = SccBadRequest;
+    restErrorReplyGet(ciP, orionldState.httpStatusCode, res, &answer);
     return answer;
   }
 

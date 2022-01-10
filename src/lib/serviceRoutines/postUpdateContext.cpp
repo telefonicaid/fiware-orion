@@ -503,13 +503,10 @@ std::string postUpdateContext
                                                   orionldState.apiVersion,
                                                   ngsiV2Flavour));
 
-  if (ciP->httpStatusCode != SccCreated)
-  {
-    ciP->httpStatusCode = httpStatusCode;
-  }
+  if (orionldState.httpStatusCode != SccCreated)
+    orionldState.httpStatusCode = httpStatusCode;
 
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
-
 
 
   //

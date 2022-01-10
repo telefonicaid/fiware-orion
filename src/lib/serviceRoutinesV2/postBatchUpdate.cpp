@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -79,7 +81,7 @@ std::string postBatchUpdate
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
 
     TIMED_RENDER(answer = oe.smartRender(V2));
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return answer;
   }
@@ -90,12 +92,10 @@ std::string postBatchUpdate
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   // Cleanup and return result
   entities.release();

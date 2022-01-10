@@ -60,7 +60,7 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
 
     if (inEntityIdNodeP == NULL)  // Entity ID is mandatory
     {
-      LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
+      LM_E(("Invalid Entity: Mandatory field entity::id is missing"));
       entityErrorPush(errorsArrayP, "No ID", OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::id is missing", 400, true);
       next = inNodeP->next;
       kjChildRemove(incomingTree, inNodeP);
@@ -83,7 +83,7 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
 
       if (inEntityTypeNodeP == NULL)
       {
-        LM_E(("KZ: Invalid Entity: Mandatory field entity::type is missing"));
+        LM_E(("Invalid Entity: Mandatory field entity::type is missing"));
         entityErrorPush(errorsArrayP, inEntityIdNodeP->value.s, OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::type is missing", 400, false);
 
         if (removeArray != NULL)

@@ -77,6 +77,8 @@ std::string deleteIndividualContextEntity
   std::string  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   StatusCode   response;
 
+  LM_TMP(("KZ: entityType: '%s'", entityType));
+
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
   parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", ActionTypeDelete);
 

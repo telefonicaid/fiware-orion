@@ -99,8 +99,8 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   {
     if (serviceV == restBadVerbV)
     {
-      ciP->httpStatusCode  = SccBadVerb;
-      orionldState.badVerb = true;
+      orionldState.httpStatusCode = SccBadVerb;
+      orionldState.badVerb        = true;
     }
 
     return &serviceV[serviceIx];
