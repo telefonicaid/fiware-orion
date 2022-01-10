@@ -68,7 +68,7 @@ std::string getEntityAttributeValue
 {
   Attribute    attribute;
   std::string  answer;
-  std::string  type       = orionldState.uriParams.type;
+  std::string  type       = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
   if (forbiddenIdChars(orionldState.apiVersion,  compV[2].c_str(), NULL) ||
       (forbiddenIdChars(orionldState.apiVersion, compV[4].c_str(), NULL)))

@@ -77,7 +77,7 @@ std::string deleteEntity
 
   eP       = new Entity();
   eP->id   = compV[2];
-  eP->type = orionldState.uriParams.type;
+  eP->type = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
   if (compV.size() == 5)  // Deleting an attribute
   {

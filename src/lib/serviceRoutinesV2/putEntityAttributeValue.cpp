@@ -86,7 +86,9 @@ std::string putEntityAttributeValue
     orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
-  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, ActionTypeUpdate, orionldState.uriParams.type);
+
+  char* entityType = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
+  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, ActionTypeUpdate, entityType);
 
 
   // 02. Call standard op postUpdateContext

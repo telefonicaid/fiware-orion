@@ -71,7 +71,7 @@ std::string putEntity
   Entity*     eP     = &parseDataP->ent.res;
 
   eP->id   = compV[2];
-  eP->type = orionldState.uriParams.type;
+  eP->type = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
   if (forbiddenIdChars(orionldState.apiVersion, compV[2].c_str() , NULL))
   {

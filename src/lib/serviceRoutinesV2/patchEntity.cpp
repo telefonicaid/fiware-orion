@@ -70,8 +70,8 @@ std::string patchEntity
   std::string  answer = "";
   Entity*      eP     = &parseDataP->ent.res;
 
-  eP->id = compV[2];
-  eP->type = orionldState.uriParams.type;
+  eP->id   = compV[2];
+  eP->type = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
   if (forbiddenIdChars(orionldState.apiVersion, eP->id.c_str() , NULL))
   {

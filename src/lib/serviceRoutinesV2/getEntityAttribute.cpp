@@ -66,7 +66,7 @@ std::string getEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  char*        type   = orionldState.uriParams.type;
+  char*        type   = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
   std::string  answer;
   Attribute    attribute;
 
