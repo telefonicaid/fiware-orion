@@ -67,7 +67,7 @@ std::string putEntityAttribute
 {
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
-  char*        type           = orionldState.uriParams.type;
+  char*        type           = (orionldState.uriParams.type == NULL)? (char*) "" : orionldState.uriParams.type;
 
   if (forbiddenIdChars(orionldState.apiVersion,  entityId.c_str(),      NULL) ||
       (forbiddenIdChars(orionldState.apiVersion, attributeName.c_str(), NULL)))

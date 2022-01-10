@@ -70,7 +70,7 @@ std::string postEntity
   Ngsiv2Flavour  flavor;
 
   eP->id   = compV[2];
-  eP->type = orionldState.uriParams.type;
+  eP->type = (orionldState.uriParams.type == NULL)? "" : orionldState.uriParams.type;
 
   if (forbiddenIdChars(orionldState.apiVersion, compV[2].c_str() , NULL))
   {

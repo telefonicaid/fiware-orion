@@ -68,7 +68,7 @@ std::string getEntity
 )
 {
   std::string entityId        = compV[2];
-  char*       type            = orionldState.uriParams.type;
+  char*       type            = (orionldState.uriParams.type == NULL)? (char*) "" : orionldState.uriParams.type;
 
   if (entityId == "")
   {
