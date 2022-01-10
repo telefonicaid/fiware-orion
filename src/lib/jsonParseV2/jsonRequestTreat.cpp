@@ -82,7 +82,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
     }
     break;
 
@@ -97,7 +97,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
     }
     break;
 
@@ -113,7 +113,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->attr.attribute.check(orionldState.apiVersion, EntityAttributeRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
     }
     break;
 
@@ -177,7 +177,7 @@ std::string jsonRequestTreat
   default:
     OrionError error(SccNotImplemented, "Request Treat function not implemented");
     answer = error.render();
-    ciP->httpStatusCode = SccNotImplemented;
+    orionldState.httpStatusCode = SccNotImplemented;
     break;
   }
 

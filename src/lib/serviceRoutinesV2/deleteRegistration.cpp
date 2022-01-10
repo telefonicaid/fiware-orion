@@ -62,7 +62,7 @@ std::string deleteRegistration
 
   TIMED_MONGO(mongoRegistrationDelete(regId, orionldState.tenantP, ciP->servicePathV[0], &oe));
 
-  ciP->httpStatusCode = oe.code;
+  orionldState.httpStatusCode = oe.code;
 
   if (oe.code != SccNoContent)
   {

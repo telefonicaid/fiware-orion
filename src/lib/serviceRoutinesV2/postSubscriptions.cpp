@@ -57,7 +57,7 @@ extern std::string postSubscriptions
   {
     const size_t  MSG_SIZE        = 96;  // strlen(msg) + enough room for digits
     char          errMsg[MSG_SIZE];
-    ciP->httpStatusCode           = SccBadRequest;
+    orionldState.httpStatusCode           = SccBadRequest;
 
     snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
              (unsigned long) ciP->servicePathV.size());
@@ -83,7 +83,7 @@ extern std::string postSubscriptions
   if (beError.code != SccNone)
   {
     TIMED_RENDER(answer = beError.toJson());
-    ciP->httpStatusCode = beError.code;
+    orionldState.httpStatusCode = beError.code;
   }
   else
   {
@@ -91,7 +91,7 @@ extern std::string postSubscriptions
     ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
     ciP->httpHeaderValue.push_back(location);
 
-    ciP->httpStatusCode = SccCreated;
+    orionldState.httpStatusCode = SccCreated;
   }
 
   return answer;

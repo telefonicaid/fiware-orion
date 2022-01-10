@@ -56,13 +56,13 @@ std::string postNotifyContext
   NotifyContextResponse  ncr;
   std::string            answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
-                                                       &ncr,
-                                                       orionldState.tenantP,
-                                                       orionldState.xAuthToken,
-                                                       ciP->servicePathV,
-                                                       ciP->httpHeaders.correlator,
-                                                       ciP->httpHeaders.ngsiv2AttrsFormat));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
+                                                               &ncr,
+                                                               orionldState.tenantP,
+                                                               orionldState.xAuthToken,
+                                                               ciP->servicePathV,
+                                                               ciP->httpHeaders.correlator,
+                                                               ciP->httpHeaders.ngsiv2AttrsFormat));
   TIMED_RENDER(answer = ncr.render());
 
   return answer;

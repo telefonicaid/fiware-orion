@@ -33,6 +33,11 @@
 #include <vector>
 #include <map>
 
+extern "C"
+{
+#include "kjson/kjson.h"
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -40,16 +45,8 @@
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
 
-#include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
 #include "rest/HttpHeaders.h"
-#ifdef ORIONLD
-extern "C"
-{
-#include "kjson/kjson.h"
-}
-
-#endif  
 
 
 
@@ -95,7 +92,6 @@ public:
   ::std::vector<orion::CompoundValueNode*>  compoundValueVector;
 
   // Outgoing
-  HttpStatusCode            httpStatusCode;
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
 

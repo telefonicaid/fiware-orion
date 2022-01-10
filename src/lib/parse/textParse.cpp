@@ -58,7 +58,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
     else
     {
       OrionError oe(SccBadRequest, "Missing citation-mark at end of string");
-      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
     }
   }
 
@@ -90,7 +90,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   else  // 5. None of the above - it's an error
   {
     OrionError oe(SccBadRequest, "attribute value type not recognized");
-    return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+    return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
   }
 
   return "OK";
@@ -118,14 +118,14 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     if ((answer = parseDataP->av.attribute.check(orionldState.apiVersion, EntityAttributeValueRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
     }
     break;
 
   default:
     OrionError oe(SccUnsupportedMediaType, "not supported content type: text/plain");
 
-    answer = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+    answer = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
 
     alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;

@@ -88,7 +88,7 @@ std::string postBatchQuery
 
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
   {
     parseDataP->qcr.res.release();
     return answer;
@@ -97,7 +97,7 @@ std::string postBatchQuery
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     answer = "[]";
   }
   else

@@ -85,26 +85,26 @@ std::string getEntities
   Entities     entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
-  std::string  id          = ciP->uriParam["id"];
-  std::string  idPattern   = ciP->uriParam["idPattern"];
-  std::string  type        = ciP->uriParam["type"];
-  std::string  typePattern = ciP->uriParam["typePattern"];
-  std::string  q           = ciP->uriParam[URI_PARAM_Q];
-  std::string  mq          = ciP->uriParam[URI_PARAM_MQ];
   std::string  geometry    = ciP->uriParam["geometry"];
   std::string  coords      = ciP->uriParam["coords"];
   std::string  georel      = ciP->uriParam["georel"];
   std::string  out;
+  char*  id          = orionldState.uriParams.id;
+  char*  idPattern   = orionldState.uriParams.idPattern;
+  char*  type        = orionldState.uriParams.type;
+  char*  q           = orionldState.uriParams.q;
+  char*  mq          = orionldState.uriParams.mq;
+  char*  typePattern = orionldState.uriParams.typePattern;
 
-  if ((idPattern != "") && (id != ""))
+  if ((idPattern != NULL) && (id != NULL))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", "BadRequest");
 
     TIMED_RENDER(answer = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return answer;
   }
-  else if (id != "")
+  else if (id != NULL)
   {
     pattern = "";
 
@@ -128,17 +128,17 @@ std::string getEntities
       pattern += idsV[ix] + "$";
     }
   }
-  else if (idPattern != "")
+  else if (idPattern != NULL)
   {
-    pattern   = idPattern;
+    pattern = idPattern;
   }
 
-  if ((typePattern != "") && (type != ""))
+  if ((typePattern != NULL) && (type != NULL))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
 
     TIMED_RENDER(answer = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return answer;
   }
 
@@ -150,7 +150,7 @@ std::string getEntities
     OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return out;
   }
   else if ((geometry != "") && (coords == ""))
@@ -158,7 +158,7 @@ std::string getEntities
     OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return out;
   }
 
@@ -167,7 +167,7 @@ std::string getEntities
     OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
 
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return out;
   }
 
@@ -189,7 +189,7 @@ std::string getEntities
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, "BadRequest");
 
       TIMED_RENDER(out = oe.toJson());
-      ciP->httpStatusCode = oe.code;
+      orionldState.httpStatusCode = oe.code;
 
       scopeP->release();
       delete scopeP;
@@ -208,13 +208,13 @@ std::string getEntities
   // The plain q-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (q != "")
+  if (q != NULL)
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
     scopeP->stringFilterP = new StringFilter(SftQ);
-    if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
+    if (scopeP->stringFilterP->parse(q, &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, "BadRequest");
 
@@ -223,7 +223,7 @@ std::string getEntities
       delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
-      ciP->httpStatusCode = oe.code;
+      orionldState.httpStatusCode = oe.code;
       return out;
     }
 
@@ -237,13 +237,13 @@ std::string getEntities
   // The plain mq-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (mq != "")
+  if (mq != NULL)
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
     std::string  errorString;
 
     scopeP->mdStringFilterP = new StringFilter(SftMq);
-    if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
+    if (scopeP->mdStringFilterP->parse(mq, &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, "BadRequest");
 
@@ -252,7 +252,7 @@ std::string getEntities
       delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
-      ciP->httpStatusCode = oe.code;
+      orionldState.httpStatusCode = oe.code;
       return out;
     }
 
@@ -270,9 +270,9 @@ std::string getEntities
   // 2. Used with a single type name, so add it to the fill
   // 3. Used and with more than ONE typename
 
-  if (!typePattern.empty())
+  if ((typePattern != NULL) && (*typePattern != 0))
   {
-    bool      isIdPattern = (idPattern != "" || pattern == ".*");
+    bool      isIdPattern = (idPattern != NULL || pattern == ".*");
     EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
 
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
@@ -310,7 +310,7 @@ std::string getEntities
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     answer = "[]";
   }
   else
@@ -320,12 +320,12 @@ std::string getEntities
     if (entities.oe.code != SccNone)
     {
       TIMED_RENDER(answer = entities.oe.toJson());
-      ciP->httpStatusCode = entities.oe.code;
+      orionldState.httpStatusCode = entities.oe.code;
     }
     else
     {
       TIMED_RENDER(answer = entities.render());
-      ciP->httpStatusCode = SccOk;
+      orionldState.httpStatusCode = SccOk;
     }
   }
 

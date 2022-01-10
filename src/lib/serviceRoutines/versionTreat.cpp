@@ -122,6 +122,6 @@ std::string versionTreat
   out += "  \"doc\":             \"" + std::string(API_DOC)        + "\"\n";
   out += "}\n";
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return out;
 }

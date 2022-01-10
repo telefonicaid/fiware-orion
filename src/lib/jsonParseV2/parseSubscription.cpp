@@ -31,6 +31,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
@@ -91,7 +93,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -101,7 +103,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }

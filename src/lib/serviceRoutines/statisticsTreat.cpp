@@ -336,7 +336,7 @@ std::string statisticsTreat
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
   renderUsedCounter(&js, "simulatedNotifications", nSimNotif);
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return js.str();
 }
 
@@ -386,6 +386,6 @@ std::string statisticsCacheTreat
   js.addNumber("updates", (long long)mscUpdates);
   js.addNumber("items", (long long)cacheItems);
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return js.str();
 }

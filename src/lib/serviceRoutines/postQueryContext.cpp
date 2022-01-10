@@ -182,15 +182,18 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // Overriding original verb to be a POST, now that this service routine has been invoked
   orionldState.verb = POST;
 
-  // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies ciP->httpStatusCode
+
+  //
+  // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies orionldState.httpStatusCode
   // Thus, we need to preserve it before (and recover after) in order a fail in the CB-to-CPr interaction doesn't
   // "corrupt" the status code in the client-to-CB interaction.
   // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
   // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
   // hasn't anything to do with connection).
-  HttpStatusCode sc = ciP->httpStatusCode;
+  //
+  int saved = orionldState.httpStatusCode;
   s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, NULL);
-  ciP->httpStatusCode = sc;
+  orionldState.httpStatusCode = saved;
 
   if (s != "OK")
   {
@@ -310,12 +313,12 @@ std::string postQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
-                                                      qcrsP,
-                                                      orionldState.tenantP,
-                                                      ciP->servicePathV,
-                                                      countP,
-                                                      orionldState.apiVersion));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoQueryContext(qcrP,
+                                                              qcrsP,
+                                                              orionldState.tenantP,
+                                                              ciP->servicePathV,
+                                                              countP,
+                                                              orionldState.apiVersion));
 
   if (qcrsP->errorCode.code == SccBadRequest)
   {

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpHeaders.h"
@@ -77,7 +79,7 @@ std::string optionsVersionRequest
     ciP->httpHeaderValue.push_back(maxAge);
   }
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
   return "";
 }

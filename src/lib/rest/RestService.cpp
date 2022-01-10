@@ -539,9 +539,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render();
 
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
-    ciP->httpStatusCode = SccBadRequest;
     restReply(ciP, response);
 
     return std::string("Empty URL");
@@ -554,7 +553,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     if (compErrorDetect(orionldState.apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       restReply(ciP, oe.smartRender(orionldState.apiVersion));
       return "URL PATH component error";
     }
@@ -607,7 +606,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError  oe(SccBadRequest, result);
 
-    std::string  response = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &(ciP->httpStatusCode));
+    std::string  response = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
 
     alarmMgr.badInput(clientIp, result);
 

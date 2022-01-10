@@ -35,7 +35,6 @@ brokerStart CB 0-255 IPV4
 --SHELL--
 echo "01. Create an entity using foo as tenant"
 echo "========================================"
-url="/v1/updateContext"
 payload='{
   "contextElements": [
   {
@@ -53,7 +52,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url "$url" --payload "$payload" --tenant "foo"
+orionCurl --url /v1/updateContext --payload "$payload" --tenant "foo"
 echo
 echo
 

@@ -66,7 +66,7 @@ std::string badVerbGetPostOnly
     headerValue = headerValue + ", OPTIONS";
   }
   ciP->httpHeaderValue.push_back(headerValue);
-  ciP->httpStatusCode = SccBadVerb;
+  orionldState.httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);
 

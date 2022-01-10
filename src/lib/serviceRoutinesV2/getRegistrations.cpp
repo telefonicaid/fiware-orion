@@ -78,7 +78,7 @@ std::string getRegistrations
   if (oe.code != SccOk)
   {
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
 
     return out;
   }

@@ -33,7 +33,8 @@ brokerStart CB 212-249
 #
 # 01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1
 # 02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error
-# 03. Get the entity to make sure all is good
+# 03. Query the property P100 without coords URI param, make sure the broker doesn't crash - see error
+# 04. Get the entity to make sure all is good
 #
 
 echo "01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1"
@@ -62,7 +63,14 @@ echo
 echo
 
 
-echo "03. Get the entity to make sure all is good"
+echo "03. Query the property P100 without coords URI param, make sure the broker doesn't crash - see error"
+echo "===================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&geometry=Point&georel=near;maxDistance==10&type=Building&options=keyValues'
+echo
+echo
+
+
+echo "04. Get the entity to make sure all is good"
 echo "==========================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T_Query
 echo
@@ -82,6 +90,20 @@ Date: REGEX(.*)
 02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error
 ============================================================================================================
 HTTP/1.1 400 Bad Request
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Empty right-hand-side for URI param /coordinates/",
+    "title": "Error in URI param",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Query the property P100 without coords URI param, make sure the broker doesn't crash - see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
 Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
@@ -93,7 +115,7 @@ Date: REGEX(.*)
 }
 
 
-03. Get the entity to make sure all is good
+04. Get the entity to make sure all is good
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 152

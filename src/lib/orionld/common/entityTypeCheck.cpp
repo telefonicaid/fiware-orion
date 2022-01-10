@@ -54,7 +54,7 @@ bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityI
   // Entity TYPE must not be duplicated
   if (duplicatedType == true)
   {
-    LM_W(("KZ: Bad Input (UPSERT: Duplicated entity::type)"));
+    LM_W(("Bad Input (UPSERT: Duplicated entity::type)"));
     entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated field", "entity::type", 400, false);
     return false;
   }

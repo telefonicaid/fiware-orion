@@ -54,10 +54,10 @@ std::string postUpdateContextAvailabilitySubscription
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
-                                                                               &ucas,
-                                                                               ciP->httpHeaders.correlator,
-                                                                               orionldState.tenantP));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
+                                                                                       &ucas,
+                                                                                       ciP->httpHeaders.correlator,
+                                                                                       orionldState.tenantP));
 
   TIMED_RENDER(answer = ucas.render());
 

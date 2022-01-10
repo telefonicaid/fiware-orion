@@ -180,6 +180,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // Error or not, the Link header should never be present in the reponse
   orionldState.noLinkHeader = true;
 
+  // The response is never JSON-LD
+  orionldState.out.contentType = JSON;
+
   //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)

@@ -58,7 +58,7 @@ std::string badVerbPutDeleteOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   ciP->httpHeaderValue.push_back("PUT, DELETE");
-  ciP->httpStatusCode = SccBadVerb;
+  orionldState.httpStatusCode = SccBadVerb;
 
   return (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)? "" :  oe.smartRender(orionldState.apiVersion);
 }

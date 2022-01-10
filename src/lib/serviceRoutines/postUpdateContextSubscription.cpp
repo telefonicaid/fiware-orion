@@ -56,12 +56,12 @@ std::string postUpdateContextSubscription
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                                   &ucsr,
-                                                                   orionldState.tenantP,
-                                                                   orionldState.xAuthToken,
-                                                                   ciP->servicePathV,
-                                                                   ciP->httpHeaders.correlator));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
+                                                                           &ucsr,
+                                                                           orionldState.tenantP,
+                                                                           orionldState.xAuthToken,
+                                                                           ciP->servicePathV,
+                                                                           ciP->httpHeaders.correlator));
 
   TIMED_RENDER(answer = ucsr.render());
 

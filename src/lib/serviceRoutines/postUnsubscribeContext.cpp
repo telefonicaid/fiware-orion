@@ -52,7 +52,7 @@ std::string postUnsubscribeContext
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, orionldState.tenantP));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, orionldState.tenantP));
   TIMED_RENDER(answer = uncr.render());
 
   return answer;
