@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-X-Auth-Token In Custom Notifications With Token Removal
+Fiware-Service In Custom Notifications With Removal
 
 --SHELL-INIT--
 dbInit CB
@@ -32,13 +32,13 @@ accumulatorStart --pretty-print
 
 #
 #
-# 01. Make accumulator subscribe to changes in E1/A1 using custom notifications with X-Auth-Token removal
-# 02. Create E1/A1, using X-Auth-Token fgm
-# 03. Check that no X-Auth-Token header was propagated to accumulator
+# 01. Make accumulator subscribe to changes in E1/A1 using custom notifications with Fiware-Service removal
+# 02. Create E1/A1, using Fiware-Service fgm
+# 03. Check that no Fiware-Service header was propagated to accumulator
 #
 
-echo "01. Make accumulator subscribe to changes in E1/A1 using custom notifications with X-Auth-Token removal"
-echo "======================================================================================================="
+echo "01. Make accumulator subscribe to changes in E1/A1 using custom notifications with Fiware-Service removal"
+echo "========================================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -54,7 +54,7 @@ payload='{
     "httpCustom": {
       "url":     "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "payload": "{ %22A1%22: ${A1} }",
-      "headers":  {"x-auth-token": ""},
+      "headers":  {"fiware-service": ""},
       "qs":       { "step": "01" }
     }
   }
@@ -64,8 +64,8 @@ echo
 echo
 
 
-echo "02. Create E1/A1, using X-Auth-Token fgm"
-echo "========================================"
+echo "02. Create E1/A1, using Fiware-Service fgm"
+echo "=========================================="
 payload='{
   "id": "E1",
   "type": "T",
@@ -74,21 +74,21 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities --payload "${payload}"  --xauthToken fgm
+orionCurl --url /v2/entities --payload "${payload}"  --tenant fgm
 echo
 echo
 
 
-echo "03. Check that no X-Auth-Token header was propagated to accumulator"
-echo "==================================================================="
+echo "03. Check that no Fiware-Service header was propagated to accumulator"
+echo "====================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to changes in E1/A1 using custom notifications with X-Auth-Token removal
-=======================================================================================================
+01. Make accumulator subscribe to changes in E1/A1 using custom notifications with Fiware-Service removal
+=========================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -97,8 +97,8 @@ Date: REGEX(.*)
 
 
 
-02. Create E1/A1, using X-Auth-Token fgm
-========================================
+02. Create E1/A1, using Fiware-Service fgm
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -107,8 +107,8 @@ Date: REGEX(.*)
 
 
 
-03. Check that no X-Auth-Token header was propagated to accumulator
-===================================================================
+03. Check that no Fiware-Service header was propagated to accumulator
+=====================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify?step=01
 Fiware-Servicepath: /
 Content-Length: 12
