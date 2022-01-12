@@ -5,6 +5,7 @@
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
+* [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
@@ -101,6 +102,30 @@ The following headers cannot be overwritten in custom notifications:
 
 Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
 ignored.
+
+[Top](#top)
+
+## Header removal in custom notifications
+
+It is not explicilty said in NGSIv2 specification ("Custom Notifications" section) but an empty
+string value for a header key in the `headers` object will remove that header from notifications.
+For instance the following configuration:
+
+```
+"httpCustom": { 
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+will remove the `x-auth-token` header in notifications associated to the subscription.
+
+This can be useful to remove headers that Orion will include automatically in notifications.
+For instance:
+
+* To avoid headers included by default in notifications (e.g. `Accept`)
+* To cut the propagation of headers (from updates to notifications), such the
+  aforementioned `x-auth-token`
 
 [Top](#top)
 
