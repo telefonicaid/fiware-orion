@@ -770,10 +770,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if (orionldState.in.payload != NULL)
   {
-    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
-      orionldState.requestPayload = orionldState.in.payload;
-    else
-      orionldState.requestPayload = kaStrdup(&orionldState.kalloc, orionldState.in.payload);
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
+      orionldState.in.payloadCopy = kaStrdup(&orionldState.kalloc, orionldState.in.payload);
 
     if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
       goto respond;

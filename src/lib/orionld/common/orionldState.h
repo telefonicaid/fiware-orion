@@ -219,6 +219,8 @@ typedef struct OrionldStateIn
   char*     payloadCopy;
 } OrionldStateIn;
 
+
+
 // -----------------------------------------------------------------------------
 //
 // OrionldConnectionState - the state of the connection
@@ -243,7 +245,6 @@ typedef struct OrionldConnectionState
   Kjson*                  kjsonP;
   KAlloc                  kalloc;
   char                    kallocBuffer[8 * 1024];
-  char*                   requestPayload;
   KjNode*                 requestTree;
   KjNode*                 responseTree;
   char*                   responsePayload;

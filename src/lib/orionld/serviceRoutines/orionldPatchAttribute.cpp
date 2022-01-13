@@ -368,7 +368,7 @@ static bool orionldForwardPatchAttribute
     return false;
 
   const char*  contentType = (orionldState.ngsildContent == true)? "application/ld+json" : "application/json";
-  int          payloadLen  = strlen(orionldState.requestPayload);
+  int          payloadLen  = strlen(orionldState.in.payloadCopy);
   bool         tryAgain;
   bool         downloadFailed;
   bool         reqOk;
@@ -445,10 +445,10 @@ static bool orionldForwardPatchAttribute
     char link[512];
 
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen, headerV);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.in.payloadCopy, payloadLen, headerV);
   }
   else
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen, headerV);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.in.payloadCopy, payloadLen, headerV);
 
   if (reqOk == false)
   {
