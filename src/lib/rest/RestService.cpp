@@ -199,7 +199,7 @@ std::string payloadParse
     }
     else
     {
-      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
+      result = jsonTreat(orionldState.in.payload, ciP, parseDataP, service->request, jsonPP);
     }
   }
   else if (orionldState.in.contentType == TEXT)
@@ -562,7 +562,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Check the payload, if any
   //
-  if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
+  if ((orionldState.in.payload != NULL) && (ciP->payloadSize != 0) && (orionldState.in.payload[0] != 0))
   {
     std::string  response;
     const char*  spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";

@@ -721,10 +721,10 @@ static void requestCompleted
     PERFORMANCE(notifEnd);
   }
 
-  if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
+  if ((orionldState.in.payload != NULL) && (orionldState.in.payload != static_buffer))
   {
-    free(ciP->payload);
-    ciP->payload = NULL;
+    free(orionldState.in.payload);
+    orionldState.in.payload = NULL;
   }
 
 
@@ -1597,23 +1597,23 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   {
     if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
     {
-      ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      orionldState.in.payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
     }
     else
     {
-      ciP->payload = static_buffer;
+      orionldState.in.payload = static_buffer;
     }
   }
 
   // Copy the chunk
   LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
-  memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+  memcpy(&orionldState.in.payload[ciP->payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer
   ciP->payloadSize += *upload_data_size;
 
   // Zero-terminate the payload
-  ciP->payload[ciP->payloadSize] = 0;
+  orionldState.in.payload[ciP->payloadSize] = 0;
 
   // Acknowledge the data and return
   *upload_data_size = 0;

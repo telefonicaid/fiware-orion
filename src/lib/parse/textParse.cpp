@@ -45,14 +45,14 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   double d;
 
   // 1. Starts and ends with citation marks?
-  if (ciP->payload[0] == '"')
+  if (orionldState.in.payload[0] == '"')
   {
-    char* end = &ciP->payload[strlen(ciP->payload) - 1];
+    char* end = &orionldState.in.payload[strlen(orionldState.in.payload) - 1];
 
     if (*end == '"')
     {
       *end = 0;
-      caP->stringValue = &ciP->payload[1];
+      caP->stringValue = &orionldState.in.payload[1];
       caP->valueType   = orion::ValueTypeString;
     }
     else
@@ -63,25 +63,25 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   }
 
   // 2. True or false?
-  else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "true") == 0) || (strcmp(ciP->payload, "True") == 0) || (strcmp(ciP->payload, "TRUE") == 0)))
+  else if ((strlen(orionldState.in.payload) == 4) && ((strcmp(orionldState.in.payload, "true") == 0) || (strcmp(orionldState.in.payload, "True") == 0) || (strcmp(orionldState.in.payload, "TRUE") == 0)))
   {
     caP->boolValue   = true;
     caP->valueType   = orion::ValueTypeBoolean;
   }
-  else if ((strlen(ciP->payload) == 5) && ((strcmp(ciP->payload, "false") == 0) || (strcmp(ciP->payload, "False") == 0) || (strcmp(ciP->payload, "FALSE") == 0)))
+  else if ((strlen(orionldState.in.payload) == 5) && ((strcmp(orionldState.in.payload, "false") == 0) || (strcmp(orionldState.in.payload, "False") == 0) || (strcmp(orionldState.in.payload, "FALSE") == 0)))
   {
     caP->boolValue   = false;
     caP->valueType   = orion::ValueTypeBoolean;
   }
 
   // 3. Null ?
-  else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "null") == 0) || (strcmp(ciP->payload, "Null") == 0) || (strcmp(ciP->payload, "NULL") == 0)))
+  else if ((strlen(orionldState.in.payload) == 4) && ((strcmp(orionldState.in.payload, "null") == 0) || (strcmp(orionldState.in.payload, "Null") == 0) || (strcmp(orionldState.in.payload, "NULL") == 0)))
   {
     caP->valueType   = orion::ValueTypeNull;
   }
 
   // 4. Is it a valid double?
-  else if (str2double(ciP->payload, &d) == true)
+  else if (str2double(orionldState.in.payload, &d) == true)
   {
     caP->valueType   = orion::ValueTypeNumber;
     caP->numberValue = d;
