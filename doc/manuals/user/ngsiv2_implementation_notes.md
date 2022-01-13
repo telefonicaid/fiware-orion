@@ -5,6 +5,7 @@
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
+* [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
@@ -22,6 +23,7 @@
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
+* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
@@ -100,6 +102,30 @@ The following headers cannot be overwritten in custom notifications:
 
 Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
 ignored.
+
+[Top](#top)
+
+## Header removal in custom notifications
+
+It is not explicilty said in NGSIv2 specification ("Custom Notifications" section) but an empty
+string value for a header key in the `headers` object will remove that header from notifications.
+For instance the following configuration:
+
+```
+"httpCustom": { 
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+will remove the `x-auth-token` header in notifications associated to the subscription.
+
+This can be useful to remove headers that Orion will include automatically in notifications.
+For instance:
+
+* To avoid headers included by default in notifications (e.g. `Accept`)
+* To cut the propagation of headers (from updates to notifications), such the
+  aforementioned `x-auth-token`
 
 [Top](#top)
 
@@ -441,6 +467,31 @@ The following requests can use the flowControl URI param option:
 * `PUT /v2/entities/E/attrs/A?options=flowControl`
 * `PUT /v2/entities/E/attrs/A/value?options=flowControl`
 * `PATCH /v2/entities/E/attrs?options=flowControl`
+
+[Top](#top)
+
+## Ambiguous subscription status `failed` not used
+
+NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
 
 [Top](#top)
 

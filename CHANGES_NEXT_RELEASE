@@ -8,3 +8,6 @@
 - Fix: crash when updating attribute with empty JSON object or array (#3995)
 - Hardening: refactor PATCH /v2/subscriptions/{subId} logic avoiding over-quering MongoDB and possible (although very rare) crash situations during csub cache (#3701)
 - Upgrade Dockerfile base image from centos8.3.2011 to centos8.4.2105
+- Fix: avoid duplicated attributes and metadata in arrays in POST /v2/subscriptions and PATCH /v2/subscriptions/{subId} (#2101)
+- Fix: $each usage with $push operator to add several items to array (#744)
+- Fix: allow HTTPS certificates larger than 2048 bytes (#4012)

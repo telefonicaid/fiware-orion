@@ -32,23 +32,25 @@ jobs:
         ports:
         - 1884:1883
 
+    name: functional - ${{ matrix.payload.name }}
+
     strategy:
       matrix:
-        range:
-          - -e FT_FROM_IX=0 -e FT_TO_IX=300
-          - -e FT_FROM_IX=301 -e FT_TO_IX=600
-          - -e FT_FROM_IX=601 -e FT_TO_IX=900
-          - -e FT_FROM_IX=901 -e FT_TO_IX=1200
-          - -e FT_FROM_IX=1201
-          - -e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300
-          - -e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600
-          - -e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900
-          - -e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200
-          - -e CB_NO_CACHE=ON -e FT_FROM_IX=1201
+        payload:
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201' }
+          - { name: 'batch 1 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Run functional test
         run: |
-          docker run  --network host -t --rm ${{ matrix.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
+          docker run  --network host -t --rm ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional

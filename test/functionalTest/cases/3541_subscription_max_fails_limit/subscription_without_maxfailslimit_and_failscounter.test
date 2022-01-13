@@ -32,10 +32,10 @@ brokerStart CB
 #
 # 01. POST /v2/entities, to create Room1 with temperature and pressure
 # 02. POST /v2/subscriptions, to create subscription without maxFailsLimit
-# 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
+# 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
 # 04. Stop accumulator
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed
+# 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo '03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active'
-echo '======================================================================================'
+echo '03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter'
+echo '===================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -121,8 +121,8 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed'
-echo '===================================================================================='
+echo '06. GET /v2/subscriptions/subscription_id, to check failsCounter:1'
+echo '=================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -149,8 +149,8 @@ Date: REGEX(.*)
 
 
 
-03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit and status=active
-======================================================================================
+03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
+====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 334
 Content-Type: application/json
@@ -199,8 +199,8 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check failsCounter:1 and status=failed
-====================================================================================
+06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
+==================================================================
 HTTP/1.1 200 OK
 Content-Length: 501
 Content-Type: application/json
@@ -225,7 +225,7 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [

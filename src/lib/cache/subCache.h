@@ -105,6 +105,7 @@ struct CachedSubscription
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   std::string                 status;
+  double                      statusLastChange;
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
@@ -208,6 +209,7 @@ extern void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
+  double                             statusLastChange,
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
