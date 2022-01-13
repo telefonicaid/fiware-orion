@@ -77,9 +77,9 @@ TEST(postIndividualContextEntityAttributes, createEntity)
                                    sizeof(expectedBuf),
                                    outfile)) << "Error getting test data from '" << outfile << "'";
 
-  orionldState.in.contentType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
+  orionldState.in.contentType  = JSON;
+  orionldState.in.payload      = testBuf;
+  orionldState.in.payloadSize  = strlen(testBuf);
 
   serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbV);
   out = orionServe(&ci);

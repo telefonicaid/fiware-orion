@@ -215,6 +215,8 @@ typedef struct OrionldStateIn
 
   // Incoming payload
   char*     payload;
+  int       payloadSize;
+  char*     payloadCopy;
 } OrionldStateIn;
 
 // -----------------------------------------------------------------------------
