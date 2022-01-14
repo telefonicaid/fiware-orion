@@ -30,6 +30,7 @@
 
 #include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/RestService.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "parse/forbiddenChars.h"
@@ -163,5 +164,5 @@ std::string parseEntityObject
     }
   }
 
-  return eP->check(ciP->requestType);
+  return eP->check(ciP->restServiceP->request);
 }

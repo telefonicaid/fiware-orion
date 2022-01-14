@@ -183,8 +183,6 @@ std::string payloadParse
 {
   std::string result = "NONE";
 
-  ciP->requestType = service->request;
-
   if (orionldState.in.contentType == JSON)
   {
     if (orionldState.apiVersion == V2)

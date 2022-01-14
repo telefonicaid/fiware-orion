@@ -36,6 +36,7 @@
 #include "parse/forbiddenChars.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/RestService.h"
 #include "rest/OrionError.h"
 
 #include "jsonParseV2/jsonParseTypeNames.h"
@@ -285,7 +286,7 @@ std::string parseContextAttribute
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  std::string r = caP->check(orionldState.apiVersion, ciP->requestType);
+  std::string r = caP->check(orionldState.apiVersion, ciP->restServiceP->request);
   if (r != "OK")
   {
     alarmMgr.badInput(clientIp, r);

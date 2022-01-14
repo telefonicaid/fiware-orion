@@ -32,10 +32,11 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttributeValue.h"
 #include "rest/OrionError.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/RestService.h"
 #include "parse/forbiddenChars.h"
 
 
@@ -79,7 +80,7 @@ std::string putEntityAttributeValue
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
   parseDataP->av.attribute.onlyValue = true;
 
-  std::string err = parseDataP->av.attribute.check(orionldState.apiVersion, ciP->requestType);
+  std::string err = parseDataP->av.attribute.check(orionldState.apiVersion, ciP->restServiceP->request);
   if (err != "OK")
   {
     OrionError oe(SccBadRequest, err, "BadRequest");
