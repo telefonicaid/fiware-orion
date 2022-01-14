@@ -134,7 +134,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 {
   rapidjson::Document  document;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {

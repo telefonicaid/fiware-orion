@@ -27,6 +27,9 @@
 #include "rapidjson/document.h"
 
 #include "logMsg/logMsg.h"
+
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/string.h"
 #include "common/errorMessages.h"
 #include "common/globals.h"
@@ -248,7 +251,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
   std::string          errorString;
   rapidjson::Document  document;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {

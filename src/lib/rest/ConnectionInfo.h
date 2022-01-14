@@ -75,10 +75,7 @@ public:
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
-  char*                      payload;
-  int                        payloadSize;
   std::string                answer;
-  RequestType                requestType;  // FIXME P2: To Be Removed (found inside restServiceP->request (restServiceP->type))
   std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics
 
@@ -97,9 +94,6 @@ public:
 
   // Timing
   struct timespec           reqStartTime;
-
-#ifdef ORIONLD
-#endif  
 };
 
 

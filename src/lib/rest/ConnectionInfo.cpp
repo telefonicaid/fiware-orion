@@ -67,8 +67,6 @@ static const char* validOptions[] =
 */
 ConnectionInfo::ConnectionInfo():
   restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),
@@ -84,8 +82,6 @@ ConnectionInfo::ConnectionInfo():
 */
 ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
   restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
   transactionStart       { 0, 0 },
   inCompoundValue        (false),
   compoundValueP         (NULL),

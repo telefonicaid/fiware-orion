@@ -49,7 +49,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   rapidjson::Document    document;
   OrionError             oe;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {

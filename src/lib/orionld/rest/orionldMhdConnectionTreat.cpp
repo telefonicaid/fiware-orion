@@ -250,7 +250,7 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 static bool payloadEmptyCheck(ConnectionInfo* ciP)
 {
   // No payload?
-  if (ciP->payload == NULL)
+  if (orionldState.in.payload == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
     orionldState.httpStatusCode = 400;
@@ -258,7 +258,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   }
 
   // Empty payload?
-  if (ciP->payload[0] == 0)
+  if (orionldState.in.payload[0] == 0)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
     orionldState.httpStatusCode = 400;
@@ -298,7 +298,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   // Parse the payload
   //
   PERFORMANCE(parseStart);
-  orionldState.requestTree = kjParse(orionldState.kjsonP, ciP->payload);
+  orionldState.requestTree = kjParse(orionldState.kjsonP, orionldState.in.payload);
   PERFORMANCE(parseEnd);
 
   //
@@ -768,12 +768,10 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Save a copy of the incoming payload before it is destroyed during kjParse AND
   // parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
-  if (ciP->payload != NULL)
+  if (orionldState.in.payload != NULL)
   {
-    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
-      orionldState.requestPayload = ciP->payload;
-    else
-      orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
+      orionldState.in.payloadCopy = kaStrdup(&orionldState.kalloc, orionldState.in.payload);
 
     if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
       goto respond;

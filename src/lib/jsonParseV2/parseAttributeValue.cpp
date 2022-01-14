@@ -48,7 +48,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   rapidjson::Document  document;
   OrionError           oe;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {

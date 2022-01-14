@@ -183,8 +183,6 @@ std::string payloadParse
 {
   std::string result = "NONE";
 
-  ciP->requestType = service->request;
-
   if (orionldState.in.contentType == JSON)
   {
     if (orionldState.apiVersion == V2)
@@ -199,7 +197,7 @@ std::string payloadParse
     }
     else
     {
-      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
+      result = jsonTreat(orionldState.in.payload, ciP, parseDataP, service->request, jsonPP);
     }
   }
   else if (orionldState.in.contentType == TEXT)
@@ -562,12 +560,12 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Check the payload, if any
   //
-  if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
+  if ((orionldState.in.payload != NULL) && (orionldState.in.payloadSize != 0) && (orionldState.in.payload[0] != 0))
   {
     std::string  response;
     const char*  spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
 
-    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
+    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_REQ_SIZE, orionldState.in.payloadSize);
     response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
 
     if (response != "OK")
@@ -588,7 +586,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   }
 
   // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), orionldState.urlPath)); // Sacred - used in 'heavyTest'
-  if (ciP->payloadSize == 0)
+  if (orionldState.in.payloadSize == 0)
   {
     orionldState.in.contentType = NOMIMETYPE;
   }

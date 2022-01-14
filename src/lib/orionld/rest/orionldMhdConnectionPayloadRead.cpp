@@ -87,29 +87,29 @@ MHD_Result orionldMhdConnectionPayloadRead
   // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
   //           Once we *really* look to scratch some efficiency, this change should be made.
   //
-  if (ciP->payloadSize == 0)  // First call with payload
+  if (orionldState.in.payloadSize == 0)  // First call with payload
   {
     if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
     {
-      ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-      if (ciP->payload == NULL)
+      orionldState.in.payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      if (orionldState.in.payload == NULL)
       {
         LM_E(("Out of memory!!!"));
         return MHD_NO;
       }
     }
     else
-      ciP->payload = static_buffer;
+      orionldState.in.payload = static_buffer;
   }
 
   // Copy the chunk
-  memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+  memcpy(&orionldState.in.payload[orionldState.in.payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer
-  ciP->payloadSize += dataLen;
+  orionldState.in.payloadSize += dataLen;
 
   // Zero-terminate the payload
-  ciP->payload[ciP->payloadSize] = 0;
+  orionldState.in.payload[orionldState.in.payloadSize] = 0;
 
   // Acknowledge the data and return
   *upload_data_size = 0;

@@ -106,8 +106,8 @@ TEST(RestService, payloadParse)
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
   orionldState.in.contentType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
+  orionldState.in.payload         = testBuf;
+  orionldState.in.payloadSize     = strlen(testBuf);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
@@ -120,9 +120,9 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  orionldState.in.contentType     = NOMIMETYPE;
-  ci.payload        = (char*) "123";
-  ci.payloadSize    = strlen(ci.payload);
+  orionldState.in.contentType    = NOMIMETYPE;
+  orionldState.in.payload        = (char*) "123";
+  orionldState.in.payloadSize    = strlen(orionldState.in.payload);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad Input", out);
@@ -159,10 +159,10 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  orionldState.in.contentType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
-  ci.restServiceP   = &restService;
+  orionldState.in.contentType   = JSON;
+  orionldState.in.payload       = testBuf;
+  orionldState.in.payloadSize   = strlen(testBuf);
+  ci.restServiceP               = &restService;
 
   serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
   out = orion::requestServe(&ci);
@@ -176,9 +176,9 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  orionldState.in.contentType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
+  orionldState.in.contentType    = JSON;
+  orionldState.in.payload        = testBuf;
+  orionldState.in.payloadSize    = strlen(testBuf);
 
   serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
   out = orion::requestServe(&ci);

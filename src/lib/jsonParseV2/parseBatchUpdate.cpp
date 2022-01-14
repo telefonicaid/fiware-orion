@@ -49,7 +49,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   rapidjson::Document  document;
   OrionError           oe;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {
