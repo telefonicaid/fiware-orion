@@ -26,7 +26,6 @@
 #
 # paho-mqtt==1.5.1
 
-from __future__ import division   # need for seconds calculation (could be removed with Python 2.7)
 __author__ = 'fermin'
 
 # This program stores everything it receives by HTTP in a given URL (pased as argument),
@@ -290,7 +289,6 @@ def record_request(request):
 
     global ac, t0, times
     s = ''
-    times = []
 
     # First request? Then, set reference datetime. Otherwise, add the
     # timedelta to the list
@@ -466,7 +464,7 @@ def dump():
 
 
 @app.route('/times', methods=['GET'])
-def times_():
+def giveTimes():
     return ', '.join(map(str, times)) + '\n'
 
 
@@ -492,7 +490,7 @@ def getPid():
 # This is the accumulation string
 ac = ''
 t0 = ''
-# times = []
+times = []
 lock = threading.Lock()
 
 
