@@ -548,7 +548,7 @@ def on_message(client, userdata, msg):
 
 ac = ''
 t0 = ''
-# times = []
+times = []
 
 if __name__ == '__main__':
 
