@@ -21,7 +21,7 @@ Consider this method if you want to try Orion Context Broker and do not want to 
 Follow these steps:
 
 1. Create a directory on your system on which to work (for example, `~/fiware`).
-2. Create a new file called `docker-compose.yml` inside your directory with the following contents(or use the provided [docker-compose.yml](docker-compose.yml)):
+2. Create a new file called `docker-compose.yml` inside your directory with the following contents (or use the provided [docker-compose.yml](docker-compose.yml)):
 	
 		mongo:
 		  image: mongo:4.4
@@ -55,7 +55,7 @@ This method will launch a container running Orion Context Broker, but it is up t
 
 > TIP: If you are trying these methods or run them more than once and come across an error saying that the container already exists you can delete it with `docker rm orion1`. If you have to stop it first do `docker stop orion1`.
 
-Keep in mind that if you use these commands you get access to the tags and specific versions of Orion. For example, you may use `fiware/orion-ld:0.22` instead of `fiware/orion-ld` in the following commands if you need that particular version. If you do not specify a version you are pulling from `latest` by default.
+Keep in mind that if you use these commands you get access to the tags and specific versions of Orion-LD. For example, you may use `fiware/orion-ld:1.0.0` instead of `fiware/orion-ld` in the following commands if you need that particular version. If you do not specify a version you are pulling from `latest` by default.
 
 ### 2A. MongoDB is on localhost
 
@@ -101,9 +101,9 @@ Steps:
 1. Download [Orion-LD's source code](https://github.com/FIWARE/context.Orion-LD) from Github (`git clone https://github.com/FIWARE/context.Orion-LD/`)
 2. Switch to the repo base-directory
 3. (optional) Modify the [Base-Image Dockerfile](Dockerfile-ubi-base) to your liking 
-4. (optional) Built the Base-Image `docker build -f docker/Dockerfile-ubi-base -t <YOUR_BASE_IMAGE_TAG>` 
+4. (optional) Build the Base-Image `docker build -f docker/Dockerfile-ubi-base -t <YOUR_BASE_IMAGE_TAG>` 
 5. Modify the [Orion-LD Dockerfile](Dockerfile-ubi) to your liking
-6. Built the Orion-LD image `docker build -f docker/Dockerfile-ubi -t <YOUR_CUSTOM_TAG>`
+6. Build the Orion-LD image `docker build -f docker/Dockerfile-ubi -t <YOUR_CUSTOM_TAG>`
 
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
 
