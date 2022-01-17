@@ -1592,14 +1592,14 @@ function cServerCurl
   #
   verb=GET
   url=""
-  payload=""
+  _payload=""
   hasPayload=no
 
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--verb" ];    then  verb=$2;    shift;
     elif [ "$1" == "--url" ];     then  url=$2;     shift;
-    elif [ "$1" == "--payload" ]; then  payload=$2; hasPayload=yes; shift;
+    elif [ "$1" == "--payload" ]; then  _payload=$2; hasPayload=yes; shift;
     else
       echo "Invalid option/parameter for cServerCurl: $1"
       exit 1
@@ -1620,7 +1620,7 @@ function cServerCurl
 
   if [ "$hasPayload" == "yes" ]
   then
-    curl -s http://localhost:7080$url -X $verb -d "$payload" -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    curl -s http://localhost:7080$url -X $verb -d "$_payload" -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
     r=$?
   else
     curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders > /tmp/cServerOut
@@ -1631,7 +1631,7 @@ function cServerCurl
   if [ $r != 0 ]
   then
     echo curl error $r
-    echo curl command: curl http:localhost:7080$url -d "$payload"
+    echo curl command: curl http:localhost:7080$url -d "$_payload"
     echo curl response:
   fi
   cat /tmp/cServerHeaders
