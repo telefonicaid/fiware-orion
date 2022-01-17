@@ -478,8 +478,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
 
   if (*rest != 'q')
   {
-    ciP->acceptHeaderError      = "q missing in accept header";
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.out.acceptErrorDetail = (char*) "q missing in accept header";
+    orionldState.httpStatusCode        = SccBadRequest;
     delete acceptHeaderP;
     return false;
   }
@@ -488,8 +488,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   ++rest;
   if (*rest != '=')
   {
-    ciP->acceptHeaderError      = "missing equal-sign after q in accept header";
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.out.acceptErrorDetail = (char*) "missing equal-sign after q in accept header";
+    orionldState.httpStatusCode        = SccBadRequest;
     delete acceptHeaderP;
     return false;
   }
@@ -505,8 +505,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   // qvalue there?
   if (*rest == 0)
   {
-    ciP->acceptHeaderError      = "qvalue in accept header is missing";
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.out.acceptErrorDetail = (char*) "qvalue in accept header is missing";
+    orionldState.httpStatusCode        = SccBadRequest;
     delete acceptHeaderP;
     return false;
   }
@@ -514,8 +514,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   // qvalue a number?
   if (str2double(rest, &acceptHeaderP->qvalue) == false)
   {
-    ciP->acceptHeaderError      = "qvalue in accept header is not a number";
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.out.acceptErrorDetail = (char*) "qvalue in accept header is not a number";
+    orionldState.httpStatusCode        = SccBadRequest;
 
     orionldState.out.contentType = mimeTypeSelect(ciP);
 
@@ -546,10 +546,10 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
   char*         itemStart  = (char*) value;
   char*         cP         = (char*) value;
 
-  if (value[0] == 0)
+  if ((value == NULL) || (value[0] == 0))
   {
-    ciP->acceptHeaderError      = "empty accept header";
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.out.acceptErrorDetail = (char*) "empty accept header";
+    orionldState.httpStatusCode        = SccBadRequest;
     return;
   }
 
@@ -579,15 +579,15 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
   acceptItemParse(ciP, itemStart);
 
-  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (ciP->acceptHeaderError == ""))
+  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (orionldState.out.acceptErrorDetail == NULL))
   {
-    orionldState.httpStatusCode = SccNotAcceptable;
-    ciP->acceptHeaderError      = "no acceptable mime-type in accept header";
+    orionldState.httpStatusCode        = SccNotAcceptable;
+    orionldState.out.acceptErrorDetail = (char*) "no acceptable mime-type in accept header";
   }
 
   if ((orionldState.httpStatusCode == SccNotAcceptable) || (orionldState.httpStatusCode == SccBadRequest))
   {
-    OrionError oe((HttpStatusCode) orionldState.httpStatusCode, ciP->acceptHeaderError);
+    OrionError oe((HttpStatusCode) orionldState.httpStatusCode, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
 
     ciP->answer = oe.smartRender(orionldState.apiVersion);
   }
@@ -610,7 +610,7 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
     headerP->accept = value;
-    acceptParse(ciP, value);  // Any errors are flagged in ciP->acceptHeaderError and taken care of later
+    acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
   }
   else if (strcasecmp(key, HTTP_EXPECT) == 0)            headerP->expect         = value;
   else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
@@ -1787,12 +1787,12 @@ static MHD_Result connectionTreat
   //
   // Check for error during Accept Header parsing
   //
-  if (ciP->acceptHeaderError != "")
+  if (orionldState.out.acceptErrorDetail != NULL)
   {
-    OrionError   oe(SccBadRequest, ciP->acceptHeaderError);
+    OrionError   oe(SccBadRequest, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
 
     orionldState.httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
+    alarmMgr.badInput(clientIp, orionldState.out.acceptErrorDetail);
     restReply(ciP, oe.smartRender(orionldState.apiVersion));
     return MHD_YES;
   }
