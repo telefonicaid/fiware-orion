@@ -76,7 +76,6 @@ public:
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   std::string                answer;
-  std::string                acceptHeaderError;
   struct timeval             transactionStart;  // For metrics
 
   std::map<std::string, std::string>   uriParam;

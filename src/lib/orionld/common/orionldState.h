@@ -194,6 +194,9 @@ typedef struct OrionldStateOut
   // Outgoing HTTP headers
   MimeType  contentType;
 
+  // Errors
+  char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
+
 #if 0
   char*     httpHeaderV[10];    // Buffer to be used if less than 10 headers
   char**    httpHeader;         // Points to httpHeaderV, reallocated if necessary
