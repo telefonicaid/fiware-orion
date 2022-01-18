@@ -130,7 +130,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (valueP == NULL)
     {
       LM_E(("Database Error (the %s '%s' has no value)", typeP->value.s, attrP->name));
-      return false;
+      valueP = kjString(orionldState.kjsonP, "value", "Internal Error - attribute value lost");
     }
 
     // Inherit the value field

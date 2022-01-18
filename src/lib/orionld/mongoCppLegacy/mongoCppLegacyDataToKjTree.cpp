@@ -83,7 +83,10 @@ static void objectToKjTree(KjNode* containerP, mongo::BSONObj* bsonObjP, char** 
       continue;
     }
 
-    kjChildAdd(containerP, nodeP);
+    if (nodeP != NULL)
+      kjChildAdd(containerP, nodeP);
+    else
+      LM_E(("Internal Error - NULL node pointer"));
   }
 }
 
@@ -130,7 +133,10 @@ static void arrayToKjTree(KjNode* containerP, mongo::BSONArray* bsonArrayP, char
       continue;
     }
 
-    kjChildAdd(containerP, nodeP);
+    if (nodeP != NULL)
+      kjChildAdd(containerP, nodeP);
+    else
+      LM_E(("Internal Error - NULL node pointer"));
   }
 }
 

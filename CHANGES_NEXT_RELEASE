@@ -1,0 +1,3 @@
+* Issue #280   Preparations for the complete removal of ConnectionInfo (Refactor + Performance)
+* Issue #954   Broker crashes with too big attribute values (Orion-LD limit for an attribute value is 64k right now)
+* 
