@@ -1,0 +1,1 @@
+- Fix: buffer overflow problem in logs subsystem for from= field, causing crash in some cases (#3884)
