@@ -1,0 +1,2 @@
+* Issue #954   Broker crashes with too big attribute values (Orion-LD limit is 64k right now)
+* 

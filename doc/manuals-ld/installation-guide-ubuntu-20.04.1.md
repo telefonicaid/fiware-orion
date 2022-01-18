@@ -108,7 +108,8 @@ sudo make install
 
 ### Mongo C driver
 The idea is to leave the old mongo legacy driver in the dust and new stuff is implemented using the new C driver.
-Install it like this:
+
+To install version 1.17.5 of the mongo C driver:
 ```
 cd /opt
 sudo mkdir mongoc
@@ -139,26 +140,6 @@ wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
 tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
-
-### Mongo C driver
-Orion-LD uses a mix of the old (deprecated) mongo C++ legacy driver and the new mongo C driver.
-The idea is to migrate all to the new C driver, but right now, the old legacy driver is still needed.
-
-To install version 1.17.5 of the mongo C driver:
-```bash
-sudo mkdir /opt/mongo-c-driver
-sudo chown $USER:$GROUP /opt/mongo-c-driver
-cd /opt/mongo-c-driver
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
-tar xzf mongo-c-driver-1.17.5.tar.gz
-cd mongo-c-driver-1.17.5
-mkdir cmake-build
-cd cmake-build
-cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
-export LD_LIBRARY_PATH=/usr/local/lib
-sudo make install
-```
-
 
 ### kbase
 
