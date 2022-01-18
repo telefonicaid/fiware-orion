@@ -30,31 +30,26 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity E with attributes A=1 and B=2
+# 01. Create an entity E with attributes A=1 and B=2
 # 02. Strict append update E-A=10, we should see 422 response (as operation completely fails in this case)
 # 03. GET E to check A=1 and B=2 have not changed
 # 04. Strict append update E-A=10,C=30, we should see 207 response (as operation partially success in this case)
 # 05. GET E to check partial result C=30 appended (but A=1 and B=2 untouched)
 #
 
-echo "01. Create entity E with attributes A=1 and B=2"
-echo "==============================================="
+echo "01. Create an entity E with attributes A=1 and B=2"
+echo "=================================================="
 payload='{
-  "actionType": "appendStrict",
-  "entities": [
-    {
-      "id": "E",
-      "type": "T",
-      "A": {
-        "value": 1
-      },
-      "B": {
-        "value": 2
-      }
+    "id": "E",
+    "type": "T",
+    "A": { 
+      "value": 1 
+    },
+    "B": {
+      "value": 2
     }
-  ]
 }'
-orionCurl --url /v2/op/update --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -116,9 +111,11 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with attributes A=1 and B=2
-===============================================
-HTTP/1.1 204 No Content
+01. Create an entity E with attributes A=1 and B=2
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -126,7 +123,7 @@ Date: REGEX(.*)
 
 02. Strict append update E-A=10, we should see 422 response (as operation completely fails in this case)
 ========================================================================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -165,13 +162,13 @@ Date: REGEX(.*)
 04. Strict append update E-A=10,C=30, we should see 207 response (as operation partially success in this case)
 ==============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 107
+Content-Length: 69
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request already exist: [ A ]",
+    "description": "attribute partially updated",
     "error": "Unprocessable"
 }
 

@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -2456,7 +2455,7 @@ static bool deleteContextAttributeItem
                             " - location attribute has to be defined at creation time, with APPEND";
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
+      oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
@@ -2859,7 +2858,7 @@ static bool createEntity
       // FIXME P7: same comment in the upsert case
       if (errDetail->find(MONGODB_ERROR_DUPLICATE_KEY) != std::string::npos)
       {
-        oeP->fill(SccMultiStatus, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
+        oeP->fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       }
       else if (errDetail->find(MONGODB_ERROR_WRONGJSON) != std::string::npos)
       {
@@ -3433,6 +3432,13 @@ static unsigned int updateEntity
         }
         *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
       }
+      else
+      {
+        *attributeAlreadyExistsError = false;
+        std::string details = "attribute partially updated";
+        buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+        responseP->oe.fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
+      }
     }
     *attributeAlreadyExistsList += " ]";
   }
@@ -3452,6 +3458,13 @@ static unsigned int updateEntity
           *attributeNotExistingList += ", ";
         }
         *attributeNotExistingList += eP->attributeVector[ix]->name;
+      }
+      else
+      {
+        *attributeNotExistingError = false;
+        std::string details = "attribute partially updated";
+        buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+        responseP->oe.fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
       }
     }
     *attributeNotExistingList += " ]";
@@ -3819,7 +3832,7 @@ static bool contextElementPreconditionsCheck
         ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
         std::string details = std::string("duplicated attribute name: name=<") + name + ">";
         alarmMgr.badInput(clientIp, details);
-        buildGeneralErrorResponse(eP, ca, responseP, SccMultiStatus,
+        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
         responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
@@ -3856,7 +3869,7 @@ static bool contextElementPreconditionsCheck
             " - offending attribute: " + aP->name +
             " - empty attribute not allowed in APPEND or UPDATE";
 
-        buildGeneralErrorResponse(eP, ca, responseP, SccMultiStatus, details);
+        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
         responseP->oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
         alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
@@ -3975,8 +3988,8 @@ unsigned int processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccMultiStatus, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
-      responseP->oe.fill(SccMultiStatus, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
+      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
+      responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
       return 0;
     }
 
@@ -4246,14 +4259,14 @@ unsigned int processContextElement
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   if (attributeNotExistingError == true)
   {
     std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
+    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
   }
 
   // Response in responseP

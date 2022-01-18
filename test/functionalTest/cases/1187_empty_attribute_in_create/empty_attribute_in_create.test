@@ -98,7 +98,7 @@ Date: REGEX(.*)
 
 03. POST /v2/entities to create E1/A2="", using json object (fails, as entity already exists)
 =============================================================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 56
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

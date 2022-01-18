@@ -198,7 +198,7 @@ Date: REGEX(.*)
 
 03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error
 ================================================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

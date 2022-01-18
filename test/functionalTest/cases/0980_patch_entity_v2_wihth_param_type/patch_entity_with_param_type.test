@@ -165,7 +165,7 @@ Date: REGEX(.*)
 
 05. PATCH /v2/entities/E1 T1 (error, attribute not exist)
 =========================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

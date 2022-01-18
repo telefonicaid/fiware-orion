@@ -63,7 +63,7 @@ payload='{
       "id": "E",
       "type": "T",
       "C": {
-        "value": 10
+        "value": 30
       }
     }
   ]
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 
 02. Patch update E-C=30, we should see 422 response (as operation completely fails in this case)
 ================================================================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 
 04. Patch update E-A=10,C=30, we should see 207 response (as operation partially success in this case)
 ======================================================================================================
-HTTP/1.1 207 Multi-Status
+HTTP/1.1 422 Unprocessable Entity
 Content-Length: 106
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
