@@ -37,6 +37,7 @@
 #include "mongoBackend/MongoGlobal.h"
 
 #include "orionld/types/OrionldTenant.h"                          // OrionldTenant
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"      // mongoCppLegacyDbFieldGet
 #include "orionld/mongoBackend/mongoEntityExists.h"               // Own Interface
 
 
@@ -87,7 +88,22 @@ bool mongoEntityExists(const char* entityId, OrionldTenant* tenantP)
     try
     {
       bo = cursor->nextSafe();
-      ++docs;
+
+      mongo::BSONElement _id;
+
+      if (mongoCppLegacyDbFieldGet(&bo, "_id", &_id) == true)
+      {
+        mongo::BSONElement id;
+        mongo::BSONObj     obj = _id.Obj();
+
+        if (mongoCppLegacyDbFieldGet(&obj, "id", &id) == true)
+        {
+          const char* idString = id.valuestr();
+
+          if ((idString != NULL) && (strcmp(idString, entityId) == 0))
+            ++docs;
+        }
+      }
     }
     catch (...)
     {
