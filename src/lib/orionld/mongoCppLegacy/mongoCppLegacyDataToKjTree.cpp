@@ -65,6 +65,8 @@ static void objectToKjTree(KjNode* containerP, mongo::BSONObj* bsonObjP, char** 
       nodeP = kjInteger(orionldState.kjsonP, nodeName, be.Number());
     else if (type == mongo::jstNULL)
       nodeP = kjNull(orionldState.kjsonP, nodeName);
+    else if (type == mongo::Timestamp)
+      nodeP = kjFloat(orionldState.kjsonP, nodeName, be.date().millis / 1000.0);
     else if (type == mongo::Object)
     {
       mongo::BSONObj bo = be.embeddedObject();
