@@ -277,7 +277,7 @@ tag `fiware-orion`
 Orion Context Broker is licensed under [Affero General Public License (GPL)
 version 3](./LICENSE).
 
-© 2021 Telefonica Investigación y Desarrollo, S.A.U
+© 2022 Telefonica Investigación y Desarrollo, S.A.U
 
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 
