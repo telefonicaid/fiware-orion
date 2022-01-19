@@ -256,7 +256,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, int statusCode, const std::string& d
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    bool                  asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
     *outStringP = qcr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
@@ -277,7 +277,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, int statusCode, const std::string& d
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
     *outStringP = ucr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)

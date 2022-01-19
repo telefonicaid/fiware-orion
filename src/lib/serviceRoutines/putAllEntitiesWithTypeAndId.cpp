@@ -81,7 +81,7 @@ extern std::string putAllEntitiesWithTypeAndId
   std::string                   answer;
   UpdateContextElementResponse  response;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // FIXME P1: AttributeDomainName skipped
   // FIXME P1: domainMetadataVector skipped
