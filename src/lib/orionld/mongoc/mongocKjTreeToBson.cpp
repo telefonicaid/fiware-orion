@@ -44,7 +44,7 @@ static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray)
   int         slen = (inArray == true)? 0 : -1;
   const char* name = (inArray == true)? "" : nodeP->name;
 
-  if      (nodeP->type == KjString)    bson_append_symbol(parentP, name, slen, nodeP->value.s, -1);
+  if      (nodeP->type == KjString)    bson_append_utf8(parentP, name, slen, nodeP->value.s, -1);
   else if (nodeP->type == KjInt)       bson_append_int32(parentP, name, slen, nodeP->value.i);
   else if (nodeP->type == KjFloat)     bson_append_double(parentP, name, slen, nodeP->value.f);
   else if (nodeP->type == KjBoolean)   bson_append_bool(parentP, name, slen, nodeP->value.b);
