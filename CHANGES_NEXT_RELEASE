@@ -1,3 +1,6 @@
 * Issue #280   Preparations for the complete removal of ConnectionInfo (Refactor + Performance)
 * Issue #954   Broker crashes with too big attribute values (Orion-LD limit for an attribute value is 64k right now)
 * Issue #986   Username and Password for the mongo C driver connection to the MongoDB server
+* Issue #990   mongo::Timestamp support
+* Issue #989   Deprecated bson_append_symbol still in use - change for bson_append_utf8
+

@@ -46,7 +46,7 @@ void mongocContextCacheDelete(const char* id)
   bson_t selector;
 
   bson_init(&selector);
-  bson_append_symbol(&selector, "_id", 3, id, -1);
+  bson_append_utf8(&selector, "_id", 3, id, -1);
 
   sem_wait(&mongoContextsSem);
 
