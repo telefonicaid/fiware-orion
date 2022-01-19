@@ -3,4 +3,4 @@
 * Issue #986   Username and Password for the mongo C driver connection to the MongoDB server
 * Issue #990   mongo::Timestamp support
 * Issue #989   Deprecated bson_append_symbol still in use - change for bson_append_utf8
-
+* Issue #992   100% reliable implementation of existence check of entities (mongoEntityExists)
