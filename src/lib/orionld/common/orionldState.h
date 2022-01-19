@@ -220,6 +220,9 @@ typedef struct OrionldStateIn
   char*     payload;
   int       payloadSize;
   char*     payloadCopy;
+
+  // Meta info for URL parameters
+  bool      attributeFormatAsObject;
 } OrionldStateIn;
 
 

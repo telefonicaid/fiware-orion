@@ -625,15 +625,13 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.collapse = true;
   }
   //
-  // FIXME: attributeFormat AND attributesFormat ???
+  // NOTE: Seems like both "attributeFormat" AND "attributesFormat" need to be supported
   //
-  else if (strcmp(key, "attributeFormat") == 0)
+  else if ((strcmp(key, "attributeFormat") == 0) || (strcmp(key, "attributesFormat") == 0))
   {
     orionldState.uriParams.attributeFormat = (char*) value;
-  }
-  else if (strcmp(key, "attributesFormat") == 0)
-  {
-    orionldState.uriParams.attributeFormat = (char*) value;
+    if (strcmp(value, "object") == 0)
+      orionldState.in.attributeFormatAsObject = true;
   }
   else if (strcmp(key, "reset") == 0)
   {

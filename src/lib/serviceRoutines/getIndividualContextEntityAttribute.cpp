@@ -82,7 +82,7 @@ std::string getIndividualContextEntityAttribute
   std::string               attributeName  = compV[4];
   ContextAttributeResponse  response;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // 0. Take care of URI params
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)

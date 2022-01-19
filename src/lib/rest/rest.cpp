@@ -267,16 +267,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       return MHD_YES;
     }
   }
-  else if (key == URI_PARAM_ATTRIBUTES_FORMAT)
-  {
-    // If URI_PARAM_ATTRIBUTES_FORMAT used, set URI_PARAM_ATTRIBUTE_FORMAT as well
-    ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] = value;
-  }
-  else if (key == URI_PARAM_ATTRIBUTE_FORMAT)
-  {
-    // If URI_PARAM_ATTRIBUTE_FORMAT used, set URI_PARAM_ATTRIBUTES_FORMAT as well
-    ciP->uriParam[URI_PARAM_ATTRIBUTES_FORMAT] = value;
-  }
   else if (key == URI_PARAM_OPTIONS)
   {
     ciP->uriParam[URI_PARAM_OPTIONS] = value;

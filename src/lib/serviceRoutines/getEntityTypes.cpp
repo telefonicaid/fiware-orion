@@ -62,7 +62,7 @@ std::string getEntityTypes
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   response.statusCode.fill(SccOk);
 
