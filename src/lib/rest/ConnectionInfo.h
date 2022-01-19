@@ -76,7 +76,6 @@ public:
   std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   std::string                answer;
-  struct timeval             transactionStart;  // For metrics
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;
@@ -90,9 +89,6 @@ public:
   // Outgoing
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
-
-  // Timing
-  struct timespec           reqStartTime;
 };
 
 

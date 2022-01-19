@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                                // struct timespec
+#include <time.h>                                                // struct timespec, struct timeval
 #include <semaphore.h>                                           // sem_t
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 #include <microhttpd.h>                                          // MHD_Connection
@@ -240,8 +240,9 @@ typedef struct OrionldConnectionState
   OrionldPhase            phase;
   MHD_Connection*         mhdConnection;
   ConnectionInfo*         ciP;                    // To Be Removed
+  struct timeval          transactionStart;       // For metrics
   struct timespec         timestamp;              // The time when the request entered
-  double                  requestTime;            // Same same, but at a floating point
+  double                  requestTime;            // Same same (timestamp), but at a floating point
   char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;

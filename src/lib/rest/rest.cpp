@@ -733,7 +733,7 @@ static void requestCompleted
   if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
-    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+    clock_difftime(&reqEndTime, &orionldState.timestamp, &threadLastTimeStat.reqTime);
   }
 
 
@@ -785,15 +785,15 @@ static void requestCompleted
       metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
-  if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
+  if (metricsMgr.isOn() && (orionldState.transactionStart.tv_sec != 0))
   {
     struct timeval  end;
 
     if (gettimeofday(&end, NULL) == 0)
     {
       unsigned long long elapsed =
-        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
-        (end.tv_usec - ciP->transactionStart.tv_usec);
+        (end.tv_sec  - orionldState.transactionStart.tv_sec) * 1000000 +
+        (end.tv_usec - orionldState.transactionStart.tv_usec);
 
       metricsMgr.add(orionldState.tenantP->tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
@@ -1419,13 +1419,8 @@ ConnectionInfo* connectionTreatInit
   LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   // LM_K(("--------------------- Serving APIv%d request %s %s -----------------", orionldState.apiVersion, method, url));
 
-  ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
-  ciP->transactionStart.tv_usec = transactionStart.tv_usec;
-
-  if (timingStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
-  }
+  orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
+  orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
 
   // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
   LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
