@@ -1,3 +1,3 @@
 * Issue #280   Preparations for the complete removal of ConnectionInfo (Refactor + Performance)
 * Issue #954   Broker crashes with too big attribute values (Orion-LD limit for an attribute value is 64k right now)
-* 
+* Issue #986   Username and Password for the mongo C driver connection to the MongoDB server

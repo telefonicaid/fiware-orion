@@ -321,11 +321,11 @@ int mongoConnectionPoolInit
   //
   // Initialize (connect) the pool
   //
+  LM_K(("Connecting to mongo for the C++ legacy driver"));
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     connectionPool[ix].free       = true;
-    connectionPool[ix].connection =
-        mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
 
     if ((connectionPool[ix].connection == NULL) && (ix == 0))
       LM_X(1, ("Database Error (unable connect to mongo after a number of retries)"));

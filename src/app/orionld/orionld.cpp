@@ -920,7 +920,7 @@ int main(int argC, char* argV[])
     }
   }
 
-  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum);
 
   LM_I(("Orion Context Broker is running"));
 

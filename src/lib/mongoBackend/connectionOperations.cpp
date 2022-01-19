@@ -830,7 +830,7 @@ bool getWriteConcern
   }
   catch (const std::exception &e)
   {
-    std::string msg = std::string("getWritteConern()") +
+    std::string msg = std::string("getWriteConern()") +
       " - exception: " + e.what();
 
     *err = "Database Error (" + msg + ")";
@@ -840,7 +840,7 @@ bool getWriteConcern
   }
   catch (...)
   {
-    std::string msg = std::string("getWritteConern()") +
+    std::string msg = std::string("getWriteConern()") +
       " - exception: generic";
 
     *err = "Database Error (" + msg + ")";

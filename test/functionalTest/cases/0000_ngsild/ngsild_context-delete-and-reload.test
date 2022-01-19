@@ -52,7 +52,7 @@ payload='{
     "p2": "urn:p2"
   }
 }'
-cServerCurl --url /jsonldContexts/testContext --payload "$payload" --verb POST
+cServerCurl --url /jsonldContexts/testContext2 --payload "$payload" --verb POST
 echo
 echo
 
@@ -67,21 +67,21 @@ payload='{
     "value": 1
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <http://localhost:7080/jsonldContexts/testContext2>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET the context (from step 01) from the broker"
 echo "=================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext'
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
 echo
 echo
 
 
 echo "04. Update the context in the context server"
 echo "============================================"
-cServerCurl --url /jsonldContexts/testContext --verb DELETE
+cServerCurl --url /jsonldContexts/testContext2 --verb DELETE
 echo
 payload='{
   "@context": {
@@ -89,49 +89,49 @@ payload='{
     "p2": "urn:step04:p2"
   }
 }'
-cServerCurl --url /jsonldContexts/testContext --payload "$payload" --verb POST
+cServerCurl --url /jsonldContexts/testContext2 --payload "$payload" --verb POST
 echo
 echo
 
 
 echo "05. DELETE and RELOAD the context in the broker's context cache"
 echo "==============================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext?reload=true' -X DELETE
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?reload=true' -X DELETE
 echo
 echo
 
 
 echo "06. GET the context (from step 05) from the broker and make sure it's been updated"
 echo "=================================================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext'
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
 echo
 echo
 
 
 echo "07. Delete the context in the context server"
 echo "============================================"
-cServerCurl --url /jsonldContexts/testContext --verb DELETE
+cServerCurl --url /jsonldContexts/testContext2 --verb DELETE
 echo
 echo
 
 
 echo "08. Get the context in the context server"
 echo "========================================="
-cServerCurl --url /jsonldContexts/testContext --verb GET
+cServerCurl --url /jsonldContexts/testContext2 --verb GET
 echo
 echo
 
 
 echo "09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead"
 echo "================================================================================================================"
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext?reload=true' -X DELETE
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?reload=true' -X DELETE
 echo
 echo
 
 
 echo "10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06"
 echo "======================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext'
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
 echo
 echo
 
@@ -140,7 +140,7 @@ echo
 01. Create a context in the context server
 ==========================================
 HTTP/1.1 201 Created
-Location: http://localhost:8080/jsonldContexts/testContext
+Location: http://localhost:8080/jsonldContexts/testContext2
 Date: REGEX(.*)
 connection: keep-alive
 transfer-encoding: chunked
@@ -179,7 +179,7 @@ connection: keep-alive
 
 
 HTTP/1.1 201 Created
-Location: http://localhost:8080/jsonldContexts/testContext
+Location: http://localhost:8080/jsonldContexts/testContext2
 Date: REGEX(.*)
 connection: keep-alive
 transfer-encoding: chunked
@@ -228,12 +228,12 @@ connection: keep-alive
 09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead
 ================================================================================================================
 HTTP/1.1 503 Service Unavailable
-Content-Length: 165
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "http://localhost:7080/jsonldContexts/testContext",
+    "detail": "http://localhost:7080/jsonldContexts/testContext2",
     "title": "Unable to download context",
     "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
 }
