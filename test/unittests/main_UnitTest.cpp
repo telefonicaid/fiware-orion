@@ -100,6 +100,8 @@ char            troePwd[256];
 bool            forwarding              = true;
 bool            idIndex                 = false;
 bool            noNotifyFalseUpdate     = false;
+char            dbUser[64]              = { 0 };
+char            dbPwd[64]               = { 0 };
 
 
 

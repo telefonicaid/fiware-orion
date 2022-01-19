@@ -41,7 +41,12 @@ void mongocInit(const char* dbHost, const char* dbName)
   bson_error_t mongoError;
   char         mongoUri[512];
 
-  snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
+  if ((dbUser[0] != 0) && (dbPwd[0] != 0))
+    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s:%s@%s", dbUser, dbPwd, dbHost);
+  else
+    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
+
+  LM_K(("Connecting to mongo for the C driver, with URI '%s'", mongoUri));
 
   //
   // Initialize libmongoc's internals
@@ -53,7 +58,16 @@ void mongocInit(const char* dbHost, const char* dbName)
   //
   orionldState.mongoUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (orionldState.mongoUri == NULL)
-    LM_X(1, ("mongoc_uri_new_with_error(%s): %s", orionldState.mongoUri, mongoError.message));
+  {
+    if ((dbUser[0] != 0) && (dbPwd[0] != 0))
+      LM_W(("Database username: '%s', password: '%s'", dbUser, dbPwd));
+    else if (dbUser[0] != 0)
+      LM_W(("Database username given but no database password"));
+    else if (dbPwd[0] != 0)
+      LM_W(("Database password given but no database username"));
+
+    LM_X(1, ("Unable to connect to mongo(URI: %s): %s", orionldState.mongoUri, mongoError.message));
+  }
 
   //
   // Create a new client instance
