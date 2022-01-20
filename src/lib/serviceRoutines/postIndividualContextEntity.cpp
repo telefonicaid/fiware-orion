@@ -100,8 +100,6 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-  LM_TMP(("KZ: entityTypeFromURL == '%s'", entityTypeFromURL.c_str()));
-
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   //

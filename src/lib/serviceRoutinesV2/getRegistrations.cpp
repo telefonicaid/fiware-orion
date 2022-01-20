@@ -69,8 +69,8 @@ std::string getRegistrations
   std::vector<ngsiv2::Registration>  registrationV;
   OrionError                         oe;
   std::string                        out;
-  int                                offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int                                limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+  int                                offset = orionldState.uriParams.offset;
+  int                                limit  = orionldState.uriParams.limit;
   long long                          count  = 0;
 
   TIMED_MONGO(mongoRegistrationsGet(&registrationV, orionldState.tenantP, ciP->servicePathV, offset, limit, &count, &oe));

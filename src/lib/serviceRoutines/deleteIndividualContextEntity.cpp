@@ -79,8 +79,6 @@ std::string deleteIndividualContextEntity
   std::string  entityType = orionldState.uriParams.type? orionldState.uriParams.type : "";
   StatusCode   response;
 
-  LM_TMP(("KZ: entityType: '%s'", entityType));
-
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
   parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", ActionTypeDelete);
 

@@ -85,9 +85,9 @@ std::string getEntities
   Entities     entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
-  std::string  geometry    = ciP->uriParam["geometry"];
-  std::string  coords      = ciP->uriParam["coords"];
-  std::string  georel      = ciP->uriParam["georel"];
+  std::string  geometry    = orionldState.uriParams.geometry?     orionldState.uriParams.geometry   : "";
+  std::string  coords      = orionldState.uriParams.coordinates? orionldState.uriParams.coordinates : "";
+  std::string  georel      = orionldState.uriParams.georel?      orionldState.uriParams.georel      : "";
   std::string  out;
   char*  id          = orionldState.uriParams.id;
   char*  idPattern   = orionldState.uriParams.idPattern;

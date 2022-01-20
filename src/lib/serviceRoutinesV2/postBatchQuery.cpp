@@ -77,11 +77,14 @@ std::string postBatchQuery
   // However, the implementation is cleaner and no more code is needed for this, just to set the
   // URI param with the value of the metadata filter from the payload.
   //
-  orionldState.uriParams.metadata = (char*) bqP->metadataV.toString().c_str();
-  orionldState.uriParams.attrs    = (char*) bqP->attrsV.toString().c_str();
+  std::string metadataString;
+  std::string attrsString;
 
-  ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();  // To be removed
-  ciP->uriParam[URI_PARAM_ATTRS]    = bqP->attrsV.toString();     // To be removed
+  bqP->metadataV.toString(&metadataString);
+  bqP->attrsV.toString(&attrsString);
+
+  orionldState.uriParams.metadata = (char*) metadataString.c_str();
+  orionldState.uriParams.attrs    = (char*) attrsString.c_str();
 
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed

@@ -113,7 +113,7 @@ std::string getEntityAttributeValue
                                              &orionldState.out.contentType,
                                              &orionldState.httpStatusCode,
                                              ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
+                                             orionldState.uriParams.metadata? orionldState.uriParams.metadata : "",
                                              EntityAttributeValueRequest,
                                              false));
     }

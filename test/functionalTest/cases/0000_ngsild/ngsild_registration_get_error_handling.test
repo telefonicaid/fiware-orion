@@ -88,12 +88,12 @@ Date: REGEX(.*)
 03. GET  /ngsi-ld/v1/csourceRegistrations GET limit = abc
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 175
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "must be an integer value >= 1, if /count/ is not set",
+    "detail": "must be an integer value >= 1",
     "title": "Invalid value for URI parameter /limit/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

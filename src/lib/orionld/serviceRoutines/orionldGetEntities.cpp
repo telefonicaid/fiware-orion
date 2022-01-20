@@ -144,10 +144,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  LM_TMP(("KZ2: geometry:    '%s'", geometry));
-  LM_TMP(("KZ2: georel:      '%s'", georel));
-  LM_TMP(("KZ2: coordinates: '%s'", orionldState.uriParams.coordinates));
-
   //
   // FIXME: Move all this to orionldMhdConnectionInit()
   //

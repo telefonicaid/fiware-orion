@@ -67,7 +67,7 @@ std::string getEntityTypes
   response.statusCode.fill(SccOk);
 
   // NGSIv1 uses details=on to request count
-  if (ciP->uriParam["details"] == "on")
+  if (orionldState.uriParams.details == true)
   {
     totalTypesP = &totalTypes;
   }
@@ -84,7 +84,7 @@ std::string getEntityTypes
   TIMED_RENDER(rendered = response.render(orionldState.apiVersion,
                                           asJsonObject,
                                           orionldState.out.contentType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
+                                          orionldState.uriParams.collapse));
 
   response.release();
 

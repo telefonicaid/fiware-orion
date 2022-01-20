@@ -152,7 +152,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
-  LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   if ((val == NULL) || (*val == 0))
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
@@ -173,14 +172,37 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString.c_str());
     }
 
-    LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
     return MHD_YES;
   }
 
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (key == URI_PARAM_PAGINATION_OFFSET)
+  if (key == URI_PARAM_OPTIONS)
+  {
+    if (uriParamOptionsParse(ciP, val) != 0)
+    {
+      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+
+      LM_W(("Bad Input (Invalid value for URI param /options/)"));
+      orionldState.httpStatusCode = error.code;
+      ciP->answer                 = error.smartRender(orionldState.apiVersion);
+
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
+    }
+  }
+  else if (key == URI_PARAM_TYPE)
+  {
+    if (strstr(val, ","))  // More than ONE type?
+    {
+      uriParamTypesParse(ciP, val);
+    }
+    else
+    {
+      ciP->uriParamTypes.push_back(val);
+    }
+  }
+  else if (key == URI_PARAM_PAGINATION_OFFSET)
   {
     char* cP = (char*) val;
 
@@ -194,7 +216,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0");
 
-        LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
         return MHD_YES;
       }
 
@@ -217,7 +238,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
         LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
         orionldState.httpStatusCode = SccBadRequest;
-        LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
         return MHD_YES;
       }
@@ -235,7 +255,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
         LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
         orionldState.httpStatusCode = SccBadRequest;
-        LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
       return MHD_YES;
     }
@@ -246,7 +265,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
         orionldState.httpStatusCode = error.code;
         ciP->answer                 = error.smartRender(orionldState.apiVersion);
-        LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
       }
       return MHD_YES;
     }
@@ -262,68 +280,10 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->answer                 = error.smartRender(orionldState.apiVersion);
 
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for /details/ - accepted: /on/, /ON/, /off/, /OFF/. Default is /off/", val);
-      LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
       return MHD_YES;
     }
   }
-  else if (key == URI_PARAM_OPTIONS)
-  {
-    ciP->uriParam[URI_PARAM_OPTIONS] = value;
-
-    if (uriParamOptionsParse(ciP, val) != 0)
-    {
-      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
-
-      LM_W(("Bad Input (Invalid value for URI param /options/)"));
-      orionldState.httpStatusCode = error.code;
-      ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
-      LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
-    }
-  }
-  else if (key == URI_PARAM_TYPE)
-  {
-    ciP->uriParam[URI_PARAM_TYPE] = value;
-
-    if (strstr(val, ","))  // More than ONE type?
-    {
-      uriParamTypesParse(ciP, val);
-    }
-    else
-    {
-      ciP->uriParamTypes.push_back(val);
-    }
-  }
-  else if (key == URI_PARAM_PRETTY_PRINT)
-  {
-    if (strcmp(val, "yes") == 0)
-    {
-      orionldState.uriParams.prettyPrint = true;
-    }
-  }
-  else if (key == URI_PARAM_SPACES)
-  {
-    orionldState.uriParams.spaces = atoi(val);
-  }
-  else if ((key != URI_PARAM_Q)       &&
-           (key != URI_PARAM_MQ)      &&
-           (key != URI_PARAM_LEVEL))  // FIXME P1: possibly more known options here ...
-  {
-    LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
-  }
-
-  if (val != NULL)
-  {
-    ciP->uriParam[key] = value;
-  }
-  else
-  {
-    ciP->uriParam[key] = "SET";
-  }
-
-  LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
 
   //
   // Now check the URI param has no invalid characters
@@ -358,7 +318,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     orionldState.httpStatusCode = error.code;
     ciP->answer                 = error.smartRender(orionldState.apiVersion);
     LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key.c_str(), val));
-    LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   }
 
   return MHD_YES;
@@ -699,7 +658,6 @@ static void requestCompleted
 {
   PERFORMANCE(requestCompletedStart);
 
-  LM_TMP(("orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   const char*      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
@@ -807,8 +765,6 @@ static void requestCompleted
   *con_cls = NULL;
 
   ++reqNo;
-  if (reqNo % 1000 == 0)
-    LM_TMP(("reqNo: %d", reqNo));
 
 #ifdef REQUEST_PERFORMANCE
   if (reqNo % 100 == 0)
@@ -1406,31 +1362,15 @@ ConnectionInfo* connectionTreatInit
     return NULL;
   }
 
-  LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
-  // LM_K(("--------------------- Serving APIv%d request %s %s -----------------", orionldState.apiVersion, method, url));
-
   orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
   orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
 
-  // WARNING: This log message below is crucial for the correct function of the Behave tests - CANNOT BE REMOVED
-  LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-
-  ++reqNo;
-
+  LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
 
   //
   // URI parameters
   //
-  // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
-  //           Once we *really* look to scratch some efficiency, this change should be made.
-  //
-  ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
-  ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
-  ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
-
-  LM_TMP(("KZ: Calling httpHeaderGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-  LM_TMP(("KZ: Called httpHeaderGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
   if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
   {
@@ -1494,9 +1434,7 @@ ConnectionInfo* connectionTreatInit
 
   orionldState.out.contentType = mimeTypeSelect(ciP);
 
-  LM_TMP(("KZ: Calling uriArgumentGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-  LM_TMP(("KZ: After uriArgumentGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
   // Lookup Rest Service
   bool badVerb = false;
@@ -1708,9 +1646,7 @@ static MHD_Result connectionTreat
     orionldState.correlator     = (char*) "";
     orionldState.httpStatusCode = 200;
 
-    LM_TMP(("KZ: Before orionldUriArgumentGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
-    LM_TMP(("KZ: After orionldUriArgumentGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;
