@@ -77,7 +77,7 @@ std::string getNgsi10ContextEntityTypes
   std::string     answer;
   std::string     typeName              = compV[2];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
-  std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
@@ -87,7 +87,7 @@ std::string getNgsi10ContextEntityTypes
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

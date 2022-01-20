@@ -77,7 +77,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   std::string     entityId              = compV[5];
   std::string     attributeName         = compV[7];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
-  std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string     answer;
   StatusCode      response;
 
@@ -86,7 +86,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

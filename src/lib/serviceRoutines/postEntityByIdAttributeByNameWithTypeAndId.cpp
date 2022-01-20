@@ -75,7 +75,7 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
   std::string     entityType              = compV[4];
   std::string     entityId                = compV[6];
   std::string     attributeName           = compV[8];
-  std::string     entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     entityTypeFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo  typeInfo                = EntityTypeEmptyOrNotEmpty;
   std::string     answer;
 
@@ -85,7 +85,7 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

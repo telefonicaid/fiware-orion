@@ -75,7 +75,7 @@ std::string postContextEntitiesByEntityIdAndType
   std::string              entityType            = compV[4];
   std::string              entityId              = compV[6];
   EntityTypeInfo           typeInfo              = EntityTypeEmptyOrNotEmpty;
-  std::string              typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string              typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string              answer;
   RegisterContextResponse  response;
 
@@ -84,7 +84,7 @@ std::string postContextEntitiesByEntityIdAndType
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

@@ -79,7 +79,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   std::string               entityType              = compV[3];
   std::string               entityId                = compV[5];
   std::string               attributeName           = compV[7];
-  std::string               entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string               entityTypeFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo            typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextAttributeResponse  response;
 
@@ -91,7 +91,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

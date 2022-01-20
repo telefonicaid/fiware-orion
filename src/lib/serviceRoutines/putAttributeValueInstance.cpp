@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -75,7 +77,7 @@ std::string putAttributeValueInstance
   std::string  entityId      = compV[2];
   std::string  attributeName = compV[4];
   std::string  metaID        = compV[5];
-  std::string  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string  entityType    = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string  answer;
   StatusCode   response;
 

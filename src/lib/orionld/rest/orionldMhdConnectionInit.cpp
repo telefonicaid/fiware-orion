@@ -605,6 +605,9 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "exist") == 0)
   {
     orionldState.uriParams.exists = (char*) value;
+
+    if (strcmp(value, "entity::type") == 0)
+      orionldState.in.entityTypeExists = true;
   }
   else if (strcmp(key, "!exist") == 0)
   {

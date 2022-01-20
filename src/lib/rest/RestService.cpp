@@ -317,7 +317,7 @@ static void commonFilters
   //
   // 2. ?exist=entity::type
   //
-  if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+  if (orionldState.in.entityTypeExists == true)
   {
     Restriction* restrictionP = NULL;
 

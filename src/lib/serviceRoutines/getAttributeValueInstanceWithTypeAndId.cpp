@@ -84,7 +84,7 @@ std::string getAttributeValueInstanceWithTypeAndId
   std::string              entityId             = compV[5];
   std::string              attributeName        = compV[7];
   std::string              metaID               = compV[8];
-  std::string              entityTypeFromParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string              entityTypeFromParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo           typeInfo             = EntityTypeEmptyOrNotEmpty;
 
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
@@ -95,7 +95,7 @@ std::string getAttributeValueInstanceWithTypeAndId
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }
