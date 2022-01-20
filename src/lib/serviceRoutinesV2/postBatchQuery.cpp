@@ -80,9 +80,6 @@ std::string postBatchQuery
   orionldState.uriParams.metadata = (char*) bqP->metadataV.toString().c_str();
   orionldState.uriParams.attrs    = (char*) bqP->attrsV.toString().c_str();
 
-  ciP->uriParam[URI_PARAM_METADATA] = bqP->metadataV.toString();  // To be removed
-  ciP->uriParam[URI_PARAM_ATTRS]    = bqP->attrsV.toString();     // To be removed
-
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
 

@@ -77,7 +77,6 @@ public:
   HttpHeaders                httpHeaders;
   std::string                answer;
 
-  std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;
   std::vector<std::string>             uriParamTypes;
 

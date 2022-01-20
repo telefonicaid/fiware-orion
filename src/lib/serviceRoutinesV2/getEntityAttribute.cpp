@@ -80,7 +80,8 @@ std::string getEntityAttribute
 
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
-  parseDataP->qcr.res.metadataList.fill(ciP->uriParam[URI_PARAM_METADATA]);
+  if (orionldState.uriParams.metadata != NULL)
+  parseDataP->qcr.res.metadataList.fill(orionldState.uriParams.metadata);
 
 
   // 02. Call standard op postQueryContext
@@ -96,7 +97,7 @@ std::string getEntityAttribute
                                          &orionldState.out.contentType,
                                          &orionldState.httpStatusCode,
                                          ciP->uriParamOptions[OPT_KEY_VALUES],
-                                         ciP->uriParam[URI_PARAM_METADATA],
+                                         orionldState.uriParams.metadata? orionldState.uriParams.metadata : "",
                                          EntityAttributeResponse));
 
   if (attribute.oe.reasonPhrase == ERROR_TOO_MANY)

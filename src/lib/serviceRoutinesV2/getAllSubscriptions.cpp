@@ -60,15 +60,13 @@ std::string getAllSubscriptions
   std::vector<ngsiv2::Subscription> subs;
   OrionError                        oe;
   long long                         count  = 0;
-  int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
   TIMED_MONGO(mongoListSubscriptions(&subs,
                                      &oe,
                                      orionldState.tenantP,
                                      ciP->servicePathV[0],
-                                     limit,
-                                     offset,
+                                     orionldState.uriParams.limit,
+                                     orionldState.uriParams.offset,
                                      &count));
 
   if (oe.code != SccOk)

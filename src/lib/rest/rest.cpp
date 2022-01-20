@@ -269,8 +269,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   }
   else if (key == URI_PARAM_OPTIONS)
   {
-    ciP->uriParam[URI_PARAM_OPTIONS] = value;
-
     if (uriParamOptionsParse(ciP, val) != 0)
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
@@ -285,8 +283,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   }
   else if (key == URI_PARAM_TYPE)
   {
-    ciP->uriParam[URI_PARAM_TYPE] = value;
-
     if (strstr(val, ","))  // More than ONE type?
     {
       uriParamTypesParse(ciP, val);
@@ -313,17 +309,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
-
-  if (val != NULL)
-  {
-    ciP->uriParam[key] = value;
-  }
-  else
-  {
-    ciP->uriParam[key] = "SET";
-  }
-
-  LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
 
   //
   // Now check the URI param has no invalid characters
@@ -1421,16 +1406,7 @@ ConnectionInfo* connectionTreatInit
   //
   // URI parameters
   //
-  // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
-  //           Once we *really* look to scratch some efficiency, this change should be made.
-  //
-  ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
-  ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
-  ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
-
-  LM_TMP(("KZ: Calling httpHeaderGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-  LM_TMP(("KZ: Called httpHeaderGet: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
 
   if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
   {
