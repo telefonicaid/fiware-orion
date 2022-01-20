@@ -72,7 +72,7 @@ std::string getContextEntitiesByEntityIdAndType
 {
   std::string                          entityType              = compV[4];
   std::string                          entityId                = compV[6];
-  std::string                          entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string                          entityTypeFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo                       typeInfo                = EntityTypeEmptyOrNotEmpty;
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;

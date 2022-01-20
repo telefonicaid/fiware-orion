@@ -93,7 +93,7 @@ std::string getIndividualContextEntityAttribute
   {
     typeInfo = EntityTypeNotEmpty;
   }
-  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  entityType = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
 
   // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)

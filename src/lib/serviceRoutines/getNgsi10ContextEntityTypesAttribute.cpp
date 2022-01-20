@@ -78,7 +78,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   std::string     typeName              = compV[2];
   std::string     attributeName         = compV[4];
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
-  std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 

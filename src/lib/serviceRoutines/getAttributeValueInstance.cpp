@@ -82,7 +82,7 @@ std::string getAttributeValueInstance
 {
   std::string               answer;
   std::string               entityId       = compV[2];
-  std::string               entityType     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string               entityType     = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string               attributeName  = compV[4];
   std::string               metaIdValue    = compV[5];
   EntityTypeInfo            typeInfo       = EntityTypeEmptyOrNotEmpty;

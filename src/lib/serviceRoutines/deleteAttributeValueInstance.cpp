@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -79,7 +81,7 @@ std::string deleteAttributeValueInstance
   std::string             entityType;
 
   // 01. URI parameters
-  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  entityType    = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
   // 02. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, metaId, ActionTypeDelete);

@@ -95,7 +95,7 @@ std::string postIndividualContextEntity
   std::string                   entityIdFromURL       = ((compV.size() == 3) || (compV.size() == 4))? compV[2] : "";
   std::string                   entityId;
   std::string                   entityTypeFromPayload = reqP->entity.type;
-  std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string                   entityTypeFromURL     = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string                   entityType;
   std::string                   answer;
   std::string                   out;

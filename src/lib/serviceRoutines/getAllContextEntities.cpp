@@ -69,7 +69,7 @@ std::string getAllContextEntities
   ParseData*                 parseDataP
 )
 {
-  std::string     typeName  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     typeName  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo  typeInfo  = EntityTypeEmptyOrNotEmpty;
   std::string     answer;
 

@@ -82,7 +82,7 @@ std::string putIndividualContextEntity
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // 01. Take care of URI params
-  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  entityType = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
 
   // 02. Fill in UpdateContextRequest from UpdateContextElementRequest and entityId
