@@ -35,34 +35,6 @@
 
 /* ****************************************************************************
 *
-* validOptions -
-*
-* Text definitions OPT_* found in common/globals.h
-*/
-static const char* validOptions[] =
-{
-  OPT_COUNT,
-  OPT_NORMALIZED,
-  OPT_VALUES,
-  OPT_KEY_VALUES,
-  OPT_APPEND,
-  OPT_UNIQUE_VALUES,
-  OPT_DATE_CREATED,
-  OPT_DATE_MODIFIED,
-  OPT_NO_ATTR_DETAIL,
-  OPT_UPSERT
-#ifdef ORIONLD
-  , OPT_SYS_ATTRS
-  , OPT_NO_OVERWRITE
-  , OPT_UPDATE
-  , OPT_REPLACE
-#endif
-};
-
-
-
-/* ****************************************************************************
-*
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
@@ -115,72 +87,6 @@ ConnectionInfo::~ConnectionInfo()
 
   servicePathV.clear();
   httpHeaders.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* isValidOption -
-*/
-static bool isValidOption(std::string item)
-{
-  for (unsigned int ix = 0; ix < sizeof(validOptions) / sizeof(validOptions[0]); ++ix)
-  {
-    if (item == validOptions[ix])
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* uriParamOptionsParse - parse the URI param 'options' into uriParamOptions map
-*
-* RETURN VALUE
-*  0  on success
-* <0  on error
-*/
-int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
-{
-  std::vector<std::string> vec;
-
-  stringSplit(value, ',', vec);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if (!isValidOption(vec[ix]))
-    {
-      return -1;
-    }
-
-    ciP->uriParamOptions[vec[ix]] = true;
-
-#ifdef ORIONLD
-    if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
-      orionldState.uriParamOptions.noOverwrite = true;
-    else if (strcmp(vec[ix].c_str(), "update") == 0)
-      orionldState.uriParamOptions.update = true;
-    else if (strcmp(vec[ix].c_str(), "replace") == 0)
-      orionldState.uriParamOptions.replace = true;
-    else if (strcmp(vec[ix].c_str(), "keyValues") == 0)
-      orionldState.uriParamOptions.keyValues = true;
-#endif
-  }
-
-  //
-  // Check of invalid combinations
-  //
-  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_VALUES])        return -1;
-  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_UNIQUE_VALUES]) return -1;
-  if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] && ciP->uriParamOptions[OPT_VALUES])        return -1;
-
-  return 0;
 }
 
 

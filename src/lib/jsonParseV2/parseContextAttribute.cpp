@@ -189,12 +189,11 @@ std::string parseContextAttribute
 {
   std::string  name           = iter->name.GetString();
   std::string  type           = jsonParseTypeNames[iter->value.GetType()];
-  bool         keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
   bool         compoundVector = false;
 
   caP->name = name;
 
-  if (keyValues)
+  if (orionldState.uriParamOptions.keyValues)
   {
     if (type == "String")
     {

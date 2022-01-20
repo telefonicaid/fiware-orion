@@ -77,7 +77,6 @@ public:
   HttpHeaders                httpHeaders;
   std::string                answer;
 
-  std::map<std::string, bool>          uriParamOptions;
   std::vector<std::string>             uriParamTypes;
 
   bool                                      inCompoundValue;
@@ -89,14 +88,6 @@ public:
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
 };
-
-
-
-/* ****************************************************************************
-*
-* uriParamOptionsParse -
-*/
-extern int uriParamOptionsParse(ConnectionInfo* ciP, const char* value);
 
 
 

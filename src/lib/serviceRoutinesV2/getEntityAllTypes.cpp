@@ -66,12 +66,12 @@ std::string getEntityAllTypes
   unsigned int*             totalTypesP  = NULL;
 
   // NGSIv2 uses options=count to request count
-  if (ciP->uriParamOptions[OPT_COUNT])
+  if (orionldState.uriParams.count)
   {
     totalTypesP = &totalTypes;
   }
 
-  if (ciP->uriParamOptions[OPT_VALUES])
+  if (orionldState.uriParamOptions.values)
   {
     TIMED_MONGO(mongoEntityTypesValues(&response, orionldState.tenantP, ciP->servicePathV, totalTypesP));
   }
@@ -84,9 +84,9 @@ std::string getEntityAllTypes
                                  totalTypesP,
                                  noAttrDetail));
   }
-  TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
+  TIMED_RENDER(answer = response.toJson(orionldState.uriParamOptions.values));
 
-  if (ciP->uriParamOptions[OPT_COUNT])
+  if (orionldState.uriParams.count)
   {
     char cVec[64];
 

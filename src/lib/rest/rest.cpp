@@ -178,20 +178,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (key == URI_PARAM_OPTIONS)
-  {
-    if (uriParamOptionsParse(ciP, val) != 0)
-    {
-      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
-
-      LM_W(("Bad Input (Invalid value for URI param /options/)"));
-      orionldState.httpStatusCode = error.code;
-      ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
-    }
-  }
-  else if (key == URI_PARAM_TYPE)
+  if (key == URI_PARAM_TYPE)
   {
     if (strstr(val, ","))  // More than ONE type?
     {

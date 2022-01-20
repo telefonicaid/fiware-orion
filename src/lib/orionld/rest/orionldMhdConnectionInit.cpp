@@ -66,7 +66,6 @@ extern __thread char  clientIp[IP_LENGTH_MAX + 1];
 // External declarations - tmp - should be in their own files (not rest.cpp) and included here
 //
 extern MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
-extern MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val);
 
 
 

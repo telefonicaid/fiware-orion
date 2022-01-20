@@ -83,7 +83,7 @@ std::string getRegistrations
     return out;
   }
 
-  if ((ciP->uriParamOptions["count"]))
+  if (orionldState.uriParams.count)
   {
     ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
     ciP->httpHeaderValue.push_back(toString(count));
