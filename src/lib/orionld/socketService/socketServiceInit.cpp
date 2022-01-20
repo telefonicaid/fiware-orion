@@ -41,7 +41,6 @@ int socketServiceInit(unsigned short port)
   int                 listenFd = -1;
   struct sockaddr_in  sai;
 
-  LM_TMP(("SS: initializing the socket service"));
   listenFd = socket(AF_INET,  SOCK_STREAM, 0);
 
   if (listenFd == -1)

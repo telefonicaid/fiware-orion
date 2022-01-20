@@ -192,18 +192,16 @@ void StringList::clone(const StringList& sList)
 *
 * StringList::toString -
 */
-std::string StringList::toString(void)
+void StringList::toString(std::string* sP)
 {
-  std::string out;
+  *sP = "";
 
   for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    out += stringV[ix];
+    *sP += stringV[ix];
     if (ix < stringV.size() - 1)
     {
-      out += ",";
+      *sP += ",";
     }
   }
-
-  return out;
 }

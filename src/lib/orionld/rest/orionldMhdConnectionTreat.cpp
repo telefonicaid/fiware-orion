@@ -697,7 +697,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
-  LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   //
   // Predetected Error from orionldMhdConnectionInit?
   //
@@ -857,9 +856,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Call the SERVICE ROUTINE
   //
   PERFORMANCE(serviceRoutineStart);
-  LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
-  LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
   PERFORMANCE(serviceRoutineEnd);
 
   //
@@ -887,7 +884,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
   {
-    LM_TMP(("KZ: orionldState.httpStatusCode == %d", orionldState.httpStatusCode));
     orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
     orionldState.httpStatusCode = 500;
   }
