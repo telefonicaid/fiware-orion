@@ -204,9 +204,9 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "upsert")        == 0)  orionldState.uriParamOptions.upsert        = true;  // NGSIv2 compatibility
       else
       {
-        LM_W(("Unknown 'options' value: %s", optionStart));
+        LM_W(("Invalid 'options' value: %s", optionStart));
         orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI param /options/", optionStart);
         return;
       }
 

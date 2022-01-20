@@ -1636,6 +1636,38 @@ static MHD_Result connectionTreat
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
+
+    ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+    //
+    // Check validity of URI parameters
+    //
+    bool keyValuesEtAl = true;
+
+    if      ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.values))        keyValuesEtAl = false;
+    else if ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    else if ((orionldState.uriParamOptions.values)    && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    if (keyValuesEtAl == false)
+    {
+      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+      LM_W(("Bad Input (Invalid value for URI param /options/)"));
+
+      orionldState.httpStatusCode = 400;
+      ciP->answer                 = error.smartRender(orionldState.apiVersion);
+
+      return MHD_YES;
+    }
+
+    if ((orionldState.httpStatusCode >= 400) && (orionldState.httpStatusCode != 405) && (ciP->answer == ""))
+    {
+      const char* title  = (orionldState.pd.title  != NULL)? orionldState.pd.title  : "no title";
+      const char* detail = (orionldState.pd.detail != NULL)? orionldState.pd.detail : "no detail";
+      OrionError  error((HttpStatusCode) orionldState.httpStatusCode, title, detail);
+
+      ciP->answer = error.smartRender(orionldState.apiVersion);
+      return MHD_YES;
+    }
+
     return retVal;
   }
 

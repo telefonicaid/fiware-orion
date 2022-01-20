@@ -104,14 +104,14 @@ Date: REGEX(.*)
 03. Error: Send a request with one invalid option (canonical)
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "Invalid value for URI param /options/",
-    "error": "BadRequest"
+    "error": "canonical"
 }
 
 
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 06. Error: Test an arbitrary API v1 path
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -151,7 +151,7 @@ Date: REGEX(.*)
     "orionError": {
         "code": "400",
         "details": "Invalid value for URI param /options/",
-        "reasonPhrase": "Bad Request"
+        "reasonPhrase": "BAD"
     }
 }
 
