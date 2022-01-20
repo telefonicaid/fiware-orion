@@ -610,6 +610,9 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.notExists = (char*) value;
     orionldState.uriParams.mask  |= ORIONLD_URIPARAM_NOTEXISTS;
+
+    if (strcmp(value, "entity::type") == 0)
+      orionldState.in.entityTypeDoesNotExist = true;
   }
   else if (strcmp(key, "metadata") == 0)
   {
@@ -642,7 +645,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.level = (char*) value;
   }
-  else if (strcmp(key, "entity::type") == 0)
+  else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?
   {
     orionldState.uriParams.type = (char*) value;
   }

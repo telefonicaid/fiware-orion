@@ -223,6 +223,7 @@ typedef struct OrionldStateIn
 
   // Meta info for URL parameters
   bool      attributeFormatAsObject;
+  bool      entityTypeDoesNotExist;
 } OrionldStateIn;
 
 

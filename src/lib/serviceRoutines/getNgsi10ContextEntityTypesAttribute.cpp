@@ -84,7 +84,7 @@ std::string getNgsi10ContextEntityTypesAttribute
 
 
   // 01. Get values from URL (entityId::type, esist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
