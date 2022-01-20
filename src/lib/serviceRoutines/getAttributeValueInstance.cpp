@@ -91,7 +91,7 @@ std::string getAttributeValueInstance
   bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // 0. Take care of URI params
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }

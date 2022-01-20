@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -73,7 +75,7 @@ std::string getAllContextEntities
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }

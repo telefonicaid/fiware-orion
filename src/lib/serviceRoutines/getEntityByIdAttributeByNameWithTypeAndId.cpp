@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -80,7 +82,7 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
