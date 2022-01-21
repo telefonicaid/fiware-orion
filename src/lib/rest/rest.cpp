@@ -1261,6 +1261,8 @@ RestService restServiceForBadVerb;
 
 
 
+extern Verb verbGet(const char* method);
+extern MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value);
 /* ****************************************************************************
 *
 * connectionTreatInit -
@@ -1333,6 +1335,9 @@ ConnectionInfo* connectionTreatInit
   }
 
 
+  orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
+  orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
+
   //
   // ConnectionInfo
   //
@@ -1349,13 +1354,9 @@ ConnectionInfo* connectionTreatInit
     return NULL;
   }
 
-  orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
-  orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
-
-  LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
 
   //
-  // URI parameters
+  // HTTP Headers
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
@@ -1395,6 +1396,23 @@ ConnectionInfo* connectionTreatInit
     //
     //
     restReply(ciP, ciP->answer);  // to not hang on too big payloads
+    return ciP;
+  }
+
+
+  //
+  // URI parameters
+  //
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
+  if (orionldState.httpStatusCode >= 400)
+  {
+    LM_W(("Bad Request (error in URI parameters - %s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    if (orionldState.httpStatusCode != 406)
+    {
+      OrionError oe(SccBadRequest, orionldState.pd.title? orionldState.pd.title : "TITLE");
+      ciP->answer = oe.smartRender(orionldState.apiVersion);
+    }
+
     return ciP;
   }
 
@@ -1532,9 +1550,6 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
 
 
 
-extern Verb verbGet(const char* method);
-extern MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value);
-
 /* ****************************************************************************
 *
 * connectionTreat -
@@ -1616,6 +1631,7 @@ static MHD_Result connectionTreat
   {
     MHD_Result retVal;
 
+    LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //
@@ -1632,8 +1648,6 @@ static MHD_Result connectionTreat
     orionldState.attrsFormat    = (char*) "normalized";
     orionldState.correlator     = (char*) "";
     orionldState.httpStatusCode = 200;
-
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
 
