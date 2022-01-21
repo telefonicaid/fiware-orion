@@ -435,13 +435,13 @@ Date: REGEX(.*)
 10. Send a request with an invalid character in a URI parameter
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unknown URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 

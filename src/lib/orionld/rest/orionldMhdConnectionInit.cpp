@@ -378,11 +378,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     if (containsForbiddenChars == true)
     {
-      OrionError  error(SccBadRequest, "forbidden character in URI parameter");
+      OrionError  error(SccBadRequest, "invalid character in a URI parameter");
       char        details[256];
 
-      snprintf(details, sizeof(details), "forbidden character in URI param '%s'", key);
-      orionldErrorResponseCreate(OrionldBadRequestData, "forbidden character in a URI param", key);
+      snprintf(details, sizeof(details), "invalid character in URI param '%s'", key);
+      orionldErrorResponseCreate(OrionldBadRequestData, "invalid character in a URI parameter", key);
 
       alarmMgr.badInput(clientIp, details);
       orionldState.httpStatusCode = 400;

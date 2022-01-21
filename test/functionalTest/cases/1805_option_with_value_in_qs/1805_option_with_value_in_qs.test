@@ -44,13 +44,13 @@ echo
 01. GET /v2/entities/E1?a
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Empty right-hand-side for URI param /a/",
+    "description": "Empty right-hand-side for a URI parameter",
     "error": "BadRequest"
 }
 
