@@ -121,12 +121,12 @@ command:
 ```
 # cd /dir/where/accumulator-server/is/downloaded
 # chmod a+x accumulator-server.py
-# ./accumulator-server.py --pretty-print -v
+# ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-Note this script requires Flask, and paho-mqtt, which can be installed using
-`pip install Flask`, and `pip install paho-mqtt`. In addition, it is recommended to use
-`python3`. In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
+Note this script requires Flask version 1.0.2, pyOpenSSL version 19.0.0 and paho-mqtt version 1.5.1, which can be installed using
+`pip install Flask==1.0.2`, `pip install pyOpenSSL==19.0.0` and `pip install paho-mqtt==1.5.1`. In addition, it is recommended to use
+Python 2.7. In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
 [Top](#top)
 
