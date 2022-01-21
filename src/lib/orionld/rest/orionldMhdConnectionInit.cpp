@@ -36,8 +36,11 @@ extern "C"
 
 #include "common/wsStrip.h"                                      // wsStrip
 #include "common/MimeType.h"                                     // mimeTypeParse
+#include "alarmMgr/alarmMgr.h"                                   // alarmMgr
 #include "rest/Verb.h"                                           // Verb
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/OrionError.h"                                     // OrionError
+#include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
@@ -350,16 +353,44 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
 //
 MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  // NULL/empty URI param value
   if ((value == NULL) || (*value == 0))
   {
-    char errorString[256];
-
-    snprintf(errorString, sizeof(errorString) - 1, "Empty right-hand-side for URI param /%s/", key);
-    orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for a URI parameter", key);
     orionldState.httpStatusCode = 400;
 
     return MHD_YES;
   }
+
+  //
+  // Forbidden characters in URI param value - not for NGSI-LD - for now at least ...
+  //
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    bool containsForbiddenChars = false;
+
+    if ((strcmp(key, "geometry") == 0) || (strcmp(key, "georel") == 0))
+      containsForbiddenChars = forbiddenChars(value, "=;");
+    else if (strcmp(key, "coords") == 0)
+      containsForbiddenChars = forbiddenChars(value, ";");
+    else if ((strcmp(key, "q") != 0) && (strcmp(key, "mq") != 0) && (strcmp(key, "idPattern") != 0) && (strcmp(key, "typePattern") != 0))
+      containsForbiddenChars = forbiddenChars(key) || forbiddenChars(value);
+
+    if (containsForbiddenChars == true)
+    {
+      std::string details = std::string("forbidden character in URI param '") + key + "'";
+      OrionError error(SccBadRequest, "forbidden character in URI parameter");
+
+      orionldErrorResponseCreate(OrionldBadRequestData, "forbidden character in a URI param", key);
+
+      alarmMgr.badInput(clientIp, details);
+      orionldState.httpStatusCode = 400;
+      orionldState.ciP->answer    = error.smartRender(orionldState.apiVersion);
+      LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key, value));
+      return MHD_YES;
+    }
+  }
+
 
   if (strcmp(key, "id") == 0)
   {

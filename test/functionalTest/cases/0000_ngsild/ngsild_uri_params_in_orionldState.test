@@ -79,13 +79,13 @@ Date: REGEX(.*)
 02. GET Entity with 'id=' - no value for id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Empty right-hand-side for URI param /id/",
-    "title": "Error in URI param",
+    "detail": "id",
+    "title": "Empty right-hand-side for a URI parameter",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -70,14 +70,14 @@ echo
 01. Get error message from query by id URI param
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Error in URI param",
-  "detail": "Empty right-hand-side for URI param /id/"
+  "title": "Empty right-hand-side for a URI parameter",
+  "detail": "id"
 }
 
 
@@ -85,14 +85,14 @@ Date: REGEX(.*)
 02. Get error message from query by type URI param
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 158
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Error in URI param",
-  "detail": "Empty right-hand-side for URI param /type/"
+  "title": "Empty right-hand-side for a URI parameter",
+  "detail": "type"
 }
 
 
@@ -100,14 +100,14 @@ Date: REGEX(.*)
 03. Get error message from query by idPattern URI param
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 163
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Error in URI param",
-  "detail": "Empty right-hand-side for URI param /idPattern/"
+  "title": "Empty right-hand-side for a URI parameter",
+  "detail": "idPattern"
 }
 
 
@@ -115,14 +115,14 @@ Date: REGEX(.*)
 04. Get error message from query by attrs URI param
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 159
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Error in URI param",
-  "detail": "Empty right-hand-side for URI param /attrs/"
+  "title": "Empty right-hand-side for a URI parameter",
+  "detail": "attrs"
 }
 
 

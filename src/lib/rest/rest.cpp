@@ -299,7 +299,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in URI param", key.c_str());
+    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in a URI param", key.c_str());
 
     alarmMgr.badInput(clientIp, details);
     orionldState.httpStatusCode = error.code;
@@ -1353,7 +1353,7 @@ ConnectionInfo* connectionTreatInit
     *retValP = MHD_NO;
     return NULL;
   }
-
+  orionldState.ciP = ciP;
 
   //
   // HTTP Headers
@@ -1403,7 +1403,7 @@ ConnectionInfo* connectionTreatInit
   //
   // URI parameters
   //
-  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, ciP);
   if (orionldState.httpStatusCode >= 400)
   {
     LM_W(("Bad Request (error in URI parameters - %s: %s)", orionldState.pd.title, orionldState.pd.detail));
