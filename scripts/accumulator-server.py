@@ -68,8 +68,7 @@ def usage_and_exit(msg):
     """
 
     if msg != '':
-        print(msg)
-        print()
+        print(msg + "\n")
 
     usage()
     sys.exit(1)
@@ -118,6 +117,7 @@ https = False
 key_file = None
 cert_file = None
 
+# TODO: Improve cli argument parsing with click
 try:
     opts, args = getopt(
         sys.argv[1:],
@@ -571,6 +571,7 @@ if __name__ == '__main__':
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
+        # TODO: Improve SSL support by using pyOpenSSL
         context = (cert_file, key_file)
         app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
