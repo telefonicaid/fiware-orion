@@ -45,7 +45,6 @@ __author__ = 'fermin'
 # * This script also depends on pyOpenSSL 19.0.0
 
 
-# from OpenSSL import SSL
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
 from datetime import datetime
@@ -81,7 +80,9 @@ def usage():
     Print usage message
     """
 
-    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --url <server url> --pretty-print -v -u")
+    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --mqttHost " +
+          "<host> --mqttPort <port> --mqttTopic <topic> --url <server url> --pretty-print " +
+          "--https --key <key_file> --cert <cert_file> -v -u")
     print("""\nParameters:
           --host <host>: host to use database to use (default is '0.0.0.0')"
           --port <port>: port to use (default is 1028)"
@@ -91,8 +92,8 @@ def usage():
           --url <server url>: server URL to use (default is /accumulate)"
           --pretty-print: pretty print mode"
           --https: start in https"
-          --key: key file (only used if https is enabled)"
-          --cert: cert file (only used if https is enabled)"
+          --key: <key file> (only used if https is enabled)"
+          --cert: <cert file> (only used if https is enabled)"
           -v: verbose mode"
           -u: print this usage message
           """
@@ -133,7 +134,7 @@ try:
         ]
     )
 except GetoptError:
-    usage_and_exit('wrong parameter')
+    usage_and_exit('Wrong parameter')
 
 for opt, arg in opts:
     if opt == '-u':
@@ -570,20 +571,6 @@ if __name__ == '__main__':
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
-        """
-        Commented lines correspond to the way of using context with pyOpenSSL 0.13.1
-        (the one that comes with system Python in CentOS 7).
-        We are using the new way (which is simpler) as we moved to pyOpenSSL 19.0.0.
-        Referecence: Reference:
-        http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266
-
-        We need to upgrade pyOpenSSL version due to problems of installing 0.13.1 inside virtualenv.
-        Installing the module requires to compile some parts and this causes a conflict with base
-        openssl devel libraries in CentOS 7 (solvable by hack, but we want to avoid it)
-        """
-        # context = SSL.Context(SSL.SSLv23_METHOD)
-        # context.use_privatekey_file(key_file)
-        # context.use_certificate_file(cert_file)
         context = (cert_file, key_file)
         app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
