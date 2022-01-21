@@ -116,17 +116,15 @@ In the case of the aarch64 architecture, install libxslt using yum, and run `./c
         sudo yum install curl nc valgrind bc
         sudo pip2 install virtualenv
 
-In the case of the aarch64 architecture, additionally install python2-devel, rpm-build and libffi-devel using yum. It is needed when building pyOpenSSL.
-
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python2
+        virtualenv /opt/ft_env --python=/usr/bin/python3
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
