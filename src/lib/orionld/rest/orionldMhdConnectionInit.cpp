@@ -378,9 +378,10 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     if (containsForbiddenChars == true)
     {
-      std::string details = std::string("forbidden character in URI param '") + key + "'";
-      OrionError error(SccBadRequest, "forbidden character in URI parameter");
+      OrionError  error(SccBadRequest, "forbidden character in URI parameter");
+      char        details[256];
 
+      snprintf(details, sizeof(details), "forbidden character in URI param '%s'", key);
       orionldErrorResponseCreate(OrionldBadRequestData, "forbidden character in a URI param", key);
 
       alarmMgr.badInput(clientIp, details);
