@@ -127,7 +127,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       char* contentType = (char*) "application/json";
 
       if      (answerLen <= 2)                          contentType = (char*) "application/json";
-      else if (orionldState.httpStatusCode  == 207)     contentType = (char*) "application/json";
       else if (orionldState.httpStatusCode  >= 400)     contentType = (char*) "application/json";
       else if (orionldState.out.contentType == JSONLD)  contentType = (char*) "application/ld+json";
       else if (orionldState.out.contentType == GEOJSON) contentType = (char*) "application/geo+json";

@@ -422,22 +422,6 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
       orionldState.httpStatusCode = 400;
     }
   }
-  else if (strcmp(key, "Ngsiv2-AttrsFormat") == 0)  // FIXME: This header name needs to change for NGSI-LD
-  {
-    orionldState.attrsFormat = (char*) value;
-  }
-  else if (strcmp(key, "X-Auth-Token") == 0)
-  {
-    orionldState.xAuthToken = (char*) value;
-  }
-  else if (strcmp(key, "Fiware-Correlator") == 0)
-  {
-    orionldState.correlator = (char*) value;
-  }
-  else if (strcmp(key, "Content-Type") == 0)
-  {
-    orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
-  }
   else if (strcmp(key, "Accept") == 0)
   {
     orionldState.out.contentType = acceptHeaderParse((char*) value);
@@ -452,6 +436,10 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
       orionldState.httpStatusCode = SccNotAcceptable;
     }
   }
+  else if (strcmp(key, "Ngsiv2-AttrsFormat") == 0)  orionldState.attrsFormat    = (char*) value;
+  else if (strcmp(key, "X-Auth-Token")       == 0)  orionldState.xAuthToken     = (char*) value;
+  else if (strcmp(key, "Fiware-Correlator")  == 0)  orionldState.correlator     = (char*) value;
+  else if (strcmp(key, "Content-Type")       == 0)  orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
 
   return MHD_YES;
 }
@@ -1020,6 +1008,7 @@ MHD_Result orionldMhdConnectionInit
   // The idea is to move all headers from httpHeaderGet to orionldHttpHeaderGet
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderGet, NULL);
+
   if (orionldState.httpStatusCode != 200)
   {
     LM_W(("Error detected in a HTTP header: %s: %s", orionldState.pd.title, orionldState.pd.detail));
@@ -1027,6 +1016,7 @@ MHD_Result orionldMhdConnectionInit
   }
 
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+
 
   //
   // Any error detected during httpHeaderGet calls?
@@ -1050,7 +1040,7 @@ MHD_Result orionldMhdConnectionInit
     }
   }
 
-  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
+  if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
     orionldState.httpStatusCode  = 400;

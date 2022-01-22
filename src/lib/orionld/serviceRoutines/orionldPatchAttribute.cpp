@@ -367,7 +367,7 @@ static bool orionldForwardPatchAttribute
   if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
     return false;
 
-  const char*  contentType = (orionldState.ngsildContent == true)? "application/ld+json" : "application/json";
+  const char*  contentType = (orionldState.in.contentType == JSONLD)? "application/ld+json" : "application/json";
   int          payloadLen  = strlen(orionldState.in.payloadCopy);
   bool         tryAgain;
   bool         downloadFailed;

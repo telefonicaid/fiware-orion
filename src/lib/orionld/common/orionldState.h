@@ -290,9 +290,8 @@ typedef struct OrionldConnectionState
   char*                   urlPath;
   char*                   httpVersion;
   Verb                    verb;
-  bool                    badVerb;     // ToDo: verb == NOVERB should cover this
-  char*                   verbString;
-  bool                    ngsildContent;
+  bool                    badVerb;             // ToDo: verb == NOVERB should cover this
+  char*                   verbString;          // For error handling the incorrect verb is needed for the error response
   KjNode*                 payloadContextNode;
   KjNode*                 payloadIdNode;
   KjNode*                 payloadTypeNode;

@@ -123,7 +123,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
   char* errorTitle           = NULL;
   char* errorDetails         = NULL;
 
-  if (orionldState.ngsildContent == true)
+  if (orionldState.in.contentType == JSONLD)
   {
     if (orionldState.linkHttpHeaderPresent == true)
     {
@@ -856,16 +856,14 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Should a @context be added to the response payload?
     //
-    bool addContext = ((orionldState.serviceP        != NULL) &&
-                       (orionldState.linkHeaderAdded == false) &&
+    bool addContext = ((orionldState.serviceP        != NULL)    &&
+                       (orionldState.linkHeaderAdded == false)   &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
-                       (orionldState.out.contentType == JSONLD));
+                       (orionldState.out.contentType == JSONLD)  &&
+                       (orionldState.httpStatusCode   < 300));
 
     if (addContext)
-    {
-      if ((orionldState.out.contentType == JSONLD) && (orionldState.httpStatusCode < 300))
-        contextToPayload();
-    }
+      contextToPayload();
 
     //
     // Render the payload to get a string for restReply to send the response

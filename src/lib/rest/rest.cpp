@@ -555,12 +555,12 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
-    orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
+    if (orionldState.apiVersion != NGSI_LD_V1)
+    {
+      orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
 
-    headerP->contentType = value;
-
-    if (strcmp(value, "application/ld+json") == 0)
-      orionldState.ngsildContent = true;
+      headerP->contentType = value;
+    }
   }
   else if (strcasecmp(key, HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
   else if (strcasecmp(key, HTTP_ORIGIN) == 0)            headerP->origin         = value;
