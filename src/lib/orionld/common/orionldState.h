@@ -292,9 +292,6 @@ typedef struct OrionldConnectionState
   Verb                    verb;
   bool                    badVerb;     // ToDo: verb == NOVERB should cover this
   char*                   verbString;
-  bool                    acceptJson;
-  bool                    acceptJsonld;
-  bool                    acceptGeojson;
   bool                    ngsildContent;
   KjNode*                 payloadContextNode;
   KjNode*                 payloadIdNode;

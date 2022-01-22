@@ -334,15 +334,15 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   //
   if (errorsArrayP->value.firstChildP == NULL)  // No errors - 201 and String[] as payload body
   {
-    orionldState.httpStatusCode = 201;
-    orionldState.responseTree   = successArrayP;
-    orionldState.acceptJsonld   = false;
+    orionldState.httpStatusCode  = 201;
+    orionldState.responseTree    = successArrayP;
+    orionldState.out.contentType = JSON;
   }
   else
   {
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = kjObject(orionldState.kjsonP, NULL);
-    orionldState.acceptJsonld   = false;
+    orionldState.httpStatusCode  = 207;
+    orionldState.responseTree    = kjObject(orionldState.kjsonP, NULL);
+    orionldState.out.contentType = JSON;
 
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);

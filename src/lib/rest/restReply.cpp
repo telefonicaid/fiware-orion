@@ -120,7 +120,23 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
-  if (answer != "")
+  if (orionldState.apiVersion == NGSI_LD_V1)
+  {
+    if (answerLen > 0)
+    {
+      char* contentType = (char*) "application/json";
+
+      if      (answerLen <= 2)                          contentType = (char*) "application/json";
+      else if (orionldState.httpStatusCode  == 207)     contentType = (char*) "application/json";
+      else if (orionldState.httpStatusCode  >= 400)     contentType = (char*) "application/json";
+      else if (orionldState.out.contentType == JSONLD)  contentType = (char*) "application/ld+json";
+      else if (orionldState.out.contentType == GEOJSON) contentType = (char*) "application/geo+json";
+      else                                              contentType = (char*) "application/json";
+
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, contentType);
+    }
+  }
+  else if (answer != "")
   {
     //
     // For error-responses, never respond with application/ld+json
@@ -131,7 +147,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if (orionldState.httpStatusCode == 207)
       orionldState.out.contentType = JSON;
 
-    if (orionldState.acceptGeojson == true)
+    if (orionldState.out.contentType == GEOJSON)
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/geo+json");
     else if (orionldState.out.contentType == JSON)
     {

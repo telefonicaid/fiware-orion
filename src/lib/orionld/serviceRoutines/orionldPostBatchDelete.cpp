@@ -193,8 +193,8 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     kjChildAdd(orionldState.responseTree, success);
     kjChildAdd(orionldState.responseTree, errors);
 
-    orionldState.httpStatusCode = 207;  // Multi-Status
-    orionldState.acceptJsonld   = false;
+    orionldState.httpStatusCode  = 207;   // Multi-Status
+    orionldState.out.contentType = JSON;  // restReply already sets it to JSON is 207 ...
   }
 
   return true;

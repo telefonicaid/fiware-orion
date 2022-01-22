@@ -350,8 +350,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
   {
-    orionldState.httpStatusCode = 207;  // Multi-Status
-    orionldState.acceptJsonld   = false;
+    orionldState.httpStatusCode  = 207;   // Multi-Status
+    orionldState.out.contentType = JSON;  // restReply already sets it to JSON is 207 ...
   }
   else
   {

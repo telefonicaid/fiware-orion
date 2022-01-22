@@ -34,8 +34,8 @@ brokerStart CB 212-249
 # For this test we don't use "orionCurl", but "raw" calls to 'curl'
 #
 # 01. Create an entity, no @context
-# 02. GET the entity, no @context, no Accept header (=> */*) - see @context in payload and correct Content-Len
-# 
+# 02. GET the entity, no @context, no Accept header (=> */*) - see @context in link header and correct Content-Len
+#
 
 echo "01. Create an entity, no @context"
 echo "================================="
@@ -56,8 +56,8 @@ echo
 echo
 
 
-echo "02. GET the entity, no @context, no Accept header (=> */*) - see @context in payload and correct Content-Len"
-echo "============================================================================================================"
+echo "02. GET the entity, no @context, no Accept header (=> */*) - see @context in link header and correct Content-Len"
+echo "================================================================================================================"
 curl "localhost:$CB_PORT/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2" -s -S --dump-header /tmp/httpHeaders.out > /tmp/payloadData.out
 cat /tmp/httpHeaders.out | grep -v 'Keep-Alive'
 cat /tmp/payloadData.out
@@ -77,16 +77,16 @@ Date: REGEX(.*)
 
 
 
-02. GET the entity, no @context, no Accept header (=> */*) - see @context in payload and correct Content-Len
-============================================================================================================
+02. GET the entity, no @context, no Accept header (=> */*) - see @context in link header and correct Content-Len
+================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 199
-Content-Type: application/ld+json
+Content-Length: 120
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "id": "urn:entities:E2",
     "type": "T",
     "P1": {

@@ -531,7 +531,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
 
 
-extern MimeType contentTypeParse(const char* contentType, char** charsetP);
+extern MimeType mimeTypeFromString(const char* contentType, char** charsetP, bool exact);
 /* ****************************************************************************
 *
 * httpHeaderGet -
@@ -545,14 +545,17 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_HOST) == 0)              headerP->host           = value;
   else if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
-    headerP->accept = value;
-    acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
+    if (orionldState.apiVersion != NGSI_LD_V1)
+    {
+      headerP->accept = value;
+      acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
+    }
   }
   else if (strcasecmp(key, HTTP_EXPECT) == 0)            headerP->expect         = value;
   else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
-    orionldState.in.contentType = contentTypeParse(value, NULL);
+    orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
 
     headerP->contentType = value;
 

@@ -482,7 +482,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   }
 
   char* geometryProperty = NULL;
-  if (orionldState.acceptGeojson == true)
+  if (orionldState.out.contentType == GEOJSON)
   {
     if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
     {

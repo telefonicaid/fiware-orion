@@ -163,88 +163,6 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
-// acceptHeaderExtractAndCheck -
-//
-static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
-{
-  bool  explicit_application_json   = false;
-  bool  explicit_application_jsonld = false;
-  float weight_application_json     = 0;
-  float weight_application_jsonld   = 0;
-
-  if (ciP->httpHeaders.acceptHeaderV.size() == 0)
-  {
-    orionldState.acceptJson       = true;   // Default Accepted MIME-type is application/json
-    orionldState.acceptJsonld     = false;
-    orionldState.out.contentType  = JSON;
-  }
-
-  for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
-  {
-    const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
-
-    if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
-    {
-      const char* appType = &mediaRange[12];
-
-      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
-      {
-        orionldState.acceptJsonld   = true;
-        explicit_application_jsonld = true;
-        weight_application_jsonld   = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
-      }
-      else if (SCOMPARE9(appType, 'g', 'e', 'o', '+', 'j', 's', 'o', 'n', 0))
-        orionldState.acceptGeojson  = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))
-      {
-        orionldState.acceptJson     = true;
-        explicit_application_json   = true;
-        weight_application_json     = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
-      }
-      else if (SCOMPARE2(appType, '*', 0))
-      {
-        orionldState.acceptJsonld = true;
-        orionldState.acceptJson   = true;
-      }
-    }
-    else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
-    {
-      orionldState.acceptJsonld = true;
-      orionldState.acceptJson   = true;
-    }
-  }
-
-  if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false) && (orionldState.acceptGeojson == false))
-  {
-    const char* title   = "invalid mime-type";
-    const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
-
-    LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
-    orionldErrorResponseCreate(OrionldBadRequestData, title, details);
-    orionldState.httpStatusCode = SccNotAcceptable;
-
-    return false;
-  }
-
-  if ((explicit_application_json == true) && (explicit_application_jsonld == false))
-    orionldState.acceptJsonld = false;
-
-  if ((weight_application_json != 0) || (weight_application_jsonld != 0))
-  {
-    if (weight_application_json > weight_application_jsonld)
-      orionldState.acceptJsonld = false;
-  }
-
-  if (orionldState.acceptJsonld == true)
-    orionldState.out.contentType = JSONLD;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // payloadEmptyCheck -
 //
 static bool payloadEmptyCheck(ConnectionInfo* ciP)
@@ -684,8 +602,8 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //   17. Call the SERVICE ROUTINE
 //   18. If the service routine failed (returned FALSE), but no HTTP status ERROR code is set, the HTTP status code defaults to 400
 //   19. Check for existing responseTree, in case of httpStatusCode >= 400 (except for 405)
-//   20. If (orionldState.acceptNgsild): Add orionldState.payloadContextTree to orionldState.responseTree
-//   21. If (orionldState.acceptNgsi):   Set HTTP Header "Link" to orionldState.contextP->url
+//   20. If (Accept: JSONLD): Add orionldState.payloadContextTree to orionldState.responseTree
+//   21. If (Accept: JSON):   Set HTTP Header "Link" to orionldState.contextP->url
 //   22. Render response tree
 //   23. IF accept == app/json, add the Link HTTP header
 //   24. REPLY
@@ -784,12 +702,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (contentTypeCheck(ciP) == false)
       goto respond;
   }
-
-  //
-  // 06. Check the Accept header and ...
-  //
-  if (acceptHeaderExtractAndCheck(ciP) == false)
-    goto respond;
 
   //
   // 07. Check the @context in HTTP Header, if present
@@ -916,7 +828,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
-    if (orionldState.acceptGeojson == true)
+    if (orionldState.out.contentType == GEOJSON)
     {
       //
       // Default is: @context in payload body
@@ -927,7 +839,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
         orionldState.linkHeaderAdded = false;  // To indicate @context in payload body for geojsonEntityTransform
     }
-    else if (orionldState.acceptJsonld == false)
+    else if (orionldState.out.contentType != JSONLD)
       linkHeader = true;
     else if (orionldState.responseTree == NULL)
       linkHeader = true;
@@ -947,11 +859,11 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     bool addContext = ((orionldState.serviceP        != NULL) &&
                        (orionldState.linkHeaderAdded == false) &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
-                       (orionldState.acceptJsonld    == true));
+                       (orionldState.out.contentType == JSONLD));
 
     if (addContext)
     {
-      if ((orionldState.acceptJsonld == true) && (orionldState.httpStatusCode < 300))
+      if ((orionldState.out.contentType == JSONLD) && (orionldState.httpStatusCode < 300))
         contextToPayload();
     }
 
@@ -962,7 +874,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     PERFORMANCE(renderStart);
 
-    if ((orionldState.acceptGeojson == true) && (serviceRoutineResult == true))
+    if ((orionldState.out.contentType == GEOJSON) && (serviceRoutineResult == true))
     {
       if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
         orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues, orionldState.geoPropertyNode);

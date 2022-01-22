@@ -277,12 +277,12 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
 
 /* ****************************************************************************
 *
-* contentTypeParse -
+* mimeTypeFromString -
 */
-MimeType contentTypeParse(const char* contentType, char** charsetP)
+MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcardsAccepted)
 {
   char* s;
-  char* cP = (char*) contentType;
+  char* cP = (char*) mimeType;
 
   if ((s = strstr(cP, ";")) != NULL)
   {
@@ -296,15 +296,112 @@ MimeType contentTypeParse(const char* contentType, char** charsetP)
 
   cP = wsStrip(cP);
 
-  if      (strcmp(cP, "*/*") == 0)                  return JSON;
-  else if (strcmp(cP, "text/json") == 0)            return JSON;
-  else if (strcmp(cP, "application/json") == 0)     return JSON;
-  else if (strcmp(cP, "application/ld+json") == 0)  return JSONLD;
-  else if (strcmp(cP, "application/geo+json") == 0) return GEOJSON;
-  else if (strcmp(cP, "application/html") == 0)     return HTML;
-  else if (strcmp(cP, "text/plain") == 0)           return TEXT;
+  if (wildcardsAccepted == true)
+  {
+    if      (strcmp(cP, "*/*")                == 0)  return JSON;
+    else if (strcmp(cP, "application/*")      == 0)  return JSON;
+  }
 
-  return JSON;
+  if      (strcmp(cP, "application/json")     == 0)  return JSON;
+  else if (strcmp(cP, "application/ld+json")  == 0)  return JSONLD;
+  else if (strcmp(cP, "application/geo+json") == 0)  return GEOJSON;
+
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    if      (strcmp(cP, "text/json")         == 0)  return JSON;
+    else if (strcmp(cP, "application/html")  == 0)  return HTML;
+    else if (strcmp(cP, "text/plain")        == 0)  return TEXT;
+  }
+
+  return NOMIMETYPE;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// acceptHeaderParse -
+//
+// Wildcards:
+//   Accept: <MIME_type>/<MIME_subtype>
+//   Accept: <MIME_type>/*
+//   Accept: */*
+//
+// Example with weights:
+//   Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8
+//
+//
+static MimeType acceptHeaderParse(char* accept)
+{
+  // Split MimeTypes according to commas
+  char* mimeV[20];
+  int   mimes = 1;
+
+  // Step over any initial WS
+  while (*accept == ' ')
+  {
+    if (*accept == 0)
+      return NOMIMETYPE;
+
+    ++accept;
+  }
+
+  mimeV[0] = accept;
+
+  while (*accept != 0)
+  {
+    if (*accept == ',')
+    {
+      *accept = 0;
+      mimeV[mimes++] = &accept[1];
+    }
+
+    ++accept;
+  }
+
+  //
+  MimeType winner        = NOMIMETYPE;
+  float    winningWeight = 0;
+
+  for (int ix = 0; ix < mimes; ix++)
+  {
+    MimeType  mimeType;
+    float     weight = 1;  // Default weight is 1 - q=xxx can modify that
+
+    // Extract weight, if there
+    char* q = strstr(mimeV[ix], ";q=");
+    if (q != NULL)
+    {
+      *q     = 0;
+      weight = atof(&q[3]);
+    }
+
+    //
+    // GET the MIME type, check for new winner
+    // REMEMBER:  JSON is the default Mime Type and if equal weight, JSON wins
+    //
+    mimeType = mimeTypeFromString(mimeV[ix], NULL, true);
+    if ((mimeType == JSON) || (mimeType == JSONLD) || (mimeType == GEOJSON))
+    {
+      if (winner == NOMIMETYPE)
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+      else if (weight > winningWeight)
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+      else if ((weight == winningWeight) && (mimeType == JSON))
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+    }
+  }
+
+  return winner;
 }
 
 
@@ -339,7 +436,21 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   }
   else if (strcmp(key, "Content-Type") == 0)
   {
-    orionldState.in.contentType = contentTypeParse(value, NULL);
+    orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
+  }
+  else if (strcmp(key, "Accept") == 0)
+  {
+    orionldState.out.contentType = acceptHeaderParse((char*) value);
+
+    if (orionldState.out.contentType == NOMIMETYPE)
+    {
+      const char* title   = "Invalid Accept mime-type";
+      const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
+
+      LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      orionldState.httpStatusCode = SccNotAcceptable;
+    }
   }
 
   return MHD_YES;
@@ -909,13 +1020,19 @@ MHD_Result orionldMhdConnectionInit
   // The idea is to move all headers from httpHeaderGet to orionldHttpHeaderGet
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderGet, NULL);
+  if (orionldState.httpStatusCode != 200)
+  {
+    LM_W(("Error detected in a HTTP header: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    return MHD_YES;  // orionldHttpHeaderGet sets the error
+  }
+
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
   //
   // Any error detected during httpHeaderGet calls?
   //
   if (orionldState.httpStatusCode != 200)
-    return MHD_YES;  // httpHeaderGet stes the error
+    return MHD_YES;  // httpHeaderGet sets the error
 
   if (orionldState.tenantP == NULL)
     orionldState.tenantP = &tenant0;

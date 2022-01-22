@@ -220,7 +220,7 @@ static KjNode* getAvailableEntityTypesDetails(KjNode* sortedArrayP)
     KjNode* attrsNameP         = kjLookup(typeValueNodeP, "attributeNames");
     KjNode* typeNodeResponseP  = kjObject(orionldState.kjsonP, NULL);
 
-    if (orionldState.acceptJsonld == true)
+    if (orionldState.out.contentType == JSONLD)
     {
       KjNode* contextNode = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
       kjChildAdd(typeNodeResponseP, contextNode);
