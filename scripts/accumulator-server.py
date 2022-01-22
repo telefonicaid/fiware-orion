@@ -24,7 +24,7 @@
 
 # Requires paho-mqtt module:
 #
-# paho-mqtt==1.5.1
+# paho-mqtt==1.6.1
 
 __author__ = 'fermin'
 
@@ -39,11 +39,10 @@ __author__ = 'fermin'
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
-# * This script requires at least Flask 1.0.2, which comes with Werkzeug 0.15.2. There is a bug
-#   in Werkzeug < 0.11.16 that makes empty "content-length" headers to appear for some request
-#   in the accumulator dump
-# * This script also depends on pyOpenSSL 19.0.0
-
+# * This script requires at least Flask 2.0.2, which comes with Werkzeug 2.0.2.
+#
+# TODO: test a possible bug in Werkzeug that makes empty "content-length"
+# headers to appear for some request in the accumulator dump
 
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
