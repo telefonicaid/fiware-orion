@@ -178,20 +178,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (key == URI_PARAM_OPTIONS)
-  {
-    if (uriParamOptionsParse(ciP, val) != 0)
-    {
-      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
-
-      LM_W(("Bad Input (Invalid value for URI param /options/)"));
-      orionldState.httpStatusCode = error.code;
-      ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
-    }
-  }
-  else if (key == URI_PARAM_TYPE)
+  if (key == URI_PARAM_TYPE)
   {
     if (strstr(val, ","))  // More than ONE type?
     {
@@ -312,7 +299,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in URI param", key.c_str());
+    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in a URI param", key.c_str());
 
     alarmMgr.badInput(clientIp, details);
     orionldState.httpStatusCode = error.code;
@@ -1274,6 +1261,8 @@ RestService restServiceForBadVerb;
 
 
 
+extern Verb verbGet(const char* method);
+extern MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value);
 /* ****************************************************************************
 *
 * connectionTreatInit -
@@ -1346,6 +1335,9 @@ ConnectionInfo* connectionTreatInit
   }
 
 
+  orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
+  orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
+
   //
   // ConnectionInfo
   //
@@ -1361,14 +1353,10 @@ ConnectionInfo* connectionTreatInit
     *retValP = MHD_NO;
     return NULL;
   }
-
-  orionldState.transactionStart.tv_sec  = transactionStart.tv_sec;
-  orionldState.transactionStart.tv_usec = transactionStart.tv_usec;
-
-  LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
+  orionldState.ciP = ciP;
 
   //
-  // URI parameters
+  // HTTP Headers
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
@@ -1408,6 +1396,23 @@ ConnectionInfo* connectionTreatInit
     //
     //
     restReply(ciP, ciP->answer);  // to not hang on too big payloads
+    return ciP;
+  }
+
+
+  //
+  // URI parameters
+  //
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, ciP);
+  if (orionldState.httpStatusCode >= 400)
+  {
+    LM_W(("Bad Request (error in URI parameters - %s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    if (orionldState.httpStatusCode != 406)
+    {
+      OrionError oe(SccBadRequest, orionldState.pd.title? orionldState.pd.title : "TITLE");
+      ciP->answer = oe.smartRender(orionldState.apiVersion);
+    }
+
     return ciP;
   }
 
@@ -1545,9 +1550,6 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
 
 
 
-extern Verb verbGet(const char* method);
-extern MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value);
-
 /* ****************************************************************************
 *
 * connectionTreat -
@@ -1629,6 +1631,7 @@ static MHD_Result connectionTreat
   {
     MHD_Result retVal;
 
+    LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //
@@ -1646,9 +1649,39 @@ static MHD_Result connectionTreat
     orionldState.correlator     = (char*) "";
     orionldState.httpStatusCode = 200;
 
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
-
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
+
+    ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+    //
+    // Check validity of URI parameters
+    //
+    bool keyValuesEtAl = true;
+
+    if      ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.values))        keyValuesEtAl = false;
+    else if ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    else if ((orionldState.uriParamOptions.values)    && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    if (keyValuesEtAl == false)
+    {
+      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+      LM_W(("Bad Input (Invalid value for URI param /options/)"));
+
+      orionldState.httpStatusCode = 400;
+      ciP->answer                 = error.smartRender(orionldState.apiVersion);
+
+      return MHD_YES;
+    }
+
+    if ((orionldState.httpStatusCode >= 400) && (orionldState.httpStatusCode != 405) && (ciP->answer == ""))
+    {
+      const char* title  = (orionldState.pd.title  != NULL)? orionldState.pd.title  : "no title";
+      const char* detail = (orionldState.pd.detail != NULL)? orionldState.pd.detail : "no detail";
+      OrionError  error((HttpStatusCode) orionldState.httpStatusCode, title, detail);
+
+      ciP->answer = error.smartRender(orionldState.apiVersion);
+      return MHD_YES;
+    }
+
     return retVal;
   }
 

@@ -37,14 +37,14 @@ echo
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 400 Bad Request
-Content-Length: 86
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 { 
-    "description": "Empty right-hand-side for URI param /foo&quot;/",
-    "error": "BadRequest"	
+    "description": "Empty right-hand-side for a URI parameter",
+    "error": "BadRequest"
 }
 
 

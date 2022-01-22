@@ -96,7 +96,7 @@ std::string getEntityAttribute
                                          ciP->httpHeaders.outformatSelect(),
                                          &orionldState.out.contentType,
                                          &orionldState.httpStatusCode,
-                                         ciP->uriParamOptions[OPT_KEY_VALUES],
+                                         orionldState.uriParamOptions.keyValues,
                                          orionldState.uriParams.metadata? orionldState.uriParams.metadata : "",
                                          EntityAttributeResponse));
 

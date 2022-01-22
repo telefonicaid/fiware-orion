@@ -36,8 +36,11 @@ extern "C"
 
 #include "common/wsStrip.h"                                      // wsStrip
 #include "common/MimeType.h"                                     // mimeTypeParse
+#include "alarmMgr/alarmMgr.h"                                   // alarmMgr
 #include "rest/Verb.h"                                           // Verb
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/OrionError.h"                                     // OrionError
+#include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
@@ -66,7 +69,6 @@ extern __thread char  clientIp[IP_LENGTH_MAX + 1];
 // External declarations - tmp - should be in their own files (not rest.cpp) and included here
 //
 extern MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
-extern MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val);
 
 
 
@@ -205,9 +207,9 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "upsert")        == 0)  orionldState.uriParamOptions.upsert        = true;  // NGSIv2 compatibility
       else
       {
-        LM_W(("Unknown 'options' value: %s", optionStart));
+        LM_W(("Invalid 'options' value: %s", optionStart));
         orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI param /options/", optionStart);
         return;
       }
 
@@ -351,16 +353,45 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
 //
 MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  // NULL/empty URI param value
   if ((value == NULL) || (*value == 0))
   {
-    char errorString[256];
-
-    snprintf(errorString, sizeof(errorString) - 1, "Empty right-hand-side for URI param /%s/", key);
-    orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for a URI parameter", key);
     orionldState.httpStatusCode = 400;
 
     return MHD_YES;
   }
+
+  //
+  // Forbidden characters in URI param value - not for NGSI-LD - for now at least ...
+  //
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    bool containsForbiddenChars = false;
+
+    if ((strcmp(key, "geometry") == 0) || (strcmp(key, "georel") == 0))
+      containsForbiddenChars = forbiddenChars(value, "=;");
+    else if (strcmp(key, "coords") == 0)
+      containsForbiddenChars = forbiddenChars(value, ";");
+    else if ((strcmp(key, "q") != 0) && (strcmp(key, "mq") != 0) && (strcmp(key, "idPattern") != 0) && (strcmp(key, "typePattern") != 0))
+      containsForbiddenChars = forbiddenChars(key) || forbiddenChars(value);
+
+    if (containsForbiddenChars == true)
+    {
+      OrionError  error(SccBadRequest, "invalid character in a URI parameter");
+      char        details[256];
+
+      snprintf(details, sizeof(details), "invalid character in URI param '%s'", key);
+      orionldErrorResponseCreate(OrionldBadRequestData, "invalid character in a URI parameter", key);
+
+      alarmMgr.badInput(clientIp, details);
+      orionldState.httpStatusCode = 400;
+      orionldState.ciP->answer    = error.smartRender(orionldState.apiVersion);
+      LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key, value));
+      return MHD_YES;
+    }
+  }
+
 
   if (strcmp(key, "id") == 0)
   {
@@ -517,7 +548,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.deleteAll = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'deleteAll'", value);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /deleteAll/", value);
       orionldState.httpStatusCode = 400;
       return MHD_YES;
     }
@@ -557,7 +588,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.details = true;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'details'", value);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /details/", value);
       orionldState.httpStatusCode = 400;
       return MHD_YES;
     }
@@ -572,7 +603,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.prettyPrint = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'prettyPrint'", value);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /prettyPrint/", value);
       orionldState.httpStatusCode = 400;
       return MHD_YES;
     }
@@ -597,7 +628,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.location = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'location'", value);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /location/", value);
       orionldState.httpStatusCode = 400;
       return MHD_YES;
     }
@@ -666,7 +697,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else
   {
-    LM_W(("Bad Input (unknown URI parameter: '%s')", key));
+    LM_W(("Bad Input (unknown URI parameter: '%s' (value: '%s'))", key, value));
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Unknown URI parameter", key);
     return MHD_YES;
@@ -752,8 +783,8 @@ MHD_Result orionldMhdConnectionInit
 {
   ++requestNo;
 
-//  if (requestNo % 1000 == 0)
-    LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  //  if (requestNo % 1000 == 0)
+  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 1. Prepare connectionInfo
@@ -859,14 +890,14 @@ MHD_Result orionldMhdConnectionInit
   //
   if ((orionldState.uriParams.limit == 0) && (orionldState.uriParams.count == false))
   {
-    LM_E(("Invalid value for URI parameter 'limit': 0"));
+    LM_E(("Invalid value for URI parameter /limit/: 0"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set");
     orionldState.httpStatusCode = 400;
   }
 
   if (orionldState.uriParams.limit > 1000)
   {
-    LM_E(("Invalid value for URI parameter 'limit': %d", orionldState.uriParams.limit));
+    LM_E(("Invalid value for URI parameter /limit/: %d", orionldState.uriParams.limit));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
     orionldState.httpStatusCode = 400;
   }

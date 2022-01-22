@@ -143,13 +143,14 @@ Date: REGEX(.*)
 03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 55
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "error": "Empty right-hand-side for URI param /level/"
+    "description": "Empty right-hand-side for a URI parameter",
+    "error": "BadRequest"
 }
 
 

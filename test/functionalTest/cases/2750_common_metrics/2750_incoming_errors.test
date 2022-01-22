@@ -435,13 +435,13 @@ Date: REGEX(.*)
 10. Send a request with an invalid character in a URI parameter
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -501,10 +501,10 @@ Date: REGEX(.*)
         "default-service": {
             "subservs": {
                 "SP/error": {
-                    "incomingTransactionErrors": 6,
+                    "incomingTransactionErrors": 4,
                     "incomingTransactionRequestSize": 39,
-                    "incomingTransactionResponseSize": 556,
-                    "incomingTransactions": 6,
+                    "incomingTransactionResponseSize": 398,
+                    "incomingTransactions": 4,
                     "serviceTime": REGEX(.*)
                 },
                 "SP/get/entities": {
@@ -518,9 +518,9 @@ Date: REGEX(.*)
                     "serviceTime": REGEX(.*)
                 },
                 "root-subserv": {
-                    "incomingTransactionErrors": 1,
+                    "incomingTransactionErrors": 3,
                     "incomingTransactionResponseSize": REGEX(\d+),
-                    "incomingTransactions": 1,
+                    "incomingTransactions": 3,
                     "serviceTime": REGEX(.*)
                 }
             },
@@ -536,10 +536,10 @@ Date: REGEX(.*)
     "sum": {
         "subservs": {
             "SP/error": {
-                "incomingTransactionErrors": 6,
+                "incomingTransactionErrors": 4,
                 "incomingTransactionRequestSize": 39,
-                "incomingTransactionResponseSize": 556,
-                "incomingTransactions": 6,
+                "incomingTransactionResponseSize": 398,
+                "incomingTransactions": 4,
                 "serviceTime": REGEX(.*)
             },
             "SP/get/entities": {
@@ -553,9 +553,9 @@ Date: REGEX(.*)
                 "serviceTime": REGEX(.*)
             },
             "root-subserv": {
-                "incomingTransactionErrors": 1,
+                "incomingTransactionErrors": 3,
                 "incomingTransactionResponseSize": REGEX(\d+),
-                "incomingTransactions": 1,
+                "incomingTransactions": 3,
                 "serviceTime": REGEX(.*)
             }
         },
