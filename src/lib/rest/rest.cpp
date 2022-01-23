@@ -604,8 +604,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
   }
 
-  headerP->gotHeaders = true;
-
   return MHD_YES;
 }
 

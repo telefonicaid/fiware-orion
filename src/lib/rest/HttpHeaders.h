@@ -124,7 +124,6 @@ typedef struct HttpHeaders
 
   std::vector<HttpAcceptHeader*> acceptHeaderV;
 
-  bool          gotHeaders;
   std::string   accept;
   std::string   expect;
   std::string   contentType;
