@@ -587,7 +587,7 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
   }
-  else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) headerP->contentLength           = atoi(value);
+  else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
   else if (strcasecmp(key, HTTP_ORIGIN)             == 0) headerP->origin                  = value;
   else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
   else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
@@ -1053,7 +1053,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 1
-  if (ciP->httpHeaders.contentLength == 0)
+  if (orionldState.in.contentLength == 0)
   {
     return 0;
   }
@@ -1373,10 +1373,10 @@ ConnectionInfo* connectionTreatInit
   ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
   ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
-  if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
+  if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
   {
     char details[256];
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
 
     alarmMgr.badInput(clientIp, details);
     OrionError oe(SccRequestEntityTooLarge, details);
@@ -1456,7 +1456,7 @@ ConnectionInfo* connectionTreatInit
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
-  else if ((ciP->httpHeaders.contentLength == 0) &&
+  else if ((orionldState.in.contentLength == 0) &&
            ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
            (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
            (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
@@ -1491,7 +1491,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
   // just silently "eat" the entire message.
   //
-  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
   // bytes to read.
   // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
   // and the broker isn't able to respond. MHD just closes the connection.
@@ -1500,7 +1500,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -1518,9 +1518,9 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
     {
-      orionldState.in.payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
     }
     else
     {
@@ -1529,7 +1529,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   }
 
   // Copy the chunk
-  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, orionldState.in.contentLength));
   memcpy(&orionldState.in.payload[orionldState.in.payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer
@@ -1721,11 +1721,11 @@ static MHD_Result connectionTreat
   //
   // If the incoming request was too big, return error about it
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
 
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
     alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
@@ -1786,7 +1786,7 @@ static MHD_Result connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
+  if ((ciP->httpHeaders.contentType != "") && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);

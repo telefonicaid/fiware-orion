@@ -138,7 +138,6 @@ typedef struct HttpHeaders
   std::string   correlator;
   std::string   ngsiv2AttrsFormat;
   bool          servicePathReceived;
-  unsigned int  contentLength;
   std::string   connection;
 } HttpHeaders;
 

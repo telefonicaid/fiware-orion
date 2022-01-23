@@ -62,7 +62,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
   // just silently "eat" the entire message.
   //
-  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
   // bytes to read.
   // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
   // and the broker isn't able to respond. MHD just closes the connection.
@@ -71,7 +71,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -89,9 +89,9 @@ MHD_Result orionldMhdConnectionPayloadRead
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
     {
-      orionldState.in.payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
       if (orionldState.in.payload == NULL)
       {
         LM_E(("Out of memory!!!"));

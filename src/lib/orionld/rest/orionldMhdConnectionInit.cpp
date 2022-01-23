@@ -437,11 +437,12 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
       orionldState.httpStatusCode = SccNotAcceptable;
     }
   }
-  else if (strcasecmp(key, "Ngsiv2-AttrsFormat") == 0) orionldState.attrsFormat    = (char*) value;
-  else if (strcasecmp(key, "X-Auth-Token")       == 0) orionldState.xAuthToken     = (char*) value;
-  else if (strcasecmp(key, "Fiware-Correlator")  == 0) orionldState.correlator     = (char*) value;
-  else if (strcasecmp(key, "Content-Type")       == 0) orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
-  else if (strcasecmp(key, "Prefer")             == 0) orionldState.preferHeader   = (char*) value;
+  else if (strcasecmp(key, "Ngsiv2-AttrsFormat") == 0) orionldState.attrsFormat      = (char*) value;
+  else if (strcasecmp(key, "X-Auth-Token")       == 0) orionldState.xAuthToken       = (char*) value;
+  else if (strcasecmp(key, "Fiware-Correlator")  == 0) orionldState.correlator       = (char*) value;
+  else if (strcasecmp(key, "Content-Type")       == 0) orionldState.in.contentType   = mimeTypeFromString(value, NULL, false);
+  else if (strcasecmp(key, "Content-Length")     == 0) orionldState.in.contentLength = atoi(value);
+  else if (strcasecmp(key, "Prefer")             == 0) orionldState.preferHeader     = (char*) value;
 
   return MHD_YES;
 }
@@ -1050,7 +1051,7 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // Check payload too big
-  if (ciP->httpHeaders.contentLength > 2000000)
+  if (orionldState.in.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;
     orionldState.httpStatusCode  = 400;
