@@ -165,7 +165,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (orionldState.httpStatusCode != SccBadVerb))
+  if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
   {
     // Only GET method is supported for V1 API
     if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
@@ -178,7 +178,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
         MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
       }
       // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
+      else if (strcmp(orionldState.in.origin, corsOrigin) == 0)
       {
         MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
       }

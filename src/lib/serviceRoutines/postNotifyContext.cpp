@@ -61,7 +61,7 @@ std::string postNotifyContext
                                                                orionldState.tenantP,
                                                                orionldState.xAuthToken,
                                                                ciP->servicePathV,
-                                                               ciP->httpHeaders.correlator,
+                                                               orionldState.correlator,
                                                                ciP->httpHeaders.ngsiv2AttrsFormat));
   TIMED_RENDER(answer = ncr.render());
 

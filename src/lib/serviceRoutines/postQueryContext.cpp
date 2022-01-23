@@ -135,7 +135,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       resource,
                       mimeType,
                       payload,
-                      ciP->httpHeaders.correlator,
+                      orionldState.correlator,
                       "",
                       false,
                       &out,

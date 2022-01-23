@@ -173,7 +173,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
-                      ciP->httpHeaders.correlator,
+                      orionldState.correlator,
                       "",
                       false,
                       &out,
@@ -498,7 +498,7 @@ std::string postUpdateContext
                                                   orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   orionldState.xAuthToken,
-                                                  ciP->httpHeaders.correlator.c_str(),
+                                                  orionldState.correlator,
                                                   ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
                                                   orionldState.apiVersion,
                                                   ngsiV2Flavour));

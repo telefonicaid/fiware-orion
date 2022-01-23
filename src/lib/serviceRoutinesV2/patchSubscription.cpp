@@ -76,7 +76,7 @@ std::string patchSubscription
                                       orionldState.tenantP,
                                       ciP->servicePathV,
                                       orionldState.xAuthToken,
-                                      ciP->httpHeaders.correlator));
+                                      orionldState.correlator));
 
   std::string  answer = "";
   if (beError.code != SccNone)

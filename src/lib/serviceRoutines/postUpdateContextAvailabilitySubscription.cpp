@@ -56,7 +56,7 @@ std::string postUpdateContextAvailabilitySubscription
 
   TIMED_MONGO(orionldState.httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                                        &ucas,
-                                                                                       ciP->httpHeaders.correlator,
+                                                                                       orionldState.correlator,
                                                                                        orionldState.tenantP));
 
   TIMED_RENDER(answer = ucas.render());

@@ -49,7 +49,7 @@ std::string optionsVersionRequest
   ParseData*                 parseDataP
 )
 {
-  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  if (isOriginAllowedForCORS(orionldState.in.origin))
   {
     ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
 

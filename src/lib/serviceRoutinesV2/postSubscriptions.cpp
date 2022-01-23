@@ -76,7 +76,7 @@ extern std::string postSubscriptions
                                                orionldState.tenantP,
                                                ciP->servicePathV,
                                                orionldState.xAuthToken,
-                                               ciP->httpHeaders.correlator,
+                                               orionldState.correlator,
                                                ""));
 
   // Check potential error

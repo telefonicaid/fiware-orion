@@ -588,35 +588,20 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     orionldState.linkHttpHeaderPresent = true;
   }
   else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
-  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) headerP->origin                  = value;
+  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
   else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
   else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
-  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) headerP->xrealIp                 = value;
-  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) headerP->xforwardedFor           = value;
-  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) headerP->correlator              = value;
+  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) orionldState.in.xRealIp          = (char*) value;
+  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) orionldState.in.xForwardedFor    = (char*) value;
+  else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;
+  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) orionldState.correlator          = (char*) value;
+  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) orionldState.in.connection       = (char*) value;
   else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) headerP->ngsiv2AttrsFormat       = value;
-  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) headerP->userAgent               = value;
-  else if (strcasecmp(key, HTTP_HOST)               == 0) headerP->host                    = value;
+  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) {}
   else if (strcasecmp(key, HTTP_EXPECT)             == 0) headerP->expect                  = value;
-  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) headerP->connection              = value;
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
-  }
-
-  if ((strcasecmp(key, "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
-  {
-    LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
-  }
-
-  /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
-   * to "deactivate" this part of the string in the checking done at connectionTreat() */
-  char* cP = (char*) headerP->contentType.c_str();
-  char* match;
-  if ((match = strstr(cP, ";")) != NULL)
-  {
-     *match = 0;
-     headerP->contentType = cP;
   }
 
   headerP->gotHeaders = true;
@@ -940,9 +925,9 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
 * isOriginAllowedForCORS - checks the Origin header of the request and returns
 * true if that Origin is allowed to make a CORS request
 */
-bool isOriginAllowedForCORS(const std::string& requestOrigin)
+bool isOriginAllowedForCORS(const char* requestOrigin)
 {
-  return ((requestOrigin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
+  return ((requestOrigin != NULL) && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin, corsOrigin) == 0)));
 }
 
 
@@ -1361,17 +1346,16 @@ ConnectionInfo* connectionTreatInit
     acceptParse(ciP, "*/*");
   }
 
-  char correlator[CORRELATOR_ID_SIZE + 1];
-  if (ciP->httpHeaders.correlator == "")
+  if ((orionldState.correlator == NULL) || (orionldState.correlator[0] == 0))
   {
-    correlatorGenerate(correlator);
-    ciP->httpHeaders.correlator = correlator;
+    orionldState.correlator = kaAlloc(&orionldState.kalloc, CORRELATOR_ID_SIZE + 1);
+    correlatorGenerate(orionldState.correlator);
   }
 
-  correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+  correlatorIdSet(orionldState.correlator);
 
   ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
-  ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+  ciP->httpHeaderValue.push_back(orionldState.correlator);
 
   if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
   {
@@ -1419,13 +1403,13 @@ ConnectionInfo* connectionTreatInit
 
   /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
      X-Real-IP takes preference over X-Forwarded-For, if both appear */
-  if (ciP->httpHeaders.xrealIp != "")
+  if (orionldState.in.xRealIp != NULL)
   {
-    lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
+    lmTransactionSetFrom(orionldState.in.xRealIp);
   }
-  else if (ciP->httpHeaders.xforwardedFor != "")
+  else if (orionldState.in.xForwardedFor != NULL)
   {
-    lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
+    lmTransactionSetFrom(orionldState.in.xForwardedFor);
   }
   else
   {
