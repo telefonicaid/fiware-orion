@@ -44,12 +44,13 @@
 */
 typedef enum MimeType
 {
-  JSON       = 1,
-  TEXT       = 2,
-  HTML       = 3,
-  JSONLD     = 4,
-  GEOJSON    = 5,
-  NOMIMETYPE = 6
+  JSON           = 1,
+  TEXT           = 2,
+  HTML           = 3,
+  JSONLD         = 4,
+  GEOJSON        = 5,
+  MERGEPATCHJSON = 6,
+  NOMIMETYPE     = 7
 } MimeType;
 
 

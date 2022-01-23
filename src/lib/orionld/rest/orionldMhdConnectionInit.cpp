@@ -302,9 +302,10 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
     else if (strcmp(cP, "application/*")      == 0)  return JSON;
   }
 
-  if      (strcmp(cP, "application/json")     == 0)  return JSON;
-  else if (strcmp(cP, "application/ld+json")  == 0)  return JSONLD;
-  else if (strcmp(cP, "application/geo+json") == 0)  return GEOJSON;
+  if      (strcmp(cP, "application/json")             == 0)  return JSON;
+  else if (strcmp(cP, "application/ld+json")          == 0)  return JSONLD;
+  else if (strcmp(cP, "application/geo+json")         == 0)  return GEOJSON;
+  else if (strcmp(cP, "application/merge-patch+json") == 0)  return MERGEPATCHJSON;
 
   if (orionldState.apiVersion != NGSI_LD_V1)
   {
@@ -1067,16 +1068,13 @@ MHD_Result orionldMhdConnectionInit
   // Check URL path is OK
 
   // Check Content-Type is accepted
-  if ((orionldState.verb == PATCH) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/merge-patch+json") == 0))
-    ciP->httpHeaders.contentType = "application/json";
+  if ((orionldState.verb == PATCH) && (orionldState.in.contentType == MERGEPATCHJSON))
+    orionldState.in.contentType = JSON;
   else if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
-    //
-    // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
-    //
-    if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
+    if ((orionldState.in.contentType != JSON) && (orionldState.in.contentType != JSONLD))
     {
-      LM_W(("Bad Input (invalid Content-Type: '%s'", ciP->httpHeaders.contentType.c_str()));
+      LM_W(("Bad Input (invalid Content-Type: '%s'", mimeTypeToString(orionldState.in.contentType)));
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported");
