@@ -541,9 +541,7 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
 
-  if      (strcasecmp(key, HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
-  else if (strcasecmp(key, HTTP_HOST) == 0)              headerP->host           = value;
-  else if (strcasecmp(key, HTTP_ACCEPT) == 0)
+  if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
     if (orionldState.apiVersion != NGSI_LD_V1)
     {
@@ -551,8 +549,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
     }
   }
-  else if (strcasecmp(key, HTTP_EXPECT) == 0)            headerP->expect         = value;
-  else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
     if (orionldState.apiVersion != NGSI_LD_V1)
@@ -562,8 +558,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       headerP->contentType = value;
     }
   }
-  else if (strcasecmp(key, HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key, HTTP_ORIGIN) == 0)            headerP->origin         = value;
   else if ((strcasecmp(key, HTTP_FIWARE_SERVICE) == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
   {
     if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
@@ -582,16 +576,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       }
     }
   }
-  else if (strcasecmp(key, "X-Auth-Token") == 0)
-  {
-    orionldState.xAuthToken     = (char*) value;
-  }
-  else if (strcasecmp(key, "Authorization") == 0)
-    orionldState.authorizationHeader = (char*) value;
-  else if (strcasecmp(key, HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
-  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
-  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
-  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
   else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0)
   {
     headerP->servicePath         = value;
@@ -603,10 +587,18 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
   }
-  else if (strcasecmp(key, "Prefer") == 0)
-  {
-    orionldState.preferHeader = (char*) value;
-  }
+  else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) headerP->contentLength           = atoi(value);
+  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) headerP->origin                  = value;
+  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
+  else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
+  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) headerP->xrealIp                 = value;
+  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) headerP->xforwardedFor           = value;
+  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) headerP->correlator              = value;
+  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) headerP->ngsiv2AttrsFormat       = value;
+  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) headerP->userAgent               = value;
+  else if (strcasecmp(key, HTTP_HOST)               == 0) headerP->host                    = value;
+  else if (strcasecmp(key, HTTP_EXPECT)             == 0) headerP->expect                  = value;
+  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) headerP->connection              = value;
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
