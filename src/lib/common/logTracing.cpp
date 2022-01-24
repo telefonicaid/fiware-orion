@@ -161,6 +161,10 @@ void logInfoRequestWithPayload
 */
 void logInfoFwdStart(const char* verb, const char*  url)
 {
+  //
+  // WARNING:
+  //  This log line is used during functional tests, thus crucial. Please DO NOT modify nor delete it
+  //
   LM_I(("Starting forwarding for %s %s", verb, url));
 }
 

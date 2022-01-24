@@ -61,7 +61,7 @@ yum install contextBroker
 <a name="using-rpm-file"></a>
 ### RPM ファイルの使用
 
-[FIWARE Files area](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) から直接パッケージをダウンロードします。両方のタイプのパッケージを提供しています。
+[FIWARE Files area](https://nexus.lab.fiware.org/service/rest/repository/browse/el/8/x86_64/) から直接パッケージをダウンロードします。両方のタイプのパッケージを提供しています。
 
 次に、rpm コマンドを使用してパッケージをインストールします (root として) :
 
@@ -102,7 +102,7 @@ yum install contextBroker
 
 上記のコマンドは、yum キャッシュのために失敗することがあります。その場合は、`yum clean all` を実行 して再試行してください。
 
-RPM ファイルを使用してアップグレードする場合は、まず [FIWARE yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/7/x86_64/) から新しいパッケージをダウンロードしてください。両方のタイプのパッケージを提供しています。
+RPM ファイルを使用してアップグレードする場合は、まず [FIWARE yum repository](https://nexus.lab.fiware.org/service/rest/repository/browse/el/8/x86_64/) から新しいパッケージをダウンロードしてください。両方のタイプのパッケージを提供しています。
 
 rpm コマンドを使用してパッケージをアップグレードします (root として) :
 
