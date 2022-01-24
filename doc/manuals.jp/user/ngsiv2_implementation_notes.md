@@ -5,6 +5,7 @@
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
+* [カスタム通知でのヘッダの削除](#header-removal-in-custom-notifications)
 * [エンティティ・ロケーションの属性に制限](#limit-to-attributes-for-entity-location)
 * [`geo:json` 属性でサポートされる GeoJSON タイプ](#supported-geojson-types-in-geojson-attributes)
 * [通知の従来の属性フォーマット](#legacy-attribute-format-in-notifications)
@@ -100,6 +101,28 @@ Orion は、`-disableCustomNotifications` [CLI パラメータ](../admin/cli.md)
 * `Ngsiv2-AttrsFormat`
 
 そのような試み (例えば `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}`) は無視されます。
+
+[トップ](#top)
+
+<a name="header-removal-in-custom-notifications"></a>
+## カスタム通知でのヘッダの削除
+
+NGSIv2仕様 ("カスタム通知" セクション) で明示的に述べられていませんが、`headers` オブジェクトの
+ヘッダ・キーの文字列値が空の場合、そのヘッダは通知から削除されます。たとえば、次の構成:
+
+```
+"httpCustom": {
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダが削除されます。
+
+これは、Orion が通知に自動的に含めるヘッダを削除するのに役立ちます。例えば:
+
+* 通知にデフォルトで含まれるヘッダを回避するため (例: `Accept`)
+* 前述の `x-auth-token` などの (更新から通知までの) ヘッダの伝播を削減するため
 
 [トップ](#top)
 

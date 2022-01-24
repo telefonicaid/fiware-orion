@@ -50,6 +50,7 @@ extern void httpRequestInit(long defaultTimeoutInMilliseconds);
 extern int httpRequestSend
 (
   CURL*                                      curl,
+  const std::string&                         idStringForLogs,
   const std::string&                         from,
   const std::string&                         ip,
   unsigned short                             port,

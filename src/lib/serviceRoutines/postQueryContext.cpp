@@ -271,6 +271,7 @@ static bool queryForward
   url = ip + ":" + portV + resource;
 
   r = httpRequestSend(NULL,
+                      "regId: " + regId,
                       fromIp,  // thread variable
                       ip,
                       port,
