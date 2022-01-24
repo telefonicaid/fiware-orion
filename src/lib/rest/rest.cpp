@@ -553,9 +553,8 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   {
     if (orionldState.apiVersion != NGSI_LD_V1)
     {
-      orionldState.in.contentType = mimeTypeFromString(value, NULL, false);
-
-      headerP->contentType = value;
+      orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
+      orionldState.in.contentTypeString = (char*) value;
     }
   }
   else if ((strcasecmp(key, HTTP_FIWARE_SERVICE) == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
@@ -1043,7 +1042,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 2
-  if (ciP->httpHeaders.contentType == "")
+  if (orionldState.in.contentType == NOMIMETYPEGIVEN)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1054,9 +1053,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((orionldState.apiVersion == V1) && (ciP->httpHeaders.contentType != "application/json"))
+  if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != JSON))
   {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
     restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1065,9 +1064,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((orionldState.apiVersion == V2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
+  if ((orionldState.apiVersion == V2) && (orionldState.in.contentType != JSON) && (orionldState.in.contentType != TEXT))
   {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
     restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1768,7 +1767,7 @@ static MHD_Result connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((ciP->httpHeaders.contentType != "") && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
+  if ((orionldState.in.contentType != NOMIMETYPEGIVEN) && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);

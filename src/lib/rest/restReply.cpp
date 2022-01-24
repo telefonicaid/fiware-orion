@@ -152,12 +152,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }
-#ifdef ORIONLD
-    else if ((orionldState.out.contentType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
-    }
-#endif
     else if (orionldState.out.contentType == TEXT)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");

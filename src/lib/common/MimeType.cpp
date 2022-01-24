@@ -49,6 +49,7 @@ const char* mimeTypeToString(MimeType mimeType)
   case HTML:            return "HTML";
   case MERGEPATCHJSON:  return "MERGEPATCHJSON";
   case NOMIMETYPE:      return "NOMIMETYPE";
+  case NOMIMETYPEGIVEN: return "NOMIMETYPEGIVEN";
   }
 
   return "Unknown mimeType";
@@ -69,6 +70,7 @@ MimeType stringToMimeType(const std::string& s)
   else if (s == "HTML")            return HTML;
   else if (s == "MERGEPATCHJSON")  return MERGEPATCHJSON;
   else if (s == "NOMIMETYPE")      return NOMIMETYPE;
+  else if (s == "NOMIMETYPEGIVEN") return NOMIMETYPEGIVEN;
 
   return NOMIMETYPE;
 }
@@ -103,13 +105,14 @@ const char* mimeTypeToLongString(MimeType mimeType)
 {
   switch (mimeType)
   {
-  case JSON:            return "application/json";
-  case JSONLD:          return "application/ld+json";
-  case GEOJSON:         return "application/geo+json";
-  case TEXT:            return "plain/text";
-  case HTML:            return "application/html";
-  case MERGEPATCHJSON:  return "application/merge-patch+json";
-  case NOMIMETYPE:      return "NOMIMETYPE";
+  case JSON:             return "application/json";
+  case JSONLD:           return "application/ld+json";
+  case GEOJSON:          return "application/geo+json";
+  case TEXT:             return "plain/text";
+  case HTML:             return "application/html";
+  case MERGEPATCHJSON:   return "application/merge-patch+json";
+  case NOMIMETYPE:       return "NOMIMETYPE";
+  case NOMIMETYPEGIVEN:  return "NOMIMETYPEGIVEN";
   }
 
   return "NOMIMETYPE";

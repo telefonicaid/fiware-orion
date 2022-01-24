@@ -126,8 +126,6 @@ typedef struct HttpHeaders
 
   std::string   accept;
   std::string   expect;
-  std::string   contentType;
-  std::string   tenant;
   std::string   servicePath;
   std::string   ngsiv2AttrsFormat;
   bool          servicePathReceived;

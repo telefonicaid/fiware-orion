@@ -173,10 +173,6 @@ void orionldStateInit(MHD_Connection* connection)
 
   orionldState.out.contentType    = JSON;  // Default outgoing Content-Type
 
-  // Incoming HTTP headers
-  orionldState.in.contentType    = JSON;  // Default incoming Content-Type
-
-
   // Default response status code is 200 OK
   orionldState.httpStatusCode = 200;
 }
