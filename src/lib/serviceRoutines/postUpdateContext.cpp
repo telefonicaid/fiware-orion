@@ -499,7 +499,7 @@ std::string postUpdateContext
                                                   ciP->servicePathV,
                                                   orionldState.xAuthToken,
                                                   orionldState.correlator,
-                                                  ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                  orionldState.attrsFormat,
                                                   orionldState.apiVersion,
                                                   ngsiV2Flavour));
 

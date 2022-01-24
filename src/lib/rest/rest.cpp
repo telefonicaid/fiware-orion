@@ -581,11 +581,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
     headerP->servicePathReceived = true;
     orionldState.servicePath = (char*) value;
   }
-  else if (strcasecmp(key, HTTP_LINK) == 0)
-  {
-    orionldState.link                  = (char*) value;
-    orionldState.linkHttpHeaderPresent = true;
-  }
   else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
   else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
   else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
@@ -595,9 +590,9 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;
   else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) orionldState.correlator          = (char*) value;
   else if (strcasecmp(key, HTTP_CONNECTION)         == 0) orionldState.in.connection       = (char*) value;
-  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) headerP->ngsiv2AttrsFormat       = value;
+  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) orionldState.attrsFormat         = (char*) value;
   else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) {}
-  else if (strcasecmp(key, HTTP_EXPECT)             == 0) headerP->expect                  = value;
+  else if (strcasecmp(key, HTTP_EXPECT)             == 0) {}
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));

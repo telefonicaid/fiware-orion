@@ -125,9 +125,7 @@ typedef struct HttpHeaders
   std::vector<HttpAcceptHeader*> acceptHeaderV;
 
   std::string   accept;
-  std::string   expect;
   std::string   servicePath;
-  std::string   ngsiv2AttrsFormat;
   bool          servicePathReceived;
 } HttpHeaders;
 

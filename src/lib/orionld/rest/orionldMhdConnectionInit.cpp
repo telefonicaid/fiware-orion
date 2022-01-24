@@ -452,6 +452,11 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
     orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
     orionldState.in.contentTypeString = (char*) value;
   }
+  else if (strcasecmp(key, HTTP_LINK) == 0)
+  {
+    orionldState.link                  = (char*) value;
+    orionldState.linkHttpHeaderPresent = true;
+  }
 
   return MHD_YES;
 }
