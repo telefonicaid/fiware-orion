@@ -1368,6 +1368,7 @@ extern __thread char   subService[101];                 // Using SERVICE_PATH_MA
 extern __thread char   fromIp[IP_LENGTH_MAX + 1];
 
 
+
 /* ****************************************************************************
 *
 * lmxFp - 
@@ -1821,11 +1822,11 @@ extern int lmLogLinesGet(void);
 */
 inline void lmTransactionReset()
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
-  strncpy(correlatorId,  "N/A", sizeof(correlatorId));
-  strncpy(service,       "N/A", sizeof(service));
-  strncpy(subService,    "N/A", sizeof(subService));
-  strncpy(fromIp,        "N/A", sizeof(fromIp));
+  strncpy(transactionId, "N/A", sizeof(transactionId) - 1);
+  strncpy(correlatorId,  "N/A", sizeof(correlatorId) - 1);
+  strncpy(service,       "N/A", sizeof(service) - 1);
+  strncpy(subService,    "N/A", sizeof(subService) - 1);
+  strncpy(fromIp,        "N/A", sizeof(fromIp) - 1);
 }
 
 
@@ -1838,10 +1839,9 @@ inline void lmTransactionStart(const char* keyword, const char* schema, const ch
 {
   transactionIdSet();
 
-  snprintf(service,    sizeof(service),    "pending");
-  snprintf(subService, sizeof(subService), "pending");
-  snprintf(fromIp,     sizeof(fromIp),     "pending");
-  // LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
+  snprintf(service,    sizeof(service) - 1,    "pending");
+  snprintf(subService, sizeof(subService) - 1, "pending");
+  snprintf(fromIp,     sizeof(fromIp) - 1,     "pending");
 }
 
 
@@ -1853,9 +1853,9 @@ inline void lmTransactionStart(const char* keyword, const char* schema, const ch
 inline void lmTransactionSetService(const char* _service)
 {
   if (_service != NULL)
-    snprintf(service, sizeof(service), "%s", _service);
+    snprintf(service, sizeof(service) - 1, "%s", _service);
   else
-    snprintf(service, sizeof(service), "%s", "<default>");
+    snprintf(service, sizeof(service) - 1, "%s", "<default>");
 }
 
 
@@ -1864,16 +1864,12 @@ inline void lmTransactionSetService(const char* _service)
 *
 * lmTransactionSetSubservice -
 */
-inline void lmTransactionSetSubservice(const char* _subService)
+inline void lmTransactionSetSubservice(const char* subSrv)
 {
-  if (strlen(_subService) != 0)
-  {
-    snprintf(subService, sizeof(service), "%s", _subService);
-  }
+  if (subSrv != NULL)
+    snprintf(subService, sizeof(subService) - 1, "%s", subSrv);
   else
-  {
-    snprintf(subService, sizeof(service), "%s", "<default>");
-  }
+    snprintf(subService, sizeof(subService) - 1, "%s", "<default>");
 }
 
 
@@ -1884,34 +1880,11 @@ inline void lmTransactionSetSubservice(const char* _subService)
 */
 inline void lmTransactionSetFrom(const char* _fromIp)
 {
-  if (strlen(_fromIp) != 0)
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
-  }
+  if (_fromIp != NULL)
+    snprintf(fromIp, sizeof(fromIp) - 1, "%s", _fromIp);
   else
-  {
-    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
-  }
+    snprintf(fromIp, sizeof(fromIp) - 1, "%s", "<no ip>");
 }
-
-
-
-#if 0
-
-// This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION
-// notifications... let's hold in until OTI (deprecated in 0.26.0) gets definitivealy
-// removed from code
-
-/* ****************************************************************************
-*
-* lmTransactionStart_URL -
-*/
-inline void lmTransactionStart_URL(const char* url)
-{
-  transactionIdSet();
-  // LM_I(("Starting transaction from %s", url));
-}
-#endif
 
 
 

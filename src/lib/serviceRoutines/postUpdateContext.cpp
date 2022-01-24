@@ -155,7 +155,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
-  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  char*           servicePath  = (orionldState.in.servicePath != NULL)? orionldState.in.servicePath : (char*) "";
   std::string     mimeType     = "application/json";
   std::string     out;
   int             r;

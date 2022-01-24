@@ -222,6 +222,7 @@ typedef struct OrionldStateIn
   char*     xRealIp;
   char*     xForwardedFor;
   char*     connection;
+  char*     servicePath;
 
   // Incoming payload
   char*     payload;
@@ -267,7 +268,6 @@ typedef struct OrionldConnectionState
   bool                    responsePayloadAllocated;
   char*                   tenantName;
   OrionldTenant*          tenantP;
-  char*                   servicePath;
   bool                    linkHttpHeaderPresent;
   char*                   link;
   bool                    linkHeaderAdded;

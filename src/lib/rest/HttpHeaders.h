@@ -105,7 +105,6 @@ typedef struct HttpAcceptHeader
 {
   std::string               mediaRange;
   double                    qvalue;
-  std::vector<std::string>  acceptExtensions;
 } HttpAcceptHeader;
 
 
@@ -125,8 +124,6 @@ typedef struct HttpHeaders
   std::vector<HttpAcceptHeader*> acceptHeaderV;
 
   std::string   accept;
-  std::string   servicePath;
-  bool          servicePathReceived;
 } HttpHeaders;
 
 #endif  // SRC_LIB_REST_HTTPHEADERS_H_

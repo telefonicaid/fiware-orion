@@ -575,13 +575,8 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       }
     }
   }
-  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0)
-  {
-    headerP->servicePath         = value;
-    headerP->servicePathReceived = true;
-    orionldState.servicePath = (char*) value;
-  }
   else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
+  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0) orionldState.in.servicePath      = (char*) value;
   else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
   else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
   else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
@@ -800,16 +795,11 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   int                      components;
 
 
-  if (ciP->httpHeaders.servicePathReceived == false)
-  {
+  if (servicePath == NULL)
     return 0;
-  }
 
-  if (servicePath[0] == 0)
-  {
-    // Special case, corresponding to default service path
+  if (servicePath[0] == 0)  // Special case, corresponding to default service path
     return 0;
-  }
 
 
   if (servicePath[0] != '/')
@@ -933,9 +923,9 @@ int servicePathSplit(ConnectionInfo* ciP)
   char* servicePathCopy = NULL;
   int   servicePaths    = 0;
 
-  if (ciP->httpHeaders.servicePath != "")
+  if (orionldState.in.servicePath != NULL)
   {
-    servicePathCopy = strdup(ciP->httpHeaders.servicePath.c_str());
+    servicePathCopy = strdup(orionldState.in.servicePath);
     servicePaths    = stringSplit(servicePathCopy, ',', ciP->servicePathV);
   }
   else
@@ -1393,20 +1383,18 @@ ConnectionInfo* connectionTreatInit
   //
   lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
 
-  /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
-     X-Real-IP takes preference over X-Forwarded-For, if both appear */
+  //
+  // X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+  // X-Real-IP takes preference over X-Forwarded-For, if both appear */
+  //
+  char* transactionIp = ip;
+
   if (orionldState.in.xRealIp != NULL)
-  {
-    lmTransactionSetFrom(orionldState.in.xRealIp);
-  }
+    transactionIp = orionldState.in.xRealIp;
   else if (orionldState.in.xForwardedFor != NULL)
-  {
-    lmTransactionSetFrom(orionldState.in.xForwardedFor);
-  }
-  else
-  {
-    lmTransactionSetFrom(ip);
-  }
+    transactionIp = orionldState.in.xForwardedFor;
+
+  lmTransactionSetFrom(transactionIp);
 
   orionldState.out.contentType = mimeTypeSelect(ciP);
 
@@ -1684,7 +1672,7 @@ static MHD_Result connectionTreat
   else
     orionldState.tenantP = &tenant0;
 
-  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
+  lmTransactionSetSubservice(orionldState.in.servicePath);
 
   if ((orionldState.httpStatusCode != SccOk) && (orionldState.httpStatusCode != SccBadVerb))
   {

@@ -432,10 +432,11 @@ static bool orionldForwardPatchAttribute
     headerV[header].value = orionldState.tenantP->tenant;
     ++header;
   }
-  if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
+
+  if ((orionldState.in.servicePath != NULL) && (orionldState.in.servicePath[0] != 0))
   {
     headerV[header].type  = HttpHeaderPath;
-    headerV[header].value = orionldState.servicePath;
+    headerV[header].value = orionldState.in.servicePath;
     ++header;
   }
   headerV[header].type = HttpHeaderNone;

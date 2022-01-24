@@ -117,7 +117,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
-  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  std::string     servicePath  = (orionldState.in.servicePath != NULL)? orionldState.in.servicePath : (char*) "";
   std::string     mimeType     = "application/json";
   std::string     out;
   int             r;

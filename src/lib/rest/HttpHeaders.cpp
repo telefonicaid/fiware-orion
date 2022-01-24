@@ -36,7 +36,7 @@
 *
 * HttpHeaders::HttpHeaders - 
 */
-HttpHeaders::HttpHeaders(): servicePathReceived(false)
+HttpHeaders::HttpHeaders()
 {
 }
 
