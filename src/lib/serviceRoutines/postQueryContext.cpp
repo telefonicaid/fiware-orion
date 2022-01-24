@@ -472,7 +472,6 @@ std::string postQueryContext
   QueryContextRequestVector   requestV;
   std::vector<std::string>    regIdsV;
   QueryContextResponseVector  responseV;
-  int                         limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
   long long                   count = 0;
   long long*                  countP = NULL;
 
@@ -505,8 +504,6 @@ std::string postQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
 
-  if (limit != 0)
-  {
     TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
                                                         qcrsP,
                                                         ciP->tenant,
@@ -515,7 +512,6 @@ std::string postQueryContext
                                                         ciP->uriParamOptions,
                                                         countP,
                                                         ciP->apiVersion));
-  }
 
   if ((qcrsP->errorCode.code == SccBadRequest) || (qcrsP->errorCode.code == SccReceiverInternalError))
   {

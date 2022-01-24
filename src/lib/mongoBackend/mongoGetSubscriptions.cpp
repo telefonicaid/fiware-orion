@@ -317,23 +317,25 @@ void mongoListSubscriptions
   /* Process query result */
   unsigned int docs = 0;
 
-  orion::BSONObj  r;
-  while (cursor.next(&r))
+  if (limit != 0)
   {
-    docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    orion::BSONObj  r;
+    while (cursor.next(&r))
+    {
+      docs++;
+      LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription  s;
+      Subscription  s;
 
-    setNewSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setSubject(&s, r);
-    setStatus(&s, r, tenant);
-    setNotification(&s, r, tenant);
+      setNewSubscriptionId(&s, r);
+      setDescription(&s, r);
+      setSubject(&s, r);
+      setStatus(&s, r, tenant);
+      setNotification(&s, r, tenant);
 
-    subs->push_back(s);
+      subs->push_back(s);
+    }
   }
-
   orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
 

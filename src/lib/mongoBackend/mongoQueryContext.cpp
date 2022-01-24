@@ -357,28 +357,30 @@ HttpStatusCode mongoQueryContext
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
 
-  ok = entitiesQuery(requestP->entityIdVector,
-                     requestP->attributeList,
-                     requestP->restriction,
-                     &rawCerV,
-                     &err,
-                     true,
-                     tenant,
-                     servicePathV,
-                     offset,
-                     limit,
-                     &limitReached,
-                     countP,
-                     sortOrderList,
-                     apiVersion);
-
-  if (!ok)
+  if (limit != 0)
   {
-    responseP->errorCode.fill(SccReceiverInternalError, err);
-    rawCerV.release();
-    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+    ok = entitiesQuery(requestP->entityIdVector,
+                       requestP->attributeList,
+                       requestP->restriction,
+                       &rawCerV,
+                       &err,
+                       true,
+                       tenant,
+                       servicePathV,
+                       offset,
+                       limit,
+                       &limitReached,
+                       countP,
+                       sortOrderList,
+                       apiVersion);
+    if (!ok)
+    {
+      responseP->errorCode.fill(SccReceiverInternalError, err);
+      rawCerV.release();
+      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
-    return SccOk;
+      return SccOk;
+    }
   }
 
   ContextRegistrationResponseVector crrV;

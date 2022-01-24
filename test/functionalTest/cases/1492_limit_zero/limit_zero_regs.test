@@ -116,11 +116,13 @@ echo
 01. GET /v2/registrations with 'limit' == 0 and options=count and see no registrations and fiware-total-count: 0
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
+Content-Length: 2
+Content-Type: application/json
 Fiware-Total-Count: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+[]
 
 
 02. POST /v2/registrations to create registration
@@ -146,20 +148,24 @@ Date: REGEX(.*)
 04. GET /v2/registrations with 'limit' == 0 and options=count and see no registrations and fiware-total-count: 2
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
+Content-Length: 2
+Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+[]
 
 
 05. GET /v2/registrations with 'limit' == 0 and see no registrations
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
+Content-Length: 2
+Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+[]
 
 
 --TEARDOWN--

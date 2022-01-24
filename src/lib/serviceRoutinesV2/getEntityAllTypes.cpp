@@ -63,7 +63,6 @@ std::string getEntityAllTypes
   unsigned int              totalTypes   = 0;
   bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
   unsigned int*             totalTypesP  = NULL;
-  int                       limit        = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
   // NGSIv2 uses options=count to request count
   if (ciP->uriParamOptions[OPT_COUNT])
@@ -84,11 +83,6 @@ std::string getEntityAllTypes
                                  ciP->apiVersion,
                                  totalTypesP,
                                  noAttrDetail));
-  }
-
-  if (limit != 0)
-  {
-    TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
   }
 
   if (ciP->uriParamOptions[OPT_COUNT])
