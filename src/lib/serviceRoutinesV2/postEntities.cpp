@@ -49,10 +49,11 @@ static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 *
 * Check if the entity length is supported by Mongo
 */
-
-static bool legalEntityLength(Entity* eP, const std::string& servicePath)
+static bool legalEntityLength(Entity* eP, char* servicePath)
 {
-  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+  int spathLen = (servicePath == NULL)? 0 : strlen(servicePath);
+
+  return (spathLen + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
 }
 
 
@@ -85,7 +86,7 @@ std::string postEntities
 {
   Entity* eP = &parseDataP->ent.res;
 
-  if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
+  if (!legalEntityLength(eP, orionldState.in.servicePath))
   {
     OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();

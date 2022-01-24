@@ -497,7 +497,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //     "geometry": null
   //   with whatever was found in this second query to mongo
   //
-  if ((orionldState.acceptGeojson) && (attrsCount > 0) && (orionldState.responseTree->type == KjArray))
+  if ((orionldState.out.contentType == GEOJSON) && (attrsCount > 0) && (orionldState.responseTree->type == KjArray))
   {
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
     bool        geoPropertyNameInAttrs = geoPropertyInAttrs(attrsV, attrsCount, geoPropertyName);

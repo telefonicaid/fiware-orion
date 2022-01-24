@@ -105,7 +105,6 @@ typedef struct HttpAcceptHeader
 {
   std::string               mediaRange;
   double                    qvalue;
-  std::vector<std::string>  acceptExtensions;
 } HttpAcceptHeader;
 
 
@@ -124,22 +123,7 @@ typedef struct HttpHeaders
 
   std::vector<HttpAcceptHeader*> acceptHeaderV;
 
-  bool          gotHeaders;
-  std::string   userAgent;
-  std::string   host;
   std::string   accept;
-  std::string   expect;
-  std::string   contentType;
-  std::string   origin;
-  std::string   tenant;
-  std::string   servicePath;
-  std::string   xrealIp;
-  std::string   xforwardedFor;
-  std::string   correlator;
-  std::string   ngsiv2AttrsFormat;
-  bool          servicePathReceived;
-  unsigned int  contentLength;
-  std::string   connection;
 } HttpHeaders;
 
 #endif  // SRC_LIB_REST_HTTPHEADERS_H_

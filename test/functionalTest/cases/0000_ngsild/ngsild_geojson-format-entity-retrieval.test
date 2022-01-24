@@ -543,7 +543,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 404 Not Found
 Content-Length: 116
-Content-Type: application/geo+json
+Content-Type: application/json
 Date: REGEX(.*)
 
 {

@@ -50,7 +50,7 @@ HttpStatusCode mongoNotifyContext
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               fiwareCorrelator,
+  const char*                      fiwareCorrelator,
   const std::string&               ngsiV2AttrsFormat
 )
 {
@@ -64,7 +64,7 @@ HttpStatusCode mongoNotifyContext
     UpdateContextResponse               ucr;        // Unused, necessary for processContextElement()
     ContextElement*                     ceP = &requestP->contextElementResponseVector[ix]->contextElement;
 
-    processContextElement(ceP, &ucr, ActionTypeAppend, tenantP, servicePathV, xauthToken, fiwareCorrelator.c_str(), ngsiV2AttrsFormat);
+    processContextElement(ceP, &ucr, ActionTypeAppend, tenantP, servicePathV, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);

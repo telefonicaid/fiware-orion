@@ -82,8 +82,6 @@ bool MetricsManager::subServiceValid(const std::string& subsrv)
 {
   ConnectionInfo ci;
 
-  ci.httpHeaders.servicePathReceived = true;
-
   if (servicePathCheck(&ci, subsrv.c_str()) != 0)
   {
     return false;

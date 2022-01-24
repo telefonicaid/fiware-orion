@@ -46,7 +46,7 @@ extern HttpStatusCode mongoNotifyContext
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               fiwareCorrelator,
+  const char*                      fiwareCorrelator,
   const std::string&               ngsiV2AttrsFormat
 );
 

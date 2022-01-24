@@ -42,12 +42,14 @@ const char* mimeTypeToString(MimeType mimeType)
 {
   switch (mimeType)
   {
-  case JSON:        return "JSON";
-  case JSONLD:      return "JSONLD";
-  case GEOJSON:     return "GEOJSON";
-  case TEXT:        return "TEXT";
-  case HTML:        return "HTML";
-  case NOMIMETYPE:  return "NOMIMETYPE";
+  case JSON:            return "JSON";
+  case JSONLD:          return "JSONLD";
+  case GEOJSON:         return "GEOJSON";
+  case TEXT:            return "TEXT";
+  case HTML:            return "HTML";
+  case MERGEPATCHJSON:  return "MERGEPATCHJSON";
+  case NOMIMETYPE:      return "NOMIMETYPE";
+  case NOMIMETYPEGIVEN: return "NOMIMETYPEGIVEN";
   }
 
   return "Unknown mimeType";
@@ -61,12 +63,14 @@ const char* mimeTypeToString(MimeType mimeType)
 */
 MimeType stringToMimeType(const std::string& s)
 {
-  if      (s == "JSON")        return JSON;
-  else if (s == "JSONLD")      return JSONLD;
-  else if (s == "GEOJSON")     return GEOJSON;
-  else if (s == "TEXT")        return TEXT;
-  else if (s == "HTML")        return HTML;
-  else if (s == "NOMIMETYPE")  return NOMIMETYPE;
+  if      (s == "JSON")            return JSON;
+  else if (s == "JSONLD")          return JSONLD;
+  else if (s == "GEOJSON")         return GEOJSON;
+  else if (s == "TEXT")            return TEXT;
+  else if (s == "HTML")            return HTML;
+  else if (s == "MERGEPATCHJSON")  return MERGEPATCHJSON;
+  else if (s == "NOMIMETYPE")      return NOMIMETYPE;
+  else if (s == "NOMIMETYPEGIVEN") return NOMIMETYPEGIVEN;
 
   return NOMIMETYPE;
 }
@@ -79,12 +83,13 @@ MimeType stringToMimeType(const std::string& s)
 */
 MimeType longStringToMimeType(const char* s)
 {
-  if      (strcmp(s, "application/json")      == 0) return JSON;
-  else if (strcmp(s, "application/ld+json")   == 0) return JSONLD;
-  else if (strcmp(s, "application/geo+json")  == 0) return GEOJSON;
-  else if (strcmp(s, "plain/text")            == 0) return TEXT;
-  else if (strcmp(s, "application/html")      == 0) return HTML;
-  else if (strcmp(s, "NOMIMETYPE")            == 0) return NOMIMETYPE;
+  if      (strcmp(s, "application/json")             == 0) return JSON;
+  else if (strcmp(s, "application/ld+json")          == 0) return JSONLD;
+  else if (strcmp(s, "application/geo+json")         == 0) return GEOJSON;
+  else if (strcmp(s, "plain/text")                   == 0) return TEXT;
+  else if (strcmp(s, "application/html")             == 0) return HTML;
+  else if (strcmp(s, "application/merge-patch+json") == 0) return MERGEPATCHJSON;
+  else if (strcmp(s, "NOMIMETYPE")                   == 0) return NOMIMETYPE;
 
   return NOMIMETYPE;
 }
@@ -100,12 +105,14 @@ const char* mimeTypeToLongString(MimeType mimeType)
 {
   switch (mimeType)
   {
-  case JSON:        return "application/json";
-  case JSONLD:      return "application/ld+json";
-  case GEOJSON:     return "application/geo+json";
-  case TEXT:        return "plain/text";
-  case HTML:        return "application/html";
-  case NOMIMETYPE:  return "NOMIMETYPE";
+  case JSON:             return "application/json";
+  case JSONLD:           return "application/ld+json";
+  case GEOJSON:          return "application/geo+json";
+  case TEXT:             return "plain/text";
+  case HTML:             return "application/html";
+  case MERGEPATCHJSON:   return "application/merge-patch+json";
+  case NOMIMETYPE:       return "NOMIMETYPE";
+  case NOMIMETYPEGIVEN:  return "NOMIMETYPEGIVEN";
   }
 
   return "NOMIMETYPE";

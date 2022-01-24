@@ -190,7 +190,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
 
     entityFieldsExtractSimple(entityP, &entityId, &entityType, &contextNodeP);
 
-    if (orionldState.ngsildContent == true)
+    if (orionldState.in.contentType == JSONLD)
     {
       if (contextNodeP == NULL)
       {

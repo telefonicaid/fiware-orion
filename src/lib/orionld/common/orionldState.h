@@ -215,6 +215,14 @@ typedef struct OrionldStateIn
 {
   // Incoming HTTP headers
   MimeType  contentType;
+  char*     contentTypeString;
+  int       contentLength;
+  char*     origin;
+  char*     host;
+  char*     xRealIp;
+  char*     xForwardedFor;
+  char*     connection;
+  char*     servicePath;
 
   // Incoming payload
   char*     payload;
@@ -260,7 +268,6 @@ typedef struct OrionldConnectionState
   bool                    responsePayloadAllocated;
   char*                   tenantName;
   OrionldTenant*          tenantP;
-  char*                   servicePath;
   bool                    linkHttpHeaderPresent;
   char*                   link;
   bool                    linkHeaderAdded;
@@ -290,12 +297,8 @@ typedef struct OrionldConnectionState
   char*                   urlPath;
   char*                   httpVersion;
   Verb                    verb;
-  bool                    badVerb;     // ToDo: verb == NOVERB should cover this
-  char*                   verbString;
-  bool                    acceptJson;
-  bool                    acceptJsonld;
-  bool                    acceptGeojson;
-  bool                    ngsildContent;
+  bool                    badVerb;             // ToDo: verb == NOVERB should cover this
+  char*                   verbString;          // For error handling the incorrect verb is needed for the error response
   KjNode*                 payloadContextNode;
   KjNode*                 payloadIdNode;
   KjNode*                 payloadTypeNode;

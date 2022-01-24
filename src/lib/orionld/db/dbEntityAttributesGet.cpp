@@ -325,7 +325,7 @@ static KjNode* attributeCreate(KjNode* attrV, KjNode* aP, char* entityType)
   KjNode*       typeNamesP       = kjArray(orionldState.kjsonP,   "typeNames");
   char*         attrShortName    = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, NULL, NULL);
 
-  if (orionldState.acceptJsonld == true)
+  if (orionldState.out.contentType == JSONLD)
   {
     KjNode* contextNode = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
     kjChildAdd(entityAttrP, contextNode);

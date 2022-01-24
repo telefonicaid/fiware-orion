@@ -49,7 +49,7 @@ std::string optionsGetPutOnly
   ParseData*                 parseDataP
 )
 {
-  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  if (isOriginAllowedForCORS(orionldState.in.origin))
   {
     ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_METHODS);
     ciP->httpHeaderValue.push_back("GET, PUT, OPTIONS");

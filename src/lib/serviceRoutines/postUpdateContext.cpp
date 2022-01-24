@@ -155,7 +155,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
-  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  char*           servicePath  = (orionldState.in.servicePath != NULL)? orionldState.in.servicePath : (char*) "";
   std::string     mimeType     = "application/json";
   std::string     out;
   int             r;
@@ -173,7 +173,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
-                      ciP->httpHeaders.correlator,
+                      orionldState.correlator,
                       "",
                       false,
                       &out,
@@ -498,8 +498,8 @@ std::string postUpdateContext
                                                   orionldState.tenantP,
                                                   ciP->servicePathV,
                                                   orionldState.xAuthToken,
-                                                  ciP->httpHeaders.correlator.c_str(),
-                                                  ciP->httpHeaders.ngsiv2AttrsFormat.c_str(),
+                                                  orionldState.correlator,
+                                                  orionldState.attrsFormat,
                                                   orionldState.apiVersion,
                                                   ngsiV2Flavour));
 

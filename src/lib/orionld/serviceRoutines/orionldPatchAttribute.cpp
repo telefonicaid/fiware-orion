@@ -367,7 +367,7 @@ static bool orionldForwardPatchAttribute
   if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
     return false;
 
-  const char*  contentType = (orionldState.ngsildContent == true)? "application/ld+json" : "application/json";
+  const char*  contentType = (orionldState.in.contentType == JSONLD)? "application/ld+json" : "application/json";
   int          payloadLen  = strlen(orionldState.in.payloadCopy);
   bool         tryAgain;
   bool         downloadFailed;
@@ -432,10 +432,11 @@ static bool orionldForwardPatchAttribute
     headerV[header].value = orionldState.tenantP->tenant;
     ++header;
   }
-  if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
+
+  if ((orionldState.in.servicePath != NULL) && (orionldState.in.servicePath[0] != 0))
   {
     headerV[header].type  = HttpHeaderPath;
-    headerV[header].value = orionldState.servicePath;
+    headerV[header].value = orionldState.in.servicePath;
     ++header;
   }
   headerV[header].type = HttpHeaderNone;

@@ -246,19 +246,19 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
   OrionError  oe;
   bool        ok = false;
 
-  if ((ciP->httpHeaders.ngsiv2AttrsFormat == "normalized") || (ciP->httpHeaders.ngsiv2AttrsFormat == ""))
+  if ((orionldState.attrsFormat == NULL) || (strcmp(orionldState.attrsFormat, "normalized") == 0))
   {
     ok = parseNotificationNormalized(ciP, ncrP, &oe);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "keyValues")
+  else if (strcmp(orionldState.attrsFormat, "keyValues") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_KEYVALUES);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "uniqueValues")
+  else if (strcmp(orionldState.attrsFormat, "uniqueValues") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "custom")
+  else if (strcmp(orionldState.attrsFormat, "custom") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM);
   }

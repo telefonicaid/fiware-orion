@@ -111,7 +111,7 @@ std::string postRegisterContext
     return answer;
   }
 
-  TIMED_MONGO(orionldState.httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->httpHeaders.correlator, orionldState.tenantP, ciP->servicePathV[0]));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, orionldState.correlator, orionldState.tenantP, ciP->servicePathV[0]));
   TIMED_RENDER(answer = rcr.render());
 
   return answer;

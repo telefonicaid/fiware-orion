@@ -531,7 +531,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
 
 
-extern MimeType contentTypeParse(const char* contentType, char** charsetP);
+extern MimeType mimeTypeFromString(const char* contentType, char** charsetP, bool exact);
 /* ****************************************************************************
 *
 * httpHeaderGet -
@@ -541,26 +541,22 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
 
-  if      (strcasecmp(key, HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
-  else if (strcasecmp(key, HTTP_HOST) == 0)              headerP->host           = value;
-  else if (strcasecmp(key, HTTP_ACCEPT) == 0)
+  if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
-    headerP->accept = value;
-    acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
+    if (orionldState.apiVersion != NGSI_LD_V1)
+    {
+      headerP->accept = value;
+      acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
+    }
   }
-  else if (strcasecmp(key, HTTP_EXPECT) == 0)            headerP->expect         = value;
-  else if (strcasecmp(key, HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
-    orionldState.in.contentType = contentTypeParse(value, NULL);
-
-    headerP->contentType = value;
-
-    if (strcmp(value, "application/ld+json") == 0)
-      orionldState.ngsildContent = true;
+    if (orionldState.apiVersion != NGSI_LD_V1)
+    {
+      orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
+      orionldState.in.contentTypeString = (char*) value;
+    }
   }
-  else if (strcasecmp(key, HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key, HTTP_ORIGIN) == 0)            headerP->origin         = value;
   else if ((strcasecmp(key, HTTP_FIWARE_SERVICE) == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
   {
     if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
@@ -579,52 +575,23 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       }
     }
   }
-  else if (strcasecmp(key, "X-Auth-Token") == 0)
-  {
-    orionldState.xAuthToken     = (char*) value;
-  }
-  else if (strcasecmp(key, "Authorization") == 0)
-    orionldState.authorizationHeader = (char*) value;
-  else if (strcasecmp(key, HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
-  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
-  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
-  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0)  headerP->ngsiv2AttrsFormat  = value;
-  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0)
-  {
-    headerP->servicePath         = value;
-    headerP->servicePathReceived = true;
-    orionldState.servicePath = (char*) value;
-  }
-  else if (strcasecmp(key, HTTP_LINK) == 0)
-  {
-    orionldState.link                  = (char*) value;
-    orionldState.linkHttpHeaderPresent = true;
-  }
-  else if (strcasecmp(key, "Prefer") == 0)
-  {
-    orionldState.preferHeader = (char*) value;
-  }
+  else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
+  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0) orionldState.in.servicePath      = (char*) value;
+  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
+  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
+  else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
+  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) orionldState.in.xRealIp          = (char*) value;
+  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) orionldState.in.xForwardedFor    = (char*) value;
+  else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;
+  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) orionldState.correlator          = (char*) value;
+  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) orionldState.in.connection       = (char*) value;
+  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) orionldState.attrsFormat         = (char*) value;
+  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) {}
+  else if (strcasecmp(key, HTTP_EXPECT)             == 0) {}
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
   }
-
-  if ((strcasecmp(key, "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
-  {
-    LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
-  }
-
-  /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
-   * to "deactivate" this part of the string in the checking done at connectionTreat() */
-  char* cP = (char*) headerP->contentType.c_str();
-  char* match;
-  if ((match = strstr(cP, ";")) != NULL)
-  {
-     *match = 0;
-     headerP->contentType = cP;
-  }
-
-  headerP->gotHeaders = true;
 
   return MHD_YES;
 }
@@ -828,16 +795,11 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   int                      components;
 
 
-  if (ciP->httpHeaders.servicePathReceived == false)
-  {
+  if (servicePath == NULL)
     return 0;
-  }
 
-  if (servicePath[0] == 0)
-  {
-    // Special case, corresponding to default service path
+  if (servicePath[0] == 0)  // Special case, corresponding to default service path
     return 0;
-  }
 
 
   if (servicePath[0] != '/')
@@ -945,9 +907,9 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
 * isOriginAllowedForCORS - checks the Origin header of the request and returns
 * true if that Origin is allowed to make a CORS request
 */
-bool isOriginAllowedForCORS(const std::string& requestOrigin)
+bool isOriginAllowedForCORS(const char* requestOrigin)
 {
-  return ((requestOrigin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
+  return ((requestOrigin != NULL) && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin, corsOrigin) == 0)));
 }
 
 
@@ -961,9 +923,9 @@ int servicePathSplit(ConnectionInfo* ciP)
   char* servicePathCopy = NULL;
   int   servicePaths    = 0;
 
-  if (ciP->httpHeaders.servicePath != "")
+  if (orionldState.in.servicePath != NULL)
   {
-    servicePathCopy = strdup(ciP->httpHeaders.servicePath.c_str());
+    servicePathCopy = strdup(orionldState.in.servicePath);
     servicePaths    = stringSplit(servicePathCopy, ',', ciP->servicePathV);
   }
   else
@@ -1058,14 +1020,14 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 1
-  if (ciP->httpHeaders.contentLength == 0)
+  if (orionldState.in.contentLength == 0)
   {
     return 0;
   }
 
 
   // Case 2
-  if (ciP->httpHeaders.contentType == "")
+  if (orionldState.in.contentType == NOMIMETYPEGIVEN)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1076,9 +1038,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((orionldState.apiVersion == V1) && (ciP->httpHeaders.contentType != "application/json"))
+  if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != JSON))
   {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
     restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1087,9 +1049,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((orionldState.apiVersion == V2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
+  if ((orionldState.apiVersion == V2) && (orionldState.in.contentType != JSON) && (orionldState.in.contentType != TEXT))
   {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
     restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1366,22 +1328,21 @@ ConnectionInfo* connectionTreatInit
     acceptParse(ciP, "*/*");
   }
 
-  char correlator[CORRELATOR_ID_SIZE + 1];
-  if (ciP->httpHeaders.correlator == "")
+  if ((orionldState.correlator == NULL) || (orionldState.correlator[0] == 0))
   {
-    correlatorGenerate(correlator);
-    ciP->httpHeaders.correlator = correlator;
+    orionldState.correlator = kaAlloc(&orionldState.kalloc, CORRELATOR_ID_SIZE + 1);
+    correlatorGenerate(orionldState.correlator);
   }
 
-  correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+  correlatorIdSet(orionldState.correlator);
 
   ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
-  ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+  ciP->httpHeaderValue.push_back(orionldState.correlator);
 
-  if ((ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
+  if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
   {
     char details[256];
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
 
     alarmMgr.badInput(clientIp, details);
     OrionError oe(SccRequestEntityTooLarge, details);
@@ -1422,20 +1383,18 @@ ConnectionInfo* connectionTreatInit
   //
   lmTransactionStart("from", "", ip, port, url);  // Incoming REST request starts
 
-  /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
-     X-Real-IP takes preference over X-Forwarded-For, if both appear */
-  if (ciP->httpHeaders.xrealIp != "")
-  {
-    lmTransactionSetFrom(ciP->httpHeaders.xrealIp.c_str());
-  }
-  else if (ciP->httpHeaders.xforwardedFor != "")
-  {
-    lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
-  }
-  else
-  {
-    lmTransactionSetFrom(ip);
-  }
+  //
+  // X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+  // X-Real-IP takes preference over X-Forwarded-For, if both appear */
+  //
+  char* transactionIp = ip;
+
+  if (orionldState.in.xRealIp != NULL)
+    transactionIp = orionldState.in.xRealIp;
+  else if (orionldState.in.xForwardedFor != NULL)
+    transactionIp = orionldState.in.xForwardedFor;
+
+  lmTransactionSetFrom(transactionIp);
 
   orionldState.out.contentType = mimeTypeSelect(ciP);
 
@@ -1461,7 +1420,7 @@ ConnectionInfo* connectionTreatInit
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
-  else if ((ciP->httpHeaders.contentLength == 0) &&
+  else if ((orionldState.in.contentLength == 0) &&
            ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
            (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
            (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
@@ -1496,7 +1455,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
   // just silently "eat" the entire message.
   //
-  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
   // bytes to read.
   // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
   // and the broker isn't able to respond. MHD just closes the connection.
@@ -1505,7 +1464,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -1523,9 +1482,9 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
     {
-      orionldState.in.payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+      orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
     }
     else
     {
@@ -1534,7 +1493,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   }
 
   // Copy the chunk
-  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, orionldState.in.contentLength));
   memcpy(&orionldState.in.payload[orionldState.in.payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer
@@ -1713,7 +1672,7 @@ static MHD_Result connectionTreat
   else
     orionldState.tenantP = &tenant0;
 
-  lmTransactionSetSubservice(ciP->httpHeaders.servicePath.c_str());
+  lmTransactionSetSubservice(orionldState.in.servicePath);
 
   if ((orionldState.httpStatusCode != SccOk) && (orionldState.httpStatusCode != SccBadVerb))
   {
@@ -1726,11 +1685,11 @@ static MHD_Result connectionTreat
   //
   // If the incoming request was too big, return error about it
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
 
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
     alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
@@ -1791,7 +1750,7 @@ static MHD_Result connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
+  if ((orionldState.in.contentType != NOMIMETYPEGIVEN) && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);

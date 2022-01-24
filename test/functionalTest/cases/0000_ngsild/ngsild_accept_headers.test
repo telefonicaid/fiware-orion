@@ -1,0 +1,268 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Accept Headers
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity for the queries
+# 02. GET /entities with Accept header application/json
+# 03. GET /entities with Accept header application/ld+json
+# 04. GET /entities with Accept header application/ld+json, application/json
+# 05. GET /entities with Accept header application/ld+json;q=0.9, application/json
+# 06. GET /entities with Accept header application/ld+json;q=0.9, application/json;q=0.8
+# 07. GET /entities with Accept header application/*
+# 08. GET /entities with Accept header */*
+# 09. GET /entities?type=T2, with Accept header application/ld+json - receive application/json
+# 10. GET /entities, with Accept header application/ldjson - see error
+#
+
+echo "01. Create an entity for the queries"
+echo "===================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET /entities with Accept header application/json"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --out json
+echo
+echo
+
+
+echo "03. GET /entities with Accept header application/ld+json"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T --out jsonld
+echo
+echo
+
+
+echo "04. GET /entities with Accept header application/ld+json, application/json"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --out "application/ld+json, application/json"
+echo
+echo
+
+
+echo "05. GET /entities with Accept header application/ld+json;q=0.9, application/json"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T --out "application/ld+json;q=0.9, application/json"
+echo
+echo
+
+
+echo "06. GET /entities with Accept header application/ld+json;q=0.9, application/json;q=0.8"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T --out "application/ld+json;q=0.9, application/json;q=0.8"
+echo
+echo
+
+
+echo "07. GET /entities with Accept header application/*"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --out 'application/*'
+echo
+echo
+
+
+echo "08. GET /entities with Accept header */*"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T --out '*/*'
+echo
+echo
+
+
+echo "09. GET /entities?type=T2, with Accept header application/ld+json - receive application/json"
+echo "============================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T2 --out jsonld
+echo
+echo
+
+
+echo "10. GET /entities, with Accept header application/ldjson - see error"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T --out 'application/ldjson'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity for the queries
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. GET /entities with Accept header application/json
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+03. GET /entities with Accept header application/ld+json
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 101
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+    {
+        "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+04. GET /entities with Accept header application/ld+json, application/json
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+05. GET /entities with Accept header application/ld+json;q=0.9, application/json
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+06. GET /entities with Accept header application/ld+json;q=0.9, application/json;q=0.8
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 101
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+    {
+        "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+07. GET /entities with Accept header application/*
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+08. GET /entities with Accept header */*
+========================================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+09. GET /entities?type=T2, with Accept header application/ld+json - receive application/json
+============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+10. GET /entities, with Accept header application/ldjson - see error
+====================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 214
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'",
+    "title": "Invalid Accept mime-type",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -277,12 +277,12 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
 
 /* ****************************************************************************
 *
-* contentTypeParse -
+* mimeTypeFromString -
 */
-MimeType contentTypeParse(const char* contentType, char** charsetP)
+MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcardsAccepted)
 {
   char* s;
-  char* cP = (char*) contentType;
+  char* cP = (char*) mimeType;
 
   if ((s = strstr(cP, ";")) != NULL)
   {
@@ -296,15 +296,113 @@ MimeType contentTypeParse(const char* contentType, char** charsetP)
 
   cP = wsStrip(cP);
 
-  if      (strcmp(cP, "*/*") == 0)                  return JSON;
-  else if (strcmp(cP, "text/json") == 0)            return JSON;
-  else if (strcmp(cP, "application/json") == 0)     return JSON;
-  else if (strcmp(cP, "application/ld+json") == 0)  return JSONLD;
-  else if (strcmp(cP, "application/geo+json") == 0) return GEOJSON;
-  else if (strcmp(cP, "application/html") == 0)     return HTML;
-  else if (strcmp(cP, "text/plain") == 0)           return TEXT;
+  if (wildcardsAccepted == true)
+  {
+    if      (strcmp(cP, "*/*")                == 0)  return JSON;
+    else if (strcmp(cP, "application/*")      == 0)  return JSON;
+  }
 
-  return JSON;
+  if      (strcmp(cP, "application/json")             == 0)  return JSON;
+  else if (strcmp(cP, "application/ld+json")          == 0)  return JSONLD;
+  else if (strcmp(cP, "application/geo+json")         == 0)  return GEOJSON;
+  else if (strcmp(cP, "application/merge-patch+json") == 0)  return MERGEPATCHJSON;
+
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    if      (strcmp(cP, "text/json")         == 0)  return JSON;
+    else if (strcmp(cP, "application/html")  == 0)  return HTML;
+    else if (strcmp(cP, "text/plain")        == 0)  return TEXT;
+  }
+
+  return NOMIMETYPE;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// acceptHeaderParse -
+//
+// Wildcards:
+//   Accept: <MIME_type>/<MIME_subtype>
+//   Accept: <MIME_type>/*
+//   Accept: */*
+//
+// Example with weights:
+//   Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8
+//
+//
+static MimeType acceptHeaderParse(char* accept)
+{
+  // Split MimeTypes according to commas
+  char* mimeV[20];
+  int   mimes = 1;
+
+  // Step over any initial WS
+  while (*accept == ' ')
+  {
+    if (*accept == 0)
+      return NOMIMETYPE;
+
+    ++accept;
+  }
+
+  mimeV[0] = accept;
+
+  while (*accept != 0)
+  {
+    if (*accept == ',')
+    {
+      *accept = 0;
+      mimeV[mimes++] = &accept[1];
+    }
+
+    ++accept;
+  }
+
+  //
+  MimeType winner        = NOMIMETYPE;
+  float    winningWeight = 0;
+
+  for (int ix = 0; ix < mimes; ix++)
+  {
+    MimeType  mimeType;
+    float     weight = 1;  // Default weight is 1 - q=xxx can modify that
+
+    // Extract weight, if there
+    char* q = strstr(mimeV[ix], ";q=");
+    if (q != NULL)
+    {
+      *q     = 0;
+      weight = atof(&q[3]);
+    }
+
+    //
+    // GET the MIME type, check for new winner
+    // REMEMBER:  JSON is the default Mime Type and if equal weight, JSON wins
+    //
+    mimeType = mimeTypeFromString(mimeV[ix], NULL, true);
+    if ((mimeType == JSON) || (mimeType == JSONLD) || (mimeType == GEOJSON))
+    {
+      if (winner == NOMIMETYPE)
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+      else if (weight > winningWeight)
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+      else if ((weight == winningWeight) && (mimeType == JSON))
+      {
+        winner        = mimeType;
+        winningWeight = weight;
+      }
+    }
+  }
+
+  return winner;
 }
 
 
@@ -325,21 +423,39 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
       orionldState.httpStatusCode = 400;
     }
   }
-  else if (strcmp(key, "Ngsiv2-AttrsFormat") == 0)  // FIXME: This header name needs to change for NGSI-LD
+  else if (strcmp(key, "Accept") == 0)
   {
-    orionldState.attrsFormat = (char*) value;
+    orionldState.out.contentType = acceptHeaderParse((char*) value);
+
+    if (orionldState.out.contentType == NOMIMETYPE)
+    {
+      const char* title   = "Invalid Accept mime-type";
+      const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
+
+      LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      orionldState.httpStatusCode = SccNotAcceptable;
+    }
   }
-  else if (strcmp(key, "X-Auth-Token") == 0)
+  else if (strcasecmp(key, "Ngsiv2-AttrsFormat") == 0) orionldState.attrsFormat         = (char*) value;
+  else if (strcasecmp(key, "X-Auth-Token")       == 0) orionldState.xAuthToken          = (char*) value;
+  else if (strcasecmp(key, "Authorization")      == 0) orionldState.authorizationHeader = (char*) value;
+  else if (strcasecmp(key, "Fiware-Correlator")  == 0) orionldState.correlator          = (char*) value;
+  else if (strcasecmp(key, "Content-Length")     == 0) orionldState.in.contentLength    = atoi(value);
+  else if (strcasecmp(key, "Prefer")             == 0) orionldState.preferHeader        = (char*) value;
+  else if (strcasecmp(key, "Origin")             == 0) orionldState.in.origin           = (char*) value;
+  else if (strcasecmp(key, "Host")               == 0) orionldState.in.host             = (char*) value;
+  else if (strcasecmp(key, "X-Real-IP")          == 0) orionldState.in.xRealIp          = (char*) value;
+  else if (strcasecmp(key, "Connection")         == 0) orionldState.in.connection       = (char*) value;
+  else if (strcasecmp(key, "Content-Type")       == 0)
   {
-    orionldState.xAuthToken = (char*) value;
+    orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
+    orionldState.in.contentTypeString = (char*) value;
   }
-  else if (strcmp(key, "Fiware-Correlator") == 0)
+  else if (strcasecmp(key, HTTP_LINK) == 0)
   {
-    orionldState.correlator = (char*) value;
-  }
-  else if (strcmp(key, "Content-Type") == 0)
-  {
-    orionldState.in.contentType = contentTypeParse(value, NULL);
+    orionldState.link                  = (char*) value;
+    orionldState.linkHttpHeaderPresent = true;
   }
 
   return MHD_YES;
@@ -909,13 +1025,21 @@ MHD_Result orionldMhdConnectionInit
   // The idea is to move all headers from httpHeaderGet to orionldHttpHeaderGet
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderGet, NULL);
+
+  if (orionldState.httpStatusCode != 200)
+  {
+    LM_W(("Error detected in a HTTP header: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    return MHD_YES;  // orionldHttpHeaderGet sets the error
+  }
+
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+
 
   //
   // Any error detected during httpHeaderGet calls?
   //
   if (orionldState.httpStatusCode != 200)
-    return MHD_YES;  // httpHeaderGet stes the error
+    return MHD_YES;  // httpHeaderGet sets the error
 
   if (orionldState.tenantP == NULL)
     orionldState.tenantP = &tenant0;
@@ -933,7 +1057,7 @@ MHD_Result orionldMhdConnectionInit
     }
   }
 
-  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
+  if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
     orionldState.httpStatusCode  = 400;
@@ -941,7 +1065,7 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // Check payload too big
-  if (ciP->httpHeaders.contentLength > 2000000)
+  if (orionldState.in.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;
     orionldState.httpStatusCode  = 400;
@@ -959,16 +1083,13 @@ MHD_Result orionldMhdConnectionInit
   // Check URL path is OK
 
   // Check Content-Type is accepted
-  if ((orionldState.verb == PATCH) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/merge-patch+json") == 0))
-    ciP->httpHeaders.contentType = "application/json";
+  if ((orionldState.verb == PATCH) && (orionldState.in.contentType == MERGEPATCHJSON))
+    orionldState.in.contentType = JSON;
   else if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
-    //
-    // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
-    //
-    if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
+    if ((orionldState.in.contentType != JSON) && (orionldState.in.contentType != JSONLD))
     {
-      LM_W(("Bad Input (invalid Content-Type: '%s'", ciP->httpHeaders.contentType.c_str()));
+      LM_W(("Bad Input (invalid Content-Type: '%s'", mimeTypeToString(orionldState.in.contentType)));
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported");

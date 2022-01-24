@@ -61,7 +61,7 @@ std::string postUpdateContextSubscription
                                                                            orionldState.tenantP,
                                                                            orionldState.xAuthToken,
                                                                            ciP->servicePathV,
-                                                                           ciP->httpHeaders.correlator));
+                                                                           orionldState.correlator));
 
   TIMED_RENDER(answer = ucsr.render());
 
