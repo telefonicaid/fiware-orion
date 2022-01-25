@@ -706,7 +706,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 07. Check the @context in HTTP Header, if present
   //
-  // NOTE: orionldState.link is set by httpHeaderGet() in rest.cpp, called by orionldMhdConnectionInit()
+  // NOTE: orionldState.link is set by orionldHttpHeaderReceive() called by orionldMhdConnectionInit()
   //
   // NOTE: Some requests don't use the context and thus should simplt ignore the Link header
   //

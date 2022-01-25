@@ -56,19 +56,21 @@ extern "C"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "parse/forbiddenChars.h"
+#include "serviceRoutinesV2/getEntityAttributeValue.h"           // getEntityAttributeValue
 
 #include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
 #include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 
+#include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/Verb.h"
-#include "rest/HttpHeaders.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
@@ -312,250 +314,39 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
 
 
-/* ****************************************************************************
-*
-* mimeTypeSelect -
-*/
-static MimeType mimeTypeSelect(ConnectionInfo* ciP)
-{
-  if (ciP->httpHeaders.accepted("application/json"))
-  {
-    return JSON;
-  }
-
-  if (ciP->httpHeaders.accepted("text/plain"))
-  {
-    return TEXT;
-  }
-
-  return JSON;
-}
-
-
-
-/* ****************************************************************************
-*
-* acceptItemParse -
-*/
-static bool acceptItemParse(ConnectionInfo* ciP, char* value)
-{
-  HttpHeaders*       headerP        = &ciP->httpHeaders;
-  char*              rest           = NULL;
-  char*              cP             = (char*) value;
-  HttpAcceptHeader*  acceptHeaderP;
-  char*              delimiter;
-
-  LM_T(LmtHttpHeaders, ("Initial value of Accept header: %s", value));
-
-  if (value[0] == 0)
-  {
-    // NOTE
-    //   According to https://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2, empty
-    //   items in the comma list of Accepot are allowed, so we simply return OK (true) here
-    //   and skip to the next item.
-    //
-    return true;
-  }
-
-  if ((delimiter = strchr(cP, ';')) != NULL)
-  {
-    *delimiter = 0;
-    rest = &delimiter[1];
-  }
-
-  //
-  // Now we have the 'media-range'.
-  // The broker accepts only the following two media types:
-  //   - application/json
-  //   - text/plain
-  //   - application/ld+json (if compiled for orionld)
-  //
-  // So, if the media-range is anything else, it is rejected immediately and not put in the list
-  //
-  if ((strcmp(cP, "*/*")                  != 0) &&
-      (strcmp(cP, "application/*")        != 0) &&
-      (strcmp(cP, "application/ld+json")  != 0) &&
-      (strcmp(cP, "application/geo+json") != 0) &&
-      (strcmp(cP, "application/json")     != 0) &&
-      (strcmp(cP, "text/*")               != 0) &&
-      (strcmp(cP, "text/plain")           != 0))
-  {
-    return true;  // No error, just a media type that the broker doesn't recognize
-  }
-
-
-  acceptHeaderP = new HttpAcceptHeader();
-  acceptHeaderP->mediaRange = cP;
-  acceptHeaderP->qvalue     = 1;  // default value of 'q' - may be modified later
-
-  // If nothing after the media-range, we are done
-  if (rest == NULL)
-  {
-    headerP->acceptHeaderV.push_back(acceptHeaderP);
-    return true;
-  }
-
-  // If we get here, next in line must be a 'q', perhaps preceded by whitespace
-  while ((*rest == ' ') || (*rest == '\t'))
-  {
-    ++rest;
-  }
-
-  if (*rest == 0)
-  {
-    headerP->acceptHeaderV.push_back(acceptHeaderP);
-    return true;
-  }
-
-
-  //
-  // Next item is q=qvalue
-  //
-
-  if (*rest != 'q')
-  {
-    orionldState.out.acceptErrorDetail = (char*) "q missing in accept header";
-    orionldState.httpStatusCode        = SccBadRequest;
-    delete acceptHeaderP;
-    return false;
-  }
-
-  // Pass 'q' and check for '='
-  ++rest;
-  if (*rest != '=')
-  {
-    orionldState.out.acceptErrorDetail = (char*) "missing equal-sign after q in accept header";
-    orionldState.httpStatusCode        = SccBadRequest;
-    delete acceptHeaderP;
-    return false;
-  }
-
-  // Pass '=' and check for Number
-  ++rest;
-  // Zero-out ';' if present
-  if ((cP = strchr(rest, ';')) != NULL)
-  {
-    *cP = 0;
-  }
-
-  // qvalue there?
-  if (*rest == 0)
-  {
-    orionldState.out.acceptErrorDetail = (char*) "qvalue in accept header is missing";
-    orionldState.httpStatusCode        = SccBadRequest;
-    delete acceptHeaderP;
-    return false;
-  }
-
-  // qvalue a number?
-  if (str2double(rest, &acceptHeaderP->qvalue) == false)
-  {
-    orionldState.out.acceptErrorDetail = (char*) "qvalue in accept header is not a number";
-    orionldState.httpStatusCode        = SccBadRequest;
-
-    orionldState.out.contentType = mimeTypeSelect(ciP);
-
-    delete acceptHeaderP;
-    return false;
-  }
-
-
-  //
-  // And now the accept-extensions  (which is ignored for now)
-  // FIXME P4: Implement treatment of accept-extensions
-  //
-
-  // push the accept header and return true
-  headerP->acceptHeaderV.push_back(acceptHeaderP);
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* acceptParse -
-*/
-static void acceptParse(ConnectionInfo* ciP, const char* value)
-{
-  char*         itemStart  = (char*) value;
-  char*         cP         = (char*) value;
-
-  if ((value == NULL) || (value[0] == 0))
-  {
-    orionldState.out.acceptErrorDetail = (char*) "empty accept header";
-    orionldState.httpStatusCode        = SccBadRequest;
-    return;
-  }
-
-  while (*cP != 0)
-  {
-    if (*cP != ',')
-    {
-      ++cP;
-    }
-    else
-    {
-      *cP = 0;
-
-      // step over the comma
-      ++cP;
-
-      // step over initial whitespace
-      while ((*cP == ' ') || (*cP == '\t'))
-      {
-        ++cP;
-      }
-
-      acceptItemParse(ciP, itemStart);
-      itemStart = cP;
-    }
-  }
-
-  acceptItemParse(ciP, itemStart);
-
-  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (orionldState.out.acceptErrorDetail == NULL))
-  {
-    orionldState.httpStatusCode        = SccNotAcceptable;
-    orionldState.out.acceptErrorDetail = (char*) "no acceptable mime-type in accept header";
-  }
-
-  if ((orionldState.httpStatusCode == SccNotAcceptable) || (orionldState.httpStatusCode == SccBadRequest))
-  {
-    OrionError oe((HttpStatusCode) orionldState.httpStatusCode, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
-
-    ciP->answer = oe.smartRender(orionldState.apiVersion);
-  }
-}
-
-
-
-extern MimeType mimeTypeFromString(const char* contentType, char** charsetP, bool exact);
+extern MimeType acceptHeaderParse(char* accept, bool textOk);
 /* ****************************************************************************
 *
 * httpHeaderGet -
 */
-MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
-  ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
-  HttpHeaders*     headerP = &ciP->httpHeaders;
-
-  if (strcasecmp(key, HTTP_ACCEPT) == 0)
+  if      (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
+  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0) orionldState.in.servicePath      = (char*) value;
+  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
+  else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
+  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
+  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) orionldState.in.xRealIp          = (char*) value;
+  else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;
+  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) orionldState.correlator          = (char*) value;
+  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) orionldState.in.connection       = (char*) value;
+  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) orionldState.attrsFormat         = (char*) value;
+  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) orionldState.in.xForwardedFor    = (char*) value;
+  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) {}
+  else if (strcasecmp(key, HTTP_EXPECT)             == 0) {}
+  else if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
-    if (orionldState.apiVersion != NGSI_LD_V1)
+    orionldState.out.contentType = acceptHeaderParse((char*) value, true);
+    if (orionldState.out.contentType == NOMIMETYPE)
     {
-      headerP->accept = value;
-      acceptParse(ciP, value);  // Any errors are flagged in orionldState.out.acceptErrorDetail and taken care of later
+      orionldState.httpStatusCode = 406;
+      orionldState.pd.detail      = (char*) "no acceptable mime-type in accept header";
     }
   }
   else if (strcasecmp(key, HTTP_CONTENT_TYPE) == 0)
   {
-    if (orionldState.apiVersion != NGSI_LD_V1)
-    {
-      orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
-      orionldState.in.contentTypeString = (char*) value;
-    }
+    orionldState.in.contentType       = mimeTypeFromString(value, NULL, false, true, &orionldState.acceptMask);
+    orionldState.in.contentTypeString = (char*) value;
   }
   else if ((strcasecmp(key, HTTP_FIWARE_SERVICE) == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
   {
@@ -575,19 +366,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, con
       }
     }
   }
-  else if (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
-  else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0) orionldState.in.servicePath      = (char*) value;
-  else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
-  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
-  else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
-  else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) orionldState.in.xRealIp          = (char*) value;
-  else if (strcasecmp(key, HTTP_X_FORWARDED_FOR)    == 0) orionldState.in.xForwardedFor    = (char*) value;
-  else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;
-  else if (strcasecmp(key, HTTP_FIWARE_CORRELATOR)  == 0) orionldState.correlator          = (char*) value;
-  else if (strcasecmp(key, HTTP_CONNECTION)         == 0) orionldState.in.connection       = (char*) value;
-  else if (strcasecmp(key, HTTP_NGSIV2_ATTRSFORMAT) == 0) orionldState.attrsFormat         = (char*) value;
-  else if (strcasecmp(key, HTTP_USER_AGENT)         == 0) {}
-  else if (strcasecmp(key, HTTP_EXPECT)             == 0) {}
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
@@ -1147,76 +925,6 @@ static ApiVersion apiVersionGet(const char* path)
 
 /* ****************************************************************************
 *
-* acceptHeadersAcceptable -
-*
-* URI paths ending with '/value' accept both text/plain and application/json.
-* All other requests accept only application/json.
-*
-* This function just checks that the media types flagged as accepted by the client
-* are OK to work with for the broker.
-* The media type to be used is selected later, depending on the request.
-* Actually, all requests except those ending in '/value' will use application/json.
-*
-*/
-static bool acceptHeadersAcceptable(ConnectionInfo* ciP, bool* textAcceptedP)
-{
-  char* eopath = orionldState.urlPath;
-  int   urllen = strlen(eopath);
-
-  if (urllen > 6)
-  {
-    eopath = &eopath[urllen - 6];  // to point to '/value' if present
-  }
-
-  if (strcmp(eopath, "/value") == 0)
-  {
-    *textAcceptedP = true;
-  }
-
-
-  //
-  // Go over vector with accepted mime types
-  //
-  for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ++ix)
-  {
-    HttpAcceptHeader* haP = ciP->httpHeaders.acceptHeaderV[ix];
-
-    if (haP->mediaRange == "*/*")
-    {
-      return true;
-    }
-
-    if (haP->mediaRange == "application/*")
-    {
-      return true;
-    }
-
-    if (haP->mediaRange == "application/json")
-    {
-      return true;
-    }
-
-    if (*textAcceptedP == true)
-    {
-      if (haP->mediaRange == "text/*")
-      {
-        return true;
-      }
-
-      if (haP->mediaRange == "text/plain")
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * restServiceForBadVerb - dummy instance
 */
 RestService restServiceForBadVerb;
@@ -1322,12 +1030,6 @@ ConnectionInfo* connectionTreatInit
   //
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
-  if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
-  {
-    ciP->httpHeaders.accept = "*/*";
-    acceptParse(ciP, "*/*");
-  }
-
   if ((orionldState.correlator == NULL) || (orionldState.correlator[0] == 0))
   {
     orionldState.correlator = kaAlloc(&orionldState.kalloc, CORRELATOR_ID_SIZE + 1);
@@ -1360,6 +1062,16 @@ ConnectionInfo* connectionTreatInit
     return ciP;
   }
 
+
+  // Error detected in HTTP headers?
+  if (orionldState.httpStatusCode != 200)
+  {
+    LM_E(("ERROR in HTTP Headers (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    OrionError oe((HttpStatusCode) orionldState.httpStatusCode, orionldState.pd.detail);
+    ciP->answer = oe.smartRender(orionldState.apiVersion);
+
+    return ciP;
+  }
 
   //
   // URI parameters
@@ -1395,8 +1107,6 @@ ConnectionInfo* connectionTreatInit
     transactionIp = orionldState.in.xForwardedFor;
 
   lmTransactionSetFrom(transactionIp);
-
-  orionldState.out.contentType = mimeTypeSelect(ciP);
 
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -1436,6 +1146,28 @@ ConnectionInfo* connectionTreatInit
   {
     // Not ready to answer here - must wait until all the payload has been read
     orionldState.httpStatusCode = SccBadVerb;
+  }
+
+  //
+  // If Accept: TEXT was chosen, only a few service routines allow this.
+  // If also JSON is accepted, then all is OK - just change the chosen format for JSON
+  // If JSON is NOT accepted, then we have an error
+  //
+  // This algorithm would be better if we knew this beforehand - before calling acceptHeaderParse.
+  // So, could be better ...
+  //
+  if (orionldState.out.contentType == TEXT)
+  {
+    if ((orionldState.acceptMask & (1 << JSON)) == 0)
+    {
+      if (ciP->restServiceP->treat != getEntityAttributeValue)
+      {
+        OrionError oe(SccNotAcceptable, "Invalid Mime Type");
+        ciP->answer = oe.smartRender(orionldState.apiVersion);
+        orionldState.httpStatusCode  = 406;
+        orionldState.out.contentType = JSON;  // JSON output for the error?
+      }
+    }
   }
 
   return ciP;
@@ -1702,7 +1434,7 @@ static MHD_Result connectionTreat
   //
   if (orionldState.out.acceptErrorDetail != NULL)
   {
-    OrionError   oe(SccBadRequest, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
+    OrionError oe(SccBadRequest, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
 
     orionldState.httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, orionldState.out.acceptErrorDetail);
@@ -1714,13 +1446,11 @@ static MHD_Result connectionTreat
   //
   // Check that Accept Header values are valid
   //
-  bool textAccepted = false;
-
-  if (!acceptHeadersAcceptable(ciP, &textAccepted))
+  if (orionldState.out.contentType == NOMIMETYPE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (!textAccepted)
+    if ((orionldState.acceptMask & (1 << TEXT)) == 0)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1731,11 +1461,11 @@ static MHD_Result connectionTreat
     return MHD_YES;
   }
 
-  if (ciP->httpHeaders.outformatSelect() == NOMIMETYPE)
+  if (orionldState.out.contentType == NOMIMETYPE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if (!textAccepted)
+    if ((orionldState.acceptMask & (1 << TEXT)) == 0)
     {
       oe.details = "acceptable MIME types: application/json";
     }

@@ -34,9 +34,9 @@
 #include "apiTypesV2/Registration.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "rest/HttpHeaders.h"                   // HTTP_*
 #include "mongoBackend/mongoRegistrationGet.h"  // FIXME P0: Two external functions in the same module ...
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutinesV2/getRegistrations.h"

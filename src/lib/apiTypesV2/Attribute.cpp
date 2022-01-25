@@ -41,9 +41,7 @@
 */
 std::string Attribute::render
 (
-  bool                acceptedTextPlain,   // in parameter (pass-through)
-  bool                acceptedJson,        // in parameter (pass-through)
-  MimeType            outFormatSelection,  // in parameter (pass-through)
+  MimeType            outFormat,           // in parameter (pass-through)
   MimeType*           outContentTypeP,     // out parameter (pass-through)
   int*                scP,                 // out parameter (pass-through)
   bool                keyValues,           // in parameter
@@ -61,9 +59,7 @@ std::string Attribute::render
     if (requestType == EntityAttributeValueRequest)
     {
       out = pcontextAttribute->toJsonAsValue(V2,
-                                             acceptedTextPlain,
-                                             acceptedJson,
-                                             outFormatSelection,
+                                             outFormat,
                                              outContentTypeP,
                                              scP);
     }

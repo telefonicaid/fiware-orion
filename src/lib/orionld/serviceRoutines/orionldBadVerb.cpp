@@ -68,7 +68,7 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   if (bitmask & (1 << DELETE)) strcat(allowValue, ",PATCH");
   if (bitmask & (1 << PATCH))  strcat(allowValue, ",DELETE");
 
-  ciP->httpHeader.push_back(HTTP_ALLOW);
+  ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back(&allowValue[1]);  // Skipping first comma
 
   return true;

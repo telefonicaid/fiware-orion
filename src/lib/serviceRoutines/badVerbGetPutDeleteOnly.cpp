@@ -35,9 +35,9 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "rest/OrionError.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 
 

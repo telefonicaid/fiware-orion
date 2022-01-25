@@ -30,7 +30,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "orionTypes/EntityTypeVectorResponse.h"

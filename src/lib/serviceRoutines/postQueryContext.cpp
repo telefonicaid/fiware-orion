@@ -33,6 +33,7 @@
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -44,10 +45,10 @@
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutines/postQueryContext.h"
 #include "jsonParse/jsonRequest.h"
 

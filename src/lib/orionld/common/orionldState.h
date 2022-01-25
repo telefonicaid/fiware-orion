@@ -353,6 +353,7 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+  uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
   // TRoE

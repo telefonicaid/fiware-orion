@@ -56,6 +56,7 @@ SET (SOURCES
     duplicatedInstances.cpp
     troeIgnored.cpp
     tenantList.cpp
+    mimeTypeFromString.cpp
 )
 
 # Include directories

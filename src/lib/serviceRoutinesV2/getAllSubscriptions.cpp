@@ -35,9 +35,9 @@
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 
 

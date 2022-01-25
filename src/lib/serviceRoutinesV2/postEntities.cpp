@@ -34,7 +34,6 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
@@ -151,7 +150,7 @@ std::string postEntities
       location += "?type=none";
     }
 
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
+    ciP->httpHeader.push_back("Location");
     ciP->httpHeaderValue.push_back(location);
     orionldState.httpStatusCode = sccCodeOnSuccess;
   }

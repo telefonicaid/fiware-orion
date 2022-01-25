@@ -91,9 +91,7 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
-                                         ciP->httpHeaders.accepted("application/json"),
-                                         ciP->httpHeaders.outformatSelect(),
+  TIMED_RENDER(answer = attribute.render(orionldState.out.contentType,
                                          &orionldState.out.contentType,
                                          &orionldState.httpStatusCode,
                                          orionldState.uriParamOptions.keyValues,

@@ -48,9 +48,9 @@
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
 
