@@ -43,7 +43,6 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
   char* s;
   char* cP = (char*) mimeType;
 
-  LM_TMP(("KZ: Accept: '%s'", mimeType));
   if ((s = strstr(cP, ";")) != NULL)
   {
     *s = 0;
