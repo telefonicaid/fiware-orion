@@ -331,7 +331,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
     // GET the MIME type, check for new winner
     // REMEMBER:  JSON is the default Mime Type and if equal weight, JSON wins
     //
-    mimeType = mimeTypeFromString(mimeV[ix], NULL, true, textOk, &orionldState.acceptMask);
+    mimeType                 = mimeTypeFromString(mimeV[ix], NULL, true, textOk, &orionldState.acceptMask);
     orionldState.acceptMask |= (1 << mimeType);  // It's OK to include "NOMIMETYPE"
 
     if (mimeType > NOMIMETYPE)
@@ -881,6 +881,7 @@ MHD_Result orionldMhdConnectionInit
   // 2. Prepare orionldState
   //
   orionldStateInit(connection);
+  orionldState.apiVersion  = NGSI_LD_V1;
   orionldState.ciP         = ciP;
   orionldState.httpVersion = (char*) version;
 
