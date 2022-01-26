@@ -37,7 +37,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -327,12 +326,8 @@ bool orionldPostQuery(ConnectionInfo* ciP)
     // Not an error - just "nothing found" - return an empty array
     orionldState.responsePayload = (char*) "[]";
     if (countP != NULL)
-    {
-      char number[16];
+      orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, 0);
 
-      snprintf(number, sizeof(number), "%d", count);
-      httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-    }
     return true;
   }
 
@@ -365,12 +360,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   orionldState.httpStatusCode = 200;
 
   if (countP != NULL)
-  {
-    char number[16];
-
-    snprintf(number, sizeof(number), "%d", count);
-    httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   return true;
 }

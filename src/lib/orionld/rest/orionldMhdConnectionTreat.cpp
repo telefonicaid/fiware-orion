@@ -46,7 +46,7 @@ extern "C"
 
 #include "common/string.h"                                       // FT
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
@@ -99,7 +99,7 @@ extern "C"
 //   For this function to work properly, the payload must have been parsed, so that we know whether there is
 //   a "@context" member as part of the payload or not.
 //
-static bool contentTypeCheck(ConnectionInfo* ciP)
+static bool contentTypeCheck(void)
 {
   if ((orionldState.verb != POST) && (orionldState.verb != PATCH))
     return true;
@@ -165,7 +165,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 //
 // payloadEmptyCheck -
 //
-static bool payloadEmptyCheck(ConnectionInfo* ciP)
+static bool payloadEmptyCheck(void)
 {
   // No payload?
   if (orionldState.in.payload == NULL)
@@ -210,7 +210,7 @@ static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
 //
 // payloadParseAndExtractSpecialFields -
 //
-static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* contextToBeCashedP)
+static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 {
   //
   // Parse the payload
@@ -397,7 +397,7 @@ void orionldErrorResponseFromProblemDetails(OrionldProblemDetails* pdP)
 //
 // linkHeaderCheck -
 //
-static bool linkHeaderCheck(ConnectionInfo* ciP)
+static bool linkHeaderCheck(void)
 {
   char* details;
 
@@ -677,7 +677,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 03. Check for empty payload for POST/PATCH/PUT
   //
-  if (((orionldState.verb == POST) || (orionldState.verb == PATCH) || (orionldState.verb == PUT)) && (payloadEmptyCheck(ciP) == false))
+  if (((orionldState.verb == POST) || (orionldState.verb == PATCH) || (orionldState.verb == PUT)) && (payloadEmptyCheck() == false))
     goto respond;
 
 
@@ -690,7 +690,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
       orionldState.in.payloadCopy = kaStrdup(&orionldState.kalloc, orionldState.in.payload);
 
-    if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
+    if (payloadParseAndExtractSpecialFields(&contextToBeCashed) == false)
       goto respond;
   }
 
@@ -699,7 +699,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK) == 0)
   {
-    if (contentTypeCheck(ciP) == false)
+    if (contentTypeCheck() == false)
       goto respond;
   }
 
@@ -712,7 +712,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED) == 0)
   {
-    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
+    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck() == false))
       goto respond;
 
     //
@@ -846,7 +846,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
 
   if (linkHeader == true)
-    httpHeaderLinkAdd(ciP, orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
+    httpHeaderLinkAdd(orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
 
   //
   // Is there a KJSON response tree to render?

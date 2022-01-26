@@ -115,9 +115,14 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
-  for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+  //
+  // Get the HTTP headers from orionldState.out.headers
+  //
+  for (int ix = 0; ix < orionldState.out.headers.ix; ix++)
   {
-    MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
+    OrionldHeader* hP = &orionldState.out.headers.headerV[ix];
+
+    MHD_add_response_header(response, orionldHeaderName[hP->type], hP->sValue);
   }
 
   if (orionldState.apiVersion == NGSI_LD_V1)

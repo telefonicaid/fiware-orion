@@ -25,13 +25,14 @@
 #include <string>
 #include <vector>
 
-#include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 
-#include "common/limits.h"                           // STRING_SIZE_FOR_INT
+#include "common/limits.h"                                     // STRING_SIZE_FOR_INT
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/rest.h"
-#include "rest/HttpHeaders.h"                             // HTTP_*
+#include "rest/HttpHeaders.h"                                  // CORS_EXPOSED_HEADERS, ...
 #include "serviceRoutines/optionsVersionRequest.h"
 
 
@@ -52,32 +53,13 @@ std::string optionsVersionRequest
 {
   if (isOriginAllowedForCORS(orionldState.in.origin))
   {
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
+    char* allowOrigin = (strcmp(corsOrigin, "__ALL") == 0)? (char*) "*" : corsOrigin;
 
-    // If any origin is allowed, the header is always sent with the value "*"
-    if (strcmp(corsOrigin, "__ALL") == 0)
-    {
-      ciP->httpHeaderValue.push_back("*");
-    }
-    // If a specific origin is allowed, the header is only sent if the origins match
-    else
-    {
-      ciP->httpHeaderValue.push_back(corsOrigin);
-    }
-
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_METHODS);
-    ciP->httpHeaderValue.push_back("GET, OPTIONS");
-
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_EXPOSE_HEADERS);
-    ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
-
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_HEADERS);
-    ciP->httpHeaderValue.push_back(CORS_ALLOWED_HEADERS);
-
-    char maxAge[STRING_SIZE_FOR_INT];
-    snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_MAX_AGE);
-    ciP->httpHeaderValue.push_back(maxAge);
+    orionldHeaderAdd(&orionldState.out.headers, HttpAllowOrigin,   allowOrigin,                  0);
+    orionldHeaderAdd(&orionldState.out.headers, HttpAllowMethods,  (char*) "GET, OPTIONS",       0);
+    orionldHeaderAdd(&orionldState.out.headers, HttpExposeHeaders, (char*) CORS_EXPOSED_HEADERS, 0);
+    orionldHeaderAdd(&orionldState.out.headers, HttpAllowHeaders,  (char*) CORS_ALLOWED_HEADERS, 0);
+    orionldHeaderAdd(&orionldState.out.headers, HttpMaxAge,        NULL,                         corsMaxAge);
   }
 
   orionldState.httpStatusCode = SccOk;

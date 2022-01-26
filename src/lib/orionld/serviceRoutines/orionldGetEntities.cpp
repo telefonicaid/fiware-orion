@@ -52,6 +52,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
@@ -570,12 +571,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   // Add "count" if asked for
   if (countP != NULL)
-  {
-    char cV[32];
-    snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back("NGSILD-Results-Count");
-    ciP->httpHeaderValue.push_back(cV);
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, *countP);
 
   mongoRequest.release();
 

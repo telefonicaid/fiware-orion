@@ -163,16 +163,16 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.attrsFormat = (char*) "normalized";
   orionldState.correlator  = (char*) "";
 
+  //
   // Outgoing HTTP headers
-#if 0
-  orionldState.out.httpHeader     = orionldState.out.httpHeaderV;
-  orionldState.out.httpHeaderSize = K_VEC_SIZE(orionldState.out.httpHeaderV);
-  orionldState.out.httpHeaderIx   = 0;
-#endif
+  //
+  orionldState.out.contentType    = JSON;              // Default response Content-Type is "application/json"
+  orionldHeaderSetInit(&orionldState.out.headers, 5);  // 5 response headers, to start with
 
-  orionldState.out.contentType    = JSON;  // Default outgoing Content-Type
 
+  //
   // Default response status code is 200 OK
+  //
   orionldState.httpStatusCode = 200;
 }
 

@@ -104,7 +104,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   // FIXME: Check oError for failure!
   orionldState.httpStatusCode = SccCreated;
 
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/csourceRegistrations/", regIdP);
+  httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP);
 
   return true;
 }

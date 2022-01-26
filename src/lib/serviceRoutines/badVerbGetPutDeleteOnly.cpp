@@ -28,16 +28,15 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/orionldState.h"                  // orionldState
 
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/rest.h"
 #include "rest/OrionError.h"
-#include "rest/HttpHeaders.h"                             // HTTP_*
+#include "rest/rest.h"                                    // corsEnabled
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 
 
@@ -55,19 +54,19 @@ std::string badVerbGetPutDeleteOnly
 )
 {
   std::string  details = std::string("bad verb for url '") + orionldState.urlPath + "', method '" + orionldState.verbString + "'";
-  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+  char*        allowed;
 
-  ciP->httpHeader.push_back(HTTP_ALLOW);
-  std::string headerValue = "GET, PUT, DELETE";
-  //OPTIONS verb is only available for V2 API
-  if ((corsEnabled == true) && (orionldState.apiVersion == V2))
-  {
-    headerValue = headerValue + ", OPTIONS";
-  }
-  ciP->httpHeaderValue.push_back(headerValue);
+  // OPTIONS verb is only available for V2 API
+  if ((corsEnabled == true) && (orionldState.apiVersion == V2))    allowed = (char*) "GET, PUT, DELETE, OPTIONS";
+  else                                                             allowed = (char*) "GET, PUT, DELETE";
+
+  orionldHeaderAdd(&orionldState.out.headers, HttpAllow, allowed, 0);
   orionldState.httpStatusCode = SccBadVerb;
-
   alarmMgr.badInput(clientIp, details);
 
-  return (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)? "" :  oe.smartRender(orionldState.apiVersion);
+  if (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)
+    return "";
+
+  OrionError oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+  return oe.smartRender(orionldState.apiVersion);
 }

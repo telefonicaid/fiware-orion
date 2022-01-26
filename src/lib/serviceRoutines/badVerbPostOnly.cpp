@@ -35,9 +35,8 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/rest.h"
+#include "rest/rest.h"                                    // corsEnabled
 #include "rest/OrionError.h"
-#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutines/badVerbPostOnly.h"
 
 
@@ -55,20 +54,19 @@ std::string badVerbPostOnly
 )
 {
   std::string  details = std::string("bad verb for url '") + orionldState.urlPath + "', method '" + orionldState.verbString + "'";
-  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+  char*        allowed;
 
-  ciP->httpHeader.push_back(HTTP_ALLOW);
-  std::string headerValue = "POST";
   // OPTIONS verb is only available for V2 API
-  if ((corsEnabled == true) && (orionldState.apiVersion == V2))
-  {
-    headerValue = headerValue + ", OPTIONS";
-  }
-  ciP->httpHeaderValue.push_back(headerValue);
-  orionldState.httpStatusCode = SccBadVerb;
+  if ((corsEnabled == true) && (orionldState.apiVersion == V2))    allowed = (char*) "POST, OPTIONS";
+  else                                                             allowed = (char*) "POST";
 
+  orionldHeaderAdd(&orionldState.out.headers, HttpAllow, allowed, 0);
+  orionldState.httpStatusCode = SccBadVerb;
   alarmMgr.badInput(clientIp, details);
 
-  ciP->answer = oe.smartRender(orionldState.apiVersion);
-  return ciP->answer;
+  if (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)
+    return "";
+
+  OrionError oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+  return oe.smartRender(orionldState.apiVersion);
 }

@@ -71,10 +71,6 @@ public:
   orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
   orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
   ::std::vector<orion::CompoundValueNode*>  compoundValueVector;
-
-  // Outgoing
-  std::vector<std::string>  httpHeader;
-  std::vector<std::string>  httpHeaderValue;
 };
 
 

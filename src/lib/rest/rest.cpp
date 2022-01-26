@@ -64,6 +64,7 @@ extern "C"
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
@@ -1038,8 +1039,7 @@ ConnectionInfo* connectionTreatInit
 
   correlatorIdSet(orionldState.correlator);
 
-  ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
-  ciP->httpHeaderValue.push_back(orionldState.correlator);
+  orionldHeaderAdd(&orionldState.out.headers, HttpCorrelator, orionldState.correlator, 0);
 
   if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
   {

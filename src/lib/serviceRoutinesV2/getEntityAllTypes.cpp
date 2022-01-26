@@ -25,7 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "orionld/common/orionldState.h"    // orionldState
+#include "orionld/common/orionldState.h"                  // orionldState
+#include "orionld/types/OrionldHeader.h"                  // orionldHeaderAdd
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -87,13 +88,7 @@ std::string getEntityAllTypes
   TIMED_RENDER(answer = response.toJson(orionldState.uriParamOptions.values));
 
   if (orionldState.uriParams.count)
-  {
-    char cVec[64];
-
-    snprintf(cVec, sizeof(cVec), "%u", totalTypes);
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(cVec);
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpNgsiv2Count, NULL, totalTypes);
 
   response.release();
   return answer;
