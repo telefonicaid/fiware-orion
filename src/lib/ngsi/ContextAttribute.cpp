@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -935,19 +937,17 @@ std::string ContextAttribute::toJson
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
-  bool             acceptedTextPlain,   // in parameter
-  bool             acceptedJson,        // in parameter
-  MimeType         outFormatSelection,  // in parameter
-  MimeType*        outContentTypeP,     // out parameter
-  int*             scP                  // out parameter
+  ApiVersion       apiVersion,
+  MimeType         outFormat,
+  MimeType*        outContentTypeP,
+  int*             scP
 )
 {
   std::string  out;
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (acceptedTextPlain)
+    if (orionldState.acceptMask & (1 << TEXT))
     {
       char buf[64];
 
@@ -1006,7 +1006,7 @@ std::string ContextAttribute::toJsonAsValue
   }
   else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if (!acceptedJson && !acceptedTextPlain)
+    if ((orionldState.acceptMask & ((1 << TEXT) | (1 << JSON))) == 0)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;
@@ -1015,7 +1015,7 @@ std::string ContextAttribute::toJsonAsValue
     }
     else
     {
-      *outContentTypeP = outFormatSelection;
+      *outContentTypeP = outFormat;
 
       if (compoundValueP->isVector())
       {

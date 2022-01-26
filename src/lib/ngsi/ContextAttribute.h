@@ -103,8 +103,6 @@ public:
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
   std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
-                             bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outContentTypeP,
                              int*             scP);

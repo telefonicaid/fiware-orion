@@ -54,9 +54,7 @@ class Attribute
   OrionError         oe;                    // Optional - mandatory if not 200-OK
 
   Attribute(): pcontextAttribute(0) {}
-  std::string  render(bool                acceptedTextPlain,
-                      bool                acceptedJson,
-                      MimeType            outFormatSelection,
+  std::string  render(MimeType            outFormat,
                       MimeType*           outContentTypeP,
                       int*                scP,
                       bool                keyValues,

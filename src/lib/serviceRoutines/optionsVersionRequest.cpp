@@ -27,10 +27,11 @@
 
 #include "orionld/common/orionldState.h"             // orionldState
 
+#include "common/limits.h"                           // STRING_SIZE_FOR_INT
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutines/optionsVersionRequest.h"
 
 

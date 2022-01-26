@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "rest/ConnectionInfo.h"
@@ -62,7 +64,7 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
   else
     snprintf(location, sizeof(location), "%s", uriPathWithSlash);
 
-  ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
+  ciP->httpHeader.push_back("Location");
   ciP->httpHeaderValue.push_back(location);
 }
 

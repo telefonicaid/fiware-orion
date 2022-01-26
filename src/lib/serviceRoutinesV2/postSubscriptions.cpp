@@ -30,10 +30,10 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
-#include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
-#include "orionld/common/orionldState.h"               // orionldState
+#include "rest/HttpHeaders.h"                             // HTTP_*
+#include "orionld/common/orionldState.h"                  // orionldState
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 

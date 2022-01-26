@@ -34,8 +34,8 @@
 #include "common/clockFunctions.h"
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/mongoRegistrationCreate.h"

@@ -34,8 +34,8 @@
 #include "common/compileInfo.h"
 #include "common/defaultValues.h"
 #include "orionld/common/orionldState.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*, CORS_*
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"

@@ -31,7 +31,6 @@ SET (SOURCES
     HttpStatusCode.cpp
     ConnectionInfo.cpp
     StringFilter.cpp
-    HttpHeaders.cpp
     restServiceLookup.cpp
     httpHeaderAdd.cpp
 )

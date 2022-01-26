@@ -32,10 +32,10 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "common/wsStrip.h"                                      // wsStrip
-#include "common/MimeType.h"                                     // mimeTypeParse
+#include "common/MimeType.h"                                     // MimeType
+#include "common/string.h"                                       // toLowercase
 #include "alarmMgr/alarmMgr.h"                                   // alarmMgr
 #include "rest/Verb.h"                                           // Verb
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
@@ -61,14 +62,6 @@ extern "C"
 // clientIp - move to orionldState
 //
 extern __thread char  clientIp[IP_LENGTH_MAX + 1];
-
-
-
-// ----------------------------------------------------------------------------
-//
-// External declarations - tmp - should be in their own files (not rest.cpp) and included here
-//
-extern MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
 
 
 
@@ -275,49 +268,6 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
 
 
 
-/* ****************************************************************************
-*
-* mimeTypeFromString -
-*/
-MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcardsAccepted)
-{
-  char* s;
-  char* cP = (char*) mimeType;
-
-  if ((s = strstr(cP, ";")) != NULL)
-  {
-    *s = 0;
-    ++s;
-    s = wsStrip(s);
-
-    if ((charsetP != NULL) && (strncmp(s, "charset=", 8) == 0))
-      *charsetP = &s[8];
-  }
-
-  cP = wsStrip(cP);
-
-  if (wildcardsAccepted == true)
-  {
-    if      (strcmp(cP, "*/*")                == 0)  return JSON;
-    else if (strcmp(cP, "application/*")      == 0)  return JSON;
-  }
-
-  if      (strcmp(cP, "application/json")             == 0)  return JSON;
-  else if (strcmp(cP, "application/ld+json")          == 0)  return JSONLD;
-  else if (strcmp(cP, "application/geo+json")         == 0)  return GEOJSON;
-  else if (strcmp(cP, "application/merge-patch+json") == 0)  return MERGEPATCHJSON;
-
-  if (orionldState.apiVersion != NGSI_LD_V1)
-  {
-    if      (strcmp(cP, "text/json")         == 0)  return JSON;
-    else if (strcmp(cP, "application/html")  == 0)  return HTML;
-    else if (strcmp(cP, "text/plain")        == 0)  return TEXT;
-  }
-
-  return NOMIMETYPE;
-}
-
-
 
 // -----------------------------------------------------------------------------
 //
@@ -332,7 +282,7 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
 //   Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8
 //
 //
-static MimeType acceptHeaderParse(char* accept)
+MimeType acceptHeaderParse(char* accept, bool textOk)
 {
   // Split MimeTypes according to commas
   char* mimeV[20];
@@ -381,8 +331,10 @@ static MimeType acceptHeaderParse(char* accept)
     // GET the MIME type, check for new winner
     // REMEMBER:  JSON is the default Mime Type and if equal weight, JSON wins
     //
-    mimeType = mimeTypeFromString(mimeV[ix], NULL, true);
-    if ((mimeType == JSON) || (mimeType == JSONLD) || (mimeType == GEOJSON))
+    mimeType                 = mimeTypeFromString(mimeV[ix], NULL, true, textOk, &orionldState.acceptMask);
+    orionldState.acceptMask |= (1 << mimeType);  // It's OK to include "NOMIMETYPE"
+
+    if (mimeType > NOMIMETYPE)
     {
       if (winner == NOMIMETYPE)
       {
@@ -394,7 +346,7 @@ static MimeType acceptHeaderParse(char* accept)
         winner        = mimeType;
         winningWeight = weight;
       }
-      else if ((weight == winningWeight) && (mimeType == JSON))
+      else if ((weight == winningWeight) && (mimeType == JSON) && (orionldState.apiVersion == NGSI_LD_V1))
       {
         winner        = mimeType;
         winningWeight = weight;
@@ -409,9 +361,9 @@ static MimeType acceptHeaderParse(char* accept)
 
 // -----------------------------------------------------------------------------
 //
-// orionldHttpHeaderGet -
+// orionldHttpHeaderReceive -
 //
-static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (strcmp(key, "NGSILD-Scope") == 0)
   {
@@ -425,15 +377,14 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   }
   else if (strcmp(key, "Accept") == 0)
   {
-    orionldState.out.contentType = acceptHeaderParse((char*) value);
+    orionldState.out.contentType = acceptHeaderParse((char*) value, false);
 
     if (orionldState.out.contentType == NOMIMETYPE)
     {
-      const char* title   = "Invalid Accept mime-type";
       const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
 
       LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Accept mime-type", details);
       orionldState.httpStatusCode = SccNotAcceptable;
     }
   }
@@ -447,15 +398,31 @@ static MHD_Result orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const 
   else if (strcasecmp(key, "Host")               == 0) orionldState.in.host             = (char*) value;
   else if (strcasecmp(key, "X-Real-IP")          == 0) orionldState.in.xRealIp          = (char*) value;
   else if (strcasecmp(key, "Connection")         == 0) orionldState.in.connection       = (char*) value;
+  else if (strcasecmp(key, "X-Forwarded-For")    == 0) orionldState.in.xForwardedFor    = (char*) value;
   else if (strcasecmp(key, "Content-Type")       == 0)
   {
-    orionldState.in.contentType       = mimeTypeFromString(value, NULL, false);
+    orionldState.in.contentType       = mimeTypeFromString(value, NULL, false, false, &orionldState.acceptMask);
     orionldState.in.contentTypeString = (char*) value;
   }
-  else if (strcasecmp(key, HTTP_LINK) == 0)
+  else if (strcasecmp(key, "Link") == 0)
   {
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
+  }
+  else if ((strcasecmp(key, "Fiware-Service") == 0) || (strcasecmp(key, "NGSILD-Tenant") == 0))
+  {
+    if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
+    {
+      toLowercase((char*) value);
+      orionldState.tenantName = (char*) value;
+    }
+    else
+    {
+      // Tenant used when tenant is not supported by the broker - silently ignored for NGSIv2/v2, error for NGSI-LD
+      LM_E(("tenant in use but tenant support is not enabled for the broker"));
+      orionldState.httpStatusCode = 400;
+      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
+    }
   }
 
   return MHD_YES;
@@ -914,6 +881,7 @@ MHD_Result orionldMhdConnectionInit
   // 2. Prepare orionldState
   //
   orionldStateInit(connection);
+  orionldState.apiVersion  = NGSI_LD_V1;
   orionldState.ciP         = ciP;
   orionldState.httpVersion = (char*) version;
 
@@ -1020,26 +988,14 @@ MHD_Result orionldMhdConnectionInit
 
   //
   // Get HTTP Headers
-  // First we call the Orion-LD function 'orionldHttpHeaderGet' and then the Orion/NGSIv2 function 'httpHeaderGet'
-  // Any header cannot be part of both functions.
-  // The idea is to move all headers from httpHeaderGet to orionldHttpHeaderGet
   //
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderGet, NULL);
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, orionldHttpHeaderReceive, NULL);
 
   if (orionldState.httpStatusCode != 200)
   {
     LM_W(("Error detected in a HTTP header: %s: %s", orionldState.pd.title, orionldState.pd.detail));
-    return MHD_YES;  // orionldHttpHeaderGet sets the error
+    return MHD_YES;  // orionldHttpHeaderReceive sets the error
   }
-
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-
-
-  //
-  // Any error detected during httpHeaderGet calls?
-  //
-  if (orionldState.httpStatusCode != 200)
-    return MHD_YES;  // httpHeaderGet sets the error
 
   if (orionldState.tenantP == NULL)
     orionldState.tenantP = &tenant0;

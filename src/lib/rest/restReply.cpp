@@ -45,11 +45,11 @@
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
-#include "rest/HttpHeaders.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
@@ -137,25 +137,12 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
   else if (answer != "")
   {
-    //
-    // For error-responses, never respond with application/ld+json
-    // Same same for 207
-    //
-    if ((orionldState.httpStatusCode >= 400) && (orionldState.out.contentType == JSONLD))
-      orionldState.out.contentType = JSON;
-    if (orionldState.httpStatusCode == 207)
-      orionldState.out.contentType = JSON;
+    char* contentType = (char*) "application/json";
 
-    if (orionldState.out.contentType == GEOJSON)
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/geo+json");
-    else if (orionldState.out.contentType == JSON)
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
-    }
-    else if (orionldState.out.contentType == TEXT)
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
-    }
+    if (orionldState.out.contentType == TEXT)
+      contentType = (char*) "text/plain";
+
+    MHD_add_response_header(response, HTTP_CONTENT_TYPE, contentType);
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response

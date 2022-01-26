@@ -25,10 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "common/MimeType.h"
 
 
 
@@ -60,9 +56,7 @@
 #define HTTP_X_AUTH_TOKEN                  "X-Auth-Token"
 #define HTTP_X_REAL_IP                     "X-Real-IP"
 #define HTTP_X_FORWARDED_FOR               "X-Forwarded-For"
-#ifdef ORIONLD
 #define HTTP_LINK                          "Link"
-#endif
 
 
 
@@ -79,51 +73,5 @@
 * CORS Exposed Headers -
 */
 #define CORS_EXPOSED_HEADERS HTTP_FIWARE_CORRELATOR ", " HTTP_FIWARE_TOTAL_COUNT ", " HTTP_RESOURCE_LOCATION
-
-
-
-// -----------------------------------------------------------------------------
-//
-// HttpAcceptHeader -
-//
-// The incoming data is a comma-separated list of media-range, accept-params, and accept-extension.
-// The three components are separated by semicolon, and so are multiple accept-extensions.
-// There is only one media-range and only one instance of accept-params (or zero)
-//
-// See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-//
-// Accept = "Accept" ":" <media-range> [;<accept-params>[;accept-extension]*]
-//
-//   media-range:      < */* | type/* | type/subtype >
-//   accept-params:    [ q=<qvalue> ]
-//   accept-extension: [ token=<token|quoted-string> ]*
-//
-// The qvalue is a parameter for indicating a relative quality factor. It goes from 1 to 0, 1 being max-priority.
-// The default value of q is 1.
-//
-typedef struct HttpAcceptHeader
-{
-  std::string               mediaRange;
-  double                    qvalue;
-} HttpAcceptHeader;
-
-
-
-/* ****************************************************************************
-*
-* HttpHeaders -
-*/
-typedef struct HttpHeaders
-{
-  HttpHeaders();
-
-  void      release(void);
-  bool      accepted(const std::string& mime);
-  MimeType  outformatSelect(void);
-
-  std::vector<HttpAcceptHeader*> acceptHeaderV;
-
-  std::string   accept;
-} HttpHeaders;
 
 #endif  // SRC_LIB_REST_HTTPHEADERS_H_

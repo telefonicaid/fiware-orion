@@ -86,7 +86,6 @@ ConnectionInfo::~ConnectionInfo()
   }
 
   servicePathV.clear();
-  httpHeaders.release();
 }
 
 

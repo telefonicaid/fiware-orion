@@ -33,20 +33,10 @@
 #include <vector>
 #include <map>
 
-extern "C"
-{
-#include "kjson/kjson.h"
-}
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "common/MimeType.h"
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
 
 #include "rest/mhd.h"
-#include "rest/HttpHeaders.h"
 
 
 
@@ -74,10 +64,8 @@ public:
   std::vector<std::string>   urlCompV;
   RestService*               restServiceP;
   std::vector<std::string>   servicePathV;
-  HttpHeaders                httpHeaders;
   std::string                answer;
-
-  std::vector<std::string>             uriParamTypes;
+  std::vector<std::string>   uriParamTypes;
 
   bool                                      inCompoundValue;
   orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
