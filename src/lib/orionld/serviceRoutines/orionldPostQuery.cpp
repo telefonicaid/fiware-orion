@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/payloadCheck/pcheckQuery.h"                    // pcheckQuery
 #include "orionld/db/dbConfiguration.h"                          // dbEntitiesQuery
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -322,17 +323,14 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
   KjNode*  dbEntityArray;
 
+  LM_TMP(("KZ: orionldState.uriParams.count == %s", (orionldState.uriParams.count == true)? "true" : "false"));
   if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
   {
     // Not an error - just "nothing found" - return an empty array
     orionldState.responsePayload = (char*) "[]";
     if (countP != NULL)
-    {
-      char number[16];
+      orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, 0);
 
-      snprintf(number, sizeof(number), "%d", count);
-      httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-    }
     return true;
   }
 
@@ -365,12 +363,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   orionldState.httpStatusCode = 200;
 
   if (countP != NULL)
-  {
-    char number[16];
-
-    snprintf(number, sizeof(number), "%d", count);
-    httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   return true;
 }

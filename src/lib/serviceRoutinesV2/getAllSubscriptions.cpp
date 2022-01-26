@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "orionld/common/orionldState.h"        // orionldState
+#include "orionld/types/OrionldHeader.h"        // orionldHeaderAdd
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -80,10 +81,7 @@ std::string getAllSubscriptions
   }
 
   if (orionldState.uriParams.count)
-  {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(toString(count));
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpNgsiv2Count, NULL, count);
 
   std::string out;
   TIMED_RENDER(out = vectorToJson(subs));

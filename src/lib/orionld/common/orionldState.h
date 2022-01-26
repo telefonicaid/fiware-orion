@@ -52,6 +52,7 @@ extern "C"
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
@@ -192,17 +193,11 @@ typedef enum OrionldPhase
 typedef struct OrionldStateOut
 {
   // Outgoing HTTP headers
-  MimeType  contentType;
+  OrionldHeaderSet headers;
+  MimeType         contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
 
   // Errors
   char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
-
-#if 0
-  char*     httpHeaderV[10];    // Buffer to be used if less than 10 headers
-  char**    httpHeader;         // Points to httpHeaderV, reallocated if necessary
-  int       httpHeaderSize;     // Max number of headers (reallocation if necessary)
-  int       httpHeaderIx;       // Current index of 'httpHeader'
-#endif
 } OrionldStateOut;
 
 

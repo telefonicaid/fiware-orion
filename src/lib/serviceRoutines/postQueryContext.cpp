@@ -37,6 +37,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
@@ -337,11 +338,9 @@ std::string postQueryContext
   //
   if (((orionldState.apiVersion == V2) || (orionldState.apiVersion == NGSI_LD_V1)) && (countP != NULL))
   {
-    char cV[32];
+    OrionldHeaderType headerType = (orionldState.apiVersion == NGSI_LD_V1)? HttpResultsCount : HttpNgsiv2Count;
 
-    snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(cV);
+    orionldHeaderAdd(&orionldState.out.headers, headerType, NULL, *countP);
   }
 
 
