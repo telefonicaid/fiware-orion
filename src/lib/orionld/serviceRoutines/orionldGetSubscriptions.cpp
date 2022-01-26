@@ -35,8 +35,8 @@ extern "C"
 
 #include "common/string.h"                                     // toString
 #include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
@@ -49,7 +49,7 @@ extern "C"
 //
 // orionldGetSubscriptions -
 //
-bool orionldGetSubscriptions(ConnectionInfo* ciP)
+bool orionldGetSubscriptions(void)
 {
   std::vector<ngsiv2::Subscription> subVec;
   OrionError                        oe;

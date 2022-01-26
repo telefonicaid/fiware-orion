@@ -39,7 +39,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/globals.h"                                    // parse8601Time
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
@@ -123,7 +122,7 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 // From the spec:
 //   This operation allows creating a batch of NGSI-LD Entities, creating each of them if they don't exist.
 //
-bool orionldPostBatchCreate(ConnectionInfo* ciP)
+bool orionldPostBatchCreate(void)
 {
   // Error or not, the Link header should never be present in the reponse
   orionldState.noLinkHeader = true;

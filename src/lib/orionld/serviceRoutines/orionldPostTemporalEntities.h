@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldPostTemporalEntities -
 //
-extern bool orionldPostTemporalEntities(ConnectionInfo* ciP);
+extern bool orionldPostTemporalEntities(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTTEMPORALENTITIES_H_

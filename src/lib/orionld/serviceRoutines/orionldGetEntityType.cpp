@@ -32,8 +32,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
@@ -126,7 +124,7 @@ static void outAttrInfoAdd(KjNode* outAttrP, const char* attrType)
 //
 // FIXME: Only local types are taken into account, for now
 //
-bool orionldGetEntityType(ConnectionInfo* ciP)
+bool orionldGetEntityType(void)
 {
   OrionldProblemDetails  pd;
   int                    entities;

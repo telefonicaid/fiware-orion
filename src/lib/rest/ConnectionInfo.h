@@ -66,11 +66,6 @@ public:
   std::vector<std::string>   servicePathV;
   std::string                answer;
   std::vector<std::string>   uriParamTypes;
-
-  bool                                      inCompoundValue;
-  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
-  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
-  ::std::vector<orion::CompoundValueNode*>  compoundValueVector;
 };
 
 

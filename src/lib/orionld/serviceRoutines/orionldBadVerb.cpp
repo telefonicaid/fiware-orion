@@ -25,8 +25,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
@@ -40,7 +38,7 @@
 //
 // orionldBadVerb -
 //
-bool orionldBadVerb(ConnectionInfo* ciP)
+bool orionldBadVerb(void)
 {
   uint16_t  bitmask = 0;
 

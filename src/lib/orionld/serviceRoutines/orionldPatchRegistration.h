@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldPatchRegistration -
 //
-extern bool orionldPatchRegistration(ConnectionInfo* ciP);
+extern bool orionldPatchRegistration(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHREGISTRATION_H_

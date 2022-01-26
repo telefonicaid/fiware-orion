@@ -37,7 +37,6 @@ extern "C"
 #include "common/defaultValues.h"
 #include "common/string.h"                                    // toString
 #include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "rest/ConnectionInfo.h"                              // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldErrorResponse.h"              // orionldErrorResponseCreate
@@ -70,7 +69,7 @@ extern "C"
 // - offset
 // - options=count
 //
-bool orionldGetRegistrations(ConnectionInfo* ciP)
+bool orionldGetRegistrations(void)
 {
   std::vector<ngsiv2::Registration>  registrationVec;
   OrionError                         oe;

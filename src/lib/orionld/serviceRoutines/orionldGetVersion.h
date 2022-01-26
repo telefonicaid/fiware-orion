@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldGetVersion -
 //
-extern bool orionldGetVersion(ConnectionInfo* ciP);
+extern bool orionldGetVersion(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETVERSION_H_

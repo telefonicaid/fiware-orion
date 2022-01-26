@@ -36,7 +36,6 @@ extern "C"
 
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
@@ -77,7 +76,7 @@ extern "C"
 // * Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them
 // * For now, 'timeInterval' will not be implemented. If ever ...
 //
-bool orionldPostSubscriptions(ConnectionInfo* ciP)
+bool orionldPostSubscriptions(void)
 {
   ngsiv2::Subscription sub;
   std::string          subId;

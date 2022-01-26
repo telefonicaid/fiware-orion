@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                             // NULL
+
 #include "orionld/serviceRoutines/orionldPostEntities.h"
 #include "orionld/serviceRoutines/orionldPostNotify.h"
 #include "orionld/serviceRoutines/orionldPostEntity.h"

@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldGetEntityAttributes -
 //
-extern bool orionldGetEntityAttributes(ConnectionInfo* ciP);
+extern bool orionldGetEntityAttributes(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYATTRIBUTES_H_

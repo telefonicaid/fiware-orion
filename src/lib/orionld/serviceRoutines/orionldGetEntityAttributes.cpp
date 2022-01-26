@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
@@ -44,7 +42,7 @@ extern "C"
 //
 // orionldGetEntityAttributes -
 //
-bool orionldGetEntityAttributes(ConnectionInfo* ciP)
+bool orionldGetEntityAttributes(void)
 {
   OrionldProblemDetails  pd;
 

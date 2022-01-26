@@ -610,7 +610,7 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //   25. Cleanup
 //   26. DONE
 //
-MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
+MHD_Result orionldMhdConnectionTreat(void)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
@@ -768,7 +768,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Call the SERVICE ROUTINE
   //
   PERFORMANCE(serviceRoutineStart);
-  serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
+  serviceRoutineResult = orionldState.serviceP->serviceRoutine();
   PERFORMANCE(serviceRoutineEnd);
 
   //
@@ -924,9 +924,9 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   PERFORMANCE(restReplyStart);
 
   if (orionldState.responsePayload != NULL)
-    restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
+    restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
-    restReply(ciP, "");
+    restReply(NULL, "");
 
   PERFORMANCE(restReplyEnd);
 

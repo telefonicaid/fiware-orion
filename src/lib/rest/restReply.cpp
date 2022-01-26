@@ -78,7 +78,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   MHD_Response*  response;
 
   uint64_t     answerLen = answer.length();
-  const char*  spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
+  const char*  spath     = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
 
   ++replyIx;
   // LM_TMP(("Response %d: responding with %d bytes, Status Code %d: %s", replyIx, answerLen, orionldState.httpStatusCode, answer.c_str()));

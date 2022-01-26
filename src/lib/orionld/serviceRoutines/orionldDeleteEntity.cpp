@@ -28,8 +28,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
@@ -42,7 +40,7 @@
 //
 // orionldDeleteEntity -
 //
-bool orionldDeleteEntity(ConnectionInfo* ciP)
+bool orionldDeleteEntity(void)
 {
   char* entityId = orionldState.wildcard[0];
   char* detail;

@@ -34,7 +34,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
 #include "common/globals.h"                                     // parse8601Time
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
@@ -540,7 +539,7 @@ static void ngsildRegistrationPatch(KjNode* dbRegistrationP, KjNode* patchTree)
 //
 // orionldPatchRegistration -
 //
-bool orionldPatchRegistration(ConnectionInfo* ciP)
+bool orionldPatchRegistration(void)
 {
   char*    registrationId = orionldState.wildcard[0];
   KjNode*  propertyTree;

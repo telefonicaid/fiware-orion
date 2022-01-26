@@ -31,8 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
@@ -459,7 +457,7 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 // 6. Call dbSubscriptionReplace(char* subscriptionId, KjNode* subscriptionTree) to replace the old sub with the new
 //    Or, dbSubscriptionUpdate(char* subscriptionId, KjNode* toAddP, KjNode* toRemoveP, KjNode* toUpdate)
 //
-bool orionldPatchSubscription(ConnectionInfo* ciP)
+bool orionldPatchSubscription(void)
 {
   char* subscriptionId = orionldState.wildcard[0];
   char* detail;

@@ -271,7 +271,7 @@ void eatCompound
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(ValueTypeObject);
-    ciP->compoundValueRoot = containerP;
+    orionldState.compoundValueRoot = containerP;
   }
   else
   {
@@ -361,7 +361,7 @@ static std::string jsonParse
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
-    if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))
+    if ((nodeName != arrayElementName) || (orionldState.inCompoundValue == true))
     {
       path = path + "/" + nodeName;
     }

@@ -38,7 +38,6 @@ extern "C"
 #include "common/string.h"                                       // toLowercase
 #include "alarmMgr/alarmMgr.h"                                   // alarmMgr
 #include "rest/Verb.h"                                           // Verb
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/OrionError.h"                                     // OrionError
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
@@ -468,8 +467,8 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldErrorResponseCreate(OrionldBadRequestData, "invalid character in a URI parameter", key);
 
       alarmMgr.badInput(clientIp, details);
-      orionldState.httpStatusCode = 400;
-      orionldState.ciP->answer    = error.smartRender(orionldState.apiVersion);
+      orionldState.httpStatusCode  = 400;
+
       LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key, value));
       return MHD_YES;
     }
@@ -798,14 +797,14 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 // orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
 // orionldServiceLookup makes sure the URL supprts the verb
 //
-static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
+static OrionLdRestService* serviceLookup(void)
 {
   OrionLdRestService* serviceP;
 
   serviceP = orionldServiceLookup(&orionldRestServiceV[orionldState.verb]);
   if (serviceP == NULL)
   {
-    if (orionldBadVerb(ciP) == true)
+    if (orionldBadVerb() == true)
       orionldState.httpStatusCode = 405;  // SccBadVerb
     else
     {
@@ -870,19 +869,10 @@ MHD_Result orionldMhdConnectionInit
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
-  // 1. Prepare connectionInfo
-  //
-  ConnectionInfo* ciP = new ConnectionInfo();
-
-  // Remember ciP for consequent connection callbacks from MHD
-  *con_cls = ciP;
-
-  //
   // 2. Prepare orionldState
   //
   orionldStateInit(connection);
   orionldState.apiVersion  = NGSI_LD_V1;
-  orionldState.ciP         = ciP;
   orionldState.httpVersion = (char*) version;
 
   // IP Address and port of caller
@@ -936,7 +926,7 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // 4. GET Service Pointer from VERB and URL-PATH
-  orionldState.serviceP = serviceLookup(ciP);
+  orionldState.serviceP = serviceLookup();
 
   if (orionldState.serviceP == NULL)  // 405 or 404 - no need to continue - prettyPrint not possible here
     return MHD_YES;
@@ -1027,10 +1017,6 @@ MHD_Result orionldMhdConnectionInit
     orionldState.httpStatusCode  = 400;
     return MHD_YES;
   }
-
-  // Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
-  ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
-
 
   // Check that GET/DELETE has no payload
   // Check that POST/PUT/PATCH has payload

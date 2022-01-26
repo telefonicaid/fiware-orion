@@ -25,9 +25,6 @@
 *
 * Author: Larysse Savanna
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldPostBatchDelete -
 //
-extern bool orionldPostBatchDelete(ConnectionInfo* ciP);
+extern bool orionldPostBatchDelete(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_

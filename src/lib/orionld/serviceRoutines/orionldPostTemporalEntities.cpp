@@ -30,7 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "rest/ConnectionInfo.h"                                    // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                     // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                            // orionldState
@@ -86,7 +85,7 @@ extern "C"
 //
 // This request adds entries in the TRoE database for the entity urn:ngsi-ld:entities:E1 and all of its attrs and their sub-attrs
 //
-bool orionldPostTemporalEntities(ConnectionInfo* ciP)
+bool orionldPostTemporalEntities(void)
 {
   OBJECT_CHECK(orionldState.requestTree, "toplevel");
 

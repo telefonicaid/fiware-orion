@@ -33,7 +33,6 @@ extern "C"
 }
 
 #include "common/globals.h"                                    // parse8601Time
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -46,7 +45,7 @@ extern "C"
 //
 // orionldPostNotify -
 //
-bool orionldPostNotify(ConnectionInfo* ciP)
+bool orionldPostNotify(void)
 {
   KjNode* dataArray = kjLookup(orionldState.requestTree, "data");
 
@@ -75,5 +74,5 @@ bool orionldPostNotify(ConnectionInfo* ciP)
   orionldState.requestTree            = dataArray;
   orionldState.uriParamOptions.update = true;
 
-  return orionldPostBatchUpsert(ciP);
+  return orionldPostBatchUpsert();
 }

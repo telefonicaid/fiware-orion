@@ -22,7 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
@@ -34,7 +33,7 @@
 //
 // orionldNotImplemented -
 //
-bool orionldNotImplemented(ConnectionInfo* ciP)
+bool orionldNotImplemented(void)
 {
   orionldState.httpStatusCode = 501;
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests

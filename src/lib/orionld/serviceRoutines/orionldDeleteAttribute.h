@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldDeleteAttribute -
 //
-extern bool orionldDeleteAttribute(ConnectionInfo* ciP);
+extern bool orionldDeleteAttribute(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_

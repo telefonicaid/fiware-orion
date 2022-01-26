@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "rest/OrionError.h"                                   // OrionError
 #include "apiTypesV2/Registration.h"                           // Registration
@@ -47,7 +46,7 @@
 //
 // orionldPostRegistrations -
 //
-bool orionldPostRegistrations(ConnectionInfo* ciP)
+bool orionldPostRegistrations(void)
 {
   ngsiv2::Registration  reg;
   std::string           regId;

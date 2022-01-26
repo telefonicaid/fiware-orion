@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldNotImplemented -
 //
-extern bool orionldNotImplemented(ConnectionInfo* ciP);
+extern bool orionldNotImplemented(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDNOTIMPLEMENTED_H_

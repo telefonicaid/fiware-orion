@@ -33,7 +33,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -61,7 +60,7 @@ extern "C"
 //
 // orionldMhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
 //
-bool orionldPostContexts(ConnectionInfo* ciP)
+bool orionldPostContexts(void)
 {
   char* id;
   char* url;
