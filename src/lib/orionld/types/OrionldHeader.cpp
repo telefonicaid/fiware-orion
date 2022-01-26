@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                          // kaAlloc
+#include "kalloc/kaStrdup.h"                         // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                           // LM_*
@@ -117,9 +118,9 @@ bool orionldHeaderSetInit(OrionldHeaderSet* setP, int headers)
 //
 int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, char* sValue, int iValue)
 {
-  if (setP->ix >= setP->size - 1)  // Reallocation needed (add 3)
+  if (setP->ix >= setP->size)  // Reallocation needed (add 3)
   {
-    OrionldHeader* headerV = (OrionldHeader*) kaAlloc(&orionldState.kalloc, sizeof(OrionldHeader) * setP->size + 3);
+    OrionldHeader* headerV = (OrionldHeader*) kaAlloc(&orionldState.kalloc, sizeof(OrionldHeader) * (setP->size + 3));
 
     if (headerV == NULL)
       LM_RE(-1, ("Error allocating %d OrionldHeader items of %d bytes each", setP->size + 3, sizeof(OrionldHeader)));
@@ -150,7 +151,7 @@ int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, char* sValu
     snprintf(headerP->sValue, 30, "%d", headerP->iValue);
   }
   else
-    headerP->sValue = sValue;
+    headerP->sValue = kaStrdup(&orionldState.kalloc, sValue);
 
   setP->ix += 1;
 

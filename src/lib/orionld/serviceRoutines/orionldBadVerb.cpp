@@ -26,7 +26,9 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
@@ -68,8 +70,7 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   if (bitmask & (1 << DELETE)) strcat(allowValue, ",PATCH");
   if (bitmask & (1 << PATCH))  strcat(allowValue, ",DELETE");
 
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back(&allowValue[1]);  // Skipping first comma
+  orionldHeaderAdd(&orionldState.out.headers, HttpAllow, (char*) &allowValue[1], 0);  // Skipping first comma of 'allowValue'
 
   return true;
 }

@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/types/OrionldHeader.h"                        // orionldHeaderAdd
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -150,8 +151,7 @@ std::string postEntities
       location += "?type=none";
     }
 
-    ciP->httpHeader.push_back("Location");
-    ciP->httpHeaderValue.push_back(location);
+    orionldHeaderAdd(&orionldState.out.headers, HttpLocation, (char*) location.c_str(), 0);
     orionldState.httpStatusCode = sccCodeOnSuccess;
   }
 

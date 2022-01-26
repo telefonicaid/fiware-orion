@@ -429,7 +429,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   orionldState.httpStatusCode = 201;
 
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", entityId);
+  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId);
 
   if (cloneForTroeP != NULL)
     orionldState.requestTree = cloneForTroeP;

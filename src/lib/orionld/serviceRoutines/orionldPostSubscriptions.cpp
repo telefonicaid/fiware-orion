@@ -217,7 +217,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 
   orionldState.httpStatusCode = SccCreated;
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
+  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str());
 
   return true;
 }

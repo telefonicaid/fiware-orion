@@ -27,7 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "orionld/common/orionldState.h"            // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 
 #include "common/defaultValues.h"
 #include "common/statistics.h"
@@ -35,7 +36,6 @@
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/mongoRegistrationCreate.h"
@@ -101,9 +101,7 @@ std::string postRegistration
   {
     std::string location = "/v2/registrations/" + regId;
 
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-    ciP->httpHeaderValue.push_back(location);
-
+    orionldHeaderAdd(&orionldState.out.headers, HttpLocation, (char*) location.c_str(), 0);
     orionldState.httpStatusCode = SccCreated;
   }
 

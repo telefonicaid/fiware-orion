@@ -84,7 +84,7 @@ bool orionldPostContexts(ConnectionInfo* ciP)
   contextP->createdAt = orionldState.requestTime;
   contextP->usedAt    = orionldState.requestTime;
 
-  httpHeaderLocationAdd(ciP, contextP->url, NULL);
+  httpHeaderLocationAdd(contextP->url, NULL);
 
   orionldContextCachePersist(contextP);
   orionldState.httpStatusCode = 201;

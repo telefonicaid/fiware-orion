@@ -118,18 +118,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   //
   // Get the HTTP headers from orionldState.out.headers
   //
-  LM_TMP(("KZ: HTTP Headers in orionldState.out.headers:"));
   for (int ix = 0; ix < orionldState.out.headers.ix; ix++)
   {
     OrionldHeader* hP = &orionldState.out.headers.headerV[ix];
-    LM_TMP(("KZ: o %s=%s", orionldHeaderName[hP->type], hP->sValue));
-    MHD_add_response_header(response, orionldHeaderName[hP->type], hP->sValue);
-  }
 
-  // This construction (ciP->httpHeader) is no longer to be used (once orionldState.out.headers is fully implemented)
-  for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
-  {
-    MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
+    MHD_add_response_header(response, orionldHeaderName[hP->type], hP->sValue);
   }
 
   if (orionldState.apiVersion == NGSI_LD_V1)

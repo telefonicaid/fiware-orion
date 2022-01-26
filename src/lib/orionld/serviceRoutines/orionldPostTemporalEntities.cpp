@@ -140,7 +140,7 @@ bool orionldPostTemporalEntities(ConnectionInfo* ciP)
   if (troeOk == true)
   {
     if (httpStatusCode == 201)
-      httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/temporal/entities/", entityId);
+      httpHeaderLocationAdd("/ngsi-ld/v1/temporal/entities/", entityId);
 
     orionldState.httpStatusCode = httpStatusCode;
     return true;

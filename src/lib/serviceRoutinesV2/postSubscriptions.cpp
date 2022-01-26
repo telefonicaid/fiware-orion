@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoCreateSubscription.h"
 #include "ngsi/ParseData.h"
@@ -32,8 +35,6 @@
 #include "common/statistics.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
-#include "rest/HttpHeaders.h"                             // HTTP_*
-#include "orionld/common/orionldState.h"                  // orionldState
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -88,10 +89,9 @@ extern std::string postSubscriptions
   else
   {
     std::string location = "/v2/subscriptions/" + subsID;
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-    ciP->httpHeaderValue.push_back(location);
 
-    orionldState.httpStatusCode = SccCreated;
+    orionldHeaderAdd(&orionldState.out.headers, HttpLocation, (char*) location.c_str(), 0);
+    orionldState.httpStatusCode = 201;
   }
 
   return answer;

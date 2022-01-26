@@ -37,13 +37,11 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/payloadCheck/pcheckQuery.h"                    // pcheckQuery
 #include "orionld/db/dbConfiguration.h"                          // dbEntitiesQuery
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -323,7 +321,6 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
   KjNode*  dbEntityArray;
 
-  LM_TMP(("KZ: orionldState.uriParams.count == %s", (orionldState.uriParams.count == true)? "true" : "false"));
   if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
   {
     // Not an error - just "nothing found" - return an empty array

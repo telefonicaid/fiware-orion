@@ -47,18 +47,9 @@ class ConnectionInfo;
 
 // -----------------------------------------------------------------------------
 //
-// httpHeaderAdd -
-//
-extern void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value);
-
-
-
-#ifdef ORIONLD
-// -----------------------------------------------------------------------------
-//
 // httpHeaderLocationAdd -
 //
-extern void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId);
+extern void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId);
 
 
 
@@ -67,7 +58,6 @@ struct OrionldContext;
 //
 // httpHeaderLinkAdd -
 //
-extern void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url);
+extern void httpHeaderLinkAdd(const char* _url);
 
-#endif  // ORIONLD
 #endif  // SRC_LIB_REST_HTTPHEADERADD_H_

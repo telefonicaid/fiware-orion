@@ -163,13 +163,6 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.attrsFormat = (char*) "normalized";
   orionldState.correlator  = (char*) "";
 
-  // Outgoing HTTP headers
-#if 0
-  orionldState.out.httpHeader     = orionldState.out.httpHeaderV;
-  orionldState.out.httpHeaderSize = K_VEC_SIZE(orionldState.out.httpHeaderV);
-  orionldState.out.httpHeaderIx   = 0;
-#endif
-
   //
   // Outgoing HTTP headers
   //
