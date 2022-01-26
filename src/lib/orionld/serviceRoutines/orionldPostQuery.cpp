@@ -36,8 +36,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
@@ -296,7 +294,7 @@ KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pd
 //
 // POST /ngsi-ld/v1/entityOperations/query
 //
-bool orionldPostQuery(ConnectionInfo* ciP)
+bool orionldPostQuery(void)
 {
   if (orionldState.requestTree->type != KjObject)
   {

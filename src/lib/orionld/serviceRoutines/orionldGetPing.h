@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldGetPing -
 //
-extern bool orionldGetPing(ConnectionInfo* ciP);
+extern bool orionldGetPing(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETPING_H_

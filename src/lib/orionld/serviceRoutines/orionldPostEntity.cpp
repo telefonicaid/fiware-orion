@@ -42,7 +42,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "common/MimeType.h"                                     // MimeType
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
@@ -189,7 +188,7 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
 // 10. Call mongoBackend (mongoUpdateContext) to do the Update
 // 11. Prepare the response
 //
-bool orionldPostEntity(ConnectionInfo* ciP)
+bool orionldPostEntity(void)
 {
   bool  overwrite  = (orionldState.uriParamOptions.noOverwrite == true)? false : true;
   char* entityId   = orionldState.wildcard[0];

@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+#include <stdint.h>                     // types: uint32_t, ...
 
 
 
@@ -33,7 +33,7 @@
 //
 // OrionldServiceRoutine -
 //
-typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
+typedef bool (*OrionldServiceRoutine)(void);
 
 
 

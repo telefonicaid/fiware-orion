@@ -38,10 +38,7 @@
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
-  restServiceP           (NULL),
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL)
+  restServiceP           (NULL)
 {
 }
 
@@ -52,10 +49,7 @@ ConnectionInfo::ConnectionInfo():
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
-  restServiceP           (NULL),
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL)
+  restServiceP           (NULL)
 {
   orionldState.mhdConnection = _connection;
 
@@ -79,12 +73,6 @@ ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
 */
 ConnectionInfo::~ConnectionInfo()
 {
-  if (compoundValueRoot != NULL)
-  {
-    delete compoundValueRoot;
-    compoundValueRoot = NULL;
-  }
-
   servicePathV.clear();
 }
 

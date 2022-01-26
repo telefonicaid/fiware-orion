@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldDeleteContext -
 //
-extern bool orionldDeleteContext(ConnectionInfo* ciP);
+extern bool orionldDeleteContext(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETECONTEXT_H_

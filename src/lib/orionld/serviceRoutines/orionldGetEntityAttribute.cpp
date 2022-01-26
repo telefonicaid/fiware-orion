@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/db/dbEntityAttributesGet.h"                    // dbEntityAttributesGet
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
@@ -43,11 +41,11 @@ extern "C"
 //
 // orionldGetEntityAttribute -
 //
-bool orionldGetEntityAttribute(ConnectionInfo* ciP)
+bool orionldGetEntityAttribute(void)
 {
   OrionldProblemDetails  pd;
+  char*                  attrLongName = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[0], true, NULL);
 
-  char* attrLongName        = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[0], true, NULL);
   orionldState.responseTree = dbEntityAttributesGet(&pd, attrLongName, true);
 
   if (orionldState.responseTree == NULL)

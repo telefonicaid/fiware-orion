@@ -36,7 +36,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -158,7 +157,7 @@ static bool attributeCheck(KjNode* attrNodeP, char** titleP, char** detailP)
 //   Attribute includes a datasetId, only an Attribute instance with the same datasetId is replaced.
 //   In all other cases, the Attribute shall be ignored.
 //
-bool orionldPatchEntity(ConnectionInfo* ciP)
+bool orionldPatchEntity(void)
 {
   char* entityId   = orionldState.wildcard[0];
   char* detail;

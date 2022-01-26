@@ -37,7 +37,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
@@ -619,7 +618,7 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 // FIXME: Invent a new ServiceCharacteristics to NOT parse the payload and use it for orionldPatchAttribute
 // FIXME: Encapsulate the parsing of the payload and extraction of eventual @context payload member so it's easy to use from inside orionldPatchAttribute.
 //
-bool orionldPatchAttribute(ConnectionInfo* ciP)
+bool orionldPatchAttribute(void)
 {
   char*    entityId      = orionldState.wildcard[0];
   char*    attrName      = orionldState.wildcard[1];

@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldPostTemporalQuery -
 //
-extern bool orionldPostTemporalQuery(ConnectionInfo* ciP);
+extern bool orionldPostTemporalQuery(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTTEMPORALQUERY_H_

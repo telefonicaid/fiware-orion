@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldGetDbIndexes -
 //
-extern bool orionldGetDbIndexes(ConnectionInfo* ciP);
+extern bool orionldGetDbIndexes(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETDBINDEXES_H_

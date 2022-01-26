@@ -392,7 +392,7 @@ static void requestCompleted
   PERFORMANCE(requestCompletedStart);
 
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
-  const char*      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
+  const char*      spath    = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
 
   if (orionldState.notify == true)
@@ -454,7 +454,7 @@ static void requestCompleted
   //
   // Metrics
   //
-  if (metricsMgr.isOn())
+  if ((orionldState.apiVersion != NGSI_LD_V1) && (metricsMgr.isOn()))
     metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN, 1);
 
   //
@@ -462,11 +462,11 @@ static void requestCompleted
   //
   if (orionldState.httpStatusCode >= SccBadRequest)
   {
-    if (metricsMgr.isOn())
+    if ((orionldState.apiVersion != NGSI_LD_V1) && (metricsMgr.isOn()))
       metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
-  if (metricsMgr.isOn() && (orionldState.transactionStart.tv_sec != 0))
+  if ((orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn() && (orionldState.transactionStart.tv_sec != 0))
   {
     struct timeval  end;
 
@@ -488,7 +488,8 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  delete(ciP);
+  if (orionldState.apiVersion != NGSI_LD_V1)
+    delete(ciP);
 
   kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
 
@@ -1024,7 +1025,6 @@ ConnectionInfo* connectionTreatInit
     *retValP = MHD_NO;
     return NULL;
   }
-  orionldState.ciP = ciP;
 
   //
   // HTTP Headers
@@ -1285,6 +1285,8 @@ static MHD_Result connectionTreat
     {
       if (*con_cls == NULL)
       {
+        *con_cls = &cls;  // to "acknowledge" the first call
+
 #ifdef REQUEST_PERFORMANCE
         bzero(&timestamps, sizeof(timestamps));
         kTimeGet(&timestamps.reqStart);
@@ -1292,7 +1294,7 @@ static MHD_Result connectionTreat
         return orionldMhdConnectionInit(connection, url, method, version, con_cls);
       }
       else if (*upload_data_size != 0)
-        return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
+        return orionldMhdConnectionPayloadRead(upload_data_size, upload_data);
 
       // else ...
       //
@@ -1307,7 +1309,7 @@ static MHD_Result connectionTreat
       *upload_data_size = 0;
 
       // Then treat the request
-      return orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
+      return orionldMhdConnectionTreat();
     }
   }
 

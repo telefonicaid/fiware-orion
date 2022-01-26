@@ -38,7 +38,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/globals.h"                                    // parse8601Time
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
@@ -175,7 +174,7 @@ static KjNode* entityLookupInDb(KjNode* idTypeAndCreDateFromDb, const char* enti
 //   Replace:  All the existing Entity content shall be replaced  - like PUT
 //   Update:   Existing Entity content shall be updated           - like PATCH
 //
-bool orionldPostBatchUpsert(ConnectionInfo* ciP)
+bool orionldPostBatchUpsert(void)
 {
   // Error or not, the Link header should never be present in the reponse
   orionldState.noLinkHeader = true;

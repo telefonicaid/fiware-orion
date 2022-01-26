@@ -41,7 +41,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
@@ -412,7 +411,7 @@ static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[]
 // 5. Forward the GET /entities/{entityId} to all matching CPs and add the attributes to the entity
 // 6. Return the full entity
 //
-bool orionldGetEntity(ConnectionInfo* ciP)
+bool orionldGetEntity(void)
 {
   char*    detail;
   KjNode*  regArray = NULL;

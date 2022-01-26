@@ -43,6 +43,7 @@ extern "C"
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
+#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/QNode.h"                                // QNode
@@ -87,7 +88,6 @@ extern "C"
 // Forward declarations -
 //
 struct OrionLdRestService;
-struct ConnectionInfo;
 
 
 
@@ -247,7 +247,6 @@ typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
   MHD_Connection*         mhdConnection;
-  ConnectionInfo*         ciP;                    // To Be Removed
   struct timeval          transactionStart;       // For metrics
   struct timespec         timestamp;              // The time when the request entered
   double                  requestTime;            // Same same (timestamp), but at a floating point
@@ -389,6 +388,13 @@ typedef struct OrionldConnectionState
 
   // FIWARE Correlator
   char* correlator;
+
+  //
+  // Compounds
+  //
+  bool                                      inCompoundValue;
+  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
+  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
 
   //
   // Error Handling

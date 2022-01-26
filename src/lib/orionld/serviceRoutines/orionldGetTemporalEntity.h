@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldGetTemporalEntity -
 //
-extern bool orionldGetTemporalEntity(ConnectionInfo* ciP);
+extern bool orionldGetTemporalEntity(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETTEMPORALENTITY_H_

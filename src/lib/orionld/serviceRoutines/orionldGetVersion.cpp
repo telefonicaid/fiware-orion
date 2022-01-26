@@ -47,7 +47,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "serviceRoutines/versionTreat.h"                      // versionGet
 #include "cache/subCache.h"                                    // subCacheItems
 #include "orionld/common/pqHeader.h"                           // Postgres header
@@ -105,7 +104,7 @@ static void pgVersionToString(int version, char* versionString, int versionStrin
 //
 // orionldGetVersion -
 //
-bool orionldGetVersion(ConnectionInfo* ciP)
+bool orionldGetVersion(void)
 {
   KjNode*                  nodeP;
   char                     mhdVersion[32];

@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "common/globals.h"                                      // noCache
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
 
@@ -41,7 +40,7 @@
 //
 // orionldDeleteSubscription -
 //
-bool orionldDeleteSubscription(ConnectionInfo* ciP)
+bool orionldDeleteSubscription(void)
 {
   char* detail;
 

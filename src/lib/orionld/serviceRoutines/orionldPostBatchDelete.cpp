@@ -32,7 +32,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 
@@ -54,7 +53,7 @@ extern "C"
 // This function receives an array of entity ids as parameter and performs the batch delete operation.
 // It will remove a set of entities from the database.
 //
-bool orionldPostBatchDelete(ConnectionInfo* ciP)
+bool orionldPostBatchDelete(void)
 {
   KjNode* success  = kjArray(orionldState.kjsonP, "success");
   KjNode* errors   = kjArray(orionldState.kjsonP, "errors");

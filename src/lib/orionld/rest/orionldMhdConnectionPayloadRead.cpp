@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"      // Own interface
 
@@ -51,7 +49,6 @@ extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 */
 MHD_Result orionldMhdConnectionPayloadRead
 (
-  ConnectionInfo*  ciP,
   size_t*          upload_data_size,
   const char*      upload_data
 )

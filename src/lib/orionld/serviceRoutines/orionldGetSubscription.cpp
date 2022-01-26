@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -38,7 +37,7 @@
 //
 // orionldGetSubscription -
 //
-bool orionldGetSubscription(ConnectionInfo* ciP)
+bool orionldGetSubscription(void)
 {
   ngsiv2::Subscription  subscription;
   char*                 details;

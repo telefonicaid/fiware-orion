@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,7 +34,6 @@
 */
 extern MHD_Result orionldMhdConnectionPayloadRead
 (
-  ConnectionInfo*  ciP,
   size_t*          upload_data_size,
   const char*      upload_data
 );

@@ -37,9 +37,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/HttpStatusCode.h"                                 // SccContextElementNotFound
-
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -81,7 +78,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
       return false;
     }
 
-    orionldState.httpStatusCode = SccNoContent;
+    orionldState.httpStatusCode = 204;
 
     return true;
   }
@@ -152,7 +149,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
     dbEntityFieldDelete(entityId, datasetPath);
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
   return true;
 }
 
@@ -162,7 +159,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 //
 // orionldDeleteAttribute -
 //
-bool orionldDeleteAttribute(ConnectionInfo* ciP)
+bool orionldDeleteAttribute(void)
 {
   char*    entityId = orionldState.wildcard[0];
   char*    attrName = orionldState.wildcard[1];
@@ -187,7 +184,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - not a URI)", entityId));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include name (entityId) and value ($entityId)
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -198,7 +195,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   {
     LM_W(("Bad Input (Invalid Attribute Name (%s): %s)", attrName, detail));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Attribute Name", detail);  // FIXME: Include name (entityId) and value ($entityId)
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -266,6 +263,6 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     return false;
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
   return true;
 }

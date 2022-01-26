@@ -31,7 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
@@ -47,7 +46,7 @@ extern "C"
 //
 // orionldDeleteContext -
 //
-bool orionldDeleteContext(ConnectionInfo* ciP)
+bool orionldDeleteContext(void)
 {
   char*            id          = orionldState.wildcard[0];
   OrionldContext*  oldContextP = orionldContextCacheLookup(id);

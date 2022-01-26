@@ -24,7 +24,6 @@
 */
 #include "logMsg/logMsg.h"
 
-#include "rest/ConnectionInfo.h"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
@@ -36,7 +35,7 @@
 //
 // orionldPostTemporalQuery -
 //
-bool orionldPostTemporalQuery(ConnectionInfo* ciP)
+bool orionldPostTemporalQuery(void)
 {
   orionldState.httpStatusCode = 501;
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests

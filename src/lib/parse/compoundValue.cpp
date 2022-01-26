@@ -51,15 +51,21 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   LM_T(LmtCompoundValue, ("Compound END"));
 
   // Finish the compound value - error check included
-  std::string status = ciP->compoundValueRoot->finish();
+  std::string status = orionldState.compoundValueRoot->finish();
 
   // Any problems in 'finish'?
   // If so, mark as erroneous
   if (status != "OK")
   {
     orionldState.httpStatusCode = SccBadRequest;
-    ciP->answer = std::string("compound value error: ") + status;
-    alarmMgr.badInput(clientIp, ciP->answer);
+
+    if (orionldState.apiVersion == NGSI_LD_V1)
+      orionldState.responsePayload = (char*) "{\"ERROR\": \"in compoundValueEnd\"}";
+    else
+    {
+      ciP->answer = std::string("compound value error: ") + status;
+      alarmMgr.badInput(clientIp, ciP->answer);
+    }
   }
 
   //
@@ -70,7 +76,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   //
 
   LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p",
-                          ciP->compoundValueRoot,
+                          orionldState.compoundValueRoot,
                           parseDataP->lastContextAttribute));
 
   //
@@ -78,24 +84,24 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // ContextAttribute to point to by lastContextAttribute, as the whole payload
   // is a part of a ContextAttribute.
   //
-  RequestType requestType = ciP->restServiceP->request;
+  RequestType requestType = (orionldState.apiVersion != NGSI_LD_V1)? ciP->restServiceP->request : NoRequest;
   
   if ((requestType == AttributeValueInstance)                           ||
       (requestType == AttributeValueInstanceWithTypeAndId)              ||
       (requestType == IndividualContextEntityAttribute)                 ||
       (requestType == IndividualContextEntityAttributeWithTypeAndId))
   {
-    parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
+    parseDataP->upcar.res.compoundValueP = orionldState.compoundValueRoot;
   }
   else
   {
-    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
+    parseDataP->lastContextAttribute->compoundValueP = orionldState.compoundValueRoot;
   }
 
-  // Reset the Compound stuff in ConnectionInfo
-  ciP->compoundValueRoot = NULL;
-  ciP->compoundValueP    = NULL;
-  LM_T(LmtCompoundValueContainer, ("Set current container to NULL"));
-  ciP->inCompoundValue   = false;
+  // Reset the Compound stuff in orionldState
+  orionldState.compoundValueRoot = NULL;
+  orionldState.compoundValueP    = NULL;
+  orionldState.inCompoundValue   = false;
 }
+
 }

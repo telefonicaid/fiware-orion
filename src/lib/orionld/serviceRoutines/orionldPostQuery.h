@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldPostQuery -
 //
-extern bool orionldPostQuery(ConnectionInfo* ciP);
+extern bool orionldPostQuery(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTQUERY_H_

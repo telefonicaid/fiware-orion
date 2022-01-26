@@ -31,7 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -46,7 +45,7 @@ extern "C"
 //
 // orionldGetContexts -
 //
-bool orionldGetContexts(ConnectionInfo* ciP)
+bool orionldGetContexts(void)
 {
   if (orionldState.uriParams.location == true)
   {

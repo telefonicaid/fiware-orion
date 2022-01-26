@@ -255,13 +255,13 @@ std::string jsonTreat
     return answer;
   }
 
-  if (ciP->inCompoundValue == true)
+  if (orionldState.inCompoundValue == true)
   {
     orion::compoundValueEnd(ciP, parseDataP);
   }
-  if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+  if ((lmTraceIsSet(LmtCompoundValueShow)) && (orionldState.compoundValueP != NULL))
   {
-    ciP->compoundValueP->shortShow("after parse: ");
+    orionldState.compoundValueP->shortShow("after parse: ");
   }
 
   res = reqP->check(parseDataP, ciP);

@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldGetSubscriptions -
 //
-extern bool orionldGetSubscriptions(ConnectionInfo* ciP);
+extern bool orionldGetSubscriptions(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETSUBSCRIPTIONS_H_

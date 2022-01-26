@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldDeleteRegistration -
 //
-extern bool orionldDeleteRegistration(ConnectionInfo* ciP);
+extern bool orionldDeleteRegistration(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_

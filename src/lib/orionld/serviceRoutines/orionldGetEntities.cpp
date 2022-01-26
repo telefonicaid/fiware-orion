@@ -39,7 +39,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi10/QueryContextRequest.h"                        // QueryContextRequest
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
@@ -119,7 +118,7 @@ static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPro
 // Note that the pagination params (limit, offset) make no sense when returning a single entity.
 // 'attrs' is a different deal though. 'attrs' will filter the attributes to be returned.
 //
-bool orionldGetEntities(ConnectionInfo* ciP)
+bool orionldGetEntities(void)
 {
   char*                 id             = orionldState.uriParams.id;
   char*                 type           = orionldState.uriParams.type;
@@ -175,7 +174,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //
     // If the entity id found, it is added to the array
     //
-    if (orionldGetEntity(ciP) == true)
+    if (orionldGetEntity() == true)
     {
       KjNode* entityP = orionldState.responseTree;
 
