@@ -446,7 +446,7 @@ typedef struct Timestamps
   int             getMongoConnectionCalls;
 } Timestamps;
 
-extern __thread Timestamps timestamps;
+extern __thread Timestamps performanceTimestamps;
 #endif
 
 
