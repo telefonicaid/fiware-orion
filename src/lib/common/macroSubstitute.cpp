@@ -45,14 +45,14 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
       continue;
     }
 
-    bool isDateType = vec[ix]->type == DATE_TYPE? true : false;
-
     if (vec[ix]->valueType == orion::ValueTypeString)
     {
       *valueP = vec[ix]->stringValue;
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
+      bool isDateType = ((vec[ix]->type == DATE_TYPE) || (vec[ix]->type == DATE_TYPE_ALT))? true : false;
+
       if (isDateType)
       {
         *valueP = isodate2str(vec[ix]->numberValue);
