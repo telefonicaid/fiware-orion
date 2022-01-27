@@ -455,31 +455,26 @@ static void requestCompleted
   // Metrics
   //
   if ((orionldState.apiVersion != NGSI_LD_V1) && (metricsMgr.isOn()))
+  {
     metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN, 1);
 
-  //
-  // If the httpStatusCode is above the set of 200s, an error has occurred
-  //
-  if (orionldState.httpStatusCode >= SccBadRequest)
-  {
-    if ((orionldState.apiVersion != NGSI_LD_V1) && (metricsMgr.isOn()))
+    if (orionldState.httpStatusCode >= 400)
       metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
-  }
 
-  if ((orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn() && (orionldState.transactionStart.tv_sec != 0))
-  {
-    struct timeval  end;
-
-    if (gettimeofday(&end, NULL) == 0)
+    if (orionldState.transactionStart.tv_sec != 0)
     {
-      unsigned long long elapsed =
-        (end.tv_sec  - orionldState.transactionStart.tv_sec) * 1000000 +
-        (end.tv_usec - orionldState.transactionStart.tv_usec);
+      struct timeval  end;
 
-      metricsMgr.add(orionldState.tenantP->tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      if (gettimeofday(&end, NULL) == 0)
+      {
+        unsigned long long elapsed =
+          (end.tv_sec  - orionldState.transactionStart.tv_sec) * 1000000 +
+          (end.tv_usec - orionldState.transactionStart.tv_usec);
+
+        metricsMgr.add(orionldState.tenantP->tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+      }
     }
   }
-
 
   //
   // delayed release of ContextElementResponseVector must be effectuated now.
@@ -1058,7 +1053,7 @@ ConnectionInfo* connectionTreatInit
     // However, tests have shown that the broker hangs if the response is delayed until later calls ...
     //
     //
-    restReply(ciP, ciP->answer);  // to not hang on too big payloads
+    restReply(ciP, ciP->answer.c_str());  // to not hang on too big payloads
     return ciP;
   }
 
@@ -1139,7 +1134,7 @@ ConnectionInfo* connectionTreatInit
 
     restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
     orionldState.httpStatusCode  = SccContentLengthRequired;
-    restReply(ciP, errorMsg);  // OK to respond as no payload
+    restReply(ciP, errorMsg.c_str());  // OK to respond as no payload
     alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (orionldState.badVerb == true)
@@ -1276,41 +1271,30 @@ static MHD_Result connectionTreat
   // NGSI-LD requests implement a different URL parsing algorithm, a different payload parse algorithm, etc.
   // A complete new set of functions are used for NGSI-LD, so ...
   //
-  if (url[5] == '-')  // URL indicates an /ngsi-ld request
+  if (strncmp(url, "/ngsi-ld/", 9) == 0)
   {
-    //
-    // Seems like an NGSI-LD request, but, let's make sure
-    //
-    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[5] == '-') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/'))
+    if (*con_cls == NULL)
     {
-      if (*con_cls == NULL)
-      {
-        *con_cls = &cls;  // to "acknowledge" the first call
+      *con_cls = &cls;  // to "acknowledge" the first call
 
 #ifdef REQUEST_PERFORMANCE
         bzero(&performanceTimestamps, sizeof(performanceTimestamps));
         kTimeGet(&performanceTimestamps.reqStart);
 #endif
-        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
-      }
-      else if (*upload_data_size != 0)
-        return orionldMhdConnectionPayloadRead(upload_data_size, upload_data);
-
-      // else ...
-      //
-      // The entire message has been read, we're allowed to respond.
-      //
-      // If any error has been encountered during stage I and II (init + payload-read), then orionldState.httpStatusCode has been set to != SccOk (200)
-      // and, optionally a payload tree hangs under ciP->response.
-      // No need to call the stage III function if this is the case.
-      //
-
-      // Mark the request as "finished", by setting upload_data_size to 0
-      *upload_data_size = 0;
-
-      // Then treat the request
-      return orionldMhdConnectionTreat();
+      return orionldMhdConnectionInit(connection, url, method, version, con_cls);
     }
+    else if (*upload_data_size != 0)
+      return orionldMhdConnectionPayloadRead(upload_data_size, upload_data);
+
+    //
+    // The entire message has been read, we're allowed to respond.
+    //
+
+    // Mark the request as "finished", by setting upload_data_size to 0
+    *upload_data_size = 0;
+
+    // Then treat the request
+    return orionldMhdConnectionTreat();
   }
 
   //
@@ -1410,7 +1394,7 @@ static MHD_Result connectionTreat
   {
     // An error has occurred. Here we are ready to respond, as all data has been read
     // However, if badVerb, then the service routine needs to execute to add the "Allow" HTTP header
-    restReply(ciP, ciP->answer);
+    restReply(ciP, ciP->answer.c_str());
     return MHD_YES;
   }
 
@@ -1438,7 +1422,7 @@ static MHD_Result connectionTreat
 
     orionldState.httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, orionldState.out.acceptErrorDetail);
-    restReply(ciP, oe.smartRender(orionldState.apiVersion));
+    restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
 
@@ -1457,7 +1441,7 @@ static MHD_Result connectionTreat
 
     orionldState.httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
-    restReply(ciP, oe.smartRender(orionldState.apiVersion));
+    restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
 
@@ -1472,7 +1456,7 @@ static MHD_Result connectionTreat
 
     orionldState.httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.details);
-    restReply(ciP, oe.smartRender(orionldState.apiVersion));
+    restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
 
@@ -1487,7 +1471,7 @@ static MHD_Result connectionTreat
 
     orionldState.httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
-    restReply(ciP, oe.smartRender(orionldState.apiVersion));
+    restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
 
     return MHD_YES;
   }
@@ -1499,7 +1483,7 @@ static MHD_Result connectionTreat
   if (ciP->answer != "")
   {
     alarmMgr.badInput(clientIp, ciP->answer);
-    restReply(ciP, ciP->answer);
+    restReply(ciP, ciP->answer.c_str());
 
     return MHD_YES;
   }
@@ -1518,7 +1502,7 @@ static MHD_Result connectionTreat
       ciP->answer = "";
     }
 
-    restReply(ciP, ciP->answer);
+    restReply(ciP, ciP->answer.c_str());
   }
   else
   {

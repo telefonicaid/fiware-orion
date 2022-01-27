@@ -78,11 +78,11 @@ bool MetricsManager::serviceValid(const char* srv)
 *
 * MetricsManager::subServiceValid - 
 */
-bool MetricsManager::subServiceValid(const std::string& subsrv)
+bool MetricsManager::subServiceValid(const char* subsrv)
 {
   ConnectionInfo ci;
 
-  if (servicePathCheck(&ci, subsrv.c_str()) != 0)
+  if (servicePathCheck(&ci, subsrv) != 0)
   {
     return false;
   }
@@ -173,15 +173,15 @@ int64_t MetricsManager::semWaitTimeGet(void)
 *   spathIn:       original service path (input)
 *   subServiceP    pointer to resulting service path (output)
 */
-bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::string* subServiceP)
+bool MetricsManager::servicePathForMetrics(const char* spathIn, std::string* subServiceP)
 {
-  if (spathIn == "")
+  if (spathIn == NULL)
   {
     *subServiceP = "";
     return true;
   }
 
-  char* spath  = strdup(spathIn.c_str());
+  char* spath  = strdup(spathIn);
   char* toFree = spath;
 
   if (subServiceValid(spath) == false)

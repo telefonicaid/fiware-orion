@@ -36,7 +36,7 @@
 *
 * restReply - 
 */
-extern void restReply(ConnectionInfo* ciP, const std::string& answer);
+extern void restReply(ConnectionInfo* ciP, const char* answer);
 
 
 
