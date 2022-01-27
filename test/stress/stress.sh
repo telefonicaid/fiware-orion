@@ -96,7 +96,7 @@ done
 #
 # Making sure the test case file is A-OK
 #
-if [ $testCase == "" ]
+if [ $testCase == "/X" ]
 then
     echo "Please supply a test file for the stress test"
     usage
