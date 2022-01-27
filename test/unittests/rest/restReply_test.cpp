@@ -57,7 +57,7 @@ TEST(restReply, MHD_create_response_from_data_error)
     memset(answer, 'x', TEST_SIZE - 1);
     answer[TEST_SIZE - 1] = 0;
 
-    restReply(&ci, answer);
+    restReply(&ci, answer.c_str());
     free(answer);
   }
 

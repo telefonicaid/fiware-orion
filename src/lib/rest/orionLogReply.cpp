@@ -45,7 +45,7 @@ std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const st
    out += '}';
 
    orionldState.httpStatusCode = SccOk;
-   restReply(ciP, out);
+   restReply(ciP, out.c_str());
 
    return out;
 }

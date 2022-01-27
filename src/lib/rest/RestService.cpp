@@ -211,9 +211,7 @@ std::string payloadParse
   }
 
   if (result != "OK")
-  {
-    restReply(ciP, result);
-  }
+    restReply(ciP, result.c_str());
 
   return result;
 }
@@ -539,7 +537,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     orionldState.httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
-    restReply(ciP, response);
+    restReply(ciP, response.c_str());
 
     return std::string("Empty URL");
   }
@@ -552,7 +550,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       alarmMgr.badInput(clientIp, oe.details);
       orionldState.httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.smartRender(orionldState.apiVersion));
+      restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
       return "URL PATH component error";
     }
   }
@@ -571,7 +569,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     if (response != "OK")
     {
       alarmMgr.badInput(clientIp, response);
-      restReply(ciP, response);
+      restReply(ciP, response.c_str());
 
       if (jsonReqP != NULL)
         jsonReqP->release(&parseData);
@@ -608,7 +606,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     alarmMgr.badInput(clientIp, result);
 
-    restReply(ciP, response);
+    restReply(ciP, response.c_str());
 
     if (jsonReqP != NULL)
     {
@@ -653,7 +651,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     orionExitFunction(0, "Received a 'DIE' request on REST interface");
   }
 
-  restReply(ciP, response);
+  restReply(ciP, response.c_str());
   return response;
 }
 
