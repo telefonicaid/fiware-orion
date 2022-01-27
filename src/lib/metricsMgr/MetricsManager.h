@@ -132,8 +132,8 @@ class MetricsManager
   void            _reset(void);
   std::string     _toJson(void);
   bool            serviceValid(const char* srv);
-  bool            subServiceValid(const std::string& subsrv);
-  bool            servicePathForMetrics(const std::string& spath, std::string* subServiceP);
+  bool            subServiceValid(const char* subsrv);
+  bool            servicePathForMetrics(const char* spath, std::string* subServiceP);
 
  public:
   MetricsManager();
