@@ -69,7 +69,7 @@ __thread OrionldConnectionState orionldState;
 // timestamps -
 //
 #ifdef REQUEST_PERFORMANCE
-__thread Timestamps timestamps;
+__thread Timestamps performanceTimestamps;
 #endif
 
 
