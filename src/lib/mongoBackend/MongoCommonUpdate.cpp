@@ -3459,13 +3459,6 @@ static unsigned int updateEntity
         }
         *attributeNotExistingList += eP->attributeVector[ix]->name;
       }
-      else
-      {
-        *attributeNotExistingError = false;
-        std::string details = "attribute partially updated";
-        buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-        responseP->oe.fill(SccMultiStatus, details, ERROR_UNPROCESSABLE);
-      }
     }
     *attributeNotExistingList += " ]";
   }
