@@ -70,7 +70,7 @@ extern "C"
 #include "orionld/common/orionldTenantGet.h"                   // orionldTenantGet
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*
+#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*, performanceTimestamps
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
@@ -425,11 +425,11 @@ DBClientBase* getMongoConnection(void)
   //
   // Accumulate
   //
-  ++timestamps.getMongoConnectionCalls;
+  ++performanceTimestamps.getMongoConnectionCalls;
 
   kTimeDiff(&start, &end, &diff, &fDiff);
 
-  timestamps.mongoConnectAccumulated += fDiff;
+  performanceTimestamps.mongoConnectAccumulated += fDiff;
   return connectionP;
 #else
   return mongoPoolConnectionGet();

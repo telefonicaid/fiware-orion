@@ -157,12 +157,15 @@ bool orionldGetEntities(void)
   if ((id != NULL) && (strchr(id, ',') == NULL))
   {
     //
-    // The entity 'id' is given, so we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
+    // Only ONE entity 'id' is given, so ...
+    // we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
     //
     orionldState.wildcard[0] = id;
 
     //
-    // An array must be returned
+    // An array must be returned from GET /entities.
+    // GET /entities/{entityId} returns just the entity as an object, so we need to create an array here
+    // and put the entity inside the array vefore returning the array.
     //
     KjNode* arrayP  = kjArray(orionldState.kjsonP, NULL);
 
@@ -172,19 +175,18 @@ bool orionldGetEntities(void)
     // * return true even if orionldGetEntity returns false
     // * change the 404 to a 200
     //
-    // If the entity id found, it is added to the array
+    // If the entity is found, it is added to the array
     //
     if (orionldGetEntity() == true)
     {
-      KjNode* entityP = orionldState.responseTree;
-
-      entityP->next             = NULL;
-      arrayP->value.firstChildP = entityP;
+      KjNode* entityP             = orionldState.responseTree;
+      entityP->next               = NULL;
+      arrayP->value.firstChildP   = entityP;
     }
     else
-      orionldState.httpStatusCode = 200;  // Overwrite the 404 from orionldGetEntity
+      orionldState.httpStatusCode = 200;  // Overwrite the 404 from orionldGetEntity (it's 200 OK to find nothing in a Query)
 
-    orionldState.responseTree = arrayP;
+    orionldState.responseTree     = arrayP;
     return true;
   }
 

@@ -43,9 +43,9 @@ extern "C"
 //
 // PERFORMANCE -
 //
-#define PERFORMANCE(timeField)            \
-do {                                      \
-  kTimeGet(&timestamps.timeField);        \
+#define PERFORMANCE(timeField)                \
+do {                                          \
+  kTimeGet(&performanceTimestamps.timeField); \
 } while (0)
 
 
@@ -54,10 +54,10 @@ do {                                      \
 //
 // PERFORMANCE_BEGIN -
 //
-#define PERFORMANCE_BEGIN(ix, desc)       \
-do {                                      \
-  timestamps.srDesc[ix] = (char*) desc;   \
-  kTimeGet(&timestamps.srStart[ix]);      \
+#define PERFORMANCE_BEGIN(ix, desc)                  \
+do {                                                 \
+  performanceTimestamps.srDesc[ix] = (char*) desc;   \
+  kTimeGet(&performanceTimestamps.srStart[ix]);      \
 } while (0)
 
 
@@ -68,11 +68,11 @@ do {                                      \
 //
 // Possibility to change the description, in case the measure ends in a different path (error)
 //
-#define PERFORMANCE_END(ix, desc)         \
-do {                                      \
-  kTimeGet(&timestamps.srEnd[ix]);        \
-  if (desc != NULL)                       \
-    timestamps.srDesc[ix] = (char*) desc; \
+#define PERFORMANCE_END(ix, desc)                    \
+do {                                                 \
+  kTimeGet(&performanceTimestamps.srEnd[ix]);        \
+  if (desc != NULL)                                  \
+    performanceTimestamps.srDesc[ix] = (char*) desc; \
 } while (0)
 
 #else

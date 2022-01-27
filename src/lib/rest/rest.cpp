@@ -501,29 +501,29 @@ static void requestCompleted
   ++reqNo;
 
 #ifdef REQUEST_PERFORMANCE
-  if (reqNo % 100 == 0)
+  // if (reqNo % 100 == 0)
   {
     PERFORMANCE(reqEnd);
 
-    TIME_REPORT(timestamps.reqStart,            timestamps.serviceRoutineStart,    "Before Service Routine:    ");
-    TIME_REPORT(timestamps.serviceRoutineStart, timestamps.serviceRoutineEnd,      "During Service Routine:    ");
-    TIME_REPORT(timestamps.serviceRoutineEnd,   timestamps.reqEnd,                 "After Service Routine:     ");
-    TIME_REPORT(timestamps.parseStart,          timestamps.parseEnd,               "Payload Parse:             ");
-    TIME_REPORT(timestamps.renderStart,         timestamps.renderEnd,              "Rendering Response:        ");
-    TIME_REPORT(timestamps.restReplyStart,      timestamps.restReplyEnd,           "Sending Response:          ");
-    TIME_REPORT(timestamps.forwardStart,        timestamps.forwardEnd,             "Forwarding:                ");
-    TIME_REPORT(timestamps.forwardDbStart,      timestamps.forwardDbEnd,           "DB Query for Forwarding:   ");
-    TIME_REPORT(timestamps.reqStart,            timestamps.reqEnd,                 "Entire request:            ");
-    TIME_REPORT(timestamps.troeStart,           timestamps.troeEnd,                "TRoE Processing:           ");
-    TIME_REPORT(timestamps.requestPartEnd,      timestamps.requestCompletedStart,  "MHD Delay (send response): ");
+    TIME_REPORT(performanceTimestamps.reqStart,            performanceTimestamps.serviceRoutineStart,    "Before Service Routine:    ");
+    TIME_REPORT(performanceTimestamps.serviceRoutineStart, performanceTimestamps.serviceRoutineEnd,      "During Service Routine:    ");
+    TIME_REPORT(performanceTimestamps.serviceRoutineEnd,   performanceTimestamps.reqEnd,                 "After Service Routine:     ");
+    TIME_REPORT(performanceTimestamps.parseStart,          performanceTimestamps.parseEnd,               "Payload Parse:             ");
+    TIME_REPORT(performanceTimestamps.renderStart,         performanceTimestamps.renderEnd,              "Rendering Response:        ");
+    TIME_REPORT(performanceTimestamps.restReplyStart,      performanceTimestamps.restReplyEnd,           "Sending Response:          ");
+    TIME_REPORT(performanceTimestamps.forwardStart,        performanceTimestamps.forwardEnd,             "Forwarding:                ");
+    TIME_REPORT(performanceTimestamps.forwardDbStart,      performanceTimestamps.forwardDbEnd,           "DB Query for Forwarding:   ");
+    TIME_REPORT(performanceTimestamps.reqStart,            performanceTimestamps.reqEnd,                 "Entire request:            ");
+    TIME_REPORT(performanceTimestamps.troeStart,           performanceTimestamps.troeEnd,                "TRoE Processing:           ");
+    TIME_REPORT(performanceTimestamps.requestPartEnd,      performanceTimestamps.requestCompletedStart,  "MHD Delay (send response): ");
 
-    TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting DB:               ");
-    TIME_REPORT(timestamps.mongoBackendStart,   timestamps.mongoBackendEnd,        "Awaiting MongoBackend:     ");
+    TIME_REPORT(performanceTimestamps.dbStart,             performanceTimestamps.dbEnd,                  "Awaiting DB:               ");
+    TIME_REPORT(performanceTimestamps.mongoBackendStart,   performanceTimestamps.mongoBackendEnd,        "Awaiting MongoBackend:     ");
 
     for (int ix = 0; ix < 50; ix++)
     {
-      if (timestamps.srDesc[ix] != NULL)
-        TIME_REPORT(timestamps.srStart[ix], timestamps.srEnd[ix], timestamps.srDesc[ix]);
+      if (performanceTimestamps.srDesc[ix] != NULL)
+        TIME_REPORT(performanceTimestamps.srStart[ix], performanceTimestamps.srEnd[ix], performanceTimestamps.srDesc[ix]);
     }
 
     struct timespec  all;
@@ -531,15 +531,15 @@ static void requestCompleted
     float            mongoF;
     float            allF;
 
-    kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
+    kTimeDiff(&performanceTimestamps.reqStart, &performanceTimestamps.reqEnd, &all,   &allF);
 
-    if (timestamps.dbStart.tv_sec != 0)
-      kTimeDiff(&timestamps.dbStart,           &timestamps.dbEnd,           &mongo, &mongoF);
+    if (performanceTimestamps.dbStart.tv_sec != 0)
+      kTimeDiff(&performanceTimestamps.dbStart,           &performanceTimestamps.dbEnd,           &mongo, &mongoF);
     else
-      kTimeDiff(&timestamps.mongoBackendStart, &timestamps.mongoBackendEnd, &mongo, &mongoF);
+      kTimeDiff(&performanceTimestamps.mongoBackendStart, &performanceTimestamps.mongoBackendEnd, &mongo, &mongoF);
 
     LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
-    LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", timestamps.mongoConnectAccumulated, timestamps.getMongoConnectionCalls));
+    LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
   }
 #endif
 }
@@ -1288,8 +1288,8 @@ static MHD_Result connectionTreat
         *con_cls = &cls;  // to "acknowledge" the first call
 
 #ifdef REQUEST_PERFORMANCE
-        bzero(&timestamps, sizeof(timestamps));
-        kTimeGet(&timestamps.reqStart);
+        bzero(&performanceTimestamps, sizeof(performanceTimestamps));
+        kTimeGet(&performanceTimestamps.reqStart);
 #endif
         return orionldMhdConnectionInit(connection, url, method, version, con_cls);
       }
