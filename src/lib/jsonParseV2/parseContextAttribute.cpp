@@ -153,8 +153,8 @@ static std::string parseContextAttributeObject
     }
     else  // ERROR
     {
-      LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
-      return "unrecognized property for context attribute";
+      alarmMgr.badInput(clientIp, "JSON parse error");
+      return "JSON parse error in context attribute";
     }
   }
 
