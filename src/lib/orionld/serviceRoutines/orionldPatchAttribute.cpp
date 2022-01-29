@@ -731,7 +731,7 @@ static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP,
   //
   // 2. Set the valueNodeName according to the value of the type KjNode
   //
-  char* valueNodeName;
+  char* valueNodeName = NULL;
   if      (strcmp(typeP->value.s, "Property")     == 0) valueNodeName = (char*) "value";
   else if (strcmp(typeP->value.s, "GeoProperty")  == 0) valueNodeName = (char*) "value";
   else if (strcmp(typeP->value.s, "Relationship") == 0) valueNodeName = (char*) "object";
@@ -742,6 +742,7 @@ static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP,
       LM_W(("Bad Input (invalid value of attribute type '%s')", typeP->value.s));
       orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of attribute type", typeP->value.s);
+      return NULL;
     }
     else
     {
