@@ -621,6 +621,14 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
+  if ((orionldState.in.contentLength > 0) && ((orionldState.verb != POST) && (orionldState.verb != PATCH)))
+  {
+    LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb));
+    orionldState.httpStatusCode = 400;
+    goto respond;
+  }
+
   //
   // Any URI param given but not supported?
   //

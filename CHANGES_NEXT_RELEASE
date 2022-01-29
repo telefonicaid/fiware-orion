@@ -1,6 +1,7 @@
-* Issue #280   Preparations for the complete removal of ConnectionInfo (Refactor + Performance)
-* Issue #954   Broker crashes with too big attribute values (Orion-LD limit for an attribute value is 64k right now)
+* Issue #280   Complete removal of ConnectionInfo (Refactor + Performance)
+* Issue #954   Broker crashes with too big attribute values (Orion-LD's limit for the size of an attribute value is 64k right now)
 * Issue #986   Username and Password for the mongo C driver connection to the MongoDB server
 * Issue #990   mongo::Timestamp support
 * Issue #989   Deprecated bson_append_symbol still in use - change for bson_append_utf8
-* Issue #992   100% reliable implementation of existence check of entities (mongoEntityExists)
+* Issue #992   More reliable (100% I'd say) implementation of existence check of entities (mongoEntityExists)
+* Issue #127   Implemented keyValues support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}

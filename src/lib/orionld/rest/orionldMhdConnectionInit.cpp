@@ -539,7 +539,6 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     }
 
     orionldState.uriParams.limit = atoi(value);
-
     if (orionldState.uriParams.limit > 1000)
     {
       LM_W(("Bad Input (too big value for /limit/ URI param: %d - max allowed is 1000)", orionldState.uriParams.limit));
@@ -764,6 +763,21 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     if (strcmp(value, "object") == 0)
       orionldState.in.attributeFormatAsObject = true;
   }
+  else if (strcmp(key, "relationships") == 0)
+  {
+    orionldState.uriParams.relationships   = (char*) value;
+    orionldState.uriParams.mask           |= ORIONLD_URIPARAM_RELATIONSHIPS;
+  }
+  else if (strcmp(key, "geoproperties") == 0)
+  {
+    orionldState.uriParams.geoproperties   = (char*) value;
+    orionldState.uriParams.mask           |= ORIONLD_URIPARAM_GEOPROPERTIES;
+  }
+  else if (strcmp(key, "languageproperties") == 0)
+  {
+    orionldState.uriParams.languageproperties  = (char*) value;
+    orionldState.uriParams.mask               |= ORIONLD_URIPARAM_LANGUAGEPROPERTIES;
+  }
   else if (strcmp(key, "reset") == 0)
   {
     if (strcmp(value, "true") == 0)
@@ -865,8 +879,8 @@ MHD_Result orionldMhdConnectionInit
 {
   ++requestNo;
 
-  if ((requestNo % 100 == 0) || (requestNo == 1))
-    LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  // if ((requestNo % 100 == 0) || (requestNo == 1))
+  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 2. Prepare orionldState
@@ -1031,7 +1045,7 @@ MHD_Result orionldMhdConnectionInit
   {
     if ((orionldState.in.contentType != JSON) && (orionldState.in.contentType != JSONLD))
     {
-      LM_W(("Bad Input (invalid Content-Type: '%s'", mimeTypeToString(orionldState.in.contentType)));
+      LM_W(("Bad Input (invalid Content-Type: '%s')", orionldState.in.contentTypeString));
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported");
