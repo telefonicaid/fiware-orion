@@ -276,8 +276,8 @@ bool orionldGetEntities(void)
       return false;
     }
 
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
-    std::string  errorString;
+    Scope*  scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    char*   errorString;
 
     //
     // In APIv2, the vector is a string without [], in NGSI-LD, [] are present. Must remove ...
@@ -297,7 +297,7 @@ bool orionldGetEntities(void)
       delete scopeP;
 
       LM_E(("Geo: Scope::fill failed"));
-      orionldErrorResponseCreate(OrionldInternalError, "Invalid Geometry", errorString.c_str());
+      orionldErrorResponseCreate(OrionldInternalError, "Invalid Geometry", errorString);
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }

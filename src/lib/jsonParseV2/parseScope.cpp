@@ -51,9 +51,9 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
   // get value georel as a list of strings
   // get value geometry as a string
   // get coords as a list of pairs of numbers
-  std::string georelS;
-  std::string geometryS;
-  std::string coordsS;
+  std::string georel;
+  std::string geometry;
+  std::string coords;
 
   rapidjson::Value::ConstMemberIterator iter;
   for (iter = valueP->value.MemberBegin(); iter != valueP->value.MemberEnd(); ++iter)
@@ -90,7 +90,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
         return "invalid JSON type for geometry (must be string)";
       }
 
-      geometryS = iter->value.GetString();
+      geometry = (char*) iter->value.GetString().c_str();
     }
     else if (name == "coords")
     {
@@ -125,15 +125,15 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
           return "invalid JSON type for geometry (must be string)";
         }
 
-        // Adding coord
-        char buf[STRING_SIZE_FOR_DOUBLE * 2 + 2];
+        // Adding coords
+        char buf[STRING_SIZE_FOR_DOUBLE * 2 + 2 + 2];
 
-        snprintf(buf, sizeof(buf), "%f,%f", x->GetDouble(), y->GetDouble());
-        coordsS += buf;
+        snprintf(buf, sizeof(buf) - 2, "%f,%f", x->GetDouble(), y->GetDouble());
+        coords = buf;
 
         if (iter2 != iter->value.End() - 1)
         {
-          coordsS += ";";
+          coords += ";";
         }
       }
     }
@@ -143,7 +143,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
     }
   }
 
-  std::string result;
+  char* result;
   scopeP->fill(V2, geometryS, coordsS, georelS, &result);
 
   return result;
