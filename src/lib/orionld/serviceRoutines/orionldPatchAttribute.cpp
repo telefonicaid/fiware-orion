@@ -69,12 +69,12 @@ extern "C"
 //
 // DB_ERROR -
 //
-#define DB_ERROR(title, detail)                                       \
+#define DB_ERROR(r, title, detail)                                    \
 do {                                                                  \
   LM_E(("Database Error: %s: %s", title, detail));                    \
   orionldState.httpStatusCode = 500;                                  \
   orionldErrorResponseCreate(OrionldInternalError, title, detail);    \
-  return false;                                                       \
+  return r;                                                           \
 } while (0)
 
 
@@ -135,7 +135,12 @@ bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, cha
     nodeP->value.f = orionldState.requestTime;
   else
   {
-    // This should not happen
+    //
+    // This should not happen!
+    //
+    // If modifiedAt is not found in the database, we have a bug.
+    // These two lines fix the bug, but ... prior GET operations would be erroneous, as modifiedAs isn't present
+    //
     nodeP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbInstanceP, nodeP);
   }
@@ -345,7 +350,34 @@ static bool kjTreeToMetadataValue(Metadata* metadataP, KjNode* valueP)
 
 // -----------------------------------------------------------------------------
 //
-// orionldForwardPatchAttribute
+// headersForForwardedRequest -
+//
+static void headersForForwardedRequest(OrionldHttpHeader* headerV, int headerMax)
+{
+  int header = 0;
+
+  if (orionldState.tenantP != &tenant0)
+  {
+    headerV[header].type  = HttpHeaderTenant;
+    headerV[header].value = orionldState.tenantP->tenant;
+    ++header;
+  }
+
+  if ((orionldState.in.servicePath != NULL) && (orionldState.in.servicePath[0] != 0))
+  {
+    headerV[header].type  = HttpHeaderPath;
+    headerV[header].value = orionldState.in.servicePath;
+    ++header;
+  }
+
+  headerV[header].type = HttpHeaderNone;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldForwardPatchAttribute -
 //
 static bool orionldForwardPatchAttribute
 (
@@ -423,32 +455,33 @@ static bool orionldForwardPatchAttribute
   // Prepare HTTP headers
   //
   OrionldHttpHeader headerV[5];
-  int               header = 0;
+  char              link[512];
+  char*             linkP = NULL;
 
-  if (orionldState.tenantP != &tenant0)
-  {
-    headerV[header].type  = HttpHeaderTenant;
-    headerV[header].value = orionldState.tenantP->tenant;
-    ++header;
-  }
-
-  if ((orionldState.in.servicePath != NULL) && (orionldState.in.servicePath[0] != 0))
-  {
-    headerV[header].type  = HttpHeaderPath;
-    headerV[header].value = orionldState.in.servicePath;
-    ++header;
-  }
-  headerV[header].type = HttpHeaderNone;
+  headersForForwardedRequest(headerV, 5);
 
   if (orionldState.linkHttpHeaderPresent)
   {
-    char link[512];
-
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.in.payloadCopy, payloadLen, headerV);
+    linkP = link;
   }
-  else
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.in.payloadCopy, payloadLen, headerV);
+
+  reqOk = orionldRequestSend(&orionldState.httpResponse,
+                             protocol,
+                             host,
+                             port,
+                             "PATCH",
+                             uriPath,
+                             5000,
+                             linkP,
+                             &detail,
+                             &tryAgain,
+                             &downloadFailed,
+                             NULL,
+                             contentType,
+                             orionldState.in.payloadCopy,
+                             payloadLen,
+                             headerV);
 
   if (reqOk == false)
   {
@@ -576,6 +609,264 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldAttributeType - move to src/lib/orionld/types
+//
+typedef enum OrionldAttributeType
+{
+  Property,
+  Relationship,
+  GeoProperty,
+  LanguageProperty
+} OrionldAttributeType;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// isHit -
+//
+inline bool isHit(char* list, const char* item, int itemLen)
+{
+  if (list == NULL)
+    return false;
+
+  char* hit = strstr(list, item);
+
+  if (hit != NULL)  // Make sure it's really a hit
+  {
+    if ((hit[itemLen] == 0) || (hit[itemLen] == ','))
+      return true;
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attributeTypeFromUriParam -
+//
+OrionldAttributeType attributeTypeFromUriParam(const char* attrShortName)
+{
+  int attrShortNameLen = strlen(attrShortName);
+
+  if (isHit(orionldState.uriParams.relationships,      attrShortName, attrShortNameLen) == true)    return Relationship;
+  if (isHit(orionldState.uriParams.geoproperties,      attrShortName, attrShortNameLen) == true)    return GeoProperty;
+  if (isHit(orionldState.uriParams.languageproperties, attrShortName, attrShortNameLen) == true)    return LanguageProperty;
+
+  return Property;
+}
+
+static const char* attributeTypeString[] = { "Property", "Relationship", "GeoProperty", "LanguageProperty" };
+
+
+// -----------------------------------------------------------------------------
+//
+// kjKeyValueTransformAttribute -
+//
+// INPUT:
+// {
+//   "value": "xxx",  (OR "object" OR "lang" OR ...)
+//   "P1": 1,
+//   "R1": "urn:..."
+// }
+//
+// OUTPUT:
+// {
+//   "value/object/...": "xxx",
+//   "P1": { "type": "Property", "value": 1 },
+//   "R1": { "type": "Relationship", "object": "urn:..." }
+// }
+//
+// If "type" is not given (it is a PATCH operation, so, not necessary), it is looked up in the database.
+// We need to know the type, to know whether next we're interested in "value" or "object", or ...
+//
+// [ "type" CAN ONLY be present in the payload body if it is the same as what is found in the database. ]
+//
+static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP, KjNode** dbAttributeTypePP)
+{
+  KjNode*  typeP;
+  KjNode*  valueP;
+  KjNode*  outTreeP = kjObject(orionldState.kjsonP, attrP->name);
+
+  //
+  // 1. Look up "type", remove it from the tree and add it to the output tree "outTreeP"
+  // 2. Set the valueNodeName according to the value of the type KjNode
+  // 3. Look up value/object/..., remove it from the tree and add it to "outTreeP"
+  // 4. Go over all sub-attrs, transform them into "non-keyValues" and add to "outTreeP"
+  //
+
+  //
+  // 1. Look up "type", remove it from the tree and add it to the output tree "outTreeP"
+  //
+  // If not present, we get it from the DB
+  // We need to know the type, to know whether next we're interested in "value" or "object", or ...
+  //
+  bool typeInPayloadBody = true;
+  typeP = kjLookup(attrP, "type");
+  if (typeP != NULL)
+  {
+    kjChildRemove(attrP, typeP);
+  }
+  else
+  {
+    typeP = kjLookup(dbAttributeP, "type");
+    *dbAttributeTypePP = typeP;
+    if (typeP == NULL)
+    {
+      LM_E(("Database Error (no type field found in the attribute '%s' of an entity)", attrP->name));
+      orionldState.httpStatusCode = 500;
+      orionldErrorResponseCreate(OrionldInternalError, "no type field found for an attribute", attrP->name);
+      return NULL;
+    }
+    typeInPayloadBody = false;
+    kjChildRemove(dbAttributeP, typeP);
+  }
+  kjChildAdd(outTreeP, typeP);
+
+
+  //
+  // 2. Set the valueNodeName according to the value of the type KjNode
+  //
+  char* valueNodeName = NULL;
+  if      (strcmp(typeP->value.s, "Property")     == 0) valueNodeName = (char*) "value";
+  else if (strcmp(typeP->value.s, "GeoProperty")  == 0) valueNodeName = (char*) "value";
+  else if (strcmp(typeP->value.s, "Relationship") == 0) valueNodeName = (char*) "object";
+  else
+  {
+    if (typeInPayloadBody == true)
+    {
+      LM_W(("Bad Input (invalid value of attribute type '%s')", typeP->value.s));
+      orionldState.httpStatusCode = 400;
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of attribute type", typeP->value.s);
+      return NULL;
+    }
+    else
+    {
+      LM_E(("Database Error (invalid value of attribute type '%s')", typeP->value.s));
+      orionldState.httpStatusCode = 500;
+      orionldErrorResponseCreate(OrionldInternalError, "Invalid value of attribute type", typeP->value.s);
+      return NULL;
+    }
+  }
+
+  //
+  // 3. Look up value/object/..., remove it from the tree and add it to "outTreeP"
+  //
+  // Not Present?
+  // That's OK - this is a PATCH operation ... right ... ?
+  //
+  valueP = kjLookup(attrP, valueNodeName);
+  if (valueP != NULL)
+  {
+    kjChildRemove(attrP, valueP);
+    kjChildAdd(outTreeP, valueP);
+  }
+
+  //
+  // 4. Go over all sub-attrs and transform them into "non-keyValues"
+  //    Need a while-loop and a next pointer as the loop moves nodeP around
+  //
+  KjNode* nodeP = attrP->value.firstChildP;
+  KjNode* next;
+  while (nodeP != NULL)
+  {
+    next = nodeP->next;
+    kjChildRemove(attrP, nodeP);
+
+    KjNode*              objectP       = kjObject(orionldState.kjsonP, nodeP->name);
+    OrionldAttributeType attributeType = attributeTypeFromUriParam(nodeP->name);
+
+    //
+    // Check the JSON type is OK fore the attribute type.
+    // Relationship must be string, LanguageProp must be Object, ...
+    //
+    if (attributeType == Relationship)
+    {
+      if (nodeP->type != KjString)
+      {
+        LM_W(("Bad Input (Relationship attributes must be strings)"));
+        orionldState.httpStatusCode = 400;
+        orionldErrorResponseCreate(OrionldBadRequestData, "Relationship attributes must be strings", nodeP->name);
+        return NULL;
+      }
+    }
+    else if (attributeType == GeoProperty)
+    {
+      if (nodeP->type != KjObject)
+      {
+        LM_W(("Bad Input (GeoProperty attributes must be objects)"));
+        orionldState.httpStatusCode = 400;
+        orionldErrorResponseCreate(OrionldBadRequestData, "GeoProperty attributes must be objects", nodeP->name);
+        return NULL;
+      }
+    }
+    else if (attributeType == LanguageProperty)
+    {
+      if (nodeP->type != KjObject)
+      {
+        LM_W(("Bad Input (LanguageProperty attributes must be objects)"));
+        orionldState.httpStatusCode = 400;
+        orionldErrorResponseCreate(OrionldBadRequestData, "LanguageProperty attributes must be objects", nodeP->name);
+        return NULL;
+      }
+    }
+
+    nodeP->name = (attributeType == Relationship)? (char*) "object" : (char*) "value";
+    kjChildAdd(objectP, nodeP);
+
+    // Add the type
+    KjNode* typeP = kjString(orionldState.kjsonP, "type", attributeTypeString[attributeType]);
+    kjChildAdd(objectP, typeP);
+
+    // Add sub-attr to outgoing tree
+    kjChildAdd(outTreeP, objectP);
+
+    // Next!
+    nodeP = next;
+  }
+
+  return outTreeP;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// attributeFromDb -
+//
+static KjNode* attributeFromDb(char* entityId, char* attrName, char* attrNameExpanded, char* attrNameExpandedEq)
+{
+  KjNode* dbEntityP = dbEntityAttributeLookup(entityId, attrNameExpanded);
+
+  if (dbEntityP == NULL)
+  {
+    char pair[1024];
+
+    snprintf(pair, sizeof(pair), "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpandedEq);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", pair);
+    return NULL;
+  }
+
+  // Get "attrs" member of the DB entity
+  KjNode* dbAttrs = kjLookup(dbEntityP, "attrs");
+  if (dbAttrs == NULL)
+    DB_ERROR(NULL, "Database Error (entity field not found)", "attrs");
+
+
+  // Get the attribute named attrNameExpandedEq from the "attrs" field of the DB Entity
+  KjNode* dbAttributeP = kjLookup(dbAttrs, attrNameExpandedEq);
+  if (dbAttributeP == NULL)
+    DB_ERROR(NULL, "Database Error (attribute not found)", attrNameExpandedEq);
+
+  return dbAttributeP;
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -584,11 +875,11 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 // 1.  Check wildcards for validity (entity ID + attribute name) + remove ev. builtins from payload body
 // 2.  Query registrations and forward message if found
 // 3.  Lookup 'datasetId' in inAttribute - if found, enter datasetId function
-// 4.  GET the attribute from the DB (dbAttribute)
+// 4.  GET the attribute from the DB (dbAttributeP)
 // 5.  404 if not found in DB
-// 6.  Extract type and createdAt from dbAttribute
+// 6.  Extract type and createdAt from dbAttributeP
 // 7.  Check that inAttribute is OK (especially the attribute type)
-// 8.  Merge dbAttribute into inAttribute
+// 8.  Merge dbAttributeP into inAttribute
 // 9.  Convert merged inAttribute into a ContextElement
 // 10. DELETE the attribute from the DB
 // 11. Call mongoBackend
@@ -620,10 +911,13 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 //
 bool orionldPatchAttribute(void)
 {
-  char*    entityId      = orionldState.wildcard[0];
-  char*    attrName      = orionldState.wildcard[1];
-  KjNode*  inAttribute   = orionldState.requestTree;
+  char*    entityId             = orionldState.wildcard[0];
+  char*    attrName             = orionldState.wildcard[1];
+  KjNode*  inAttribute          = orionldState.requestTree;
+  KjNode*  dbAttributeP         = NULL;
+  KjNode*  dbAttributeTypeNodeP = NULL;
   char*    detail;
+  KjNode*  nodeP;
 
   //
   // 1.1 Make sure the ID (orionldState.wildcard[0]) is a valid URI
@@ -649,8 +943,6 @@ bool orionldPatchAttribute(void)
   //
   // 1.3 If createdAt or modifiedAt are found in the incoming payload body - remove them
   //
-  KjNode* nodeP;
-
   nodeP = kjLookup(inAttribute, "createdAt");
   if (nodeP != NULL)
     kjChildRemove(inAttribute, nodeP);
@@ -661,10 +953,30 @@ bool orionldPatchAttribute(void)
 
 
   char* attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
+  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
+  dotForEq(attrNameExpandedEq);
+
+  //
+  // 1.4 If keyValues is set, modify the tree accordingly (add objects for all sub-attributes with "type" and "value")
+  //
+  if (orionldState.uriParamOptions.keyValues == true)
+  {
+    // Need info from DB for this (attribute type)
+    dbAttributeP = attributeFromDb(entityId, attrName, attrNameExpanded, attrNameExpandedEq);
+    if (dbAttributeP == NULL)
+      return false;
+
+    inAttribute = kjKeyValueTransformAttribute(inAttribute, dbAttributeP, &dbAttributeTypeNodeP);
+    if (inAttribute == NULL)
+    {
+      LM_E(("kjKeyValueTransformAttribute failed"));
+      return false;
+    }
+  }
 
 
   //
-  // 2. Query registrations and forward message if found - let forward-receiver check the validity
+  // 2. Query registrations and forward message if found - let the forward-receiver check the validity
   //
   if (forwarding)
   {
@@ -689,9 +1001,6 @@ bool orionldPatchAttribute(void)
   }
 
 
-  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
-  dotForEq(attrNameExpandedEq);
-
   //
   // 3. Lookup 'datasetId' in inAttribute - if found, enter datasetId function
   //
@@ -705,44 +1014,32 @@ bool orionldPatchAttribute(void)
   }
 
   //
-  // 4. GET the attribute from the DB (dbAttribute)
-  // 5. 404 if not found in DB
+  // 4. GET the attribute from the DB (dbAttributeP)
   //
-  KjNode* dbEntityP = dbEntityAttributeLookup(entityId, attrNameExpanded);
-  if (dbEntityP == NULL)
+  if (dbAttributeP == NULL)
   {
-    char pair[1024];
+    dbAttributeP = attributeFromDb(entityId, attrName, attrNameExpanded, attrNameExpandedEq);
 
-    snprintf(pair, sizeof(pair), "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpandedEq);
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", pair);
-    return false;
+    if (dbAttributeP == NULL)
+      return false;
   }
 
-  // Get "attrs" member of the DB entity
-  KjNode* dbAttrs = kjLookup(dbEntityP, "attrs");
-  if (dbAttrs == NULL)
-    DB_ERROR("Database Error (entity field not found)", "attrs");
-
-
-  // Get the attribute named attrNameExpandedEq from the "attrs" field of the DB Entity
-  KjNode* dbAttribute = kjLookup(dbAttrs, attrNameExpandedEq);
-  if (dbAttribute == NULL)
-    DB_ERROR("Database Error (attribute not found)", attrNameExpandedEq);
-
 
   //
-  // 6. Extract type and createdAt from dbAttribute
+  // 6. Extract createdAt and type from dbAttributeP
   //
-  KjNode* dbAttributeType = kjLookup(dbAttribute, "type");
-  if (dbAttributeType == NULL)
-    DB_ERROR("Database Error (attribute member not found)", "type");
-  kjChildRemove(dbAttribute, dbAttributeType);
-
-  KjNode* dbCreatedAt = kjLookup(dbAttribute, "creDate");
+  KjNode* dbCreatedAt = kjLookup(dbAttributeP, "creDate");
   if (dbCreatedAt == NULL)
-    DB_ERROR("Database Error (attribute member not found)", "creDate");
-  kjChildRemove(dbAttribute, dbCreatedAt);
+    DB_ERROR(false, "Database Error (attribute member not found)", "creDate");
+  kjChildRemove(dbAttributeP, dbCreatedAt);
+
+  if (dbAttributeTypeNodeP == NULL)  // If not already extracted from dbAttributeP as key-values is set
+  {
+    dbAttributeTypeNodeP = kjLookup(dbAttributeP, "type");
+    if (dbAttributeTypeNodeP == NULL)
+      DB_ERROR(false, "Database Error (attribute member not found)", "type");
+    kjChildRemove(dbAttributeP, dbAttributeTypeNodeP);
+  }
 
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
@@ -758,9 +1055,9 @@ bool orionldPatchAttribute(void)
       return false;
     }
 
-    if (strcmp(inType->value.s, dbAttributeType->value.s) != 0)
+    if (strcmp(inType->value.s, dbAttributeTypeNodeP->value.s) != 0)
     {
-      LM_W(("Bad Input (input attribute type differs from the one in the database - '%s' vs '%s')", inType->value.s, dbAttributeType->value.s));
+      LM_W(("Bad Input (input attribute type differs from the one in the database - '%s' vs '%s')", inType->value.s, dbAttributeTypeNodeP->value.s));
       orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Attribute Type", "attribute type cannot be modified");
       return false;
@@ -773,7 +1070,7 @@ bool orionldPatchAttribute(void)
     saP->name = orionldSubAttributeExpand(orionldState.contextP, saP->name, true, NULL);
   }
 
-  if (pcheckAttribute(inAttribute, dbAttributeType->value.s, false, &detail) == false)
+  if (pcheckAttribute(inAttribute, dbAttributeTypeNodeP->value.s, false, &detail) == false)
   {
     LM_W(("Bad Input (invalid attribute - %s)", detail));
     orionldState.httpStatusCode = 400;
@@ -793,7 +1090,7 @@ bool orionldPatchAttribute(void)
 
     if (inType == NULL)  // No attribute type present in the incoming payload body
     {
-      KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", dbAttributeType->value.s);
+      KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", dbAttributeTypeNodeP->value.s);
 
       kjChildAdd(troeTree, typeNodeP);
     }
@@ -803,9 +1100,9 @@ bool orionldPatchAttribute(void)
 
 
   //
-  // 8. Merge dbAttribute into inAttribute
+  // 8. Merge dbAttributeP into inAttribute
   //
-  kjAttributeMerge(inAttribute, dbAttribute, dbAttributeType, inType, dbCreatedAt);
+  kjAttributeMerge(inAttribute, dbAttributeP, dbAttributeTypeNodeP, inType, dbCreatedAt);
 
 
   //
@@ -827,7 +1124,7 @@ bool orionldPatchAttribute(void)
   ContextElement*        ceP = new ContextElement();
 
   ceP->entityId.id = entityId;
-  // GET entity type from dbEntityP::_id::type ?
+
   ceP->entityId.servicePath = "/";
 
   // Add ceP to ucr

@@ -285,7 +285,11 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchAttribute)
   {
-    serviceP->options |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_RELATIONSHIPS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTIES;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LANGUAGEPROPERTIES;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
