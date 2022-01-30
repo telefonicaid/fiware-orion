@@ -140,6 +140,10 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_URL                  (1 << 27)
 #define ORIONLD_URIPARAM_RELOAD               (1 << 28)
 #define ORIONLD_URIPARAM_NOTEXISTS            (1 << 29)
+#define ORIONLD_URIPARAM_RELATIONSHIPS        (1 << 30)
+#define ORIONLD_URIPARAM_GEOPROPERTIES        (1 << 31)
+#define ORIONLD_URIPARAM_LANGUAGEPROPERTIES   (1UL << 32)
+
 
 
 // -----------------------------------------------------------------------------
@@ -164,7 +168,7 @@ typedef struct OrionLdRestService
   char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
   int                    matchForSecondWildcardLen;     // strlen of last path to match
   uint32_t               options;                       // Peculiarities of this type of requests (bitmask)
-  uint32_t               uriParams;                     // Supported URI parameters (bitmask)
+  uint64_t               uriParams;                     // Supported URI parameters (bitmask)
 } OrionLdRestService;
 
 

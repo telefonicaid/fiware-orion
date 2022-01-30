@@ -143,7 +143,6 @@ typedef struct OrionldUriParams
   char*     timeAt;
   char*     endTimeAt;
   bool      details;
-  uint32_t  mask;
   bool      prettyPrint;
   int       spaces;
   char*     subscriptionId;
@@ -158,6 +157,10 @@ typedef struct OrionldUriParams
   bool      reset;
   char*     attributeFormat;
   char*     level;
+  char*     relationships;
+  char*     geoproperties;
+  char*     languageproperties;
+  uint64_t  mask;
 } OrionldUriParams;
 
 
