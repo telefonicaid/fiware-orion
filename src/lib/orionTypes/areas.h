@@ -172,7 +172,7 @@ public:
   Georel();
 
   void         fill(Georel* georelP);
-  int          parse(const char* in, std::string* errorString);
+  int          parse(const char* in, char** errorStringP);
 
   std::string  type;
   double       maxDistance;
@@ -189,7 +189,7 @@ class Geometry
 {
 public:
   Geometry();
-  int          parse(ApiVersion apiVersion, const char* in, std::string* errorString);
+  int          parse(ApiVersion apiVersion, const char* in, char** errorStringP);
 
   std::string  areaType;
   float        radius;

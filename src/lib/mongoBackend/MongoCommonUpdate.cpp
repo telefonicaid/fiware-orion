@@ -2194,10 +2194,10 @@ static bool processSubscriptions
      * (Issue #2396 should solve that) */
     if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
     {
-      Scope        geoScope;
-      std::string  filterErr;
+      Scope  geoScope;
+      char*  filterErr;
 
-      if (geoScope.fill(V2, tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
+      if (geoScope.fill(V2, tSubP->expression.geometry.c_str(), tSubP->expression.coords.c_str(), tSubP->expression.georel.c_str(), &filterErr) != 0)
       {
         // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
         // this part.
@@ -2205,7 +2205,7 @@ static bool processSubscriptions
         // (Probably the whole if clause will disapear when the missing part of #1705 gets implemented,
         // moving geo-stuff strings to a filter object in TriggeredSubscription class
 
-        LM_E(("Runtime Error (code cannot reach this point, error: %s)", filterErr.c_str()));
+        LM_E(("Runtime Error (code cannot reach this point, error: %s)", filterErr));
         continue;
       }
 
@@ -2227,8 +2227,9 @@ static bool processSubscriptions
       std::string  sp      = notifyCerP->contextElement.entityId.servicePath;
       BSONObj      query   = BSON(keyId << id << keyType << type << keySp << sp << keyLoc << areaFilter);
 
-      unsigned long long n;
-      if (!collectionCount(tenantP->entities, query, &n, &filterErr))
+      unsigned long long  n;
+      std::string         error;
+      if (!collectionCount(tenantP->entities, query, &n, &error))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;

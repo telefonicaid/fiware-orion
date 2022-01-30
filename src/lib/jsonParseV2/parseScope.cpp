@@ -76,10 +76,10 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
           return "only JSON Strings allowed in geometry list";
         }
 
-        georelS += iter2->GetString();
+        georel += iter2->GetString();
         if (iter2 != iter->value.End() - 1)
         {
-          georelS += ";";
+          georel += ";";
         }
       }
     }
@@ -90,7 +90,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
         return "invalid JSON type for geometry (must be string)";
       }
 
-      geometry = (char*) iter->value.GetString().c_str();
+      geometry = iter->value.GetString();
     }
     else if (name == "coords")
     {
@@ -121,9 +121,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
         std::string typeY = jsonParseTypeNames[y->GetType()];
 
         if (typeX != "Number" || typeY != "Number")
-        {
           return "invalid JSON type for geometry (must be string)";
-        }
 
         // Adding coords
         char buf[STRING_SIZE_FOR_DOUBLE * 2 + 2 + 2];
@@ -132,19 +130,15 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
         coords = buf;
 
         if (iter2 != iter->value.End() - 1)
-        {
           coords += ";";
-        }
       }
     }
     else
-    {
       return std::string("unrecognized item in value object: /") + name + "/";
-    }
   }
 
   char* result;
-  scopeP->fill(V2, geometryS, coordsS, georelS, &result);
+  scopeP->fill(V2, geometry.c_str(), coords.c_str(), georel.c_str(), &result);
 
   return result;
 }

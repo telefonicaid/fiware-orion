@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "orionld/common/orionldState.h"             // orionldState
 
 #include "common/statistics.h"
@@ -85,9 +86,9 @@ std::string getEntities
   Entities     entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
-  std::string  geometry    = orionldState.uriParams.geometry?     orionldState.uriParams.geometry   : "";
-  std::string  coords      = orionldState.uriParams.coordinates? orionldState.uriParams.coordinates : "";
-  std::string  georel      = orionldState.uriParams.georel?      orionldState.uriParams.georel      : "";
+  const char*  geometry    = orionldState.uriParams.geometry;
+  const char*  coords      = orionldState.uriParams.coordinates;
+  const char*  georel      = orionldState.uriParams.georel;
   std::string  out;
   char*  id          = orionldState.uriParams.id;
   char*  idPattern   = orionldState.uriParams.idPattern;
@@ -145,7 +146,7 @@ std::string getEntities
   //
   // Making sure geometry, georel and coords are not used individually
   //
-  if ((coords != "") && (geometry == ""))
+  if ((coords != NULL) && (geometry == NULL))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
 
@@ -153,7 +154,7 @@ std::string getEntities
     orionldState.httpStatusCode = oe.code;
     return out;
   }
-  else if ((geometry != "") && (coords == ""))
+  else if ((geometry != NULL) && (coords == NULL))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
 
@@ -162,7 +163,7 @@ std::string getEntities
     return out;
   }
 
-  if ((georel != "") && (geometry == ""))
+  if ((georel != NULL) && (geometry == NULL))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
 
@@ -179,10 +180,10 @@ std::string getEntities
   // - georel
   // - coords
   //
-  if (geometry != "")
+  if (geometry != NULL)
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
-    std::string  errorString;
+    Scope*  scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    char*   errorString;
 
     if (scopeP->fill(orionldState.apiVersion, geometry, coords, georel, &errorString) != 0)
     {

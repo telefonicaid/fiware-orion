@@ -117,8 +117,8 @@ int Scope::fill
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
-  char*                       coordsString2 = kaStrdup(&orionldState.kalloc, coordsString);
-  char*                       georelString2 = kaStrdup(&orionldState.kalloc, georelString);
+  char*                       coordsString2 = (coordsString != NULL)? kaStrdup(&orionldState.kalloc, coordsString) : NULL;
+  char*                       georelString2 = (georelString != NULL)? kaStrdup(&orionldState.kalloc, georelString) : NULL;
 
   type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
@@ -262,11 +262,9 @@ int Scope::fill
   //
   // parse geometry
   //
-  std::string errorString;
-  if (geometry.parse(apiVersion, geometryString, &errorString) != 0)
+  if (geometry.parse(apiVersion, geometryString, errorStringP) != 0)
   {
-    *errorStringP = (char*) "error parsing geometry";  // + ": " + errorString;
-    LM_E(("geometry.parse: %s", errorString.c_str()));
+    LM_E(("geometry.parse: %s", *errorStringP));
     return -1;
   }
 
@@ -276,9 +274,9 @@ int Scope::fill
   //
   if (georelString2 != NULL)
   {
-    if (georel.parse(georelString2, &errorString) != 0)
+    if (georel.parse(georelString2, errorStringP) != 0)
     {
-      LM_E(("geometry.parse: %s", errorString.c_str()));
+      LM_E(("geometry.parse: %s", *errorStringP));
       return -1;
     }
   }
@@ -293,7 +291,7 @@ int Scope::fill
      */
 
     *errorStringP = (char*) "line geometry cannot be used with coveredBy georel";
-    LM_E(("geometry.parse: %s", errorStringP));
+    LM_E(("geometry.parse: %s", *errorStringP));
     return -1;
   }
 
@@ -306,7 +304,7 @@ int Scope::fill
      */
 
     *errorStringP = (char*) "point geometry cannot be used with coveredBy georel";
-    LM_E(("geometry.parse: %s", errorStringP));
+    LM_E(("geometry.parse: %s", *errorStringP));
     return -1;
   }
 
@@ -326,7 +324,7 @@ int Scope::fill
   //
   // Split coordsString into a vector of points, or pairs of coordinates
   //
-  if (coordsString2 == NULL)
+  if ((coordsString2 == NULL) || (*coordsString2 == 0))
   {
     *errorStringP = (char*) "no coordinates for geometry";
     LM_E(("geometry.parse: %s", *errorStringP));
