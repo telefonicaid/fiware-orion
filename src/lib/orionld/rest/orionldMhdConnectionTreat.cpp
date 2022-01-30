@@ -24,7 +24,6 @@
 */
 #include <string.h>                                              // strncpy
 #include <semaphore.h>                                           // sem_wait, sem_post
-#include <string>                                                // std::string
 
 extern "C"
 {
