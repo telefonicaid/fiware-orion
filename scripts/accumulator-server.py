@@ -40,9 +40,6 @@ __author__ = 'fermin'
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 # * This script requires at least Flask 2.0.2, which comes with Werkzeug 2.0.2.
-#
-# TODO: test a possible bug in Werkzeug that makes empty "content-length"
-# headers to appear for some request in the accumulator dump
 
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
@@ -90,8 +87,8 @@ def usage():
           --url <server url>: server URL to use (default is /accumulate)"
           --pretty-print: pretty print mode"
           --https: start in https"
-          --key: <key file> (only used if https is enabled)"
-          --cert: <cert file> (only used if https is enabled)"
+          --key <key file>: (only used if https is enabled)"
+          --cert <cert file>: (only used if https is enabled)"
           -v: verbose mode"
           -u: print this usage message
           """
@@ -117,6 +114,8 @@ key_file = None
 cert_file = None
 
 # TODO: Improve cli argument parsing with click
+# https://click.palletsprojects.com/en/8.0.x/
+# This will avoid the 'complex' for statement at L137
 try:
     opts, args = getopt(
         sys.argv[1:],
@@ -133,7 +132,7 @@ try:
         ]
     )
 except GetoptError:
-    usage_and_exit('Wrong parameter')
+    usage_and_exit('wrong parameter')
 
 for opt, arg in opts:
     if opt == '-u':
@@ -570,7 +569,6 @@ if __name__ == '__main__':
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
-        # TODO: Improve SSL support by using pyOpenSSL
         context = (cert_file, key_file)
         app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
