@@ -44,7 +44,8 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-#define NGSI_MD_LOCATION           "location"
+#define NGSI_MD_LOCATION           "location"        // Deprecated (NGSIv1)
+#define NGSI_MD_EXTRA_LOC          "extraLoc"
 #define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
 #define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
 #define NGSI_MD_DATECREATED        "dateCreated"     // Special metadata

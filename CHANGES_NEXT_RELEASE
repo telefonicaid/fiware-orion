@@ -1,0 +1,1 @@
+- Add: extraLoc metadata to allow extra location attributes (without geo-query usage) (#4032)
