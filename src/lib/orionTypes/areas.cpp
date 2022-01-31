@@ -465,7 +465,7 @@ Georel::Georel(): maxDistance(0), minDistance(0)
 *
 * Georel::parse -
 */
-int Georel::parse(const char* in, std::string* errorString)
+int Georel::parse(const char* in, char** errorStringP)
 {
   std::vector<std::string>  items;
   bool                      maxDistanceSet = false;
@@ -476,7 +476,7 @@ int Georel::parse(const char* in, std::string* errorString)
 
   if (stringSplit(in, ';', items) == 0)
   {
-    *errorString = "empty georel";
+    *errorStringP = (char*) "empty georel";
     return -1;
   }
 
@@ -492,7 +492,7 @@ int Georel::parse(const char* in, std::string* errorString)
     {
       if (type != "")
       {
-        *errorString = "georel type present more than once";
+        *errorStringP = (char*) "georel type present more than once";
         return -1;
       }
 
@@ -502,13 +502,13 @@ int Georel::parse(const char* in, std::string* errorString)
     {
       if (maxDistanceSet)
       {
-        *errorString = "maxDistance present more than once";
+        *errorStringP = (char*) "maxDistance present more than once";
         return -1;
       }
 
       if (str2double(&item[12], &maxDistance) == false)
       {
-        *errorString = "invalid number for maxDistance";
+        *errorStringP = (char*) "invalid number for maxDistance";
         return -1;
       }
 
@@ -518,13 +518,13 @@ int Georel::parse(const char* in, std::string* errorString)
     {
       if (minDistanceSet)
       {
-        *errorString = "minDistance present more than once";
+        *errorStringP = (char*) "minDistance present more than once";
         return -1;
       }
 
       if (str2double(&item[12], &minDistance) == false)
       {
-        *errorString = "invalid number for minDistance";
+        *errorStringP = (char*) "invalid number for minDistance";
         return -1;
       }
 
@@ -535,13 +535,13 @@ int Georel::parse(const char* in, std::string* errorString)
     {
       if (maxDistanceSet)
       {
-        *errorString = "maxDistance present more than once";
+        *errorStringP = (char*) "maxDistance present more than once";
         return -1;
       }
 
       if (str2double(&item[13], &maxDistance) == false)
       {
-        *errorString = "invalid number for maxDistance";
+        *errorStringP = (char*) "invalid number for maxDistance";
         return -1;
       }
 
@@ -551,13 +551,13 @@ int Georel::parse(const char* in, std::string* errorString)
     {
       if (minDistanceSet)
       {
-        *errorString = "minDistance present more than once";
+        *errorStringP = (char*) "minDistance present more than once";
         return -1;
       }
 
       if (str2double(&item[13], &minDistance) == false)
       {
-        *errorString = "invalid number for minDistance";
+        *errorStringP = (char*) "invalid number for minDistance";
         return -1;
       }
 
@@ -566,7 +566,7 @@ int Georel::parse(const char* in, std::string* errorString)
 #endif
     else
     {
-      *errorString = "Invalid modifier in georel parameter";
+      *errorStringP = (char*) "Invalid modifier in georel parameter";
       LM_E(("Invalid modifier in georel parameter: '%s'", item));
       return -1;
     }
@@ -574,19 +574,19 @@ int Georel::parse(const char* in, std::string* errorString)
 
   if (maxDistanceSet && (type != "near"))
   {
-    *errorString = std::string("maxDistance erroneously used with georel /") + type + "/";
+    *errorStringP = (char*) "maxDistance erroneously used with georel";
     return -1;
   }
 
   if (minDistanceSet && (type != "near"))
   {
-    *errorString = std::string("minDistance erroneously used with georel /") + type + "/";
+    *errorStringP = (char*) "minDistance erroneously used with georel";
     return -1;
   }
 
   if ((type == "near") && !maxDistanceSet && !minDistanceSet)
   {
-    *errorString = "georel /near/ without either minDistance nor maxDistance";
+    *errorStringP = (char*) "georel /near/ without either minDistance nor maxDistance";
     return -1;
   }
 
@@ -622,13 +622,13 @@ Geometry::Geometry(): areaType(""), radius(-1), external(false)
 *
 * Geometry::parse -
 */
-int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorString)
+int Geometry::parse(ApiVersion apiVersion, const char* in, char** errorStringP)
 {
   std::vector<std::string> items;
 
   if (stringSplit(in, ';', items) == 0)
   {
-    *errorString = "empty geometry";
+    *errorStringP = (char*) "empty geometry";
     return -1;
   }
 
@@ -647,7 +647,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
     {
       if (areaType != "")
       {
-        *errorString = "polygon/circle present more than once";
+        *errorStringP = (char*) "polygon/circle present more than once";
         return -1;
       }
       areaType = items[ix];
@@ -656,7 +656,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
     {
       if (areaType != "")
       {
-        *errorString = "geometry-type present more than once";
+        *errorStringP = (char*) "geometry-type present more than once";
         return -1;
       }
 
@@ -668,7 +668,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
 
       if (radius == 0)
       {
-        *errorString = "Invalid value of /radius/";
+        *errorStringP = (char*) "Invalid value of /radius/";
         return -1;
       }
     }
@@ -679,20 +679,20 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
     else
     {
       LM_E(("items[ix] == '%s' - invalid selector in geometry specification", items[ix].c_str()));
-      *errorString = "Invalid selector in geometry specification";
+      *errorStringP = (char*) "Invalid selector in geometry specification";
       return -1;
     }
   }
 
   if ((areaType == "circle") && (radius == -1))
   {
-    *errorString = "no radius for circle";
+    *errorStringP = (char*) "no radius for circle";
     return -1;
   }
 
   if ((areaType == "polygon") && (radius != -1))
   {
-    *errorString = "radius set for polygon";
+    *errorStringP = (char*) "radius set for polygon";
     return -1;
   }
 

@@ -460,13 +460,13 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions (invalid expression)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 113
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "error parsing geo-query fields: error parsing geometry: Invalid selector in geometry specification",
+    "description": "error parsing geo-query fields: Invalid selector in geometry specification",
     "error": "BadRequest"
 }
 
