@@ -17,7 +17,7 @@ do
   filename=$(basename $file)
   if [ "$type" == "nightly" ]
   then
-      filename=$(echo $filename | sed 's/[0-9]*.[0-9]*.[0-9]*_next-//g')
+      filename=$(echo $filename | sed 's/[0-9]+.[0-9]+.[0-9]+_next-//g')
   fi
   echo "Uploading $filename"
   curl -v -f -u telefonica-github:$secret --upload-file $file https://nexus.lab.fiware.org/repository/el/8/x86_64/$type/$filename
