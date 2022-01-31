@@ -144,6 +144,43 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 
 In the case of Orion, that limit is one (1) attribute.
 
+However, you can set `extraLoc` metadata to `true` to mean that a given attribute contains an extra informative
+location. These extra locations don't count for the limit described above. For instance:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "value": true,
+      "type": "Boolean"
+    }
+  }
+}
+```
+
+Both attributes are of type `geo:json`, but `serviceArea` uses `extraLoc` metadata to `true` so the limit 
+of one non-informative location is not overpassed.
+
+If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
+is the one without `extraLoc` set to `true` metadata (`location` attribute in the example above). All
+the locations defined with `extraLoc` are considered informative and, in this sense, doesn't take part
+in geo-queries.
+
 [Top](#top)
 
 ## Supported GeoJSON types in `geo:json` attributes
