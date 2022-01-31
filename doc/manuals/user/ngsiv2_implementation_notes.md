@@ -166,8 +166,10 @@ location. These extra locations don't count for the limit described above. For i
     },
     "type": "geo:json",
     "metadata": {
-      "value": true,
-      "type": "Boolean"
+      "extraLoc":{
+        "value": true,
+        "type": "Boolean"
+      }
     }
   }
 }
