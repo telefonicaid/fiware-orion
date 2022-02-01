@@ -5,6 +5,11 @@ set -e
 secret=$1
 type=$2
 
+if [ "$type" == "release" ]
+then
+  type="1"
+fi
+
 docker run -e BROKER_RELEASE=$type -v $(pwd):/opt/orion --workdir=/opt/orion fiware/orion-ci:rpm8 make rpm
 
 for file in "$(pwd)/rpm/RPMS/x86_64"/*
