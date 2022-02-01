@@ -36,10 +36,10 @@ accumulatorStart --pretty-print
 # 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
 # 04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)
 # 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
-# 06. Update E to remove extraLoc metadata in L2: see fail
-# 07. Update E to add extraLoc metadata in L1: success
+# 06. Update E to remove ignoreType metadata in L2: see fail
+# 07. Update E to add ignoreType metadata in L1: success
 # 08. GET geoquery near 1m around L1, to check there is no result
-# 09. Update E to remove extraLoc metadata in L2: success
+# 09. Update E to remove ignoreType metadata in L2: success
 # 10. GET geoquery near 1m around L2, to check this is the actual location of the entity
 #
 
@@ -77,7 +77,7 @@ payload='{
     "value": { "type":"Point", "coordinates": [20,20] },
     "type": "geo:json",
     "metadata": {
-      "extraLoc": {
+      "ignoreType": {
         "value": true,
         "type": "Boolean"
       }
@@ -87,7 +87,7 @@ payload='{
     "value": { "type":"Point", "coordinates": [30,30] },
     "type": "geo:json",
     "metadata": {
-      "extraLoc": {
+      "ignoreType": {
         "value": true,
         "type": "Boolean"
       }
@@ -121,8 +121,8 @@ echo
 echo
 
 
-echo "06. Update E to remove extraLoc metadata in L2: see fail"
-echo "========================================================"
+echo "06. Update E to remove ignoreType metadata in L2: see fail"
+echo "=========================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
@@ -134,14 +134,14 @@ echo
 echo
 
 
-echo "07. Update E to add extraLoc metadata in L1: success"
-echo "===================================================="
+echo "07. Update E to add ignoreType metadata in L1: success"
+echo "======================================================"
 payload='{
   "L1": {
     "value": { "type": "Point", "coordinates": [10,10] },
     "type": "geo:json",
     "metadata": {
-      "extraLoc": {
+      "ignoreType": {
         "value": true,
         "type": "Boolean"
       }
@@ -160,8 +160,8 @@ echo
 echo
 
 
-echo "09. Update E to remove extraLoc metadata in L2: success"
-echo "======================================================="
+echo "09. Update E to remove ignoreType metadata in L2: success"
+echo "========================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 363
+Content-Length: 367
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -223,7 +223,7 @@ Date: REGEX(.*)
     },
     "L2": {
         "metadata": {
-            "extraLoc": {
+            "ignoreType": {
                 "type": "Boolean",
                 "value": true
             }
@@ -239,7 +239,7 @@ Date: REGEX(.*)
     },
     "L3": {
         "metadata": {
-            "extraLoc": {
+            "ignoreType": {
                 "type": "Boolean",
                 "value": true
             }
@@ -262,7 +262,7 @@ Date: REGEX(.*)
 =============================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 418
+Content-Length: 422
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -286,7 +286,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             },
             "L2": {
                 "metadata": {
-                    "extraLoc": {
+                    "ignoreType": {
                         "type": "Boolean",
                         "value": true
                     }
@@ -302,7 +302,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             },
             "L3": {
                 "metadata": {
-                    "extraLoc": {
+                    "ignoreType": {
                         "type": "Boolean",
                         "value": true
                     }
@@ -328,7 +328,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 365
+Content-Length: 369
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -348,7 +348,7 @@ Date: REGEX(.*)
         },
         "L2": {
             "metadata": {
-                "extraLoc": {
+                "ignoreType": {
                     "type": "Boolean",
                     "value": true
                 }
@@ -364,7 +364,7 @@ Date: REGEX(.*)
         },
         "L3": {
             "metadata": {
-                "extraLoc": {
+                "ignoreType": {
                     "type": "Boolean",
                     "value": true
                 }
@@ -384,22 +384,22 @@ Date: REGEX(.*)
 ]
 
 
-06. Update E to remove extraLoc metadata in L2: see fail
-========================================================
+06. Update E to remove ignoreType metadata in L2: see fail
+==========================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 200
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity. Use extraLoc metadata if you want to add additional informative locations.",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
 
-07. Update E to add extraLoc metadata in L1: success
-====================================================
+07. Update E to add ignoreType metadata in L1: success
+======================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -417,8 +417,8 @@ Date: REGEX(.*)
 []
 
 
-09. Update E to remove extraLoc metadata in L2: success
-=======================================================
+09. Update E to remove ignoreType metadata in L2: success
+=========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -428,7 +428,7 @@ Date: REGEX(.*)
 10. GET geoquery near 1m around L2, to check this is the actual location of the entity
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 365
+Content-Length: 369
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -437,7 +437,7 @@ Date: REGEX(.*)
     {
         "L1": {
             "metadata": {
-                "extraLoc": {
+                "ignoreType": {
                     "type": "Boolean",
                     "value": true
                 }
@@ -464,7 +464,7 @@ Date: REGEX(.*)
         },
         "L3": {
             "metadata": {
-                "extraLoc": {
+                "ignoreType": {
                     "type": "Boolean",
                     "value": true
                 }

@@ -1,1 +1,1 @@
-- Add: extraLoc metadata to allow extra location attributes (without geo-query usage) (#4032)
+- Add: ignoreTypec metadata so Orion ignored attribute type semantic (supported by geo-types at the present moment) (#4032)

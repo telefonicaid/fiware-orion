@@ -100,7 +100,7 @@
 #define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
 
 #define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"
-#define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use extraLoc metadata if you want to add additional informative locations."
+#define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations."
 
 #define ERROR_INTERNAL_ERROR                          "InternalError"
 

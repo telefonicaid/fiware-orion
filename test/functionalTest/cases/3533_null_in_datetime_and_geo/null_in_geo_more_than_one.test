@@ -172,13 +172,13 @@ Date: REGEX(.*)
 03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one
 ================================================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 200
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity. Use extraLoc metadata if you want to add additional informative locations.",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
@@ -234,13 +234,13 @@ Date: REGEX(.*)
 07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one
 ================================================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 200
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity. Use extraLoc metadata if you want to add additional informative locations.",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
