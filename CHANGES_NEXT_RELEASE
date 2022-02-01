@@ -1,1 +1,1 @@
-- Add: ignoreTypec metadata so Orion ignored attribute type semantic (supported by geo-types at the present moment) (#4032)
+- Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
