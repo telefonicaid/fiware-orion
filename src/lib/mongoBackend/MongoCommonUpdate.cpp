@@ -3378,7 +3378,7 @@ static unsigned int updateEntity
   std::map<std::string, TriggeredSubscription*> subsToNotify;
 
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
-   * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
+   * we fill an empty locAttr. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
   std::string            locAttr = "";
   orion::BSONObj         currentGeoJson;
