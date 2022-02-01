@@ -32,63 +32,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeTypeName
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/attributeTypeFromUriParam.h"            // attributeTypeFromUriParam
 #include "orionld/kjTree/kjAttributeKeyValueAmend.h"             // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTypeString -
-//
-static const char* attributeTypeString[] =
-{
-  "Property",
-  "Relationship",
-  "GeoProperty",
-  "LanguageProperty"
-};
-
-
-
-// -----------------------------------------------------------------------------
-//
-// isHit -
-//
-inline bool isHit(char* list, const char* item, int itemLen)
-{
-  if (list == NULL)
-    return false;
-
-  char* hit = strstr(list, item);
-
-  if (hit != NULL)  // Make sure it's really a hit
-  {
-    if ((hit[itemLen] == 0) || (hit[itemLen] == ','))
-      return true;
-  }
-
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTypeFromUriParam -
-//
-static OrionldAttributeType attributeTypeFromUriParam(const char* attrShortName)
-{
-  int attrShortNameLen = strlen(attrShortName);
-
-  if (isHit(orionldState.uriParams.relationships,      attrShortName, attrShortNameLen) == true)    return Relationship;
-  if (isHit(orionldState.uriParams.geoproperties,      attrShortName, attrShortNameLen) == true)    return GeoProperty;
-  if (isHit(orionldState.uriParams.languageproperties, attrShortName, attrShortNameLen) == true)    return LanguageProperty;
-
-  return Property;
-}
 
 
 
@@ -255,7 +203,7 @@ KjNode* kjAttributeKeyValueAmend(KjNode* attrP, KjNode* dbAttributeP, KjNode** d
     kjChildAdd(objectP, nodeP);
 
     // Add the type
-    KjNode* typeP = kjString(orionldState.kjsonP, "type", attributeTypeString[attributeType]);
+    KjNode* typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName[attributeType]);
     kjChildAdd(objectP, typeP);
 
     // Add sub-attr to outgoing tree

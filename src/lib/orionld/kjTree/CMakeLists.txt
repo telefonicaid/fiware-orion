@@ -51,6 +51,7 @@ SET (SOURCES
     kjStringArraySortedInsert.cpp
     kjSort.cpp
     kjAttributeKeyValueAmend.cpp
+    kjEntityKeyValueAmend.cpp
 )
 
 # Include directories

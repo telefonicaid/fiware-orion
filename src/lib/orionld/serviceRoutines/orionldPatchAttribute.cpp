@@ -702,6 +702,7 @@ bool orionldPatchAttribute(void)
   if (pcheckUri(entityId, true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
+    orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URI");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }

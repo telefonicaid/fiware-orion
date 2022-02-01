@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_
 
 /*
 *
@@ -25,27 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldAttributeType -
-//
-typedef enum OrionldAttributeType
+extern "C"
 {
-  Property,
-  Relationship,
-  GeoProperty,
-  LanguageProperty
-} OrionldAttributeType;
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldAttributeTypeName -
+// kjEntityKeyValueAmend -
 //
-extern const char* orionldAttributeTypeName[4];
+extern KjNode* kjEntityKeyValueAmend(KjNode* entityP);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_

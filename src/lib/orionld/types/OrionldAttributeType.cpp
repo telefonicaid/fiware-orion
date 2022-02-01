@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -30,22 +27,12 @@
 
 // -----------------------------------------------------------------------------
 //
-// OrionldAttributeType -
-//
-typedef enum OrionldAttributeType
-{
-  Property,
-  Relationship,
-  GeoProperty,
-  LanguageProperty
-} OrionldAttributeType;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldAttributeTypeName -
 //
-extern const char* orionldAttributeTypeName[4];
-
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
+const char* orionldAttributeTypeName[4] =
+{
+  "Property",
+  "Relationship",
+  "GeoProperty",
+  "LanguageProperty"
+};

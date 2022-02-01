@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ATTRIBUTETYPEFROMURIPARAM_H_
+#define SRC_LIB_ORIONLD_COMMON_ATTRIBUTETYPEFROMURIPARAM_H_
 
 /*
 *
@@ -25,27 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldAttributeType -
+// attributeTypeFromUriParam -
 //
-typedef enum OrionldAttributeType
-{
-  Property,
-  Relationship,
-  GeoProperty,
-  LanguageProperty
-} OrionldAttributeType;
+extern OrionldAttributeType attributeTypeFromUriParam(const char* attrShortName);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldAttributeTypeName -
-//
-extern const char* orionldAttributeTypeName[4];
-
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ATTRIBUTETYPEFROMURIPARAM_H_
