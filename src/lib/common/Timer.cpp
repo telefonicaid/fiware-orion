@@ -59,7 +59,7 @@ double Timer::getCurrentTime(void)
 
   if (clock_gettime(CLOCK_REALTIME, &ts) != 0)
   {
-    LM_E(("Internal Error (clock_gettime: %s)", strerror(errno)));
+    LM_E(("Runtime Error (clock_gettime: %s)", strerror(errno)));
     return 0;
   }
 

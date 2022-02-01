@@ -195,7 +195,7 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
   else
   {
     // Empty UpdateContextResponse::contextElementResponseVector AND unfilled UpdateContextResponse::errorCode
-    LM_E(("Internal Error (can't fill StatusCode from UpdateContextResponse)"));
+    LM_E(("Runtime Error (can't fill StatusCode from UpdateContextResponse)"));
     fill(SccReceiverInternalError, "can't fill StatusCode from UpdateContextResponse");
   }
 }
