@@ -349,9 +349,8 @@ bool processLocationAtEntityCreation
 
     if (!locAttr->empty())
     {
-      *errDetail = "You cannot use more than one geo location attribute "
-                   "when creating an entity [see Orion user manual]";
-      oe->fill(SccRequestEntityTooLarge, *errDetail, "NoResourcesAvailable");
+      *errDetail = ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC;
+      oe->fill(SccRequestEntityTooLarge, *errDetail, ERROR_NO_RESOURCES_AVAILABLE);
       return false;
     }
 
@@ -437,9 +436,7 @@ bool processLocationAtUpdateAttribute
         *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                      " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-        oe->fill(SccRequestEntityTooLarge,
-                 "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-                 "NoResourcesAvailable");
+        oe->fill(SccRequestEntityTooLarge, ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC, ERROR_NO_RESOURCES_AVAILABLE);
 
         return false;
       }
@@ -538,9 +535,7 @@ bool processLocationAtAppendAttribute
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-      oe->fill(SccRequestEntityTooLarge,
-               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-               "NoResourcesAvailable");
+      oe->fill(SccRequestEntityTooLarge, ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC, ERROR_NO_RESOURCES_AVAILABLE);
 
       return false;
     }
@@ -565,9 +560,7 @@ bool processLocationAtAppendAttribute
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
 
-      oe->fill(SccRequestEntityTooLarge,
-               "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
-               "NoResourcesAvailable");
+      oe->fill(SccRequestEntityTooLarge, ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC, ERROR_NO_RESOURCES_AVAILABLE);
 
       return false;
     }

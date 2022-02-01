@@ -1,3 +1,4 @@
+- Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
 - Fix: unify error traces with "Runtime Error" (some of them where using "Internal Error" or "Orion Bug")
 - Fix: increase severity to ERROR in some WARN traces actually meaning Runtime Error conditions
-- Fix: ForwardingError alarm logic, which was missing some cases
+- Fix: ForwardingError alarm logic, which was missing in some cases
