@@ -29,11 +29,14 @@ yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_6
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 yum -y --nogpgcheck install postgresql12 postgresql12-contrib
 
-echo "Add repos"
-yum-config-manager --add-repo http://mirror.centos.org/centos/8/AppStream/x86_64/os/
-yum-config-manager --add-repo http://mirror.centos.org/centos/8/PowerTools/x86_64/os/
-yum update -y --nogpgcheck
+yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/libdap-3.19.1-2.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/SuperLU-5.2.0-7.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/blas-3.8.0-8.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/lapack-3.8.0-8.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/epel/8/Everything/x86_64/Packages/a/armadillo-9.700.2-1.el8.x86_64.rpm
 
+echo "Add repos"
+yum update -y --nogpgcheck
 
 echo "Install libs"
 yum -y --nogpgcheck install hdf5 xerces-c gdal-libs

@@ -3,6 +3,9 @@ FROM registry.access.redhat.com/ubi8/ubi:8.5
 ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
 
+COPY ./docker/subscription-manager.conf /etc/yum/pluginconf.d/subscription-manager.conf
+COPY ./docker/ubi.repo /etc/yum.repos.d/ubi.repo
+
 RUN mkdir /tmp/build
 
 COPY ./docker/build-ubi/install-build-dependencies.sh /tmp/build/install-build-dependencies.sh
