@@ -312,7 +312,7 @@ extern int64_t parse8601(const std::string& s);
 * This is common code for Duration and Throttling (at least)
 *
 */
-extern double parse8601Time(const std::string& s);
+extern double parse8601Time(char* ss);
 
 
 
