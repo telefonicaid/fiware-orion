@@ -1,0 +1,3 @@
+- Fix: unify error traces with "Runtime Error" (some os them wer using "Internal Error" or "Orion Bug"
+- Fix: increase severity to ERROR in some WARN traces actually meaning Runtime Error conditions
+- Fix: ForwardingError alarm logic, which was missing some cases

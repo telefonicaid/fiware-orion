@@ -260,7 +260,6 @@ static bool updateForward
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
     std::string  s;
-    std::string  errorMsg;
 
     cleanPayload = jsonPayloadClean(out.c_str());
 
@@ -270,7 +269,7 @@ static bool updateForward
       // This is really an internal error in the Context Provider
       // It is not in the orion broker though, so 404 is returned
       //
-      LM_W(("Forwarding Error (context provider response to UpdateContext is empty)"));
+      alarmMgr.forwardingError(url, "context provider response to UpdateContext is empty");
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
@@ -295,7 +294,7 @@ static bool updateForward
 
     if (s != "OK")
     {
-      LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
       upcrsP->errorCode.fill(SccContextElementNotFound, "");
       parseData.upcr.res.release();
       parseData.upcrs.res.release();
@@ -348,7 +347,7 @@ static bool updateForward
       return true;
     }
 
-    LM_W(("Forwarding Error (unexpected response from context provider: %s)", out.c_str()));
+    alarmMgr.forwardingError(url, "unexpected response from context provider: %s" + out);
     upcrsP->errorCode.fill(SccReceiverInternalError);
     return false;
   }
@@ -642,7 +641,7 @@ std::string postUpdateContext
 
       if (aP == NULL)
       {
-        LM_E(("Internal Error (attribute '%s' not found)", eP->attributeVector[aIx]->name.c_str()));
+        LM_E(("Runtime Error (attribute '%s' not found)", eP->attributeVector[aIx]->name.c_str()));
       }
       else
       {
@@ -681,7 +680,7 @@ std::string postUpdateContext
       //
       // If we find a contextElement without attributes here, then something is wrong
       //
-      LM_E(("Orion Bug (empty contextAttributeVector for ContextElementResponse %d)", cerIx));
+      LM_E(("Runtime Error (empty contextAttributeVector for ContextElementResponse %d)", cerIx));
     }
     else
     {
@@ -773,7 +772,7 @@ std::string postUpdateContext
   {
     if (requestV[ix]->contextProvider.empty())
     {
-      LM_E(("Internal Error (empty context provider string)"));
+      LM_E(("Runtime Error (empty context provider string)"));
       continue;
     }
 
