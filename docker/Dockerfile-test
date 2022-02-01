@@ -31,7 +31,9 @@ RUN pip2.7 install Flask
 RUN pip2.7 install paho-mqtt
 RUN pip2.7 install pyopenssl
 
-RUN yum install --nogpgcheck -y gmock-devel
+RUN yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gtest-1.8.0-5.el8.x86_64.rpm
+RUN yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-1.8.0-5.el8.x86_64.rpm
+RUN yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-devel-1.8.0-5.el8.x86_64.rpm
 RUN yum install -y procps
 
 RUN wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
