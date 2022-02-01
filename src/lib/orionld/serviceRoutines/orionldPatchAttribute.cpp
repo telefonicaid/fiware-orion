@@ -40,15 +40,15 @@ extern "C"
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/CHECK.h"                                // *CHECK*
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
+#include "orionld/kjTree/kjAttributeKeyValueAmend.h"             // kjAttributeKeyValueAmend
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
 
 
@@ -609,252 +610,6 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 }
 
 
-// -----------------------------------------------------------------------------
-//
-// OrionldAttributeType - move to src/lib/orionld/types
-//
-typedef enum OrionldAttributeType
-{
-  Property,
-  Relationship,
-  GeoProperty,
-  LanguageProperty
-} OrionldAttributeType;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// isHit -
-//
-inline bool isHit(char* list, const char* item, int itemLen)
-{
-  if (list == NULL)
-    return false;
-
-  char* hit = strstr(list, item);
-
-  if (hit != NULL)  // Make sure it's really a hit
-  {
-    if ((hit[itemLen] == 0) || (hit[itemLen] == ','))
-      return true;
-  }
-
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTypeFromUriParam -
-//
-OrionldAttributeType attributeTypeFromUriParam(const char* attrShortName)
-{
-  int attrShortNameLen = strlen(attrShortName);
-
-  if (isHit(orionldState.uriParams.relationships,      attrShortName, attrShortNameLen) == true)    return Relationship;
-  if (isHit(orionldState.uriParams.geoproperties,      attrShortName, attrShortNameLen) == true)    return GeoProperty;
-  if (isHit(orionldState.uriParams.languageproperties, attrShortName, attrShortNameLen) == true)    return LanguageProperty;
-
-  return Property;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTypeString -
-//
-static const char* attributeTypeString[] =
-{
-  "Property",
-  "Relationship",
-  "GeoProperty",
-  "LanguageProperty"
-};
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjKeyValueTransformAttribute -
-//
-// INPUT:
-// {
-//   "value": "xxx",  (OR "object" OR "lang" OR ...)
-//   "P1": 1,
-//   "R1": "urn:..."
-// }
-//
-// OUTPUT:
-// {
-//   "value/object/...": "xxx",
-//   "P1": { "type": "Property", "value": 1 },
-//   "R1": { "type": "Relationship", "object": "urn:..." }
-// }
-//
-// If "type" is not given (it is a PATCH operation, so, not necessary), it is looked up in the database.
-// We need to know the type, to know whether next we're interested in "value" or "object", or ...
-//
-// [ "type" CAN ONLY be present in the payload body if it is the same as what is found in the database. ]
-//
-static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP, KjNode** dbAttributeTypePP)
-{
-  KjNode*  typeP;
-  KjNode*  valueP;
-  KjNode*  outTreeP = kjObject(orionldState.kjsonP, attrP->name);
-
-  //
-  // 1. Look up "type", remove it from the tree and add it to the output tree "outTreeP"
-  // 2. Set the valueNodeName according to the value of the type KjNode
-  // 3. Look up value/object/..., remove it from the tree and add it to "outTreeP"
-  // 4. Go over all sub-attrs, transform them into "non-keyValues" and add to "outTreeP"
-  //
-
-  //
-  // 1. Look up "type", remove it from the tree and add it to the output tree "outTreeP"
-  //
-  // If not present, we get it from the DB
-  // We need to know the type, to know whether next we're interested in "value" or "object", or ...
-  //
-  bool typeInPayloadBody = true;
-  typeP = kjLookup(attrP, "type");
-  if (typeP != NULL)
-  {
-    kjChildRemove(attrP, typeP);
-  }
-  else
-  {
-    typeP = kjLookup(dbAttributeP, "type");
-    *dbAttributeTypePP = typeP;
-    if (typeP == NULL)
-    {
-      LM_E(("Database Error (no type field found in the attribute '%s' of an entity)", attrP->name));
-      orionldState.httpStatusCode = 500;
-      orionldErrorResponseCreate(OrionldInternalError, "no type field found for an attribute", attrP->name);
-      return NULL;
-    }
-    typeInPayloadBody = false;
-    kjChildRemove(dbAttributeP, typeP);
-  }
-  kjChildAdd(outTreeP, typeP);
-
-
-  //
-  // 2. Set the valueNodeName according to the value of the type KjNode
-  //
-  char* valueNodeName = NULL;
-  if      (strcmp(typeP->value.s, "Property")     == 0) valueNodeName = (char*) "value";
-  else if (strcmp(typeP->value.s, "GeoProperty")  == 0) valueNodeName = (char*) "value";
-  else if (strcmp(typeP->value.s, "Relationship") == 0) valueNodeName = (char*) "object";
-  else
-  {
-    if (typeInPayloadBody == true)
-    {
-      LM_W(("Bad Input (invalid value of attribute type '%s')", typeP->value.s));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of attribute type", typeP->value.s);
-      return NULL;
-    }
-    else
-    {
-      LM_E(("Database Error (invalid value of attribute type '%s')", typeP->value.s));
-      orionldState.httpStatusCode = 500;
-      orionldErrorResponseCreate(OrionldInternalError, "Invalid value of attribute type", typeP->value.s);
-      return NULL;
-    }
-  }
-
-  //
-  // 3. Look up value/object/..., remove it from the tree and add it to "outTreeP"
-  //
-  // Not Present?
-  // That's OK - this is a PATCH operation ... all A-OK
-  //
-  valueP = kjLookup(attrP, valueNodeName);
-  if (valueP != NULL)
-  {
-    kjChildRemove(attrP, valueP);
-    kjChildAdd(outTreeP, valueP);
-  }
-
-  //
-  // 4. Go over all sub-attrs and transform them into "non-keyValues"
-  //    Need a while-loop and a next pointer as the loop moves nodeP around
-  //
-  KjNode* nodeP = attrP->value.firstChildP;
-  KjNode* next;
-
-  while (nodeP != NULL)
-  {
-    next = nodeP->next;
-
-    kjChildRemove(attrP, nodeP);
-
-    if ((strcmp(nodeP->name, "unitCode") == 0) || (strcmp(nodeP->name, "observedAt") == 0) || (strcmp(nodeP->name, "datasetId") == 0))
-    {
-      kjChildAdd(outTreeP, nodeP);
-      nodeP = next;
-      continue;
-    }
-
-    KjNode*              objectP       = kjObject(orionldState.kjsonP, nodeP->name);
-    OrionldAttributeType attributeType = attributeTypeFromUriParam(nodeP->name);
-
-    //
-    // Check the JSON type is OK fore the attribute type.
-    // Relationship must be string, LanguageProp must be Object, ...
-    //
-    if (attributeType == Relationship)
-    {
-      if (nodeP->type != KjString)
-      {
-        LM_W(("Bad Input (Relationship attributes must be strings)"));
-        orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Relationship attributes must be strings", nodeP->name);
-        return NULL;
-      }
-    }
-    else if (attributeType == GeoProperty)
-    {
-      if (nodeP->type != KjObject)
-      {
-        LM_W(("Bad Input (GeoProperty attributes must be objects)"));
-        orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "GeoProperty attributes must be objects", nodeP->name);
-        return NULL;
-      }
-    }
-    else if (attributeType == LanguageProperty)
-    {
-      if (nodeP->type != KjObject)
-      {
-        LM_W(("Bad Input (LanguageProperty attributes must be objects)"));
-        orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "LanguageProperty attributes must be objects", nodeP->name);
-        return NULL;
-      }
-    }
-
-    nodeP->name = (attributeType == Relationship)? (char*) "object" : (char*) "value";
-    kjChildAdd(objectP, nodeP);
-
-    // Add the type
-    KjNode* typeP = kjString(orionldState.kjsonP, "type", attributeTypeString[attributeType]);
-    kjChildAdd(objectP, typeP);
-
-    // Add sub-attr to outgoing tree
-    kjChildAdd(outTreeP, objectP);
-
-    // Next!
-    nodeP = next;
-  }
-
-  return outTreeP;
-}
-
-
 
 // ----------------------------------------------------------------------------
 //
@@ -988,10 +743,10 @@ bool orionldPatchAttribute(void)
     if (dbAttributeP == NULL)
       return false;
 
-    inAttribute = kjKeyValueTransformAttribute(inAttribute, dbAttributeP, &dbAttributeTypeNodeP);
+    inAttribute = kjAttributeKeyValueAmend(inAttribute, dbAttributeP, &dbAttributeTypeNodeP);
     if (inAttribute == NULL)
     {
-      LM_E(("kjKeyValueTransformAttribute failed"));
+      LM_E(("kjAttributeKeyValueAmend failed"));
       return false;
     }
   }
