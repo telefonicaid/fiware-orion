@@ -159,7 +159,7 @@ static std::string parseContextAttributeObject
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    caP->numberValue =  parse8601Time(caP->stringValue);
+    caP->numberValue =  parse8601Time((char*) caP->stringValue.c_str());
 
     if (caP->numberValue == -1)
     {

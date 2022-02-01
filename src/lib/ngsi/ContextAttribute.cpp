@@ -61,7 +61,7 @@ using namespace orion;
 */
 void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
-  std::string effectiveStringValue = stringValue;
+  char*       effectiveStringValue = (char*) stringValue.c_str();
   bool        effectiveBoolValue   = boolValue;
   double      effectiveNumberValue = numberValue;
   ValueType   effectiveValueType   = valueType;
@@ -72,7 +72,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     // Autocast only for selected attribute types
     if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
     {
-      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      if (str2double(effectiveStringValue, &effectiveNumberValue))
       {
         effectiveValueType = ValueTypeNumber;
       }
@@ -82,12 +82,12 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     {
       // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
       // valid true/false values and JSON spec mandates exactly true or false
-      if (effectiveStringValue == "true")
+      if (strcmp(effectiveStringValue, "true") == 0)
       {
         effectiveBoolValue = true;
         effectiveValueType = ValueTypeBoolean;
       }
-      else if (effectiveStringValue == "false")
+      else if (strcmp(effectiveStringValue, "false") == 0)
       {
         effectiveBoolValue = false;
         effectiveValueType = ValueTypeBoolean;

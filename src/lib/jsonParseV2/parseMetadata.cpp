@@ -123,7 +123,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
   // Is it a date?
   if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
   {
-    mdP->numberValue =  parse8601Time(mdP->stringValue);
+    mdP->numberValue =  parse8601Time((char*) mdP->stringValue.c_str());
 
     if (mdP->numberValue == -1)
     {

@@ -194,7 +194,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = (uint64_t) parse8601Time(expires);
+      eT = (uint64_t) parse8601Time((char*) expires.c_str());
       if (eT == -1)
       {
         return badInput(ciP, "expires has an invalid format");

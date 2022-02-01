@@ -341,7 +341,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
 
     if (!expires.empty())
     {
-      expiresValue = parse8601Time(expires);
+      expiresValue = parse8601Time((char*) expires.c_str());
       if (expiresValue == -1)
       {
         return badInput(ciP, "the field /expires/ has an invalid format");
