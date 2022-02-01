@@ -38,6 +38,7 @@ extern "C"
 
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
@@ -48,6 +49,7 @@ extern "C"
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/kjTree/kjEntityKeyValueAmend.h"                // kjEntityKeyValueAmend
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
@@ -165,6 +167,7 @@ bool orionldPatchEntity(void)
   // 1. Is the Entity ID in the URL a valid URI?
   if (pcheckUri(entityId, true, &detail) == false)
   {
+    LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
     return false;
@@ -181,6 +184,13 @@ bool orionldPatchEntity(void)
     orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
     return false;
   }
+
+  //
+  // If keyValues is set, modify the tree accordingly (add objects for all attributes - with "type" and "value")
+  //
+  if (orionldState.uriParamOptions.keyValues == true)
+    orionldState.requestTree = kjEntityKeyValueAmend(orionldState.requestTree);
+
 
   // 3. Get the Entity Type, needed later in the call to the constructor of ContextElement
   KjNode* idNodeP = kjLookup(dbEntityP, "_id");

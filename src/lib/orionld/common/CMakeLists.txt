@@ -57,6 +57,7 @@ SET (SOURCES
     troeIgnored.cpp
     tenantList.cpp
     mimeTypeFromString.cpp
+    attributeTypeFromUriParam.cpp
 )
 
 # Include directories

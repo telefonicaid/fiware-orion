@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation
+Attribute Patch with key-values
 
 --SHELL-INIT--
 export BROKER=orionld

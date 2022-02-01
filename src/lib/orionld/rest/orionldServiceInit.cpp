@@ -291,6 +291,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTIES;
     serviceP->uriParams |= ORIONLD_URIPARAM_LANGUAGEPROPERTIES;
   }
+  else if (serviceP->serviceRoutine == orionldPatchEntity)
+  {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_RELATIONSHIPS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTIES;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LANGUAGEPROPERTIES;
+  }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_DATASETID;
