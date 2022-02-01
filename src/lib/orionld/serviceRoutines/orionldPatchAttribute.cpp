@@ -660,7 +660,20 @@ OrionldAttributeType attributeTypeFromUriParam(const char* attrShortName)
   return Property;
 }
 
-static const char* attributeTypeString[] = { "Property", "Relationship", "GeoProperty", "LanguageProperty" };
+
+
+// -----------------------------------------------------------------------------
+//
+// attributeTypeString -
+//
+static const char* attributeTypeString[] =
+{
+  "Property",
+  "Relationship",
+  "GeoProperty",
+  "LanguageProperty"
+};
+
 
 
 // -----------------------------------------------------------------------------
@@ -757,7 +770,7 @@ static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP,
   // 3. Look up value/object/..., remove it from the tree and add it to "outTreeP"
   //
   // Not Present?
-  // That's OK - this is a PATCH operation ... right ... ?
+  // That's OK - this is a PATCH operation ... all A-OK
   //
   valueP = kjLookup(attrP, valueNodeName);
   if (valueP != NULL)
@@ -772,10 +785,19 @@ static KjNode* kjKeyValueTransformAttribute(KjNode* attrP, KjNode* dbAttributeP,
   //
   KjNode* nodeP = attrP->value.firstChildP;
   KjNode* next;
+
   while (nodeP != NULL)
   {
     next = nodeP->next;
+
     kjChildRemove(attrP, nodeP);
+
+    if ((strcmp(nodeP->name, "unitCode") == 0) || (strcmp(nodeP->name, "observedAt") == 0) || (strcmp(nodeP->name, "datasetId") == 0))
+    {
+      kjChildAdd(outTreeP, nodeP);
+      nodeP = next;
+      continue;
+    }
 
     KjNode*              objectP       = kjObject(orionldState.kjsonP, nodeP->name);
     OrionldAttributeType attributeType = attributeTypeFromUriParam(nodeP->name);
@@ -1026,7 +1048,7 @@ bool orionldPatchAttribute(void)
 
 
   //
-  // 6. Extract createdAt and type from dbAttributeP
+  // 6. REMOVE createdAt and type from dbAttributeP
   //
   KjNode* dbCreatedAt = kjLookup(dbAttributeP, "creDate");
   if (dbCreatedAt == NULL)

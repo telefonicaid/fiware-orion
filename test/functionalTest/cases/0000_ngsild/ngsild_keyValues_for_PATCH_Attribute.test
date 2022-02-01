@@ -34,12 +34,14 @@ brokerStart CB
 # 01. Create an entity with a Property P
 # 02. PATCH the Property P using keyValues
 # 03. GET the entity and see the updates from step 02
+# 04. Another PATCH, but with special sub-attrs, such as unitCode
+# 05. GET the entity and see the updates from step 04
 #
 # ERROR CHECKS
-# 04. Invalid type value for the attribute
-# 05. PATCH the Property P using keyValues, but a Relationship isn't a string
-# 06. PATCH the Property P using keyValues, but a GeoProperty isn't an object
-# 07. PATCH the Property P using keyValues, but a LanguageProperty isn't an object
+# 06. Invalid type value for the attribute
+# 07. PATCH the Property P using keyValues, but a Relationship isn't a string
+# 08. PATCH the Property P using keyValues, but a GeoProperty isn't an object
+# 09. PATCH the Property P using keyValues, but a LanguageProperty isn't an object
 #
 
 echo "01. Create an entity with a Property P"
@@ -96,7 +98,27 @@ echo
 echo
 
 
-echo "04. Invalid type value for the attribute"
+echo "04. Another PATCH, but with special sub-attrs, such as unitCode"
+echo "==============================================================="
+payload='{
+  "type": "Property",
+  "value": 4,
+  "unitCode": "cm",
+  "observedAt": "2022-01-31T10:00:00.000Z"
+}'
+orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P?options=keyValues&relationships=R1&geoproperties=G1&languageproperties=L1" -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the entity and see the updates from step 04"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "06. Invalid type value for the attribute"
 echo "========================================"
 payload='{
   "type": "Relationship",
@@ -107,7 +129,7 @@ echo
 echo
 
 
-echo "05. PATCH the Property P using keyValues, but a Relationship isn't a string"
+echo "07. PATCH the Property P using keyValues, but a Relationship isn't a string"
 echo "==========================================================================="
 payload='{
   "R1": 13
@@ -117,7 +139,7 @@ echo
 echo
 
 
-echo "06. PATCH the Property P using keyValues, but a GeoProperty isn't an object"
+echo "08. PATCH the Property P using keyValues, but a GeoProperty isn't an object"
 echo "==========================================================================="
 payload='{
   "G1": 13
@@ -127,7 +149,7 @@ echo
 echo
 
 
-echo "07. PATCH the Property P using keyValues, but a LanguageProperty isn't an object"
+echo "09. PATCH the Property P using keyValues, but a LanguageProperty isn't an object"
 echo "================================================================================"
 payload='{
   "L1": 13
@@ -217,7 +239,79 @@ Date: REGEX(.*)
 }
 
 
-04. Invalid type value for the attribute
+04. Another PATCH, but with special sub-attrs, such as unitCode
+===============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the entity and see the updates from step 04
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 539
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P": {
+        "G1": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2,
+                    4
+                ],
+                "type": "Point"
+            }
+        },
+        "L1": {
+            "type": "LanguageProperty",
+            "value": {
+                "en": "Here",
+                "es": "Aqui"
+            }
+        },
+        "P1": {
+            "type": "Property",
+            "value": 12
+        },
+        "P2": {
+            "type": "Property",
+            "value": "12"
+        },
+        "P3": {
+            "type": "Property",
+            "value": true
+        },
+        "P4": {
+            "type": "Property",
+            "value": [
+                "a",
+                "b"
+            ]
+        },
+        "P5": {
+            "type": "Property",
+            "value": "will not be overwritten"
+        },
+        "R1": {
+            "object": "urn:xxx",
+            "type": "Relationship"
+        },
+        "observedAt": "2022-01-31T10:00:00.000Z",
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 4
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+06. Invalid type value for the attribute
 ========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 139
@@ -231,7 +325,7 @@ Date: REGEX(.*)
 }
 
 
-05. PATCH the Property P using keyValues, but a Relationship isn't a string
+07. PATCH the Property P using keyValues, but a Relationship isn't a string
 ===========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 125
@@ -245,7 +339,7 @@ Date: REGEX(.*)
 }
 
 
-06. PATCH the Property P using keyValues, but a GeoProperty isn't an object
+08. PATCH the Property P using keyValues, but a GeoProperty isn't an object
 ===========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 124
@@ -259,7 +353,7 @@ Date: REGEX(.*)
 }
 
 
-07. PATCH the Property P using keyValues, but a LanguageProperty isn't an object
+09. PATCH the Property P using keyValues, but a LanguageProperty isn't an object
 ================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 129
