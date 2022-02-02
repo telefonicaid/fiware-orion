@@ -21,6 +21,11 @@
 #
 # Author: Dmitrii Demin
 
+# FIXME: default yum repositories has been changed to vault due to CentOS 8 EOL on February 1st, 2022
+# This is just a temporal solution so the build doesn't break while we find a new distro to use
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+yum upgrade -y
 yum -y install epel-release
 yum -y install \
   bc \
