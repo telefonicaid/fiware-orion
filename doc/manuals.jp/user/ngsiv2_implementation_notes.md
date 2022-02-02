@@ -13,6 +13,7 @@
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
 * [`actionType` メタデータ](#actiontype-metadata)
+* [`ignoreType` メタデータ](#ignoretype-metadata)
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
@@ -134,6 +135,48 @@ NGSIv2 仕様の "エンティティの地理空間プロパティ" のセクシ
 > クライアントアプリケーションは、(適切な NGSI アトリビュート型を提供することによって) ジオスペース・プロパティを伝えるエンティティ属性を定義する責任があります。通常これは `location` という名前のついたエンティティ属性ですが、エンティティに複数の地理空間属性が含まれているユース・ケースはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度で異なる場所の方法によって提供された場所です。それにもかかわらず、空間特性には、バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることは注目に値します。したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況で推奨される HTTP ステータス・コードは `413` です。リクエスト・エンティティが大きすぎます。また、レスポンス・ペイロードで報告されたエラーは、`NoResourcesAvailable` である必要があります。
 
 Orion の場合、その制限は1つの属性です。
+
+ただし、`ignoreType` メタデータを `true` に設定して、特定の属性に追加の有益なロケーションが含まれるように
+することができます (詳細については、[ドキュメントのこのセクション](#ignoretype-metadata)を参照してください。
+これにより、Orion によるその属性のロケーションとしての解釈が無効になるため、制限にはカウントされません。
+
+例えば:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}
+```
+
+どちらの属性もタイプ `geo:json` ですが、`serviceArea` は `ignoreType` メタデータを `true` に使用するため、
+情報を提供しない1つのロケーションの制限を超えません。
+
+この方法で追加ロケーションを定義する場合は、ジオクエリの解決に使用されるロケーションが、 `ignoreType` が
+`true` メタデータ (上記の例では `location` 属性) に設定されていない場所であることを考慮してください。
+`ignoreType` を `true` に設定して定義されたすべてのロケーションは、Orion によって無視され、この意味で、
+ジオクエリには加わりません。
 
 [トップ](#top)
 
@@ -279,6 +322,27 @@ NGSIv2 仕様のセクション "組み込みメタデータ" から `actionType
 > その値はリクエストオペレーションの型によって異なります : 更新のための `update`, 作成のための `append`, 削除のための `delete`。その型は常に Text です。
 
 現在の Orion の実装では、"update (更新)" と "append (追加)" がサポートされています。[この問題](https://github.com/telefonicaid/fiware-orion/issues/1494)が完了すると、"delete (削除)" のケースがサポートされます。
+
+[トップ](#top)
+
+<a name="ignoretype-metadata"></a>
+## `ignoreType` メタデータ
+
+NGSIv2 仕様の "Builtin metadata" セクションで説明されているメタデータから、Orion は `ignoreType`
+メタデータを実装します。
+
+値が `true` の `ignoreType` が属性に追加されると、Orion は属性タイプに関連付けられたセマンティクスを
+無視します。Orion は一般に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、
+属性タイプに Orion の特別なセマンティクスがある2つのケースがあります (詳細については NGSIv2 仕様を
+確認してください):
+
+* `DateTime`
+* Geo-location タイプ (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+現時点では、`ignoreType` は Geo-location タイプでのみサポートされているため、メカニズムは
+エンティティごとに1つのジオロケーションのみの制限を克服できます (詳細については、
+[ドキュメントのこのセクション](#limit-to-attributes-for-entity-location)を参照)。`DateTime`
+での `ignoreType` のサポートは将来的に行われる可能性があります。
 
 [トップ](#top)
 
