@@ -146,7 +146,7 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 In the case of Orion, that limit is one (1) attribute.
 
 However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
-location (more detail in [this section of the documentation](#ignoretype-metadata). This disables Orion
+location (more detail in [this section of the documentation](#ignoretype-metadata)). This disables Orion
 interpretation of that attribute as a location, so it doesn't count towards the limit.
 
 For instance:
