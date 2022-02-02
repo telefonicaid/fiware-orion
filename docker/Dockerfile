@@ -39,6 +39,10 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /opt
 
 RUN \
+    #FIXME: Repo fix due to EOL Centos8
+    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    yum upgrade -y && \
     adduser --comment "${ORION_USER}" ${ORION_USER} && \
     # Install dependencies
     yum -y install epel-release && \
