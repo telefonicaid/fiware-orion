@@ -2448,7 +2448,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (!targetAttr->getLocation(apiVersion).empty())
+    if (targetAttr->getLocation(apiVersion))
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +

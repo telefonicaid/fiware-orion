@@ -340,9 +340,7 @@ bool processLocationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    std::string location = caP->getLocation(apiVersion);
-
-    if (location.empty())
+    if (!caP->getLocation(apiVersion))
     {
       continue;
     }
@@ -351,13 +349,6 @@ bool processLocationAtEntityCreation
     {
       *errDetail = ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC;
       oe->fill(SccRequestEntityTooLarge, *errDetail, ERROR_NO_RESOURCES_AVAILABLE);
-      return false;
-    }
-
-    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
-    {
-      *errDetail = "only WGS84 are supported, found: " + location;
-      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
 
@@ -390,22 +381,12 @@ bool processLocationAtUpdateAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-  {
-    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-    return false;
-  }
 
   //
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (!locationString.empty())
+  if (targetAttr->getLocation(apiVersion))
   {
     //
     // Case 1a:
@@ -515,19 +496,10 @@ bool processLocationAtAppendAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-  {
-    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
-    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-    return false;
-  }
+  bool        isALocation = targetAttr->getLocation(apiVersion);
 
   /* Case 1: append of new location attribute */
-  if (actualAppend && (!locationString.empty()))
+  if (actualAppend && isALocation)
   {
     /* Case 1a: there is a previous location attribute -> error */
     if (!currentLocAttrName->empty())
@@ -552,7 +524,7 @@ bool processLocationAtAppendAttribute
     }
   }
   /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (!locationString.empty()))
+  else if (!actualAppend && isALocation)
   {
     /* Case 2a: there is a previous (not empty and with different name) location attribute -> error */
     if ((!currentLocAttrName->empty()) && (*currentLocAttrName != targetAttr->name))
@@ -588,7 +560,7 @@ bool processLocationAtAppendAttribute
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.empty()) && (*currentLocAttrName == targetAttr->name))
+  else if (!actualAppend && !isALocation && (*currentLocAttrName == targetAttr->name))
   {
     *currentLocAttrName = "";
   }

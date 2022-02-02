@@ -1,1 +1,2 @@
 - Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
+- Remove: deprecated NGSIv1 location metadata to specify entity geo-location

@@ -550,25 +550,16 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
+bool ContextAttribute::getLocation(ApiVersion apiVersion) const
 {
   if (apiVersion == V1)
   {
-    // Deprecated way, but still supported
-    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
-    {
-      if (metadataVector[ix]->name == NGSI_MD_LOCATION)
-      {
-        return metadataVector[ix]->stringValue;
-      }
-    }
-
     // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
     // but doing so have problems so we need to support all them at the end, 
     // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
     if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
     {
-      return LOCATION_WGS84;
+      return true;
     }
   }
   else // v2
@@ -583,15 +574,15 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
         {
           if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
           {
-            return "";
+            return false;
           }
         }
       }
-      return LOCATION_WGS84;
+      return true;
     }
   }
 
-  return "";
+  return false;
 }
 
 
