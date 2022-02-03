@@ -550,36 +550,23 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getLocation() -
 */
-bool ContextAttribute::getLocation(ApiVersion apiVersion) const
+bool ContextAttribute::getLocation() const
 {
-  if (apiVersion == V1)
+  // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
+  if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
   {
-    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
-    // but doing so have problems so we need to support all them at the end, 
-    // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
+    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
     {
-      return true;
-    }
-  }
-  else // v2
-  {
-    // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
-    if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
-    {
-      for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+      // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
+      if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
       {
-        // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
-        if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+        if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
         {
-          if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
-          {
-            return false;
-          }
+          return false;
         }
       }
-      return true;
     }
+    return true;
   }
 
   return false;

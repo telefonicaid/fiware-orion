@@ -105,6 +105,8 @@ static bool stringArray2coords
 * ContextAttribute provided as parameter.
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
+*
+* FIXME PR: try to avoid apiVersion
 */
 static bool getGeoJson
 (
@@ -117,31 +119,6 @@ static bool getGeoJson
   std::vector<double>      coordLat;
   std::vector<double>      coordLong;
   orion::BSONArrayBuilder  ba;
-
-  if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
-      (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
-  {
-    // This corresponds to the legacy way in NGSIv1 based in metadata
-    // The block is the same that for GEO_POINT but it is clearer if we keep it separated
-
-    double  aLat;
-    double  aLong;
-
-    if (!string2coords(caP->stringValue, aLat, aLong))
-    {
-      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
-      return false;
-    }
-
-    geoJson->append("type", "Point");
-
-    orion::BSONArrayBuilder ba;
-    ba.append(aLong);
-    ba.append(aLat);
-    geoJson->append("coordinates", ba.arr());
-
-    return true;
-  }
 
   if (caP->type == GEO_POINT)
   {
@@ -340,7 +317,7 @@ bool processLocationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    if (!caP->getLocation(apiVersion))
+    if (!caP->getLocation())
     {
       continue;
     }
@@ -386,7 +363,7 @@ bool processLocationAtUpdateAttribute
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (targetAttr->getLocation(apiVersion))
+  if (targetAttr->getLocation())
   {
     //
     // Case 1a:
@@ -496,7 +473,7 @@ bool processLocationAtAppendAttribute
 )
 {
   std::string subErr;
-  bool        isALocation = targetAttr->getLocation(apiVersion);
+  bool        isALocation = targetAttr->getLocation();
 
   /* Case 1: append of new location attribute */
   if (actualAppend && isALocation)

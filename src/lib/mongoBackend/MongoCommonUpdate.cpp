@@ -2438,7 +2438,6 @@ static bool deleteContextAttributeItem
   std::string*              currentLocAttrName,
   bool*                     entityModified,
   orion::BSONDate*          dateExpiration,
-  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
@@ -2448,7 +2447,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (targetAttr->getLocation(apiVersion))
+    if (targetAttr->getLocation())
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
@@ -2618,7 +2617,6 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       &entityModified,
                                       dateExpiration,
-                                      apiVersion,
                                       oe))
       {
         return false;
