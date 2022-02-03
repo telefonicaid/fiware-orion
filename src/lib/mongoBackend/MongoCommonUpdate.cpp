@@ -630,13 +630,13 @@ static bool mergeAttrInfo
 
       mdSize++;
 
-      if (apiVersion != V2 || caP->onlyValue)
-      {
+      //if (apiVersion != V2 || caP->onlyValue)
+      //{
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
           appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
         }
-      }
+      //}
 
       // Any compound value in md is released by Metadata::~Metadata
     }
@@ -763,16 +763,16 @@ static bool contextAttributeCustomMetadataToBson
 *
 * The isReplace boolean specifies how toSet has to be filled, either:
 *
-*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isPeplace = false)
+*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isReplace = false)
 *
 * or
 *
-*   { A1: { ... }, A2: { ... } }              (in the case of isPeplace = true)
+*   { A1: { ... }, A2: { ... } }              (in the case of isReplace = true)
 *
 * The former is to be used with { $set: <toSet> }, the later to be used with { attrs: <toSet> }
 *
-* In addition, in the case of isReplace, the attribute is added to toPush (otherwise, toPush is not
-* touched).
+* In addition, in the case of isReplace, the attribute is added to attrNamesAdd (otherwise, attrNamesAdd
+* is not touched).
 *
 * You may wonder why we need toUnset if this function is not related with delete attribute
 * logic. However, it's need to "clean" metadata in some cases.
@@ -2169,6 +2169,7 @@ static void updateAttrInNotifyCer
       double now = getCurrentTime();
       caP->modDate = now;
 
+#if 0
       /* Metadata. Note we clean any previous content as updating an attribute means that all
        * its previous values are removed (this may change if someday PATCH /v2/entities/E/attrs/A/metadata
        * is implemented) */
@@ -2183,6 +2184,53 @@ static void updateAttrInNotifyCer
         // FIXME P5: maybe this can be optimized, as we started with an empty caP->metadataVector so probably
         // we can assume that every metadata is new and the "for" block is not needed (although I'm
         // not fully sure... we should test)
+        bool matchMd = false;
+        for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
+        {
+          Metadata* mdP = caP->metadataVector[kx];
+
+          if (mdP->name == targetMdP->name)
+          {
+            mdP->valueType   = targetMdP->valueType;
+            mdP->stringValue = targetMdP->stringValue;
+            mdP->boolValue   = targetMdP->boolValue;
+            mdP->numberValue = targetMdP->numberValue;
+
+            // Free old value of compound, if any
+            if (mdP->compoundValueP != NULL)
+            {
+              delete mdP->compoundValueP;
+              mdP->compoundValueP = NULL;
+            }
+
+            // Steal compound value from targetMdP
+            mdP->compoundValueP       = targetMdP->compoundValueP;
+            targetMdP->compoundValueP = NULL;
+
+            if (!targetMdP->type.empty())
+            {
+              mdP->type = targetMdP->type;
+            }
+
+            matchMd = true;
+            break;   /* kx  loop */
+          }
+        }
+
+        /* If the attribute in target attr was not found, then it has to be added*/
+        if (!matchMd)
+        {
+          Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
+          caP->metadataVector.push_back(newMdP);
+        }
+      }
+#endif
+      /* Metadata. The metadata previous content is "patched" by the metadata in the request */
+      for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
+      {
+        Metadata* targetMdP = targetAttr->metadataVector[jx];
+
+        /* Search for matching metadata in the CER attribute */
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
