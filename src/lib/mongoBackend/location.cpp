@@ -340,7 +340,7 @@ bool processLocationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    std::string location = caP->getLocation(apiVersion);
+    std::string location = caP->getLocation(NULL, apiVersion);
 
     if (location.empty())
     {
@@ -382,6 +382,7 @@ bool processLocationAtEntityCreation
 bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
+  orion::BSONObj*                attrsP,
   const ContextAttribute*        targetAttr,
   orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
@@ -390,13 +391,13 @@ bool processLocationAtUpdateAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(apiVersion);
+  std::string locationString = targetAttr->getLocation(attrsP, apiVersion);
 
   /* Check that location (if any) is using the correct coordinates string (it only
    * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
   if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
-    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    *errDetail = "only WGS84 is supported for location, found: [" + locationString + "]";
     oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
     return false;
   }
@@ -506,6 +507,7 @@ bool processLocationAtUpdateAttribute
 bool processLocationAtAppendAttribute
 (
   std::string*                   currentLocAttrName,
+  orion::BSONObj*                attrsP,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
   orion::BSONObjBuilder*         geoJson,
@@ -515,13 +517,13 @@ bool processLocationAtAppendAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(apiVersion);
+  std::string locationString = targetAttr->getLocation(attrsP, apiVersion);
 
   /* Check that location (if any) is using the correct coordinates string (it only
      * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
   if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
-    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    *errDetail = "only WGS84 is supported for location, found: [" + locationString + "]";
     oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
     return false;
   }

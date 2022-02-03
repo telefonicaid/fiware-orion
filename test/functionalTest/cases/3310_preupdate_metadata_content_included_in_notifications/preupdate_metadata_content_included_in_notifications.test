@@ -33,8 +33,8 @@ accumulatorStart --pretty-print
 #
 # 02. Create subscription
 # 01. Create entity E with atribute A with metadata MDA=1 (triggers notif)
-# 03. Update attribute A with MDB=2 (triggers notif)
-# 04. Update attribute A without metadata (triggers notif)
+# 03. Update attribute A with MDB=2 with resetMetadata (triggers notif)
+# 04. Update attribute A without metadata with resetMetadata (triggers notif)
 # 05. Create new entity E2 with attribute A with metadata MDC=3 (triggers notif)
 # 06. Dump accumulator and see four notification: E-A-MDA=1, E-A-MDB=2, E-A-<no-metadata>, E2-A-MDC=3
 #
@@ -85,8 +85,8 @@ echo
 echo
 
 
-echo "03. Update attribute A with MDB=2 (triggers notif)"
-echo "=================================================="
+echo "03. Update attribute A with MDB=2 with resetMetadata (triggers notif)"
+echo "====================================================================="
 payload='{
   "A":{
     "type": "Text",
@@ -99,20 +99,20 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+orionCurl --url '/v2/entities/E/attrs?options=resetMetadata' -X PATCH --payload "$payload"
 echo
 echo
 
 
-echo "04. Update attribute A without metadata (triggers notif)"
-echo "========================================================"
+echo "04. Update attribute A without metadata with resetMetadata (triggers notif)"
+echo "==========================================================================="
 payload='{
   "A":{
     "type": "Text",
     "value": "bar"
   }
 }'
-orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+orionCurl --url '/v2/entities/E/attrs?options=resetMetadata' -X PATCH --payload "$payload"
 echo
 echo
 
@@ -166,16 +166,16 @@ Date: REGEX(.*)
 
 
 
-03. Update attribute A with MDB=2 (triggers notif)
-==================================================
+03. Update attribute A with MDB=2 with resetMetadata (triggers notif)
+=====================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-04. Update attribute A without metadata (triggers notif)
-========================================================
+04. Update attribute A without metadata with resetMetadata (triggers notif)
+===========================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

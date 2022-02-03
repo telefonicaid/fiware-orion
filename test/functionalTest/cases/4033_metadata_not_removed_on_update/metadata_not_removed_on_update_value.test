@@ -30,7 +30,7 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-#
+# FIXME PR: use resetMetadata to check it is ignored in this case
 # 01. Create subscription for entity E
 # 02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2
 # 03. GET entity E and see A=foo with metadata MD1=1 and MD2=2

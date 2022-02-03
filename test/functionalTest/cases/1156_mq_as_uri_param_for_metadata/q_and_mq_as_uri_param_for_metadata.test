@@ -41,7 +41,7 @@ accumulatorStart --pretty-print
 # 08. Dump accumulator, see E2, then reset accumulator
 # 09. Modify the subscription to have q=A1 AND mq=A1.M1
 # 10. GET E3, just to check the value/type of its A1 attribute
-# 11. Update E3, setting M1 to A1
+# 11. Update E3, setting M1 to A1 with resetMetadata
 # 12. GET E3, just to check the value/type of its A1 attribute
 # 13. Dump accumulator, see E3
 #
@@ -204,8 +204,8 @@ echo
 echo
 
 
-echo "11. Update E3, setting M1 to A1"
-echo "==============================="
+echo "11. Update E3, setting M1 to A1 with resetMetadata"
+echo "=================================================="
 payload='{
   "A1": {
     "metadata": {
@@ -215,7 +215,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E3/attrs --payload "$payload" -X PATCH
+orionCurl --url '/v2/entities/E3/attrs?options=resetMetadata' --payload "$payload" -X PATCH
 echo
 echo
 
@@ -418,8 +418,8 @@ Date: REGEX(.*)
 }
 
 
-11. Update E3, setting M1 to A1
-===============================
+11. Update E3, setting M1 to A1 with resetMetadata
+==================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

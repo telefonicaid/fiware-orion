@@ -63,10 +63,11 @@ HttpStatusCode mongoNotifyContext
   {
     UpdateContextResponse               ucr;        // Unused, necessary for processContextElement()
     std::map<std::string, std::string>  uriParams;  // Unused, necessary for processContextElement()
-    Entity*                             eP           = &requestP->contextElementResponseVector[ix]->entity;
-    bool                                forcedUpdate = false;
+    Entity*                             eP            = &requestP->contextElementResponseVector[ix]->entity;
+    bool                                forcedUpdate  = false;
+    bool                                resetMetadata = false;
 
-    processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, 0);
+    processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, resetMetadata, 0);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
