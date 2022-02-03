@@ -229,13 +229,17 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   }
 
   //
-  // All requests are either arrays or objects
+  // Most requests are either arrays or objects
+  // PATCH Attribute can have a payload body of any JSON type
   //
-  if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
+  if (orionldState.serviceP->serviceRoutine != orionldPatchAttribute)
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
-    orionldState.httpStatusCode = 400;
-    return false;
+    if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
+    {
+      orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
   }
 
   //
@@ -339,30 +343,32 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   {
     KjNode* prev = NULL;
 
-    for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+    if (orionldState.requestTree->type == KjObject)
     {
-      if (attrNodeP->name == NULL)
-        continue;
-
-      if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+      for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
-        if (orionldState.payloadContextNode != NULL)
+        if (attrNodeP->name == NULL)
+          continue;
+
+        if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
-          LM_W(("Bad Input (duplicated attribute: '@context'"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
-          orionldState.httpStatusCode = 400;
-          return false;
+          if (orionldState.payloadContextNode != NULL)
+          {
+            LM_W(("Bad Input (duplicated attribute: '@context'"));
+            orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+            orionldState.httpStatusCode = 400;
+            return false;
+          }
+
+          orionldState.payloadContextNode = attrNodeP;
+
+          kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
         }
 
-        orionldState.payloadContextNode = attrNodeP;
-
-        kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
+        prev = attrNodeP;
       }
-
-      prev = attrNodeP;
     }
   }
-
 
   if (orionldState.payloadContextNode != NULL)
   {
@@ -614,6 +620,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
+  LM_TMP(("KZ: Payload Body: %s", orionldState.in.payload));
   //
   // Predetected Error from orionldMhdConnectionInit?
   //

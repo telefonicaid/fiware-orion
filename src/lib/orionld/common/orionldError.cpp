@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +22,33 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
+#include "orionld/common/orionldError.h"                      // Own interface
 
 
-// -----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
 //
-// pcheckUri -
+// orionldError -
 //
-extern bool pcheckUri(char* uri, bool strict,    char**                  detailP);
-extern bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails*  pdP);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+void orionldError
+(
+  OrionldProblemDetails*    pdP,
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail,
+  int                       status
+)
+{
+  //
+  // Id pdP already contains an error, then that first error prevails
+  //
+  if (pdP->type != 0)
+  {
+    pdP->type   = errorType;
+    pdP->title  = (char*) title;
+    pdP->detail = (char*) detail;
+    pdP->status = status;
+  }
+}

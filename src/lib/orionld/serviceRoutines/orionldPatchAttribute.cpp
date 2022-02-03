@@ -32,10 +32,10 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
@@ -48,9 +48,9 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
+#include "orionld/payloadCheck/pbodyAttribute.h"                 // pbodyAttribute
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -699,13 +699,8 @@ bool orionldPatchAttribute(void)
   //
   // 1.1 Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URI");  // FIXME: Include 'detail' and name (entityId)
+  if (pCheckUri(entityId, true, &orionldState.pd) == false)
     return false;
-  }
 
   //
   // 1.2 Make sure the attrName (orionldState.wildcard[1]) is a valid NAME or URI
@@ -721,36 +716,25 @@ bool orionldPatchAttribute(void)
   //
   // 1.3 If createdAt or modifiedAt are found in the incoming payload body - remove them
   //
-  nodeP = kjLookup(inAttribute, "createdAt");
-  if (nodeP != NULL)
-    kjChildRemove(inAttribute, nodeP);
+  if ((nodeP = kjLookup(inAttribute, "createdAt"))  != NULL) kjChildRemove(inAttribute, nodeP);
+  if ((nodeP = kjLookup(inAttribute, "modifiedAt")) != NULL) kjChildRemove(inAttribute, nodeP);
 
-  nodeP = kjLookup(inAttribute, "modifiedAt");
-  if (nodeP != NULL)
-    kjChildRemove(inAttribute, nodeP);
 
+
+  //
+  // Check and Normalize
+  //
+  char buf[2048];
+  kjFastRender(inAttribute, buf);
+  LM_TMP(("inAttribute BEFORE pbodyAttribute: %s", buf));
+  if (pbodyAttribute(inAttribute, &orionldState.pd) == false)
+    return false;
+  kjFastRender(inAttribute, buf);
+  LM_TMP(("inAttribute AFTER pbodyAttribute: %s", buf));
 
   char* attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
   char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
   dotForEq(attrNameExpandedEq);
-
-  //
-  // 1.4 If keyValues is set, modify the tree accordingly (add objects for all sub-attributes with "type" and "value")
-  //
-  if (orionldState.uriParamOptions.keyValues == true)
-  {
-    // Need info from DB for this (attribute type)
-    dbAttributeP = attributeFromDb(entityId, attrName, attrNameExpanded, attrNameExpandedEq);
-    if (dbAttributeP == NULL)
-      return false;
-
-    inAttribute = kjAttributeKeyValueAmend(inAttribute, dbAttributeP, &dbAttributeTypeNodeP);
-    if (inAttribute == NULL)
-    {
-      LM_E(("kjAttributeKeyValueAmend failed"));
-      return false;
-    }
-  }
 
 
   //
@@ -822,6 +806,9 @@ bool orionldPatchAttribute(void)
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
+  kjFastRender(inAttribute, buf);
+  LM_TMP(("Looking for 'type' in: %s", buf));
+
   KjNode* inType = kjLookup(inAttribute, "type");
   if (inType != NULL)
   {

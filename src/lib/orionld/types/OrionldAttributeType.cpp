@@ -29,8 +29,9 @@
 //
 // orionldAttributeTypeName -
 //
-const char* orionldAttributeTypeName[4] =
+const char* orionldAttributeTypeName[5] =
 {
+  "NoAttributeType",
   "Property",
   "Relationship",
   "GeoProperty",

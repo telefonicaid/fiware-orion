@@ -367,11 +367,11 @@ MongoDB server version: REGEX(.*)
 	"@datasets" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P1:D1 from step 03"
+				"value" : "P1:D1 from step 03",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
@@ -470,11 +470,11 @@ MongoDB server version: REGEX(.*)
 	"@datasets" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P1:D1 from step 03"
+				"value" : "P1:D1 from step 03",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
@@ -485,11 +485,11 @@ MongoDB server version: REGEX(.*)
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-			"type" : "Property",
 			"datasetId" : "urn:ngsi-ld:dataset:D1",
 			"createdAt" : REGEX(.*),
 			"modifiedAt" : REGEX(.*),
-			"value" : "P2:D1 from step 05"
+			"value" : "P2:D1 from step 05",
+			"type" : "Property"
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
 			{
@@ -580,11 +580,11 @@ MongoDB server version: REGEX(.*)
 	"@datasets" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P1:D1 from step 03"
+				"value" : "P1:D1 from step 03",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
@@ -595,11 +595,11 @@ MongoDB server version: REGEX(.*)
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-			"type" : "Property",
 			"datasetId" : "urn:ngsi-ld:dataset:D1",
 			"createdAt" : REGEX(.*),
 			"modifiedAt" : REGEX(.*),
-			"value" : "P2:D1 from step 05"
+			"value" : "P2:D1 from step 05",
+			"type" : "Property"
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
 			{
@@ -683,11 +683,11 @@ MongoDB server version: REGEX(.*)
 	"@datasets" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P1:D1 from step 03"
+				"value" : "P1:D1 from step 03",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
@@ -698,19 +698,19 @@ MongoDB server version: REGEX(.*)
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-			"type" : "Property",
 			"datasetId" : "urn:ngsi-ld:dataset:D1",
 			"createdAt" : REGEX(.*),
 			"modifiedAt" : REGEX(.*),
-			"value" : "P2:D1 from step 05"
+			"value" : "P2:D1 from step 05",
+			"type" : "Property"
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*)
-				"value" : "P4:D1 from step 09"
+				"value" : "P4:D1 from step 09",
+				"type" : "Property"
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
@@ -786,11 +786,11 @@ MongoDB server version: REGEX(.*)
 	"@datasets" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P1:D1 from step 03"
+				"value" : "P1:D1 from step 03",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
@@ -801,28 +801,28 @@ MongoDB server version: REGEX(.*)
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-			"type" : "Property",
 			"datasetId" : "urn:ngsi-ld:dataset:D1",
 			"createdAt" : REGEX(.*),
 			"modifiedAt" : REGEX(.*),
-			"value" : "P2:D1 from step 05"
+			"value" : "P2:D1 from step 05",
+			"type" : "Property"
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P4:D1 from step 09"
+				"value" : "P4:D1 from step 09",
+				"type" : "Property"
 			}
 		],
 		"https://uri=etsi=org/ngsi-ld/default-context/P5" : [
 			{
-				"type" : "Property",
 				"datasetId" : "urn:ngsi-ld:dataset:D1",
 				"createdAt" : REGEX(.*),
 				"modifiedAt" : REGEX(.*),
-				"value" : "P5:D1 from step 11"
+				"value" : "P5:D1 from step 11",
+				"type" : "Property"
 			},
 			{
 				"type" : "Property",
