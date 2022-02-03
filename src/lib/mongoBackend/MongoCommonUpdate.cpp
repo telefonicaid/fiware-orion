@@ -527,7 +527,7 @@ static bool mergeAttrInfo
   orion::BSONObjBuilder*  toSet,
   orion::BSONObjBuilder*  toUnset,
   const bool&             forcedUpdate,
-  bool                    resetMetadata,
+  const bool&             resetMetadata,
   ApiVersion              apiVersion
 )
 {
@@ -788,7 +788,7 @@ static bool updateAttribute
   bool*                     actualUpdate,
   bool                      isReplace,
   const bool&               forcedUpdate,
-  bool                      resetMetadata,
+  const bool&               resetMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -884,7 +884,7 @@ static bool appendAttribute
   ContextAttribute*         caP,
   bool*                     actualUpdate,
   const bool&               forcedUpdate,
-  bool                      resetMetadata,
+  const bool&               resetMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -2108,7 +2108,7 @@ static void updateAttrInNotifyCer
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
   const std::string&      actionType,
-  bool                    resetMetadata
+  const bool&             resetMetadata
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2302,7 +2302,7 @@ static bool updateContextAttributeItem
   bool*                     dateExpirationInPayload,
   bool                      isReplace,
   const bool&               forcedUpdate,
-  bool                      resetMetadata,
+  const bool&               resetMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
@@ -2385,7 +2385,7 @@ static bool appendContextAttributeItem
   orion::BSONObjBuilder*    geoJson,
   orion::BSONDate*          dateExpiration,
   const bool&               forcedUpdate,
-  bool                      resetMetadata,
+  const bool&               resetMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
@@ -2532,7 +2532,7 @@ static bool processContextAttributeVector
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   const bool&                                     forcedUpdate,
-  bool                                            resetMetadata,
+  const bool&                                     resetMetadata,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
@@ -3330,7 +3330,7 @@ static unsigned int updateEntity
   bool*                           attributeNotExistingError,
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
-  bool                            resetMetadata,
+  const bool&                     resetMetadata,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   unsigned int                    notifStartCounter,
@@ -3916,7 +3916,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
-  bool                                 resetMetadata,
+  const bool&                          resetMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour

@@ -50,7 +50,7 @@ extern HttpStatusCode mongoUpdateContext
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate     = false,
-  bool                                  resetMetadata    = false,
+  const bool&                           resetMetadata    = false,
   ApiVersion                            apiVersion       = V1,
   Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR,
   bool                                  flowControl      = false
