@@ -607,12 +607,12 @@ std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion api
       if (attrsP != NULL)
       {
         std::string effectiveName = dbEncode(name);
-        if (!attrsP->hasField(effectiveName.c_str()))
+        if (attrsP->hasField(effectiveName))
         {
           orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
           if (attr.hasField(ENT_ATTRS_MD))
           {
-            // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+            // FIXME PR: not sure if this way of lookup the metadata collection is the best one
             // or can be simplified
             orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
             std::set<std::string>  mdsSet;

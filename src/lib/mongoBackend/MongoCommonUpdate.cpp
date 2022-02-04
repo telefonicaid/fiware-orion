@@ -2340,7 +2340,9 @@ static bool updateContextAttributeItem
     }
   }
   /* Check aspects related with location and date expiration */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, attrsP, targetAttr, geoJson, &err, apiVersion, oe)
+  /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
+   * i.e. if resetMetadata is not in use */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, resetMetadata? NULL : attrsP, targetAttr, geoJson, &err, apiVersion, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
@@ -2397,7 +2399,9 @@ static bool appendContextAttributeItem
   *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
-  if (!processLocationAtAppendAttribute(currentLocAttrName, attrsP, targetAttr, actualAppend, geoJson,
+  /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
+   * i.e. if resetMetadata is not in use */
+  if (!processLocationAtAppendAttribute(currentLocAttrName, resetMetadata? NULL : attrsP, targetAttr, actualAppend, geoJson,
                                         &err, apiVersion, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
