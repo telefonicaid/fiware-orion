@@ -78,8 +78,8 @@ brokerStart CB
 # 07. GET the entity and see the update from step the previous step
 # 08. PATCH the Property P with simplified format, setting it to the BOOL true
 # 09. GET the entity and see the update from the previous step
-# 10. PATCH the Property P with simplified format, using { "a": 1 }
-# 11. GET the entity and see the update from the previous step
+# 10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail
+# 11. GET the entity and see NO update from the previous step
 # 12. PATCH the Property P with simplified format, using [ 1, 2 ]
 # 13. GET the entity and see the update from the previous step
 # 14. PATCH the GeoProperty G with simplified format, making it a polygon
@@ -202,8 +202,8 @@ echo
 echo
 
 
-echo '10. PATCH the Property P with simplified format, using { "a": 1 }'
-echo "================================================================="
+echo '10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail'
+echo "==============================================================================="
 payload='{
   "a": 1
 }'
@@ -212,8 +212,8 @@ echo
 echo
 
 
-echo "11. GET the entity and see the update from the previous step"
-echo "============================================================"
+echo "11. GET the entity and see No update from the previous step"
+echo "==========================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 echo
 echo
@@ -613,17 +613,24 @@ Date: REGEX(.*)
 }
 
 
-10. PATCH the Property P with simplified format, using { "a": 1 }
-=================================================================
-HTTP/1.1 204 No Content
+10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "detail": "value/object/languageMap",
+    "title": "Mandatory field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
-11. GET the entity and see the update from the previous step
-============================================================
+11. GET the entity and see NO update from the previous step
+===========================================================
 HTTP/1.1 200 OK
-Content-Length: 265
+Content-Length: 262
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -645,9 +652,7 @@ Date: REGEX(.*)
             "value": "kept after PATCH"
         },
         "type": "Property",
-        "value": {
-            "a": 1
-        }
+        "value": true
     },
     "R": {
         "object": "urn:test:step:01",

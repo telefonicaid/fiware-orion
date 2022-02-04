@@ -724,13 +724,13 @@ bool orionldPatchAttribute(void)
   //
   // Check and Normalize
   //
-  char buf[2048];
-  kjFastRender(inAttribute, buf);
-  LM_TMP(("inAttribute BEFORE pbodyAttribute: %s", buf));
-  if (pbodyAttribute(inAttribute, &orionldState.pd) == false)
+  if (pbodyAttribute(inAttribute, 0, &orionldState.pd) == false)
+  {
+    LM_TMP(("KZ: pbodyAttribute failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    orionldState.httpStatusCode = 400;
+    orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
     return false;
-  kjFastRender(inAttribute, buf);
-  LM_TMP(("inAttribute AFTER pbodyAttribute: %s", buf));
+  }
 
   char* attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
   char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
@@ -806,6 +806,7 @@ bool orionldPatchAttribute(void)
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
+  char buf[2048];
   kjFastRender(inAttribute, buf);
   LM_TMP(("Looking for 'type' in: %s", buf));
 

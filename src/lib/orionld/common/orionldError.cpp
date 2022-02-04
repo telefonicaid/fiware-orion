@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                    // LM_*
+
 #include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
 #include "orionld/common/orionldError.h"                      // Own interface
@@ -44,11 +46,13 @@ void orionldError
   //
   // Id pdP already contains an error, then that first error prevails
   //
-  if (pdP->type != 0)
+  //  if (pdP->type != 0)
   {
     pdP->type   = errorType;
     pdP->title  = (char*) title;
     pdP->detail = (char*) detail;
     pdP->status = status;
   }
+
+  LM_E(("%s: %s (status code: %d", title, detail, status));
 }
