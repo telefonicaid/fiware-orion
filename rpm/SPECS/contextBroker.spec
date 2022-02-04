@@ -193,6 +193,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Feb 04 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.5.1-1
+- Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
+
 * Fri Jan 28 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.5.0-1
 - Fix: avoid duplicated attributes and metadata in arrays in POST /v2/subscriptions and PATCH /v2/subscriptions/{subId} (#2101)
 - Fix: $each usage with $push operator to add several items to array (#744)

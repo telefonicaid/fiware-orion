@@ -576,6 +576,17 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
     // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
     if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
+      for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+      {
+        // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
+        if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+        {
+          if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
+          {
+            return "";
+          }
+        }
+      }
       return LOCATION_WGS84;
     }
   }
