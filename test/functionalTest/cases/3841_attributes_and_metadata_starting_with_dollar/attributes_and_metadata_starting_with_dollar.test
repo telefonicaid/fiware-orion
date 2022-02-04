@@ -36,7 +36,7 @@ brokerStart CB
 # 04. Get entity, see $temperature=32 $avg=33
 # 05. Add attribute $humidity=0.9 with metadata $min=0.8
 # 06. Get entity, see $temperature=32 $avg=33 $humidty=0.9 $min=0.8
-# 07. Update $temperature=32 $max=40 (with resetMetadata so removing $avg metadata)
+# 07. Update $temperature=32 $max=40 (with overrideMetadata so removing $avg metadata)
 # 08. Get entity, see $temperature=32 $max=40 $humidty=0.9 $min=0.8
 # 09. Remove $temperature attribute
 # 10. Get entity, see $humidty=0.9 $min=0.8
@@ -123,8 +123,8 @@ echo
 echo
 
 
-echo '07. Update $temperature=32 $max=40 (with resetMetadata so removing $avg metadata)'
-echo '================================================================================='
+echo '07. Update $temperature=32 $max=40 (with overrideMetadata so removing $avg metadata)'
+echo '===================================================================================='
 payload='{
   "$temperature": {
     "value": 32,
@@ -137,7 +137,7 @@ payload='{
     }
   }
 }'
-orionCurl --url '/v2/entities/E/attrs?options=resetMetadata' --payload "$payload"
+orionCurl --url '/v2/entities/E/attrs?options=overrideMetadata' --payload "$payload"
 echo
 echo
 
@@ -272,8 +272,8 @@ Date: REGEX(.*)
 }
 
 
-07. Update $temperature=32 $max=40 (with resetMetadata so removing $avg metadata)
-=================================================================================
+07. Update $temperature=32 $max=40 (with overrideMetadata so removing $avg metadata)
+====================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

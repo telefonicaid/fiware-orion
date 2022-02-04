@@ -556,7 +556,7 @@ ContextAttribute::ContextAttribute
 * attribute. Note this parameter is NULL is some of the following situations:
 *
 * - At entity creation time (as there is not attrs object in that case)
-* - If resetMetadata option is used (as in this case existing medatada are goint to be deleted and
+* - If overrideMetadata option is used (as in this case existing medatada are goint to be deleted and
 *   doesn't count for looking ignoreTYpe)
 */
 std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const

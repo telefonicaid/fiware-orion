@@ -527,7 +527,7 @@ static bool mergeAttrInfo
   orion::BSONObjBuilder*  toSet,
   orion::BSONObjBuilder*  toUnset,
   const bool&             forcedUpdate,
-  const bool&             resetMetadata,
+  const bool&             overrideMetadata,
   ApiVersion              apiVersion
 )
 {
@@ -631,7 +631,7 @@ static bool mergeAttrInfo
 
       mdSize++;
 
-      if (apiVersion != V2 || caP->onlyValue || !resetMetadata)
+      if (apiVersion != V2 || caP->onlyValue || !overrideMetadata)
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
@@ -788,7 +788,7 @@ static bool updateAttribute
   bool*                     actualUpdate,
   bool                      isReplace,
   const bool&               forcedUpdate,
-  const bool&               resetMetadata,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -850,7 +850,7 @@ static bool updateAttribute
     orion::BSONObj newAttr;
     orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, resetMetadata, apiVersion);
+    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata, apiVersion);
   }
 
   return true;
@@ -884,7 +884,7 @@ static bool appendAttribute
   ContextAttribute*         caP,
   bool*                     actualUpdate,
   const bool&               forcedUpdate,
-  const bool&               resetMetadata,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -894,7 +894,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrsP->hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, resetMetadata, apiVersion);
+    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, overrideMetadata, apiVersion);
     return false;
   }
 
@@ -2108,7 +2108,7 @@ static void updateAttrInNotifyCer
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
   const std::string&      actionType,
-  const bool&             resetMetadata
+  const bool&             overrideMetadata
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2174,9 +2174,9 @@ static void updateAttrInNotifyCer
       caP->modDate = now;
 
       /* Metadata. The metadata previous content is "patched" by the metadata in the request,
-         except if resetMetadata option is used, in which case a previous cleanup is done*/
-      // FIXME PR: fix contition so caP->onlyValue overrides resetMetadta
-      if (resetMetadata)
+         except if overrideMetadata option is used, in which case a previous cleanup is done*/
+      // FIXME PR: fix contition so caP->onlyValue overrides overrideMetadata
+      if (overrideMetadata)
       {
         caP->metadataVector.release();
       }
@@ -2302,14 +2302,14 @@ static bool updateContextAttributeItem
   bool*                     dateExpirationInPayload,
   bool                      isReplace,
   const bool&               forcedUpdate,
-  const bool&               resetMetadata,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, resetMetadata, apiVersion))
+  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, overrideMetadata, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2341,8 +2341,8 @@ static bool updateContextAttributeItem
   }
   /* Check aspects related with location and date expiration */
   /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
-   * i.e. if resetMetadata is not in use */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, resetMetadata? NULL : attrsP, targetAttr, geoJson, &err, apiVersion, oe)
+   * i.e. if overrideMetadata is not in use */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, apiVersion, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
@@ -2357,7 +2357,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE, resetMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
 
   return true;
 }
@@ -2387,21 +2387,21 @@ static bool appendContextAttributeItem
   orion::BSONObjBuilder*    geoJson,
   orion::BSONDate*          dateExpiration,
   const bool&               forcedUpdate,
-  const bool&               resetMetadata,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, resetMetadata, apiVersion);
+  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, overrideMetadata, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
   /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
-   * i.e. if resetMetadata is not in use */
-  if (!processLocationAtAppendAttribute(currentLocAttrName, resetMetadata? NULL : attrsP, targetAttr, actualAppend, geoJson,
+   * i.e. if overrideMetadata is not in use */
+  if (!processLocationAtAppendAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, actualAppend, geoJson,
                                         &err, apiVersion, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
@@ -2422,7 +2422,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType, resetMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType, overrideMetadata);
 
   return true;
 }
@@ -2536,7 +2536,7 @@ static bool processContextAttributeVector
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   const bool&                                     forcedUpdate,
-  const bool&                                     resetMetadata,
+  const bool&                                     overrideMetadata,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
@@ -2586,7 +2586,7 @@ static bool processContextAttributeVector
                                       dateExpirationInPayload,
                                       action == ActionTypeReplace,
                                       forcedUpdate,
-                                      resetMetadata,
+                                      overrideMetadata,
                                       apiVersion,
                                       oe))
       {
@@ -2609,7 +2609,7 @@ static bool processContextAttributeVector
                                       geoJson,
                                       dateExpiration,
                                       forcedUpdate,
-                                      resetMetadata,
+                                      overrideMetadata,
                                       apiVersion,
                                       oe))
       {
@@ -3334,7 +3334,7 @@ static unsigned int updateEntity
   bool*                           attributeNotExistingError,
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
-  const bool&                     resetMetadata,
+  const bool&                     overrideMetadata,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   unsigned int                    notifStartCounter,
@@ -3503,7 +3503,7 @@ static unsigned int updateEntity
                                      tenant,
                                      servicePathV,
                                      forcedUpdate,
-                                     resetMetadata,
+                                     overrideMetadata,
                                      apiVersion,
                                      loopDetected,
                                      &(responseP->oe)))
@@ -3920,7 +3920,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
-  const bool&                          resetMetadata,
+  const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
@@ -4093,7 +4093,7 @@ unsigned int processContextElement
                              &attributeNotExistingError,
                              &attributeNotExistingList,
                              forcedUpdate,
-                             resetMetadata,
+                             overrideMetadata,
                              apiVersion,
                              fiwareCorrelator,
                              notifStartCounter,

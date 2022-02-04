@@ -36,10 +36,10 @@ accumulatorStart --pretty-print
 # 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
 # 04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)
 # 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
-# 06. Update E (with resetMetadata) to remove ignoreType metadata in L2: see fail
+# 06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
 # 07. Update E to add ignoreType metadata in L1: success
 # 08. GET geoquery near 1m around L1, to check there is no result
-# 09. Update E (with resetMetadata) to remove ignoreType metadata in L2: success
+# 09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
 # 10. GET geoquery near 1m around L2, to check this is the actual location of the entity
 #
 
@@ -121,15 +121,15 @@ echo
 echo
 
 
-echo "06. Update E (with resetMetadata) to remove ignoreType metadata in L2: see fail"
-echo "==============================================================================="
+echo "06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail"
+echo "=================================================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
     "type": "geo:json"
   }
 }'
-orionCurl --url '/v2/entities/E/attrs?options=resetMetadata' --payload "${payload}"
+orionCurl --url '/v2/entities/E/attrs?options=overrideMetadata' --payload "${payload}"
 echo
 echo
 
@@ -160,15 +160,15 @@ echo
 echo
 
 
-echo "09. Update E (with resetMetadata) to remove ignoreType metadata in L2: success"
-echo "=============================================================================="
+echo "09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success"
+echo "================================================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
     "type": "geo:json"
   }
 }'
-orionCurl --url '/v2/entities/E/attrs?options=resetMetadata' --payload "${payload}"
+orionCurl --url '/v2/entities/E/attrs?options=overrideMetadata' --payload "${payload}"
 echo
 echo
 
@@ -384,8 +384,8 @@ Date: REGEX(.*)
 ]
 
 
-06. Update E (with resetMetadata) to remove ignoreType metadata in L2: see fail
-===============================================================================
+06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
+==================================================================================
 HTTP/1.1 413 Payload Too Large
 Content-Length: 202
 Content-Type: application/json
@@ -417,8 +417,8 @@ Date: REGEX(.*)
 []
 
 
-09. Update E (with resetMetadata) to remove ignoreType metadata in L2: success
-==============================================================================
+09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
+============================0====================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

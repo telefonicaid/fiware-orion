@@ -114,7 +114,7 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate,
-  const bool&                           resetMetadata,
+  const bool&                           overrideMetadata,
   ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour,
   bool                                  flowControl
@@ -162,7 +162,7 @@ HttpStatusCode mongoUpdateContext
                                          fiwareCorrelator,
                                          ngsiV2AttrsFormat,
                                          forcedUpdate,
-                                         resetMetadata,
+                                         overrideMetadata,
                                          notifSent,
                                          apiVersion,
                                          ngsiv2Flavour);

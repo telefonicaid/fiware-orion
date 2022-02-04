@@ -126,7 +126,7 @@
 #define OPT_UPSERT                      "upsert"
 #define OPT_SKIPINITALNOTIFICATION      "skipInitialNotification"
 #define OPT_FORCEDUPDATE                "forcedUpdate"
-#define OPT_RESETMETADATA               "resetMetadata"
+#define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
 
 
