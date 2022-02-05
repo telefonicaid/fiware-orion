@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,19 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                     // KjNode
+}
+
 #include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
+
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckUri -
+// pbodyAttribute -
 //
-extern bool pcheckUri(char* uri, bool strict,    char**                  detailP);
-extern bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails*  pdP);
+extern bool pbodyAttribute(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_

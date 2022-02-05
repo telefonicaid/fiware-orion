@@ -442,13 +442,13 @@ bye
 03. Attempt to PATCH E1/P1 by changing the type of E1/P1 to Relationship - see error
 ====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "attribute type cannot be modified",
-    "title": "Invalid Attribute Type",
+    "detail": "P1",
+    "title": "Attempt to change the Type of an Attribute",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

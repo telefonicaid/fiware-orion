@@ -81,7 +81,7 @@ KjNode* kjEntityKeyValueAmend(KjNode* entityP)
     attrNodeP->name = (attributeType == Relationship)? (char*) "object" : (char*) "value";
     kjChildAdd(objectP, attrNodeP);
 
-    KjNode* typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName[attributeType]);
+    KjNode* typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName(attributeType));
     kjChildAdd(objectP, typeP);
 
     kjChildAdd(outP, objectP);

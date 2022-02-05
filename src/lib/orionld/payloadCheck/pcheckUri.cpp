@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                      // LM_*
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/payloadCheck/pcheckUri.h"                     // Own interface
 
 
@@ -178,6 +179,92 @@ bool pcheckUri(char* uri, bool strict, char** detailP)
       if (valid[(unsigned char) *s] == false)
       {
         *detailP = (char*) "invalid character in URI";
+        LM_W(("Bad Input (invalid character in URI '%s', at position %d (0x%x)", uri, (int) (s - uri),  *s & 0xFF));
+        return false;
+      }
+
+      ++s;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUri - newer version of pcheckUri - accepting OrionldProblemDetails as input/output
+//
+bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP)
+{
+  bool hasColon = false;
+
+  if (uri == NULL)
+  {
+    orionldError(pdP, OrionldBadRequestData, "No URI", NULL, 400);
+    LM_W(("Bad Input (%s)", pdP->title));
+    return false;
+  }
+  else if (*uri == 0)
+  {
+    orionldError(pdP, OrionldBadRequestData, "Empty URI", NULL, 400);
+    LM_W(("Bad Input (%s)", pdP->title));
+    return false;
+  }
+
+
+  //
+  // Is there a colon somewhere inside the URI string?
+  //
+  char* s = uri;
+  while (*s != 0)
+  {
+    if (*s == ':')
+      hasColon = true;
+    ++s;
+  }
+
+  //
+  // If it's a strict URI (mustBeUri == TRUE) - there must be a colon present
+  //
+  if ((mustBeUri == true) && (hasColon == false))
+  {
+    orionldError(pdP, OrionldBadRequestData, "Invalid URI", "No colon present", 400);
+    LM_W(("Bad Input (%s: %s)", pdP->title, pdP->detail));
+    return false;
+  }
+
+
+  //
+  // If not strict and no colon found - it's considered a shortname
+  // For shortnames, we only check for the space character - it's forbidden
+  //
+  if ((mustBeUri == false) && (hasColon == false))
+  {
+    s = uri;
+
+    while (*s != 0)
+    {
+      if (*s == ' ')
+      {
+        orionldError(pdP, OrionldBadRequestData, "Invalid URI/Shortname", "whitespace in shortname", 400);
+        LM_W(("Bad Input (%s: %s)", pdP->title, pdP->detail));
+        return false;
+      }
+
+      ++s;
+    }
+  }
+  else
+  {
+    s = uri;
+
+    while (*s != 0)
+    {
+      if (valid[(unsigned char) *s] == false)
+      {
+        orionldError(pdP, OrionldBadRequestData, "Invalid URI", "invalid character", 400);
         LM_W(("Bad Input (invalid character in URI '%s', at position %d (0x%x)", uri, (int) (s - uri),  *s & 0xFF));
         return false;
       }

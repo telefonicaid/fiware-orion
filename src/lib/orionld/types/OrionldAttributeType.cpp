@@ -22,6 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strcmp
+
+#include "logMsg/logMsg.h"                                       // LM_*
+
+#include "orionld/types/OrionldAttributeType.h"                  // Own interface
 
 
 
@@ -29,10 +34,32 @@
 //
 // orionldAttributeTypeName -
 //
-const char* orionldAttributeTypeName[4] =
+const char* orionldAttributeTypeName(OrionldAttributeType attributeType)
 {
-  "Property",
-  "Relationship",
-  "GeoProperty",
-  "LanguageProperty"
-};
+  switch (attributeType)
+  {
+  case NoAttributeType:   return "NoAttributeType";
+  case Property:          return "Property";
+  case Relationship:      return "Relationship";
+  case GeoProperty:       return "GeoProperty";
+  case LanguageProperty:  return "LanguageProperty";
+  }
+
+  return "InvalidAttributeType";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAttributeType -
+//
+OrionldAttributeType orionldAttributeType(const char* typeString)
+{
+  if      (strcmp(typeString, "Property")          == 0) return Property;
+  else if (strcmp(typeString, "Relationship")      == 0) return Relationship;
+  else if (strcmp(typeString, "GeoProperty")       == 0) return GeoProperty;
+  else if (strcmp(typeString, "LanguageProperty")  == 0) return LanguageProperty;
+
+  return NoAttributeType;
+}

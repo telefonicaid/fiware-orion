@@ -58,6 +58,7 @@ SET (SOURCES
     tenantList.cpp
     mimeTypeFromString.cpp
     attributeTypeFromUriParam.cpp
+    orionldError.cpp
 )
 
 # Include directories

@@ -203,7 +203,7 @@ KjNode* kjAttributeKeyValueAmend(KjNode* attrP, KjNode* dbAttributeP, KjNode** d
     kjChildAdd(objectP, nodeP);
 
     // Add the type
-    KjNode* typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName[attributeType]);
+    KjNode* typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName(attributeType));
     kjChildAdd(objectP, typeP);
 
     // Add sub-attr to outgoing tree

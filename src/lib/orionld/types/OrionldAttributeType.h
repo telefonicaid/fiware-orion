@@ -34,6 +34,7 @@
 //
 typedef enum OrionldAttributeType
 {
+  NoAttributeType,
   Property,
   Relationship,
   GeoProperty,
@@ -46,6 +47,14 @@ typedef enum OrionldAttributeType
 //
 // orionldAttributeTypeName -
 //
-extern const char* orionldAttributeTypeName[4];
+extern const char* orionldAttributeTypeName(OrionldAttributeType attributeType);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAttributeType -
+//
+extern OrionldAttributeType orionldAttributeType(const char* typeString);
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDATTRIBUTETYPE_H_

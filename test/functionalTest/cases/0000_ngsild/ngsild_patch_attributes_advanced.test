@@ -1,0 +1,417 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute Patch Test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity with a Property P, a Relationship R, and a GeoProperty G
+# 02. PATCH P by adding a unitCode
+# 03. GET the entity and see the update from the previous step
+# 04. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:04" }
+# 05. GET the entity and see the update from the previous step
+# 06. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:06", "a": true }
+# 07. GET the entity and see the update from the previous step
+# 08. Attempt to PATCH R by adding a unitCode (and type: Relationship for type awareness) - see error
+# 09. GET the entity and see NO update from the previous step
+# 10. Attempt to PATCH R by adding a unitCode (and NO type - DB info needed for type awareness) - see error
+# 11. GET the entity and see NO update from the previous step
+#
+
+echo "01. Create an entity with a Property P, a Relationship R, and a GeoProperty G"
+echo "============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": 1,
+    "P1": {
+      "type": "Property",
+      "value": "kept after PATCH"
+    }
+  },
+  "R": {
+    "type": "Relationship",
+    "object": "urn:test:step:01"
+  },
+  "G": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [1,2]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH P by adding a unitCode"
+echo "================================"
+payload='{
+  "unitCode": "cm"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '04. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:04" }'
+echo "=========================================================================================="
+payload='{ "type": "Relationship", "object": "urn:test:step:04" }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '06. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:06", "a": true }'
+echo "====================================================================================================="
+payload='{ "type": "Relationship", "object": "urn:test:step:06", "a": true }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "08. Attempt to PATCH R by adding a unitCode (and type: Relationship for type awareness) - see error"
+echo "==================================================================================================="
+payload='{
+  "unitCode": "cm",
+  "type": "Relationship"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09. GET the entity and see NO update from the previous step"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "10. Attempt to PATCH R by adding a unitCode (and NO type - DB info needed for type awareness) - see error"
+echo "========================================================================================================="
+payload='{
+  "unitCode": "cm"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "11. GET the entity and see NO update from the previous step"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a Property P, a Relationship R, and a GeoProperty G
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+Date: REGEX(.*)
+
+
+
+02. PATCH P by adding a unitCode
+================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 275
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+04. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:04" }
+==========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 275
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R": {
+        "object": "urn:test:step:04",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+06. PATCH the Relationship R with { "type": "Relationship", "object": "urn:test:step:06", "a": true }
+=====================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 312
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R": {
+        "a": {
+            "type": "Property",
+            "value": true
+        },
+        "object": "urn:test:step:06",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+08. Attempt to PATCH R by adding a unitCode (and type: Relationship for type awareness) - see error
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "valid for Property attributes only",
+    "title": "Invalid member /unitCode/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. GET the entity and see NO update from the previous step
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 312
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R": {
+        "a": {
+            "type": "Property",
+            "value": true
+        },
+        "object": "urn:test:step:06",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+10. Attempt to PATCH R by adding a unitCode (and NO type - DB info needed for type awareness) - see error
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "valid for Property attributes only",
+    "title": "Invalid member /unitCode/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. GET the entity and see NO update from the previous step
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 312
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R": {
+        "a": {
+            "type": "Property",
+            "value": true
+        },
+        "object": "urn:test:step:06",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
