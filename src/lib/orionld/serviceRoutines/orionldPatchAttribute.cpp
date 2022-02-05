@@ -724,7 +724,7 @@ bool orionldPatchAttribute(void)
   //
   // Check and Normalize
   //
-  if (pbodyAttribute(inAttribute, 0, &orionldState.pd) == false)
+  if (pbodyAttribute(inAttribute, true, &orionldState.pd) == false)
   {
     LM_TMP(("KZ: pbodyAttribute failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     orionldState.httpStatusCode = 400;
@@ -738,7 +738,7 @@ bool orionldPatchAttribute(void)
 
 
   //
-  // 2. Query registrations and forward message if found - let the forward-receiver check the validity
+  // 2. Query registrations and forward message if found
   //
   if (forwarding)
   {

@@ -33,12 +33,11 @@ brokerStart CB
 #
 # Payloads to test ... there ara MANY !!!
 #
-# The entire payload is the "value":
+# The entire payload is the "value", unless it's a JSON Object:
 #   o 2 => Property
 #   o "04" => Property
 #   o 3.1416 => Property
 #   o true => Property
-#   o { "a": 1 } => Property
 #   o [ 1, 2 ] => Property
 #   o { "type": "Point", "coordinates": [1,2] }  => GeoProperty
 #   o "urn:ngsi-ld:xxx" - Relationship!  => Relationship
@@ -78,8 +77,8 @@ brokerStart CB
 # 07. GET the entity and see the update from step the previous step
 # 08. PATCH the Property P with simplified format, setting it to the BOOL true
 # 09. GET the entity and see the update from the previous step
-# 10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail
-# 11. GET the entity and see NO update from the previous step
+# 10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/
+# 11. GET the entity and see the update from the previous step
 # 12. PATCH the Property P with simplified format, using [ 1, 2 ]
 # 13. GET the entity and see the update from the previous step
 # 14. PATCH the GeoProperty G with simplified format, making it a polygon
@@ -100,7 +99,7 @@ brokerStart CB
 # 29. GET the entity and see the update from the previous step
 # 30. PATCH the Property P with simplified format, using { "value": true }
 # 31. GET the entity and see the update from the previous step
-# 32. PATCH the Property P with simplified format, using { "value": { "a": 1 } }
+# 32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }
 # 33. GET the entity and see the update from the previous step
 # 34. PATCH the Property P with simplified format, using { "value": [ 1, 2 ] }
 # 35. GET the entity and see the update from the previous step
@@ -202,8 +201,8 @@ echo
 echo
 
 
-echo '10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail'
-echo "==============================================================================="
+echo '10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/'
+echo "=============================================================================================="
 payload='{
   "a": 1
 }'
@@ -212,8 +211,8 @@ echo
 echo
 
 
-echo "11. GET the entity and see No update from the previous step"
-echo "==========================================================="
+echo "11. GET the entity and see the update from the previous step"
+echo "============================================================"
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 echo
 echo
@@ -371,9 +370,9 @@ echo
 echo
 
 
-echo '32. PATCH the Property P with simplified format, using { "value": { "a": 1 } }'
+echo '32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }'
 echo '=============================================================================='
-payload='{ "value": { "a": 1 } }'
+payload='{ "value": { "b": 1 } }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
@@ -613,24 +612,17 @@ Date: REGEX(.*)
 }
 
 
-10. PATCH the Property P with simplified format, using { "a": 1 } - see it fail
-===============================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 131
-Content-Type: application/json
+10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/
+==============================================================================================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "detail": "value/object/languageMap",
-    "title": "Mandatory field missing",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
-11. GET the entity and see NO update from the previous step
-===========================================================
+11. GET the entity and see the update from the previous step
+============================================================
 HTTP/1.1 200 OK
-Content-Length: 262
+Content-Length: 296
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -650,6 +642,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": true
@@ -673,7 +669,7 @@ Date: REGEX(.*)
 13. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 297
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -693,6 +689,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -719,7 +719,7 @@ Date: REGEX(.*)
 15. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 325
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -755,6 +755,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -788,7 +792,7 @@ Date: REGEX(.*)
 17. GET the entity and see NO update from the previous step
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 325
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -824,6 +828,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -850,7 +858,7 @@ Date: REGEX(.*)
 19. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 328
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -887,6 +895,10 @@ Date: REGEX(.*)
             "type": "Property",
             "value": "kept after PATCH"
         },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
         "type": "Property",
         "value": [
             1,
@@ -912,7 +924,7 @@ Date: REGEX(.*)
 21. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 302
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -932,6 +944,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -958,7 +974,7 @@ Date: REGEX(.*)
 23. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 280
+Content-Length: 314
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -978,6 +994,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": "urn:ngsi-lf:xxx"
@@ -1001,7 +1021,7 @@ Date: REGEX(.*)
 25. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 264
+Content-Length: 298
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1021,6 +1041,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": 2
@@ -1044,7 +1068,7 @@ Date: REGEX(.*)
 27. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 267
+Content-Length: 301
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1064,6 +1088,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": "04"
@@ -1087,7 +1115,7 @@ Date: REGEX(.*)
 29. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 269
+Content-Length: 303
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1107,6 +1135,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": 3.1416
@@ -1130,7 +1162,7 @@ Date: REGEX(.*)
 31. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 267
+Content-Length: 301
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1150,6 +1182,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": true
@@ -1163,7 +1199,7 @@ Date: REGEX(.*)
 }
 
 
-32. PATCH the Property P with simplified format, using { "value": { "a": 1 } }
+32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }
 ==============================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -1173,7 +1209,7 @@ Date: REGEX(.*)
 33. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 270
+Content-Length: 304
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1194,9 +1230,13 @@ Date: REGEX(.*)
             "type": "Property",
             "value": "kept after PATCH"
         },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
         "type": "Property",
         "value": {
-            "a": 1
+            "b": 1
         }
     },
     "R": {
@@ -1218,7 +1258,7 @@ Date: REGEX(.*)
 35. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 302
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1238,6 +1278,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -1264,7 +1308,7 @@ Date: REGEX(.*)
 37. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 302
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1284,6 +1328,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
@@ -1310,7 +1358,7 @@ Date: REGEX(.*)
 39. GET the entity and see the update from the previous step
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 302
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1330,6 +1378,10 @@ Date: REGEX(.*)
         "P1": {
             "type": "Property",
             "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
         },
         "type": "Property",
         "value": [
