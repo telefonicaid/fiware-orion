@@ -859,7 +859,7 @@ MHD_Result orionldMhdConnectionTreat(void)
       linkHeader = true;
   }
 
-  if (linkHeader == true)
+  if ((linkHeader == true) && (orionldState.httpStatusCode != 204))
     httpHeaderLinkAdd(orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
 
   //
@@ -940,7 +940,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.responsePayload != NULL)
     restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
-    restReply(NULL, "");
+    restReply(NULL, NULL);
 
   PERFORMANCE(restReplyEnd);
 

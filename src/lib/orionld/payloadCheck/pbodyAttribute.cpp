@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -307,9 +308,9 @@ inline bool pbodyAttributeArray(KjNode* attrP, bool isAttribute, OrionldProblemD
 //
 // pbodyAttributeNull -
 //
-inline bool pbodyAttributeNull(KjNode* attrP, bool isAttribute, OrionldProblemDetails* pdP)
+inline bool pbodyAttributeNull(KjNode* attrP, OrionldProblemDetails* pdP)
 {
-  LM_W(("RHS for attribute '%s' is NULL - that is forbidden in the NGSI-LD API"));
+  LM_W(("RHS for attribute '%s' is NULL - that is forbidden in the NGSI-LD API", attrP->name));
   orionldError(pdP,
                OrionldBadRequestData,
                "The use of NULL value is banned in NGSI-LD",
@@ -380,13 +381,18 @@ bool pbodyGeoPropertyValue(KjNode* attrP, KjNode* typeP, OrionldProblemDetails* 
 }
 
 
-bool typeCheck(KjNode* attrP, KjNode** typePP, bool mandatory, OrionldProblemDetails* pdP)
+
+// -----------------------------------------------------------------------------
+//
+// typeCheck -
+//
+bool pbodyAttributeType(KjNode* attrP, KjNode** typePP, bool mandatory, OrionldProblemDetails* pdP)
 {
   KjNode* typeP   = kjLookup(attrP, "type");
   KjNode* atTypeP = kjLookup(attrP, "@type");
 
   //
-  // It's allowed use either "type" or "@type" but not both
+  // It's allowed to use either "type" or "@type" but not both
   //
   if ((typeP != NULL) && (atTypeP != NULL))
   {
@@ -497,22 +503,44 @@ bool languageMapCheck(KjNode* fieldP, OrionldProblemDetails* pdP) { return true;
 // - if "type" is present inside the object:
 //   - and it's a valid NGSI-LD Attribute type name ("Property", "Relationship, "GeoProperty", ...)
 //     then the type of the attribute is DECIDED
-//   - else ("type" is not a valid type) AND "coordinates" present, and nothing else, it's considered a GeoProperty - procedure as for SIMPLE formats
+//   - else ("type" is not a valid type) AND "coordinates" present, and nothing else,
+//     it's considered a GeoProperty - procedure as for SIMPLE formats
 // - if "type" is NOT present:
 //   - if "value/object/languageMap" is present, then we can deduct the attribute type and add it to the object. Sub-attrs are processed
 //   - if no value is present, then no type is added, only sub-attrs are processed.
 //
-inline bool pbodyAttributeObject(KjNode* attrP, bool isAttribute, OrionldProblemDetails* pdP)
+bool pbodyAttributeObject(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP)
 {
   OrionldAttributeType  attributeType = NoAttributeType;
   KjNode*               typeP;
   KjNode*               valueP = NULL;  // "object" if Relationship, "languageMap" if LanguageProperty
+  OrionldAttributeType  attributeTypeFromDb = (attrTypeInDb != NULL)? orionldAttributeType(attrTypeInDb) : NoAttributeType;
 
-  if (typeCheck(attrP, &typeP, false, pdP) == false)
+  // Check for errors in the input payload for the attribute type
+  if (pbodyAttributeType(attrP, &typeP, false, pdP) == false)
     return false;
 
+  // If the attribute already exists, we KMOW the type of the attribute.
+  // If the payload body contains a type, and it's not the same type, well, that's an error right there
+  //
+  // However, the payload body *might* be the value of a GeoProperty.
+  // If so, the payload body would have a type == "Point", "Polygon" or something similar.
+  // We CAN'T compare the type with what "should be according to the DB" until we rule GeoProperty value out.
+  //
+  // That is done a little later in this function - see "All good, let's now compare with the truth"
+  //
+
+  //
+  // Attribute Type given.
+  // 1. If the attribute exists already, is the "new" type the same (foirbidden to change attribute types
+  // 2. ...
+  //
   if (typeP != NULL)
   {
+    //
+    // OK, type given in the payload body.
+    // If the entity/attribute already existed, we can compare. Attribute types MAY NOT BE ALTERED
+    //
     LM_TMP(("KZ: attribute type: %s", typeP->value.s));
     attributeType = orionldAttributeType(typeP->value.s);
 
@@ -532,25 +560,44 @@ inline bool pbodyAttributeObject(KjNode* attrP, bool isAttribute, OrionldProblem
       LM_TMP(("KZ: I have the attribute type: '%s'", typeP->value.s));
       LM_TMP(("KZ: If I only had the attribute type from the DB also, I could compare ..."));
 
-      // As "type" present, if also the value/object is, we need to check
+      // As "type" is present - is it coherent? (Property has "value", Relationship has "object", etc)
       if (valueAndTypeCheck(attrP, attributeType, &valueP, pdP) == false)
         LM_RE(false, ("valueAndTypeCheck failed"));
+
+      //
+      // All good, let's now compare with the truth - input attr type VS what's in the DB
+      //
+      if (attrTypeInDb != NULL)  // Means it already existed, means we can compare
+      {
+        LM_TMP(("KZ: Comparing new/old attribute types: NEW '%s' vs OLD '%s'", typeP->value.s, attrTypeInDb));
+        if (strcmp(typeP->value.s, attrTypeInDb) != 0)
+        {
+          LM_E(("Bad Input (attempt to change the Attribute Type of '%s' from '%s' to '%s'", attrP->name, attrTypeInDb, typeP->value.s));
+          orionldError(pdP, OrionldBadRequestData, "Attempt to change the Type of an Attribute", attrP->name, 400);
+          return false;
+        }
+      }
     }
   }
-  else  // type is not there - try to guess the type
+  else  // type is not there - try to guess the type, if not already know from the DB
   {
-    KjNode* objectP      = kjLookup(attrP, "object");
-    KjNode* languageMapP = kjLookup(attrP, "languageMap");
-
-    if ((valueP = kjLookup(attrP, "value")) != NULL)
+    if (attributeTypeFromDb != NoAttributeType)
+      attributeType = attributeTypeFromDb;
+    else
     {
-      LM_TMP(("KZ: found a 'value', assuming Property"));
-      attributeType = Property;  // Well ... or GeoProperty!
+      KjNode* objectP      = kjLookup(attrP, "object");
+      KjNode* languageMapP = kjLookup(attrP, "languageMap");
+
+      if ((valueP = kjLookup(attrP, "value")) != NULL)
+      {
+        LM_TMP(("KZ: found a 'value', assuming Property"));
+        attributeType = Property;  // Well ... or GeoProperty!
+      }
+      else if (objectP != NULL)
+        attributeType = Relationship;
+      else if (languageMapP != NULL)
+        attributeType = LanguageProperty;
     }
-    else if (objectP != NULL)
-      attributeType = Relationship;
-    else if (languageMapP != NULL)
-      attributeType = LanguageProperty;
   }
   LM_TMP(("attributeType: %d", attributeType));
 
@@ -602,7 +649,7 @@ inline bool pbodyAttributeObject(KjNode* attrP, bool isAttribute, OrionldProblem
       if (languageMapCheck(fieldP, pdP) == false)
         return false;
     }
-    else if (pbodyAttribute(fieldP, false, pdP) == false)
+    else if (pbodyAttribute(fieldP, false, NULL, pdP) == false)  // Need to find fieldP->name in dbAttributeP ...
       return false;
 
     fieldP = next;
@@ -690,17 +737,17 @@ inline bool pbodyAttributeObject(KjNode* attrP, bool isAttribute, OrionldProblem
 //      - observedAt
 //      - datasetId (sub-attributes don't have datasetId)
 //
-bool pbodyAttribute(KjNode* attrP, bool isAttribute, OrionldProblemDetails* pdP)
+bool pbodyAttribute(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP)
 {
   LM_TMP(("KZ: RHS of attribute '%s' is a JSON %s", attrP->name, kjValueType(attrP->type)));
 
-  if      (attrP->type == KjString)  return pbodyAttributeString(attrP,  isAttribute,  pdP);
-  else if (attrP->type == KjInt)     return pbodyAttributeInteger(attrP, isAttribute,  pdP);
-  else if (attrP->type == KjFloat)   return pbodyAttributeFloat(attrP,   isAttribute,  pdP);
-  else if (attrP->type == KjBoolean) return pbodyAttributeBoolean(attrP, isAttribute,  pdP);
-  else if (attrP->type == KjArray)   return pbodyAttributeArray(attrP,   isAttribute,  pdP);
-  else if (attrP->type == KjObject)  return pbodyAttributeObject(attrP,  isAttribute,  pdP);
-  else if (attrP->type == KjNull)    return pbodyAttributeNull(attrP,    isAttribute,  pdP);
+  if      (attrP->type == KjString)  return pbodyAttributeString(attrP,  isAttribute, pdP);
+  else if (attrP->type == KjInt)     return pbodyAttributeInteger(attrP, isAttribute, pdP);
+  else if (attrP->type == KjFloat)   return pbodyAttributeFloat(attrP,   isAttribute, pdP);
+  else if (attrP->type == KjBoolean) return pbodyAttributeBoolean(attrP, isAttribute, pdP);
+  else if (attrP->type == KjArray)   return pbodyAttributeArray(attrP,   isAttribute, pdP);
+  else if (attrP->type == KjObject)  return pbodyAttributeObject(attrP,  isAttribute, attrTypeInDb,  pdP);
+  else if (attrP->type == KjNull)    return pbodyAttributeNull(attrP,    pdP);
 
   // Invalid JSON type of the attribute
   LM_W(("Unknown JSON type for the Right-Hand-Side of the attribute '%s'", attrP->name));

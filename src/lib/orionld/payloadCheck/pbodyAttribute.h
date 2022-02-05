@@ -38,6 +38,6 @@ extern "C"
 //
 // pbodyAttribute -
 //
-extern bool pbodyAttribute(KjNode* attrP, bool isAttribute, OrionldProblemDetails* pdP);
+extern bool pbodyAttribute(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_

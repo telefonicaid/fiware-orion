@@ -778,13 +778,13 @@ Date: REGEX(.*)
 16. PATCH the Property P with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Relationship - see error
 ==========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "attribute type cannot be modified",
-    "title": "Invalid Attribute Type",
+    "detail": "Only Relationships can have an 'object' member",
+    "title": "Invalid Attribute",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -302,7 +302,7 @@ Date: REGEX(.*)
 }
 
 
-08. Attempt to PATCH P by adding a unitCode (and type: Relationship for type awareness) - see error
+08. Attempt to PATCH R by adding a unitCode (and type: Relationship for type awareness) - see error
 ===================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 143
