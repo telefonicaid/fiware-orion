@@ -42,9 +42,9 @@ extern "C"
 
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/CHECK.h"                                // *CHECK*
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
@@ -722,13 +722,13 @@ bool orionldPatchAttribute(void)
   //
   // 1.1 Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pCheckUri(entityId, true, &orionldState.pd) == false)
+  if (pCheckUri(entityId, true) == false)
     return false;
 
   //
   // 1.2 Make sure the attrName (orionldState.wildcard[1]) is a valid NAME or URI
   //
-  if (pCheckUri(attrName, false, &orionldState.pd) == false)
+  if (pCheckUri(attrName, false) == false)
     return false;
 
 
@@ -782,7 +782,7 @@ bool orionldPatchAttribute(void)
     attributeType = orionldAttributeType(attrTypeInDb);
 
   LM_TMP(("KZ: Calling pCheckAttribute with attrTypeInDb == '%s' (%d)", attrTypeInDb, attributeType));
-  if (pCheckAttribute(inAttribute, true, attributeType, &orionldState.pd) == false)
+  if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType) == false)
   {
     LM_TMP(("KZ: pCheckAttribute failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     orionldState.httpStatusCode = 400;
@@ -824,8 +824,8 @@ bool orionldPatchAttribute(void)
   KjNode* datasetIdP = kjLookup(inAttribute, "datasetId");
   if (datasetIdP != NULL)
   {
-    STRING_CHECK(datasetIdP, "datasetId");
-    if (pCheckUri(datasetIdP->value.s, true, &orionldState.pd) == false)
+    PCHECK_STRING(datasetIdP, 0, NULL, "datasetId", 400);
+    if (pCheckUri(datasetIdP->value.s, true) == false)
       return false;
 
     return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP->value.s);

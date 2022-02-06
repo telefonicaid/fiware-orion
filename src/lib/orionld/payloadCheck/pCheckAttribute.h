@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                     // KjNode
 }
 
-#include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
 #include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
 
 
@@ -39,6 +38,12 @@ extern "C"
 //
 // pCheckAttribute -
 //
-extern bool pCheckAttribute(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeInDb, OrionldProblemDetails* pdP);
+extern bool pCheckAttribute
+(
+  KjNode*                 attrP,
+  bool                    isAttribute,
+  KjNode*                 dbAttributeP,
+  OrionldAttributeType    attrTypeFromDb
+);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_

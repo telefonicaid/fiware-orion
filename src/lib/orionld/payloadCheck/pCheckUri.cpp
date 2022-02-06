@@ -43,22 +43,18 @@ extern char validUriChars[256];  // From pcheckUri.cpp
 //
 // pCheckUri - newer version of pcheckUri - accepting OrionldProblemDetails as input/output
 //
-bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP)
+bool pCheckUri(char* uri, bool mustBeUri)
 {
   bool hasColon = false;
 
   if (uri == NULL)
   {
-    if (pdP != NULL)
-      orionldError(pdP, OrionldBadRequestData, "No URI", NULL, 400);
-    LM_W(("Bad Input (no URI)"));
+    orionldError(OrionldBadRequestData, "No URI", NULL, 400);
     return false;
   }
   else if (*uri == 0)
   {
-    if (pdP != NULL)
-      orionldError(pdP, OrionldBadRequestData, "Empty URI", NULL, 400);
-    LM_W(("Bad Input (Empty URI)"));
+    orionldError(OrionldBadRequestData, "Empty URI", NULL, 400);
     return false;
   }
 
@@ -79,9 +75,7 @@ bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP)
   //
   if ((mustBeUri == true) && (hasColon == false))
   {
-    if (pdP != NULL)
-      orionldError(pdP, OrionldBadRequestData, "Invalid URI", "No colon present", 400);
-    LM_W(("Bad Input (%s: %s)", "Invalid URI", "No colon present"));
+    orionldError(OrionldBadRequestData, "Invalid URI", "No colon present", 400);
     return false;
   }
 
@@ -98,9 +92,7 @@ bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP)
     {
       if (*s == ' ')
       {
-        if (pdP != NULL)
-          orionldError(pdP, OrionldBadRequestData, "Invalid URI/Shortname", "whitespace in shortname", 400);
-        LM_W(("Bad Input (%s: %s)", "Invalid URI/Shortname", "whitespace in shortname"));
+        orionldError(OrionldBadRequestData, "Invalid URI/Shortname", "whitespace in shortname", 400);
         return false;
       }
 
@@ -115,8 +107,7 @@ bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP)
     {
       if (validUriChars[(unsigned char) *s] == false)
       {
-        if (pdP != NULL)
-          orionldError(pdP, OrionldBadRequestData, "Invalid URI", "invalid character", 400);
+        orionldError(OrionldBadRequestData, "Invalid URI", "invalid character", 400);
         LM_W(("Bad Input (invalid character in URI '%s', at position %d (0x%x)", uri, (int) (s - uri),  *s & 0xFF));
         return false;
       }

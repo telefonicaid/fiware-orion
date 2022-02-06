@@ -36,7 +36,6 @@
 //
 extern void orionldError
 (
-  OrionldProblemDetails*    pdP,
   OrionldResponseErrorType  errorType,
   const char*               title,
   const char*               detail,
