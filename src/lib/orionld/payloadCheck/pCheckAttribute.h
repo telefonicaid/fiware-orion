@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
 
 /*
 *
@@ -31,13 +31,14 @@ extern "C"
 }
 
 #include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
+#include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pbodyAttribute -
+// pCheckAttribute -
 //
-extern bool pbodyAttribute(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP);
+extern bool pCheckAttribute(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeInDb, OrionldProblemDetails* pdP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_

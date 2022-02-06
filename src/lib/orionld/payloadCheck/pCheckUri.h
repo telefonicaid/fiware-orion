@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
 
 
 
@@ -32,6 +33,6 @@
 //
 // pcheckUri -
 //
-extern bool pcheckUri(char* uri, bool strict, char** detailP);
+extern bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
