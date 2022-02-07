@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Patch with key-values
+Entity Patch using Smart Input Format
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,14 +32,14 @@ brokerStart CB
 
 #
 # 01. Create an entity E1 with attributes P1, R1, G1
-# 02. PATCH E1 using keyValues
+# 02. PATCH E1 using Smart Input Format
 # 03. GET the entity and see the updates from step 02
 # 04. PATCH E1 again, but with special attributes, such as location, observationSpace, and operationSpace
 # 05. GET the entity and see the updates from step 04
 #
 # ERROR CHECKS
-# 06. PATCH E1 using keyValues, but R1 isn't a string
-# 07. PATCH E1 using keyValues, but G1 isn't an object
+# 06. PATCH E1 using Smart Input Format, but R1 isn't a string
+# 07. PATCH E1 using Smart Input Format, but G1 isn't an object
 #
 
 echo "01. Create an entity E1 with attributes P1, R1, G1"
@@ -93,17 +93,17 @@ echo
 echo
 
 
-echo "02. PATCH E1 using keyValues"
-echo "============================"
+echo "02. PATCH E1 using Smart Input Format"
+echo "====================================="
 payload='{
   "P1": 12,
-  "R1": "urn:xxx",
+  "R1": "urn:ngsi-ld:entities:E2",
   "G1": {
     "type": "Point",
     "coordinates": [ 1, 2, 4 ]
   }
 }'
-orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs?options=keyValues&relationships=R1&geoproperties=G1&languageproperties=L1" -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
 echo
 echo
 
@@ -131,7 +131,7 @@ payload='{
     "coordinates": [ 1, 2, 4 ]
   }
 }'
-orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs?options=keyValues" -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
 echo
 echo
 
@@ -153,8 +153,8 @@ Date: REGEX(.*)
 
 
 
-02. PATCH E1 using keyValues
-============================
+02. PATCH E1 using Smart Input Format
+=====================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -163,7 +163,7 @@ Date: REGEX(.*)
 03. GET the entity and see the updates from step 02
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 520
+Content-Length: 536
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -189,7 +189,7 @@ Date: REGEX(.*)
         "value": "will not be overwritten"
     },
     "R1": {
-        "object": "urn:xxx",
+        "object": "urn:ngsi-ld:entities:E2",
         "type": "Relationship"
     },
     "id": "urn:ngsi-ld:entities:T:E1",
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 05. GET the entity and see the updates from step 04
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 520
+Content-Length: 536
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -266,7 +266,7 @@ Date: REGEX(.*)
         "value": "will not be overwritten"
     },
     "R1": {
-        "object": "urn:xxx",
+        "object": "urn:ngsi-ld:entities:E2",
         "type": "Relationship"
     },
     "id": "urn:ngsi-ld:entities:T:E1",
