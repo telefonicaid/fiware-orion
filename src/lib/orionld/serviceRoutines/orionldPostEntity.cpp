@@ -272,7 +272,7 @@ bool orionldPostEntity(void)
     {
       if (kjStringValueLookupInArray(inDbAttrNamesP, attrP->name) != NULL)
       {
-        attributeNotUpdated(notUpdatedP, shortName, "attribute already exists and overwrite is not allowed");
+        attributeNotUpdated(notUpdatedP, shortName, "attribute already exists", "overwrite is not allowed");
 
         // Remove attr from tree
         kjChildRemove(orionldState.requestTree, attrP);
@@ -400,7 +400,7 @@ bool orionldPostEntity(void)
         if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
         {
           LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
-          attributeNotUpdated(notUpdatedP, shortName, detail);
+          attributeNotUpdated(notUpdatedP, shortName, "Error converting attribute", detail);
           caP->release();
           free(caP);
           continue;
@@ -419,15 +419,14 @@ bool orionldPostEntity(void)
       {
         LM_E(("Bad Input (datasetId given but not an array - should this be allowed?)"));
         detail = (char*) "datasetId given but not an array";
-        attributeNotUpdated(notUpdatedP, shortName, detail);
+        attributeNotUpdated(notUpdatedP, shortName, detail, NULL);
         continue;
       }
 
       ContextAttribute* caP = new ContextAttribute();
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {
-        LM_E(("kjTreeToContextAttribute(%s): %s: %s", attrP->name, orionldState.pd.title, orionldState.pd.detail));
-        attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.titleAndDetail);
+        attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
         caP->release();
         delete caP;
         continue;

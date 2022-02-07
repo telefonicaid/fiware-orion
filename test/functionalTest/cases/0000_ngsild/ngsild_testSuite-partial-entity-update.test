@@ -100,7 +100,7 @@ Date: REGEX(.*)
 02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
 ===============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 97
+Content-Length: 107
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -109,7 +109,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "location",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: location"
         }
     ],
     "updated": [

@@ -32,6 +32,6 @@
 //
 // attributeNotUpdated -
 //
-extern void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* reason);
+extern void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* title, const char* detail);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ATTRIBUTENOTUPDATED_H_

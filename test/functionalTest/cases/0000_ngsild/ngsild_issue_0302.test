@@ -199,7 +199,7 @@ Date: REGEX(.*)
 04. Attempt to patch a non-existing attribute P3 of E1 - see 207
 ================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 87
+Content-Length: 136
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -208,7 +208,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P3",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/P3"
         }
     ],
     "updated": []
@@ -218,7 +218,7 @@ Date: REGEX(.*)
 05. Attempt to patch a non-existing attribute	P3 and an existing attribute P2 - see 207 MultiStatus
 ===================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 91
+Content-Length: 140
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -227,7 +227,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P3",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/P3"
         }
     ],
     "updated": [

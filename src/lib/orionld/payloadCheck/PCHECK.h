@@ -44,7 +44,26 @@ do                                                                              
     int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
     const char* title = (_title == NULL)? "Not a JSON String"   : _title;                    \
                                                                                              \
-    orionldError((OrionldResponseErrorType) type, title, detail, status);  \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_OBJECT -
+//
+#define PCHECK_OBJECT(kNodeP, _type, _title, detail, status)                                 \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->type != KjObject)                                                              \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Object"   : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \
   }                                                                                          \
 } while (0)

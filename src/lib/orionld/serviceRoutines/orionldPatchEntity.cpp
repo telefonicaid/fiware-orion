@@ -42,106 +42,18 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/CHECK.h"                                // DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjEntityKeyValueAmend.h"                // kjEntityKeyValueAmend
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// attributeCheck -
-//
-// FIXME - move to separate module - should be used also for:
-//   * POST /entities/*/attrs
-//   * PATCH /entities/*/attrs
-//   * etc
-//
-static bool attributeCheck(KjNode* attrNodeP, char** titleP, char** detailP)
-{
-  if (attrNodeP->type != KjObject)
-  {
-    *titleP  = (char*) "Invalid JSON Type";
-    *detailP = (char*) "Attribute must be an object";
-
-    return false;
-  }
-
-  KjNode* typeP    = NULL;
-  KjNode* valueP   = NULL;
-  KjNode* objectP  = NULL;
-  int     attrType = 0;   // 1: Property, 2: Relationship, 3: GeoProperty, 4: TemporalProperty
-
-  for (KjNode* nodeP = attrNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-  {
-    if (strcmp(nodeP->name, "type") == 0)
-    {
-      DUPLICATE_CHECK(typeP, "type", nodeP);
-      STRING_CHECK(typeP, "type");
-
-      if      (strcmp(typeP->value.s, "Property")         == 0)  attrType = 1;
-      else if (strcmp(typeP->value.s, "Relationship")     == 0)  attrType = 2;
-      else if (strcmp(typeP->value.s, "GeoProperty")      == 0)  attrType = 3;
-      else if (strcmp(typeP->value.s, "TemporalProperty") == 0)  attrType = 4;
-      else
-      {
-        *titleP  = (char*) "Invalid Value of Attribute Type";
-        *detailP = typeP->value.s;
-
-        return false;
-      }
-    }
-    else if (strcmp(nodeP->name, "value") == 0)
-    {
-      DUPLICATE_CHECK(valueP, "value", nodeP);
-    }
-    else if (strcmp(nodeP->name, "object") == 0)
-    {
-      DUPLICATE_CHECK(objectP, "object", nodeP);
-    }
-  }
-
-  if (typeP == NULL)
-  {
-    *titleP  = (char*) "Mandatory field missing";
-    *detailP = (char*) "attribute type";
-
-    return false;
-  }
-
-  if (attrType == 2)  // 2 == Relationship
-  {
-    // Relationships MUST have an "object"
-    if (objectP == NULL)
-    {
-      *titleP  = (char*) "Mandatory field missing";
-      *detailP = (char*) "Mandatory field missing: Relationship object";
-
-      return false;
-    }
-  }
-  else
-  {
-    // Properties MUST have a "value"
-    if (valueP == NULL)
-    {
-      *titleP  = (char*) "Mandatory field missing";
-      *detailP = (char*) "Mandatory field missing: Property value";
-
-      return false;
-    }
-  }
-
-  return true;
-}
 
 
 
@@ -165,16 +77,11 @@ bool orionldPatchEntity(void)
   char* detail;
 
   // 1. Is the Entity ID in the URL a valid URI?
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
+  if (pCheckUri(entityId, true) == false)
     return false;
-  }
 
   // 2. Is the payload not a JSON object?
-  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, kjValueType(orionldState.requestTree->type), 400);
 
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
@@ -244,58 +151,68 @@ bool orionldPatchEntity(void)
 
   while (newAttrP != NULL)
   {
-    KjNode*  dbAttrP;
-    char*    title     = (char*) "No Title";
-    char*    detail    = (char*) "No Detail";
-    char*    shortName = newAttrP->name;
+    char* shortName = newAttrP->name;
 
     next = newAttrP->next;
 
     if ((strcmp(newAttrP->name, "createdAt") == 0) || (strcmp(newAttrP->name, "modifiedAt") == 0))
     {
-      attributeNotUpdated(notUpdatedP, shortName, "built-in timestamps are ignored");
+      attributeNotUpdated(notUpdatedP, shortName, "built-in timestamps are ignored", NULL);
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "id") == 0) || (strcmp(newAttrP->name, "@id") == 0))
     {
-      attributeNotUpdated(notUpdatedP, shortName, "the ID of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the ID of an entity cannot be altered", NULL);
       newAttrP = next;
       continue;
     }
     else if ((strcmp(newAttrP->name, "type") == 0) || (strcmp(newAttrP->name, "@type") == 0))
     {
-      attributeNotUpdated(notUpdatedP, shortName, "the TYPE of an entity cannot be altered");
+      attributeNotUpdated(notUpdatedP, shortName, "the TYPE of an entity cannot be altered", NULL);
       newAttrP = next;
       continue;
     }
     else
       newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
 
-    // Is the attribute in the incoming payload a valid attribute?
-    if (attributeCheck(newAttrP, &title, &detail) == false)
-    {
-      LM_E(("attributeCheck: %s: %s", title, detail));
-      attributeNotUpdated(notUpdatedP, shortName, detail);
-      newAttrP = next;
-      continue;
-    }
 
-    char* eqName = kaStrdup(&orionldState.kalloc, newAttrP->name);
+    //
+    // Check and Normalize
+    //
+    KjNode*               dbAttributeP;
+    OrionldAttributeType  attributeType     = NoAttributeType;
+    char*                 eqName            = kaStrdup(&orionldState.kalloc, newAttrP->name);
+
     dotForEq(eqName);
-
-    dbAttrP = kjLookup(inDbAttrsP, eqName);
-    if (dbAttrP == NULL)  // Doesn't already exist - must be discarded
+    dbAttributeP = kjLookup(inDbAttrsP, eqName);
+    if (dbAttributeP == NULL)  // Doesn't already exist - must be discarded
     {
-      attributeNotUpdated(notUpdatedP, shortName, "attribute doesn't exist");
+      attributeNotUpdated(notUpdatedP, shortName, "attribute doesn't exist", newAttrP->name);
       newAttrP = next;
       continue;
     }
 
-    // Steal createdAt from dbAttrP?
+    if (pCheckAttribute(newAttrP, true, dbAttributeP, attributeType) == false)
+    {
+      //
+      // A failure will set a 400 (probably) in orionldState.pd.status
+      // Here it's OK to fail, as this piece of info is put in a 207 response.
+      // So, need to set it back to 200
+      //
+      // pCheckAttribute should perhaps have a parameter about "ok-to-fail"
+      //
+      LM_E(("attributeCheck: %s: %s (code: %d)", orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status));
+      orionldState.pd.status = 200;
+      attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
+      newAttrP = next;
+      continue;
+    }
+
+    // Steal createdAt from dbAttributeP?
 
     // Remove the attribute to be updated (from dbEntityP::inDbAttrsP) and insert the attribute from the payload data
-    kjChildRemove(inDbAttrsP, dbAttrP);
+    kjChildRemove(inDbAttrsP, dbAttributeP);
     kjChildAdd(inDbAttrsP, newAttrP);
     attributeUpdated(updatedP, shortName);
 
@@ -320,7 +237,7 @@ bool orionldPatchEntity(void)
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {
         LM_E(("kjTreeToContextAttribute: %s", detail));
-        attributeNotUpdated(notUpdatedP, attrP->name, "Error");
+        attributeNotUpdated(notUpdatedP, attrP->name, "Error", detail);
         delete caP;
       }
       else
@@ -348,7 +265,7 @@ bool orionldPatchEntity(void)
   }
 
   // 9. Postprocess output from mongoBackend
-  if (orionldState.httpStatusCode == 200)
+  if ((orionldState.pd.status == 200) || (orionldState.pd.status == 0))
   {
     //
     // 204 or 207?
@@ -372,8 +289,7 @@ bool orionldPatchEntity(void)
   }
   else
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
+    LM_E(("Error: %s: %s (%d)", orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status));
     return false;
   }
 

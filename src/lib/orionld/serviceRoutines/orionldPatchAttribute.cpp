@@ -781,10 +781,8 @@ bool orionldPatchAttribute(void)
   if (attrTypeInDb != NULL)
     attributeType = orionldAttributeType(attrTypeInDb);
 
-  LM_TMP(("KZ: Calling pCheckAttribute with attrTypeInDb == '%s' (%d)", attrTypeInDb, attributeType));
   if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType) == false)
   {
-    LM_TMP(("KZ: pCheckAttribute failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
     return false;
