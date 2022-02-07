@@ -842,7 +842,7 @@ static bool updateAttribute
   }
   else
   {
-    if (!attrsP->hasField(effectiveName.c_str()))
+    if (!attrsP->hasField(effectiveName))
     {
       return false;
     }
@@ -892,7 +892,7 @@ static bool appendAttribute
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   /* APPEND with existing attribute equals to UPDATE */
-  if (attrsP->hasField(effectiveName.c_str()))
+  if (attrsP->hasField(effectiveName))
   {
     updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, overrideMetadata, apiVersion);
     return false;
@@ -967,7 +967,7 @@ static bool deleteAttribute
 {
   std::string effectiveName = dbEncode(caP->name);
 
-  if (!attrs.hasField(effectiveName.c_str()))
+  if (!attrs.hasField(effectiveName))
   {
     return false;
   }
