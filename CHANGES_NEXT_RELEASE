@@ -7,3 +7,4 @@
 * Issue #127   Implemented 'Smart Input Format' support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}
 * Issue #127   Implemented keyValues support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs - deprecated before even being discussed in ETSI
 * Issue #1010  Fixed bug related to parsing ISO8601 DateTime strings
+* Issue #1016  Fixed bug related to wrong context in response when input context is an array with a single URL
