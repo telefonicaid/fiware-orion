@@ -91,6 +91,9 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
       return orionldCoreContextP;
     }
 
+    if ((itemsInArray == 1) && (contextTreeP->value.firstChildP->type == KjString))
+      orionldState.link = contextTreeP->value.firstChildP->value.s;
+
     //
     // Need to clone the array and add it to the context cache
     //

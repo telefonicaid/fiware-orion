@@ -1,0 +1,183 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 1016 - wrong context in Link header of the response
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an Entity E1 with attrs location, observationSpace, operationSpace, weight, owner
+# 02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct
+#
+
+echo "01. Create an Entity E1 with attrs location, observationSpace, operationSpace, weight, owner"
+echo "============================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Device",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 2 ]
+      }
+    },
+    "observationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 3 ]
+      }
+    },
+    "operationSpace": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [ 1, 4 ]
+      }
+    },
+    "weight": {
+      "type":  "Property",
+      "value": 250,
+      "unitCode": "kg"
+    },
+    "owner": {
+      "type":  "Relationship",
+      "object": "urn:ngsi-ld:owner:1",
+      "observedAt": "2021-03-07T08:32:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct"
+echo "===================================================================================================================="
+payload='{
+  "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "Device",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.2 ]
+    }
+  },
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.3 ]
+    }
+  },
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11.1, 11.4 ]
+    }
+  },
+  "weight": {
+    "type":  "Property",
+    "value": 1150,
+    "unitCode": "kg",
+    "observedAt": "2021-03-10T10:31:00.123Z"
+  },
+  "owner": {
+    "type":  "Relationship",
+    "object": "urn:ngsi-ld:owner:11",
+    "observedAt": "2021-03-10T10:32:00.123Z"
+  },
+  "noSuchAttr": {
+    "type":  "Property",
+    "value": "Error in 207 response"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs --payload "$payload" -X PATCH --in application/ld+json
+echo
+echo
+
+--REGEXPECT--
+01. Create an Entity E1 with attrs location, observationSpace, operationSpace, weight, owner
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entity:E1"
+]
+
+
+02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct
+====================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 412
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "the ID of an entity cannot be altered"
+        },
+        {
+            "attributeName": "type",
+            "reason": "the TYPE of an entity cannot be altered"
+        },
+        {
+            "attributeName": "weight",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "owner",
+            "reason": "attribute doesn't exist"
+        },
+        {
+            "attributeName": "noSuchAttr",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "location",
+        "observationSpace",
+        "operationSpace"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
