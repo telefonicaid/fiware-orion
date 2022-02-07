@@ -620,7 +620,6 @@ MHD_Result orionldMhdConnectionTreat(void)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
-  LM_TMP(("KZ: Payload Body: %s", orionldState.in.payload));
   //
   // Predetected Error from orionldMhdConnectionInit?
   //
@@ -774,7 +773,8 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.contextP == NULL)
     orionldState.contextP = orionldCoreContextP;
 
-  orionldState.link = orionldState.contextP->url;
+  if (orionldState.link == NULL)
+    orionldState.link = orionldState.contextP->url;
 
 
   // -----------------------------------------------------------------------------
