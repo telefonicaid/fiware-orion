@@ -44,6 +44,6 @@ for line in sys.stdin:
 
 try:
     doc = json.loads(data, object_pairs_hook=dict_raise_on_duplicates)
-    print json.dumps(doc, indent=4, sort_keys=True)
+    print (json.dumps(doc, indent=4, sort_keys=True))
 except ValueError as e:
-    print str(e)
+    print (str(e))

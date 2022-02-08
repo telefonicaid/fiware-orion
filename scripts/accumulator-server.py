@@ -199,7 +199,7 @@ pidfile = "/tmp/accumulator." + str(port) + ".pid"
 #
 if os.path.isfile(pidfile):
     oldpid = open(pidfile, 'r').read()
-    opid = string.atoi(oldpid)
+    opid = int(oldpid)
     print(f"PID file {pidfile} already exists, killing the process {oldpid}")
 
     try:
@@ -279,6 +279,45 @@ def dict_raise_on_duplicates(ordered_pairs):
     return d
 
 
+def sort_headers(headers):
+    """
+    Sort headers in a predefined order. It seems that from the Python2 version of this
+    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==1.0.2)
+    the order of the headers has changed. We sort to avoid change a lot of .test
+    expectations with no gain.
+
+    :param headers: the headers list to sort
+    """
+
+    sorted = []
+    headers_order = [
+        'Fiware-Servicepath',
+        'Content-Length',
+        'X-Auth-Token',
+        'User-Agent',
+        'Ngsiv2-Attrsformat',
+        'Host',
+        'Accept',
+        'Fiware-Service',
+        'Content-Type',
+        'Fiware-Correlator',
+    ]
+
+    # headers is a generator object, not exactly a list (i.e. it doesn't have remove method)
+    headers_list = list(headers)
+
+    for h in headers_order:
+        if h in headers_list:
+            sorted.append(h)
+            headers_list.remove(h)
+
+    # Remaining headers are added at the end of sorted array in the same order
+    for h in headers_list:
+        sorted.append(h)
+
+    return sorted
+
+
 def record_request(request):
     """
     Common function used by several route methods to save request content
@@ -296,6 +335,8 @@ def record_request(request):
         times.append(0)
     else:
         delta = datetime.now() - t0
+        # FIXME PR: we should use the "right way" used in Python 3 and remove the
+        # following comment
         # Python 2.7 could use delta.total_seconds(), but we use this formula
         # for backward compatibility with Python 2.6
         t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
@@ -325,8 +366,8 @@ def record_request(request):
     else:
         s += '?' + params + '\n'
 
-    # Store headers
-    for h in request.headers.keys():
+    # Store headers (according to pre-defined order)
+    for h in sort_headers(request.headers.keys()):
         s += h + ': ' + request.headers[h] + '\n'
 
     # Store payload
@@ -340,7 +381,7 @@ def record_request(request):
             except ValueError as e:
                 s += str(e)
         else:
-            s += request.data
+            s += request.data.decode("utf-8")
 
     # Separator
     s += '=======================================\n'
@@ -519,6 +560,8 @@ def on_message(client, userdata, msg):
         times.append(0)
     else:
         delta = datetime.now() - t0
+        # FIXME PR: we should use the "right way" used in Python 3 and remove the
+        # following comment
         # Python 2.7 could use delta.total_seconds(), but we use this formula
         # for backward compatibility with Python 2.6
         t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
