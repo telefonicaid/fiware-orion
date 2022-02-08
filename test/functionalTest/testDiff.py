@@ -35,7 +35,7 @@ def validation_error(input_line, ref_line):
 
 
 def line_count(file_name):
-    input = open(file_name, 'r')
+    input = open(file_name, 'r', encoding='utf-8')
     lines = 0
 
     for input_line in input.readlines():
@@ -53,8 +53,8 @@ def escape(s):
 
 def diff_files(input_file, ref_file):
 
-    input = open(input_file, 'r')
-    ref = open(ref_file, 'r')
+    input = open(input_file, 'r', encoding='utf-8')
+    ref = open(ref_file, 'r', encoding='utf-8')
 
     input_lines = input.readlines()
 
