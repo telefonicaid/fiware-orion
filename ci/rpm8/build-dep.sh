@@ -23,6 +23,7 @@
 
 # FIXME: default yum repositories has been changed to vault due to CentOS 8 EOL on February 1st, 2022
 # This is just a temporal solution so the build doesn't break while we find a new distro to use
+# FIXME: python2 required by an installagion script in GMock. Sad but true :(
 sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
 sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
 yum upgrade -y
@@ -43,6 +44,7 @@ yum -y install \
   valgrind \
   mongodb-org-shell \
   nc \
+  python2 \
   python3 \
   rpm-build \
   tar \
@@ -79,8 +81,10 @@ echo "INSTALL: libmicrohttpd" \
 && make \
 && make install
 
+# FIXME: if sometimes python2 goes away the fuse_gtest_files.py would need to be migrated to python3
 echo "INSTALL: gmock" \
 && curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
+&& sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
