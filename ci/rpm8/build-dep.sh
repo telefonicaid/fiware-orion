@@ -43,14 +43,14 @@ yum -y install \
   valgrind \
   mongodb-org-shell \
   nc \
-  python2 \
+  python3 \
   rpm-build \
   tar \
   cyrus-sasl-devel
 
 echo "INSTALL: python special dependencies" \
 && cd /opt \
-&& pip install virtualenv \
+&& pip3 install virtualenv \
 && virtualenv /opt/ft_env --python=/usr/bin/python3 \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==2.0.2 \
