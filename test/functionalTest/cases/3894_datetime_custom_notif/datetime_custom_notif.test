@@ -135,12 +135,12 @@ POST http://127.0.0.1:REGEX(\d+)/notify?t=2022-01-27T13:16:00.000Z
 Fiware-Servicepath: /
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-X-Time: 2022-01-27T13:16:00.000Z
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+X-Time: 2022-01-27T13:16:00.000Z
 
 {
     "DT": "2022-01-27T13:16:00.000Z"
@@ -150,12 +150,12 @@ POST http://127.0.0.1:REGEX(\d+)/notify?t=2022-01-28T00:00:00.000Z
 Fiware-Servicepath: /
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-X-Time: 2022-01-28T00:00:00.000Z
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+X-Time: 2022-01-28T00:00:00.000Z
 
 {
     "DT": "2022-01-28T00:00:00.000Z"
