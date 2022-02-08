@@ -569,12 +569,14 @@ def on_message(client, userdata, msg):
 
     s += 'MQTT message at topic ' + msg.topic + ':'
     s += '\n'
+
+    message = msg.payload.decode("utf-8")
     if pretty:
-        raw = json.loads(str(msg.payload))
+        raw = json.loads(message)
         s += json.dumps(raw, indent=4, sort_keys=True)
         s += '\n'
     else:
-        s += str(msg.payload)
+        s += str(message)
 
     # Separator
     s += '=======================================\n'
@@ -608,7 +610,7 @@ if __name__ == '__main__':
         # manual interface.
         client.loop_start()
 
-    # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
+    # Note that using debug=True breaks the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
