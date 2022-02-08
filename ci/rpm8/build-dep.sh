@@ -84,8 +84,8 @@ echo "INSTALL: libmicrohttpd" \
 # FIXME: if sometimes python2 goes away the fuse_gtest_files.py would need to be migrated to python3
 echo "INSTALL: gmock" \
 && curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
-&& sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py \
 && cd /opt/gmock-1.5.0 \
+&& sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py \
 && ./configure \
 && make \
 && make install
