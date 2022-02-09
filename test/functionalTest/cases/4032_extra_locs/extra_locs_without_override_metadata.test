@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Extra locations feature
+Extra locations feature (variant without overrideMetadata)
 
 --SHELL-INIT--
 dbInit CB
@@ -36,11 +36,11 @@ accumulatorStart --pretty-print
 # 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
 # 04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)
 # 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
-# 06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
-# 07. Update E to add ignoreType metadata in L1: success
+# 06. Update E L2 without metadata: see success (as overrideMetadata is not used)
+# 07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success
 # 08. GET geoquery near 1m around L1, to check there is no result
-# 09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
-# 10. GET geoquery near 1m around L2, to check this is the actual location of the entity
+# 09. Update E L2 without metadata: see success (as overrideMetadata is not used)
+# 10. GET geoquery near 1m around L2, to check there is no result
 #
 
 echo "01. Create subscription for entity E"
@@ -121,21 +121,21 @@ echo
 echo
 
 
-echo "06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail"
-echo "=================================================================================="
+echo "06. Update E L2 without metadata: see success (as overrideMetadata is not used)"
+echo "==============================================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
     "type": "geo:json"
   }
 }'
-orionCurl --url '/v2/entities/E/attrs?options=overrideMetadata' --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
 
-echo "07. Update E to add ignoreType metadata in L1: success"
-echo "======================================================"
+echo "07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success"
+echo "============================================================================================="
 payload='{
   "L1": {
     "value": { "type": "Point", "coordinates": [10,10] },
@@ -160,21 +160,21 @@ echo
 echo
 
 
-echo "09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success"
-echo "================================================================================="
+echo "09. Update E L2 without metadata: see success (as overrideMetadata is not used)"
+echo "==============================================================================="
 payload='{
   "L2": {
     "value": { "type": "Point", "coordinates": [20,20] },
     "type": "geo:json"
   }
 }'
-orionCurl --url '/v2/entities/E/attrs?options=overrideMetadata' --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
 
-echo "10. GET geoquery near 1m around L2, to check this is the actual location of the entity"
-echo "======================================================================================"
+echo "10. GET geoquery near 1m around L2, to check there is no result"
+echo "==============================================================="
 orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=20,20'
 echo
 echo
@@ -384,22 +384,16 @@ Date: REGEX(.*)
 ]
 
 
-06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
-==================================================================================
-HTTP/1.1 413 Payload Too Large
-Content-Length: 202
-Content-Type: application/json
+06. Update E L2 without metadata: see success (as overrideMetadata is not used)
+===============================================================================
+HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
-    "error": "NoResourcesAvailable"
-}
 
 
-07. Update E to add ignoreType metadata in L1: success
-======================================================
+07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success
+=============================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -417,71 +411,23 @@ Date: REGEX(.*)
 []
 
 
-09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
-=================================================================================
+09. Update E L2 without metadata: see success (as overrideMetadata is not used)
+===============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-10. GET geoquery near 1m around L2, to check this is the actual location of the entity
-======================================================================================
+10. GET geoquery near 1m around L2, to check there is no result
+===============================================================
 HTTP/1.1 200 OK
-Content-Length: 369
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "L1": {
-            "metadata": {
-                "ignoreType": {
-                    "type": "Boolean",
-                    "value": true
-                }
-            },
-            "type": "geo:json",
-            "value": {
-                "coordinates": [
-                    10,
-                    10
-                ],
-                "type": "Point"
-            }
-        },
-        "L2": {
-            "metadata": {},
-            "type": "geo:json",
-            "value": {
-                "coordinates": [
-                    20,
-                    20
-                ],
-                "type": "Point"
-            }
-        },
-        "L3": {
-            "metadata": {
-                "ignoreType": {
-                    "type": "Boolean",
-                    "value": true
-                }
-            },
-            "type": "geo:json",
-            "value": {
-                "coordinates": [
-                    30,
-                    30
-                ],
-                "type": "Point"
-            }
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
+[]
 
 
 --TEARDOWN--

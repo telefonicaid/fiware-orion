@@ -544,6 +544,7 @@ std::string postUpdateContext
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
+  bool overrideMetadata = ciP->uriParamOptions[OPT_OVERRIDEMETADATA];
   bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
   //
   // 01. Check service-path consistency
@@ -596,6 +597,7 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.correlator,
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
                                                   forcedUpdate,
+                                                  overrideMetadata,
                                                   ciP->apiVersion,
                                                   ngsiV2Flavour,
                                                   flowControl));
