@@ -2173,10 +2173,10 @@ static void updateAttrInNotifyCer
       double now = getCurrentTime();
       caP->modDate = now;
 
-      /* Metadata. The metadata previous content is "patched" by the metadata in the request,
-         except if overrideMetadata option is used, in which case a previous cleanup is done*/
-      // FIXME PR: fix contition so caP->onlyValue overrides overrideMetadata
-      if (overrideMetadata)
+      /* Metadata. The metadata previous content is "patched" by the metadata in the request.
+       * Exception: a cleanup is done if overrideMetadata option is used and we are not in
+       * only value modification case. */
+      if ((!targetAttr->onlyValue) && (overrideMetadata))
       {
         caP->metadataVector.release();
       }

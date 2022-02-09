@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Metadata are not removed upon attribute value update (direct value modification operation)
+Metadata are not removed upon attribute value update even if overrideMetadata is used
 
 --SHELL-INIT--
 dbInit CB
@@ -30,13 +30,12 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-# FIXME PR: use overrideMetadata to check it is ignored in this case
 #
 # 01. Create subscription for entity E
 # 02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2
 # 03. GET entity E and see A=foo with metadata MD1=1 and MD2=2
 # 04. Dump&reset accumulator and see A=foo with metadata MD1=1 and MD2=2
-# 05. PUT /v2/entities/E/attrs/A/value with bar
+# 05. PUT /v2/entities/E/attrs/A/value?options=overrideMetadata with bar
 # 06. GET entity E and see A=bar with metadata MD1=1 and MD2=2
 # 07. Dump&reset accumulator and see A=bar with metadata MD1=1 and MD2=2
 #
@@ -103,10 +102,10 @@ echo
 echo
 
 
-echo "05. PUT /v2/entities/E/attrs/A/value with bar"
-echo "============================================="
+echo "05. PUT /v2/entities/E/attrs/A/value?options=overrideMetadata with bar"
+echo "======================================================================"
 payload='"bar"'
-orionCurl --url /v2/entities/E/attrs/A/value --payload "$payload" --in text -X PUT
+orionCurl --url '/v2/entities/E/attrs/A/value?options=overrideMetadata' --payload "$payload" --in text -X PUT
 echo
 echo
 
@@ -213,8 +212,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
-05. PUT /v2/entities/E/attrs/A/value with bar
-=============================================
+05. PUT /v2/entities/E/attrs/A/value?options=overrideMetadata with bar
+======================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
