@@ -379,14 +379,16 @@ bool pCheckGeoPropertyCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoTy
 
   switch (geoType)
   {
-  case GeoJsonPoint:    return pCheckGeoPointCoordinates(coordinatesP);
-  case GeoJsonPolygon:  return pCheckGeoPolygonCoordinates(coordinatesP);
-
-  default:
-    return false;
+  case GeoJsonPoint:            return pCheckGeoPointCoordinates(coordinatesP);
+  case GeoJsonPolygon:          return pCheckGeoPolygonCoordinates(coordinatesP);
+  case GeoJsonLineString:       return true;
+  case GeoJsonMultiPoint:       return true;
+  case GeoJsonMultiPolygon:     return true;
+  case GeoJsonMultiLineString:  return true;
+  case GeoJsonNoType:           return false;
   }
 
-  return true;
+  return false;
 }
 
 
@@ -709,7 +711,7 @@ bool pCheckAttributeObject
     {
       if (pCheckGeoPropertyValue(attrP, typeP) == false)
       {
-        LM_W(("pCheckGeoPropertyValue flagged an error"));
+        LM_W(("pCheckGeoPropertyValue flagged an error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
         return false;
       }
 

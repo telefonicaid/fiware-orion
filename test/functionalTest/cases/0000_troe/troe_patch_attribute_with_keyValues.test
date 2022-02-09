@@ -33,7 +33,7 @@ brokerStart CB 100 IPv4 -troe
 
 #
 # 01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
-# 02. PATCH E1:P, with keyValues, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
+# 02. PATCH E1:P, in compact format, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
 # 03. See E1 in the temporal database
 # 04. See the attributes in the temporal database
 # 05. See the sub-attributes in the temporal database
@@ -71,11 +71,11 @@ echo
 echo
 
 
-echo "02. PATCH E1:P, with keyValues, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44"
-echo "======================================================================================================================"
+echo "02. PATCH E1:P, in compact format, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44"
+echo "========================================================================================================================="
 payload='{
   "value": 44,
-  "Sub-R": "urn:ngsi-ld:rel:R2",
+  "Sub-R": {"object": "urn:ngsi-ld:rel:R2" },
   "Sub-P": "Sub-P",
   "geo-point": {
     "type": "Point",
@@ -98,7 +98,7 @@ payload='{
     "coordinates": [ [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]], [[ [10,0], [14,0], [14,-2], [10,-2], [10,0] ]] ]
   }
 }'
-orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P?options=keyValues&relationships=Sub-R&geoproperties=geo-point,geo-line-string,geo-multi-line-string,geo-polygon,geo-multi-polygon" -X PATCH --payload "$payload"
+orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P" -X PATCH --payload "$payload"
 echo
 echo
 
@@ -134,8 +134,8 @@ Date: REGEX(.*)
 
 
 
-02. PATCH E1:P, with keyValues, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
-======================================================================================================================
+02. PATCH E1:P, in compact format, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
+=========================================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

@@ -72,7 +72,7 @@ payload='{
   "P1": "New P1",
   "P2": "P2"
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs?options=keyValues --payload "$payload" -X PATCH
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload" -X PATCH
 echo
 echo
 
