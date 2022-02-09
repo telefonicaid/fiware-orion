@@ -118,7 +118,7 @@ payload='{
   "PI": 2,
   "PF": 2.02,
   "PB": false,
-  "R1": "urn:ngsi-ld:entities:E2",
+  "R1": { "object": "urn:ngsi-ld:entities:E2" },
   "G1": {
     "type": "Point",
     "coordinates": [ 2, 2, 2 ]

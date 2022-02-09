@@ -213,56 +213,30 @@ static inline void attributeTransform(KjNode* attrP, const char* type, KjNode* v
 //
 // pCheckAttributeString -
 //
+// A String is always a Property.
+// Make sure that:
+// - if the attribute already existed, that it is a Property in the DB
+// - OR: it's a new attribute
+//
 inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
-  bool     relationship = (strncmp(attrP->value.s, "urn:ngsi-ld:", 12) == 0);
-  char*    valueKey;
-  char*    attrType;
-  KjNode*  valueP;
-
-  LM_TMP(("In pCheckAttributeString for attribute '%s'", attrP->name));
-
-  if (attrTypeFromDb == Property)
-  {
-    // Even if the string is a URI, if the attribute already exists and its a Property, all good
-  }
-  else if (attrTypeFromDb == NoAttributeType)
-  {
-    // If the attribute did not exist, also no problem
-    // I think ... :)
-    // This might depend on the SERVICE and if attr or sub-attr
-  }
-  else if ((relationship == true) && (attrTypeFromDb != Relationship))
-  {
-    LM_TMP(("attrTypeFromDb: %d", attrTypeFromDb));
-    orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Relationship", attrP->name, 400);
-    return false;
-  }
-  else if (relationship == false)
+  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
   {
     if (attrTypeFromDb == Relationship)
       orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
     else if (attrTypeFromDb == GeoProperty)
       orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
+    else if (attrTypeFromDb == LanguageProperty)
+      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
+    else
+      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
 
     return false;
   }
 
+  KjNode* valueP = kjString(orionldState.kjsonP, "value", attrP->value.s);
+  attributeTransform(attrP, "Property", valueP);
 
-  if (relationship == false)
-  {
-    valueKey = (char*) "value";
-    attrType = (char*) "Property";
-  }
-  else
-  {
-    valueKey = (char*) "object";
-    attrType = (char*) "Relationship";
-  }
-
-  valueP = kjString(orionldState.kjsonP, valueKey, attrP->value.s);
-
-  attributeTransform(attrP, attrType, valueP);
   return true;
 }
 
@@ -280,6 +254,10 @@ inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttri
       orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
     else if (attrTypeFromDb == GeoProperty)
       orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
+    else if (attrTypeFromDb == LanguageProperty)
+      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
+    else
+      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
 
     return false;
   }
@@ -303,6 +281,10 @@ inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttribu
       orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
     else if (attrTypeFromDb == GeoProperty)
       orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
+    else if (attrTypeFromDb == LanguageProperty)
+      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
+    else
+      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
 
     return false;
   }
@@ -326,6 +308,10 @@ inline bool pCheckAttributeBoolean(KjNode* attrP, bool isAttribute, OrionldAttri
       orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
     else if (attrTypeFromDb == GeoProperty)
       orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
+    else if (attrTypeFromDb == LanguageProperty)
+      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
+    else
+      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
 
     return false;
   }
@@ -395,6 +381,7 @@ bool pCheckGeoPropertyCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoTy
   {
   case GeoJsonPoint:    return pCheckGeoPointCoordinates(coordinatesP);
   case GeoJsonPolygon:  return pCheckGeoPolygonCoordinates(coordinatesP);
+
   default:
     return false;
   }
