@@ -2,6 +2,7 @@
 
 * [Forbidden characters](#forbidden-characters)
 * [Update operators for attribute values](#update-operators-for-attribute-values)
+* [Metadata update semantics](#metadata-update-semantics)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
@@ -72,6 +73,28 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
+
+[Top](#top)
+
+## Metadata update semantics
+
+The metadata update semantics used by Orion Context Broker (and the
+related `overrideMetadata` option are detailed in
+[this section of the documentation](metadata.md)[#updating-metadata].
+
+Moreover, from NGSIv2 specification section "Partial Representations":
+
+> Attribute `metadata` may be omitted in requests, meaning that there are no metadata
+> elements associated to the attribute.
+
+Depending if `overrideMetadata` is used or not, this sentence has two interpretations:
+
+* If `overrideMetadata` is not used (default behaviour) it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **which need to be updated**"
+* If `overrideMetadata` is used it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **as a result of the the attribute update**"
 
 [Top](#top)
 
