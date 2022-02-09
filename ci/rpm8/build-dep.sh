@@ -23,6 +23,7 @@
 
 # FIXME: default yum repositories has been changed to vault due to CentOS 8 EOL on February 1st, 2022
 # This is just a temporal solution so the build doesn't break while we find a new distro to use
+# FIXME: python2 required by an installation script in GMock. Sad but true :(
 sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
 sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
 yum upgrade -y
@@ -44,33 +45,18 @@ yum -y install \
   mongodb-org-shell \
   nc \
   python2 \
+  python3 \
   rpm-build \
   tar \
   cyrus-sasl-devel
 
-# FIXME: review this with CentOS 8. Probably CentOS 8 uses Flask >0.10.1 but, anyway
-# using virtual env seems to be a good idea
-#
-# CentOS 7 installs Flask==0.10.1 which depends on Werkzeug==0.9.1. There is a bug
-# in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
-# dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
-# installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
-#
-# In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
-# may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
-# (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
-# This installation is done using pip2 (the one that comes with CentOS 8) but, after that,
-# pip gets installed with the usal name and next pip commands doesn't need pip2
 echo "INSTALL: python special dependencies" \
 && cd /opt \
-&& alternatives --set python /usr/bin/python2 \
-&& pip2 install --upgrade "pip < 21.0" \
-&& pip install virtualenv \
-&& virtualenv /opt/ft_env \
+&& pip3 install virtualenv \
+&& virtualenv /opt/ft_env --python=/usr/bin/python3 \
 && . /opt/ft_env/bin/activate \
-&& pip install Flask==1.0.2 \
-&& pip install pyOpenSSL==19.0.0 \
-&& pip install paho-mqtt==1.5.1 \
+&& pip install Flask==2.0.2 \
+&& pip install paho-mqtt==1.6.1 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
@@ -95,9 +81,11 @@ echo "INSTALL: libmicrohttpd" \
 && make \
 && make install
 
+# FIXME: if sometimes python2 goes away the fuse_gtest_files.py would need to be migrated to python3
 echo "INSTALL: gmock" \
 && curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
+&& sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py \
 && ./configure \
 && make \
 && make install
