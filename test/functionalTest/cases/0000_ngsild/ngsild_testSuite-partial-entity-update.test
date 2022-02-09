@@ -64,8 +64,8 @@ echo "02. Update the entity partially, the same way as the Test Suite Case 'Part
 echo "==============================================================================================="
 payload='{
   "P1": {
-    "type": "Relationship",
-    "object": "urn:ngsi-ld:T2:6789"
+    "type": "Property",
+    "value": "urn:ngsi-ld:T2:6789"
   },
   "location": {
     "type": "GeoProperty",
@@ -121,15 +121,15 @@ Date: REGEX(.*)
 03. Get the entity to see that the update was correctly performed
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 103
+Content-Length: 98
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
     "P1": {
-        "object": "urn:ngsi-ld:T2:6789",
-        "type": "Relationship"
+        "type": "Property",
+        "value": "urn:ngsi-ld:T2:6789"
     },
     "id": "urn:ngsi-ld:Entities:E1",
     "type": "T"

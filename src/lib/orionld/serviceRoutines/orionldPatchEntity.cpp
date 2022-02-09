@@ -31,6 +31,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -50,7 +51,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/kjTree/kjEntityKeyValueAmend.h"                // kjEntityKeyValueAmend
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
@@ -91,13 +91,6 @@ bool orionldPatchEntity(void)
     orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
     return false;
   }
-
-  //
-  // If keyValues is set, modify the tree accordingly (add objects for all attributes - with "type" and "value")
-  //
-  if (orionldState.uriParamOptions.keyValues == true)
-    orionldState.requestTree = kjEntityKeyValueAmend(orionldState.requestTree);
-
 
   // 3. Get the Entity Type, needed later in the call to the constructor of ContextElement
   KjNode* idNodeP = kjLookup(dbEntityP, "_id");
@@ -193,6 +186,15 @@ bool orionldPatchEntity(void)
       continue;
     }
 
+    //
+    // Get the type of the attribute (from DB)
+    //
+    KjNode* typeP = kjLookup(dbAttributeP, "type");
+
+    if (typeP != NULL)
+      attributeType = orionldAttributeType(typeP->value.s);
+
+    LM_TMP(("Calling pCheckAttribute for attribute '%s'", shortName));
     if (pCheckAttribute(newAttrP, true, dbAttributeP, attributeType) == false)
     {
       //

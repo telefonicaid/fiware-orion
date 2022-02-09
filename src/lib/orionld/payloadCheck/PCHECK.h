@@ -68,4 +68,23 @@ do                                                                              
   }                                                                                          \
 } while (0)
 
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_ARRAY -
+//
+#define PCHECK_ARRAY(kNodeP, _type, _title, detail, status)                                  \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->type != KjArray)                                                               \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Array"   : _title;                     \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECK_H_

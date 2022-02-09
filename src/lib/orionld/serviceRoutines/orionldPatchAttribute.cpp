@@ -60,7 +60,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
-#include "orionld/kjTree/kjAttributeKeyValueAmend.h"             // kjAttributeKeyValueAmend
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
 
 
@@ -832,10 +831,6 @@ bool orionldPatchAttribute(void)
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
-  char buf[2048];
-  kjFastRender(inAttribute, buf);
-  LM_TMP(("Looking for 'type' in: %s", buf));
-
   KjNode* inType = kjLookup(inAttribute, "type");
 
   // Expand all sub-attributes

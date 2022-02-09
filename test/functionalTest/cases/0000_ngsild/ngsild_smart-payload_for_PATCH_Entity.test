@@ -31,19 +31,25 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create an entity E1 with attributes P1, R1, G1
-# 02. PATCH E1 using Smart Input Format
+# 01. Create an entity E1 with attributes Px, R1, G1 + entity special GeoProperties
+# 02. PATCH Px, R1, and G1 with direct values
 # 03. GET the entity and see the updates from step 02
-# 04. PATCH E1 again, but with special attributes, such as location, observationSpace, and operationSpace
+# 04. PATCH Px, R1, and G1 with JSON objects with only "value" items
 # 05. GET the entity and see the updates from step 04
+# 06. PATCH the special attributes location, observationSpace, and operationSpace
+# 07. GET the entity and see the updates from step 04
 #
-# ERROR CHECKS
-# 06. PATCH E1 using Smart Input Format, but R1 isn't a string
-# 07. PATCH E1 using Smart Input Format, but G1 isn't an object
+# This should be its own test file - ngsild_PATCH_Entity_errors.test
+# 10. Attempt to turn the Relationship R1 into a Property using "R1": { "value": "10" } - see error
+# 11. Attempt to turn the Relationship R1 into a Property using "R1": "11" - see error
+# 12. GET the entity and see NO updates from steps 10 and 11
+# 13. Invalid URI (entityId) in URL PATH - see error
+# 14. Non-existing entity - see error
 #
 
-echo "01. Create an entity E1 with attributes P1, R1, G1"
-echo "=================================================="
+
+echo "01. Create an entity E1 with attributes Px, R1, G1 + entity special GeoProperties"
+echo "================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:T:E1",
   "type": "T",
@@ -68,9 +74,21 @@ payload='{
       "coordinates": [ 1, 1, 1 ]
     }
   },
-  "P1": {
+  "PS": {
     "type": "Property",
     "value": "will be overwritten"
+  },
+  "PB": {
+    "type": "Property",
+    "value": true
+  },
+  "PI": {
+    "type": "Property",
+    "value": 1
+  },
+  "PF": {
+    "type": "Property",
+    "value": 1.01
   },
   "P5": {
     "type": "Property",
@@ -84,7 +102,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "Point",
-      "coordinates": [ 1,2 ]
+      "coordinates": [ 1, 1, 1 ]
     }
   }  
 }'
@@ -93,14 +111,17 @@ echo
 echo
 
 
-echo "02. PATCH E1 using Smart Input Format"
-echo "====================================="
+echo "02. PATCH Px, R1, and G1 with direct values"
+echo "==========================================="
 payload='{
-  "P1": 12,
+  "PS": "2",
+  "PI": 2,
+  "PF": 2.02,
+  "PB": false,
   "R1": "urn:ngsi-ld:entities:E2",
   "G1": {
     "type": "Point",
-    "coordinates": [ 1, 2, 4 ]
+    "coordinates": [ 2, 2, 2 ]
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
@@ -115,20 +136,19 @@ echo
 echo
 
 
-echo "04. PATCH E1 again, but with special attributes, such as location, observationSpace, and operationSpace"
-echo "======================================================================================================="
+echo '04. PATCH Px, R1, and G1 with JSON objects with only "value" items'
+echo '=================================================================='
 payload='{
-  "location":  {
-    "type": "Point",
-    "coordinates": [ 1, 2, 4 ]
-  },
-  "observationSpace":  {
-    "type": "Point",
-    "coordinates": [ 1, 2, 4 ]
-  },
-  "operationSpace": {
-    "type": "Point",
-    "coordinates": [ 1, 2, 4 ]
+  "PS": { "value": "4" },
+  "PI": { "value": 4 },
+  "PF": { "value": 4.04 },
+  "PB": { "value": true },
+  "R1": { "object": "urn:ngsi-ld:entities:E4" },
+  "G1": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ 4, 4, 4 ]
+    }
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
@@ -143,9 +163,64 @@ echo
 echo
 
 
+echo "06. PATCH the special attributes location, observationSpace, and operationSpace"
+echo "==============================================================================="
+payload='{
+  "location":  {
+    "type": "Point",
+    "coordinates": [ 6, 6, 6 ]
+  },
+  "observationSpace":  {
+    "type": "Point",
+    "coordinates": [ 6, 6, 6 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 6, 6, 6 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET the entity and see the updates from step 06"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '10. Attempt to turn the Relationship R1 into a Property using "R1": { "value": "10" } - see error'
+echo '================================================================================================='
+payload='{
+  "R1": { "value": "10" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '11. Attempt to turn the Relationship R1 into a Property using "R1": "11" - see error'
+echo '===================================================================================='
+payload='{
+  "R1": "11"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "12. GET the entity and see NO updates from steps 10 and 11"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
 --REGEXPECT--
-01. Create an entity E1 with attributes P1, R1, G1
-==================================================
+01. Create an entity E1 with attributes Px, R1, G1 + entity special GeoProperties
+=================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
@@ -153,8 +228,8 @@ Date: REGEX(.*)
 
 
 
-02. PATCH E1 using Smart Input Format
-=====================================
+02. PATCH Px, R1, and G1 with direct values
+===========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -163,7 +238,7 @@ Date: REGEX(.*)
 03. GET the entity and see the updates from step 02
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 649
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -173,20 +248,32 @@ Date: REGEX(.*)
         "type": "GeoProperty",
         "value": {
             "coordinates": [
-                1,
                 2,
-                4
+                2,
+                2
             ],
             "type": "Point"
         }
     },
-    "P1": {
-        "type": "Property",
-        "value": 12
-    },
     "P5": {
         "type": "Property",
         "value": "will not be overwritten"
+    },
+    "PB": {
+        "type": "Property",
+        "value": false
+    },
+    "PF": {
+        "type": "Property",
+        "value": 2.02
+    },
+    "PI": {
+        "type": "Property",
+        "value": 2
+    },
+    "PS": {
+        "type": "Property",
+        "value": "2"
     },
     "R1": {
         "object": "urn:ngsi-ld:entities:E2",
@@ -230,8 +317,8 @@ Date: REGEX(.*)
 }
 
 
-04. PATCH E1 again, but with special attributes, such as location, observationSpace, and operationSpace
-=======================================================================================================
+04. PATCH Px, R1, and G1 with JSON objects with only "value" items
+==================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -240,7 +327,7 @@ Date: REGEX(.*)
 05. GET the entity and see the updates from step 04
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 648
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -250,23 +337,35 @@ Date: REGEX(.*)
         "type": "GeoProperty",
         "value": {
             "coordinates": [
-                1,
-                2,
+                4,
+                4,
                 4
             ],
             "type": "Point"
         }
     },
-    "P1": {
-        "type": "Property",
-        "value": 12
-    },
     "P5": {
         "type": "Property",
         "value": "will not be overwritten"
     },
+    "PB": {
+        "type": "Property",
+        "value": true
+    },
+    "PF": {
+        "type": "Property",
+        "value": 4.04
+    },
+    "PI": {
+        "type": "Property",
+        "value": 4
+    },
+    "PS": {
+        "type": "Property",
+        "value": "4"
+    },
     "R1": {
-        "object": "urn:ngsi-ld:entities:E2",
+        "object": "urn:ngsi-ld:entities:E4",
         "type": "Relationship"
     },
     "id": "urn:ngsi-ld:entities:T:E1",
@@ -275,8 +374,8 @@ Date: REGEX(.*)
         "value": {
             "coordinates": [
                 1,
-                2,
-                4
+                1,
+                1
             ],
             "type": "Point"
         }
@@ -286,8 +385,8 @@ Date: REGEX(.*)
         "value": {
             "coordinates": [
                 1,
-                2,
-                4
+                1,
+                1
             ],
             "type": "Point"
         }
@@ -297,8 +396,217 @@ Date: REGEX(.*)
         "value": {
             "coordinates": [
                 1,
-                2,
+                1,
+                1
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+06. PATCH the special attributes location, observationSpace, and operationSpace
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET the entity and see the updates from step 06
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 648
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                4,
+                4,
                 4
+            ],
+            "type": "Point"
+        }
+    },
+    "P5": {
+        "type": "Property",
+        "value": "will not be overwritten"
+    },
+    "PB": {
+        "type": "Property",
+        "value": true
+    },
+    "PF": {
+        "type": "Property",
+        "value": 4.04
+    },
+    "PI": {
+        "type": "Property",
+        "value": 4
+    },
+    "PS": {
+        "type": "Property",
+        "value": "4"
+    },
+    "R1": {
+        "object": "urn:ngsi-ld:entities:E4",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+10. Attempt to turn the Relationship R1 into a Property using "R1": { "value": "10" } - see error
+=================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 107
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "R1",
+            "reason": "Forbidden field for a Relationship: /value/"
+        }
+    ],
+    "updated": []
+}
+
+
+11. Attempt to turn the Relationship R1 into a Property using "R1": "11" - see error
+====================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 164
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "R1",
+            "reason": "Attempt to transform a Relationship into a Property: https://uri.etsi.org/ngsi-ld/default-context/R1"
+        }
+    ],
+    "updated": []
+}
+
+
+12. GET the entity and see NO updates from steps 10 and 11
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 648
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                4,
+                4,
+                4
+            ],
+            "type": "Point"
+        }
+    },
+    "P5": {
+        "type": "Property",
+        "value": "will not be overwritten"
+    },
+    "PB": {
+        "type": "Property",
+        "value": true
+    },
+    "PF": {
+        "type": "Property",
+        "value": 4.04
+    },
+    "PI": {
+        "type": "Property",
+        "value": 4
+    },
+    "PS": {
+        "type": "Property",
+        "value": "4"
+    },
+    "R1": {
+        "object": "urn:ngsi-ld:entities:E4",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                6,
+                6,
+                6
             ],
             "type": "Point"
         }

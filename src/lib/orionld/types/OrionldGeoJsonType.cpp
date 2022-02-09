@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
-
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,23 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                               // strcmp
 
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldGeoJsonType -
-//
-typedef enum OrionldGeoJsonType
-{
-  GeoJsonNoType,
-  GeoJsonPoint,
-  GeoJsonMultiPoint,
-  GeoJsonLineString,
-  GeoJsonMultiLineString,
-  GeoJsonPolygon,
-  GeoJsonMultiPolygon
-} GeoJsonType;
+#include "orionld/types/OrionldGeoJsonType.h"     // Own Interface
 
 
 
@@ -49,6 +32,14 @@ typedef enum OrionldGeoJsonType
 //
 // orionldGeoJsonTypeFromString -
 //
-extern OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type);
+OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type)
+{
+  if      (strcmp(type, "Point")           == 0)  return GeoJsonPoint;
+  else if (strcmp(type, "Polygon")         == 0)  return GeoJsonPolygon;
+  else if (strcmp(type, "LineString")      == 0)  return GeoJsonLineString;
+  else if (strcmp(type, "MultiPoint")      == 0)  return GeoJsonMultiPoint;
+  else if (strcmp(type, "MultiPolygon")    == 0)  return GeoJsonMultiPolygon;
+  else if (strcmp(type, "MultiLineString") == 0)  return GeoJsonMultiLineString;
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
+  return GeoJsonNoType;
+}
