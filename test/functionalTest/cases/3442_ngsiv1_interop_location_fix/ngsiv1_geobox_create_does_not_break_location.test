@@ -61,7 +61,7 @@ echo
 
 echo "02. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 

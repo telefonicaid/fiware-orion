@@ -130,7 +130,7 @@ echo
 
 echo "05. Get doc in DB before cache refresh and see status active changed in a far future and without count and without failsCounter"
 echo "==============================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -147,7 +147,7 @@ echo
 
 echo "07. Get doc in DB before cache refresh and see status active changed in a far future and without count and without failsCounter + description"
 echo "============================================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -162,7 +162,7 @@ echo
 
 echo "09. Get doc in DB after cache refresh and see status active changed in a far future and count 2, failsCounter 2 + description"
 echo "============================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 

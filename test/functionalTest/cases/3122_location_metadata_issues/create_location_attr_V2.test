@@ -80,14 +80,14 @@ echo
 
 echo "03. Check E1 entity in DB has location metadata but no location GeoJSON field"
 echo "============================================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
 
 echo "04. Check E2 entity in DB has no location metadata but location GeoJSON field"
 echo "============================================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E2",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python ${SCRIPT_HOME}/testJson.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E2",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1, location: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
