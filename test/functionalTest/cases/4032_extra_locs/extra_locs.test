@@ -418,7 +418,7 @@ Date: REGEX(.*)
 
 
 09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
-============================0====================================================
+=================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
