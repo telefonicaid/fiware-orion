@@ -23,17 +23,21 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 1. 作業するシステム上のディレクトリを作成します。たとえば `~/fiware` です
 2. ディレクトリ内に `docker-compose.yml` という名前の新しいファイルを次の内容で作成します :
-	
-		 mongo:
-		  image: mongo:4.4
-		  command: --nojournal
-		 orion:
-		  image: fiware/orion
-		  links:
-		    - mongo
-		  ports:
-		    - "1026:1026"
-		  command: -dbhost mongo
+
+		version: "3"
+
+		services:
+		  orion:
+		    image: fiware/orion
+		    ports:
+		      - "1026:1026"
+		    depends_on:
+		      - mongo
+		    command: -dbhost mongo
+
+		  mongo:
+		    image: mongo:4.4
+		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
 
