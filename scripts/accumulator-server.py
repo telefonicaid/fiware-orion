@@ -335,11 +335,7 @@ def record_request(request):
         times.append(0)
     else:
         delta = datetime.now() - t0
-        # FIXME PR: we should use the "right way" used in Python 3 and remove the
-        # following comment
-        # Python 2.7 could use delta.total_seconds(), but we use this formula
-        # for backward compatibility with Python 2.6
-        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+        t = delta.total_seconds()
         times.append(trunc(round(t)))
         # times.append(t)
 
@@ -560,11 +556,7 @@ def on_message(client, userdata, msg):
         times.append(0)
     else:
         delta = datetime.now() - t0
-        # FIXME PR: we should use the "right way" used in Python 3 and remove the
-        # following comment
-        # Python 2.7 could use delta.total_seconds(), but we use this formula
-        # for backward compatibility with Python 2.6
-        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+        t = delta.total_seconds()
         times.append(trunc(round(t)))
 
     s += 'MQTT message at topic ' + msg.topic + ':'
