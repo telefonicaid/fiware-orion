@@ -618,9 +618,11 @@ static bool mergeAttrInfo
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
+    // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+    // or can be simplified
+    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     std::set<std::string>  mdsSet;
 
-    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
