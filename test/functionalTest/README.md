@@ -12,7 +12,7 @@ We recommend to use Python [virtualenv](https://virtualenv.pypa.io/en/latest) to
 
 ```
 pip install virtualenv  # if you don't have virtualenv itself previously installed
-virtualenv --python=/usr/bin/python2 /path/to/ft_env
+virtualenv --python=/usr/bin/python3 /path/to/ft_env
 ```
 
 Then activate the virtual env:
@@ -24,9 +24,8 @@ Then activate the virtual env:
 Next install accumulator-server.py depencencies:
 
 ```
-pip install Flask==1.0.2
-pip install pyOpenSSL==19.0.0
-pip install paho-mqtt==1.5.1
+pip install Flask==2.0.2
+pip install paho-mqtt==1.6.1
 ```
 
 Next, install the accumulator-server.py script itself:
