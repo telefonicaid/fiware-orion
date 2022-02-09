@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
 
 /*
 *
@@ -27,15 +27,23 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                     // KjNode
 }
+
+#include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjEntityKeyValueAmend -
+// pCheckAttribute -
 //
-extern KjNode* kjEntityKeyValueAmend(KjNode* entityP);
+extern bool pCheckAttribute
+(
+  KjNode*                 attrP,
+  bool                    isAttribute,
+  KjNode*                 dbAttributeP,
+  OrionldAttributeType    attrTypeFromDb
+);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYKEYVALUEAMEND_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_

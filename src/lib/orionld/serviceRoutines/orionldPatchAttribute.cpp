@@ -40,17 +40,16 @@ extern "C"
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/CHECK.h"                                // *CHECK*
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
-#include "orionld/payloadCheck/pbodyAttribute.h"                 // pbodyAttribute
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -61,7 +60,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
-#include "orionld/kjTree/kjAttributeKeyValueAmend.h"             // kjAttributeKeyValueAmend
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
 
 
@@ -96,13 +94,6 @@ do {                                                                  \
 //
 bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, const char* datasetId)
 {
-  char* detail;
-  if (pcheckAttribute(inAttribute, NULL, false, &detail) == false)
-  {
-    LM_W(("Bad Input (invalid attribute - %s)", detail));
-    return false;
-  }
-
   KjNode* datasetNodeP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
   if (datasetNodeP == NULL)
   {
@@ -730,18 +721,14 @@ bool orionldPatchAttribute(void)
   //
   // 1.1 Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pCheckUri(entityId, true, &orionldState.pd) == false)
+  if (pCheckUri(entityId, true) == false)
     return false;
 
   //
   // 1.2 Make sure the attrName (orionldState.wildcard[1]) is a valid NAME or URI
   //
-  if (pcheckUri(attrName, false, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Attribute Name '%s' - %s)", attrName, detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Attribute Name", detail);
+  if (pCheckUri(attrName, false) == false)
     return false;
-  }
 
 
   //
@@ -787,11 +774,14 @@ bool orionldPatchAttribute(void)
   //
   // Check and Normalize
   //
-  char* attrTypeInDb = (dbAttributeTypeNodeP != NULL)? dbAttributeTypeNodeP->value.s : NULL;
-  LM_TMP(("KZ: Calling pbodyAttribute with attrTypeInDb == '%s'", attrTypeInDb));
-  if (pbodyAttribute(inAttribute, true, attrTypeInDb, &orionldState.pd) == false)
+  char*                 attrTypeInDb = (dbAttributeTypeNodeP != NULL)? dbAttributeTypeNodeP->value.s : NULL;
+  OrionldAttributeType  attributeType = NoAttributeType;
+
+  if (attrTypeInDb != NULL)
+    attributeType = orionldAttributeType(attrTypeInDb);
+
+  if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType) == false)
   {
-    LM_TMP(("KZ: pbodyAttribute failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
     return false;
@@ -831,8 +821,9 @@ bool orionldPatchAttribute(void)
   KjNode* datasetIdP = kjLookup(inAttribute, "datasetId");
   if (datasetIdP != NULL)
   {
-    STRING_CHECK(datasetIdP, "datasetId");
-    URI_CHECK(datasetIdP->value.s, "datasetId", true);
+    PCHECK_STRING(datasetIdP, 0, NULL, "datasetId", 400);
+    if (pCheckUri(datasetIdP->value.s, true) == false)
+      return false;
 
     return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP->value.s);
   }
@@ -840,10 +831,6 @@ bool orionldPatchAttribute(void)
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
-  char buf[2048];
-  kjFastRender(inAttribute, buf);
-  LM_TMP(("Looking for 'type' in: %s", buf));
-
   KjNode* inType = kjLookup(inAttribute, "type");
 
   // Expand all sub-attributes
@@ -851,15 +838,6 @@ bool orionldPatchAttribute(void)
   {
     saP->name = orionldSubAttributeExpand(orionldState.contextP, saP->name, true, NULL);
   }
-
-  if (pcheckAttribute(inAttribute, dbAttributeTypeNodeP->value.s, false, &detail) == false)
-  {
-    LM_W(("Bad Input (invalid attribute - %s)", detail));
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Attribute", detail);
-    return false;
-  }
-
 
   //
   // Save the incoming tree for TRoE

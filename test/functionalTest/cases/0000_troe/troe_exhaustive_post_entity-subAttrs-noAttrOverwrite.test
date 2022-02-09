@@ -894,7 +894,7 @@ Date: REGEX(.*)
 04. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and without context
 =========================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -903,7 +903,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P1",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []
@@ -920,7 +920,7 @@ Date: REGEX(.*)
 06. Attempt to replace the attribute P1 with sub-attrs R1,status,owner,batteryLevel,location for E2 for T1 tenant and without context
 =====================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -929,7 +929,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P1",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []
@@ -946,7 +946,7 @@ Date: REGEX(.*)
 08. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in Link header
 ==========================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -955,7 +955,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P2",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []
@@ -972,7 +972,7 @@ Date: REGEX(.*)
 10. Attempt to replace the attribute P2 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in Link header
 =====================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -981,7 +981,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P2",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []
@@ -998,7 +998,7 @@ Date: REGEX(.*)
 12. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E1 on default tenant and with user context in payload body
 ===========================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1007,7 +1007,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P3",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []
@@ -1024,7 +1024,7 @@ Date: REGEX(.*)
 14. Attempt to replace the attribute P3 with sub-attrs R1,status,owner,batteryLevel,location for E2 on T1 tenant and with user context in payload body
 ======================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 117
+Content-Length: 114
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1033,7 +1033,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P3",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": []

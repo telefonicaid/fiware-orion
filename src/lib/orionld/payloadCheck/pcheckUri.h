@@ -25,14 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
+
 
 
 // -----------------------------------------------------------------------------
 //
 // pcheckUri -
 //
-extern bool pcheckUri(char* uri, bool strict,    char**                  detailP);
-extern bool pCheckUri(char* uri, bool mustBeUri, OrionldProblemDetails*  pdP);
+extern bool pcheckUri(char* uri, bool strict, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_

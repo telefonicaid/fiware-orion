@@ -142,7 +142,7 @@ Date: REGEX(.*)
 02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct
 ====================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 412
+Content-Length: 545
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -159,15 +159,15 @@ Date: REGEX(.*)
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist"
+            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
         }
     ],
     "updated": [

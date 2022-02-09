@@ -26,6 +26,7 @@
 
 #include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
+#include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldError.h"                      // Own interface
 
 
@@ -34,25 +35,29 @@
 //
 // orionldError -
 //
+// ToDo:
+// * Make the function accept also filename and line number
+// * Use a macro for calling the function:
+//   #define ERR(typ, title, detail, status)
+//     orionldError(typ, title, detail, status, __FILE__, __LINE__
+// * Instead of overwritinf every error, stack them. Keep all of them
+//
 void orionldError
 (
-  OrionldProblemDetails*    pdP,
   OrionldResponseErrorType  errorType,
   const char*               title,
   const char*               detail,
   int                       status
 )
 {
-  //
-  // Id pdP already contains an error, then that first error prevails
-  //
-  //  if (pdP->type != 0)
-  {
-    pdP->type   = errorType;
-    pdP->title  = (char*) title;
-    pdP->detail = (char*) detail;
-    pdP->status = status;
-  }
+  OrionldProblemDetails*    pdP = &orionldState.pd;
 
-  LM_E(("%s: %s (status code: %d", title, detail, status));
+  pdP->type   = errorType;
+  pdP->title  = (char*) title;
+  pdP->detail = (char*) detail;
+  pdP->status = status;
+
+  orionldState.httpStatusCode = status;
+
+  LM_E(("%s: %s (status code: %d)", title, detail, status));
 }

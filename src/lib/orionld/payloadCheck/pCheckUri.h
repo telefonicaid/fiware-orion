@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
 
 /*
 *
@@ -25,19 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                     // KjNode
-}
-
-#include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pbodyAttribute -
+// pcheckUri -
 //
-extern bool pbodyAttribute(KjNode* attrP, bool isAttribute, const char* attrTypeInDb, OrionldProblemDetails* pdP);
+extern bool pCheckUri(char* uri, bool mustBeUri);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PBODYATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_

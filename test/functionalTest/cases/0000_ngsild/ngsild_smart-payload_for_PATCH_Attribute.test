@@ -83,7 +83,7 @@ brokerStart CB
 # 13. GET the entity and see the update from the previous step
 # 14. PATCH the GeoProperty G with simplified format, making it a polygon
 # 15. GET the entity and see the update from the previous step
-# 16. PATCH the Property P with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Relationship - see error
+# 16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error
 # 17. GET the entity and see NO update from the previous step
 # 18. PATCH the Relationship R with simplified format, using "urn:ngsi-ld:step:18"
 # 19. GET the entity and see the update from the previous step
@@ -250,10 +250,10 @@ echo
 echo
 
 
-echo '16. PATCH the Property P with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Relationship - see error'
-echo '=========================================================================================================================='
+echo '16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error'
+echo '======================================================================================================================'
 payload='"urn:ngsi-ld:xxx"'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
 echo
 echo
 
@@ -267,7 +267,7 @@ echo
 
 echo '18. PATCH the Relationship R with simplified format, using "urn:ngsi-ld:step:18"'
 echo '================================================================================'
-payload='"urn:ngsi-ld:step:18"'
+payload='{"object": "urn:ngsi-ld:step:18"}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R -X PATCH --payload "$payload"
 echo
 echo
@@ -775,16 +775,16 @@ Date: REGEX(.*)
 }
 
 
-16. PATCH the Property P with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Relationship - see error
-==========================================================================================================================
+16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error
+======================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 147
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Only Relationships can have an 'object' member",
-    "title": "Invalid Attribute",
+    "detail": "G",
+    "title": "Attempt to transform a GeoProperty into a Property",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

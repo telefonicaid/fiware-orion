@@ -42,7 +42,8 @@ SET (SOURCES
      pcheckQ.cpp
      pcheckUri.cpp
      pcheckAttribute.cpp
-     pbodyAttribute.cpp
+     pCheckAttribute.cpp
+     pCheckUri.cpp
 )
 
 # Include directories

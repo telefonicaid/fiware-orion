@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTEKEYVALUEAMEND_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTEKEYVALUEAMEND_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,17 +22,24 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <string.h>                               // strcmp
+
+#include "orionld/types/OrionldGeoJsonType.h"     // Own Interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjAttributeKeyValueAmend -
+// orionldGeoJsonTypeFromString -
 //
-extern KjNode* kjAttributeKeyValueAmend(KjNode* attrP, KjNode* dbAttributeP, KjNode** dbAttributeTypePP);
+OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type)
+{
+  if      (strcmp(type, "Point")           == 0)  return GeoJsonPoint;
+  else if (strcmp(type, "Polygon")         == 0)  return GeoJsonPolygon;
+  else if (strcmp(type, "LineString")      == 0)  return GeoJsonLineString;
+  else if (strcmp(type, "MultiPoint")      == 0)  return GeoJsonMultiPoint;
+  else if (strcmp(type, "MultiPolygon")    == 0)  return GeoJsonMultiPolygon;
+  else if (strcmp(type, "MultiLineString") == 0)  return GeoJsonMultiLineString;
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTEKEYVALUEAMEND_H_
+  return GeoJsonNoType;
+}
