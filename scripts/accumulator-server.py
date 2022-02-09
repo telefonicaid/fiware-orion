@@ -282,7 +282,7 @@ def dict_raise_on_duplicates(ordered_pairs):
 def sort_headers(headers):
     """
     Sort headers in a predefined order. It seems that from the Python2 version of this
-    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==1.0.2)
+    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==2.0.2)
     the order of the headers has changed. We sort to avoid change a lot of .test
     expectations with no gain.
 
