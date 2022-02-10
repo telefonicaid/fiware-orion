@@ -80,7 +80,7 @@ context. More detail in [specific documentation](update_operators.md).
 
 The metadata update semantics used by Orion Context Broker (and the
 related `overrideMetadata` option are detailed in
-[this section of the documentation](metadata.md)[#updating-metadata].
+[this section of the documentation](metadata.md#updating-metadata).
 
 Moreover, from NGSIv2 specification section "Partial Representations":
 
