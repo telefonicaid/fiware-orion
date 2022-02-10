@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,22 +25,23 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/payloadCheck/pCheckUri.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                     // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUri -
+// pCheckEntity -
 //
-extern bool pCheckUri(const char* uri, bool mustBeUri);
+extern bool pCheckEntity
+(
+  KjNode*  entityP,    // The entity from the incoming payload body
+  KjNode*  dbEntityP,  // The entity from the DB, in case the entity already existed
+  KjNode*  idNodeP,    // Entity ID
+  KjNode*  typeNodeP   // Entity Type
+);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// pcheckUri - older, now deprecated, function to check the validity of a URI
-//
-extern bool pcheckUri(char* uri, bool strict, char** detailP);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_

@@ -42,169 +42,25 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
+#include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
+#include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
+#include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // pCheckGeoPropertyValue
 #include "orionld/payloadCheck/pCheckAttribute.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjObjectTransform -
+// attrTypeChangeAttempt -
 //
-static inline void kjObjectTransform(KjNode* attrP, KjNode* firstChildP, KjNode* lastChildP)
+inline bool attrTypeChangeAttempt(KjNode* attrP, OrionldAttributeType attrTypeFromDb)
 {
-  attrP->type              = KjObject;
-  attrP->value.firstChildP = firstChildP;
-  attrP->lastChild         = lastChildP;
-}
+  if      (attrTypeFromDb == Relationship)     orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property",     attrP->name, 400);
+  else if (attrTypeFromDb == GeoProperty)      orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property",      attrP->name, 400);
+  else if (attrTypeFromDb == LanguageProperty) orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
+  else                                         orionldError(OrionldBadRequestData, "Attribute type inconsistency",                            attrP->name, 400);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// pcheckAttributeTypeValue -
-//
-bool pcheckAttributeTypeValue
-(
-  KjNode*                 typeP,
-  OrionldAttributeType*   attributeTypeP
-)
-{
-  if (typeP->type != KjString)
-  {
-    orionldError(OrionldBadRequestData, "Invalid attribute type field", "Must be a String", 400);
-    return false;
-  }
-
-  if      (strcmp(typeP->value.s, "Property")          == 0) *attributeTypeP = Property;
-  else if (strcmp(typeP->value.s, "Relationship")      == 0) *attributeTypeP = Relationship;
-  else if (strcmp(typeP->value.s, "GeoProperty")       == 0) *attributeTypeP = GeoProperty;
-  else if (strcmp(typeP->value.s, "LanguageProperty")  == 0) *attributeTypeP = LanguageProperty;
-  else
-  {
-    orionldError(OrionldBadRequestData, "Invalid value for attribute type field", typeP->value.s, 400);
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pcheckAttributeType -
-//
-bool pcheckAttributeType
-(
-  KjNode*                 typeP,
-  KjNode*                 valueP,
-  KjNode*                 objectP,
-  KjNode*                 languageMapP,
-  OrionldAttributeType*   attributeTypeP
-)
-{
-  if ((typeP != NULL) && (pcheckAttributeTypeValue(typeP, attributeTypeP) == false))
-    return false;
-
-  if (*attributeTypeP == Property)
-  {
-    if (objectP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A Property cannot have an /object/ field",
-                   400);
-      return false;
-    }
-    else if (languageMapP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A Property cannot have a /languageMap/ field",
-                   400);
-      return false;
-    }
-  }
-  else if (*attributeTypeP == GeoProperty)
-  {
-    if (objectP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A GeoProperty cannot have an /object/ field",
-                   400);
-      return false;
-    }
-    else if (languageMapP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A GeoProperty cannot have a /languageMap/ field",
-                   400);
-      return false;
-    }
-  }
-  else if (*attributeTypeP == Relationship)
-  {
-    if (valueP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A Relationship cannot have a /value/ field",
-                   400);
-      return false;
-    }
-    else if (languageMapP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A Relationship cannot have a /languageMap/ field",
-                   400);
-      return false;
-    }
-  }
-  else if (*attributeTypeP == LanguageProperty)
-  {
-    if (valueP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A LanguageMap cannot have a /value/ field",
-                   400);
-      return false;
-    }
-    else if (objectP != NULL)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid combination of attribute type and value",
-                   "A LanguageMap cannot have an /object/ field",
-                   400);
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributeTransform -
-//
-static inline void attributeTransform(KjNode* attrP, const char* type, KjNode* valueP)
-{
-  KjNode* typeP = kjString(orionldState.kjsonP,  "type",  type);
-
-  //
-  // Transform the attribute to an Object
-  //
-  attrP->type              = KjObject;
-  attrP->value.firstChildP = NULL;
-  attrP->lastChild         = NULL;
-
-  kjChildAdd(attrP, typeP);
-  kjChildAdd(attrP, valueP);
+  return false;
 }
 
 
@@ -221,22 +77,10 @@ static inline void attributeTransform(KjNode* attrP, const char* type, KjNode* v
 inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
   if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    if (attrTypeFromDb == Relationship)
-      orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == GeoProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == LanguageProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
-    else
-      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
-
-    return false;
-  }
+    return attrTypeChangeAttempt(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjString(orionldState.kjsonP, "value", attrP->value.s);
-  attributeTransform(attrP, "Property", valueP);
-
+  pCheckAttributeTransform(attrP, "Property", valueP);
   return true;
 }
 
@@ -249,21 +93,10 @@ inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttrib
 inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
   if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    if (attrTypeFromDb == Relationship)
-      orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == GeoProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == LanguageProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
-    else
-      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
-
-    return false;
-  }
+    return attrTypeChangeAttempt(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjInteger(orionldState.kjsonP, "value", attrP->value.i);
-  attributeTransform(attrP, "Property", valueP);
+  pCheckAttributeTransform(attrP, "Property", valueP);
   return true;
 }
 
@@ -276,21 +109,10 @@ inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttri
 inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
   if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    if (attrTypeFromDb == Relationship)
-      orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == GeoProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == LanguageProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
-    else
-      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
-
-    return false;
-  }
+    return attrTypeChangeAttempt(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjFloat(orionldState.kjsonP,  "value", attrP->value.f);
-  attributeTransform(attrP, "Property", valueP);
+  pCheckAttributeTransform(attrP, "Property", valueP);
   return true;
 }
 
@@ -303,21 +125,10 @@ inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttribu
 inline bool pCheckAttributeBoolean(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
   if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    if (attrTypeFromDb == Relationship)
-      orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == GeoProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a GeoProperty into a Property", attrP->name, 400);
-    else if (attrTypeFromDb == LanguageProperty)
-      orionldError(OrionldBadRequestData, "Attempt to transform a LanguageProperty into a Property", attrP->name, 400);
-    else
-      orionldError(OrionldBadRequestData, "Attribute type inconsistency", attrP->name, 400);
-
-    return false;
-  }
+    return attrTypeChangeAttempt(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjBoolean(orionldState.kjsonP,  "value", attrP->value.b);
-  attributeTransform(attrP, "Property", valueP);
+  pCheckAttributeTransform(attrP, "Property", valueP);
   return true;
 }
 
@@ -335,7 +146,7 @@ inline bool pCheckAttributeArray(KjNode* attrP, bool isAttribute, OrionldAttribu
   valueP->value.firstChildP = attrP->value.firstChildP;
   valueP->lastChild         = attrP->lastChild;
 
-  attributeTransform(attrP, "Property", valueP);
+  pCheckAttributeTransform(attrP, "Property", valueP);
 
   return true;
 }
@@ -357,131 +168,12 @@ inline bool pCheckAttributeNull(KjNode* attrP)
 }
 
 
-bool pCheckGeoPointCoordinates(KjNode* coordinatesP)
-{
-  return true;
-}
-
-bool pCheckGeoPolygonCoordinates(KjNode* coordinatesP)
-{
-  return true;
-}
-
-
 
 // -----------------------------------------------------------------------------
 //
-// pCheckGeoPropertyCoordinates -
+// pCheckAttributeType - used by pCheckAttributeObject
 //
-bool pCheckGeoPropertyCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType)
-{
-  PCHECK_ARRAY(coordinatesP, 0, "Invalid JSON type for /coordinates/ field (not a JSON Array)", kjValueType(coordinatesP->type), 400);
-
-  switch (geoType)
-  {
-  case GeoJsonPoint:            return pCheckGeoPointCoordinates(coordinatesP);
-  case GeoJsonPolygon:          return pCheckGeoPolygonCoordinates(coordinatesP);
-  case GeoJsonLineString:       return true;
-  case GeoJsonMultiPoint:       return true;
-  case GeoJsonMultiPolygon:     return true;
-  case GeoJsonMultiLineString:  return true;
-  case GeoJsonNoType:           return false;
-  }
-
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckAttributeType - move!
-//
-bool pCheckAttributeType(const char* typeValue)
-{
-  // LanguageProperty, TemporalProperty, VocabProperty ...
-
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckGeoPropertyType -
-//
-bool pCheckGeoPropertyType(KjNode* typeP, OrionldGeoJsonType* geoTypeP)
-{
-  if (typeP->type != KjString)
-  {
-    // The type, be in GeoProperty or not, must ALWAYS be a string!
-    orionldError(OrionldBadRequestData, "Invalid JSON type for /type/ field (not a JSON String)", kjValueType(typeP->type), 400);
-    return false;
-  }
-
-  *geoTypeP = orionldGeoJsonTypeFromString(typeP->value.s);
-  if (*geoTypeP == GeoJsonNoType)
-    return false;  // Not an error, simply not a GeoProperty
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckGeoPropertyValue -
-//
-bool pCheckGeoPropertyValue(KjNode* attrP, KjNode* typeP)
-{
-  if (typeP == NULL)
-  {
-    typeP = kjLookup(attrP, "type");
-
-    if (typeP == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Mandatory Field /type/ missing for a GeoProperty value", attrP->name, 400);
-      return false;
-    }
-  }
-
-  // Is the type a valid GeoJSON type? (Point, Polygon, ...)
-  OrionldGeoJsonType geoType;
-  if (pCheckGeoPropertyType(typeP, &geoType) == false)  // pCheckGeoPropertyType sets ProblemDetails
-    return false;
-
-  LM_TMP(("KZ: Looking up coordinates"));
-  KjNode* coordinatesP = kjLookup(attrP, "coordinates");
-
-  if (coordinatesP != NULL)
-  {
-    if (pCheckGeoPropertyCoordinates(coordinatesP, geoType) == true)  // pCheckGeoPropertyCoordinates sets ProblemDetails
-    {
-      // Convert to Normalized
-      KjNode* valueP = kjObject(orionldState.kjsonP,  "value");
-
-      valueP->value.firstChildP = attrP->value.firstChildP;
-      valueP->lastChild         = attrP->lastChild;
-
-      LM_TMP(("Transforming attr into a GeoProperty"));
-      attributeTransform(attrP, "GeoProperty", valueP);
-      return true;
-    }
-    else
-      return false;
-  }
-
-  orionldError(OrionldBadRequestData, "Mandatory Field /coordinates/ missing for a GeoProperty value", attrP->name, 400);
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// typeCheck -
-//
-bool pCheckAttributeType(KjNode* attrP, KjNode** typePP, bool mandatory)
+static bool pCheckAttributeType(KjNode* attrP, KjNode** typePP, bool mandatory)
 {
   KjNode* typeP   = kjLookup(attrP, "type");
   KjNode* atTypeP = kjLookup(attrP, "@type");
@@ -515,7 +207,7 @@ bool pCheckAttributeType(KjNode* attrP, KjNode** typePP, bool mandatory)
   //
   if ((typeP != NULL) && (typeP->type != KjString))
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON type for /type/ member", kjValueType(typeP->type), 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON type for /type/ field of an Attribute (not a JSON String)", attrP->name, 400);
     return false;
   }
 
@@ -533,7 +225,7 @@ bool pCheckAttributeType(KjNode* attrP, KjNode** typePP, bool mandatory)
 //
 // valueAndTypeCheck -
 //
-bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType)
+bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode* dbAttributeP)
 {
   KjNode* valueP       = kjLookup(attrP, "value");
   KjNode* objectP      = kjLookup(attrP, "object");
@@ -543,12 +235,17 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType)
   {
     if (objectP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a Property", "/object/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a Property: object", attrP->name, 400);
       return false;
     }
     else if (languageMapP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a Property", "/languageMap/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a Property: languageMap", attrP->name, 400);
+      return false;
+    }
+    else if ((valueP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    {
+      orionldError(OrionldBadRequestData, "Missing /value/ field for Property at creation time", attrP->name, 400);
       return false;
     }
   }
@@ -556,12 +253,17 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType)
   {
     if (objectP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty", "/object/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty: object", attrP->name, 400);
       return false;
     }
     else if (languageMapP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty", "/languageMap/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty: languageMap", attrP->name, 400);
+      return false;
+    }
+    else if ((valueP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    {
+      orionldError(OrionldBadRequestData, "Missing /value/ field for GeoProperty at creation time", attrP->name, 400);
       return false;
     }
   }
@@ -569,12 +271,17 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType)
   {
     if (valueP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a Relationship", "/value/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a Relationship: value", attrP->name, 400);
       return false;
     }
     else if (languageMapP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a Relationship", "/languageMap/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a Relationship: languageMap", attrP->name, 400);
+      return false;
+    }
+    else if ((objectP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    {
+      orionldError(OrionldBadRequestData, "Missing /object/ field for Relationship at creation time", attrP->name, 400);
       return false;
     }
   }
@@ -582,12 +289,17 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType)
   {
     if (valueP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty", "/value/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty: value", attrP->name, 400);
       return false;
     }
     else if (objectP != NULL)
     {
-      orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty", "/object/", 400);
+      orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty: object", attrP->name, 400);
+      return false;
+    }
+    else if ((languageMapP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    {
+      orionldError(OrionldBadRequestData, "Missing /languageMap/ field for LanguageProperty at creation time", attrP->name, 400);
       return false;
     }
   }
@@ -605,7 +317,11 @@ bool languageMapCheck(KjNode* fieldP) { return true; }
 
 
 
-bool possibleGeoJsonValue(KjNode* valueP)
+// -----------------------------------------------------------------------------
+//
+// possibleGeoJsonValue -
+//
+static bool possibleGeoJsonValue(KjNode* valueP)
 {
   if (valueP->type != KjObject)
     return false;
@@ -640,6 +356,42 @@ bool possibleGeoJsonValue(KjNode* valueP)
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// possibleMultiAttributeArray -
+//
+bool possibleMultiAttributeArray(KjNode* attrArrayP, bool* errorP)
+{
+  int datasets = 0;
+  int objects  = 0;
+
+  for (KjNode* aInstanceP = attrArrayP->value.firstChildP; aInstanceP != NULL; aInstanceP = aInstanceP->next)
+  {
+    if (aInstanceP->type != KjObject)
+      return false;
+
+    KjNode* datasetIdP = kjLookup(aInstanceP, "datasetId");
+
+    if (datasetIdP != NULL)
+      ++datasets;
+
+    ++objects;
+  }
+
+  if (datasets == 0)
+    return false;
+
+  if (objects - datasets > 1)  // More than one object without datasetId field
+  {
+      orionldError(OrionldBadRequestData, "More than one default attribute in dataset array", attrArrayP->name, 400);
+      *errorP = true;
+      return false;
+  }
+
+  return true;
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -654,7 +406,7 @@ bool possibleGeoJsonValue(KjNode* valueP)
 //   - if "value/object/languageMap" is present, then we can deduct the attribute type and add it to the object. Sub-attrs are processed
 //   - if no value is present, then no type is added, only sub-attrs are processed.
 //
-bool pCheckAttributeObject
+static bool pCheckAttributeObject
 (
   KjNode*                 attrP,
   bool                    isAttribute,
@@ -721,8 +473,10 @@ bool pCheckAttributeObject
     LM_TMP(("KZ: Got the attribute type: '%d'", attributeType));
 
     // As "type" is present - is it coherent? (Property has "value", Relationship has "object", etc)
-    if (valueAndTypeCheck(attrP, attributeType) == false)
+    LM_TMP(("Calling valueAndTypeCheck"));
+    if (valueAndTypeCheck(attrP, attributeType, dbAttributeP) == false)
       LM_RE(false, ("valueAndTypeCheck failed"));
+    LM_TMP(("After valueAndTypeCheck"));
   }
   else  // type is not there - try to guess the type, if not already known from the DB
   {
@@ -746,11 +500,20 @@ bool pCheckAttributeObject
         attributeType = Relationship;
       else if (languageMapP != NULL)
         attributeType = LanguageProperty;
+      else
+      {
+        // If new attribute and no value field at all - error
+        if (dbAttributeP == NULL)
+        {
+          orionldError(OrionldBadRequestData, "Missing value/object/languageMap field for Attribute at creation time", attrP->name, 400);
+          return false;
+        }
+      }
     }
 
     LM_TMP(("attrTypeFromDb: %d", attrTypeFromDb));
     LM_TMP(("attributeType:   %d", attributeType));
-    if (valueAndTypeCheck(attrP, attributeType) == false)
+    if (valueAndTypeCheck(attrP, attributeType, dbAttributeP) == false)
       LM_RE(false, ("valueAndTypeCheck failed"));
   }
 
@@ -966,6 +729,42 @@ bool pCheckAttribute
   LM_TMP(("RHS of attribute '%s' is a JSON %s", attrP->name, kjValueType(attrP->type)));
   LM_TMP(("dbAttributeP at   %p", dbAttributeP));
   LM_TMP(("attrTypeFromDb:   %d", attrTypeFromDb));
+
+  if (pCheckName(attrP->name) == false)
+    return false;
+
+  if ((isAttribute == true) && (attrP->type == KjArray))
+  {
+    bool error = false;
+
+    if (possibleMultiAttributeArray(attrP, &error) == false)
+    {
+      if (error == true)  // Early detection of erroneous datasetId-array
+        return false;
+    }
+    else
+    {
+      LM_TMP(("The attribute is an array and it fulfulls the criteria of multi-attribute"));
+      for (KjNode* aInstanceP = attrP->value.firstChildP; aInstanceP != NULL; aInstanceP = aInstanceP->next)
+      {
+        // Do I need the attribute instance in the DB?
+        // - only need it to determine the type of the attribute (I think ...)
+        // If so, the "non-datasetId" attribute is sufficient
+        // - What if there is no "non-datasetId" attr ... ?
+        // - Might need the datasetsP anyway
+        // - Would be good also (set to NULL in recursive calls, to avoid enter here again - datasetId check)
+        // - Actually, cannot be an Array inside there, so that problem is already taken care of
+        //
+        // => KjNode* datasetsP should be a parameter to this function
+        //
+        aInstanceP->name = attrP->name;
+        if (pCheckAttribute(aInstanceP, true, dbAttributeP, attrTypeFromDb) == false)
+          return false;
+      }
+
+      return true;
+    }
+  }
 
   if      (attrP->type == KjString)  return pCheckAttributeString(attrP,  isAttribute, attrTypeFromDb);
   else if (attrP->type == KjInt)     return pCheckAttributeInteger(attrP, isAttribute, attrTypeFromDb);

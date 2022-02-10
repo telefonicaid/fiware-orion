@@ -204,7 +204,7 @@ bool orionldPatchEntity(void)
       //
       // pCheckAttribute should perhaps have a parameter about "ok-to-fail"
       //
-      LM_E(("attributeCheck: %s: %s (code: %d)", orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status));
+      LM_E(("attributeCheck: title: '%s', detail: '%s', code: %d", orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status));
       orionldState.pd.status = 200;
       attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
       newAttrP = next;

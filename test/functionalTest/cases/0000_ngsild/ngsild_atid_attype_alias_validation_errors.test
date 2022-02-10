@@ -1595,13 +1595,13 @@ Date: REGEX(*.)
 05. Attempt to create an entity w/o @type - see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "detail": "The 'type' field is mandatory",
-    "title": "Entity - urn:ngsi-ld:E01",
+    "title": "Entity type is missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

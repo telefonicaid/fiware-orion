@@ -30,8 +30,16 @@
 
 // -----------------------------------------------------------------------------
 //
-// pcheckUri -
+// pCheckUri -
 //
-extern bool pCheckUri(char* uri, bool mustBeUri);
+extern bool pCheckUri(const char* uri, bool mustBeUri);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pcheckUri - older, now deprecated, function to check the validity of a URI
+//
+extern bool pcheckUri(char* uri, bool strict, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_

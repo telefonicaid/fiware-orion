@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,28 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation Error - should reject an entity with a property without value
+Entity Creation using Compact Format and provoking all kinds of errors
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with a property attribute without value 
+# 01. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error
 #
 
-echo "01. POST /ngsi-ld/v1/entities with a property attribute without value"
-echo "====================================================================="
+echo "01. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error"
+echo "=========================================================================================="
 payload='{
-  "id": "urn:ngsi-ld:T4:9000",
+  "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
-  "P1": {
-    "type": "Property",
-    "object": "1234"
-  }
+  "R1": { "object": 14 }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
@@ -50,16 +47,16 @@ echo
 
 
 --REGEXPECT--
-01. POST /ngsi-ld/v1/entities with a property attribute without value
-=====================================================================
+01. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error
+==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 124
+Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "P1",
-    "title": "Forbidden field for a Property: object",
+    "detail": "R1",
+    "title": "relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

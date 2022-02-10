@@ -34,8 +34,16 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// pcheckEntity -
+// pcheckName -
 //
 extern bool pcheckName(char* name, char** detailsPP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckName -
+//
+extern bool pCheckName(char* name);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNAME_H_

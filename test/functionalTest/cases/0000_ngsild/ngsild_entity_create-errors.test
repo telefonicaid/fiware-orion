@@ -38,7 +38,7 @@ brokerStart CB 212-249
 # 06. POST /ngsi-ld/v1/entities, with all OK - see a 201
 # 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 #
-# 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
+# 08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error
 # 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
 # 10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
 #
@@ -155,13 +155,13 @@ echo
 echo
 
 
-echo "08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error"
-echo "==========================================================================="
+echo "08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error"
+echo "============================================================================"
 payload='{
   "id": "http://a.b.c/entity/E7",
   "type": "A",
   "name": {
-    "value": "John 7"
+    "valueh": "John 7"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -307,12 +307,12 @@ echo
 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "toplevel",
+    "detail": "To create an Entity, a JSON OBJECT describing the entity must be provided",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -383,16 +383,16 @@ Date: REGEX(.*)
 }
 
 
-08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
-===========================================================================
+08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error
+============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 110
+Content-Length: 157
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "Attribute without type",
+    "title": "Missing value/object/languageMap field for Attribute at creation time",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -400,13 +400,13 @@ Date: REGEX(.*)
 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 124
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "Attribute type must be a JSON string",
+    "title": "Invalid JSON type for /type/ field of an Attribute (not a JSON String)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -428,13 +428,13 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 165
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "Attribute with type Property found, but the associated value field is missing",
+    "title": "Missing /value/ field for Property at creation time",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -442,13 +442,13 @@ Date: REGEX(.*)
 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "relationship attribute without 'object' field",
+    "title": "Missing /object/ field for Relationship at creation time",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -456,13 +456,13 @@ Date: REGEX(.*)
 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 168
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "Attribute with type GeoProperty found, but the associated value field is missing",
+    "title": "Missing /value/ field for GeoProperty at creation time",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
