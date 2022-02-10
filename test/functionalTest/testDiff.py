@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -27,15 +27,15 @@ import sys
 
 
 def validation_error(input_line, ref_line):
-    print "VALIDATION ERROR: input line:"
-    print "   " + input_line
-    print "does not match ref line:"
-    print "   " + ref_line
+    print ("VALIDATION ERROR: input line:")
+    print ("   " + input_line)
+    print ("does not match ref line:")
+    print ("   " + ref_line)
     exit(1)
 
 
 def line_count(file_name):
-    input = open(file_name, 'r')
+    input = open(file_name, 'r', encoding='utf-8')
     lines = 0
 
     for input_line in input.readlines():
@@ -53,8 +53,8 @@ def escape(s):
 
 def diff_files(input_file, ref_file):
 
-    input = open(input_file, 'r')
-    ref = open(ref_file, 'r')
+    input = open(input_file, 'r', encoding='utf-8')
+    ref = open(ref_file, 'r', encoding='utf-8')
 
     input_lines = input.readlines()
 
@@ -63,7 +63,7 @@ def diff_files(input_file, ref_file):
         try:
             input_line = input_lines.pop(0)
         except IndexError:
-            print "VALIDATION ERROR: input file has less lines than reference"
+            print ("VALIDATION ERROR: input file has less lines than reference")
             exit(1)
 
         # Removing trailing whitespace(to avoid "noisy" input/reference files)
@@ -85,7 +85,7 @@ def diff_files(input_file, ref_file):
             if not ref_line == input_line:
                 validation_error(input_line, ref_line)
 
-    print "Validation ok"
+    print ("Validation ok")
     exit(0)
 
 
@@ -113,15 +113,15 @@ def main():
     rlines = line_count(options.ref_file)
 
     if ilines == 0:
-        print "VALIDATION ERROR: input file is EMPTY"
+        print ("VALIDATION ERROR: input file is EMPTY")
         exit(1)
 
     if rlines == 0:
-        print "VALIDATION ERROR: reference file is EMPTY"
+        print ("VALIDATION ERROR: reference file is EMPTY")
         exit(1)
 
     if not ilines == rlines:
-        print "VALIDATION ERROR: input file and reference file have different line count"
+        print ("VALIDATION ERROR: input file and reference file have different line count")
         exit(1)
 
     diff_files(options.input_file, options.ref_file)

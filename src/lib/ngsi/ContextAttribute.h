@@ -91,8 +91,8 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
-  /* Grabbers for metadata to which CB gives a special semantic */
-  bool         getLocation(void) const;
+  /* Check if attribute means a location  */
+  bool  getLocation(orion::BSONObj* attrsP) const;
 
   std::string  toJsonV1(bool                             asJsonObject,
                         RequestType                      request,

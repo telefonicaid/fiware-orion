@@ -317,7 +317,7 @@ bool processLocationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    if (!caP->getLocation())
+    if (!caP->getLocation(NULL))
     {
       continue;
     }
@@ -350,6 +350,7 @@ bool processLocationAtEntityCreation
 bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
+  orion::BSONObj*                attrsP,
   const ContextAttribute*        targetAttr,
   orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
@@ -363,7 +364,7 @@ bool processLocationAtUpdateAttribute
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (targetAttr->getLocation())
+  if (targetAttr->getLocation(attrsP))
   {
     //
     // Case 1a:
@@ -464,6 +465,7 @@ bool processLocationAtUpdateAttribute
 bool processLocationAtAppendAttribute
 (
   std::string*                   currentLocAttrName,
+  orion::BSONObj*                attrsP,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
   orion::BSONObjBuilder*         geoJson,
@@ -473,7 +475,7 @@ bool processLocationAtAppendAttribute
 )
 {
   std::string subErr;
-  bool        isALocation = targetAttr->getLocation();
+  bool        isALocation = targetAttr->getLocation(attrsP);
 
   /* Case 1: append of new location attribute */
   if (actualAppend && isALocation)

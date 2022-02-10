@@ -292,7 +292,6 @@ static bool queryForward
   
   if (r != 0)
   {
-    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
@@ -316,7 +315,7 @@ static bool queryForward
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    LM_W(("Forwarding Error (context provider response to QueryContext is empty)"));
+    alarmMgr.forwardingError(url, "context provider response to QueryContext is empty");
     return false;
   }
 
@@ -325,7 +324,6 @@ static bool queryForward
   if (qcrP->providerFormat == PfJson)
   {
     std::string  s;
-    std::string  errorMsg;
 
     //
     // NOTE
@@ -349,7 +347,7 @@ static bool queryForward
 
     if (s != "OK")
     {
-      LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;
@@ -381,7 +379,7 @@ static bool queryForward
 
     if (b == false)
     {
-      LM_W(("Internal Error (error parsing reply from context provider: %s)", oe.details.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.details);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;
@@ -718,7 +716,7 @@ std::string postQueryContext
     {
       if (requestV[fIx]->contextProvider.empty())
       {
-        LM_E(("Internal Error (empty context provider string)"));
+        LM_E(("Runtime Error (empty context provider string)"));
         continue;
       }
 
