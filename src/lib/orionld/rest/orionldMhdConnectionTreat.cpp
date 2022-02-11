@@ -229,17 +229,13 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   }
 
   //
-  // Most requests are either arrays or objects
-  // PATCH Attribute can have a payload body of any JSON type
+  // All requests are either arrays or objects
   //
-  if (orionldState.serviceP->serviceRoutine != orionldPatchAttribute)
+  if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
   {
-    if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
-    {
-      orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
-      orionldState.httpStatusCode = 400;
-      return false;
-    }
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
+    orionldState.httpStatusCode = 400;
+    return false;
   }
 
   //
