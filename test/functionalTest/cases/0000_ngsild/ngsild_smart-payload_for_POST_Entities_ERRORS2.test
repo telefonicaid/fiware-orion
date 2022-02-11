@@ -41,7 +41,7 @@ payload='{
   "type": "T",
   "R1": { "object": 14 }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
 echo
 

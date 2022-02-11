@@ -35,8 +35,31 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
+
+
+// -----------------------------------------------------------------------------
+//
+// kjLookupByNameExceptOne -
+//
+KjNode* kjLookupByNameExceptOne(KjNode* containerP, const char* fieldName, KjNode* exceptP)
+{
+  if (containerP->type != KjObject)
+    return NULL;  // BUG ?
+
+  for (KjNode* fieldP = containerP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
+  {
+    if (fieldP == exceptP)
+      continue;
+
+    if (strcmp(fieldP->name, fieldName) == 0)
+      return fieldP;
+  }
+
+  return NULL;
+}
 
 
 
@@ -67,6 +90,12 @@ bool pCheckEntity
     if (dbEntityP != NULL)
     {
       // Get the type for the attribute, if it exists already (in the DB)
+    }
+
+    if (kjLookupByNameExceptOne(entityP, attrP->name, attrP) != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Duplicated field in an entity", attrP->name, 400);
+      return false;
     }
 
     if (pCheckAttribute(attrP, true, dbAttributeP, attributeType) == false)
