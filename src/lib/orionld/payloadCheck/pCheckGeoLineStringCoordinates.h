@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOLINESTRINGCOORDINATES_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOLINESTRINGCOORDINATES_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,22 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/payloadCheck/pCheckUri.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUri -
+// pCheckGeoLineStringCoordinates -
 //
-extern bool pCheckUri(const char* uri, bool mustBeUri);
+extern bool pCheckGeoLineStringCoordinates(KjNode* coordinatesP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// pcheckUri - older, now deprecated, function to check the validity of a URI
-//
-extern bool pcheckUri(char* uri, bool strict, char** detailP);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOLINESTRINGCOORDINATES_H_

@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,46 +21,64 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation Error - should reject an entity with a property without value
+Entity Creation using Compact Format
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with a property attribute without value 
+# 01. Create an entity E1 with attributes R1,
+# 02. GET E1
 #
 
-echo "01. POST /ngsi-ld/v1/entities with a property attribute without value"
-echo "====================================================================="
+echo "01. Create an entity E1 with attributes R1,"
+echo "==========================================="
 payload='{
-  "id": "urn:ngsi-ld:T4:9000",
+  "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
-  "P1": {
-    "type": "Property",
-    "object": "1234"
-  }
+  "R1": { "object": "urn:ngsi-ld:entities:E2" }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
 echo
 
 
+echo "02. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
 --REGEXPECT--
-01. POST /ngsi-ld/v1/entities with a property attribute without value
-=====================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 124
+01. Create an entity E1 with attributes R1,
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 107
 Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "detail": "P1",
-    "title": "Forbidden field for a Property: object",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "R1": {
+        "object": "urn:ngsi-ld:entities:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
 }
 
 

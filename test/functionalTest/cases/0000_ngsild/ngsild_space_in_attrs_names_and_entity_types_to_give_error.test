@@ -201,13 +201,13 @@ Date: REGEX(.*)
 04. Attempt to create an entity with a space as part of an unexpanded attribute name - see error
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 121
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "A 1",
-    "title": "Invalid Property/Relationship name",
+    "detail": "invalid character",
+    "title": "Invalid attribute name",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -215,13 +215,13 @@ Date: REGEX(.*)
 05. Attempt to create an entity with a space as part of an expanded attribute name - see error
 ==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 144
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "urn:ngsi-ld:attributes:A 1",
-    "title": "Invalid Property/Relationship name",
+    "detail": "invalid character",
+    "title": "Invalid attribute name",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

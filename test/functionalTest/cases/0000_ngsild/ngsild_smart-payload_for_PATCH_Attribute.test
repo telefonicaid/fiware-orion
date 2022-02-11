@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute Patch with key-values
+Attribute Patch with Compact Format
 
 --SHELL-INIT--
 export BROKER=orionld

@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+
 #include <string>                                                // std::string
 #include <vector>                                                // std::vector
 
@@ -50,17 +52,22 @@ extern "C"
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, NoAttributeType
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/payloadCheck/pcheckAttribute.h"                // pcheckAttribute
+#include "orionld/common/CHECK.h"                                // CHECK_*
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
+#include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
+#include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
+#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -73,29 +80,23 @@ extern "C"
 //
 // datasetInstances -
 //
-KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, double timestamp, OrionldProblemDetails* pdP)
+static KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName)
 {
-  // Loop over all instances and remove all without datasetId and with default datasetId
-  KjNode*          next;
-  KjNode*          instanceP         = attrV->value.firstChildP;
-  KjNode*          defaultInstanceP  = NULL;
-  KjNode*          modifiedAt;
-  KjNode*          createdAt;
-  char*            longName = NULL;
+  char* longName;
 
   longName      = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
   attributeName = kaStrdup(&orionldState.kalloc, longName);
   dotForEq(attributeName);
 
-  int instanceIx = 0;
+  //
+  // Loop over all instances and remove all lacking datasetId (or with default datasetId - which is DEPRECATED !!!)
+  //
+  KjNode*  defaultInstanceP  = NULL;
+  KjNode*  instanceP         = attrV->value.firstChildP;
+  KjNode*  next;
+
   while (instanceP != NULL)
   {
-    if (pcheckAttribute(instanceP, NULL, true, &pdP->detail) != true)
-    {
-      pdP->status = 400;
-      return NULL;
-    }
-
     next = instanceP->next;
 
     KjNode* datasetIdP = kjLookup(instanceP, "datasetId");
@@ -104,17 +105,13 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
     {
       if (datasetIdP->type != KjString)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", "datasetId");
-        orionldState.httpStatusCode = SccBadRequest;
-        pdP->status = 400;
+        orionldError(OrionldBadRequestData, "Not a JSON String", "datasetId", 400);
         return NULL;
       }
 
-      if (pcheckUri(datasetIdP->value.s, true, &pdP->detail) == false)
+      if (pCheckUri(datasetIdP->value.s, true) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");  // FIXME: Include 'detail' and value (datasetIdP->value.s)
-        orionldState.httpStatusCode = SccBadRequest;
-        pdP->status = 400;
+        orionldError(OrionldBadRequestData, "Not a URI", "datasetId", 400);
         return NULL;
       }
     }
@@ -123,9 +120,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
     {
       if (defaultInstanceP != NULL)  // Already found an instance without datasetId ?
       {
-        LM_W(("Bad Input (more that one instance without datasetId"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload data", "more that one instance without datasetId");
-        pdP->status = 400;
+        orionldError(OrionldBadRequestData, "Invalid payload data", "more that one instance without datasetId", 400);
         return NULL;
       }
 
@@ -139,14 +134,14 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
     else
     {
       // Add createdAt and modifiedAt to the instance
-      createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  timestamp);
-      modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", timestamp);
+      KjNode*  createdAt   = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
+      KjNode*  modifiedAt  = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
+
       kjChildAdd(instanceP, createdAt);
       kjChildAdd(instanceP, modifiedAt);
     }
 
     instanceP = next;
-    ++instanceIx;
   }
 
   // Create an array for the attribute and put all remaining instances in the array
@@ -170,82 +165,39 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 
 
 
-// -----------------------------------------------------------------------------
-//
-// pcheckAttributeType - move to payloadCheck library
-//
-bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
-{
-  if (attrTypeP == NULL)
-  {
-    LM_W(("Bad Input (attribute without type)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute without type", attrName);
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (attrTypeP->type != KjString)
-  {
-    LM_W(("Bad Input (attribute type must be a JSON string)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a JSON string", attrName);
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  return true;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldPostEntities -
 //
 bool orionldPostEntities(void)
 {
-  OBJECT_CHECK(orionldState.requestTree, "toplevel");
+  char*    entityId;
+  char*    entityType;
 
-  char*    detail;
-  KjNode*  locationP          = NULL;
-  KjNode*  observationSpaceP  = NULL;
-  KjNode*  operationSpaceP    = NULL;
-  KjNode*  createdAtP         = NULL;
-  KjNode*  modifiedAtP        = NULL;
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "To create an Entity, a JSON OBJECT describing the entity must be provided", 400);
 
-  if (pcheckEntity(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
-    return false;
-
-  char*    entityId           = orionldState.payloadIdNode->value.s;
-  char*    entityType         = orionldState.payloadTypeNode->value.s;
+  if (pCheckEntityId(orionldState.payloadIdNode,     true, &entityId)   == false)   return false;
+  if (pCheckEntityType(orionldState.payloadTypeNode, true, &entityType) == false)   return false;
 
 
   //
-  // Entity ID and TYPE
-  //
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");  // FIXME: Include 'detail' and name (entityId)
-    return false;
-  }
-
-  if (pcheckUri(entityType, false, &detail) == false)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity Type", detail);  // FIXME: Include 'detail' and name (entityId)
-    return false;
-  }
-
-  //
-  // If the entity already exists, an error should be returned
+  // If the entity already exists, an error is returned
   //
   if (mongoEntityExists(entityId, orionldState.tenantP) == true)
   {
-    orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", entityId);
-    orionldState.httpStatusCode = SccConflict;
+    orionldError(OrionldAlreadyExists, "Entity already exists", entityId, SccConflict);
     return false;
   }
 
+
   //
-  // This function destroys the incoming tree - must save it for TRoE
+  // Check and fix the incoming payload (entity)
+  //
+  if (pCheckEntity(orionldState.requestTree, NULL, orionldState.payloadIdNode, orionldState.payloadTypeNode) == false)
+    return false;
+
+  //
+  // The function 'kjTreeToContextAttribute' destroys the incoming tree - must save it for TRoE
   //
   KjNode* cloneForTroeP = NULL;
   if (troe)
@@ -276,11 +228,6 @@ bool orionldPostEntities(void)
   KjNode*          datasets = kjObject(orionldState.kjsonP, "@datasets");
   KjNode*          kNodeP   = orionldState.requestTree->value.firstChildP;
   KjNode*          next;
-  struct timespec  now;
-  double           timestamp;
-
-  kTimeGet(&now);
-  timestamp = now.tv_sec + ((double) now.tv_nsec / 1000000000);
 
   while (kNodeP != NULL)
   {
@@ -290,16 +237,15 @@ bool orionldPostEntities(void)
     // If the attribute is an array ( "attr": [] ), then special treatment is necessary
     // One of the instances in the array may be without datasetId, or with the default datasetId ...
     // If so, that instance must be treated as a "normal" attribute.
-    // It must be remved from the array and returned as kNodeP;
+    // It must be removed from the array and returned as kNodeP;
+    //
     if (kNodeP->type == KjArray)
     {
-      OrionldProblemDetails pd = { OrionldOk, NULL, NULL, 0 };
-
-      kNodeP = datasetInstances(datasets, kNodeP, kNodeP->name, timestamp, &pd);
+      kNodeP = datasetInstances(datasets, kNodeP, kNodeP->name);
 
       if (kNodeP == NULL)
       {
-        if (pd.status != 0)  // Error in datasetInstances
+        if (orionldState.pd.status != 0)  // Error in datasetInstances
         {
           mongoRequest.release();
           return false;
@@ -317,20 +263,6 @@ bool orionldPostEntities(void)
       //
     }
 
-    KjNode* attrType = kjLookup(kNodeP, "type");
-
-    if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
-    {
-      kNodeP = next;
-      continue;
-    }
-
-    if (pcheckAttributeType(attrType, kNodeP->name) == false)
-    {
-      mongoRequest.release();
-      return false;
-    }
-
     //
     // If a datasetId member is present, and it's not the default datasetId, then the
     // attribute is removed from the entity and added to the 'datasets' object
@@ -338,6 +270,7 @@ bool orionldPostEntities(void)
     // If the datasetId is the default datasetId, then the field is simply removed
     //
     KjNode* datasetIdP = kjLookup(kNodeP, "datasetId");
+
     if (datasetIdP != NULL)
     {
       STRING_CHECK(datasetIdP, "datasetId");
@@ -347,8 +280,8 @@ bool orionldPostEntities(void)
       kjChildAdd(datasets, kNodeP);
 
       // Add createdAt and modifiedAt to the instance
-      KjNode* createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  timestamp);
-      KjNode* modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", timestamp);
+      KjNode* createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
+      KjNode* modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
       kjChildAdd(kNodeP, createdAt);
       kjChildAdd(kNodeP, modifiedAt);
 

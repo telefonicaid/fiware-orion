@@ -4,7 +4,8 @@
 * Issue #990   mongo::Timestamp support
 * Issue #989   Deprecated bson_append_symbol still in use - change for bson_append_utf8
 * Issue #992   More reliable (100% I'd say) implementation of existence check of entities (mongoEntityExists)
-* Issue #127   Implemented 'Smart Input Format' support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}
-* Issue #127   Implemented 'Smart Input Format' support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs
+* Issue #127   Implemented 'Simplified Input Format' support for POST  /ngsi-ld/v1/entities
+* Issue #127   Implemented 'Simplified Input Format' support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs
+* Issue #127   Implemented 'Simplified Input Format' support for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}
 * Issue #1010  Fixed bug related to parsing ISO8601 DateTime strings
 * Issue #1016  Fixed bug related to wrong context in response when input context is an array with a single URL

@@ -1,0 +1,372 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation with Simplified Format
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format
+# 02. GET E1
+# 03. See E1 in mongo
+#
+
+echo "01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format"
+echo "========================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "String": "String",
+  "Int": 1,
+  "Float": 3.14,
+  "Bool": "true",
+  "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+  "Array": [ 5, 6 ],
+  "Dataset": [{"value": 1}, {"value": 2, "datasetId": "urn:ngsi-ld:dataset:1"}],
+  "Rel": { "object": "urn:ngsi-ld:entities:E2" },
+  "Sub": {
+    "value": 6,
+    "String": "String",
+    "Int": 1,
+    "Float": 3.14,
+    "Bool": "true",
+    "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E2" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "03. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 879
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "Array": {
+        "type": "Property",
+        "value": [
+            5,
+            6
+        ]
+    },
+    "Bool": {
+        "type": "Property",
+        "value": "true"
+    },
+    "Dataset": [
+        {
+            "type": "Property",
+            "value": 1
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:1",
+            "type": "Property",
+            "value": 2
+        }
+    ],
+    "Float": {
+        "type": "Property",
+        "value": 3.14
+    },
+    "Geo": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "Int": {
+        "type": "Property",
+        "value": 1
+    },
+    "Rel": {
+        "object": "urn:ngsi-ld:entities:E2",
+        "type": "Relationship"
+    },
+    "String": {
+        "type": "Property",
+        "value": "String"
+    },
+    "Sub": {
+        "Array": {
+            "type": "Property",
+            "value": [
+                5,
+                6
+            ]
+        },
+        "Bool": {
+            "type": "Property",
+            "value": "true"
+        },
+        "Float": {
+            "type": "Property",
+            "value": 3.14
+        },
+        "Geo": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2
+                ],
+                "type": "Point"
+            }
+        },
+        "Int": {
+            "type": "Property",
+            "value": 1
+        },
+        "Rel": {
+            "object": "urn:ngsi-ld:entities:E2",
+            "type": "Relationship"
+        },
+        "String": {
+            "type": "Property",
+            "value": "String"
+        },
+        "type": "Property",
+        "value": 6
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+03. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/String",
+		"https://uri.etsi.org/ngsi-ld/default-context/Int",
+		"https://uri.etsi.org/ngsi-ld/default-context/Float",
+		"https://uri.etsi.org/ngsi-ld/default-context/Bool",
+		"https://uri.etsi.org/ngsi-ld/default-context/Geo",
+		"https://uri.etsi.org/ngsi-ld/default-context/Array",
+		"https://uri.etsi.org/ngsi-ld/default-context/Dataset",
+		"https://uri.etsi.org/ngsi-ld/default-context/Rel",
+		"https://uri.etsi.org/ngsi-ld/default-context/Sub"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/String" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "String",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Int" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Float" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3.14,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Bool" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "true",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Geo" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					1,
+					2
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Array" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : [
+				5,
+				6
+			],
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Dataset" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:entities:E2",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Sub" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 6,
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/String" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : "String"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Int" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : 1
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Float" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : 3.14
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Bool" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : "true"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Geo" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "GeoProperty",
+					"value" : {
+						"type" : "Point",
+						"coordinates" : [
+							1,
+							2
+						]
+					}
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Array" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : [
+						5,
+						6
+					]
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:entities:E2"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/String",
+				"https://uri.etsi.org/ngsi-ld/default-context/Int",
+				"https://uri.etsi.org/ngsi-ld/default-context/Float",
+				"https://uri.etsi.org/ngsi-ld/default-context/Bool",
+				"https://uri.etsi.org/ngsi-ld/default-context/Geo",
+				"https://uri.etsi.org/ngsi-ld/default-context/Array",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/Dataset" : [
+			{
+				"value" : 2,
+				"datasetId" : "urn:ngsi-ld:dataset:1",
+				"type" : "Property",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

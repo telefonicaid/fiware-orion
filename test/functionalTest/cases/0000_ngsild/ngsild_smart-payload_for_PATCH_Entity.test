@@ -498,7 +498,7 @@ Date: REGEX(.*)
 10. Attempt to turn the Relationship R1 into a Property using "R1": { "value": "10" } - see error
 =================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 107
+Content-Length: 154
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -507,7 +507,7 @@ Date: REGEX(.*)
     "notUpdated": [
         {
             "attributeName": "R1",
-            "reason": "Forbidden field for a Relationship: /value/"
+            "reason": "Forbidden field for a Relationship: value: https://uri.etsi.org/ngsi-ld/default-context/R1"
         }
     ],
     "updated": []

@@ -43,7 +43,7 @@ extern char validUriChars[256];  // From pcheckUri.cpp
 //
 // pCheckUri - newer version of pcheckUri - accepting OrionldProblemDetails as input/output
 //
-bool pCheckUri(char* uri, bool mustBeUri)
+bool pCheckUri(const char* uri, bool mustBeUri)
 {
   bool hasColon = false;
 
@@ -62,7 +62,7 @@ bool pCheckUri(char* uri, bool mustBeUri)
   //
   // Is there a colon somewhere inside the URI string?
   //
-  char* s = uri;
+  char* s = (char*) uri;
   while (*s != 0)
   {
     if (*s == ':')
@@ -84,10 +84,9 @@ bool pCheckUri(char* uri, bool mustBeUri)
   // If not strict and no colon found - it's considered a shortname
   // For shortnames, we only check for the space character - it's forbidden
   //
+  s = (char*) uri;
   if ((mustBeUri == false) && (hasColon == false))
   {
-    s = uri;
-
     while (*s != 0)
     {
       if (*s == ' ')
@@ -101,8 +100,6 @@ bool pCheckUri(char* uri, bool mustBeUri)
   }
   else
   {
-    s = uri;
-
     while (*s != 0)
     {
       if (validUriChars[(unsigned char) *s] == false)
