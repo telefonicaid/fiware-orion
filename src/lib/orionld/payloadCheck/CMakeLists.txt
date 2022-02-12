@@ -56,6 +56,7 @@ SET (SOURCES
      pCheckGeoPropertyCoordinates.cpp
      pCheckGeoPropertyType.cpp
      pCheckGeoPropertyValue.cpp
+     pCheckAttributeType.cpp
 )
 
 # Include directories

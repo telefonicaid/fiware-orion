@@ -31,6 +31,10 @@ brokerStart CB
 --SHELL--
 
 #
+# We learnt that JSON-LD doesn't allow for the payloadbody to be just a simple type, like String or Bool.
+# This is OK in JSON, but not in JSON-LD.
+# So, those tests that use simple types as payload bidy are modified to use { "value": XXX }  instead of just XXX.
+#
 # Payloads to test ... there ara MANY !!!
 #
 # The entire payload is the "value", unless it's a JSON Object:
@@ -143,7 +147,7 @@ echo
 
 echo "02. PATCH the Property P with simplified format, setting it to the INTEGER 2"
 echo "============================================================================"
-payload=2
+payload='{"value": 2}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
@@ -158,7 +162,7 @@ echo
 
 echo "04. PATCH the Property P with simplified format, setting it to the STRING 04"
 echo "============================================================================"
-payload='"04"'
+payload='{"value": "04"}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
@@ -173,7 +177,7 @@ echo
 
 echo "06. PATCH the Property P with simplified format, setting it to the FLOAT 3.1416"
 echo "==============================================================================="
-payload=3.1416
+payload='{"value": 3.1416}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
@@ -188,7 +192,7 @@ echo
 
 echo "08. PATCH the Property P with simplified format, setting it to the BOOL true"
 echo "============================================================================"
-payload=true
+payload='{"value": true}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
@@ -252,7 +256,7 @@ echo
 
 echo '16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error'
 echo '======================================================================================================================'
-payload='"urn:ngsi-ld:xxx"'
+payload='{"value": "urn:ngsi-ld:xxx"}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
 echo
 echo
@@ -297,7 +301,7 @@ echo
 
 echo '22. PATCH the Property P with simplified format, using "urn:ngsi-lf:xxx" - not assumed a Relationship, so, OK, still a Property'
 echo '==============================================================================================================================='
-payload='"urn:ngsi-lf:xxx"'
+payload='{"value": "urn:ngsi-lf:xxx"}'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
