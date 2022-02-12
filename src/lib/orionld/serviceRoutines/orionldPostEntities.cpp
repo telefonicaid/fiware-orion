@@ -193,7 +193,7 @@ bool orionldPostEntities(void)
   //
   // Check and fix the incoming payload (entity)
   //
-  if (pCheckEntity(orionldState.requestTree, NULL, orionldState.payloadIdNode, orionldState.payloadTypeNode) == false)
+  if (pCheckEntity(orionldState.requestTree, NULL, false, false) == false)
     return false;
 
   //

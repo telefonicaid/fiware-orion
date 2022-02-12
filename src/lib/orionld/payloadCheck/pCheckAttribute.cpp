@@ -305,9 +305,9 @@ bool languageMapCheck(KjNode* fieldP) { return true; }
 
 // -----------------------------------------------------------------------------
 //
-// possibleGeoJsonValue -
+// isGeoJsonValue -
 //
-static bool possibleGeoJsonValue(KjNode* valueP)
+static bool isGeoJsonValue(KjNode* valueP)
 {
   if (valueP->type != KjObject)
     return false;
@@ -344,9 +344,9 @@ static bool possibleGeoJsonValue(KjNode* valueP)
 
 // -----------------------------------------------------------------------------
 //
-// possibleMultiAttributeArray -
+// multiAttributeArray -
 //
-bool possibleMultiAttributeArray(KjNode* attrArrayP, bool* errorP)
+bool multiAttributeArray(KjNode* attrArrayP, bool* errorP)
 {
   int datasets = 0;
   int objects  = 0;
@@ -430,7 +430,7 @@ static bool pCheckAttributeObject
     bool geoJsonValue = false;
 
     attributeType = orionldAttributeType(typeP->value.s);
-    if ((attributeType == NoAttributeType) && (possibleGeoJsonValue(attrP)))
+    if ((attributeType == NoAttributeType) && (isGeoJsonValue(attrP)))
     {
       attributeType = GeoProperty;
       geoJsonValue  = true;
@@ -466,7 +466,7 @@ static bool pCheckAttributeObject
 
     if (valueP != NULL)
     {
-      if (possibleGeoJsonValue(valueP) == true)
+      if (isGeoJsonValue(valueP) == true)
         attributeType = GeoProperty;
       else
         attributeType = Property;
@@ -593,7 +593,7 @@ static bool pCheckAttributeObject
         }
       }
 
-      if (pCheckAttribute(fieldP, false, dbSubAttrP, subAttributeType) == false)  // Need to find fieldP->name in dbAttributeP ...
+      if (pCheckAttribute(fieldP, false, dbSubAttrP, subAttributeType, false) == false)  // Need to find fieldP->name in dbAttributeP ...
         return false;
     }
 
@@ -696,22 +696,18 @@ bool pCheckAttribute
   KjNode*                 attrP,
   bool                    isAttribute,
   KjNode*                 dbAttributeP,
-  OrionldAttributeType    attrTypeFromDb
+  OrionldAttributeType    attrTypeFromDb,
+  bool                    attrNameAlreadyExpanded
 )
 {
-  if (pCheckName(attrP->name) == false)
+  if ((attrNameAlreadyExpanded == false) && (pCheckName(attrP->name) == false))
     return false;
 
   if ((isAttribute == true) && (attrP->type == KjArray))
   {
     bool error = false;
 
-    if (possibleMultiAttributeArray(attrP, &error) == false)
-    {
-      if (error == true)  // Early detection of erroneous datasetId-array
-        return false;
-    }
-    else
+    if (multiAttributeArray(attrP, &error) == true)
     {
       for (KjNode* aInstanceP = attrP->value.firstChildP; aInstanceP != NULL; aInstanceP = aInstanceP->next)
       {
@@ -726,11 +722,16 @@ bool pCheckAttribute
         // => KjNode* datasetsP should be a parameter to this function
         //
         aInstanceP->name = attrP->name;
-        if (pCheckAttribute(aInstanceP, true, dbAttributeP, attrTypeFromDb) == false)
+        if (pCheckAttribute(aInstanceP, true, dbAttributeP, attrTypeFromDb, attrNameAlreadyExpanded) == false)
           return false;
       }
 
       return true;
+    }
+    else
+    {
+      if (error == true)  // Early detection of erroneous datasetId-array
+        return false;
     }
   }
 
@@ -742,11 +743,8 @@ bool pCheckAttribute
   else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, dbAttributeP, attrTypeFromDb);
   else if (attrP->type == KjNull)    return pCheckAttributeNull(attrP);
 
-  // Invalid JSON type of the attribute
-  LM_W(("Unknown JSON type for the Right-Hand-Side of the attribute '%s'", attrP->name));
-  orionldError(OrionldInternalError,
-               "invalid value type for attribute",
-               attrP->name,
-               500);
+  // Invalid JSON type of the attribute - we should never reach this point
+  orionldError(OrionldInternalError, "invalid value type for attribute", attrP->name, 500);
+
   return false;
 }

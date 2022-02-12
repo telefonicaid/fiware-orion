@@ -56,9 +56,11 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -192,37 +194,28 @@ bool orionldPostEntity(void)
 {
   bool  overwrite  = (orionldState.uriParamOptions.noOverwrite == true)? false : true;
   char* entityId   = orionldState.wildcard[0];
-  char* detail;
 
-  // 1. Is the Entity ID in the URL a valid URI?
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
-    return false;
-  }
+  // Payload Body must be a JSON Object
+  // Entity ID must be a valid URI
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "To update an Entity, a JSON OBJECT must be provided", 400);
+  PCHECK_URI(entityId, true, 0, "Entity ID must be a valid URI", entityId, 400);
 
-  // 2. Is the payload not a JSON object?
-  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
-
-  // 3. Get the entity from mongo
+  // Get the entity from mongo
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
+    orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
 
   // 4. Get the 'attrNames' array from the mongo entity - to see whether an attribute already existed or not
-  KjNode* inDbAttrNamesP = NULL;
+  KjNode* dbAttrNamesP = NULL;
   if (overwrite == false)
   {
-    inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-    if (inDbAttrNamesP == NULL)
+    dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
+    if (dbAttrNamesP == NULL)
     {
-      orionldState.httpStatusCode = SccReceiverInternalError;
-      orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found");
+      orionldError(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found", 500);
       return false;
     }
   }
@@ -230,17 +223,17 @@ bool orionldPostEntity(void)
   //
   // 5. How many attributes are there (in the payload), and are they valid (if overwrite == false)?
   //    Those that are invalid are removed from the tree "orionldState.requestTree"
-  int     attrsInPayload = 0;
+  //
+  int     attrsInPayload  = 0;
+  KjNode* responseP       = kjObject(orionldState.kjsonP, NULL);
+  KjNode* updatedP        = kjArray(orionldState.kjsonP, "updated");
+  KjNode* notUpdatedP     = kjArray(orionldState.kjsonP, "notUpdated");
+  KjNode* dbAttrsP        = kjLookup(dbEntityP, "attrs");
   KjNode* next;
-  KjNode* responseP      = kjObject(orionldState.kjsonP, NULL);
-  KjNode* updatedP       = kjArray(orionldState.kjsonP, "updated");
-  KjNode* notUpdatedP    = kjArray(orionldState.kjsonP, "notUpdated");
-  KjNode* dbAttrsP       = kjLookup(dbEntityP, "attrs");
 
   if (dbAttrsP == NULL)
   {
-    orionldState.httpStatusCode = SccReceiverInternalError;
-    orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
+    orionldError(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found", 500);
     return false;
   }
 
@@ -260,9 +253,17 @@ bool orionldPostEntity(void)
       continue;
     }
 
+    if (pCheckUri(attrP->name, false) == false)
+    {
+      attributeNotUpdated(notUpdatedP, attrP->name, "invalid attribute name", NULL);
+      kjChildRemove(orionldState.requestTree, attrP);
+      attrP = next;
+      continue;
+    }
+
     //
     // The attribute name must be expanded before any comparisons can take place
-    // But, for the "upsdated" / "notUpdated", we need the shortname
+    // But, for the "updated" / "notUpdated", we need the shortname
     //
     char* shortName = attrP->name;
     attrP->name     = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
@@ -270,7 +271,7 @@ bool orionldPostEntity(void)
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)
     {
-      if (kjStringValueLookupInArray(inDbAttrNamesP, attrP->name) != NULL)
+      if (kjStringValueLookupInArray(dbAttrNamesP, attrP->name) != NULL)
       {
         attributeNotUpdated(notUpdatedP, shortName, "attribute already exists", "overwrite is not allowed");
 
@@ -304,6 +305,12 @@ bool orionldPostEntity(void)
 
     return true;
   }
+
+  //
+  // The tree is "pruned", time to check its validity and process for Simplified format
+  //
+  if (pCheckEntity(orionldState.requestTree, dbEntityP, false, true) == false)
+    return false;
 
   //
   // Here the incoming payload tree should be OK for TRoE

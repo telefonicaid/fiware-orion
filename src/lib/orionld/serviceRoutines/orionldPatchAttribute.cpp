@@ -742,6 +742,7 @@ bool orionldPatchAttribute(void)
   char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
   dotForEq(attrNameExpandedEq);
 
+  inAttribute->name = attrNameExpanded;
 
   //
   // GET the attribute from the DB (dbAttributeP)
@@ -780,7 +781,7 @@ bool orionldPatchAttribute(void)
   if (attrTypeInDb != NULL)
     attributeType = orionldAttributeType(attrTypeInDb);
 
-  if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType) == false)
+  if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType, true) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);

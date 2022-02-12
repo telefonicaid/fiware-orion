@@ -29,6 +29,7 @@
 
 #include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/common/orionldState.h"                      // orionldState
+#include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
 
 
 
@@ -82,6 +83,25 @@ do                                                                              
     int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
     const char* title = (_title == NULL)? "Not a JSON Array"   : _title;                     \
                                                                                              \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_URI -
+//
+#define PCHECK_URI(uri, mustBeUri, _type, _title, detail, status)                            \
+do                                                                                           \
+{                                                                                            \
+  int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                       \
+  const char* title = (_title == NULL)? "Invalid URI"         : _title;                      \
+                                                                                             \
+  if (pCheckUri(uri, mustBeUri) == false)                                                    \
+  {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \
   }                                                                                          \
