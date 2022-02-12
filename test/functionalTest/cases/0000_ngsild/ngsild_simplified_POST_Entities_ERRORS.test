@@ -31,37 +31,41 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Attempt to create an Entity with a GeoProperty that is not a JSON Object - see failure
-# 02. Attempt to create an Entity with a duplicated GeoProperty - see failure
-# 03. Attempt to create an Entity with a GeoProperty that contains no 'type' field - see failure
-# 04. Attempt to create an Entity with a GeoProperty with a 'type' that is not a string  - see failure
-# 05. Attempt to create an Entity with a GeoProperty with a 'type' whose string is not a valid geometry name - see failure
-# 06. Attempt to create an Entity with a GeoProperty that has a duplicated 'type' - see failure
-# 07. Attempt to create an Entity with a GeoProperty that contains no 'coordinates' field - see failure
-# 08. Attempt to create an Entity with a GeoProperty that has a duplicated	'coordinates' - see failure
-# 09. Attempt to create an Entity with a GeoProperty that has a 'coordinates' field that is not an Array - see failure
-# 10. Attempt to create an Entity with a GeoProperty that has a 'coordinates' field that is an empty Array - see failure
-# 11. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an empty array - see failure
-# 12. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
-# 13. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
-# 14. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
-# 15. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
-# 16. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
-# 17. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
-# 18. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array of three Points - see failure
-# 19. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
-# 20. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array where first item != last item
-# 21. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
-# 22. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
-# 23. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
-# 24. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
-# 25. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with	one of its Points as an empty array - see failure
-# 26. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
-# 27. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
-# 28. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
-# 29. Attempt to create an Entity with a GeoProperty that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
-# 30. Attempt to create an Entity with a GeoProperty that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
-
+# GEO:
+#   01. Attempt to create an Entity with a GeoProperty that is not a JSON Object - see failure
+#   02. Attempt to create an Entity with a duplicated GeoProperty - see failure
+#   03. Attempt to create an Entity with a GeoProperty that contains no 'type' field - see failure
+#   04. Attempt to create an Entity with a GeoProperty with a 'type' that is not a string  - see failure
+#   05. Attempt to create an Entity with a GeoProperty with a 'type' whose string is not a valid geometry name - see failure
+#   06. Attempt to create an Entity with a GeoProperty that has a duplicated 'type' - see failure
+#   07. Attempt to create an Entity with a GeoProperty that contains no 'coordinates' field - see failure
+#   08. Attempt to create an Entity with a GeoProperty that has a duplicated	'coordinates' - see failure
+#   09. Attempt to create an Entity with a GeoProperty that has a 'coordinates' field that is not an Array - see failure
+#   10. Attempt to create an Entity with a GeoProperty that has a 'coordinates' field that is an empty Array - see failure
+#   11. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an empty array - see failure
+#   12. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
+#   13. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
+#   14. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
+#   15. Attempt to create an Entity with a GeoProperty that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
+#   16. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
+#   17. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
+#   18. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array of three Points - see failure
+#   19. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
+#   20. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array where first item != last item
+#   21. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
+#   22. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
+#   23. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
+#   24. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
+#   25. Attempt to create an Entity with a GeoProperty that has a 'type==LineString' with 'coordinates' with	one of its Points as an empty array - see failure
+#   26. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
+#   27. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
+#   28. Attempt to create an Entity with a GeoProperty that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
+#   29. Attempt to create an Entity with a GeoProperty that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
+#   30. Attempt to create an Entity with a GeoProperty that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
+#
+# Invalid JSON types for non-Property attributes
+#   41. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error
+#
 
 echo "01. Attempt to create an Entity with a GeoProperty that is not a JSON Object - see failure"
 echo "=========================================================================================="
@@ -418,6 +422,18 @@ payload='{
   "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
   "G1": { "type": "MultiLineString", "coordinates": [ [ [ [ 1, 2.0 ], [ 5, 4 ] ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "41. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "R1": { "object": 14 }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
@@ -841,6 +857,20 @@ Date: REGEX(.*)
 {
     "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
     "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+41. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 186
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "R1",
+    "title": "relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
