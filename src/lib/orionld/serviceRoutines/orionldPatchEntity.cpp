@@ -167,8 +167,16 @@ bool orionldPatchEntity(void)
       continue;
     }
     else
-      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
+    {
+      if (pCheckUri(newAttrP->name, false) == false)
+      {
+        attributeNotUpdated(notUpdatedP, shortName, "invalid attribute name", NULL);
+        newAttrP = next;
+        continue;
+      }
 
+      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
+    }
 
     //
     // Check and Normalize
@@ -195,7 +203,7 @@ bool orionldPatchEntity(void)
       attributeType = orionldAttributeType(typeP->value.s);
 
     LM_TMP(("Calling pCheckAttribute for attribute '%s'", shortName));
-    if (pCheckAttribute(newAttrP, true, dbAttributeP, attributeType) == false)
+    if (pCheckAttribute(newAttrP, true, dbAttributeP, attributeType, true) == false)
     {
       //
       // A failure will set a 400 (probably) in orionldState.pd.status

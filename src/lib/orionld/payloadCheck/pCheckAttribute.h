@@ -43,7 +43,8 @@ extern bool pCheckAttribute
   KjNode*                 attrP,
   bool                    isAttribute,
   KjNode*                 dbAttributeP,
-  OrionldAttributeType    attrTypeFromDb
+  OrionldAttributeType    attrTypeFromDb,
+  bool                    attrNameAlreadyExpanded
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_

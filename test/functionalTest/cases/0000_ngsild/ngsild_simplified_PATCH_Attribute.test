@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute Patch with Compact Format
+PATCH Attribute with Simplified Format
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -782,12 +782,12 @@ Date: REGEX(.*)
 16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error
 ======================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 135
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "G",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G",
     "title": "Attempt to transform a GeoProperty into a Property",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

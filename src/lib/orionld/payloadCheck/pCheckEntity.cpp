@@ -36,6 +36,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
 
@@ -65,14 +66,55 @@ KjNode* kjLookupByNameExceptOne(KjNode* containerP, const char* fieldName, KjNod
 
 // -----------------------------------------------------------------------------
 //
+// dbAttributeGet -
+//
+static KjNode* dbAttributeGet(KjNode* dbEntityP, const char* attributeName, OrionldAttributeType* attributeTypeP)
+{
+  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");   // Really? Look up "attrs" every time?
+
+  if (dbAttrsP == NULL)
+    return NULL;
+
+  LM_TMP(("Looking for attribute '%s' in entity", attributeName));
+  KjNode* dbAttrP = kjLookup(dbAttrsP, attributeName);
+
+  if (dbAttrP == NULL)
+    return NULL;
+
+  KjNode* typeP = kjLookup(dbAttrP, "type");
+
+  if (typeP != NULL)
+    *attributeTypeP = orionldAttributeType(typeP->value.s);
+
+  return dbAttrP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckEntity -
+//
+// When an entity is created (dbEntityP == NULL), the "type" and "id" are Mandatory:
+//   - POST /entities
+//   - POST /entityOperations/create
+//   - POST /entityOperations/upsert   (possibly)
+//
+// When an entity is updated:
+//   - For the Entity ID:
+//     - POST /entities/{entityId}/attrs:    "id" can't be present - it's already in the URL PATH
+//     - PATCH /entities/{entityId}/attrs:   "id" can't be present - it's already in the URL PATH
+//     - BATCH Upsert/Update:                "id" must be present - can't find the entity otherwise ...
+//
+//   - For the Entity TYPE:
+//     POST /entities/{entityId}/attrs:      if "type" is present, it needs to coincide with what's in the DB
 //
 bool pCheckEntity
 (
-  KjNode*  entityP,    // The entity from the incoming payload body
-  KjNode*  dbEntityP,  // The entity from the DB, in case the entity already existed
-  KjNode*  idNodeP,    // Entity ID
-  KjNode*  typeNodeP   // Entity Type
+  KjNode*  entityP,       // The entity from the incoming payload body
+  KjNode*  dbEntityP,     // The entity from the DB, in case the entity already existed
+  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
+  bool     attrsExpanded  // Attribute names have been expanded already
 )
 {
   KjNode* nodeP;
@@ -87,18 +129,16 @@ bool pCheckEntity
     OrionldAttributeType  attributeType = NoAttributeType;
     KjNode*               dbAttributeP  = NULL;
 
-    if (dbEntityP != NULL)
-    {
-      // Get the type for the attribute, if it exists already (in the DB)
-    }
-
     if (kjLookupByNameExceptOne(entityP, attrP->name, attrP) != NULL)
     {
       orionldError(OrionldBadRequestData, "Duplicated field in an entity", attrP->name, 400);
       return false;
     }
 
-    if (pCheckAttribute(attrP, true, dbAttributeP, attributeType) == false)
+    if (dbEntityP != NULL)  // Get the attribute from the DB
+      dbAttributeP = dbAttributeGet(dbEntityP, attrP->name, &attributeType);
+
+    if (pCheckAttribute(attrP, true, dbAttributeP, attributeType, attrsExpanded) == false)
       return false;
   }
 
