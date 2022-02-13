@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
 
@@ -93,6 +94,46 @@ static KjNode* dbAttributeGet(KjNode* dbEntityP, const char* attributeName, Orio
 
 // -----------------------------------------------------------------------------
 //
+// idCheck -
+//
+static bool idCheck(KjNode* attrP, KjNode* idP)
+{
+  if (idP != NULL)
+  {
+    orionldError(OrionldBadRequestData, "Both /id/ and /@id/ field in an entity", idP->value.s, 400);
+    return false;
+  }
+
+  PCHECK_STRING(attrP,             0, NULL, "The Entity ID must be a string that is a valid URI", 400);
+  PCHECK_URI(attrP->value.s, true, 0, NULL, "The Entity ID must be a valid URI",                  400);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// typeCheck -
+//
+static bool typeCheck(KjNode* attrP, KjNode* typeP)
+{
+  if (typeP != NULL)
+  {
+    orionldError(OrionldBadRequestData, "Both /type/ and /@type/ field in an entity", typeP->value.s, 400);
+    return false;
+  }
+
+  PCHECK_STRING(attrP,              0, "Bad Request", "The Entity Type must be a string", 400);
+  PCHECK_URI(attrP->value.s, false, 0, "Bad Request", "Invalid Entity Type",              400);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckEntity -
 //
 // When an entity is created (dbEntityP == NULL), the "type" and "id" are Mandatory:
@@ -117,13 +158,16 @@ bool pCheckEntity
   bool     attrsExpanded  // Attribute names have been expanded already
 )
 {
+  // Remove builtin timestamps, if present
   KjNode* nodeP;
 
-  // Remove builtin timestamps, if present
   if ((nodeP = kjLookup(entityP, "createdAt"))  != NULL)  kjChildRemove(entityP, nodeP);
   if ((nodeP = kjLookup(entityP, "modifiedAt")) != NULL)  kjChildRemove(entityP, nodeP);
 
   // Loop over attributes
+  KjNode* idP   = NULL;
+  KjNode* typeP = NULL;
+
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     OrionldAttributeType  attributeType = NoAttributeType;
@@ -133,6 +177,25 @@ bool pCheckEntity
     {
       orionldError(OrionldBadRequestData, "Duplicated field in an entity", attrP->name, 400);
       return false;
+    }
+
+    if (strcmp(attrP->name, "@context") == 0)      continue;
+    if (strcmp(attrP->name, "scope")    == 0)      continue;
+
+    if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "@id") == 0))
+    {
+      if (idCheck(attrP, idP) == false)
+        return false;
+      idP = attrP;
+      continue;
+    }
+
+    if ((strcmp(attrP->name, "type")  == 0) || (strcmp(attrP->name, "@type") == 0))
+    {
+      if (typeCheck(attrP, typeP) == false)
+        return false;
+      typeP = attrP;
+      continue;
     }
 
     if (dbEntityP != NULL)  // Get the attribute from the DB

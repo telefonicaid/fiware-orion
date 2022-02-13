@@ -51,7 +51,7 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
   while (inNodeP != NULL)
   {
     //
-    // entities that weren't found in the DB MUST contain entity::type
+    // Entities that aren't found in the DB MUST contain entity::type
     //
     KjNode* inEntityIdNodeP = kjLookup(inNodeP, "id");
 
