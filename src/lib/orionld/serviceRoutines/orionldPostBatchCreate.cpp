@@ -65,6 +65,7 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
+#include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
@@ -113,44 +114,16 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldPostBatchCreate -
+// idArrayGet -
 //
-// POST /ngsi-ld/v1/entityOperations/create
-//
-// From the spec:
-//   This operation allows creating a batch of NGSI-LD Entities, creating each of them if they don't exist.
-//
-bool orionldPostBatchCreate(void)
+static KjNode* idArrayGet(KjNode* treeP, KjNode* errorsArrayP)
 {
-  // Error or not, the Link header should never be present in the reponse
-  orionldState.noLinkHeader = true;
+  KjNode* idArray = kjArray(orionldState.kjsonP, NULL);
+  KjNode* entityP = treeP->value.firstChildP;
+  KjNode* next;
 
-  // The response is never JSON-LD
-  orionldState.out.contentType = JSON;
-
-  //
-  // Prerequisites for the payload in orionldState.requestTree:
-  // * must be an array
-  // * cannot be empty
-  // * all entities must contain an entity::id (one level down)
-  // * no entity can contain an entity::type (one level down)
-  //
-  ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
-  EMPTY_ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
-
-  KjNode*               incomingTree   = orionldState.requestTree;
-  KjNode*               idArray        = kjArray(orionldState.kjsonP, NULL);
-  KjNode*               successArrayP  = kjArray(orionldState.kjsonP, "success");
-  KjNode*               errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode*               entityP;
-  KjNode*               next;
-
-  //
-  // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
-  //
-  entityP = incomingTree->value.firstChildP;
   while (entityP)
   {
     next = entityP->next;
@@ -162,15 +135,57 @@ bool orionldPostBatchCreate(void)
     if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorsArrayP) == true)
       entityIdPush(idArray, entityId);
     else
-      kjChildRemove(incomingTree, entityP);
+      kjChildRemove(treeP, entityP);
 
     entityP = next;
   }
 
+  return idArray;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldPostBatchCreate -
+//
+// POST /ngsi-ld/v1/entityOperations/create
+//
+// From the spec:
+//   This operation allows creating a batch of NGSI-LD Entities, creating each of them if they don't exist.
+//   Error or not, the Link header should never be present in the reponse
+//   And, the response is never JSON-LD
+//
+//
+// Prerequisites for the payload in orionldState.requestTree:
+// * must be an array
+// * cannot be empty
+// * all entities must contain an entity::id (one level down)
+// * no entity can contain an entity::type (one level down)
+//
+bool orionldPostBatchCreate(void)
+{
+  orionldState.noLinkHeader    = true;
+  orionldState.out.contentType = JSON;
+
+  ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
+  EMPTY_ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
+
+  KjNode*               incomingTree   = orionldState.requestTree;
+  KjNode*               successArrayP  = kjArray(orionldState.kjsonP, "success");
+  KjNode*               errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
+  //
+  // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  //
+  KjNode* idArray = idArrayGet(orionldState.requestTree, errorsArrayP);
+
+
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
   //     whose Entity::Id is part of the array "idArray".
-  //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
+  //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type, creDate }
+  //
+  // This is a CREATE operation, so, those entities that already exist ... give error
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
@@ -196,29 +211,32 @@ bool orionldPostBatchCreate(void)
 
   //
   // Attempts to create an entity more than once (more than one instance with the same Entity ID in the entity array)
-  // shall result in an error message (part of 207 response) for all but the first instance
+  // shall result in an error message (part of 207 response) for all except the first instance (which shall work just fine)
   //
-  KjNode* eidP = orionldState.requestTree->value.firstChildP;
-  while (eidP != NULL)
+  KjNode*  entityP = orionldState.requestTree->value.firstChildP;
+  KjNode*  next;
+
+  while (entityP != NULL)
   {
-    next = eidP->next;
+    next = entityP->next;
 
     //
     // Get the 'id' field
     //
-    KjNode* idP = kjLookup(eidP, "id");
+    KjNode* idP = kjLookup(entityP, "id");
     if (idP == NULL)
     {
       LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
-      eidP = next;
+      entityP = next;
       continue;
     }
 
     //
-    // Compare the 'id' field of current (eidP) with all nextcoming EIDs is the array
+    // Compare the 'id' field of current (entityP) with all nextcoming EIDs is the array
     // If match, remove the latter
     //
-    KjNode* copyP = eidP->next;
+    char*   entityId = idP->value.s;
+    KjNode* copyP    = entityP->next;
     KjNode* copyNext;
 
     while (copyP != NULL)
@@ -234,7 +252,7 @@ bool orionldPostBatchCreate(void)
         continue;
       }
 
-      if (strcmp(idP->value.s, copyIdP->value.s) == 0)
+      if (strcmp(entityId, copyIdP->value.s) == 0)
       {
         entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400, true);
         kjChildRemove(orionldState.requestTree, copyP);
@@ -242,14 +260,21 @@ bool orionldPostBatchCreate(void)
       copyP = copyNext;
     }
 
-    eidP = next;
+    // Entity ok, from a "repetition point of view", now, is it correct?
+    if (pCheckEntity(entityP, NULL, true, false) == false)
+    {
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
+      kjChildRemove(orionldState.requestTree, entityP);
+    }
+
+    entityP = next;
   }
 
   //
   // Now that:
   //   - the erroneous entities have been removed from the incoming tree,
   //   - entities that already existed have been removed from the incoming tree,
-  // let's clone the tree for TRoE !!!
+  // Let's clone the tree for TRoE
   //
   KjNode* cloneP = NULL;  // Only for TRoE
   if (troe)
