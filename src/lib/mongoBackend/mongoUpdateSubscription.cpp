@@ -323,6 +323,7 @@ std::string mongoUpdateSubscription
   if (subUp.statusProvided)        setStatus(subUp.status, &setB, now);
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
+  if (subUp.coveredProvided)       setcovered(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
 
 

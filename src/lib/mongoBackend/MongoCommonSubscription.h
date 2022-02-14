@@ -196,6 +196,12 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, orion::BSONObjBuilder*
 extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
+/* ****************************************************************************
++ * *
++ * * setcovered -
++ * */
+extern void setcovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
 
 /* ****************************************************************************
 *

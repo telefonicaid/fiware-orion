@@ -518,6 +518,18 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 }
 
 
+/* ****************************************************************************
+ * + * *
+ * + * * setcovered -
+ * + * */
+void setcovered(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  bool bl = sub.notification.covered;
+
+  b->append(CSUB_COVERED, bl);
+  LM_T(LmtMongo, ("Subscription covered: %s", bl ? "true" : "false"));
+}
+
 
 /* ****************************************************************************
 *

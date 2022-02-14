@@ -476,7 +476,7 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return badInput(ciP, timeoutOpt.error);
   }
-  if (timeoutOpt.given)
+  /*if (timeoutOpt.given)
   {
     if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
     {
@@ -486,7 +486,7 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     {
       subsP->notification.httpInfo.timeout = timeoutOpt.value;
     }
-  }
+  }*/
   else
   {
     subsP->notification.httpInfo.timeout = 0;
@@ -928,6 +928,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
   }
 
+  // covered
+  if (notification.HasMember("covered"))
+  {
+   Opt<bool> coveredOpt = getBoolOpt(notification, "covered");
+   if (!coveredOpt.ok())
+   {
+     return badInput(ciP, coveredOpt.error);
+   }
+   else if (coveredOpt.given)
+   {
+     bool coveredBool = coveredOpt.value;
+     subsP->coveredProvided = true;
+     subsP->notification.covered = coveredBool;
+   }
+   }
+  
   // metadata
   if (notification.HasMember("metadata"))
   {

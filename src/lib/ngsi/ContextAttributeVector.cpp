@@ -38,6 +38,17 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/MongoGlobal.h"
+
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONArray.h"
+#include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/BSONElement.h"
 
 
 /* ****************************************************************************
@@ -301,13 +312,31 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
 */
 int ContextAttributeVector::get(const std::string& attributeName) const
 {
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
+//added code anjali 
+//
     if (vec[ix]->name == attributeName)
+     {
+       return ix;
+     }
+     else if (vec[ix]->name != attributeName)
+     {
+      return ix;
+     }
+   }
+//      orion::BSONObj  sub;
+//      std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+
+    // if (vec[ix]->name == attributeName)
+    // {
+    //   return ix;
+    // }
+  /*  else
     {
       return ix;
-    }
-  }
+    }*/
 
   return -1;
 }

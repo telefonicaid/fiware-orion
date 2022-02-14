@@ -61,6 +61,7 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   bool                     onlyChanged;
+  bool                     covered;
   long long                timesSent;
   long long                failsCounter;
   long long                maxFailsLimit;
@@ -79,6 +80,7 @@ struct Notification
     attributes(),
     blacklist(false),
     onlyChanged(false),
+    covered(false),
     timesSent(0),
     failsCounter(0),
     maxFailsLimit(-1),

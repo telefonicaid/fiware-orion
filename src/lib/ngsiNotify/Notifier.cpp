@@ -468,6 +468,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
     else
     {
+      //anjali
       payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
     }
 

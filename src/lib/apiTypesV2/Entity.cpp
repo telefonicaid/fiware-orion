@@ -42,6 +42,17 @@
 
 #include "apiTypesV2/Entity.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/MongoGlobal.h"
+
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONArray.h"
+#include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/BSONElement.h"
 
 
 /* ****************************************************************************
@@ -155,6 +166,7 @@ void Entity::filterAndOrderAttrs
     }
     else
     {
+      //anjali
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
       // In blacklist case shadowed attributes (dateCreated, etc) are never included
       for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
@@ -164,6 +176,7 @@ void Entity::filterAndOrderAttrs
         {
           orderedAttrs->push_back(attributeVector[ix]);
         }
+        //anjali added
       }
     }
   }
@@ -190,6 +203,7 @@ void Entity::filterAndOrderAttrs
             {
               orderedAttrs->push_back(attributeVector[ix]);
             }
+            /*anjali added*/
           }
           else
           {
@@ -199,20 +213,51 @@ void Entity::filterAndOrderAttrs
       }
       else
       {
+
+        //anjali22 code for atrr found
         // - If '*' is not in: attributes are include in the attrsFilter order
-        for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+        /*for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
           int found;
           if ((found = attributeVector.get(attrsFilter[ix])) != -1)
           {
             orderedAttrs->push_back(attributeVector[found]);
           }
-        }
-      }
-    }
-  }
-}
+        }*/
+      orion::BSONObj  sub;
+      StringList                       attrL;
+      std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
+     // for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
+     // {      
+        //std::string subAttr = subAttrs[ix].String();
+       for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
+         {
+
+            int found;
+	    if ((found = attributeVector.get(attrsFilter[jx])) != -1)
+            {
+              orderedAttrs->push_back(attributeVector[found]);
+            }
+         }
+      // orderedAttrs->push_back(subAttr);
+     //  for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
+     //  {
+      //    std::string name = attributeVector.get(attrsFilter[jx]);
+//          if ((found = attributeVector.get(attrsFilter[jx])) != -1)
+//          {
+//            orderedAttrs->push_back(attributeVector[found]);
+//          }
+       /*if (subAttr == name)
+       {
+         orderedAttrs->push_back(attributeVector[jx]);
+        }*/
+       }
+     }
+
+   }
+
+}
 
 
 
