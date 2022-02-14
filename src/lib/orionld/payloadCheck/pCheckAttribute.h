@@ -38,6 +38,13 @@ extern "C"
 //
 // pCheckAttribute -
 //
+// attrTypeFromDb is needed, only for PATCH Entity/Attribute, to make sure
+// the attribute update isn't trying to modify the type of the attribute.
+// API endpoints other than those two need not make this check as attributes are REPLACED.
+//
+// Likewise, in the second (recursive) call to pCheckAttribute for PATCH Attribute, it is not
+// needed as all sub-attributes are REPLACED.
+// 
 extern bool pCheckAttribute
 (
   KjNode*                 attrP,

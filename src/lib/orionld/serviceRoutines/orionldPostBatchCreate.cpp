@@ -261,7 +261,7 @@ bool orionldPostBatchCreate(void)
     }
 
     // Entity ok, from a "repetition point of view", now, is it correct?
-    if (pCheckEntity(entityP, NULL, true, false) == false)
+    if (pCheckEntity(entityP, true, false) == false)
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
       kjChildRemove(orionldState.requestTree, entityP);

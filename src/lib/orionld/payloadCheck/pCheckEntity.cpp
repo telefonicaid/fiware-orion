@@ -67,33 +67,6 @@ KjNode* kjLookupByNameExceptOne(KjNode* containerP, const char* fieldName, KjNod
 
 // -----------------------------------------------------------------------------
 //
-// dbAttributeGet -
-//
-static KjNode* dbAttributeGet(KjNode* dbEntityP, const char* attributeName, OrionldAttributeType* attributeTypeP)
-{
-  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");   // Really? Look up "attrs" every time?
-
-  if (dbAttrsP == NULL)
-    return NULL;
-
-  LM_TMP(("Looking for attribute '%s' in entity", attributeName));
-  KjNode* dbAttrP = kjLookup(dbAttrsP, attributeName);
-
-  if (dbAttrP == NULL)
-    return NULL;
-
-  KjNode* typeP = kjLookup(dbAttrP, "type");
-
-  if (typeP != NULL)
-    *attributeTypeP = orionldAttributeType(typeP->value.s);
-
-  return dbAttrP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // idCheck -
 //
 static bool idCheck(KjNode* attrP, KjNode* idP)
@@ -153,7 +126,6 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
 bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  KjNode*  dbEntityP,     // The entity from the DB, in case the entity already existed
   bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
   bool     attrsExpanded  // Attribute names have been expanded already
 )
@@ -170,9 +142,6 @@ bool pCheckEntity
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    OrionldAttributeType  attributeType = NoAttributeType;
-    KjNode*               dbAttributeP  = NULL;
-
     if (kjLookupByNameExceptOne(entityP, attrP->name, attrP) != NULL)
     {
       orionldError(OrionldBadRequestData, "Duplicated field in an entity", attrP->name, 400);
@@ -198,10 +167,7 @@ bool pCheckEntity
       continue;
     }
 
-    if (dbEntityP != NULL)  // Get the attribute from the DB
-      dbAttributeP = dbAttributeGet(dbEntityP, attrP->name, &attributeType);
-
-    if (pCheckAttribute(attrP, true, dbAttributeP, attributeType, attrsExpanded) == false)
+    if (pCheckAttribute(attrP, true, NULL, NoAttributeType, attrsExpanded) == false)
       return false;
   }
 

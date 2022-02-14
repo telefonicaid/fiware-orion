@@ -558,42 +558,7 @@ static bool pCheckAttributeObject
     }
     else
     {
-      //
-      // To make sure the attribute type of the sub-attribute is not modified,
-      // we need to look up the sub-attr from the database and extract the attribute type from there.
-      // This info is then input to pCheckAttribute.
-      // If this is the creation of an attribute, its dbAttributeP will be NULL and there is no extra info to achieve.
-      //
-      OrionldAttributeType  subAttributeType = NoAttributeType;
-      KjNode*               dbSubAttrP       = NULL;
-
-      if (dbAttributeP != NULL)
-      {
-        const char*           dbField          = (isAttribute == true)? "attrs" : "md";
-        KjNode*               mdP              = kjLookup(dbAttributeP, dbField);
-
-        if (mdP)
-        {
-          char*   longName   = orionldContextItemExpand(orionldState.contextP, fieldP->name, true, NULL);
-          char*   longNameEq = kaStrdup(&orionldState.kalloc, longName);
-
-          if (longNameEq != NULL)
-          {
-            dotForEq(longNameEq);
-            dbSubAttrP = kjLookup(mdP, longNameEq);
-
-            if (dbSubAttrP != NULL)
-            {
-              KjNode* typeP = kjLookup(dbSubAttrP, "type");
-
-              if (typeP != NULL)
-                subAttributeType = orionldAttributeType(typeP->value.s);
-            }
-          }
-        }
-      }
-
-      if (pCheckAttribute(fieldP, false, dbSubAttrP, subAttributeType, false) == false)  // Need to find fieldP->name in dbAttributeP ...
+      if (pCheckAttribute(fieldP, false, NULL, NoAttributeType, false) == false)
         return false;
     }
 
@@ -618,7 +583,16 @@ static bool pCheckAttributeObject
 //
 // pCheckAttribute -
 //
-// With Smart-Format, an attribute RHS can be in a variety of formats:
+// PARAMETERS
+// attrTypeFromDb -    needed, only for PATCH Entity/Attribute, to make sure
+//                     the attribute update isn't trying to modify the type of the attribute.
+//                     API endpoints other than those two need not make this check as attributes are REPLACED.
+//                     Likewise, in the second (recursive) call to pCheckAttribute for PATCH Attribute, it is not
+//                     needed as all sub-attributes are REPLACED.
+// 
+// -----------------------------------------------------------------------------
+//
+// With Simplified Format, an attribute RHS can be in a variety of formats:
 //
 // 'attrP' is the output from the parsing step. It's a tree of KjNode, the tree to amend (add missing type if need be) and check for validity.
 //

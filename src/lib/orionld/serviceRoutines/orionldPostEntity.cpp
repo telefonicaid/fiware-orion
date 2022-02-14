@@ -309,7 +309,7 @@ bool orionldPostEntity(void)
   //
   // The tree is "pruned", time to check its validity and process for Simplified format
   //
-  if (pCheckEntity(orionldState.requestTree, dbEntityP, false, true) == false)
+  if (pCheckEntity(orionldState.requestTree, false, true) == false)
     return false;
 
   //
