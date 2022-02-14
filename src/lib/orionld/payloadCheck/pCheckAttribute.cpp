@@ -588,7 +588,7 @@ static bool pCheckAttributeObject
 //                     API endpoints other than those two need not make this check as attributes are REPLACED.
 //                     Likewise, in the second (recursive) call to pCheckAttribute for PATCH Attribute, it is not
 //                     needed as all sub-attributes are REPLACED.
-// 
+//
 // -----------------------------------------------------------------------------
 //
 // With Simplified Format, an attribute RHS can be in a variety of formats:

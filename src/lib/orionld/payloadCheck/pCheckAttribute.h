@@ -44,7 +44,7 @@ extern "C"
 //
 // Likewise, in the second (recursive) call to pCheckAttribute for PATCH Attribute, it is not
 // needed as all sub-attributes are REPLACED.
-// 
+//
 extern bool pCheckAttribute
 (
   KjNode*                 attrP,
