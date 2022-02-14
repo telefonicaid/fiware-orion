@@ -781,7 +781,7 @@ bool orionldPatchAttribute(void)
   if (attrTypeInDb != NULL)
     attributeType = orionldAttributeType(attrTypeInDb);
 
-  if (pCheckAttribute(inAttribute, true, dbAttributeP, attributeType, true) == false)
+  if (pCheckAttribute(inAttribute, true, attributeType, true) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);

@@ -39,7 +39,6 @@ extern "C"
 extern bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  KjNode*  dbEntityP,     // The entity from the DB, in case the entity already existed
   bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
   bool     attrsExpanded  // Attribute names have been expanded already
 );
