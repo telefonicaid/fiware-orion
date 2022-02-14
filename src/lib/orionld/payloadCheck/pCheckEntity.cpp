@@ -167,7 +167,7 @@ bool pCheckEntity
       continue;
     }
 
-    if (pCheckAttribute(attrP, true, NULL, NoAttributeType, attrsExpanded) == false)
+    if (pCheckAttribute(attrP, true, NoAttributeType, attrsExpanded) == false)
       return false;
   }
 

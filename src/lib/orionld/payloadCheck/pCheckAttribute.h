@@ -49,7 +49,6 @@ extern bool pCheckAttribute
 (
   KjNode*                 attrP,
   bool                    isAttribute,
-  KjNode*                 dbAttributeP,
   OrionldAttributeType    attrTypeFromDb,
   bool                    attrNameAlreadyExpanded
 );

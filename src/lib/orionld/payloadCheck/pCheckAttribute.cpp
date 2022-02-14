@@ -211,7 +211,7 @@ inline bool pCheckAttributeNull(KjNode* attrP)
 //
 // valueAndTypeCheck -
 //
-bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode* dbAttributeP)
+bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool attributeExisted)
 {
   KjNode* valueP       = kjLookup(attrP, "value");
   KjNode* objectP      = kjLookup(attrP, "object");
@@ -229,7 +229,7 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode
       orionldError(OrionldBadRequestData, "Forbidden field for a Property: languageMap", attrP->name, 400);
       return false;
     }
-    else if ((valueP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    else if ((valueP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /value/ field for Property at creation time", attrP->name, 400);
       return false;
@@ -247,7 +247,7 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode
       orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty: languageMap", attrP->name, 400);
       return false;
     }
-    else if ((valueP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    else if ((valueP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /value/ field for GeoProperty at creation time", attrP->name, 400);
       return false;
@@ -265,7 +265,7 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode
       orionldError(OrionldBadRequestData, "Forbidden field for a Relationship: languageMap", attrP->name, 400);
       return false;
     }
-    else if ((objectP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    else if ((objectP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /object/ field for Relationship at creation time", attrP->name, 400);
       return false;
@@ -283,7 +283,7 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, KjNode
       orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty: object", attrP->name, 400);
       return false;
     }
-    else if ((languageMapP == NULL) && (dbAttributeP == NULL))  // Attribute is new but the value is missing
+    else if ((languageMapP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /languageMap/ field for LanguageProperty at creation time", attrP->name, 400);
       return false;
@@ -396,7 +396,6 @@ static bool pCheckAttributeObject
 (
   KjNode*                 attrP,
   bool                    isAttribute,
-  KjNode*                 dbAttributeP,
   OrionldAttributeType    attrTypeFromDb
 )
 {
@@ -425,7 +424,7 @@ static bool pCheckAttributeObject
     //   - Either "Property", "Relationhip", etc
     //   - OR, GeoJSON type (Point, Polygon) AND coordinates member and only those two   => GeoProperty
     //   - IF NOT valid, then "Attribute Type Error"
-    //   - IF VALID, if dbAttributeP != NULL, compare => "attempt to change attr type"
+    //   - IF VALID, if also 'attrTypeFromDb != NoAttributeType', compare => "attempt to change attr type"
     //
     bool geoJsonValue = false;
 
@@ -455,7 +454,7 @@ static bool pCheckAttributeObject
     }
 
     // As "type" is present - is it coherent? (Property has "value", Relationship has "object", etc)
-    if (valueAndTypeCheck(attrP, attributeType, dbAttributeP) == false)
+    if (valueAndTypeCheck(attrP, attributeType, attrTypeFromDb != NoAttributeType) == false)
       LM_RE(false, ("valueAndTypeCheck failed"));
   }
   else  // type is not there - try to guess the type, if not already known from the DB
@@ -478,14 +477,14 @@ static bool pCheckAttributeObject
     else
     {
       // If new attribute and no value field at all - error
-      if (dbAttributeP == NULL)
+      if (attrTypeFromDb == NoAttributeType)
       {
         orionldError(OrionldBadRequestData, "Missing value/object/languageMap field for Attribute at creation time", attrP->name, 400);
         return false;
       }
     }
 
-    if (valueAndTypeCheck(attrP, attributeType, dbAttributeP) == false)
+    if (valueAndTypeCheck(attrP, attributeType, attrTypeFromDb != NoAttributeType) == false)
       LM_RE(false, ("valueAndTypeCheck failed"));
 
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != NoAttributeType) && (attributeType != attrTypeFromDb))
@@ -558,7 +557,7 @@ static bool pCheckAttributeObject
     }
     else
     {
-      if (pCheckAttribute(fieldP, false, NULL, NoAttributeType, false) == false)
+      if (pCheckAttribute(fieldP, false, NoAttributeType, false) == false)
         return false;
     }
 
@@ -669,7 +668,6 @@ bool pCheckAttribute
 (
   KjNode*                 attrP,
   bool                    isAttribute,
-  KjNode*                 dbAttributeP,
   OrionldAttributeType    attrTypeFromDb,
   bool                    attrNameAlreadyExpanded
 )
@@ -696,7 +694,7 @@ bool pCheckAttribute
         // => KjNode* datasetsP should be a parameter to this function
         //
         aInstanceP->name = attrP->name;
-        if (pCheckAttribute(aInstanceP, true, dbAttributeP, attrTypeFromDb, attrNameAlreadyExpanded) == false)
+        if (pCheckAttribute(aInstanceP, true, attrTypeFromDb, attrNameAlreadyExpanded) == false)
           return false;
       }
 
@@ -714,7 +712,7 @@ bool pCheckAttribute
   else if (attrP->type == KjFloat)   return pCheckAttributeFloat(attrP,   isAttribute, attrTypeFromDb);
   else if (attrP->type == KjBoolean) return pCheckAttributeBoolean(attrP, isAttribute, attrTypeFromDb);
   else if (attrP->type == KjArray)   return pCheckAttributeArray(attrP,   isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, dbAttributeP, attrTypeFromDb);
+  else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, attrTypeFromDb);
   else if (attrP->type == KjNull)    return pCheckAttributeNull(attrP);
 
   // Invalid JSON type of the attribute - we should never reach this point

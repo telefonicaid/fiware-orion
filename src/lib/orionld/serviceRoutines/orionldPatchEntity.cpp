@@ -197,13 +197,13 @@ bool orionldPatchEntity(void)
     //
     // Get the type of the attribute (from DB)
     //
-    KjNode* typeP = kjLookup(dbAttributeP, "type");
+    KjNode* dbTypeP = kjLookup(dbAttributeP, "type");
 
-    if (typeP != NULL)
-      attributeType = orionldAttributeType(typeP->value.s);
+    if (dbTypeP != NULL)
+      attributeType = orionldAttributeType(dbTypeP->value.s);
 
     LM_TMP(("Calling pCheckAttribute for attribute '%s'", shortName));
-    if (pCheckAttribute(newAttrP, true, dbAttributeP, attributeType, true) == false)
+    if (pCheckAttribute(newAttrP, true, attributeType, true) == false)
     {
       //
       // A failure will set a 400 (probably) in orionldState.pd.status
