@@ -72,6 +72,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
+#include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
 
@@ -364,6 +365,27 @@ bool orionldPostBatchUpsert(void)
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);  // Existing entities are MERGED, existing attributes are replaced
   else
     duplicatedInstances(incomingTree, NULL, true, true, errorsArrayP);   // Existing entities are REPLACED
+
+  //
+  // Simplified Format
+  //
+  for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    // No Entity from DB needed as all attributes are always overwritten
+    if (pCheckEntity(entityP, true, false) == false)
+      return false;
+  }
+
+  if ((troe == true) && (orionldState.duplicateArray != NULL))
+  {
+    // Simplified Format for the Duplicate Array
+    for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      if (pCheckEntity(entityP, true, false) == false)
+        return false;
+    }
+  }
+
 
   KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;

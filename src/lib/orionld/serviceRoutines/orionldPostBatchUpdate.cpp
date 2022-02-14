@@ -267,7 +267,9 @@ bool orionldPostBatchUpdate(void)
   else
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);                     // attributeReplace == true => existing attrs are replaced
 
-  // Time to fix Simplified Format
+  //
+  // Simplified Format
+  //
   for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     // No Entity from DB needed as all attributes are always overwritten
