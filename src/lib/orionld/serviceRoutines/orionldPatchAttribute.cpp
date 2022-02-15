@@ -209,10 +209,13 @@ bool kjAttributeMerge(KjNode* inAttribute, KjNode* dbAttribute, KjNode* dbAttrib
   }
 
   //
-  // Add the createdAt from the DB
+  // Add the createdAt from the DB, if present
   //
-  kjChildAdd(inAttribute, dbCreatedAt);
-  dbCreatedAt->name = (char*) "createdAt";
+  if (dbCreatedAt)
+  {
+    kjChildAdd(inAttribute, dbCreatedAt);
+    dbCreatedAt->name = (char*) "createdAt";
+  }
 
   //
   // Add a modifiedAt to inAttribute
@@ -635,11 +638,9 @@ static KjNode* attributeFromDb(char* entityId, char* attrName, char* attrNameExp
 
   if (dbEntityP == NULL)
   {
-    char pair[1024];
-
-    snprintf(pair, sizeof(pair), "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpandedEq);
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", pair);
+    char* pair = kaAlloc(&orionldState.kalloc, 1024);
+    snprintf(pair, 1024, "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpandedEq);
+    orionldError(OrionldResourceNotFound, "Entity/Attribute not found", pair, 404);
     return NULL;
   }
 
@@ -829,6 +830,9 @@ bool orionldPatchAttribute(void)
     return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP->value.s);
   }
 
+  if (dbAttributeP == NULL)
+    return false;
+
   //
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
@@ -906,6 +910,7 @@ bool orionldPatchAttribute(void)
   servicePathV.push_back("/");
 
   ucr.updateActionType        = ActionTypeUpdate;
+
   orionldState.httpStatusCode = mongoUpdateContext(&ucr,
                                                    &mongoResponse,
                                                    orionldState.tenantP,

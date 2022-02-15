@@ -202,7 +202,6 @@ bool orionldPatchEntity(void)
     if (dbTypeP != NULL)
       attributeType = orionldAttributeType(dbTypeP->value.s);
 
-    LM_TMP(("Calling pCheckAttribute for attribute '%s'", shortName));
     if (pCheckAttribute(newAttrP, true, attributeType, true) == false)
     {
       //

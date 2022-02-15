@@ -1,0 +1,645 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH the three special location attributes - attempt to turn into String
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with a "location" attribute, and the other two geo-attrs
+# 02. Attempt to "attribute-patch" location, turning it into a string - see error about type mismatch
+# 03. GET E1 and make sure "location" is OK
+# 04. Attempt to "entity-patch" location, turning it into a string - see error about type mismatch
+# 05. GET E1 and make sure "location" is OK
+# 06. Attribute-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 07. Entity-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 08. Attribute-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 09. Entity-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 10. Attribute-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 11. Entity-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+# 12. GET E1 and make sure all attributes are still OK
+# 13. Finally, patch location with a correct location
+# 14. GET E1 and make sure location has been updated
+# 15. Create a new entity E2, without any attributes
+# 16. PATCH E2 to add "location"
+# 17. GET E2
+#
+
+echo '01. Create an entity E1 with a "location" attribute, and the other two geo-attrs'
+echo '================================================================================'
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "location": {
+    "type": "Point",
+    "coordinates": [ 2, 3 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 2, 3 ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 2, 3 ]
+  },
+  "anyGeo": {
+    "type": "Point",
+    "coordinates": [ 2, 3 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Attempt to "attribute-patch" location, turning it into a string - see error about type mismatch'
+echo '==================================================================================================='
+payload='{
+  "value": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/location --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '03. GET E1 and make sure "location" is OK'
+echo '========================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo '04. Attempt to "entity-patch" location, turning it into a string - see error about type mismatch'
+echo '================================================================================================'
+payload='{
+  "location": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '05. GET E1 and make sure "location" is OK'
+echo '========================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo '06. Attribute-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '================================================================================================================================='
+payload='{
+  "value": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/observationSpace --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '07. Entity-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '=============================================================================================================================='
+payload='{
+  "observationSpace": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '08. Attribute-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '==============================================================================================================================='
+payload='{
+  "value": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/operationSpace --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '09. Entity-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '============================================================================================================================'
+payload='{
+  "operationSpace": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '10. Attribute-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '======================================================================================================================='
+payload='{
+  "value": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/anyGeo --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '11. Entity-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo'
+echo '===================================================================================================================='
+payload='{
+  "anyGeo": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '12. GET E1 and make sure all attributes are still OK'
+echo '===================================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo '13. Finally, patch location with a correct location'
+echo '==================================================='
+payload='{
+  "type": "GeoProperty",
+  "value": {
+    "type": "Point",
+    "coordinates": [
+      13.3505,
+      52.5144
+    ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/location --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '14. GET E1 and make sure location has been updated'
+echo '=================================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo '15. Create a new entity E2, without any attributes'
+echo '=================================================='
+payload='{
+  "id": "urn:ngsi-ld:T:E2",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '16. PATCH E2 to add "location"'
+echo '=============================='
+payload='{
+  "type": "GeoProperty",
+  "value": {
+    "type": "Point",
+    "coordinates": [
+      13.3505,
+      52.5144
+    ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2/attrs/location --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '17. GET E2'
+echo '=========='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create an entity E1 with a "location" attribute, and the other two geo-attrs
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+02. Attempt to "attribute-patch" location, turning it into a string - see error about type mismatch
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET E1 and make sure "location" is OK
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 364
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "anyGeo": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+04. Attempt to "entity-patch" location, turning it into a string - see error about type mismatch
+================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 130
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "location",
+            "reason": "Attempt to transform a GeoProperty into a Property: location"
+        }
+    ],
+    "updated": []
+}
+
+
+05. GET E1 and make sure "location" is OK
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 364
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "anyGeo": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+06. Attribute-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+=================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 150
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationSpace",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Entity-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+==============================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 146
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "observationSpace",
+            "reason": "Attempt to transform a GeoProperty into a Property: observationSpace"
+        }
+    ],
+    "updated": []
+}
+
+
+08. Attribute-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+===============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operationSpace",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Entity-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+============================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 142
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "operationSpace",
+            "reason": "Attempt to transform a GeoProperty into a Property: operationSpace"
+        }
+    ],
+    "updated": []
+}
+
+
+10. Attribute-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+=======================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 185
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/anyGeo",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Entity-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
+====================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 171
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "anyGeo",
+            "reason": "Attempt to transform a GeoProperty into a Property: https://uri.etsi.org/ngsi-ld/default-context/anyGeo"
+        }
+    ],
+    "updated": []
+}
+
+
+12. GET E1 and make sure all attributes are still OK
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 364
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "anyGeo": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+13. Finally, patch location with a correct location
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. GET E1 and make sure location has been updated
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 376
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "anyGeo": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3505,
+                52.5144
+            ],
+            "type": "Point"
+        }
+    },
+    "observationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "operationSpace": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+15. Create a new entity E2, without any attributes
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
+Date: REGEX(.*)
+
+
+
+16. PATCH E2 to add "location"
+==============================
+HTTP/1.1 404 Not Found
+Content-Length: 170
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity 'urn:ngsi-ld:T:E2', Attribute 'location' (location)",
+    "title": "Entity/Attribute not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+17. GET E2
+==========
+HTTP/1.1 200 OK
+Content-Length: 36
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:T:E2",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
