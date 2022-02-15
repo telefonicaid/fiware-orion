@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -257,8 +258,8 @@ bool orionldPostEntity(void)
     // The attribute name must be expanded before any comparisons can take place
     // But, for the "updated" / "notUpdated", we need the shortname
     //
-    OrionldContextItem*  contextItemP;
-    char*                shortName = attrP->name;
+    OrionldContextItem*  contextItemP = NULL;
+    char*                shortName    = attrP->name;
 
     attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &contextItemP);
 
@@ -276,7 +277,7 @@ bool orionldPostEntity(void)
       }
     }
 
-    if (pCheckAttribute(attrP, true, NoAttributeType, true) == false)
+    if (pCheckAttribute(attrP, true, NoAttributeType, true, contextItemP) == false)
     {
       attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
 

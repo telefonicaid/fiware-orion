@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
@@ -589,7 +590,7 @@ static bool pCheckAttributeObject
     }
     else
     {
-      if (pCheckAttribute(fieldP, false, NoAttributeType, false) == false)
+      if (pCheckAttribute(fieldP, false, NoAttributeType, false, NULL) == false)
         return false;
     }
 
@@ -735,7 +736,8 @@ bool pCheckAttribute
   KjNode*                 attrP,
   bool                    isAttribute,
   OrionldAttributeType    attrTypeFromDb,
-  bool                    attrNameAlreadyExpanded
+  bool                    attrNameAlreadyExpanded,
+  OrionldContextItem*     attrContextInfoP          // Attr Info from the @context (add shortname to struct?)
 )
 {
   if (attrNameAlreadyExpanded == false)
@@ -749,6 +751,11 @@ bool pCheckAttribute
   // Invalid name for attribute/sub-attribute?
   if (validAttrName(attrP->name, isAttribute) == false)
     return false;
+
+  if (attrContextInfoP != NULL)
+    LM_TMP(("KZ: type from context: %s", attrContextInfoP->type));
+  else
+    LM_TMP(("KZ: type from context: None"));
 
   if ((isAttribute == true) && (attrP->type == KjArray))
   {
@@ -769,7 +776,7 @@ bool pCheckAttribute
         // => KjNode* datasetsP should be a parameter to this function
         //
         aInstanceP->name = attrP->name;
-        if (pCheckAttribute(aInstanceP, true, attrTypeFromDb, attrNameAlreadyExpanded) == false)
+        if (pCheckAttribute(aInstanceP, true, attrTypeFromDb, attrNameAlreadyExpanded, attrContextInfoP) == false)
           return false;
       }
 

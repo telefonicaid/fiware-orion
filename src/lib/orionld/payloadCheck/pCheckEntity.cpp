@@ -167,7 +167,7 @@ bool pCheckEntity
     }
 
     LM_TMP(("KZ: Calling pCheckAttribute(%s)", attrP->name));
-    if (pCheckAttribute(attrP, true, NoAttributeType, false) == false)
+    if (pCheckAttribute(attrP, true, NoAttributeType, false, NULL) == false)
       return false;
   }
 
