@@ -542,6 +542,10 @@ static bool pCheckAttributeObject
         return false;
       }
     }
+    else if (strcmp(fieldP->name, "type") == 0)
+    {
+      // Sub-attribute type, or GeoProperty-type inside value
+    }
     else if (strcmp(fieldP->name, "object") == 0)
     {
       if (attributeType == Relationship)
@@ -599,6 +603,40 @@ static bool pCheckAttributeObject
     }
 
     fieldP = next;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// validAttrName -
+//
+static bool validAttrName(const char* attrName, bool isAttribute)
+{
+  bool  ok = true;
+
+  if (isAttribute == true)
+  {
+    if      (strcmp(attrName, "id")    == 0)  ok = false;
+    else if (strcmp(attrName, "@id")   == 0)  ok = false;
+    else if (strcmp(attrName, "type")  == 0)  ok = false;
+    else if (strcmp(attrName, "@type") == 0)  ok = false;
+    else if (strcmp(attrName, "scope") == 0)  ok = false;
+  }
+  else
+  {
+    if      (strcmp(attrName, "type")  == 0)  ok = false;
+    else if (strcmp(attrName, "@type") == 0)  ok = false;
+  }
+
+  if (ok == false)
+  {
+    const char* title = (isAttribute == true)? "Forbidden attribute name" : "Forbidden sub-attribute name";
+    orionldError(OrionldInternalError, title, attrName, 400);
+    return false;
   }
 
   return true;
@@ -700,7 +738,16 @@ bool pCheckAttribute
   bool                    attrNameAlreadyExpanded
 )
 {
-  if ((attrNameAlreadyExpanded == false) && (pCheckName(attrP->name) == false))
+  if (attrNameAlreadyExpanded == false)
+  {
+    if (pCheckName(attrP->name) == false)
+      return false;
+    if (pCheckUri(attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
+      return false;
+  }
+
+  // Invalid name for attribute/sub-attribute?
+  if (validAttrName(attrP->name, isAttribute) == false)
     return false;
 
   if ((isAttribute == true) && (attrP->type == KjArray))

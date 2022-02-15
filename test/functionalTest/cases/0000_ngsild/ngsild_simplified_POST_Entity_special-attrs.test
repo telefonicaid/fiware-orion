@@ -36,6 +36,10 @@ brokerStart CB
 # 03. Attempt to add "operationSpace", but being a String - see error
 # 04. Attempt to modify "location", but as a String - see error
 # 05. GET E1 and see it intact as created in step 01
+# 06. Attempt to add an attribute called "id" - cannot do that
+# 07. Attempt to add an attribute called "type" - cannot do that
+# 08. Attempt to add an attribute called "scope" - cannot do that
+# 09. GET E1 and see it intact as created in step 01
 #
 
 echo '01. Create an entity E1 with a "location" attribute'
@@ -86,6 +90,43 @@ echo
 echo
 
 
+echo '06. Attempt to add an attribute called "id" - cannot do that'
+echo '============================================================'
+payload='{
+  "id": "oops:oh"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+
+echo '07. Attempt to add an attribute called "type" - cannot do that'
+echo '=============================================================='
+payload='{
+  "type": "oops:oh"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+
+echo '08. Attempt to add an attribute called "scope" - cannot do that'
+echo '==============================================================='
+payload='{
+  "scope": "oops:oh"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+
+echo "09. GET E1 and see it intact as created in step 01"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity E1 with a "location" attribute
 ===================================================
@@ -98,47 +139,143 @@ Date: REGEX(.*)
 
 02. Attempt to add "observationSpace", but being a String - see error
 =====================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 146
+HTTP/1.1 207 Multi-Status
+Content-Length: 142
 Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "detail": "observationSpace",
-    "title": "Invalid type for special GeoProperty attribute",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "notUpdated": [
+        {
+            "attributeName": "observationSpace",
+            "reason": "Invalid type for special GeoProperty attribute: observationSpace"
+        }
+    ],
+    "updated": []
 }
 
 
 03. Attempt to add "operationSpace", but being a String - see error
 ===================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 144
+HTTP/1.1 207 Multi-Status
+Content-Length: 138
 Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "detail": "operationSpace",
-    "title": "Invalid type for special GeoProperty attribute",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "notUpdated": [
+        {
+            "attributeName": "operationSpace",
+            "reason": "Invalid type for special GeoProperty attribute: operationSpace"
+        }
+    ],
+    "updated": []
 }
 
 
 04. Attempt to modify "location", but as a String - see error
 =============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 138
+HTTP/1.1 207 Multi-Status
+Content-Length: 126
 Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "detail": "location",
-    "title": "Invalid type for special GeoProperty attribute",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "notUpdated": [
+        {
+            "attributeName": "location",
+            "reason": "Invalid type for special GeoProperty attribute: location"
+        }
+    ],
+    "updated": []
 }
 
 
 05. GET E1 and see it intact as created in step 01
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+06. Attempt to add an attribute called "id" - cannot do that
+============================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 92
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "id",
+            "reason": "Forbidden attribute name: id"
+        }
+    ],
+    "updated": []
+}
+
+
+07. Attempt to add an attribute called "type" - cannot do that
+==============================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 96
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "type",
+            "reason": "Forbidden attribute name: type"
+        }
+    ],
+    "updated": []
+}
+
+
+08. Attempt to add an attribute called "scope" - cannot do that
+===============================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 98
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "scope",
+            "reason": "Forbidden attribute name: scope"
+        }
+    ],
+    "updated": []
+}
+
+
+09. GET E1 and see it intact as created in step 01
 ==================================================
 HTTP/1.1 200 OK
 Content-Length: 122

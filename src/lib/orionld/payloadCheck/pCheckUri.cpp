@@ -49,12 +49,12 @@ bool pCheckUri(const char* uri, bool mustBeUri)
 
   if (uri == NULL)
   {
-    orionldError(OrionldBadRequestData, "No URI", NULL, 400);
+    orionldError(OrionldBadRequestData, "No URI", "no details", 400);
     return false;
   }
   else if (*uri == 0)
   {
-    orionldError(OrionldBadRequestData, "Empty URI", NULL, 400);
+    orionldError(OrionldBadRequestData, "Empty URI", "no details", 400);
     return false;
   }
 

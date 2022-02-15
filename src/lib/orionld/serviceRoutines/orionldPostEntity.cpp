@@ -60,7 +60,7 @@ extern "C"
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -253,20 +253,14 @@ bool orionldPostEntity(void)
       continue;
     }
 
-    if (pCheckUri(attrP->name, false) == false)
-    {
-      attributeNotUpdated(notUpdatedP, attrP->name, "invalid attribute name", NULL);
-      kjChildRemove(orionldState.requestTree, attrP);
-      attrP = next;
-      continue;
-    }
-
     //
     // The attribute name must be expanded before any comparisons can take place
     // But, for the "updated" / "notUpdated", we need the shortname
     //
-    char* shortName = attrP->name;
-    attrP->name     = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
+    OrionldContextItem*  contextItemP;
+    char*                shortName = attrP->name;
+
+    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &contextItemP);
 
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)
@@ -280,6 +274,16 @@ bool orionldPostEntity(void)
         attrP = next;
         continue;
       }
+    }
+
+    if (pCheckAttribute(attrP, true, NoAttributeType, true) == false)
+    {
+      attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
+
+      // Remove attr from tree
+      kjChildRemove(orionldState.requestTree, attrP);
+      attrP = next;
+      continue;
     }
 
     ++attrsInPayload;
@@ -305,12 +309,6 @@ bool orionldPostEntity(void)
 
     return true;
   }
-
-  //
-  // The tree is "pruned", time to check its validity and process for Simplified format
-  //
-  if (pCheckEntity(orionldState.requestTree, false, true) == false)
-    return false;
 
   //
   // Here the incoming payload tree should be OK for TRoE
