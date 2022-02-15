@@ -53,6 +53,50 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_SPECIAL_ATTRIBUTE
+//
+#define PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb)            \
+do                                                                              \
+{                                                                               \
+  if (attrTypeFromDb == NoAttributeType)                                        \
+  {                                                                             \
+    if (isAttribute == true)                                                    \
+    {                                                                           \
+      if ((strcmp(attrP->name, "location")         == 0) ||                     \
+          (strcmp(attrP->name, "observationSpace") == 0) ||                     \
+          (strcmp(attrP->name, "operationSpace")   == 0))                       \
+      {                                                                         \
+        orionldError(OrionldBadRequestData,                                     \
+                     "Invalid type for special GeoProperty attribute",          \
+                     attrP->name,                                               \
+                     400);                                                      \
+        return false;                                                           \
+      }                                                                         \
+    }                                                                           \
+  }                                                                             \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_NOT_A_PROPERTY -
+//
+#define PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb)                         \
+do                                                                           \
+{                                                                            \
+  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))   \
+  {                                                                          \
+    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);       \
+    orionldError(OrionldBadRequestData, title, attrP->name, 400);            \
+    return false;                                                            \
+  }                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attrTypeChangeTitle -
 //
 static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttributeType newType)
@@ -98,12 +142,8 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 //
 inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
-  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);
-    orionldError(OrionldBadRequestData, title, attrP->name, 400);
-    return false;
-  }
+  PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+  PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjString(orionldState.kjsonP, "value", attrP->value.s);
   pCheckAttributeTransform(attrP, "Property", valueP);
@@ -118,12 +158,8 @@ inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttrib
 //
 inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
-  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);
-    orionldError(OrionldBadRequestData, title, attrP->name, 400);
-    return false;
-  }
+  PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+  PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjInteger(orionldState.kjsonP, "value", attrP->value.i);
   pCheckAttributeTransform(attrP, "Property", valueP);
@@ -138,12 +174,8 @@ inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttri
 //
 inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
-  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);
-    orionldError(OrionldBadRequestData, title, attrP->name, 400);
-    return false;
-  }
+  PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+  PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjFloat(orionldState.kjsonP,  "value", attrP->value.f);
   pCheckAttributeTransform(attrP, "Property", valueP);
@@ -158,12 +190,8 @@ inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttribu
 //
 inline bool pCheckAttributeBoolean(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
 {
-  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))
-  {
-    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);
-    orionldError(OrionldBadRequestData, title, attrP->name, 400);
-    return false;
-  }
+  PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+  PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjBoolean(orionldState.kjsonP,  "value", attrP->value.b);
   pCheckAttributeTransform(attrP, "Property", valueP);
@@ -707,6 +735,18 @@ bool pCheckAttribute
     }
   }
 
+  //
+  // Check for special attributes
+  //
+  // Attributes
+  //   If isAttribute == true, we're on Entity Level. There are 3 special attributes, all GeoProperty
+  //   As we don't know the type yet, that check is postponed to pCheckAttributeObject
+  //
+  // Sub-Attributes
+  //   If isAttribute == false, we're on Attribute level. This is even more complex.
+  //   We don't know which sub-attributes are special until we know the type of the attribute (Property, Relationship, etc)
+  //   Postponed to ... all simple Property functions - pCheckAttribute[String|Integer|Float|Boolean] + pCheckAttributeObject (Geo)
+  //
   if      (attrP->type == KjString)  return pCheckAttributeString(attrP,  isAttribute, attrTypeFromDb);
   else if (attrP->type == KjInt)     return pCheckAttributeInteger(attrP, isAttribute, attrTypeFromDb);
   else if (attrP->type == KjFloat)   return pCheckAttributeFloat(attrP,   isAttribute, attrTypeFromDb);

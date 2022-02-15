@@ -153,7 +153,7 @@ bool pCheckEntity
 
     if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "@id") == 0))
     {
-      if (idCheck(attrP, idP) == false)
+      if (idCheck(attrP, idP) == false)  // POST /entities/*/attrs   CANNOT add/modify "id"
         return false;
       idP = attrP;
       continue;
@@ -167,9 +167,16 @@ bool pCheckEntity
       continue;
     }
 
+    LM_TMP(("KZ: Calling pCheckAttribute(%s)", attrP->name));
     if (pCheckAttribute(attrP, true, NoAttributeType, attrsExpanded) == false)
       return false;
   }
+
+  // If batch or POST /entities - idP cannot be NULL
+  // - All other operations, it must be NULL (can't be present)
+
+  // If batch create or POST /entities - typeP cannot be NULL  (also true if batch upert that is a create)
+  // If not creation, type cannot be present (until multi-type is implemented)
 
   return true;
 }

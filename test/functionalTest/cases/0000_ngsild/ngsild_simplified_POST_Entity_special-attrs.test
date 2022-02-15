@@ -1,0 +1,167 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update/Create the three special location attributes - attempt to make String
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with a "location" attribute
+# 02. Attempt to add "observationSpace", but being a String - see error
+# 03. Attempt to add "operationSpace", but being a String - see error
+# 04. Attempt to modify "location", but as a String - see error
+# 05. GET E1 and see it intact as created in step 01
+#
+
+echo '01. Create an entity E1 with a "location" attribute'
+echo '==================================================='
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "location": { "type": "Point", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities  --payload "$payload"
+echo
+echo
+
+
+echo '02. Attempt to add "observationSpace", but being a String - see error'
+echo '====================================================================='
+payload='{
+  "observationSpace": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+echo '03. Attempt to add "operationSpace", but being a String - see error'
+echo '==================================================================='
+payload='{
+  "operationSpace": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+
+echo '04. Attempt to modify "location", but as a String - see error'
+echo '============================================================='
+payload='{
+  "location": "A String"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs  --payload "$payload"
+echo
+echo
+
+
+echo '05. GET E1 and see it intact as created in step 01'
+echo '=================================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a "location" attribute
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Attempt to add "observationSpace", but being a String - see error
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationSpace",
+    "title": "Invalid type for special GeoProperty attribute",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to add "operationSpace", but being a String - see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operationSpace",
+    "title": "Invalid type for special GeoProperty attribute",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to modify "location", but as a String - see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Invalid type for special GeoProperty attribute",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. GET E1 and see it intact as created in step 01
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
