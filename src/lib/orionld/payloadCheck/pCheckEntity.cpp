@@ -126,8 +126,7 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
 bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
-  bool     attrsExpanded  // Attribute names have been expanded already
+  bool     batch          // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
 )
 {
   // Remove builtin timestamps, if present
@@ -168,7 +167,7 @@ bool pCheckEntity
     }
 
     LM_TMP(("KZ: Calling pCheckAttribute(%s)", attrP->name));
-    if (pCheckAttribute(attrP, true, NoAttributeType, attrsExpanded) == false)
+    if (pCheckAttribute(attrP, true, NoAttributeType, false) == false)
       return false;
   }
 

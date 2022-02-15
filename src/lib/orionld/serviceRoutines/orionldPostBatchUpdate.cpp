@@ -273,7 +273,7 @@ bool orionldPostBatchUpdate(void)
   for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     // No Entity from DB needed as all attributes are always overwritten
-    if (pCheckEntity(entityP, true, false) == false)
+    if (pCheckEntity(entityP, true) == false)
       return false;
   }
 
@@ -282,7 +282,7 @@ bool orionldPostBatchUpdate(void)
     // Simplified Format for the Duplicate Array
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pCheckEntity(entityP, true, false) == false)
+      if (pCheckEntity(entityP, true) == false)
         return false;
     }
   }

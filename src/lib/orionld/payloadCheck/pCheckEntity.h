@@ -39,8 +39,7 @@ extern "C"
 extern bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
-  bool     attrsExpanded  // Attribute names have been expanded already
+  bool     batch          // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
