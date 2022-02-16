@@ -65,6 +65,7 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
+#include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
@@ -213,8 +214,9 @@ bool orionldPostBatchCreate(void)
   // Attempts to create an entity more than once (more than one instance with the same Entity ID in the entity array)
   // shall result in an error message (part of 207 response) for all except the first instance (which shall work just fine)
   //
-  KjNode*  entityP = orionldState.requestTree->value.firstChildP;
-  KjNode*  next;
+  KjNode*          entityP       = orionldState.requestTree->value.firstChildP;
+  KjNode*          next;
+  OrionldContext*  savedContextP = orionldState.contextP;
 
   while (entityP != NULL)
   {
@@ -260,7 +262,17 @@ bool orionldPostBatchCreate(void)
       copyP = copyNext;
     }
 
-    // Entity ok, from a "repetition point of view", now, is it correct?
+    KjNode*                contextNodeP = kjLookup(entityP, "@context");
+    OrionldContext*        contextP     = NULL;
+    OrionldProblemDetails  pd;
+
+    if (contextNodeP != NULL)
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
+
+    if (contextP != NULL)
+      orionldState.contextP = contextP;
+
+    // Entity ok, from a "repetition point of view", now, let's make sure it's correct!
     if (pCheckEntity(entityP, true) == false)
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
@@ -269,6 +281,7 @@ bool orionldPostBatchCreate(void)
 
     entityP = next;
   }
+  orionldState.contextP = savedContextP;
 
   //
   // Now that:

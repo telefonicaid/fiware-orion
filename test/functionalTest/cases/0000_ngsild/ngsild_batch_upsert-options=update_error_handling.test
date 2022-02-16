@@ -448,18 +448,18 @@ echo
 01. Attempt to upsert with an entity having an id that is not a string - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 223
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errors": [
         {
-            "entityId": "invalid entity::id",
+            "entityId": "Invalid entity::id",
             "error": {
-                "detail": "entity::id",
+                "detail": "The Entity ID must be a string that is a valid URI",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "Not a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -498,7 +498,7 @@ Date: REGEX(.*)
 03. Attempt to upsert with an entity having an id with URI invalid - see error
 ==============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 201
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -507,9 +507,9 @@ Date: REGEX(.*)
         {
             "entityId": "ABC_123456",
             "error": {
-                "detail": "ABC_123456",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -523,7 +523,7 @@ Date: REGEX(.*)
 04. Attempt to upsert with an entity having a TYPE that is not a string - see error
 ===================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 230
+Content-Length: 235
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -532,9 +532,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:302",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -548,7 +548,7 @@ Date: REGEX(.*)
 05. Attempt to upsert with an entity without TYPE field - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 403
+Content-Length: 408
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -557,9 +557,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:302",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
@@ -580,7 +580,7 @@ Date: REGEX(.*)
 06. Attempt to upsert with an entity with 2 ID fields - see error
 =================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 223
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -589,9 +589,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
             "error": {
-                "detail": "entity::id",
+                "detail": "id",
                 "status": 400,
-                "title": "Duplicated field",
+                "title": "Duplicated field in an entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -605,7 +605,7 @@ Date: REGEX(.*)
 07. Attempt to upsert with an entity with 2 TYPE fields - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 223
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -614,9 +614,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
             "error": {
-                "detail": "entity::type",
+                "detail": "type",
                 "status": 400,
-                "title": "Duplicated field",
+                "title": "Duplicated field in an entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }

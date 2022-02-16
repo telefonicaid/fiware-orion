@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // Own interface
 
@@ -122,8 +121,8 @@ static bool kjTreeToContextElementAttributes
     else if (itemP->type != KjObject)  // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
     {
       LM_E(("Attribute '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
-      *titleP  = (char*) "invalid entity";
-      *detailP = (char*) "attribute must be a JSON object";
+      *titleP  = (char*) "attribute must be a JSON object";
+      *detailP = (char*) itemP->name;
 
       return false;
     }
@@ -184,7 +183,6 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     char*           detail;
     char*           entityId           = NULL;
     char*           entityType         = NULL;
-    char*           entityTypeExpanded = NULL;
     KjNode*         contextNodeP       = NULL;
     OrionldContext* contextP           = orionldState.contextP;
 
@@ -283,8 +281,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       entityType = dbEntityTypeP->value.s;
     }
 
-    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, true, NULL);  // entity type
-    if (entityTypeExpanded == NULL)
+    if (entityType == NULL)
     {
       LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to expand entity::type", detail, 400, false);
@@ -296,7 +293,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     EntityId*       entityIdP    = &ceP->entityId;
 
     entityIdP->id        = entityId;
-    entityIdP->type      = entityTypeExpanded;
+    entityIdP->type      = entityType;
     entityIdP->isPattern = "false";
 
     if (kjTreeToContextElementAttributes(contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)

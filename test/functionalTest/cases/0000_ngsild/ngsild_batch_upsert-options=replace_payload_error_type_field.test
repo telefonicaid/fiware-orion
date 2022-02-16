@@ -209,7 +209,7 @@ Date: REGEX(.*)
 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 289
+Content-Length: 334
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -218,7 +218,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:00001",
             "error": {
-                "detail": "Motorcycle",
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/Motorcycle",
                 "status": 400,
                 "title": "non-matching entity type",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

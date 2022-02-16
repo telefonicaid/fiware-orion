@@ -1,0 +1,204 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of attribute with JSON type not matching the @type in the @context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Attempt to create an entity with an attribute observedAt that is an Integer - see error
+# 02. Attempt to create an entity with an attribute observedAt that is a Boolean - see error
+# 03. Attempt to create an entity with an attribute observedAt that is a Float - see error
+# 04. Attempt to create an entity with an attribute observedAt that is an Array - see error
+# 05. Attempt to create an entity with an attribute observedAt as a normalized property - see error
+# 06. Attempt to create an entity with an attribute observedAt that is a String, but not a DateTime - see error
+#
+
+echo "01. Attempt to create an entity with an attribute observedAt that is an Integer - see error"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": 12
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create an entity with an attribute observedAt that is a Boolean - see error"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": true
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create an entity with an attribute observedAt that is a Float - see error"
+echo "========================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": 12.3
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create an entity with an attribute observedAt that is an Array - see error"
+echo "========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": [ 1, 2 ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create an entity with an attribute observedAt as a normalized property - see error"
+echo "================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": {
+    "type": "Property",
+    "value": "2022-02-16T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create an entity with an attribute observedAt that is a String, but not a DateTime - see error"
+echo "============================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "observedAt": "2022"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an entity with an attribute observedAt that is an Integer - see error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an entity with an attribute observedAt that is a Boolean - see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an entity with an attribute observedAt that is a Float - see error
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create an entity with an attribute observedAt that is an Array - see error
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create an entity with an attribute observedAt as a normalized property - see error
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create an entity with an attribute observedAt that is a String, but not a DateTime - see error
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Not a valid ISO8601 DateTime",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

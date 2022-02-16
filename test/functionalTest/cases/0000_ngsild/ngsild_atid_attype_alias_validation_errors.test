@@ -2062,7 +2062,7 @@ Date: REGEX(*.)
 26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error
 =====================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 299
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2071,18 +2071,18 @@ Date: REGEX(*.)
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -2094,7 +2094,7 @@ Date: REGEX(*.)
 27. Attempt to upsert - options=update - entities with entityOperations using @type invalid - see error
 =======================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 389
+Content-Length: 399
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2103,18 +2103,18 @@ Date: REGEX(*.)
         {
             "entityId": "urn:ngsi-ld:Vehicle:00001",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "urn:ngsi-ld:Vehicle:00002",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -2126,7 +2126,7 @@ Date: REGEX(*.)
 28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error
 ===============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 299
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2135,18 +2135,18 @@ Date: REGEX(*.)
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -2236,7 +2236,7 @@ Date: REGEX(*.)
 32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error
 ======================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 299
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2245,18 +2245,18 @@ Date: REGEX(*.)
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -2268,7 +2268,7 @@ Date: REGEX(*.)
 33. Attempt to upsert - options=replace - entities with entityOperations using @type invalid - see error
 ========================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 389
+Content-Length: 399
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2277,18 +2277,18 @@ Date: REGEX(*.)
         {
             "entityId": "urn:ngsi-ld:Vehicle:00004",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "urn:ngsi-ld:Vehicle:00005",
             "error": {
-                "detail": "entity::type",
+                "detail": "Int",
                 "status": 400,
-                "title": "field with invalid type",
+                "title": "The Entity Type must be a JSON String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -2300,7 +2300,7 @@ Date: REGEX(*.)
 34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error
 ================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 299
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -2309,18 +2309,18 @@ Date: REGEX(*.)
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
         {
             "entityId": "123",
             "error": {
-                "detail": "123",
+                "detail": "The Entity ID must be a valid URI",
                 "status": 400,
-                "title": "Not a URI",
+                "title": "Invalid URI",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }

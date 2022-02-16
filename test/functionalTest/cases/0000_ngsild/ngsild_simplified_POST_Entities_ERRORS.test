@@ -864,12 +864,12 @@ Date: REGEX(.*)
 41. POST /ngsi-ld/v1/entities, with a Relationship R1 whose object is a Number - see error
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 186
+Content-Length: 231
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "R1",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
     "title": "relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

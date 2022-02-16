@@ -42,7 +42,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
@@ -134,6 +134,41 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 
 // -----------------------------------------------------------------------------
 //
+// pCheckTypeFromContext -
+//
+bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
+{
+  if (attrContextInfoP       == NULL)  return true;
+  if (attrContextInfoP->type == NULL)  return true;
+
+  if (strcmp(attrContextInfoP->type, "DateTime") == 0)
+  {
+    if (attrP->type != KjString)
+    {
+      orionldError(OrionldBadRequestData,
+                   "JSON Type for attribute not according to @context @type field",
+                   attrP->name,
+                   400);
+      return false;
+    }
+
+    if (parse8601Time(attrP->value.s) == -1)
+    {
+      orionldError(OrionldBadRequestData,
+                   "Not a valid ISO8601 DateTime",
+                   attrP->name,
+                   400);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckAttributeString -
 //
 // A String is always a Property.
@@ -141,7 +176,13 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 // - if the attribute already existed, that it is a Property in the DB
 // - OR: it's a new attribute
 //
-inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
+inline bool pCheckAttributeString
+(
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
+)
 {
   PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
   PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
@@ -157,7 +198,13 @@ inline bool pCheckAttributeString(KjNode* attrP, bool isAttribute, OrionldAttrib
 //
 // pCheckAttributeInteger -
 //
-inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
+inline bool pCheckAttributeInteger
+(
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
+)
 {
   PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
   PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
@@ -173,7 +220,13 @@ inline bool pCheckAttributeInteger(KjNode* attrP, bool isAttribute, OrionldAttri
 //
 // pCheckAttributeFloat -
 //
-inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
+inline bool pCheckAttributeFloat
+(
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
+)
 {
   PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
   PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
@@ -189,7 +242,13 @@ inline bool pCheckAttributeFloat(KjNode* attrP, bool isAttribute, OrionldAttribu
 //
 // pCheckAttributeBoolean -
 //
-inline bool pCheckAttributeBoolean(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
+inline bool pCheckAttributeBoolean
+(
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
+)
 {
   PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
   PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
@@ -205,9 +264,17 @@ inline bool pCheckAttributeBoolean(KjNode* attrP, bool isAttribute, OrionldAttri
 //
 // pCheckAttributeArray -
 //
-inline bool pCheckAttributeArray(KjNode* attrP, bool isAttribute, OrionldAttributeType attrTypeFromDb)
+inline bool pCheckAttributeArray
+(
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
+)
 {
-  // ToDo: Check for datasetId !!!
+  PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+  PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
+
   KjNode* valueP = kjArray(orionldState.kjsonP,  "value");
 
   valueP->value.firstChildP = attrP->value.firstChildP;
@@ -407,7 +474,6 @@ bool multiAttributeArray(KjNode* attrArrayP, bool* errorP)
 }
 
 
-
 // -----------------------------------------------------------------------------
 //
 // pCheckAttributeObject -
@@ -423,13 +489,16 @@ bool multiAttributeArray(KjNode* attrArrayP, bool* errorP)
 //
 static bool pCheckAttributeObject
 (
-  KjNode*                 attrP,
-  bool                    isAttribute,
-  OrionldAttributeType    attrTypeFromDb
+  KjNode*               attrP,
+  bool                  isAttribute,
+  OrionldAttributeType  attrTypeFromDb,
+  OrionldContextItem*   attrContextInfoP
 )
 {
   OrionldAttributeType  attributeType = NoAttributeType;
   KjNode*               typeP;
+
+  LM_TMP(("KZ: The attribute '%s' is a JSON Object", attrP->name));
 
   // Check for errors in the input payload for the attribute type
   if (pCheckAttributeType(attrP, &typeP, false) == false)
@@ -746,16 +815,16 @@ bool pCheckAttribute
       return false;
     if (pCheckUri(attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
       return false;
+
+    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
   }
+
+  if (pCheckTypeFromContext(attrP, attrContextInfoP) == false)
+    return false;
 
   // Invalid name for attribute/sub-attribute?
   if (validAttrName(attrP->name, isAttribute) == false)
     return false;
-
-  if (attrContextInfoP != NULL)
-    LM_TMP(("KZ: type from context: %s", attrContextInfoP->type));
-  else
-    LM_TMP(("KZ: type from context: None"));
 
   if ((isAttribute == true) && (attrP->type == KjArray))
   {
@@ -801,12 +870,12 @@ bool pCheckAttribute
   //   We don't know which sub-attributes are special until we know the type of the attribute (Property, Relationship, etc)
   //   Postponed to ... all simple Property functions - pCheckAttribute[String|Integer|Float|Boolean] + pCheckAttributeObject (Geo)
   //
-  if      (attrP->type == KjString)  return pCheckAttributeString(attrP,  isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjInt)     return pCheckAttributeInteger(attrP, isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjFloat)   return pCheckAttributeFloat(attrP,   isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjBoolean) return pCheckAttributeBoolean(attrP, isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjArray)   return pCheckAttributeArray(attrP,   isAttribute, attrTypeFromDb);
-  else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, attrTypeFromDb);
+  if      (attrP->type == KjString)  return pCheckAttributeString(attrP,  isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjInt)     return pCheckAttributeInteger(attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjFloat)   return pCheckAttributeFloat(attrP,   isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjBoolean) return pCheckAttributeBoolean(attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjArray)   return pCheckAttributeArray(attrP,   isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, attrTypeFromDb, attrContextInfoP);
   else if (attrP->type == KjNull)    return pCheckAttributeNull(attrP);
 
   // Invalid JSON type of the attribute - we should never reach this point

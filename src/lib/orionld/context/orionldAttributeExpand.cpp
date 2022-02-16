@@ -57,7 +57,11 @@ char* orionldAttributeExpand
   else if (strcmp(shortName, "location")         == 0) return shortName;
   else if (strcmp(shortName, "observationSpace") == 0) return shortName;
   else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
-  else if (strcmp(shortName, "observedAt")       == 0) return shortName;
+  else if (strcmp(shortName, "observedAt")       == 0)
+  {
+    orionldContextItemExpand(contextP, shortName, false, contextItemPP);
+    return shortName;
+  }
 
   if (orionldContextItemAlreadyExpanded(shortName) == true)
     return shortName;

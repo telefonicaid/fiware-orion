@@ -67,7 +67,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
