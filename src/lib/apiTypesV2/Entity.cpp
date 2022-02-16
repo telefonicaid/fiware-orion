@@ -228,18 +228,24 @@ void Entity::filterAndOrderAttrs
       StringList                       attrL;
       std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
-     // for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
-     // {      
+     for (unsigned int ix = 0; ix < attrsFilter.size() ; ++ix)
+     {      
         //std::string subAttr = subAttrs[ix].String();
-       for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
-         {
 
             int found;
-	    if ((found = attributeVector.get(attrsFilter[jx])) != -1)
+	    if ((found = attributeVector.get(attrsFilter[ix])) != -1)
             {
               orderedAttrs->push_back(attributeVector[found]);
             }
-         }
+       }
+
+            /*if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
+            {
+              orderedAttrs->push_back(attributeVector[ix]);
+            }*/
+
+        }
+
       // orderedAttrs->push_back(subAttr);
      //  for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
      //  {
@@ -257,7 +263,6 @@ void Entity::filterAndOrderAttrs
 
    }
 
-}
 
 
 

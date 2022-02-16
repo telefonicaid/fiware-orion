@@ -43,6 +43,7 @@
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
+#include "ngsi10/UpdateContextRequest.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/connectionOperations.h"
 #include "mongoDriver/safeMongo.h"
@@ -312,20 +313,66 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
 */
 int ContextAttributeVector::get(const std::string& attributeName) const
 {
+//  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+//  {
+//added code anjali 
+/* orion::BSONObj  sub;
+ std::vector<std::string>         notificationAttrs;
+ std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+*/
+
+/*  for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
+  {
+    std::string subAttr = subAttrs[ix].String();
+    notificationAttrs.push_back(subAttr);*/
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-//added code anjali 
-//
     if (vec[ix]->name == attributeName)
+    {  
+ 
+      return ix;     
+    }
+    else
+    {
+    //  return ix;
+     // return vec[ix];
+   // }
+
+//Entity* EntityVector::lookup(const std::string& name, const std::string& type)
+//{
+const std::string type;
+const std::string value;   
+  
+//  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+//  {
+    vec[ix]->name == "new";
+    vec[ix]->type == "None";
+//    vec[ix]->value == null;
+      return ix;
+//  }
+}
+}
+
+
+
+//std::map<std::string, std::map<std::string, int> > perAttrTypes;
+    // if (vec[ix]->name == attributeName)
+    // if (vec[ix]->name == subAttrs)
+    // {
+    //   return ix;
+    // }
+    
+     /*else
      {
+        //return vec[ix];
        return ix;
-     }
-     else if (vec[ix]->name != attributeName)
+     }*/
+
+    /* else if (vec[ix]->name != attributeName)
      {
       return ix;
-     }
-   }
+     }*/
 //      orion::BSONObj  sub;
 //      std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
