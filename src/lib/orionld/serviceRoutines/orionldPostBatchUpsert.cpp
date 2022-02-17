@@ -254,7 +254,7 @@ bool orionldPostBatchUpsert(void)
       kjChildRemove(orionldState.requestTree, entityP);
     }
 
-    entityP =	next;
+    entityP = next;
   }
   orionldState.contextP = savedContextP;
 

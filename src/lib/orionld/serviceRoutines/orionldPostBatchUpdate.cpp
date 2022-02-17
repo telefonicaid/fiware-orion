@@ -74,6 +74,31 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// entityTypeChange -
+//
+static bool entityTypeChange(KjNode* entityP, KjNode* dbEntityP, char** newTypeP)
+{
+  KjNode*  newTypeNodeP  = kjLookup(entityP, "type");
+  char*    newType       = (newTypeNodeP != NULL)? newTypeNodeP->value.s : NULL;
+  KjNode*  oldTypeNodeP  = kjLookup(dbEntityP, "type");
+  char*    oldType       = (oldTypeNodeP != NULL)? oldTypeNodeP->value.s : NULL;
+
+  if ((newType != NULL) && (oldType != NULL))
+  {
+    if (strcmp(newType, oldType) != 0)  // They differ
+    {
+      *newTypeP = newType;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpdate -
@@ -131,6 +156,8 @@ bool orionldPostBatchUpdate(void)
   }
   else
   {
+    OrionldContext* savedContext = orionldState.contextP;
+
     for (KjNode* idEntity = idArray->value.firstChildP; idEntity != NULL; idEntity = idEntity->next)
     {
       char*    entityId      = idEntity->value.s;
@@ -154,57 +181,25 @@ bool orionldPostBatchUpdate(void)
         continue;
       }
 
-      KjNode*  inTypeP = kjLookup(entityP, "type");
+      if (contextNodeP != NULL)
+        orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
 
-      if (inTypeP != NULL)  // Make sure it's a string and compare with what's in the DB
+      if (pCheckEntity(entityP, true) == false)
       {
-        if (inTypeP->type != KjString)
-        {
-          LM_W(("Bad Input (Entity type is not a JSON string)"));
-          entityErrorPush(errorsArrayP,
-                          entityId,
-                          OrionldInternalError,
-                          "entity type is not a JSON string",
-                          kjValueType(inTypeP->type),
-                          400,
-                          false);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, false);
+        kjChildRemove(incomingTree, entityP);
+      }
 
-        //
-        // Compare the value with what's in the DB
-        //
-        KjNode* dbTypeP = kjLookup(dbEntityP, "type");
-
-        if (dbTypeP == NULL)
-        {
-          LM_E(("Internal Error (no entity type in DB)"));
-          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in DB", NULL, 500, true);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
-
-        OrionldContext* contextP = NULL;
-
-        if (contextNodeP != NULL)
-          contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
-        else if (orionldState.contextP != NULL)
-          contextP = orionldState.contextP;
-
-        if (contextP == NULL)
-          contextP = orionldCoreContextP;
-
-        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);  // entity type
-        if (strcmp(expandedType, dbTypeP->value.s) != 0)
-        {
-          LM_W(("Bad Input (non-matching entity type: '%s' vs '%s')", expandedType, dbTypeP->value.s));
-          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400, false);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
+      char* newType;
+      if (entityTypeChange(entityP, dbEntityP, &newType) == true)
+      {
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", newType, 400, false);
+        kjChildRemove(incomingTree, entityP);
+        continue;
       }
     }
+
+    orionldState.contextP = savedContext;
   }
 
 
@@ -266,27 +261,6 @@ bool orionldPostBatchUpdate(void)
     duplicatedInstances(incomingTree, idTypeAndCreDateFromDb, false, false, errorsArrayP);  // attributeReplace == false => existing attrs are ignored
   else
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);                     // attributeReplace == true => existing attrs are replaced
-
-  //
-  // Simplified Format
-  //
-  for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-  {
-    // No Entity from DB needed as all attributes are always overwritten
-    if (pCheckEntity(entityP, true) == false)
-      return false;
-  }
-
-  if ((troe == true) && (orionldState.duplicateArray != NULL))
-  {
-    // Simplified Format for the Duplicate Array
-    for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
-    {
-      if (pCheckEntity(entityP, true) == false)
-        return false;
-    }
-  }
-
 
   UpdateContextRequest  mongoRequest;
   KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
