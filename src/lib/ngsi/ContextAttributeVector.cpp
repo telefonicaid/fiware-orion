@@ -333,8 +333,12 @@ int ContextAttributeVector::get(const std::string& attributeName) const
  
       return ix;     
     }
-    else
-    {
+  
+  
+/*    {
+
+
+      Entity E1; 
     //  return ix;
      // return vec[ix];
    // }
@@ -346,14 +350,14 @@ const std::string value;
   
 //  for (unsigned int ix = 0; ix < vec.size(); ++ix)
 //  {
-    vec[ix]->name == "new";
-    vec[ix]->type == "None";
+    E1.name == attributeName;
+    E1.type == "None";
+    vec.push_back(E1);
+    return 
 //    vec[ix]->value == null;
-      return ix;
-//  }
+     // return ix;
+//  }*/
 }
-}
-
 
 
 //std::map<std::string, std::map<std::string, int> > perAttrTypes;

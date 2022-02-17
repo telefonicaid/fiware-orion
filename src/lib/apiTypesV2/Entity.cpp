@@ -236,15 +236,36 @@ void Entity::filterAndOrderAttrs
 	    if ((found = attributeVector.get(attrsFilter[ix])) != -1)
             {
               orderedAttrs->push_back(attributeVector[found]);
-            }
-       }
+           // }
+           // else
+           // {
+            bool covered             = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
 
-            /*if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
+            //covered check
+            if (covered == true)
             {
-              orderedAttrs->push_back(attributeVector[ix]);
-            }*/
 
-        }
+              alarmMgr.badInput(clientIp, "anjali covered log");
+            // if true then print atrr value
+            //orderedAttrs->push_back(""); //fill the notification elemnet making name as attribute name and type as NONE and value null
+            /* if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
+             {
+                orderedAttrs->push_back(attributeVector[ix]);
+             }*/
+
+             for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
+             {
+                std::string subAttr = subAttrs[ix].String();
+
+               // attrL.push_back(subAttr);
+                orderedAttrs->push_back(subAttr);
+             }
+
+
+            }
+            }
+
+      }
 
       // orderedAttrs->push_back(subAttr);
      //  for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
@@ -260,9 +281,8 @@ void Entity::filterAndOrderAttrs
         }*/
        }
      }
-
-   }
-
+}
+}
 
 
 
