@@ -29,6 +29,7 @@
 
 #include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/common/orionldState.h"                      // orionldState
+#include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
 #include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
 
 
@@ -105,6 +106,50 @@ do                                                                              
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \
   }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_SPECIAL_ATTRIBUTE
+//
+#define PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb)            \
+do                                                                              \
+{                                                                               \
+  if (attrTypeFromDb == NoAttributeType)                                        \
+  {                                                                             \
+    if (isAttribute == true)                                                    \
+    {                                                                           \
+      if ((strcmp(attrP->name, "location")         == 0) ||                     \
+          (strcmp(attrP->name, "observationSpace") == 0) ||                     \
+          (strcmp(attrP->name, "operationSpace")   == 0))                       \
+      {                                                                         \
+        orionldError(OrionldBadRequestData,                                     \
+                     "Invalid type for special GeoProperty attribute",          \
+                     attrP->name,                                               \
+                     400);                                                      \
+        return false;                                                           \
+      }                                                                         \
+    }                                                                           \
+  }                                                                             \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_NOT_A_PROPERTY -
+//
+#define PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb)                         \
+do                                                                           \
+{                                                                            \
+  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))   \
+  {                                                                          \
+    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);       \
+    orionldError(OrionldBadRequestData, title, attrP->name, 400);            \
+    return false;                                                            \
+  }                                                                          \
 } while (0)
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECK_H_

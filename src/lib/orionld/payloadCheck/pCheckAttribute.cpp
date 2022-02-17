@@ -54,50 +54,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// PCHECK_SPECIAL_ATTRIBUTE
-//
-#define PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb)            \
-do                                                                              \
-{                                                                               \
-  if (attrTypeFromDb == NoAttributeType)                                        \
-  {                                                                             \
-    if (isAttribute == true)                                                    \
-    {                                                                           \
-      if ((strcmp(attrP->name, "location")         == 0) ||                     \
-          (strcmp(attrP->name, "observationSpace") == 0) ||                     \
-          (strcmp(attrP->name, "operationSpace")   == 0))                       \
-      {                                                                         \
-        orionldError(OrionldBadRequestData,                                     \
-                     "Invalid type for special GeoProperty attribute",          \
-                     attrP->name,                                               \
-                     400);                                                      \
-        return false;                                                           \
-      }                                                                         \
-    }                                                                           \
-  }                                                                             \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PCHECK_NOT_A_PROPERTY -
-//
-#define PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb)                         \
-do                                                                           \
-{                                                                            \
-  if ((attrTypeFromDb != NoAttributeType) && (attrTypeFromDb != Property))   \
-  {                                                                          \
-    const char* title = attrTypeChangeTitle(attrTypeFromDb, Property);       \
-    orionldError(OrionldBadRequestData, title, attrP->name, 400);            \
-    return false;                                                            \
-  }                                                                          \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
 // attrTypeChangeTitle -
 //
 static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttributeType newType)
@@ -138,9 +94,14 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 //
 bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
 {
+  bool arrayReduction = true;
+
+  LM_TMP(("KZ: In pCheckTypeFromContext for %s", attrP->name));
+
   if (attrContextInfoP       == NULL)  return true;
   if (attrContextInfoP->type == NULL)  return true;
 
+  LM_TMP(("KZ: there is a type in the context object: %s", attrContextInfoP->type));
   if (strcmp(attrContextInfoP->type, "DateTime") == 0)
   {
     if (attrP->type != KjString)
@@ -159,6 +120,27 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
                    attrP->name,
                    400);
       return false;
+    }
+  }
+  else if (strcmp(attrContextInfoP->type, "@set") == 0)
+    arrayReduction = false;
+  else if (strcmp(attrContextInfoP->type, "@list") == 0)
+    arrayReduction = false;
+
+  //
+  // Array Reduction
+  //
+  if ((attrP->type == KjArray) && (arrayReduction == true))
+  {
+    LM_TMP(("KZ: It's an array, and arrayReduction is ON"));
+    if ((attrP->value.firstChildP != NULL) && (attrP->value.firstChildP->next == NULL))
+    {
+      KjNode* arrayItemP = attrP->value.firstChildP;
+
+      LM_TMP(("KZ: Reducing the array of ONE item"));
+      attrP->type      = arrayItemP->type;
+      attrP->value     = arrayItemP->value;
+      attrP->lastChild = arrayItemP->lastChild;  // Might be an array or object inside the array ...
     }
   }
 
@@ -606,6 +588,17 @@ static bool pCheckAttributeObject
     }
     else if (strcmp(fieldP->name, "value") == 0)
     {
+      if (fieldP->type == KjArray)
+      {
+        LM_TMP(("KZ: 'value' is a JSON %s - array reduction?", kjValueType(fieldP->type)));
+        if ((fieldP->value.firstChildP != NULL) && (fieldP->value.firstChildP->next == NULL))
+        {
+          LM_TMP(("KZ: YES - array reduction!"));
+          fieldP->lastChild = fieldP->value.firstChildP->lastChild;  // Might be an array or object inside the array ...
+          fieldP->type      = fieldP->value.firstChildP->type;
+          fieldP->value     = fieldP->value.firstChildP->value;
+        }
+      }
       if ((attributeType == Relationship) || (attributeType == LanguageProperty))
       {
         orionldError(OrionldBadRequestData, "Invalid member /value/", "valid for Property/GeoProperty attributes only", 400);

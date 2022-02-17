@@ -188,6 +188,12 @@ bool orionldPostEntities(void)
     return false;
   }
 
+  //
+  // payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  // from the payload body, so, the entity type is not expanded by pCheckEntity()
+  // It's done here instead
+  //
+  entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
 
   //
   // Check and fix the incoming payload (entity)
@@ -218,7 +224,7 @@ bool orionldPostEntities(void)
   entityIdP->creDate       = orionldState.requestTime;
   entityIdP->modDate       = orionldState.requestTime;
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity type
+  entityIdP->type          = entityType;
 
 
   //

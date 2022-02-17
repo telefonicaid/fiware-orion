@@ -442,9 +442,8 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   //
   // Expand name of attribute
   //
-  OrionldContextItem*  contextItemP = NULL;
-
-  kNodeP->name = orionldAttributeExpand(contextP, kNodeP->name, true, &contextItemP);
+  // OrionldContextItem*  contextItemP = NULL;
+  // kNodeP->name = orionldAttributeExpand(contextP, kNodeP->name, true, &contextItemP);
 
   //
   // This line had to be moced to the end of the function as it introduces a possible leak
@@ -553,28 +552,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     {
       DUPLICATE_CHECK(valueP, "attribute value", nodeP);
       // FIXME: "value" for Relationship Attribute should be added as metadata
-
-      //
-      // SINGLE ITEM ARRAY ?
-      //
-      // If the value of the attribute is an Array, and with only one item, then unless the @context item forbids it,
-      // the array should be dropped and only the array-item be left.
-      //
-
-      if (nodeP->type == KjArray)
-      {
-        if (nodeP->value.firstChildP == NULL)  // Empty Array
-        {
-        }
-        else if (nodeP->value.firstChildP->next == NULL)  // Only one item in the array
-        {
-          if ((contextItemP == NULL) || (contextItemP->type == NULL) || ((strcmp(contextItemP->type, "@list") != 0) && (strcmp(contextItemP->type, "@set") != 0)))
-          {
-            nodeP->type  = nodeP->value.firstChildP->type;
-            nodeP->value = nodeP->value.firstChildP->value;
-          }
-        }
-      }
     }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {

@@ -59,15 +59,12 @@ echo
 echo
 
 
-echo "03. Repeat step 1, but with an @context that suppressed the array reduction"
+echo "03. Repeat step 1, but with an @context that suppresses the array reduction"
 echo "==========================================================================="
 payload='{
   "id": "urn:ngsi-ld:Entity02",
   "type": "T1",
-  "P1": {
-    "type": "Property",
-    "value": [ 12 ]
-  },
+  "P1": [ 12 ],
   "@context": {
     "P1": {
       "@id": "urn:ngsi-ld:attrs:P1",
@@ -115,7 +112,7 @@ Date: REGEX(.*)
 }
 
 
-03. Repeat step 1, but with an @context that suppressed the array reduction
+03. Repeat step 1, but with an @context that suppresses the array reduction
 ===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0

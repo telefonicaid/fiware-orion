@@ -283,8 +283,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
 
     if (entityType == NULL)
     {
-      LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to expand entity::type", detail, 400, false);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to find entity::type", "not in payload nor in database", 400, false);
       entityP = next;
       continue;
     }
