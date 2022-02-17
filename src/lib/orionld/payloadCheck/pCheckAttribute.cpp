@@ -45,6 +45,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
 #include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // pCheckGeoPropertyValue
 #include "orionld/payloadCheck/pCheckAttributeType.h"            // pCheckAttributeType
@@ -117,6 +118,26 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
     {
       orionldError(OrionldBadRequestData,
                    "Not a valid ISO8601 DateTime",
+                   attrP->name,
+                   400);
+      return false;
+    }
+  }
+  else if (strcmp(attrContextInfoP->type, "@id") == 0)
+  {
+    if (attrP->type != KjString)
+    {
+      orionldError(OrionldBadRequestData,
+                   "JSON Type for attribute not according to @context @type field",
+                   attrP->name,
+                   400);
+      return false;
+    }
+
+    if (pCheckUri(attrP->value.s, true) == false)
+    {
+      orionldError(OrionldBadRequestData,
+                   "Not a valid URI",
                    attrP->name,
                    400);
       return false;

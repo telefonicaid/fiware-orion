@@ -130,7 +130,7 @@ bool troePostEntities(void)
   char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
   KjNode*  entityP     = orionldState.requestTree;
 
-  // Expand entity type and attribute names - FIXME: Remove once orionldPostEntities() has been fixed to do that
+  // Expand entity type and attribute names - orionldPostTemporalEntities doesn't do any expansion
   troeEntityExpand(entityP);
 
   if (entityType != NULL)

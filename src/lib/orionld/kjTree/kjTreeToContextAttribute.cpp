@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
@@ -216,10 +215,6 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   bool      isProperty      = false;
   bool      isRelationship  = false;
   char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
-
-  //
-  // FIXME: 'observedAt' is an API reserved word and should NEVER be expanded!
-  //
 
   if (SCOMPARE11(shortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
   {
@@ -438,17 +433,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     orionldState.httpStatusCode = 400;
     return false;
   }
-
-  //
-  // Expand name of attribute
-  //
-  // OrionldContextItem*  contextItemP = NULL;
-  // kNodeP->name = orionldAttributeExpand(contextP, kNodeP->name, true, &contextItemP);
-
-  //
-  // This line had to be moced to the end of the function as it introduces a possible leak
-  // caP->name    = kNodeP->name;
-  //
 
   //
   // For performance issues, all predefined names should have their char-sum precalculated

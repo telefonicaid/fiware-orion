@@ -38,6 +38,12 @@ brokerStart CB
 # 05. Attempt to create an entity with an attribute observedAt as a normalized property - see error
 # 06. Attempt to create an entity with an attribute observedAt that is a String, but not a DateTime - see error
 #
+# 07. Attempt to create an entity with an attribute 'object' that is not a string - see error
+# 08. Attempt to create an entity with an attribute 'object' that is a String, but not a URI - see error
+#
+# 98. Create an entity with two attributes: 'observedAt' and 'object'
+# 99. GET the entity
+#
 
 echo "01. Attempt to create an entity with an attribute observedAt that is an Integer - see error"
 echo "==========================================================================================="
@@ -110,6 +116,53 @@ payload='{
   "observedAt": "2022"
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create an entity with an attribute 'object' that is not a string - see error"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "object": {
+    "type": "Property",
+    "value": 12
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Attempt to create an entity with an attribute 'object' that is a String, but not a URI - see error"
+echo "======================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "object": "123"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "98. Create an entity with two attributes: 'observedAt' and 'object'"
+echo "==================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:weird",
+  "type": "T",
+  "object": "urn:ngsi-ld:entities:E2",
+  "observedAt": "2022-02-16T17:05:00"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "99. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:weird
 echo
 echo
 
@@ -196,6 +249,65 @@ Date: REGEX(.*)
     "detail": "observedAt",
     "title": "Not a valid ISO8601 DateTime",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create an entity with an attribute 'object' that is not a string - see error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 183
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/hasObject",
+    "title": "JSON Type for attribute not according to @context @type field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create an entity with an attribute 'object' that is a String, but not a URI - see error
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/hasObject",
+    "title": "Not a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+98. Create an entity with two attributes: 'observedAt' and 'object'
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:weird
+Date: REGEX(.*)
+
+
+
+99. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:weird",
+    "object": {
+        "type": "Property",
+        "value": "urn:ngsi-ld:entities:E2"
+    },
+    "observedAt": {
+        "type": "Property",
+        "value": "2022-02-16T17:05:00"
+    },
+    "type": "T"
 }
 
 

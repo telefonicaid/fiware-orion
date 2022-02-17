@@ -52,23 +52,6 @@ extern "C"
 //
 bool troePostEntity(void)
 {
-  //
-  // The service routine leaves us with the attributes expanded but the sub attributes NOT expanded
-  //
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (attrP->type == KjObject)      // Normal attribute
-      troeSubAttrsExpand(attrP);
-    else if (attrP->type == KjArray)  // An array with datasetId instances of the attribute
-    {
-      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
-      {
-        troeSubAttrsExpand(attrInstanceP);
-      }
-    }
-  }
-
-
   const char* opMode = (orionldState.uriParamOptions.noOverwrite == true)? "Append" : "Replace";
 
   PgAppendBuffer attributesBuffer;

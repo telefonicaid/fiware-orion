@@ -193,7 +193,10 @@ bool orionldPostEntities(void)
   // from the payload body, so, the entity type is not expanded by pCheckEntity()
   // It's done here instead
   //
+
+  // FIXME: Do this in MhdConnectionTreat instead !!!
   entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
+  orionldState.payloadTypeNode->value.s = entityType;
 
   //
   // Check and fix the incoming payload (entity)
