@@ -33,15 +33,12 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
-#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePatchAttribute.h"                   // Own interface
 
 
@@ -57,20 +54,9 @@ extern "C"
 //
 bool troePatchAttribute(void)
 {
-  // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
-  troeSubAttrsExpand(orionldState.requestTree);
-
-  char* entityId       = orionldState.wildcard[0];
-  char* attributeName  = orionldState.wildcard[1];
-
-  //
-  // pgAttributeBuild assumes the name of the attribute comes as part of the tree.
-  // So, let's name the tree then! :)
-  //
-  orionldState.requestTree->name = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
-
-  PgAppendBuffer attributes;
-  PgAppendBuffer subAttributes;
+  char*           entityId       = orionldState.wildcard[0];
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
 
   pgAppendInit(&attributes, 1024);  // Just a single attribute - 1024 should be enough
   pgAppendInit(&subAttributes, 4 * 1024);
