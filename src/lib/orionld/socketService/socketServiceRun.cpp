@@ -31,7 +31,6 @@
 #include "logMsg/logMsg.h"                                   // LM_*
 #include "logMsg/traceLevels.h"                              // Lmt*
 
-#include "orionld/db/dbConfiguration.h"                      // dbEntityRetrieve
 #include "orionld/socketService/socketService.h"             // SsHeader, SsMsgCode
 #include "orionld/socketService/socketServiceRun.h"          // Own interface
 

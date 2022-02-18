@@ -589,10 +589,8 @@ static int commaCount(char* s)
 //
 static bool uriParamAttrsFix(void)
 {
-  LM_TMP(("KZ: In uriParamAttrsFix"));
   int   items     = commaCount(orionldState.uriParams.attrs) + 1;
-  LM_TMP(("KZ: %d items", items));
-  char*	arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
 
   orionldState.in.attrsList.items = items;
   orionldState.in.attrsList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
@@ -615,12 +613,9 @@ static bool uriParamAttrsFix(void)
 
   for (int item = 0; item < items; item++)
   {
-    LM_TMP(("KZ: Expanding '%s'", orionldState.in.attrsList.array[item]));
     orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);
-    LM_TMP(("KZ: Expanded to '%s'", orionldState.in.attrsList.array[item]));
   }
 
-  LM_TMP(("KZ: From uriParamAttrsFix"));
   return true;
 }
 

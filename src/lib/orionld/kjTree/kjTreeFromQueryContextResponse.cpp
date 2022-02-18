@@ -342,7 +342,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, &valueMayBeCompacted, NULL);
 
       //
-      // If URI param attrList has been used, only matching attributes should be included in the response
+      // If URI param 'attrs' has been used, only matching attributes should be included in the response
       //
       if ((attrListExpanded != NULL) && (inAttrList(attrLongName, attrListExpanded, attrsInAttrList) == false))
         continue;

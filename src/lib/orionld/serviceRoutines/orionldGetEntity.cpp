@@ -360,38 +360,6 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 
 
 
-// -----------------------------------------------------------------------------
-//
-// attrsListToArray -
-//
-static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[], int attrVecLen, int* attrsCountP)
-{
-  int items = kStringSplit(attrList, ',', eqAttrV, attrVecLen);
-
-  dotAttrV[items] = NULL;
-  eqAttrV[items]  = NULL;
-
-  for (int ix = 0; ix < items; ix++)
-  {
-    if (strcmp(eqAttrV[ix], "location") != 0)
-    {
-      eqAttrV[ix]  = orionldAttributeExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
-      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-
-      // Copy eqAttrV[ix] before converting '.' to '=' - to not destroy the @context
-      eqAttrV[ix]  = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-      dotForEq(eqAttrV[ix]);
-    }
-    else
-      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-  }
-
-  *attrsCountP = items;
-  return eqAttrV;
-}
-
-
-
 // #define USE_MONGO_BACKEND 0
 // ----------------------------------------------------------------------------
 //
@@ -465,20 +433,24 @@ bool orionldGetEntity(void)
     orionldState.responseTree = kjTreeFromQueryContextResponse(true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
-  char*  dotAttrs[100];
-  char*  eqAttrs[100];
-  int    noOfAttrs      = 0;
-  bool   attrsMandatory = false;
+  bool attrsMandatory = false;
 
-  dotAttrs[0] = NULL;
-  eqAttrs[0]  = NULL;
+  //
+  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for dbEntityRetrieve
+  // Slightly modified as dbEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
+  //
+  char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrsList.items + 1));
 
-  if (orionldState.uriParams.attrs != NULL)
+  eqAttrV[orionldState.in.attrsList.items] = NULL;  // NULL-terminate the array
+
+  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
   {
-    attrsListToArray(orionldState.uriParams.attrs, dotAttrs, eqAttrs, 100, &noOfAttrs);
-    if (regArray == NULL)  // No matching registrations
-      attrsMandatory = true;
+    eqAttrV[ix] = kaStrdup(&orionldState.kalloc, orionldState.in.attrsList.array[ix]);
+    dotForEq(eqAttrV[ix]);
   }
+
+  if ((orionldState.in.attrsList.items > 0) && (regArray == NULL))  // attrs given, no matching registrations => no hit unless some attr present
+    attrsMandatory = true;
 
   char* geometryProperty = NULL;
   if (orionldState.out.contentType == GEOJSON)
@@ -494,7 +466,7 @@ bool orionldGetEntity(void)
   }
 
   orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
-                                               eqAttrs,
+                                               eqAttrV,
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
                                                orionldState.uriParamOptions.keyValues,
@@ -541,7 +513,7 @@ bool orionldGetEntity(void)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
+    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, orionldState.in.attrsList.array, orionldState.in.attrsList.items);
   }
 
   return true;
