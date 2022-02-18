@@ -282,7 +282,7 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'test/stress' in filename:
             is_orionld = True
-        elif 'archive/' in filename:
+        elif 'archive/orionld' in filename:
             is_orionld = True
         else:
             is_orionld = False
