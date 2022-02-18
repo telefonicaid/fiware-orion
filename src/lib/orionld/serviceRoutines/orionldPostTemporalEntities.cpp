@@ -102,7 +102,7 @@ bool orionldPostTemporalEntities(void)
   orionldState.payloadTypeNode->value.s = entityType;
 
   //
-  // Check/Expand all attributes (RHS can be Array or Object), using pCheckAttribute 
+  // Check/Expand all attributes (RHS can be Array or Object), using pCheckAttribute
   //
   // FIXME: location, observationSpace, operationSpace
   //
