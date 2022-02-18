@@ -117,7 +117,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, QueryContextResponse* responseP)
 {
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;

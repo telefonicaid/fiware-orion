@@ -468,7 +468,7 @@ bool orionldGetEntities(void)
   //
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
-  orionldState.responseTree = kjTreeFromQueryContextResponse(false, NULL, keyValues, &mongoResponse);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, &mongoResponse);
 
   //
   // Work-around for Accept: application/geo+json
