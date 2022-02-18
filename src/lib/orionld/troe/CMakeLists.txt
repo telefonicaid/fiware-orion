@@ -49,8 +49,6 @@ SET (SOURCES
     kjGeoMultiPolygonExtract.cpp
     kjGeoLineStringExtract.cpp
     kjGeoMultiLineStringExtract.cpp
-    troeEntityArrayExpand.cpp
-    troeSubAttrsExpand.cpp
     pgObservedAtExtract.cpp
     dbCreationCommand.cpp
     pgAppendInit.cpp
@@ -103,8 +101,6 @@ SET (HEADERS
     kjGeoMultiPolygonExtract.h
     kjGeoLineStringExtract.h
     kjGeoMultiLineStringExtract.h
-    troeEntityArrayExpand.h
-    troeSubAttrsExpand.h
     pgObservedAtExtract.h
     pgAppendInit.h
     pgAppend.h
