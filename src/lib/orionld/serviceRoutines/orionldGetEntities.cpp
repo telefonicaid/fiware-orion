@@ -145,10 +145,11 @@ bool orionldGetEntities(void)
   QueryContextResponse  mongoResponse;
 
   //
-  // FIXME: Move all this to orionldMhdConnectionInit()
+  // FIXME: Move this to orionldMhdConnectionInit()
   //
-  if ((id          != NULL) && (*id          == 0)) id          = NULL;
-//  if ((coordinates != NULL) && (*coordinates == 0)) coordinates = NULL;
+  if ((id != NULL) && (*id == 0))
+    id = NULL;
+
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
@@ -319,9 +320,23 @@ bool orionldGetEntities(void)
     typeVecItems  = 0;  // Just to avoid entering the "if (typeVecItems == 1)"
   }
   else
+  {
     typeVecItems = kStringSplit(type, ',', (char**) typeVector, typeVecItems);
 
-  idVecItems   = kStringSplit(id, ',', (char**) idVector, idVecItems);
+    if (typeVecItems == 1)  // type needs to be modified according to @context
+    {
+      //
+      // NOTE:
+      //   No expansion desired if the type is already FQN - however, this may
+      //   null out prefix expansion so, I've removed the call to pcheckUri() and I always expand ...
+      //
+      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
+
+      isTypePattern = false;  // Just in case ...
+    }
+  }
+
+  idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
 
   //
   // ID-list and Type-list at the same time is not supported
@@ -346,18 +361,6 @@ bool orionldGetEntities(void)
     }
   }
 
-  if (typeVecItems == 1)  // type needs to be modified according to @context
-  {
-    // FIXME:
-    //   No expansion desired if the type is already FQN - however, this may
-    //   null out prefix expansion so, I'veremoved the call to pcheckUri() and
-    //   I always expand ...
-    //
-    type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // entity type
-
-    isTypePattern = false;  // Just in case ...
-  }
-
   if (idVecItems > 1)  // A list of Entity IDs
   {
     for (int ix = 0; ix < idVecItems; ix++)
@@ -366,12 +369,12 @@ bool orionldGetEntities(void)
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
-  else if (typeVecItems > 1)  // A list of Entity Types
+  else if (typeVecItems > 1)  // A list of Entity Types instead of Entity IDs (both cannot co-exist)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
       if (pcheckUri(typeVector[ix], true, &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // entity type
+        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // URI Param 'type'
       else
         typeExpanded = typeVector[ix];
 
@@ -396,13 +399,7 @@ bool orionldGetEntities(void)
 
     for (int ix = 0; ix < attrsCount; ix++)
     {
-      if ((strcmp(attrsV[ix], "location")         != 0) &&
-          (strcmp(attrsV[ix], "observationSpace") != 0) &&
-          (strcmp(attrsV[ix], "operationSpace")   != 0))
-      {
-        attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);
-      }
-
+      attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);  // URI Param 'attrs'
       mongoRequest.attributeList.push_back(attrsV[ix]);
     }
   }
@@ -543,7 +540,7 @@ bool orionldGetEntities(void)
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
           (strcmp(geoPropertyName, "operationSpace")   != 0))
       {
-        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);
+        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);  // URI Param 'geoproperty'
 
         geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
         dotForEq(geoPropertyNameExpanded);

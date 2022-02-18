@@ -65,14 +65,23 @@ char* orionldContextItemExpand
   OrionldContextItem**  contextItemPP
 )
 {
-  OrionldContextItem* contextItemP;
-  char*               colonP;
+  OrionldContextItem*  contextItemP;
+  char*                colonP;
 
   if (contextP == NULL)
+  {
+    LM_TMP(("KX: no context - using core context"));
     contextP = orionldCoreContextP;
+  }
+
+  LM_TMP(("KX: Expanding '%s' using context '%s'", shortName, contextP->url));
 
   if ((colonP = strchr((char*) shortName, ':')) != NULL)
-    return orionldContextPrefixExpand(contextP, shortName, colonP);
+  {
+    char* longName = orionldContextPrefixExpand(contextP, shortName, colonP);
+    LM_TMP(("KX: Prefix-Expanded to '%s'", longName));
+    return longName;
+  }
 
   // 1. Lookup in Core Context
   contextItemP = orionldContextItemLookup(orionldCoreContextP, shortName, NULL);
@@ -95,6 +104,7 @@ char* orionldContextItemExpand
       if (contextItemPP != NULL)
         *contextItemPP = NULL;
 
+      LM_TMP(("KX: @vocab-expanded to '%s'", longName));
       return longName;
     }
 
@@ -105,5 +115,6 @@ char* orionldContextItemExpand
   if (contextItemPP != NULL)
     *contextItemPP = contextItemP;
 
+  LM_TMP(("KX: Expanded to '%s'", contextItemP->id));
   return contextItemP->id;
 }

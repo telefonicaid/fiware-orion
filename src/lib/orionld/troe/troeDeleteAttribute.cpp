@@ -36,7 +36,6 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
@@ -46,8 +45,6 @@ extern "C"
 #include "orionld/troe/troeDeleteAttribute.h"                  // Own interface
 
 
-// FIXME: Move to pgAttributeAppend.h/cpp
-
 
 // ----------------------------------------------------------------------------
 //
@@ -56,13 +53,12 @@ extern "C"
 bool troeDeleteAttribute(void)
 {
   char* entityId      = orionldState.wildcard[0];
-  char* attributeName = orionldState.wildcard[1];
+  char* attributeName = orionldState.wildcard[1];  // Already expanded by the service routine (orionldDeleteAttribute)
   char* attributeNameEq;
   char  instanceId[80];
 
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
-  attributeName   = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
   attributeNameEq = kaStrdup(&orionldState.kalloc, attributeName);
   dotForEq(attributeNameEq);
 

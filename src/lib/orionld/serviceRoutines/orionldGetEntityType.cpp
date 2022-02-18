@@ -128,7 +128,7 @@ bool orionldGetEntityType(void)
 {
   OrionldProblemDetails  pd;
   int                    entities;
-  char*                  typeExpanded = orionldContextItemExpand(orionldState.contextP, orionldState.wildcard[0], true, NULL);
+  char*                  typeExpanded = orionldContextItemExpand(orionldState.contextP, orionldState.wildcard[0], true, NULL);  // URL PATH
   char*                  typeAlias    = orionldContextItemAliasLookup(orionldState.contextP, typeExpanded, NULL, NULL);
   KjNode*                entityTypeV;
 

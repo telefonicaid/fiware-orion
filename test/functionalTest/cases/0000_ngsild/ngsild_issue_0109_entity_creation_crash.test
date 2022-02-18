@@ -51,7 +51,7 @@ payload='{
             "onstreet"
         ]
     },
-    "refParkingSite": {
+    "ParkingSite": {
         "type": "Relationship",
         "object": "urn:ngsi-ld:ParkingSite:santander:daoiz_velarde_1_5"
     },
@@ -99,12 +99,16 @@ Date: REGEX(.*)
 02. GET the entity, just to make sure all is A-OK
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 458
+Content-Length: 455
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
+    "ParkingSite": {
+        "object": "urn:ngsi-ld:ParkingSite:santander:daoiz_velarde_1_5",
+        "type": "Relationship"
+    },
     "category": {
         "type": "Property",
         "value": "onstreet"
@@ -123,10 +127,6 @@ Date: REGEX(.*)
     "name": {
         "type": "Property",
         "value": "A-13"
-    },
-    "refParkingSite": {
-        "object": "urn:ngsi-ld:ParkingSite:santander:daoiz_velarde_1_5",
-        "type": "Relationship"
     },
     "status": {
         "observedAt": "2018-09-21T12:00:00.000Z",

@@ -57,11 +57,11 @@ void kjEntityArrayErrorPurge(KjNode* incomingTree, KjNode* errorsArrayP, KjNode*
 
       if (entityObjectP != NULL)
       {
+        //
         // The entity from the 'incomingTree' IS PRESENT in the ERROR ARRAY - what about the SUCCESS ARRAY ?
-        entityObjectP = kjStringValueLookupInArray(successArrayP, eId->value.s);
-
         // Remove only if NOT PRESENT in success array
-        if (entityObjectP == NULL)
+        //
+        if (kjStringValueLookupInArray(successArrayP, eId->value.s) == NULL)
           kjChildRemove(incomingTree, entityObjectP);
       }
     }

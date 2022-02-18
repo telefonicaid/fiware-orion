@@ -168,10 +168,9 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, char* entit
     //
     // Got an attribute - if found in 'DB entity' OR in previous instance - then ignore it
     //
-    char*   attrName   = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
     KjNode* dbEntityP  = entityInstanceLookup(dbEntityV, entityId, NULL);
     KjNode* attrNamesP = kjLookup(dbEntityP, "attrNames");
-    KjNode* oldAttrP   = kjStringValueLookupInArray(attrNamesP, attrName);
+    KjNode* oldAttrP   = kjStringValueLookupInArray(attrNamesP, attrP->name);
 
     if (oldAttrP == NULL)
       oldAttrP = kjLookup(entityP, attrP->name);

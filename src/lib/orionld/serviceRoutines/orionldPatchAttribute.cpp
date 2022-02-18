@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -739,10 +740,11 @@ bool orionldPatchAttribute(void)
   if ((nodeP = kjLookup(inAttribute, "modifiedAt")) != NULL) kjChildRemove(inAttribute, nodeP);
 
 
-  char* attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
-  char* attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
-  dotForEq(attrNameExpandedEq);
+  OrionldContextItem*  contextItemP       = NULL;
+  char*                attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, &contextItemP);  // From URL PATH
+  char*                attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
 
+  dotForEq(attrNameExpandedEq);
   inAttribute->name = attrNameExpanded;
 
   //
@@ -782,7 +784,7 @@ bool orionldPatchAttribute(void)
   if (attrTypeInDb != NULL)
     attributeType = orionldAttributeType(attrTypeInDb);
 
-  if (pCheckAttribute(inAttribute, true, attributeType, true) == false)
+  if (pCheckAttribute(inAttribute, true, attributeType, true, contextItemP) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
@@ -837,12 +839,6 @@ bool orionldPatchAttribute(void)
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
   KjNode* inType = kjLookup(inAttribute, "type");
-
-  // Expand all sub-attributes
-  for (KjNode* saP = inAttribute->value.firstChildP; saP != NULL; saP = saP->next)
-  {
-    saP->name = orionldSubAttributeExpand(orionldState.contextP, saP->name, true, NULL);
-  }
 
   //
   // Save the incoming tree for TRoE

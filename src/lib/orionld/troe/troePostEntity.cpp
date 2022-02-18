@@ -40,8 +40,6 @@ extern "C"
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
-
-#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePostEntity.h"                       // Own interface
 
 
@@ -52,35 +50,16 @@ extern "C"
 //
 bool troePostEntity(void)
 {
-  //
-  // The service routine leaves us with the attributes expanded but the sub attributes NOT expanded
-  //
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (attrP->type == KjObject)      // Normal attribute
-      troeSubAttrsExpand(attrP);
-    else if (attrP->type == KjArray)  // An array with datasetId instances of the attribute
-    {
-      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
-      {
-        troeSubAttrsExpand(attrInstanceP);
-      }
-    }
-  }
-
-
-  const char* opMode = (orionldState.uriParamOptions.noOverwrite == true)? "Append" : "Replace";
-
-  PgAppendBuffer attributesBuffer;
-  PgAppendBuffer subAttributesBuffer;
+  const char*     opMode   = (orionldState.uriParamOptions.noOverwrite == true)? "Append" : "Replace";
+  char*           entityId = orionldState.wildcard[0];
+  PgAppendBuffer  attributesBuffer;
+  PgAppendBuffer  subAttributesBuffer;
 
   pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
   pgAppendInit(&subAttributesBuffer, 2*1024);  // ditto
 
   pgAppend(&attributesBuffer,    PG_ATTRIBUTE_INSERT_START,     0);
   pgAppend(&subAttributesBuffer, PG_SUB_ATTRIBUTE_INSERT_START, 0);
-
-  char*    entityId = orionldState.wildcard[0];
 
   pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, opMode, &subAttributesBuffer);
 

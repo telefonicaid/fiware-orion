@@ -62,8 +62,6 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
@@ -71,6 +69,31 @@ extern "C"
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityTypeChange -
+//
+static bool entityTypeChange(KjNode* entityP, KjNode* dbEntityP, char** newTypeP)
+{
+  KjNode*  newTypeNodeP  = kjLookup(entityP, "type");
+  char*    newType       = (newTypeNodeP != NULL)? newTypeNodeP->value.s : NULL;
+  KjNode*  oldTypeNodeP  = kjLookup(dbEntityP, "type");
+  char*    oldType       = (oldTypeNodeP != NULL)? oldTypeNodeP->value.s : NULL;
+
+  if ((newType != NULL) && (oldType != NULL))
+  {
+    if (strcmp(newType, oldType) != 0)  // They differ
+    {
+      *newTypeP = newType;
+      return true;
+    }
+  }
+
+  return false;
+}
 
 
 
@@ -128,84 +151,77 @@ bool orionldPostBatchUpdate(void)
       entityP = entityLookupById(incomingTree, idEntity->value.s);
       kjChildRemove(incomingTree, entityP);
     }
+
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
+    kjChildAdd(orionldState.responseTree, successArrayP);
+    kjChildAdd(orionldState.responseTree, errorsArrayP);
+
+    orionldState.out.contentType = JSON;
+    orionldState.httpStatusCode  = 207;
+
+    return true;
   }
-  else
+
+
+  LM_TMP(("KZ: Looping over all entities in the input array"));
+  OrionldContext* savedContext = orionldState.contextP;
+  for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    for (KjNode* idEntity = idArray->value.firstChildP; idEntity != NULL; idEntity = idEntity->next)
+    KjNode*  idNodeP       = kjLookup(entityP, "id");
+    KjNode*  atidNodeP     = kjLookup(entityP, "@id");
+    char*    entityId;
+
+    if (idNodeP == NULL)
+      idNodeP = atidNodeP;
+
+    if (idNodeP == NULL)
     {
-      char*    entityId      = idEntity->value.s;
-      KjNode*  entityP       = entityLookupById(incomingTree, entityId);
+      entityErrorPush(errorsArrayP, "No entity id", OrionldBadRequestData, "entity without id", NULL, 400, false);
+      continue;
+    }
 
-      if (entityP == NULL)  // This should never happen ...
-      {
-        LM_E(("Internal Error (Unable to find entity '%s')", entityId));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity disappeared from incomingTree", NULL, 500, false);
-        continue;
-      }
+    if (idNodeP->type != KjString)
+    {
+      entityErrorPush(errorsArrayP, "Invalid entity id", OrionldBadRequestData, "entity::id must be a JSON String", kjValueType(idNodeP->type), 400, false);
+      continue;
+    }
 
-      KjNode*                contextNodeP  = kjLookup(entityP, "@context");
-      OrionldProblemDetails  pd;
-      KjNode*                dbEntityP     = entityLookupById(idTypeAndCreDateFromDb, entityId);
+    entityId = idNodeP->value.s;
 
-      if (dbEntityP == NULL)
-      {
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "entity does not exist", NULL, 400, true);
-        kjChildRemove(incomingTree, entityP);
-        continue;
-      }
+    // Not existing entities cannot be updated
+    KjNode* dbEntityP = entityLookupById(idTypeAndCreDateFromDb, entityId);
+    if (dbEntityP == NULL)
+    {
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "entity does not exist", NULL, 400, true);
+      kjChildRemove(incomingTree, entityP);
+      continue;
+    }
 
-      KjNode*  inTypeP = kjLookup(entityP, "type");
+    // If @context inpayload body, it needs to be respected
+    KjNode*                contextNodeP  = kjLookup(entityP, "@context");
+    OrionldProblemDetails  pd;
+    if (contextNodeP != NULL)
+      orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
 
-      if (inTypeP != NULL)  // Make sure it's a string and compare with what's in the DB
-      {
-        if (inTypeP->type != KjString)
-        {
-          LM_W(("Bad Input (Entity type is not a JSON string)"));
-          entityErrorPush(errorsArrayP,
-                          entityId,
-                          OrionldInternalError,
-                          "entity type is not a JSON string",
-                          kjValueType(inTypeP->type),
-                          400,
-                          false);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
+    // Checking the entity and turning it Normalized
+    LM_TMP(("KZ: Calling pCheckEntity for the entity '%s'", entityId));
+    if (pCheckEntity(entityP, true) == false)
+    {
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, false);
+      kjChildRemove(incomingTree, entityP);
+    }
 
-        //
-        // Compare the value with what's in the DB
-        //
-        KjNode* dbTypeP = kjLookup(dbEntityP, "type");
-
-        if (dbTypeP == NULL)
-        {
-          LM_E(("Internal Error (no entity type in DB)"));
-          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in DB", NULL, 500, true);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
-
-        OrionldContext* contextP = NULL;
-
-        if (contextNodeP != NULL)
-          contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
-        else if (orionldState.contextP != NULL)
-          contextP = orionldState.contextP;
-
-        if (contextP == NULL)
-          contextP = orionldCoreContextP;
-
-        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);  // entity type
-        if (strcmp(expandedType, dbTypeP->value.s) != 0)
-        {
-          LM_W(("Bad Input (non-matching entity type: '%s' vs '%s')", expandedType, dbTypeP->value.s));
-          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400, false);
-          kjChildRemove(incomingTree, entityP);
-          continue;
-        }
-      }
+    char* newType;
+    if (entityTypeChange(entityP, dbEntityP, &newType) == true)
+    {
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", newType, 400, false);
+      kjChildRemove(incomingTree, entityP);
+      continue;
     }
   }
+  orionldState.contextP = savedContext;
+
 
 
   //
@@ -226,30 +242,16 @@ bool orionldPostBatchUpdate(void)
       //
       KjNode* aP = entityP->value.firstChildP;
       KjNode* next;
+
       while (aP != NULL)
       {
         next = aP->next;
 
         if ((strcmp(aP->name, "id") != 0) && (strcmp(aP->name, "type") != 0))
         {
-          char* longName = aP->name;
-
-          if ((strcmp(aP->name, "location")         == 0) ||
-              (strcmp(aP->name, "observationSpace") == 0) ||
-              (strcmp(aP->name, "operationSpace")   == 0))
-          {
-          }
-          else if ((strcmp(aP->name, "createdAt")  == 0) ||
-                   (strcmp(aP->name, "modifiedAt") == 0))
-          {
+          if ((strcmp(aP->name, "createdAt")  == 0) || (strcmp(aP->name, "modifiedAt") == 0))
             kjChildRemove(entityP, aP);
-            aP = next;
-            continue;
-          }
-          else
-            longName = orionldAttributeExpand(orionldState.contextP, aP->name, true, NULL);
-
-          if (kjStringValueLookupInArray(attrNames, longName) != NULL)
+          else if (kjStringValueLookupInArray(attrNames, aP->name) != NULL)
             kjChildRemove(entityP, aP);
         }
 
@@ -267,27 +269,6 @@ bool orionldPostBatchUpdate(void)
   else
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);                     // attributeReplace == true => existing attrs are replaced
 
-  //
-  // Simplified Format
-  //
-  for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-  {
-    // No Entity from DB needed as all attributes are always overwritten
-    if (pCheckEntity(entityP, true, false) == false)
-      return false;
-  }
-
-  if ((troe == true) && (orionldState.duplicateArray != NULL))
-  {
-    // Simplified Format for the Duplicate Array
-    for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
-    {
-      if (pCheckEntity(entityP, true, false) == false)
-        return false;
-    }
-  }
-
-
   UpdateContextRequest  mongoRequest;
   KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
 
@@ -295,14 +276,13 @@ bool orionldPostBatchUpdate(void)
 
   kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
 
-  //
-  // 03. Set 'modDate' to "RIGHT NOW"
-  //
-  time_t now = time(NULL);
 
+  //
+  // 03. Set 'modDate' to "The time when the request entered"
+  //
   for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.size(); ++ix)
   {
-    mongoRequest.contextElementVector[ix]->entityId.modDate = now;
+    mongoRequest.contextElementVector[ix]->entityId.modDate = orionldState.requestTime;
   }
 
 

@@ -172,7 +172,7 @@ Date: REGEX(.*)
 02. Attempt to upsert/create an entity with a duplicated entity id
 ==================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 196
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -181,9 +181,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E3",
             "error": {
-                "detail": "entity::id",
+                "detail": "id",
                 "status": 400,
-                "title": "Duplicated field",
+                "title": "Duplicated field in an entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -195,7 +195,7 @@ Date: REGEX(.*)
 03. Attempt to upsert/create an entity with a duplicated entity type
 ====================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 198
+Content-Length: 203
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -204,9 +204,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E3",
             "error": {
-                "detail": "entity::type",
+                "detail": "type",
                 "status": 400,
-                "title": "Duplicated field",
+                "title": "Duplicated field in an entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -264,7 +264,7 @@ Date: REGEX(.*)
 06. Attempt to upsert/update an entity with a non-matching entity type (E1/TT)
 ==============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 196
+Content-Length: 241
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -273,7 +273,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E1",
             "error": {
-                "detail": "TT",
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/TT",
                 "status": 400,
                 "title": "non-matching entity type",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

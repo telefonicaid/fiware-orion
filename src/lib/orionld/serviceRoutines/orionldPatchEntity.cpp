@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -136,11 +137,12 @@ bool orionldPatchEntity(void)
   //    Those that do exist in dbEntityP are removed from dbEntityP and replaced with the corresponding attribute from the incoming payload data.
   //    (finally the modified dbEntityP will REPLACE what is currently in the database)
   //
-  KjNode* newAttrP     = orionldState.requestTree->value.firstChildP;
-  KjNode* next;
-  KjNode* updatedP     = kjArray(orionldState.kjsonP, "updated");
-  KjNode* notUpdatedP  = kjArray(orionldState.kjsonP, "notUpdated");
-  int     newAttrs     = 0;
+  KjNode*              newAttrP     = orionldState.requestTree->value.firstChildP;
+  KjNode*              next;
+  KjNode*              updatedP     = kjArray(orionldState.kjsonP, "updated");
+  KjNode*              notUpdatedP  = kjArray(orionldState.kjsonP, "notUpdated");
+  int                  newAttrs     = 0;
+  OrionldContextItem*  contextItemP = NULL;
 
   while (newAttrP != NULL)
   {
@@ -202,7 +204,7 @@ bool orionldPatchEntity(void)
     if (dbTypeP != NULL)
       attributeType = orionldAttributeType(dbTypeP->value.s);
 
-    if (pCheckAttribute(newAttrP, true, attributeType, true) == false)
+    if (pCheckAttribute(newAttrP, true, attributeType, true, contextItemP) == false)
     {
       //
       // A failure will set a 400 (probably) in orionldState.pd.status

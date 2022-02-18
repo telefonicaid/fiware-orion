@@ -33,7 +33,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
 
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
@@ -42,8 +41,7 @@ extern "C"
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
-#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
-#include "orionld/troe/troePostEntities.h"                     // Own interface
+#include "orionld/troe/troePostBatchUpdate.h"                  // Own interface
 
 
 
@@ -65,14 +63,12 @@ bool troePostBatchUpdate(void)
 
   if (orionldState.duplicateArray != NULL)
   {
-    troeEntityArrayExpand(orionldState.duplicateArray);
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
       pgAttributesBuild(&attributes, entityP, NULL, attributeTroeMode, &subAttributes);
     }
   }
 
-  troeEntityArrayExpand(orionldState.requestTree);
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     if (troeIgnored(entityP) == true)

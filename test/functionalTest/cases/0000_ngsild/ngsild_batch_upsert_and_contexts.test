@@ -726,7 +726,7 @@ Date: REGEX(.*)
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1595
+Content-Length: 1596
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -768,7 +768,7 @@ Date: REGEX(.*)
     "origin": "Downloaded",
     "createdAt": "202REGEX(.*)",
     "lastUse": "202REGEX(.*)",
-    "lookups": 5,
+    "lookups": 10,
     "URLs": [
       "https://fiware.github.io/data-models/context.jsonld"
     ]
@@ -1023,7 +1023,7 @@ Date: REGEX(.*)
     "origin": "Downloaded",
     "createdAt": "202REGEX(.*)",
     "lastUse": "202REGEX(.*)",
-    "lookups": 16,
+    "lookups": 21,
     "URLs": [
       "https://fiware.github.io/data-models/context.jsonld"
     ]

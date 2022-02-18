@@ -85,7 +85,7 @@ void troeEntityArrayExpand(KjNode* tree)
       else if (strcmp(attrP->name, "id")       == 0) {}
       else
       {
-        attrP->name = orionldAttributeExpand(contextP, attrP->name, true, NULL);
+        attrP->name = orionldAttributeExpand(contextP, attrP->name, true, NULL);  // Could be avoided with pCheckEntity
 
         if (attrP->type == KjObject)
         {

@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
+#include "orionld/context/OrionldContextItem.h"               // OrionldContextItem
 
 
 
@@ -50,7 +51,8 @@ extern bool pCheckAttribute
   KjNode*                 attrP,
   bool                    isAttribute,
   OrionldAttributeType    attrTypeFromDb,
-  bool                    attrNameAlreadyExpanded
+  bool                    attrNameAlreadyExpanded,
+  OrionldContextItem*     attrContextInfoP
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_

@@ -61,13 +61,12 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/common/CHECK.h"                                // CHECK_*
+#include "orionld/common/CHECK.h"                                // CHECK_*    FIXME: Use PCHECK_* instead
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -82,10 +81,7 @@ extern "C"
 //
 static KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName)
 {
-  char* longName;
-
-  longName      = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
-  attributeName = kaStrdup(&orionldState.kalloc, longName);
+  attributeName = kaStrdup(&orionldState.kalloc, attributeName);
   dotForEq(attributeName);
 
   //
@@ -189,11 +185,19 @@ bool orionldPostEntities(void)
     return false;
   }
 
+  //
+  // payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  // from the payload body, so, the entity type is not expanded by pCheckEntity()
+  // It's done here instead
+  //
+
+  entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
+  orionldState.payloadTypeNode->value.s = entityType;
 
   //
   // Check and fix the incoming payload (entity)
   //
-  if (pCheckEntity(orionldState.requestTree, false, false) == false)
+  if (pCheckEntity(orionldState.requestTree, false) == false)
     return false;
 
   //
@@ -219,7 +223,7 @@ bool orionldPostEntities(void)
   entityIdP->creDate       = orionldState.requestTime;
   entityIdP->modDate       = orionldState.requestTime;
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity type
+  entityIdP->type          = entityType;
 
 
   //
@@ -286,11 +290,10 @@ bool orionldPostEntities(void)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      char*  longName = orionldAttributeExpand(orionldState.contextP, kNodeP->name, true, NULL);
+      char*  longNameEq = kaStrdup(&orionldState.kalloc, kNodeP->name);
 
-      longName = kaStrdup(&orionldState.kalloc, longName);
-      dotForEq(longName);
-      kNodeP->name = longName;
+      dotForEq(longNameEq);
+      kNodeP->name = longNameEq;
 
       kNodeP = next;
 

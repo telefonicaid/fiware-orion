@@ -49,10 +49,19 @@ char* orionldAttributeExpand
   OrionldContextItem**  contextItemPP
 )
 {
-  if      (strcmp(shortName, "location")         == 0) return shortName;
+  if      (strcmp(shortName, "id")               == 0) return shortName;
+  else if (strcmp(shortName, "@id")              == 0) return shortName;
+  else if (strcmp(shortName, "type")             == 0) return shortName;
+  else if (strcmp(shortName, "@type")            == 0) return shortName;
+  else if (strcmp(shortName, "scope")            == 0) return shortName;
+  else if (strcmp(shortName, "location")         == 0) return shortName;
   else if (strcmp(shortName, "observationSpace") == 0) return shortName;
   else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
-  else if (strcmp(shortName, "observedAt")       == 0) return shortName;
+  else if (strcmp(shortName, "observedAt")       == 0)
+  {
+    orionldContextItemExpand(contextP, shortName, false, contextItemPP);
+    return shortName;
+  }
 
   if (orionldContextItemAlreadyExpanded(shortName) == true)
     return shortName;

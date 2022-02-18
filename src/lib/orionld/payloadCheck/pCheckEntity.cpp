@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
@@ -97,8 +98,8 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
     return false;
   }
 
-  PCHECK_STRING(attrP,              0, "Bad Request", "The Entity Type must be a string", 400);
-  PCHECK_URI(attrP->value.s, false, 0, "Bad Request", "Invalid Entity Type",              400);
+  PCHECK_STRING(attrP,              0, "The Entity Type must be a JSON String", kjValueType(attrP->type), 400);
+  PCHECK_URI(attrP->value.s, false, 0, "Invalid URI",                           "Invalid Entity Type",    400);
 
   return true;
 }
@@ -126,8 +127,7 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
 bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
-  bool     attrsExpanded  // Attribute names have been expanded already
+  bool     batch          // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
 )
 {
   // Remove builtin timestamps, if present
@@ -164,11 +164,14 @@ bool pCheckEntity
       if (typeCheck(attrP, typeP) == false)
         return false;
       typeP = attrP;
+
+      // Must expand the entity type
+      typeP->value.s = orionldContextItemExpand(orionldState.contextP, typeP->value.s, true, NULL);
       continue;
     }
 
     LM_TMP(("KZ: Calling pCheckAttribute(%s)", attrP->name));
-    if (pCheckAttribute(attrP, true, NoAttributeType, attrsExpanded) == false)
+    if (pCheckAttribute(attrP, true, NoAttributeType, false, NULL) == false)
       return false;
   }
 

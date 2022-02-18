@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
@@ -216,10 +215,6 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   bool      isProperty      = false;
   bool      isRelationship  = false;
   char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
-
-  //
-  // FIXME: 'observedAt' is an API reserved word and should NEVER be expanded!
-  //
 
   if (SCOMPARE11(shortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
   {
@@ -440,18 +435,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   }
 
   //
-  // Expand name of attribute
-  //
-  OrionldContextItem*  contextItemP = NULL;
-
-  kNodeP->name = orionldAttributeExpand(contextP, kNodeP->name, true, &contextItemP);
-
-  //
-  // This line had to be moced to the end of the function as it introduces a possible leak
-  // caP->name    = kNodeP->name;
-  //
-
-  //
   // For performance issues, all predefined names should have their char-sum precalculated
   // Advantage: just a simple integer comparison before we do the complete string-comparisom
   //
@@ -553,28 +536,6 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     {
       DUPLICATE_CHECK(valueP, "attribute value", nodeP);
       // FIXME: "value" for Relationship Attribute should be added as metadata
-
-      //
-      // SINGLE ITEM ARRAY ?
-      //
-      // If the value of the attribute is an Array, and with only one item, then unless the @context item forbids it,
-      // the array should be dropped and only the array-item be left.
-      //
-
-      if (nodeP->type == KjArray)
-      {
-        if (nodeP->value.firstChildP == NULL)  // Empty Array
-        {
-        }
-        else if (nodeP->value.firstChildP->next == NULL)  // Only one item in the array
-        {
-          if ((contextItemP == NULL) || (contextItemP->type == NULL) || ((strcmp(contextItemP->type, "@list") != 0) && (strcmp(contextItemP->type, "@set") != 0)))
-          {
-            nodeP->type  = nodeP->value.firstChildP->type;
-            nodeP->value = nodeP->value.firstChildP->value;
-          }
-        }
-      }
     }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {

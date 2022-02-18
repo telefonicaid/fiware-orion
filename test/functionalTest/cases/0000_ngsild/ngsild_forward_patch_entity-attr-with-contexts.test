@@ -208,7 +208,7 @@ Date: REGEX(.*)
 06. GET the entity from CP1 - see that tweets has changed
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 128
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -217,9 +217,7 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:Building:store001",
     "tweets": {
         "type": "Property",
-        "value": [
-            "I never could get the hang of Thursdays"
-        ]
+        "value": "I never could get the hang of Thursdays"
     },
     "type": "T"
 }
@@ -228,5 +226,5 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
-#dbDrop CB
+dbDrop CB
 dbDrop CP1

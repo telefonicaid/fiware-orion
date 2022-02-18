@@ -58,7 +58,7 @@ payload=' [
       "type": "Property",
       "value": "unhealthy"
     },
-    "refPointOfInterest": {
+    "refPointOfHinterest": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
     },
@@ -102,7 +102,7 @@ payload=' [
       "type": "Property",
       "value": "unhealthy"
     },
-    "refPointOfInterest": {
+    "refPointOfHinterest": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
     },
@@ -152,7 +152,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.fiware.org/ns/data-models#dateObserved",
 		"https://uri.fiware.org/ns/data-models#airQualityLevel",
 		"https://uri.etsi.org/ngsi-ld/default-context/CO_Level",
-		"https://uri.fiware.org/ns/data-models#refPointOfInterest"
+		"https://uri.etsi.org/ngsi-ld/default-context/refPointOfHinterest"
 	],
 	"attrs" : {
 		"https://uri=fiware=org/ns/data-models#dateObserved" : {
@@ -179,7 +179,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "unhealthy",
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/data-models#refPointOfInterest" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/refPointOfHinterest" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 04. GET the entity, see the updated values
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 515
+Content-Length: 478
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -225,11 +225,11 @@ Date: REGEX(.*)
             "@value": "2018-08-12T12:00:00Z"
         }
     },
-    "https://uri.fiware.org/ns/data-models#refPointOfInterest": {
+    "id": "urn:ngsi-ld:testunit:125",
+    "refPointOfHinterest": {
         "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict",
         "type": "Relationship"
     },
-    "id": "urn:ngsi-ld:testunit:125",
     "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
 }
 

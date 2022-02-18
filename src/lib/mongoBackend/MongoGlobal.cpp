@@ -1312,7 +1312,7 @@ bool entitiesQuery
             //
             if ((orionldState.uriParams.geoproperty != NULL) && (strcmp(orionldState.uriParams.geoproperty, "location") != 0))
             {
-              attrNameP = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
+              attrNameP = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // URI Param 'geoproperty'
               dotForEq(attrNameP);
             }
 
