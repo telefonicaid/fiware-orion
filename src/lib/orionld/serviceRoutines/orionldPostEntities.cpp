@@ -61,7 +61,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/common/CHECK.h"                                // CHECK_*
+#include "orionld/common/CHECK.h"                                // CHECK_*    FIXME: Use PCHECK_* instead
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType

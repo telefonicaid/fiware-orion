@@ -33,14 +33,14 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                     // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                            // orionldState
-#include "orionld/common/orionldErrorResponse.h"                    // orionldErrorResponseCreate
-#include "orionld/common/CHECK.h"                                   // OBJECT_CHECK
 #include "orionld/common/numberToDate.h"                            // numberToDate
-#include "orionld/rest/OrionLdRestService.h"                        // OrionLdRestService
-#include "orionld/payloadCheck/pcheckEntity.h"                      // pcheckEntity
-#include "orionld/payloadCheck/pcheckUri.h"                         // pcheckUri
+#include "orionld/context/orionldContextItemExpand.h"               // orionldContextItemExpand
+#include "orionld/payloadCheck/PCHECK.h"                            // PCHECK_*
+#include "orionld/payloadCheck/pCheckEntityId.h"                    // pCheckEntityId
+#include "orionld/payloadCheck/pCheckEntityType.h"                  // pCheckEntityType
+#include "orionld/payloadCheck/pCheckAttribute.h"                   // pCheckAttribute
+#include "orionld/mongoBackend/mongoEntityExists.h"                 // mongoEntityExists
 #include "orionld/troe/troePostEntities.h"                          // troePostEntities
-#include "orionld/mongoBackend/mongoEntityExists.h"                  // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"    // Own Interface
 
 
@@ -87,39 +87,49 @@ extern "C"
 //
 bool orionldPostTemporalEntities(void)
 {
-  OBJECT_CHECK(orionldState.requestTree, "toplevel");
-
-  char*    detail;
-  KjNode*  locationP          = NULL;
-  KjNode*  observationSpaceP  = NULL;
-  KjNode*  operationSpaceP    = NULL;
-  KjNode*  createdAtP         = NULL;
-  KjNode*  modifiedAtP        = NULL;
-
-  if (pcheckEntity(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
-    return false;
-
-  char*    entityId           = orionldState.payloadIdNode->value.s;
-  char*    entityType         = orionldState.payloadTypeNode->value.s;
-
+  char*    entityId;
+  char*    entityType;
 
   //
-  // Entity ID and TYPE
+  // Check the entity id and type
   //
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");  // FIXME: Include 'detail' and name (entityId)
-    return false;
-  }
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "To create an Entity, a JSON OBJECT describing the entity must be provided", 400);
 
-  if (pcheckUri(entityType, false, &detail) == false)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity Type", detail);  // FIXME: Include 'detail' and name (entityId)
-    return false;
-  }
+  if (pCheckEntityId(orionldState.payloadIdNode,     true, &entityId)   == false)   return false;
+  if (pCheckEntityType(orionldState.payloadTypeNode, true, &entityType) == false)   return false;
 
+  entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
+  orionldState.payloadTypeNode->value.s = entityType;
+
+  //
+  // Check/Expand all attributes (RHS can be Array or Object), using pCheckAttribute 
+  //
+  // FIXME: location, observationSpace, operationSpace
+  //
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (attrP->type == KjArray)
+    {
+      for (KjNode* aInstanceP = attrP->value.firstChildP; aInstanceP != NULL; aInstanceP = aInstanceP->next)
+      {
+        aInstanceP->name = attrP->name;  // Need to "inherit" the name for the Array
+
+        if (pCheckAttribute(aInstanceP, true, NoAttributeType, false, NULL) == false)
+          return false;
+
+        attrP->name = aInstanceP->name;  // It's been expanded ionside pCheckAttribute
+      }
+    }
+    else  // KjObject
+    {
+      if (pCheckAttribute(attrP, true, NoAttributeType, false, NULL) == false)
+        return false;
+    }
+  }
 
   // Does the entity already exist?
+  // If so, it's a 204, not a 201
+  //
   // FIXME: This check should really be made in the TRoE database but, seems valid enough to do the
   //        search in mongo instead
   //
@@ -146,8 +156,6 @@ bool orionldPostTemporalEntities(void)
   }
 
   LM_E(("troePostEntities failed (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
-  orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
-  orionldState.httpStatusCode = orionldState.pd.type;
 
   return false;
 }

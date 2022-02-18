@@ -30,14 +30,8 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
@@ -45,78 +39,6 @@ extern "C"
 #include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntities.h"                     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// troeSubAttrsExpand -
-//
-static void troeSubAttrsExpand(KjNode* attrP)
-{
-  KjNode* subAttrP = attrP->value.firstChildP;
-  KjNode* nextSubAttr;
-
-  while (subAttrP != NULL)
-  {
-    nextSubAttr = subAttrP->next;
-
-    if      (strcmp(subAttrP->name,  "type")        == 0) {}
-    else if (strcmp(subAttrP->name,  "id")          == 0) {}
-    else if (strcmp(subAttrP->name,  "value")       == 0) {}
-    else if (strcmp(subAttrP->name,  "object")      == 0) {}
-    else if ((strcmp(subAttrP->name, "createdAt")   == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
-      kjChildRemove(attrP, subAttrP);
-    else
-      subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name,  true, NULL);  // Could be avoided with pCheckEntity
-
-    subAttrP = nextSubAttr;
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// troeEntityExpand -
-//
-void troeEntityExpand(KjNode* entityP)
-{
-  KjNode* attrP = entityP->value.firstChildP;
-  KjNode* nextAttr;
-
-  while (attrP != NULL)
-  {
-    nextAttr = attrP->next;
-
-    if      (strcmp(attrP->name, "type")              == 0)
-      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);  // entity type if in payload
-    else if (strcmp(attrP->name,  "id")               == 0) {}
-    else if (strcmp(attrP->name,  "location")         == 0) {}
-    else if (strcmp(attrP->name,  "observationSpace") == 0) {}
-    else if (strcmp(attrP->name,  "operationSpace")   == 0) {}
-    else if ((strcmp(attrP->name, "createdAt")        == 0) || (strcmp(attrP->name, "modifiedAt") == 0))
-    {
-      kjChildRemove(entityP, attrP);
-    }
-    else
-    {
-      attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);  // Could be avoided with pCheckEntity
-
-      if (attrP->type == KjObject)
-        troeSubAttrsExpand(attrP);
-      else if (attrP->type == KjArray)
-      {
-        for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
-        {
-          troeSubAttrsExpand(attrInstanceP);
-        }
-      }
-    }
-
-    attrP = nextAttr;
-  }
-}
 
 
 
@@ -130,11 +52,9 @@ bool troePostEntities(void)
   char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
   KjNode*  entityP     = orionldState.requestTree;
 
-  // Expand entity type and attribute names - orionldPostTemporalEntities doesn't do any expansion
-  troeEntityExpand(entityP);
-
-  if (entityType != NULL)
-    entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // From orionldState.payloadTypeNode
+  //
+  // orionldPostTemporalEntities/orionldPostEntities does all the expansion
+  //
 
   PgAppendBuffer entities;
   PgAppendBuffer attributes;
