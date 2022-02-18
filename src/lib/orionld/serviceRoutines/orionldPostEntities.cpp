@@ -81,10 +81,7 @@ extern "C"
 //
 static KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName)
 {
-  char* longName;
-
-  longName      = orionldAttributeExpand(orionldState.contextP, attributeName, true, NULL);
-  attributeName = kaStrdup(&orionldState.kalloc, longName);
+  attributeName = kaStrdup(&orionldState.kalloc, attributeName);
   dotForEq(attributeName);
 
   //
@@ -194,7 +191,6 @@ bool orionldPostEntities(void)
   // It's done here instead
   //
 
-  // FIXME: Do this in MhdConnectionTreat instead !!!
   entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
   orionldState.payloadTypeNode->value.s = entityType;
 
@@ -294,11 +290,10 @@ bool orionldPostEntities(void)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      char*  longName = orionldAttributeExpand(orionldState.contextP, kNodeP->name, true, NULL);
+      char*  longNameEq = kaStrdup(&orionldState.kalloc, kNodeP->name);
 
-      longName = kaStrdup(&orionldState.kalloc, longName);
-      dotForEq(longName);
-      kNodeP->name = longName;
+      dotForEq(longNameEq);
+      kNodeP->name = longNameEq;
 
       kNodeP = next;
 

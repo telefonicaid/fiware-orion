@@ -330,7 +330,7 @@ bool orionldGetEntities(void)
       //   No expansion desired if the type is already FQN - however, this may
       //   null out prefix expansion so, I've removed the call to pcheckUri() and I always expand ...
       //
-      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // entity type from URI param
+      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
 
       isTypePattern = false;  // Just in case ...
     }
@@ -374,7 +374,7 @@ bool orionldGetEntities(void)
     for (int ix = 0; ix < typeVecItems; ix++)
     {
       if (pcheckUri(typeVector[ix], true, &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // entity type from URI param type-list
+        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // URI Param 'type'
       else
         typeExpanded = typeVector[ix];
 
@@ -399,7 +399,7 @@ bool orionldGetEntities(void)
 
     for (int ix = 0; ix < attrsCount; ix++)
     {
-      attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);
+      attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);  // URI Param 'attrs'
       mongoRequest.attributeList.push_back(attrsV[ix]);
     }
   }
@@ -540,7 +540,7 @@ bool orionldGetEntities(void)
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
           (strcmp(geoPropertyName, "operationSpace")   != 0))
       {
-        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);
+        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);  // URI Param 'geoproperty'
 
         geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
         dotForEq(geoPropertyNameExpanded);

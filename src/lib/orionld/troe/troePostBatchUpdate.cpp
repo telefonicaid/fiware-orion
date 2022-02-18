@@ -43,7 +43,7 @@ extern "C"
 #include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
 #include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
-#include "orionld/troe/troePostEntities.h"                     // Own interface
+#include "orionld/troe/troePostBatchUpdate.h"                  // Own interface
 
 
 
