@@ -43,7 +43,6 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -55,95 +54,16 @@ extern "C"
 //
 // inAttrList -
 //
-static bool inAttrList(const char* attrName, char** attrListExpanded, int attrsInAttrList)
+static bool inAttrList(const char* attrName, char** attrList, int attrsInList)
 {
-  for (int ix = 0; ix < attrsInAttrList; ix++)
+  for (int ix = 0; ix < attrsInList; ix++)
   {
-    if (strcmp(attrName, attrListExpanded[ix]) == 0)
+    if (strcmp(attrName, attrList[ix]) == 0)
       return true;
   }
 
   return false;
 }
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attrListParseAndExpand -
-//
-static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpandedVecP, char* attrList)
-{
-  int   attrs = 0;
-  char* cP;
-
-  //
-  // attrList is a comma-separated list.
-  // First we need to find out how many attributes are in the list (== number of commas + 1)
-  //
-  if (*attrList != 0)
-  {
-    cP = attrList;
-    while (*cP != 0)
-    {
-      if (*cP == ',')
-      {
-        if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
-          ++attrs;
-      }
-
-      ++cP;
-    }
-  }
-
-  ++attrs;  // Number of attributes == number of commas + 1
-
-
-  //
-  // Allocate room for the attribute name pointers
-  //
-  char** expandedV = (char**) kaAlloc(&orionldState.kalloc, attrs * sizeof(char*));
-
-  //
-  // And, parse attrList, to make the items in the vector point to each attribute name
-  //
-
-  // The first one is given:
-  expandedV[0] = attrList;
-
-  int aIx = 1;
-  cP = attrList;
-  while (*cP != 0)
-  {
-    if (*cP == ',')
-    {
-      *cP = 0;
-
-      if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
-      {
-        ++cP;
-        expandedV[aIx++] = cP;
-      }
-      else
-        ++cP;
-    }
-    else
-      ++cP;
-  }
-
-
-  //
-  // Expand attribute names, overwriting the shortnames
-  //
-  for (int ix = 0; ix < attrs; ix++)
-  {
-    expandedV[ix] = orionldAttributeExpand(orionldState.contextP, expandedV[ix], true, NULL);
-  }
-
-  *attrListExpandedVecP = expandedV;
-  *attrsInAttrListP     = attrs;
-}
-
 
 
 // -----------------------------------------------------------------------------
@@ -266,15 +186,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
   if (oneHit == true)
     top = root;
 
-  //
-  // Expanding attrList, if present
-  //
-  int    attrsInAttrList  = 0;
-  char** attrListExpanded = NULL;
-
-  if (attrList)
-    attrListParseAndExpand(&attrsInAttrList, &attrListExpanded, attrList);
-
   for (int ix = 0; ix < hits; ix++)
   {
     ContextElement* ceP = &responseP->contextElementResponseVector[ix]->contextElement;
@@ -344,8 +255,11 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
       //
       // If URI param 'attrs' has been used, only matching attributes should be included in the response
       //
-      if ((attrListExpanded != NULL) && (inAttrList(attrLongName, attrListExpanded, attrsInAttrList) == false))
-        continue;
+      if (orionldState.in.attrsList.items > 0)
+      {
+        if (inAttrList(attrLongName, orionldState.in.attrsList.array, orionldState.in.attrsList.items) == false)
+          continue;
+      }
 
       if (keyValues)
       {
