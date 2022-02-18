@@ -51,7 +51,7 @@ payload='{
     "unitCode": "CEL"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

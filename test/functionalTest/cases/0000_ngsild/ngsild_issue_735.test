@@ -51,21 +51,21 @@ payload='{
     "unitCode": "CEL"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "02. GET E1 - see 'category' and 'temperature' compacted"
 echo "======================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -H 'Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET E1 with attrs=temperature - see 'temperature' compacted"
 echo "==============================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001?attrs=temperature' -H 'Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001?attrs=temperature' -H 'Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -85,7 +85,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
-Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
-Link: <https://context.lab.letsfiware.jp/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://raw.githubusercontent.com/fisuda/ngsi-ld-context/main/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
