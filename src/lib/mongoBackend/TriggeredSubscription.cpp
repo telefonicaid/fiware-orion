@@ -63,7 +63,8 @@ TriggeredSubscription::TriggeredSubscription
   tenant((_tenant == NULL)? "" : _tenant),
   stringFilterP(NULL),
   mdStringFilterP(NULL),
-  blacklist(false)
+  blacklist(false),
+  covered(false)
 {
 }
 
@@ -95,7 +96,8 @@ TriggeredSubscription::TriggeredSubscription
   tenant(""),
   stringFilterP(NULL),
   mdStringFilterP(NULL),
-  blacklist(false)
+  blacklist(false),
+  covered(false)
 {
 }
 

@@ -166,26 +166,8 @@ void Entity::filterAndOrderAttrs
     }
     else
     {
-      //anjali
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
       // In blacklist case shadowed attributes (dateCreated, etc) are never included
-      for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
-      {
-        std::string name = attributeVector[ix]->name;
-        if ((!attributeVector[ix]->shadowed) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
-        {
-          orderedAttrs->push_back(attributeVector[ix]);
-        }
-        //anjali added
-      }
-    }
-  }
-  else
-  {
-    if (attrsFilter.size() == 0)
-    {
-      // No filter, no blacklist. Attributes are "as is" in the entity
-      // except shadowed ones (dateCreated, etc.)
       addAllAttrsExceptShadowed(orderedAttrs);
     }
     else
@@ -203,7 +185,6 @@ void Entity::filterAndOrderAttrs
             {
               orderedAttrs->push_back(attributeVector[ix]);
             }
-            /*anjali added*/
           }
           else
           {
@@ -213,76 +194,20 @@ void Entity::filterAndOrderAttrs
       }
       else
       {
-
-        //anjali22 code for atrr found
         // - If '*' is not in: attributes are include in the attrsFilter order
-        /*for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+        for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
           int found;
           if ((found = attributeVector.get(attrsFilter[ix])) != -1)
           {
             orderedAttrs->push_back(attributeVector[found]);
           }
-        }*/
-      orion::BSONObj  sub;
-      StringList                       attrL;
-      std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-
-     for (unsigned int ix = 0; ix < attrsFilter.size() ; ++ix)
-     {      
-        //std::string subAttr = subAttrs[ix].String();
-
-            int found;
-	    if ((found = attributeVector.get(attrsFilter[ix])) != -1)
-            {
-              orderedAttrs->push_back(attributeVector[found]);
-           // }
-           // else
-           // {
-            bool covered             = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
-
-            //covered check
-            if (covered == true)
-            {
-
-              alarmMgr.badInput(clientIp, "anjali covered log");
-            // if true then print atrr value
-            //orderedAttrs->push_back(""); //fill the notification elemnet making name as attribute name and type as NONE and value null
-            /* if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
-             {
-                orderedAttrs->push_back(attributeVector[ix]);
-             }*/
-
-             for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
-             {
-                std::string subAttr = subAttrs[ix].String();
-
-               // attrL.push_back(subAttr);
-                orderedAttrs->push_back(subAttr);
-             }
-
-
-            }
-            }
-
+        }
       }
+    }
+  }
+}
 
-      // orderedAttrs->push_back(subAttr);
-     //  for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
-     //  {
-      //    std::string name = attributeVector.get(attrsFilter[jx]);
-//          if ((found = attributeVector.get(attrsFilter[jx])) != -1)
-//          {
-//            orderedAttrs->push_back(attributeVector[found]);
-//          }
-       /*if (subAttr == name)
-       {
-         orderedAttrs->push_back(attributeVector[jx]);
-        }*/
-       }
-     }
-}
-}
 
 
 

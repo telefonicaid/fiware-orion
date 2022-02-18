@@ -66,6 +66,7 @@ class TriggeredSubscription
   StringFilter*             stringFilterP;
   StringFilter*             mdStringFilterP;
   bool                      blacklist;
+  bool                      covered;
   std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)

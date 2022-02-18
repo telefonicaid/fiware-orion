@@ -1720,7 +1720,8 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
-  bool                             blacklist = false
+  bool                             blacklist = false,
+  bool                             covered = false
 )
 {
   NotifyContextRequest   ncr;
@@ -1790,6 +1791,7 @@ static bool processOnChangeConditionForUpdateContext
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
+                                          covered,
                                           metadataV);
   return true;
 }
@@ -1822,7 +1824,6 @@ static unsigned int processSubscriptions
   {
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  tSubP     = it->second;
-
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
      * that checks are done in increasing cost order (e.g. georel check is done at the end).
@@ -1935,7 +1936,8 @@ static unsigned int processSubscriptions
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
                                                                 notification,
-                                                                tSubP->blacklist);
+                                                                tSubP->blacklist,
+                                                                tSubP->covered);
 
     if (notificationSent)
     {
