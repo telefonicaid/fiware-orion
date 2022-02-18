@@ -519,9 +519,9 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 
 
 /* ****************************************************************************
- * + * *
- * + * * setcovered -
- * + * */
+*
+* setcovered -
+*/
 void setcovered(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   bool bl = sub.notification.covered;

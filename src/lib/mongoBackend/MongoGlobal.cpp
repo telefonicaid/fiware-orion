@@ -1115,9 +1115,7 @@ static void addIfNotPresentAttr
     ContextAttribute* caP = new ContextAttribute(name, type, value);
     caP->shadowed = true;
     eP->attributeVector.push_back(caP);
-  }
-  //anjali aded 
-    
+  } 
 }
 
 

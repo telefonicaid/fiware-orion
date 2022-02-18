@@ -1120,7 +1120,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                           cSubP->tenant,
+                                                           cSubP->covered);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1539,6 +1540,7 @@ static bool addTriggeredSubscriptions_noCache
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1562,7 +1564,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "");
+          aList, "", "", covered);
 
       if (!onlyChanged)
       {

@@ -85,7 +85,8 @@ class TriggeredSubscription
                         const ngsiv2::MqttInfo&  _mqttInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
-                        const char*              _tenant);
+                        const char*              _tenant,
+                        bool                     _covered);
 
   TriggeredSubscription(RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,

@@ -89,7 +89,6 @@ std::string NotifyContextRequest::toJson
 
   JsonObjectHelper jh;
 
-  //anjali 
   jh.addString("subscriptionId", subscriptionId.get());
   jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
 

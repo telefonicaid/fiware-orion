@@ -168,6 +168,22 @@ void Entity::filterAndOrderAttrs
     {
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
       // In blacklist case shadowed attributes (dateCreated, etc) are never included
+      for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
+      {
+        std::string name = attributeVector[ix]->name;
+        if ((!attributeVector[ix]->shadowed) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
+        {
+          orderedAttrs->push_back(attributeVector[ix]);
+        }
+      }
+    }
+  }
+  else
+  {
+    if (attrsFilter.size() == 0)
+    {
+      // No filter, no blacklist. Attributes are "as is" in the entity
+      // except shadowed ones (dateCreated, etc.)
       addAllAttrsExceptShadowed(orderedAttrs);
     }
     else

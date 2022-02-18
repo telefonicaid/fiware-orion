@@ -313,81 +313,13 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
 */
 int ContextAttributeVector::get(const std::string& attributeName) const
 {
-//  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-//  {
-//added code anjali 
-/* orion::BSONObj  sub;
- std::vector<std::string>         notificationAttrs;
- std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-*/
-
-/*  for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
-  {
-    std::string subAttr = subAttrs[ix].String();
-    notificationAttrs.push_back(subAttr);*/
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix]->name == attributeName)
-    {  
- 
-      return ix;     
-    }
-  
-  
-/*    {
-
-
-      Entity E1; 
-    //  return ix;
-     // return vec[ix];
-   // }
-
-//Entity* EntityVector::lookup(const std::string& name, const std::string& type)
-//{
-const std::string type;
-const std::string value;   
-  
-//  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-//  {
-    E1.name == attributeName;
-    E1.type == "None";
-    vec.push_back(E1);
-    return 
-//    vec[ix]->value == null;
-     // return ix;
-//  }*/
-}
-
-
-//std::map<std::string, std::map<std::string, int> > perAttrTypes;
-    // if (vec[ix]->name == attributeName)
-    // if (vec[ix]->name == subAttrs)
-    // {
-    //   return ix;
-    // }
-    
-     /*else
-     {
-        //return vec[ix];
-       return ix;
-     }*/
-
-    /* else if (vec[ix]->name != attributeName)
-     {
-      return ix;
-     }*/
-//      orion::BSONObj  sub;
-//      std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-
-    // if (vec[ix]->name == attributeName)
-    // {
-    //   return ix;
-    // }
-  /*  else
     {
       return ix;
-    }*/
+    }
+  }
 
   return -1;
 }

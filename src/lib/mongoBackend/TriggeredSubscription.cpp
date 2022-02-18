@@ -48,7 +48,8 @@ TriggeredSubscription::TriggeredSubscription
   const ngsiv2::MqttInfo&  _mqttInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
-  const char*              _tenant
+  const char*              _tenant,
+  bool                     _covered
 )
 :
   throttling(_throttling),
@@ -64,7 +65,7 @@ TriggeredSubscription::TriggeredSubscription
   stringFilterP(NULL),
   mdStringFilterP(NULL),
   blacklist(false),
-  covered(false)
+  covered(_covered)
 {
 }
 
