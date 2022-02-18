@@ -33,10 +33,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
 
-#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
@@ -86,18 +84,14 @@ bool troePostBatchUpsert(void)
   pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
   pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  troeEntityArrayExpand(orionldState.requestTree);
-
   if (orionldState.duplicateArray != NULL)
   {
-    troeEntityArrayExpand(orionldState.duplicateArray);
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
       pgEntityBuild(&entities, "Replace", entityP, NULL, NULL, &attributes, &subAttributes);
     }
   }
 
-  troeEntityArrayExpand(orionldState.requestTree);
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     if (troeIgnored(entityP) == true)
@@ -112,7 +106,7 @@ bool troePostBatchUpsert(void)
       {
         // If the entity already existed, the entity op mode must be "REPLACE"
         if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
-          troeEntityMode    = (char*) "Create";
+          troeEntityMode = (char*) "Create";
         else
         {
           if (orionldState.uriParamOptions.update == true)
