@@ -37,12 +37,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
@@ -71,10 +71,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
     snprintf(fieldPath, sizeof(fieldPath), "@datasets.%s", attrNameExpandedEq);
     if (dbEntityFieldDelete(entityId, fieldPath) == false)
     {
-      // orionldState.httpStatusCode = 500;
-      // orionldErrorResponseCreate(OrionldInternalError, "Database Error (unable to remove an entire dataset)", fieldPath);
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded);
+      orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
       return false;
     }
 
@@ -96,8 +93,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 
   if (datasetsP == NULL)
   {
-    orionldState.httpStatusCode = 404;
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded);
+    orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
     return false;
   }
 
@@ -123,8 +119,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 
     if (found == false)
     {
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute dataset not found", datasetId);
+      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
       return false;
     }
 
@@ -140,8 +135,7 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 
     if ((datasetIdNode == NULL) || (strcmp(datasetIdNode->value.s, datasetId) != 0))
     {
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Attribute dataset not found", datasetId);
+      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
       return false;
     }
 
@@ -165,41 +159,35 @@ bool orionldDeleteAttribute(void)
   char*    attrName = orionldState.wildcard[1];
   char*    attrNameExpanded;
   char*    attrNameExpandedEq;
-  char*    detail;
 
   //
   // URI param check: both datasetId and deleteAll cannot be set
   //
   if ((orionldState.uriParams.datasetId != NULL) && (orionldState.uriParams.deleteAll == true))
   {
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid URI param combination", "both datasetId and deleteAll are set");
+    orionldError(OrionldBadRequestData, "Invalid URI param combination", "both datasetId and deleteAll are set", 400);
     return false;
   }
 
   //
   // Make sure the Entity ID is a valid URI
   //
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Entity ID '%s' - not a URI)", entityId));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include name (entityId) and value ($entityId)
-    orionldState.httpStatusCode = 400;
+  if (pCheckUri(entityId, true) == false)
     return false;
-  }
 
   //
   // Make sure the Attribute Name is valid
   //
-  if (pcheckUri(attrName, false, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Attribute Name (%s): %s)", attrName, detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Attribute Name", detail);  // FIXME: Include name (entityId) and value ($entityId)
-    orionldState.httpStatusCode = 400;
+  if (pCheckUri(attrName, false) == false)
     return false;
-  }
 
-  attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
+
+  //
+  // Expand the attribute name and save it in the orionldState.wildcard array, so that the TROE won't have to expand it as well
+  //
+  attrNameExpanded         = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
+  orionldState.wildcard[1] = attrNameExpanded;
+
   attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
   dotForEq(attrNameExpandedEq);
 
@@ -218,8 +206,7 @@ bool orionldDeleteAttribute(void)
   {
     if (dbEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
     {
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded);
+      orionldError(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded, 404);
       return false;
     }
   }
@@ -229,8 +216,7 @@ bool orionldDeleteAttribute(void)
     orionldState.dbAttrWithDatasetsP = dbEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
     if (orionldState.dbAttrWithDatasetsP == NULL)
     {
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded);
+      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
       return false;
     }
   }
@@ -238,8 +224,7 @@ bool orionldDeleteAttribute(void)
   {
     if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
     {
-      orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded);
+      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
       return false;
     }
   }
@@ -258,8 +243,7 @@ bool orionldDeleteAttribute(void)
   if (dbEntityAttributesDelete(entityId, attrNameV, 1) == false)
   {
     LM_W(("dbEntityAttributesDelete failed"));
-    orionldState.httpStatusCode = 404;
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity/Attribute Not Found", attrNameExpanded);
+    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", attrNameExpanded, 404);
     return false;
   }
 
