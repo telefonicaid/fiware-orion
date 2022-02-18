@@ -39,7 +39,6 @@
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
 #include "mongoBackend/safeMongo.h"                              // moreSafe
 #include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery
@@ -170,33 +169,18 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 //
 // It is the responsibility of the caller to make sure that 'attrsList' is non-NULL
 //
-static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList, std::string* detailsP)
+static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, std::string* detailsP)
 {
-  std::vector<std::string>    attrsVec;
-  int                         attrs;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
 
-  attrs = stringSplit(attrsList, ',', attrsVec);
-
-  if (attrs == 0)
+  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
   {
-    *detailsP = "URI Param /attrs/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "attrs");
-    return false;
-  }
-
-  for (int ix = 0; ix < attrs; ix++)
-  {
-    char* attr = (char*) attrsVec[ix].c_str();
-
-    attr = orionldAttributeExpand(orionldState.contextP, attr, true, NULL);  // URI Param 'attrs'
-    bsonArray.append(attr);
+    bsonArray.append(orionldState.in.attrsList.array[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.attrs.name", bsonInExpression.obj());
-  orionldState.uriParams.attrs = NULL;
 
   return true;
 }
@@ -229,7 +213,7 @@ bool mongoLdRegistrationsGet
   if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern, &oeP->details) == false))
     return false;
 
-  if ((orionldState.uriParams.attrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, orionldState.uriParams.attrs, &oeP->details) == false))
+  if ((orionldState.in.attrsList.items > 0) && (uriParamAttrsToFilter(&queryBuilder, &oeP->details) == false))
     return false;
 
 
