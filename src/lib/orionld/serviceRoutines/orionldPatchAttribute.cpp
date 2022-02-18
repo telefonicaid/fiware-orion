@@ -741,7 +741,7 @@ bool orionldPatchAttribute(void)
 
 
   OrionldContextItem*  contextItemP       = NULL;
-  char*                attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, &contextItemP);
+  char*                attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, &contextItemP);  // From URL PATH
   char*                attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
 
   dotForEq(attrNameExpandedEq);
@@ -839,12 +839,6 @@ bool orionldPatchAttribute(void)
   // 7. Check that inAttribute is OK (especially the attribute type)
   //
   KjNode* inType = kjLookup(inAttribute, "type");
-
-  // Expand all sub-attributes
-  for (KjNode* saP = inAttribute->value.firstChildP; saP != NULL; saP = saP->next)
-  {
-    saP->name = orionldSubAttributeExpand(orionldState.contextP, saP->name, true, NULL);
-  }
 
   //
   // Save the incoming tree for TRoE

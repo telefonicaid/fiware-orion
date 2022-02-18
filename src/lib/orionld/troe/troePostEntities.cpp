@@ -68,7 +68,7 @@ static void troeSubAttrsExpand(KjNode* attrP)
     else if ((strcmp(subAttrP->name, "createdAt")   == 0) || (strcmp(subAttrP->name, "modifiedAt") == 0))
       kjChildRemove(attrP, subAttrP);
     else
-      subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name,  true, NULL);
+      subAttrP->name = orionldSubAttributeExpand(orionldState.contextP, subAttrP->name,  true, NULL);  // Could be avoided with pCheckEntity
 
     subAttrP = nextSubAttr;
   }
@@ -101,7 +101,7 @@ void troeEntityExpand(KjNode* entityP)
     }
     else
     {
-      attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
+      attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);  // Could be avoided with pCheckEntity
 
       if (attrP->type == KjObject)
         troeSubAttrsExpand(attrP);
@@ -134,7 +134,7 @@ bool troePostEntities(void)
   troeEntityExpand(entityP);
 
   if (entityType != NULL)
-    entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
+    entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // From orionldState.payloadTypeNode
 
   PgAppendBuffer entities;
   PgAppendBuffer attributes;

@@ -261,7 +261,15 @@ bool orionldPostEntity(void)
     OrionldContextItem*  contextItemP = NULL;
     char*                shortName    = attrP->name;
 
-    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &contextItemP);
+    if (pCheckAttribute(attrP, true, NoAttributeType, false, contextItemP) == false)
+    {
+      attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
+
+      // Remove attr from tree
+      kjChildRemove(orionldState.requestTree, attrP);
+      attrP = next;
+      continue;
+    }
 
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)
@@ -275,16 +283,6 @@ bool orionldPostEntity(void)
         attrP = next;
         continue;
       }
-    }
-
-    if (pCheckAttribute(attrP, true, NoAttributeType, true, contextItemP) == false)
-    {
-      attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
-
-      // Remove attr from tree
-      kjChildRemove(orionldState.requestTree, attrP);
-      attrP = next;
-      continue;
     }
 
     ++attrsInPayload;
