@@ -90,7 +90,7 @@ void troeEntityExpand(KjNode* entityP)
     nextAttr = attrP->next;
 
     if      (strcmp(attrP->name, "type")              == 0)
-      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);  // entity type
+      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);  // entity type if in payload
     else if (strcmp(attrP->name,  "id")               == 0) {}
     else if (strcmp(attrP->name,  "location")         == 0) {}
     else if (strcmp(attrP->name,  "observationSpace") == 0) {}
