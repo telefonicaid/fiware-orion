@@ -388,19 +388,12 @@ bool orionldGetEntities(void)
     mongoRequest.entityIdVector.push_back(entityIdP);
   }
 
-  char* attrsV[100];
-  int   attrsCount = 0;
 
-  if (attrs != NULL)
+  if (orionldState.in.attrsList.items > 0)
   {
-    attrsCount = (int) sizeof(attrsV) / sizeof(attrsV[0]);
-
-    attrsCount = kStringSplit(attrs, ',', (char**) attrsV, attrsCount);
-
-    for (int ix = 0; ix < attrsCount; ix++)
+    for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
     {
-      attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);  // URI Param 'attrs'
-      mongoRequest.attributeList.push_back(attrsV[ix]);
+      mongoRequest.attributeList.push_back(orionldState.in.attrsList.array[ix]);
     }
   }
 
@@ -496,15 +489,15 @@ bool orionldGetEntities(void)
   //     "geometry": null
   //   with whatever was found in this second query to mongo
   //
-  if ((orionldState.out.contentType == GEOJSON) && (attrsCount > 0) && (orionldState.responseTree->type == KjArray))
+  if ((orionldState.out.contentType == GEOJSON) && (orionldState.in.attrsList.items > 0) && (orionldState.responseTree->type == KjArray))
   {
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(attrsV, attrsCount, geoPropertyName);
+    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(orionldState.in.attrsList.array, orionldState.in.attrsList.items, geoPropertyName);
 
     int ix = 0;
-    while (ix < attrsCount)
+    while (ix < orionldState.in.attrsList.items)
     {
-      if (strcmp(geoPropertyName, attrsV[ix]) == 0)
+      if (strcmp(geoPropertyName, orionldState.in.attrsList.array[ix]) == 0)
         geoPropertyNameInAttrs = true;
 
       ++ix;
