@@ -2116,7 +2116,7 @@ static void updateAttrInNotifyCer
   {
     ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
 
-    if (caP->name != targetAttr->name)
+    if (caP->name == targetAttr->name)
     {
       if (targetAttr->valueType != orion::ValueTypeNotGiven)
       {
@@ -2230,8 +2230,6 @@ static void updateAttrInNotifyCer
 
       return;
     }
-       
-
   }
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */

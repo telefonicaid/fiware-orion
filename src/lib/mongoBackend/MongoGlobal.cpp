@@ -1115,7 +1115,7 @@ static void addIfNotPresentAttr
     ContextAttribute* caP = new ContextAttribute(name, type, value);
     caP->shadowed = true;
     eP->attributeVector.push_back(caP);
-  } 
+  }
 }
 
 
@@ -2338,7 +2338,7 @@ StringList subToAttributeList
   std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
   std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
-  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
+  for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
@@ -2348,10 +2348,10 @@ StringList subToAttributeList
     std::string subAttr = condAttrs[ix].String();
     conditionAttrs.push_back(subAttr);
   }
-
   subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
   return attrL;
 }
+
 
 
 /* ****************************************************************************

@@ -38,19 +38,6 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
-#include "mongoBackend/compoundResponses.h"
-#include "mongoBackend/MongoGlobal.h"
-
-#include "ngsi10/UpdateContextRequest.h"
-#include "mongoDriver/mongoConnectionPool.h"
-#include "mongoDriver/connectionOperations.h"
-#include "mongoDriver/safeMongo.h"
-#include "mongoDriver/BSONArray.h"
-#include "mongoDriver/BSONArrayBuilder.h"
-#include "mongoDriver/BSONElement.h"
-
 
 /* ****************************************************************************
 *

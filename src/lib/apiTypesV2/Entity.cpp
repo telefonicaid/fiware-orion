@@ -42,18 +42,6 @@
 
 #include "apiTypesV2/Entity.h"
 
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
-#include "mongoBackend/compoundResponses.h"
-#include "mongoBackend/MongoGlobal.h"
-
-#include "mongoDriver/mongoConnectionPool.h"
-#include "mongoDriver/connectionOperations.h"
-#include "mongoDriver/safeMongo.h"
-#include "mongoDriver/BSONArray.h"
-#include "mongoDriver/BSONArrayBuilder.h"
-#include "mongoDriver/BSONElement.h"
-
 
 /* ****************************************************************************
 *

@@ -224,7 +224,6 @@ void doNotify
                        params->maxFailsLimit,
                        params->failsCounter));
 
-    
     LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
 
     if (simulatedNotification)

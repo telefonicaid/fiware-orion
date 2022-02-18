@@ -209,11 +209,11 @@ void UpdateContextRequest::fill
 
   updateActionType = _updateActionType;
 
-/*  if (!attributeName.empty())
+  if (!attributeName.empty())
   {
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     eP->attributeVector.push_back(caP);
-  }*/
+  }
 }
 
 
@@ -350,10 +350,6 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
       if (aP->name == attributeName)
       {
         return aP;
-      }
-      else
-      {
-         return aP;
       }
     }
   }
