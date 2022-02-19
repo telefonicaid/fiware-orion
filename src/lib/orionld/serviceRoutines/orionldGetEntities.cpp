@@ -133,12 +133,9 @@ bool orionldGetEntities(void)
   const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
-  char*                 typeExpanded   = NULL;
   char*                 detail;
   char*                 idVector[32];    // Is 32 a good limit?
-  char*                 typeVector[32];  // Is 32 a good limit?
   int                   idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
-  int                   typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
@@ -312,40 +309,8 @@ bool orionldGetEntities(void)
     isIdPattern = (char*) "true";
   }
 
-  if (type == NULL)  // No type given - match all types
-  {
-    type          = (char*) ".*";
-    isTypePattern = true;
-    typeVecItems  = 0;  // Just to avoid entering the "if (typeVecItems == 1)"
-  }
-  else
-  {
-    typeVecItems = kStringSplit(type, ',', (char**) typeVector, typeVecItems);
-
-    if (typeVecItems == 1)  // type needs to be modified according to @context
-    {
-      //
-      // NOTE:
-      //   No expansion desired if the type is already FQN - however, this may
-      //   null out prefix expansion so, I've removed the call to pcheckUri() and I always expand ...
-      //
-      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
-
-      isTypePattern = false;  // Just in case ...
-    }
-  }
 
   idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
-
-  //
-  // ID-list and Type-list at the same time is not supported
-  //
-  if ((idVecItems > 1) && (typeVecItems > 1))
-  {
-    LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
-    return false;
-  }
 
   //
   // Make sure all IDs are valid URIs
@@ -360,7 +325,24 @@ bool orionldGetEntities(void)
     }
   }
 
-  if (idVecItems > 1)  // A list of Entity IDs
+
+  //
+  // If ONE or ZERO types in URI param 'type', the prepared array isn't used, just a simple char-pointer (named "type")
+  //
+  if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
+  else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
+
+
+  //
+  // ID-list and Type-list at the same time is not supported
+  //
+  if ((idVecItems > 1) && (orionldState.in.typeList.items > 1))
+  {
+    LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
+    return false;
+  }
+  else if (idVecItems > 1)  // A list of Entity IDs, a single Entity TYPE
   {
     for (int ix = 0; ix < idVecItems; ix++)
     {
@@ -368,20 +350,15 @@ bool orionldGetEntities(void)
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
-  else if (typeVecItems > 1)  // A list of Entity Types instead of Entity IDs (both cannot co-exist)
+  else if (orionldState.in.typeList.items > 1)  // A list of Entity TYPES, a single Entity ID
   {
-    for (int ix = 0; ix < typeVecItems; ix++)
+    for (int ix = 0; ix < orionldState.in.typeList.items; ix++)
     {
-      if (pcheckUri(typeVector[ix], true, &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // URI Param 'type'
-      else
-        typeExpanded = typeVector[ix];
-
-      entityIdP = new EntityId(idString, typeExpanded, isIdPattern, false);
+      entityIdP = new EntityId(idString, orionldState.in.typeList.array[ix], isIdPattern, false);
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
-  else  // Definitely no lists in EntityId id/type
+  else  // ONE Entity ID/PATTERN, ONE Entity TYPE (or .*)
   {
     entityIdP = new EntityId(idString, type, isIdPattern, isTypePattern);
     mongoRequest.entityIdVector.push_back(entityIdP);

@@ -626,6 +626,10 @@ static bool uriParamAttrsFix(void)
 //
 // uriParamTypeFix -
 //
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only alloowed by those services that need expansion (GET /entities and GET /registrations)
+//
 static bool uriParamTypeFix(void)
 {
   int   items     = commaCount(orionldState.uriParams.type) + 1;
