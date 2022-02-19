@@ -613,8 +613,73 @@ static bool uriParamAttrsFix(void)
 
   for (int item = 0; item < items; item++)
   {
-    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);
+    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);  // Expand-function
   }
+
+  return true;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamTypeFix -
+//
+static bool uriParamTypeFix(void)
+{
+  int   items     = commaCount(orionldState.uriParams.type) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.type);  // Keep original value of 'type'
+
+  orionldState.in.typeList.items = items;
+  orionldState.in.typeList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.typeList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /type/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /type/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.typeList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    orionldState.in.typeList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.typeList.array[item], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamGeoPropertyFix -
+//
+static bool uriParamGeoPropertyFix()
+{
+  orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// payloadTypeNodeFix -
+//
+static bool payloadTypeNodeFix(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_TYPE) == ORIONLD_SERVICE_OPTION_EXPAND_TYPE)
+    orionldState.payloadTypeNode->value.s = orionldAttributeExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
 
   return true;
 }
@@ -628,14 +693,18 @@ static bool uriParamAttrsFix(void)
 // Expand attribute names and entity types.
 // Convert comma separated lists (attrs + type + id + ...) into arrays.
 //
+// Doing the "type" node from the payload body as well. Not a URI param, but close enough
+//
 static bool uriParamExpansion(void)
 {
   if ((orionldState.uriParams.attrs          != NULL) && (uriParamAttrsFix()        == false))    return false;
-//  if ((orionldState.uriParams.type           != NULL) && (uriParamTypeFix()         == false))    return false;
-//  if ((orionldState.uriParams.id             != NULL) && (uriParamIdFix()           == false))    return false;
-//  if ((orionldState.uriParams.geoproperty    != NULL) && (uriParamGeoPropertyFix()  == false))    return false;
+  if ((orionldState.uriParams.type           != NULL) && (uriParamTypeFix()         == false))    return false;
+  if ((orionldState.uriParams.geoproperty    != NULL) && (uriParamGeoPropertyFix()  == false))    return false;
+  if ((orionldState.payloadTypeNode          != NULL) && (payloadTypeNodeFix()      == false))    return false;
 
-  // Can't do anything about 'q' - needs to be parsed first
+//  if ((orionldState.uriParams.id             != NULL) && (uriParamIdFix()           == false))    return false;
+
+  // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
 
   return true;
 }

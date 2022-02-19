@@ -366,8 +366,8 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 // orionldGetEntity -
 //
 // URI params:
-// - attrs               (orionldState.uriParams.attrs)
-// - options=keyValues   ()
+// - attrs
+// - options=keyValues
 //
 // For the NGSI-LD Forwarding scheme to work, we need to check for registrations and not only in the
 // local database. For this to work correctly:
@@ -383,11 +383,12 @@ bool orionldGetEntity(void)
 {
   char*    detail;
   KjNode*  regArray = NULL;
+  char*    eId      = orionldState.wildcard[0];
 
   //
-  // Make sure the ID (orionldState.wildcard[0]) is a valid URI
+  // Make sure the ID (eId) is a valid URI
   //
-  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
+  if (pcheckUri(eId, true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)
@@ -395,11 +396,11 @@ bool orionldGetEntity(void)
   }
 
   if (forwarding)
-    regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
+    regArray = dbRegistrationLookup(eId, NULL, NULL);
 
 #ifdef USE_MONGO_BACKEND
   bool                      keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId                  entityId(orionldState.wildcard[0], "", "false", false);
+  EntityId                  entityId(eId, "", "false", false);
   QueryContextRequest       request;
   QueryContextResponse      response;
   std::vector<std::string>  servicePathV;
@@ -465,7 +466,7 @@ bool orionldGetEntity(void)
       geometryProperty = (char*) "location";
   }
 
-  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
+  orionldState.responseTree = dbEntityRetrieve(eId,
                                                eqAttrV,
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
@@ -478,9 +479,9 @@ bool orionldGetEntity(void)
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
     if (attrsMandatory == true)
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", orionldState.wildcard[0]);
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", eId);
     else
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", eId);
     orionldState.httpStatusCode = SccContextElementNotFound;  // 404
 
     return false;
@@ -505,7 +506,7 @@ bool orionldGetEntity(void)
 
     if (orionldState.responseTree == NULL)
     {
-      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", orionldState.wildcard[0]);
+      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", eId);
 
       orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(orionldState.responseTree, idNodeP);
@@ -513,7 +514,7 @@ bool orionldGetEntity(void)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, orionldState.in.attrsList.array, orionldState.in.attrsList.items);
+    orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrsList.array, orionldState.in.attrsList.items);
   }
 
   return true;
