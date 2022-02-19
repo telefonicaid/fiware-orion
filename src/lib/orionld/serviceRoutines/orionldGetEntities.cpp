@@ -125,13 +125,12 @@ bool orionldGetEntities(void)
   char*                 idPattern      = orionldState.uriParams.idPattern;
   char*                 q              = orionldState.uriParams.q;
   char*                 attrs          = orionldState.uriParams.attrs;
-
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
 
-  char*                 idString       = (id != NULL)? id      : idPattern;
-  const char*           isIdPattern    = (id != NULL)? "false" : "true";
+  char*                 idString       = (id   != NULL)? id      : idPattern;
+  const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
   char*                 typeExpanded   = NULL;
@@ -473,8 +472,8 @@ bool orionldGetEntities(void)
   //
   // Work-around for Accept: application/geo+json
   //
-  // If attrs is used and the Geo-Property is not part of the attrs list, then the GeoProperty will be set to NULL
-  // even though it may exist.
+  // If URI-param 'attrs' is used and the Geo-Property is not part of the attrs list,
+  // then the GeoProperty will be set to NULL even though it may exist.
   //
   // As it will be really hard to modify mongoBackend to include that attribute that is not asked for (in URI param 'attrs'),
   // a workaround would be to perform an extra query:
