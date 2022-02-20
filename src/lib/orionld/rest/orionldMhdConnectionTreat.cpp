@@ -585,10 +585,13 @@ static int commaCount(char* s)
 
 // -----------------------------------------------------------------------------
 //
-// uriParamAttrsFix -
+// pCheckUriParamAttrs -
 //
-static bool uriParamAttrsFix(void)
+static bool pCheckUriParamAttrs(void)
 {
+  if (orionldState.uriParams.attrs == NULL)
+    return true;
+
   int   items     = commaCount(orionldState.uriParams.attrs) + 1;
   char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
 
@@ -678,12 +681,40 @@ static bool uriParamGeoPropertyFix()
 
 // -----------------------------------------------------------------------------
 //
-// payloadTypeNodeFix -
+// pCheckUriParamGeometryProperty -
 //
-static bool payloadTypeNodeFix(void)
+static bool pCheckUriParamGeometryProperty()
+{
+  if (orionldState.uriParams.geometryProperty == NULL)
+  {
+    orionldState.uriParams.geometryProperty = (char*) "location";
+  }
+  else
+  {
+    if ((strcmp(orionldState.uriParams.geometryProperty, "location")         != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "observationSpace") != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "operationSpace")   != 0))
+    {
+      orionldState.in.geometryPropertyExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckPayloadEntityType -
+//
+static bool pCheckPayloadEntityType(void)
 {
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_TYPE) == ORIONLD_SERVICE_OPTION_EXPAND_TYPE)
-    orionldState.payloadTypeNode->value.s = orionldAttributeExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+  {
+    if (orionldState.payloadTypeNode != NULL)
+      orionldState.payloadTypeNode->value.s = orionldAttributeExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+  }
 
   return true;
 }
@@ -701,10 +732,12 @@ static bool payloadTypeNodeFix(void)
 //
 static bool uriParamExpansion(void)
 {
-  if ((orionldState.uriParams.attrs          != NULL) && (uriParamAttrsFix()        == false))    return false;
-  if ((orionldState.uriParams.type           != NULL) && (uriParamTypeFix()         == false))    return false;
-  if ((orionldState.uriParams.geoproperty    != NULL) && (uriParamGeoPropertyFix()  == false))    return false;
-  if ((orionldState.payloadTypeNode          != NULL) && (payloadTypeNodeFix()      == false))    return false;
+  if (pCheckUriParamGeometryProperty() == false) return false;
+  if (pCheckPayloadEntityType()        == false) return false;
+  if (pCheckUriParamAttrs()            == false) return false;
+
+  if ((orionldState.uriParams.type             != NULL) && (uriParamTypeFix()             == false))    return false;
+  if ((orionldState.uriParams.geoproperty      != NULL) && (uriParamGeoPropertyFix()      == false))    return false;
 
 //  if ((orionldState.uriParams.id             != NULL) && (uriParamIdFix()           == false))    return false;
 

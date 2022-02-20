@@ -243,6 +243,7 @@ typedef struct OrionldStateIn
   bool      attributeFormatAsObject;
   bool      entityTypeDoesNotExist;
   bool      entityTypeExists;
+  char*     geometryPropertyExpanded;
 
   // Processed URI params
   UriParamList  attrsList;

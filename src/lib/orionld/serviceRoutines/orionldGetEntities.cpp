@@ -509,9 +509,7 @@ bool orionldGetEntities(void)
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
           (strcmp(geoPropertyName, "operationSpace")   != 0))
       {
-        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);  // URI Param 'geoproperty'
-
-        geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
+        geoPropertyNameExpanded = orionldState.in.geometryPropertyExpanded;
         dotForEq(geoPropertyNameExpanded);
       }
 
