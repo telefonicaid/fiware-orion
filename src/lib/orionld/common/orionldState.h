@@ -246,9 +246,9 @@ typedef struct OrionldStateIn
   char*     geometryPropertyExpanded;
 
   // Processed URI params
-  UriParamList  attrsList;
-  UriParamList  typeList;
   UriParamList  idList;
+  UriParamList  typeList;
+  UriParamList  attrsList;
 } OrionldStateIn;
 
 

@@ -627,14 +627,69 @@ static bool pCheckUriParamAttrs(void)
 
 // -----------------------------------------------------------------------------
 //
-// uriParamTypeFix -
+// pCheckUriParamId -
 //
 // NOTE
 //   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
 //   is only alloowed by those services that need expansion (GET /entities and GET /registrations)
 //
-static bool uriParamTypeFix(void)
+static bool pCheckUriParamId(void)
 {
+  if (orionldState.uriParams.id == NULL)
+    return true;
+
+  if (orionldState.uriParams.id[0] == 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Entity ID", "Empty String", 400);
+    return false;
+  }
+
+  int   items     = commaCount(orionldState.uriParams.id) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.id);  // Keep original value of 'id'
+
+  orionldState.in.idList.items = items;
+  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.idList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /id/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /id/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.idList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    if (pCheckUri(orionldState.in.idList.array[item], true) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamType -
+//
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only allowed by those services that need expansion (GET /entities and GET /registrations)
+//
+static bool pCheckUriParamType(void)
+{
+  if (orionldState.uriParams.type == NULL)
+    return true;
+
   int   items     = commaCount(orionldState.uriParams.type) + 1;
   char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.type);  // Keep original value of 'type'
 
@@ -669,10 +724,13 @@ static bool uriParamTypeFix(void)
 
 // -----------------------------------------------------------------------------
 //
-// uriParamGeoPropertyFix -
+// pCheckUriParamGeoProperty -
 //
-static bool uriParamGeoPropertyFix()
+static bool pCheckUriParamGeoProperty()
 {
+  if (orionldState.uriParams.geoproperty == NULL)
+    return true;
+
   orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
   return true;
 }
@@ -732,14 +790,13 @@ static bool pCheckPayloadEntityType(void)
 //
 static bool uriParamExpansion(void)
 {
+  if (pCheckUriParamId()               == false) return false;
+  if (pCheckUriParamType()             == false) return false;
+  if (pCheckUriParamAttrs()            == false) return false;
+  if (pCheckUriParamGeoProperty()      == false) return false;
   if (pCheckUriParamGeometryProperty() == false) return false;
   if (pCheckPayloadEntityType()        == false) return false;
-  if (pCheckUriParamAttrs()            == false) return false;
 
-  if ((orionldState.uriParams.type             != NULL) && (uriParamTypeFix()             == false))    return false;
-  if ((orionldState.uriParams.geoproperty      != NULL) && (uriParamGeoPropertyFix()      == false))    return false;
-
-//  if ((orionldState.uriParams.id             != NULL) && (uriParamIdFix()           == false))    return false;
 
   // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
 

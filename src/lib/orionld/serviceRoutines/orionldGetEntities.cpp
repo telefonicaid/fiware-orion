@@ -128,36 +128,25 @@ bool orionldGetEntities(void)
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
-
+  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   char*                 idString       = (id   != NULL)? id      : idPattern;
   const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
-  char*                 detail;
-  char*                 idVector[32];    // Is 32 a good limit?
-  int                   idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
-  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
-
-  //
-  // FIXME: Move this to orionldMhdConnectionInit()
-  //
-  if ((id != NULL) && (*id == 0))
-    id = NULL;
-
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
   // GET /entities/{EID} do the work
   //
-  if ((id != NULL) && (strchr(id, ',') == NULL))
+  if (orionldState.in.idList.items == 1)
   {
     //
     // Only ONE entity 'id' is given, so ...
     // we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
     //
-    orionldState.wildcard[0] = id;
+    orionldState.wildcard[0] = orionldState.in.idList.array[0];
 
     //
     // An array must be returned from GET /entities.
@@ -310,22 +299,6 @@ bool orionldGetEntities(void)
   }
 
 
-  idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
-
-  //
-  // Make sure all IDs are valid URIs
-  //
-  for (int ix = 0; ix < idVecItems; ix++)
-  {
-    if (pcheckUri(idVector[ix], true, &detail) == false)
-    {
-      LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (id array item)
-      return false;
-    }
-  }
-
-
   //
   // If ONE or ZERO types in URI param 'type', the prepared array isn't used, just a simple char-pointer (named "type")
   //
@@ -336,17 +309,17 @@ bool orionldGetEntities(void)
   //
   // ID-list and Type-list at the same time is not supported
   //
-  if ((idVecItems > 1) && (orionldState.in.typeList.items > 1))
+  if ((orionldState.in.idList.items > 1) && (orionldState.in.typeList.items > 1))
   {
     LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
     return false;
   }
-  else if (idVecItems > 1)  // A list of Entity IDs, a single Entity TYPE
+  else if (orionldState.in.idList.items > 1)  // A list of Entity IDs, a single Entity TYPE
   {
-    for (int ix = 0; ix < idVecItems; ix++)
+    for (int ix = 0; ix < orionldState.in.idList.items; ix++)
     {
-      entityIdP = new EntityId(idVector[ix], type, "false", isTypePattern);
+      entityIdP = new EntityId(orionldState.in.idList.array[ix], type, "false", isTypePattern);
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
