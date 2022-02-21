@@ -229,7 +229,7 @@ static void optionsParse(const char* options)
 #if 0
   // Need a decision in ETSI IOSG CIM for this - currently it's a valid request
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
-    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when keyValues output format is selected", 400);    
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when keyValues output format is selected", 400);
 #endif
 }
 

@@ -64,18 +64,15 @@ typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* sub
 //
 // Function pointer types for the DB interface
 //
-typedef KjNode* (*DbEntityRetrieveFunction)
-  (
-    const char*  entityId,
-    char**       attrs,
-    bool         attrMandatory,
-    bool         sysAttrs,
-    bool         keyValues,
-    bool         concise,
-    const char*  datasetId,
-    const char*  geoProperty,
-    KjNode**     geoPropertyP
-  );
+typedef KjNode* (*DbEntityRetrieveFunction)(const char*  entityId,
+                                            char**       attrs,
+                                            bool         attrMandatory,
+                                            bool         sysAttrs,
+                                            bool         keyValues,
+                                            bool         concise,
+                                            const char*  datasetId,
+                                            const char*  geoProperty,
+                                            KjNode**     geoPropertyP);
 
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
