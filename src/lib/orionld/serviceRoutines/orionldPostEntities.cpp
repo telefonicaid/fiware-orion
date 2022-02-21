@@ -67,8 +67,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
@@ -186,13 +184,11 @@ bool orionldPostEntities(void)
   }
 
   //
-  // payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
-  // from the payload body, so, the entity type is not expanded by pCheckEntity()
-  // It's done here instead
+  // NOTE
+  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   from the payload body, so, the entity type is not expanded by pCheckEntity()
+  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
   //
-
-  entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
-  orionldState.payloadTypeNode->value.s = entityType;
 
   //
   // Check and fix the incoming payload (entity)

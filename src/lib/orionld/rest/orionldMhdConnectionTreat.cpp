@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kStringSplit.h"                                  // kStringSplit
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
@@ -51,6 +52,7 @@ extern "C"
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
@@ -72,6 +74,8 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
@@ -564,6 +568,268 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 }
 
 
+static int commaCount(char* s)
+{
+  int commas = 0;
+
+  while (*s != 0)
+  {
+    if (*s == ',')
+      ++commas;
+    ++s;
+  }
+
+  return commas;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamAttrs -
+//
+static bool pCheckUriParamAttrs(void)
+{
+  if (orionldState.uriParams.attrs == NULL)
+    return true;
+
+  int   items     = commaCount(orionldState.uriParams.attrs) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
+
+  orionldState.in.attrsList.items = items;
+  orionldState.in.attrsList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.attrsList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /attrs/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /attrs/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrsList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamId -
+//
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only alloowed by those services that need expansion (GET /entities and GET /registrations)
+//
+static bool pCheckUriParamId(void)
+{
+  if (orionldState.uriParams.id == NULL)
+    return true;
+
+  if (orionldState.uriParams.id[0] == 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Entity ID", "Empty String", 400);
+    return false;
+  }
+
+  int   items     = commaCount(orionldState.uriParams.id) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.id);  // Keep original value of 'id'
+
+  orionldState.in.idList.items = items;
+  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.idList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /id/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /id/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.idList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    if (pCheckUri(orionldState.in.idList.array[item], true) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamType -
+//
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only allowed by those services that need expansion (GET /entities and GET /registrations)
+//
+static bool pCheckUriParamType(void)
+{
+  if (orionldState.uriParams.type == NULL)
+    return true;
+
+  int   items     = commaCount(orionldState.uriParams.type) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.type);  // Keep original value of 'type'
+
+  orionldState.in.typeList.items = items;
+  orionldState.in.typeList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.typeList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /type/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /type/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.typeList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    orionldState.in.typeList.array[item] = orionldContextItemExpand(orionldState.contextP, orionldState.in.typeList.array[item], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamGeoProperty -
+//
+static bool pCheckUriParamGeoProperty()
+{
+  if (orionldState.uriParams.geoproperty == NULL)
+    return true;
+
+  if ((strcmp(orionldState.uriParams.geoproperty, "location")         != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "observationSpace") != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "operationSpace")   != 0))
+  {
+    orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamGeometryProperty -
+//
+static bool pCheckUriParamGeometryProperty()
+{
+  if (orionldState.uriParams.geometryProperty == NULL)
+  {
+    orionldState.uriParams.geometryProperty  = (char*) "location";
+    orionldState.in.geometryPropertyExpanded = (char*) "location";
+  }
+  else
+  {
+    if ((strcmp(orionldState.uriParams.geometryProperty, "location")         != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "observationSpace") != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "operationSpace")   != 0))
+    {
+      orionldState.in.geometryPropertyExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
+    }
+    else
+      orionldState.in.geometryPropertyExpanded = orionldState.uriParams.geometryProperty;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckPayloadEntityType -
+//
+static bool pCheckPayloadEntityType(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_TYPE) == ORIONLD_SERVICE_OPTION_EXPAND_TYPE)
+  {
+    if (orionldState.payloadTypeNode != NULL)
+      orionldState.payloadTypeNode->value.s = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUrlPathAttributeName -
+//
+static bool pCheckUrlPathAttributeName(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_ATTR) == ORIONLD_SERVICE_OPTION_EXPAND_ATTR)
+  {
+    orionldState.in.pathAttrExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[1], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamExpansion -
+//
+// Expand attribute names and entity types.
+// Convert comma separated lists (attrs + type + id + ...) into arrays.
+//
+// Doing the "type" node from the payload body as well. Not a URI param, but close enough
+//
+static bool uriParamExpansion(void)
+{
+  if (pCheckUriParamId()               == false) return false;
+  if (pCheckUriParamType()             == false) return false;
+  if (pCheckUriParamAttrs()            == false) return false;
+  if (pCheckUriParamGeoProperty()      == false) return false;
+  if (pCheckUriParamGeometryProperty() == false) return false;
+  if (pCheckPayloadEntityType()        == false) return false;
+  if (pCheckUrlPathAttributeName()     == false) return false;
+
+  // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
+
+  return true;
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -772,6 +1038,15 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.link == NULL)
     orionldState.link = orionldState.contextP->url;
 
+
+  //
+  // @context is in place, even if in the payload body.
+  // It is now possible to expand attribute names and entity types for the URI parameters.
+  // Only exception is for batch operations that can have a number of @contexts in their entity arrays.
+  // But, those operations don't support the affected URI params anyways, so, no probs
+  //
+  if (uriParamExpansion() == false)
+    goto respond;
 
   // -----------------------------------------------------------------------------
   //

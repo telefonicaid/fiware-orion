@@ -125,43 +125,28 @@ bool orionldGetEntities(void)
   char*                 idPattern      = orionldState.uriParams.idPattern;
   char*                 q              = orionldState.uriParams.q;
   char*                 attrs          = orionldState.uriParams.attrs;
-
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
-
-  char*                 idString       = (id != NULL)? id      : idPattern;
-  const char*           isIdPattern    = (id != NULL)? "false" : "true";
+  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
+  char*                 idString       = (id   != NULL)? id      : idPattern;
+  const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
-  char*                 typeExpanded   = NULL;
-  char*                 detail;
-  char*                 idVector[32];    // Is 32 a good limit?
-  char*                 typeVector[32];  // Is 32 a good limit?
-  int                   idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
-  int                   typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
-  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
-
-  //
-  // FIXME: Move this to orionldMhdConnectionInit()
-  //
-  if ((id != NULL) && (*id == 0))
-    id = NULL;
-
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
   // GET /entities/{EID} do the work
   //
-  if ((id != NULL) && (strchr(id, ',') == NULL))
+  if (orionldState.in.idList.items == 1)
   {
     //
     // Only ONE entity 'id' is given, so ...
     // we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
     //
-    orionldState.wildcard[0] = id;
+    orionldState.wildcard[0] = orionldState.in.idList.array[0];
 
     //
     // An array must be returned from GET /entities.
@@ -313,94 +298,51 @@ bool orionldGetEntities(void)
     isIdPattern = (char*) "true";
   }
 
-  if (type == NULL)  // No type given - match all types
-  {
-    type          = (char*) ".*";
-    isTypePattern = true;
-    typeVecItems  = 0;  // Just to avoid entering the "if (typeVecItems == 1)"
-  }
-  else
-  {
-    typeVecItems = kStringSplit(type, ',', (char**) typeVector, typeVecItems);
 
-    if (typeVecItems == 1)  // type needs to be modified according to @context
-    {
-      //
-      // NOTE:
-      //   No expansion desired if the type is already FQN - however, this may
-      //   null out prefix expansion so, I've removed the call to pcheckUri() and I always expand ...
-      //
-      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
+  //
+  // If ONE or ZERO types in URI param 'type', the prepared array isn't used, just a simple char-pointer (named "type")
+  //
+  if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
+  else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
 
-      isTypePattern = false;  // Just in case ...
-    }
-  }
-
-  idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
 
   //
   // ID-list and Type-list at the same time is not supported
   //
-  if ((idVecItems > 1) && (typeVecItems > 1))
+  if ((orionldState.in.idList.items > 1) && (orionldState.in.typeList.items > 1))
   {
     LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
     return false;
   }
-
-  //
-  // Make sure all IDs are valid URIs
-  //
-  for (int ix = 0; ix < idVecItems; ix++)
+  else if (orionldState.in.idList.items > 1)  // A list of Entity IDs, a single Entity TYPE
   {
-    if (pcheckUri(idVector[ix], true, &detail) == false)
+    for (int ix = 0; ix < orionldState.in.idList.items; ix++)
     {
-      LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (id array item)
-      return false;
-    }
-  }
-
-  if (idVecItems > 1)  // A list of Entity IDs
-  {
-    for (int ix = 0; ix < idVecItems; ix++)
-    {
-      entityIdP = new EntityId(idVector[ix], type, "false", isTypePattern);
+      entityIdP = new EntityId(orionldState.in.idList.array[ix], type, "false", isTypePattern);
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
-  else if (typeVecItems > 1)  // A list of Entity Types instead of Entity IDs (both cannot co-exist)
+  else if (orionldState.in.typeList.items > 1)  // A list of Entity TYPES, a single Entity ID
   {
-    for (int ix = 0; ix < typeVecItems; ix++)
+    for (int ix = 0; ix < orionldState.in.typeList.items; ix++)
     {
-      if (pcheckUri(typeVector[ix], true, &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);  // URI Param 'type'
-      else
-        typeExpanded = typeVector[ix];
-
-      entityIdP = new EntityId(idString, typeExpanded, isIdPattern, false);
+      entityIdP = new EntityId(idString, orionldState.in.typeList.array[ix], isIdPattern, false);
       mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
-  else  // Definitely no lists in EntityId id/type
+  else  // ONE Entity ID/PATTERN, ONE Entity TYPE (or .*)
   {
     entityIdP = new EntityId(idString, type, isIdPattern, isTypePattern);
     mongoRequest.entityIdVector.push_back(entityIdP);
   }
 
-  char* attrsV[100];
-  int   attrsCount = 0;
 
-  if (attrs != NULL)
+  if (orionldState.in.attrsList.items > 0)
   {
-    attrsCount = (int) sizeof(attrsV) / sizeof(attrsV[0]);
-
-    attrsCount = kStringSplit(attrs, ',', (char**) attrsV, attrsCount);
-
-    for (int ix = 0; ix < attrsCount; ix++)
+    for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
     {
-      attrsV[ix] = orionldAttributeExpand(orionldState.contextP, attrsV[ix], true, NULL);  // URI Param 'attrs'
-      mongoRequest.attributeList.push_back(attrsV[ix]);
+      mongoRequest.attributeList.push_back(orionldState.in.attrsList.array[ix]);
     }
   }
 
@@ -475,13 +417,13 @@ bool orionldGetEntities(void)
   //
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
-  orionldState.responseTree = kjTreeFromQueryContextResponse(false, NULL, keyValues, &mongoResponse);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, &mongoResponse);
 
   //
   // Work-around for Accept: application/geo+json
   //
-  // If attrs is used and the Geo-Property is not part of the attrs list, then the GeoProperty will be set to NULL
-  // even though it may exist.
+  // If URI-param 'attrs' is used and the Geo-Property is not part of the attrs list,
+  // then the GeoProperty will be set to NULL even though it may exist.
   //
   // As it will be really hard to modify mongoBackend to include that attribute that is not asked for (in URI param 'attrs'),
   // a workaround would be to perform an extra query:
@@ -496,15 +438,15 @@ bool orionldGetEntities(void)
   //     "geometry": null
   //   with whatever was found in this second query to mongo
   //
-  if ((orionldState.out.contentType == GEOJSON) && (attrsCount > 0) && (orionldState.responseTree->type == KjArray))
+  if ((orionldState.out.contentType == GEOJSON) && (orionldState.in.attrsList.items > 0) && (orionldState.responseTree->type == KjArray))
   {
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(attrsV, attrsCount, geoPropertyName);
+    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(orionldState.in.attrsList.array, orionldState.in.attrsList.items, geoPropertyName);
 
     int ix = 0;
-    while (ix < attrsCount)
+    while (ix < orionldState.in.attrsList.items)
     {
-      if (strcmp(geoPropertyName, attrsV[ix]) == 0)
+      if (strcmp(geoPropertyName, orionldState.in.attrsList.array[ix]) == 0)
         geoPropertyNameInAttrs = true;
 
       ++ix;
@@ -540,9 +482,7 @@ bool orionldGetEntities(void)
           (strcmp(geoPropertyName, "observationSpace") != 0) &&
           (strcmp(geoPropertyName, "operationSpace")   != 0))
       {
-        geoPropertyNameExpanded = orionldAttributeExpand(orionldState.contextP, (char*) geoPropertyName, true, NULL);  // URI Param 'geoproperty'
-
-        geoPropertyNameExpanded = kaStrdup(&orionldState.kalloc, geoPropertyNameExpanded);
+        geoPropertyNameExpanded = orionldState.in.geometryPropertyExpanded;
         dotForEq(geoPropertyNameExpanded);
       }
 

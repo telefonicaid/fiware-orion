@@ -73,7 +73,7 @@ void pcheckUriInit(void)
     validUriChars[ix] = true;
   }
 
-  // And at last, the special charcters
+  // Special characters
   validUriChars['%']  = true;
   validUriChars[':']  = true;
   validUriChars['/']  = true;
@@ -97,6 +97,12 @@ void pcheckUriInit(void)
   validUriChars['.']  = true;
   validUriChars['_']  = true;
   validUriChars['~']  = true;
+
+  // Not so sure about this ... (MSB set)
+  for (int ix = 0x80; ix <= 0xFF; ix++)
+  {
+    validUriChars[ix]  = true;
+  }
 }
 
 
@@ -105,7 +111,7 @@ void pcheckUriInit(void)
 //
 // pcheckUri - check that the string 'uri' is a valid URI
 //
-// If strict - cannot be a shoprtname
+// If strict - cannot be a shortname
 // If colon found - it's not a shortname
 //
 // If shortname - all chars are OK except ' '

@@ -39,7 +39,6 @@
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
 #include "mongoBackend/safeMongo.h"                              // moreSafe
 #include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery
@@ -55,32 +54,18 @@
 //
 // It is the responsibility of the caller to make sure that 'idList' is non-NULL
 //
-static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idList, std::string* detailsP)
+static void uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char** idList, int ids)
 {
-  std::vector<std::string>    idVec;
-  int                         ids;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
 
-  ids = stringSplit(idList, ',', idVec);
-
-  if (ids == 0)
-  {
-    *detailsP = "URI Param /id/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "id");
-    return false;
-  }
-
   for (int ix = 0; ix < ids; ix++)
   {
-    bsonArray.append(idVec[ix]);
+    bsonArray.append(idList[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("_id", bsonInExpression.obj());
-  orionldState.uriParams.id = NULL;
-
-  return true;
 }
 
 
@@ -117,49 +102,18 @@ static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char
 //
 // It is the responsibility of the caller to make sure that 'typeList' is non-NULL
 //
-static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typeList, std::string* detailsP)
+static void uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char** typeList, int types)
 {
-  std::vector<std::string>    typeVec;
-  int                         types;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
-  char*                       details;
-
-  //
-  // FIXME: Need a new implementation of stringSplit -
-  //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
-  //        only points to them.
-  //
-  types = stringSplit(typeList, ',', typeVec);
-
-  if (types == 0)
-  {
-    *detailsP = "URI Param /type/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "type");
-    return false;
-  }
 
   for (int ix = 0; ix < types; ix++)
   {
-    char* type = (char*) typeVec[ix].c_str();
-
-    if ((strncmp(type, "http", 4) == 0) && (pcheckUri(type, true, &details) == true))
-    {
-      // No expansion desired, the type is already a FQN
-      bsonArray.append(type);
-    }
-    else
-    {
-      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
-      bsonArray.append(typeExpanded);
-    }
+    bsonArray.append(typeList[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.entities.type", bsonInExpression.obj());
-  orionldState.uriParams.type = NULL;
-
-  return true;
 }
 
 
@@ -170,33 +124,18 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 //
 // It is the responsibility of the caller to make sure that 'attrsList' is non-NULL
 //
-static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList, std::string* detailsP)
+static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, std::string* detailsP)
 {
-  std::vector<std::string>    attrsVec;
-  int                         attrs;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
 
-  attrs = stringSplit(attrsList, ',', attrsVec);
-
-  if (attrs == 0)
+  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
   {
-    *detailsP = "URI Param /attrs/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "attrs");
-    return false;
-  }
-
-  for (int ix = 0; ix < attrs; ix++)
-  {
-    char* attr = (char*) attrsVec[ix].c_str();
-
-    attr = orionldAttributeExpand(orionldState.contextP, attr, true, NULL);  // URI Param 'attrs'
-    bsonArray.append(attr);
+    bsonArray.append(orionldState.in.attrsList.array[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.attrs.name", bsonInExpression.obj());
-  orionldState.uriParams.attrs = NULL;
 
   return true;
 }
@@ -220,16 +159,13 @@ bool mongoLdRegistrationsGet
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
 
-  if ((orionldState.uriParams.id != NULL) && uriParamIdToFilter(&queryBuilder, orionldState.uriParams.id, &oeP->details) == false)
-    return false;
-
-  if ((orionldState.uriParams.type != NULL) && (uriParamTypeToFilter(&queryBuilder, orionldState.uriParams.type, &oeP->details) == false))
-    return false;
+  if (orionldState.in.idList.items   > 0) uriParamIdToFilter(&queryBuilder,   orionldState.in.idList.array,   orionldState.in.idList.items);
+  if (orionldState.in.typeList.items > 0) uriParamTypeToFilter(&queryBuilder, orionldState.in.typeList.array, orionldState.in.typeList.items);
 
   if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern, &oeP->details) == false))
     return false;
 
-  if ((orionldState.uriParams.attrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, orionldState.uriParams.attrs, &oeP->details) == false))
+  if ((orionldState.in.attrsList.items > 0) && (uriParamAttrsToFilter(&queryBuilder, &oeP->details) == false))
     return false;
 
 

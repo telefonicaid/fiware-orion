@@ -52,7 +52,6 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
@@ -360,46 +359,14 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 
 
 
-// -----------------------------------------------------------------------------
-//
-// attrsListToArray -
-//
-static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[], int attrVecLen, int* attrsCountP)
-{
-  int items = kStringSplit(attrList, ',', eqAttrV, attrVecLen);
-
-  dotAttrV[items] = NULL;
-  eqAttrV[items]  = NULL;
-
-  for (int ix = 0; ix < items; ix++)
-  {
-    if (strcmp(eqAttrV[ix], "location") != 0)
-    {
-      eqAttrV[ix]  = orionldAttributeExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
-      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-
-      // Copy eqAttrV[ix] before converting '.' to '=' - to not destroy the @context
-      eqAttrV[ix]  = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-      dotForEq(eqAttrV[ix]);
-    }
-    else
-      dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
-  }
-
-  *attrsCountP = items;
-  return eqAttrV;
-}
-
-
-
 // #define USE_MONGO_BACKEND 0
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntity -
 //
 // URI params:
-// - attrs               (orionldState.uriParams.attrs)
-// - options=keyValues   ()
+// - attrs
+// - options=keyValues
 //
 // For the NGSI-LD Forwarding scheme to work, we need to check for registrations and not only in the
 // local database. For this to work correctly:
@@ -415,11 +382,12 @@ bool orionldGetEntity(void)
 {
   char*    detail;
   KjNode*  regArray = NULL;
+  char*    eId      = orionldState.wildcard[0];
 
   //
-  // Make sure the ID (orionldState.wildcard[0]) is a valid URI
+  // Make sure the ID (eId) is a valid URI
   //
-  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
+  if (pcheckUri(eId, true, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)
@@ -427,11 +395,11 @@ bool orionldGetEntity(void)
   }
 
   if (forwarding)
-    regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
+    regArray = dbRegistrationLookup(eId, NULL, NULL);
 
 #ifdef USE_MONGO_BACKEND
   bool                      keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId                  entityId(orionldState.wildcard[0], "", "false", false);
+  EntityId                  entityId(eId, "", "false", false);
   QueryContextRequest       request;
   QueryContextResponse      response;
   std::vector<std::string>  servicePathV;
@@ -462,39 +430,42 @@ bool orionldGetEntity(void)
   if ((response.errorCode.code == SccOk) || (response.errorCode.code == 0))
   {
     // Create response by converting "QueryContextResponse response" into a KJson tree
-    orionldState.responseTree = kjTreeFromQueryContextResponse(true, orionldState.uriParams.attrs, keyValues, &response);
+    orionldState.responseTree = kjTreeFromQueryContextResponse(true, keyValues, &response);
   }
 #else
-  char*  dotAttrs[100];
-  char*  eqAttrs[100];
-  int    noOfAttrs      = 0;
-  bool   attrsMandatory = false;
+  bool attrsMandatory = false;
 
-  dotAttrs[0] = NULL;
-  eqAttrs[0]  = NULL;
+  //
+  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for dbEntityRetrieve
+  // Slightly modified as dbEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
+  //
+  char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrsList.items + 1));
 
-  if (orionldState.uriParams.attrs != NULL)
+  eqAttrV[orionldState.in.attrsList.items] = NULL;  // NULL-terminate the array
+
+  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
   {
-    attrsListToArray(orionldState.uriParams.attrs, dotAttrs, eqAttrs, 100, &noOfAttrs);
-    if (regArray == NULL)  // No matching registrations
-      attrsMandatory = true;
+    eqAttrV[ix] = kaStrdup(&orionldState.kalloc, orionldState.in.attrsList.array[ix]);
+    dotForEq(eqAttrV[ix]);
   }
+
+  if ((orionldState.in.attrsList.items > 0) && (regArray == NULL))  // attrs given, no matching registrations => no hit unless some attr present
+    attrsMandatory = true;
 
   char* geometryProperty = NULL;
   if (orionldState.out.contentType == GEOJSON)
   {
-    if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
+    if (orionldState.uriParams.geometryProperty != NULL)
     {
-      geometryProperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
-      geometryProperty = kaStrdup(&orionldState.kalloc, geometryProperty);
+      geometryProperty = kaStrdup(&orionldState.kalloc, orionldState.in.geometryPropertyExpanded);
       dotForEq(geometryProperty);
     }
     else
       geometryProperty = (char*) "location";
   }
 
-  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
-                                               eqAttrs,
+  orionldState.responseTree = dbEntityRetrieve(eId,
+                                               eqAttrV,
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
                                                orionldState.uriParamOptions.keyValues,
@@ -506,9 +477,9 @@ bool orionldGetEntity(void)
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
     if (attrsMandatory == true)
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", orionldState.wildcard[0]);
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", eId);
     else
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", eId);
     orionldState.httpStatusCode = SccContextElementNotFound;  // 404
 
     return false;
@@ -533,7 +504,7 @@ bool orionldGetEntity(void)
 
     if (orionldState.responseTree == NULL)
     {
-      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", orionldState.wildcard[0]);
+      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", eId);
 
       orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(orionldState.responseTree, idNodeP);
@@ -541,7 +512,7 @@ bool orionldGetEntity(void)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
+    orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrsList.array, orionldState.in.attrsList.items);
   }
 
   return true;

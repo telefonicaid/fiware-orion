@@ -207,6 +207,18 @@ typedef struct OrionldStateOut
 
 // -----------------------------------------------------------------------------
 //
+// UriParamList -
+//
+typedef struct UriParamList
+{
+  int     items;
+  char**  array;
+} UriParamList;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionldStateIn - data of the request
 //
 typedef struct OrionldStateIn
@@ -231,6 +243,15 @@ typedef struct OrionldStateIn
   bool      attributeFormatAsObject;
   bool      entityTypeDoesNotExist;
   bool      entityTypeExists;
+  char*     geometryPropertyExpanded;
+
+  // Processed URI params
+  UriParamList  idList;
+  UriParamList  typeList;
+  UriParamList  attrsList;
+
+  // Processed wildcards
+  char*         pathAttrExpanded;
 } OrionldStateIn;
 
 

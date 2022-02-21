@@ -72,7 +72,6 @@ extern "C"
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*, performanceTimestamps
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 
@@ -1301,31 +1300,25 @@ bool entitiesQuery
         {
           if (orionldState.apiVersion == NGSI_LD_V1)
           {
-            char  locationCoordinates[512];
-            char* attrNameP = (char*) "location";  // Default geoproperty name
+            char  dbAttrValuePath[512];
 
-            //
-            // If uriParams.geoproperty not present, then "location" is the default name of the geoproperty to use
-            // If uriParams.geoproperty  IS present, then we need to replace all '.' for '='
-            //
-            // After that, "attrs.$ATTRNAME.coordinates" must be used
-            //
-            if ((orionldState.uriParams.geoproperty != NULL) && (strcmp(orionldState.uriParams.geoproperty, "location") != 0))
+            if (orionldState.uriParams.geoproperty == NULL)
+              strncpy(dbAttrValuePath, "attrs.location.value", sizeof(dbAttrValuePath) - 1);
+            else
             {
-              attrNameP = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // URI Param 'geoproperty'
-              dotForEq(attrNameP);
+              char* attrName = kaStrdup(&orionldState.kalloc, orionldState.uriParams.geoproperty);
+              dotForEq(attrName);
+              snprintf(dbAttrValuePath, sizeof(dbAttrValuePath), "attrs.%s.value", attrName);
             }
 
-            snprintf(locationCoordinates, sizeof(locationCoordinates), "attrs.%s.value", attrNameP);
-
-            finalQuery.append(locationCoordinates, areaQuery);
+            finalQuery.append(dbAttrValuePath, areaQuery);
           }
           else
           {
-            std::string locationCoordinates;
+            std::string dbAttrValuePath;
 
-            locationCoordinates = ENT_LOCATION "." ENT_LOCATION_COORDS;
-            finalQuery.append(locationCoordinates, areaQuery);
+            dbAttrValuePath = ENT_LOCATION "." ENT_LOCATION_COORDS;
+            finalQuery.append(dbAttrValuePath, areaQuery);
           }
         }
       }

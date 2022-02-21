@@ -41,7 +41,7 @@ brokerStart CB 31
 
 echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values"
 echo "==============================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?id=E1,E2,E3&type=T1,T2,T3&idPattern=E.*&attrs=A1,A2,A3"
+orionCurl --url "/ngsi-ld/v1/entities?id=urn:E1,urn:E2,urn:E3&type=T1,T2,T3&idPattern=E.*&attrs=A1,A2,A3"
 echo
 echo
 

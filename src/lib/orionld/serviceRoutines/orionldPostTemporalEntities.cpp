@@ -34,7 +34,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/numberToDate.h"                            // numberToDate
-#include "orionld/context/orionldContextItemExpand.h"               // orionldContextItemExpand
 #include "orionld/payloadCheck/PCHECK.h"                            // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                    // pCheckEntityId
 #include "orionld/payloadCheck/pCheckEntityType.h"                  // pCheckEntityType
@@ -98,8 +97,13 @@ bool orionldPostTemporalEntities(void)
   if (pCheckEntityId(orionldState.payloadIdNode,     true, &entityId)   == false)   return false;
   if (pCheckEntityType(orionldState.payloadTypeNode, true, &entityType) == false)   return false;
 
-  entityType = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);  // entity::type removed from payload body - needs expansion
-  orionldState.payloadTypeNode->value.s = entityType;
+  //
+  // NOTE
+  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   from the payload body, so, the entity type is not expanded by pCheckEntity()
+  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //
+
 
   //
   // Check/Expand all attributes (RHS can be Array or Object), using pCheckAttribute
