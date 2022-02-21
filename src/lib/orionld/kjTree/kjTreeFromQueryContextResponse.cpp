@@ -309,13 +309,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
 
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
       }
-      else if (concise)
-      {
-        LM_TMP(("KZ: Concise - needs to be implemented!!!"));
-        aTop = kjString(orionldState.kjsonP, attrName, "CONCISE ...");
-        kjChildAdd(top, aTop);
-      }
-      else  // Normalized
+      else  // Normalized   AND    Concise  - concise is dealt with later!
       {
         LM_TMP(("KZ: Normalized"));
         //

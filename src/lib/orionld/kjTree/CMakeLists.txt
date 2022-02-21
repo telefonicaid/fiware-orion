@@ -50,6 +50,8 @@ SET (SOURCES
     kjTreeToCompoundValue.cpp
     kjStringArraySortedInsert.cpp
     kjSort.cpp
+    kjChildCount.cpp
+    kjEntityNormalizedToConcise.cpp
 )
 
 # Include directories

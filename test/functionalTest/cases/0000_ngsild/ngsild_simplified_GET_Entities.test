@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity in Concise Format
+GET Entities in Concise Format
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -35,15 +35,17 @@ brokerStart CB
 #        I've implemented that, in orionldMhdConnectionInit.cpp, but it's outdeffed for now.
 #        - Need a decision in ETSI ISG CIM
 #
+
+#
 # 01. Create an entity E1 attributes of all types, and sub-attrs of all types
-# 02. GET E1 in Concise output format
-# 03. GET E1 in Normalized output format
+# 02. GET using Concise output format
+# 03. GET using Normalized output format
 # 04. Attempt with Concise+KeyValues
 # 05. Attempt with Concise+Normalized
 # 06. Attempt with KeyValues+Normalized
 # 07. Attempt with Concise+KeyValues+Normalized
 # 08. Attempt with KeyValues+sysAttrs
-# 09. GET E1 in Concise output format w/ sysAttrs
+# 09. GET using Concise output format w/ sysAttrs
 #
 
 echo "01. Create an entity E1 attributes of all types, and sub-attrs of all types"
@@ -74,58 +76,58 @@ echo
 echo
 
 
-echo "02. GET E1 in Concise output format"
+echo "02. GET using Concise output format"
 echo "==================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=concise
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise'
 echo
 echo
 
 
-echo "03. GET E1 in Normalized output format"
+echo "03. GET using Normalized output format"
 echo "======================================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=normalized
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=normalized'
 echo
 echo
 
 
 echo "04. Attempt with Concise+KeyValues"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=concise,keyValues
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise,keyValues'
 echo
 echo
 
 
 echo "05. Attempt with Concise+Normalized"
 echo "==================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=concise,normalized
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise,normalized'
 echo
 echo
 
 
 echo "06. Attempt with KeyValues+Normalized"
 echo "====================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=keyValues,normalized
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=keyValues,normalized'
 echo
 echo
 
 
 echo "07. Attempt with Concise+KeyValues+Normalized"
 echo "============================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=concise,keyValues,normalized
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise,keyValues,normalized'
 echo
 echo
 
 
 echo "08. Attempt with KeyValues+sysAttrs"
 echo "==================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=keyValues,sysAttrs
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=keyValues,sysAttrs'
 echo
 echo
 
 
-echo "09. GET E1 in Concise output format w/ sysAttrs"
+echo "09. GET using Concise output format w/ sysAttrs"
 echo "==============================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=concise,sysAttrs
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise,sysAttrs'
 echo
 echo
 
@@ -140,34 +142,16 @@ Date: REGEX(.*)
 
 
 
-02. GET E1 in Concise output format
+02. GET using Concise output format
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 367
+Content-Length: 369
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "Array": [
-        5,
-        6
-    ],
-    "Bool": "true",
-    "Float": 3.14,
-    "Geo": {
-        "coordinates": [
-            1,
-            2
-        ],
-        "type": "Point"
-    },
-    "Int": 1,
-    "Rel": {
-        "object": "urn:ngsi-ld:entities:E2"
-    },
-    "String": "String",
-    "Sub": {
+[
+    {
         "Array": [
             5,
             6
@@ -186,60 +170,43 @@ Date: REGEX(.*)
             "object": "urn:ngsi-ld:entities:E2"
         },
         "String": "String",
-        "value": 6
-    },
-    "id": "urn:ngsi-ld:entities:E1",
-    "type": "T"
-}
+        "Sub": {
+            "Array": [
+                5,
+                6
+            ],
+            "Bool": "true",
+            "Float": 3.14,
+            "Geo": {
+                "coordinates": [
+                    1,
+                    2
+                ],
+                "type": "Point"
+            },
+            "Int": 1,
+            "Rel": {
+                "object": "urn:ngsi-ld:entities:E2"
+            },
+            "String": "String",
+            "value": 6
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T"
+    }
+]
 
 
-03. GET E1 in Normalized output format
+03. GET using Normalized output format
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 771
+Content-Length: 773
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "Array": {
-        "type": "Property",
-        "value": [
-            5,
-            6
-        ]
-    },
-    "Bool": {
-        "type": "Property",
-        "value": "true"
-    },
-    "Float": {
-        "type": "Property",
-        "value": 3.14
-    },
-    "Geo": {
-        "type": "GeoProperty",
-        "value": {
-            "coordinates": [
-                1,
-                2
-            ],
-            "type": "Point"
-        }
-    },
-    "Int": {
-        "type": "Property",
-        "value": 1
-    },
-    "Rel": {
-        "object": "urn:ngsi-ld:entities:E2",
-        "type": "Relationship"
-    },
-    "String": {
-        "type": "Property",
-        "value": "String"
-    },
-    "Sub": {
+[
+    {
         "Array": {
             "type": "Property",
             "value": [
@@ -277,12 +244,51 @@ Date: REGEX(.*)
             "type": "Property",
             "value": "String"
         },
-        "type": "Property",
-        "value": 6
-    },
-    "id": "urn:ngsi-ld:entities:E1",
-    "type": "T"
-}
+        "Sub": {
+            "Array": {
+                "type": "Property",
+                "value": [
+                    5,
+                    6
+                ]
+            },
+            "Bool": {
+                "type": "Property",
+                "value": "true"
+            },
+            "Float": {
+                "type": "Property",
+                "value": 3.14
+            },
+            "Geo": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        1,
+                        2
+                    ],
+                    "type": "Point"
+                }
+            },
+            "Int": {
+                "type": "Property",
+                "value": 1
+            },
+            "Rel": {
+                "object": "urn:ngsi-ld:entities:E2",
+                "type": "Relationship"
+            },
+            "String": {
+                "type": "Property",
+                "value": "String"
+            },
+            "type": "Property",
+            "value": 6
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T"
+    }
+]
 
 
 04. Attempt with Concise+KeyValues
@@ -344,90 +350,48 @@ Date: REGEX(.*)
 08. Attempt with KeyValues+sysAttrs
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 272
+Content-Length: 274
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "Array": [
-        5,
-        6
-    ],
-    "Bool": "true",
-    "Float": 3.14,
-    "Geo": {
-        "coordinates": [
-            1,
-            2
-        ],
-        "type": "Point"
-    },
-    "Int": 1,
-    "Rel": "urn:ngsi-ld:entities:E2",
-    "String": "String",
-    "Sub": 6,
-    "createdAt": "REGEX(.*)",
-    "id": "urn:ngsi-ld:entities:E1",
-    "modifiedAt": "REGEX(.*)",
-    "type": "T"
-}
-
-
-09. GET E1 in Concise output format w/ sysAttrs
-===============================================
-HTTP/1.1 200 OK
-Content-Length: 1751
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "Array": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "value": [
+[
+    {
+        "Array": [
             5,
             6
-        ]
-    },
-    "Bool": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "value": "true"
-    },
-    "Float": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "value": 3.14
-    },
-    "Geo": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "value": {
+        ],
+        "Bool": "true",
+        "Float": 3.14,
+        "Geo": {
             "coordinates": [
                 1,
                 2
             ],
             "type": "Point"
-        }
-    },
-    "Int": {
+        },
+        "Int": 1,
+        "Rel": "urn:ngsi-ld:entities:E2",
+        "String": "String",
+        "Sub": 6,
         "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:entities:E1",
         "modifiedAt": "REGEX(.*)",
-        "value": 1
-    },
-    "Rel": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "object": "urn:ngsi-ld:entities:E2"
-    },
-    "String": {
-        "createdAt": "REGEX(.*)",
-        "modifiedAt": "REGEX(.*)",
-        "value": "String"
-    },
-    "Sub": {
+        "type": "T"
+    }
+]
+
+
+09. GET using Concise output format w/ sysAttrs
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 1753
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
         "Array": {
             "createdAt": "REGEX(.*)",
             "modifiedAt": "REGEX(.*)",
@@ -472,15 +436,61 @@ Date: REGEX(.*)
             "modifiedAt": "REGEX(.*)",
             "value": "String"
         },
+        "Sub": {
+            "Array": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": [
+                    5,
+                    6
+                ]
+            },
+            "Bool": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": "true"
+            },
+            "Float": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": 3.14
+            },
+            "Geo": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": {
+                    "coordinates": [
+                        1,
+                        2
+                    ],
+                    "type": "Point"
+                }
+            },
+            "Int": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": 1
+            },
+            "Rel": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "object": "urn:ngsi-ld:entities:E2"
+            },
+            "String": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "value": "String"
+            },
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "value": 6
+        },
         "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:entities:E1",
         "modifiedAt": "REGEX(.*)",
-        "value": 6
-    },
-    "createdAt": "REGEX(.*)",
-    "id": "urn:ngsi-ld:entities:E1",
-    "modifiedAt": "REGEX(.*)",
-    "type": "T"
-}
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--

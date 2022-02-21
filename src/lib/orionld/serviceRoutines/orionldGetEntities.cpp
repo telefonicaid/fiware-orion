@@ -55,6 +55,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
@@ -137,12 +138,6 @@ bool orionldGetEntities(void)
   EntityId*             entityIdP;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
-
-  if (concise == true)
-  {
-    orionldError(OrionldOperationNotSupported, "Not Implemented", "Concise Output Format not supported yet for GET /entities", 501);
-    return false;
-  }
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
@@ -518,6 +513,9 @@ bool orionldGetEntities(void)
   // Add "count" if asked for
   if (countP != NULL)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, *countP);
+
+  if (orionldState.uriParamOptions.concise == true)
+    kjEntityNormalizedToConcise(orionldState.responseTree);
 
   mongoRequest.release();
 
