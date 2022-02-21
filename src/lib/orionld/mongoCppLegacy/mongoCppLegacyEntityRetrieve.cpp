@@ -160,7 +160,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
         kjChildRemove(mdP, modifiedAtP);
     }
   }
-  else
+  else  // Normalized
   {
     KjNode* createdAtP  = kjLookup(attrP, "createdAt");
     KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
@@ -354,6 +354,66 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 
 // ----------------------------------------------------------------------------
 //
+// kjChildCount -
+//
+static int kjChildCount(KjNode* containerP)
+{
+  int     children = 0;
+  KjNode* childP   = containerP->value.firstChildP;
+
+  while (childP != NULL)
+  {
+    ++children;
+    childP = childP->next;
+  }
+
+  return children;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// conciseSlim -
+//
+static void conciseSlim(KjNode* outputP)
+{
+  for (KjNode* attrP = outputP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (attrP->type != KjObject)
+      continue;
+
+    KjNode* typeP  = kjLookup(attrP, "type");
+    KjNode* valueP = kjLookup(attrP, "value");
+
+    if ((typeP != NULL) && (valueP != NULL) && (strcmp(typeP->value.s, "Property") == 0))
+      kjChildRemove(attrP, typeP);
+
+    // Same for GeoProperty
+    if ((typeP != NULL) && (valueP) && (strcmp(typeP->value.s, "GeoProperty") == 0))
+      kjChildRemove(attrP, typeP);
+
+    // If only value - make it keyValues
+    if ((valueP != NULL) && (kjChildCount(attrP) == 1))
+    {
+      attrP->type      = valueP->type;
+      attrP->value     = valueP->value;
+      continue;
+    }
+
+    // If Relationship, remove typeP - leave "object"
+    if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
+      kjChildRemove(attrP, typeP);
+
+    // Same same for Sub-Attributes
+    conciseSlim(attrP);
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // mongoCppLegacyEntityRetrieve -
 //
 // FIXME: Move database model relevant code to some other function (for reusal)
@@ -374,6 +434,7 @@ KjNode* mongoCppLegacyEntityRetrieve
   bool         attrMandatory,
   bool         sysAttrs,
   bool         keyValues,
+  bool         concise,
   const char*  datasetId,
   const char*  geoPropertyName,
   KjNode**     geoPropertyP
@@ -381,6 +442,9 @@ KjNode* mongoCppLegacyEntityRetrieve
 {
   KjNode* attrTree  = NULL;
   KjNode* dbTree    = NULL;
+
+  LM_TMP(("KZ: concise:   %d", concise));
+  LM_TMP(("KZ: keyValues: %d", keyValues));
 
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
@@ -722,6 +786,10 @@ KjNode* mongoCppLegacyEntityRetrieve
     idP->lastChild->next = attrTree->value.firstChildP;
     idP->lastChild       = attrTree->lastChild;
   }
+
+  // Finally, if "Concise Output Format", fix the tree accordingly
+  if (concise == true)
+    conciseSlim(idP);
 
   return idP;
 }

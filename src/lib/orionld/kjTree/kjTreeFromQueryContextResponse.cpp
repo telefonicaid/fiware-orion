@@ -117,7 +117,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, QueryContextResponse* responseP)
 {
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
@@ -188,19 +188,20 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, QueryContext
 
   for (int ix = 0; ix < hits; ix++)
   {
-    ContextElement* ceP = &responseP->contextElementResponseVector[ix]->contextElement;
+    ContextElement*  ceP = &responseP->contextElementResponseVector[ix]->contextElement;
+    KjNode*          nodeP;
 
+    //
+    // Creating the KjNode tree for the entity - 'top'
+    // If more than one hit, 'top' is added to the array 'root'
+    // If just one hit, 'top' points directly to root, whioch is then not an array but an Object
+    //
     if (oneHit == false)
     {
       top = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(root, top);
     }
 
-
-    //
-    // Time to create the KjNode tree
-    //
-    KjNode*  nodeP;
 
     // id
     nodeP = kjString(orionldState.kjsonP, "id", ceP->entityId.id.c_str());
@@ -308,8 +309,15 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, QueryContext
 
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
       }
-      else
+      else if (concise)
       {
+        LM_TMP(("KZ: Concise - needs to be implemented!!!"));
+        aTop = kjString(orionldState.kjsonP, attrName, "CONCISE ...");
+        kjChildAdd(top, aTop);
+      }
+      else  // Normalized
+      {
+        LM_TMP(("KZ: Normalized"));
         //
         // NOT keyValues - create entire attribute tree
         //
