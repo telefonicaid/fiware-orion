@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                                 // NULL
+
 #include "mongo/client/dbclient.h"                                  // MongoDB C++ Client Legacy Driver
 
 extern "C"
@@ -46,6 +48,7 @@ extern "C"
 #include "orionld/common/performance.h"                             // PERFORMANCE
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // kjEntityNormalizedToConcise
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
 
 
@@ -348,66 +351,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
   }
 
   return true;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// kjChildCount -
-//
-static int kjChildCount(KjNode* containerP)
-{
-  int     children = 0;
-  KjNode* childP   = containerP->value.firstChildP;
-
-  while (childP != NULL)
-  {
-    ++children;
-    childP = childP->next;
-  }
-
-  return children;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// conciseSlim -
-//
-static void conciseSlim(KjNode* outputP)
-{
-  for (KjNode* attrP = outputP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (attrP->type != KjObject)
-      continue;
-
-    KjNode* typeP  = kjLookup(attrP, "type");
-    KjNode* valueP = kjLookup(attrP, "value");
-
-    if ((typeP != NULL) && (valueP != NULL) && (strcmp(typeP->value.s, "Property") == 0))
-      kjChildRemove(attrP, typeP);
-
-    // Same for GeoProperty
-    if ((typeP != NULL) && (valueP) && (strcmp(typeP->value.s, "GeoProperty") == 0))
-      kjChildRemove(attrP, typeP);
-
-    // If only value - make it keyValues
-    if ((valueP != NULL) && (kjChildCount(attrP) == 1))
-    {
-      attrP->type      = valueP->type;
-      attrP->value     = valueP->value;
-      continue;
-    }
-
-    // If Relationship, remove typeP - leave "object"
-    if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
-      kjChildRemove(attrP, typeP);
-
-    // Same same for Sub-Attributes
-    conciseSlim(attrP);
-  }
 }
 
 
@@ -789,7 +732,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 
   // Finally, if "Concise Output Format", fix the tree accordingly
   if (concise == true)
-    conciseSlim(idP);
+    kjEntityNormalizedToConcise(idP);
 
   return idP;
 }
