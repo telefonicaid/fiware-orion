@@ -469,6 +469,7 @@ bool orionldGetEntity(void)
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
                                                orionldState.uriParamOptions.keyValues,
+                                               orionldState.uriParamOptions.concise,
                                                orionldState.uriParams.datasetId,
                                                geometryProperty,
                                                &orionldState.geoPropertyNode);
@@ -488,7 +489,7 @@ bool orionldGetEntity(void)
 
   //
   // GET /ngsi-ld/v1/entities/{entityId} returns a single Entity, not an Array.
-  // It is supposed that there is only ONE entity with a certain Enmtity ID in the entire system ...
+  // It is supposed that there is only ONE entity with a certain Entity ID in the entire system ...
   //
   // However, a Context Provider (or more) may have a copy of an entity and that same entity may exist in local in the broker ...
   // In the future we need to rethink this, and perhaps return an Array of entities, not just one single entity.

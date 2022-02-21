@@ -43,6 +43,7 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
@@ -188,6 +189,8 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
       else if (strcmp(optionStart, "noOverwrite")   == 0)  orionldState.uriParamOptions.noOverwrite   = true;
       else if (strcmp(optionStart, "keyValues")     == 0)  orionldState.uriParamOptions.keyValues     = true;
+      else if (strcmp(optionStart, "concise")       == 0)  orionldState.uriParamOptions.concise       = true;
+      else if (strcmp(optionStart, "normalized")    == 0)  orionldState.uriParamOptions.normalized    = true;
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
       else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "count")         == 0)  orionldState.uriParams.count               = true;  // NGSIv2 compatibility
@@ -214,6 +217,20 @@ static void optionsParse(const char* options)
 
     ++cP;
   }
+
+  if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.concise && orionldState.uriParamOptions.normalized)
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "All three output formats (keyValues, concise, normalized) are set", 400);
+  else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.concise)
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /keyValues/ and /concise/ output formats are set", 400);
+  else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.normalized)
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /keyValues/ and /normalized/ output formats are set", 400);
+  else if (orionldState.uriParamOptions.concise && orionldState.uriParamOptions.normalized)
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /concise/ and /normalized/ output formats are set", 400);
+#if 0
+  // Need a decision in ETSI IOSG CIM for this - currently it's a valid request
+  else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when keyValues output format is selected", 400);    
+#endif
 }
 
 

@@ -49,6 +49,7 @@ extern KjNode* mongoCppLegacyEntityRetrieve
   bool         attrMandatory,
   bool         sysAttrs,
   bool         keyValues,
+  bool         concise,
   const char*  datasetId,
   const char*  geoPropertyName,
   KjNode**     geoPropertyP

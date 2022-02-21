@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/common/qParse.h"                             // qParse
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
@@ -129,12 +130,19 @@ bool orionldGetEntities(void)
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
+  bool                  concise        = orionldState.uriParamOptions.concise;
   char*                 idString       = (id   != NULL)? id      : idPattern;
   const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
+
+  if (concise == true)
+  {
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Concise Output Format not supported yet for GET /entities", 501);
+    return false;
+  }
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
@@ -417,7 +425,7 @@ bool orionldGetEntities(void)
   //
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
-  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, &mongoResponse);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, concise, &mongoResponse);
 
   //
   // Work-around for Accept: application/geo+json

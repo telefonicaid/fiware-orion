@@ -101,6 +101,8 @@ typedef struct OrionldUriParamOptions
   bool update;
   bool replace;
   bool keyValues;
+  bool concise;
+  bool normalized;
   bool values;         // Only NGSIv2
   bool uniqueValues;   // Only NGSIv2
   bool dateCreated;    // Only NGSIv2
