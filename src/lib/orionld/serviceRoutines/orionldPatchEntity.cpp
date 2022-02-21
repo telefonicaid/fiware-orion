@@ -177,7 +177,7 @@ bool orionldPatchEntity(void)
         continue;
       }
 
-      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);
+      newAttrP->name = orionldAttributeExpand(orionldState.contextP, newAttrP->name, true, NULL);  // Expansion before pCheckAttribute
     }
 
     //

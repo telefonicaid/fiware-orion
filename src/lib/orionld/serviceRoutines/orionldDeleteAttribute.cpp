@@ -44,7 +44,6 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
 
 
@@ -155,9 +154,9 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 //
 bool orionldDeleteAttribute(void)
 {
-  char*    entityId = orionldState.wildcard[0];
-  char*    attrName = orionldState.wildcard[1];
-  char*    attrNameExpanded;
+  char*    entityId         = orionldState.wildcard[0];
+  char*    attrName         = orionldState.wildcard[1];
+  char*    attrNameExpanded = orionldState.in.pathAttrExpanded;
   char*    attrNameExpandedEq;
 
   //
@@ -185,10 +184,9 @@ bool orionldDeleteAttribute(void)
   //
   // Expand the attribute name and save it in the orionldState.wildcard array, so that the TROE won't have to expand it as well
   //
-  attrNameExpanded         = orionldAttributeExpand(orionldState.contextP, attrName, true, NULL);
-  orionldState.wildcard[1] = attrNameExpanded;
+  orionldState.wildcard[1] = orionldState.in.pathAttrExpanded;
 
-  attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
+  attrNameExpandedEq = kaStrdup(&orionldState.kalloc, orionldState.in.pathAttrExpanded);
   dotForEq(attrNameExpandedEq);
 
 

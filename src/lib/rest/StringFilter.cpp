@@ -659,7 +659,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    char* expanded = orionldAttributeExpand(orionldState.contextP, (char*) attributeName.c_str(), true, NULL);
+    char* expanded = orionldAttributeExpand(orionldState.contextP, (char*) attributeName.c_str(), true, NULL);  // NGSIv2 'q'
 
     //
     // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo

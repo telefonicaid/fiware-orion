@@ -55,7 +55,7 @@ bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
     char*   expanded;
 
     STRING_CHECK(attributeP, "String-List item");
-    expanded = orionldAttributeExpand(orionldState.contextP, attributeP->value.s, true, NULL);
+    expanded = orionldAttributeExpand(orionldState.contextP, attributeP->value.s, true, NULL);  // 'watchedAttributes' for Subscription
     stringListP->push_back(expanded);
   }
 

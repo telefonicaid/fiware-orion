@@ -52,7 +52,6 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
@@ -456,10 +455,9 @@ bool orionldGetEntity(void)
   char* geometryProperty = NULL;
   if (orionldState.out.contentType == GEOJSON)
   {
-    if ((orionldState.uriParams.geometryProperty != NULL) && (strcmp(orionldState.uriParams.geometryProperty, "location") != 0))
+    if (orionldState.uriParams.geometryProperty != NULL)
     {
-      geometryProperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
-      geometryProperty = kaStrdup(&orionldState.kalloc, geometryProperty);
+      geometryProperty = kaStrdup(&orionldState.kalloc, orionldState.in.geometryPropertyExpanded);
       dotForEq(geometryProperty);
     }
     else

@@ -54,8 +54,6 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
@@ -741,8 +739,8 @@ bool orionldPatchAttribute(void)
 
 
   OrionldContextItem*  contextItemP       = NULL;
-  char*                attrNameExpanded   = orionldAttributeExpand(orionldState.contextP, attrName, true, &contextItemP);  // From URL PATH
-  char*                attrNameExpandedEq = kaStrdup(&orionldState.kalloc, attrNameExpanded);
+  char*                attrNameExpanded   = orionldState.in.pathAttrExpanded;
+  char*                attrNameExpandedEq = kaStrdup(&orionldState.kalloc, orionldState.in.pathAttrExpanded);
 
   dotForEq(attrNameExpandedEq);
   inAttribute->name = attrNameExpanded;

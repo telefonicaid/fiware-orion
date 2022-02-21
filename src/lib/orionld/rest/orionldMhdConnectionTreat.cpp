@@ -74,6 +74,7 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
@@ -714,7 +715,7 @@ static bool pCheckUriParamType(void)
 
   for (int item = 0; item < items; item++)
   {
-    orionldState.in.typeList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.typeList.array[item], true, NULL);  // Expand-function
+    orionldState.in.typeList.array[item] = orionldContextItemExpand(orionldState.contextP, orionldState.in.typeList.array[item], true, NULL);  // Expand-function
   }
 
   return true;
@@ -731,7 +732,13 @@ static bool pCheckUriParamGeoProperty()
   if (orionldState.uriParams.geoproperty == NULL)
     return true;
 
-  orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
+  if ((strcmp(orionldState.uriParams.geoproperty, "location")         != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "observationSpace") != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "operationSpace")   != 0))
+  {
+    orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
+  }
+
   return true;
 }
 
@@ -745,7 +752,8 @@ static bool pCheckUriParamGeometryProperty()
 {
   if (orionldState.uriParams.geometryProperty == NULL)
   {
-    orionldState.uriParams.geometryProperty = (char*) "location";
+    orionldState.uriParams.geometryProperty  = (char*) "location";
+    orionldState.in.geometryPropertyExpanded = (char*) "location";
   }
   else
   {
@@ -755,6 +763,8 @@ static bool pCheckUriParamGeometryProperty()
     {
       orionldState.in.geometryPropertyExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
     }
+    else
+      orionldState.in.geometryPropertyExpanded = orionldState.uriParams.geometryProperty;
   }
 
   return true;
@@ -771,7 +781,23 @@ static bool pCheckPayloadEntityType(void)
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_TYPE) == ORIONLD_SERVICE_OPTION_EXPAND_TYPE)
   {
     if (orionldState.payloadTypeNode != NULL)
-      orionldState.payloadTypeNode->value.s = orionldAttributeExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+      orionldState.payloadTypeNode->value.s = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUrlPathAttributeName -
+//
+static bool pCheckUrlPathAttributeName(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_ATTR) == ORIONLD_SERVICE_OPTION_EXPAND_ATTR)
+  {
+    orionldState.in.pathAttrExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[1], true, NULL);  // Expand-function
   }
 
   return true;
@@ -796,7 +822,7 @@ static bool uriParamExpansion(void)
   if (pCheckUriParamGeoProperty()      == false) return false;
   if (pCheckUriParamGeometryProperty() == false) return false;
   if (pCheckPayloadEntityType()        == false) return false;
-
+  if (pCheckUrlPathAttributeName()     == false) return false;
 
   // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
 

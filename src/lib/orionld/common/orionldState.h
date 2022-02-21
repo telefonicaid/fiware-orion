@@ -249,6 +249,9 @@ typedef struct OrionldStateIn
   UriParamList  idList;
   UriParamList  typeList;
   UriParamList  attrsList;
+
+  // Processed wildcards
+  char*         pathAttrExpanded;
 } OrionldStateIn;
 
 

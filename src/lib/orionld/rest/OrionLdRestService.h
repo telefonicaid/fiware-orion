@@ -105,6 +105,8 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED                     (1 << 6)
 #define ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK                 (1 << 7)
 #define ORIONLD_SERVICE_OPTION_EXPAND_TYPE                           (1 << 8)
+#define ORIONLD_SERVICE_OPTION_EXPAND_ATTR                           (1 << 9)
+
 
 
 // -----------------------------------------------------------------------------

@@ -287,6 +287,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldPatchAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
   }
   else if (serviceP->serviceRoutine == orionldPatchEntity)
   {
@@ -294,6 +295,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
     serviceP->uriParams |= ORIONLD_URIPARAM_DATASETID;
     serviceP->uriParams |= ORIONLD_URIPARAM_DELETEALL;
   }

@@ -54,7 +54,7 @@
 //
 // It is the responsibility of the caller to make sure that 'idList' is non-NULL
 //
-static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char** idList, int ids, std::string* detailsP)
+static void uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char** idList, int ids)
 {
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
@@ -66,8 +66,6 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char** idLi
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("_id", bsonInExpression.obj());
-
-  return true;
 }
 
 
@@ -104,49 +102,18 @@ static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char
 //
 // It is the responsibility of the caller to make sure that 'typeList' is non-NULL
 //
-static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typeList, std::string* detailsP)
+static void uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char** typeList, int types)
 {
-  std::vector<std::string>    typeVec;
-  int                         types;
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
-  char*                       details;
-
-  //
-  // FIXME: Need a new implementation of stringSplit -
-  //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
-  //        only points to them.
-  //
-  types = stringSplit(typeList, ',', typeVec);
-
-  if (types == 0)
-  {
-    *detailsP = "URI Param /type/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "type");
-    return false;
-  }
 
   for (int ix = 0; ix < types; ix++)
   {
-    char* type = (char*) typeVec[ix].c_str();
-
-    if ((strncmp(type, "http", 4) == 0) && (pcheckUri(type, true, &details) == true))
-    {
-      // No expansion desired, the type is already a FQN
-      bsonArray.append(type);
-    }
-    else
-    {
-      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);  // URI Param 'type'
-      bsonArray.append(typeExpanded);
-    }
+    bsonArray.append(typeList[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.entities.type", bsonInExpression.obj());
-  orionldState.uriParams.type = NULL;
-
-  return true;
 }
 
 
@@ -192,11 +159,8 @@ bool mongoLdRegistrationsGet
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
 
-  if ((orionldState.in.idList.items > 0) && uriParamIdToFilter(&queryBuilder, orionldState.in.idList.array, orionldState.in.idList.items, &oeP->details) == false)
-    return false;
-
-  if ((orionldState.uriParams.type != NULL) && (uriParamTypeToFilter(&queryBuilder, orionldState.uriParams.type, &oeP->details) == false))
-    return false;
+  if (orionldState.in.idList.items   > 0) uriParamIdToFilter(&queryBuilder,   orionldState.in.idList.array,   orionldState.in.idList.items);
+  if (orionldState.in.typeList.items > 0) uriParamTypeToFilter(&queryBuilder, orionldState.in.typeList.array, orionldState.in.typeList.items);
 
   if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern, &oeP->details) == false))
     return false;
