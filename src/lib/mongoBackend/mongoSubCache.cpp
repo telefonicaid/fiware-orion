@@ -794,6 +794,14 @@ void mongoSubCountersUpdateOnSync
   {
     incB.append(CSUB_FAILSCOUNTER, failsCounter);
   }
+  else if (count > 0)
+  {
+    // no fails mean notification ok, thus reseting the counter. The count > 0 check is needed to
+    // ensure that at least one notification has been sent in since last cache refresh
+    // see cases/3541_subscription_max_fails_limit/failsCounter_keeps_after_cache_refresh_cycles.test
+    setB.append(CSUB_FAILSCOUNTER, 0);
+  }
+
   if ((lastNotificationTimeP != NULL) && (*lastNotificationTimeP > 0))
   {
     setB.append(CSUB_LASTNOTIFICATION, (long long) *lastNotificationTimeP);

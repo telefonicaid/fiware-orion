@@ -1231,9 +1231,10 @@ void subCacheSync(void)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    // Not NULL in some of this means "dirty" data to update in DB at the end
-    // Note that for count and failsCounter are special: they are update in DB
-    // using $inc and not $set and they are flushed during the cache refres process
+    // Not-NULL in some of this means "dirty" data to update in DB at the end
+    // Note that count and failsCounter are special: they are update in DB
+    // using $inc and not $set and they are flushed during the cache refresh process.
+    // There aren't pointer for them
     int64_t*      lastNotificationTimeP = NULL;
     int64_t*      lastFailureP          = NULL;
     int64_t*      lastSuccessP          = NULL;
@@ -1297,7 +1298,7 @@ void subCacheSync(void)
   }
 
   //
-  // 6. Free the vector savedSubV
+  // 5. Free the vector savedSubV
   //
   for (std::map<std::string, CachedSubSaved*>::iterator it = savedSubV.begin(); it != savedSubV.end(); ++it)
   {
