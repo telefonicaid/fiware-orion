@@ -1154,30 +1154,30 @@ void subCacheSync(void)
     // lastNotification, lastFailure and lastSuccess
     if (cssP != NULL)
     {
-      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
+      if (cssP->lastNotificationTime < cSubP->lastNotificationTime)
       {
-        // cssP->lastNotificationTime is older than what's currently in DB => throw away
-        cssP->lastNotificationTime = -1;
+        // cssP->lastNotificationTime is older than what's currently in DB => update cache with DB
+        cssP->lastNotificationTime = cSubP->lastNotificationTime;
       }
 
       if (cssP->lastFailure < cSubP->lastFailure)
       {
-        // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure       = -1;
-        cssP->lastFailureReason = "";
+        // cssP->lastFailure is older than what's currently in DB => update cache with DB
+        cssP->lastFailure       = cSubP->lastFailure;
+        cssP->lastFailureReason = cSubP->lastFailureReason;
       }
 
       if (cssP->lastSuccess < cSubP->lastSuccess)
       {
-        // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess     = -1;
-        cssP->lastSuccessCode = -1;
+        // cssP->lastSuccess is older than what's currently in DB => update cache with DB
+        cssP->lastSuccess     = cSubP->lastSuccess;
+        cssP->lastSuccessCode = cSubP->lastSuccessCode;
       }
 
       if (cssP->statusLastChange < cSubP->statusLastChange)
       {
-        // cssP->status is older than what's currently in DB => throw away
-        cssP->status = "";
+        // cssP->status is older than what's currently in DB => update cache with DB
+        cssP->status = cSubP->status;
       }
     }
 
