@@ -711,6 +711,12 @@ static void mongoSubCountersUpdateLastSuccess
 *
 * mongoSubCountersUpdate - update subscription counters and timestamps in mongo
 *
+* Used in notification logic
+*
+* FIXME P5: maybe this and mongoSubCountersUpdateOnSync() should be unified. This is
+* an old function, used in the past also in cache sync logic but found problematic after Orion 3.4.0,
+* now only used for notification logic. Maybe the new approach in mongoSubCountersUpdateOnSync() could
+* be used also in this case.
 */
 void mongoSubCountersUpdate
 (
@@ -750,5 +756,93 @@ void mongoSubCountersUpdate
   if (lastSuccess > 0)
   {
     mongoSubCountersUpdateLastSuccess(db, COL_CSUBS, subId, lastSuccess, statusCode);
+  }
+}
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdateOnSync -
+*
+* Used in cache sync logic
+*/
+void mongoSubCountersUpdateOnSync
+(
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           count,
+  long long           failsCounter,
+  int64_t*            lastNotificationTimeP,
+  int64_t*            lastFailureP,
+  int64_t*            lastSuccessP,
+  std::string*        failureReasonP,
+  int64_t*            statusCodeP,
+  std::string*        statusP,
+  double*             statusLastChangeP
+)
+{
+  orion::BSONObjBuilder  condition;
+  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  setB;
+  orion::BSONObjBuilder  incB;
+
+  if (count > 0)
+  {
+    incB.append(CSUB_COUNT, count);
+  }
+  if (failsCounter > 0)
+  {
+    incB.append(CSUB_FAILSCOUNTER, failsCounter);
+  }
+  if ((lastNotificationTimeP != NULL) && (*lastNotificationTimeP > 0))
+  {
+    setB.append(CSUB_LASTNOTIFICATION, (long long) *lastNotificationTimeP);
+  }
+  if ((lastFailureP != NULL) && (*lastFailureP > 0))
+  {
+    setB.append(CSUB_LASTFAILURE, (long long) *lastFailureP);
+  }
+  if ((lastSuccessP != NULL) && (*lastSuccessP > 0))
+  {
+    setB.append(CSUB_LASTSUCCESS, (long long) *lastSuccessP);
+  }
+  if (failureReasonP != NULL)
+  {
+    setB.append(CSUB_LASTFAILUREASON, *failureReasonP);
+  }
+  if (statusCodeP != NULL)
+  {
+    setB.append(CSUB_LASTSUCCESSCODE, (long long) *statusCodeP);
+  }
+  if (statusP != NULL)
+  {
+    setB.append(CSUB_STATUS, *statusP);
+  }
+  if (statusLastChangeP != NULL)
+  {
+    setB.append(CSUB_STATUS_LAST_CHANGE, *statusLastChangeP);
+  }
+
+  if ((incB.nFields() == 0) && (setB.nFields() == 0))
+  {
+    // Nothing to update, return
+    return;
+  }
+
+  if (incB.nFields() > 0)
+  {
+    update.append("$inc", incB.obj());
+  }
+  if (setB.nFields() > 0)
+  {
+    update.append("$set", setB.obj());
+  }
+
+  condition.append("_id", orion::OID(subId));
+
+  std::string  err;
+  if (collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, condition.obj(), update.obj(), false, &err) != true)
+  {
+    LM_E(("Runtime Error (error updating subs during cache sync: %s)", err.c_str()));
   }
 }

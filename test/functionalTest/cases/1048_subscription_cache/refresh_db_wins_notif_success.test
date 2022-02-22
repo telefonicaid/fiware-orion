@@ -334,7 +334,6 @@ Date: REGEX(.*)
         "mq": "",
         "q": ""
     },
-    "failsCounter": 0,
     "format": "normalized",
     "lastNotification": 2524644000,
     "lastSuccess": 2524644000,

@@ -404,7 +404,6 @@ Date: REGEX(.*)
         "mq": "",
         "q": ""
     },
-    "failsCounter": 0,
     "format": "normalized",
     "lastNotification": REGEX(1[6-9]\d+),
     "lastSuccess": REGEX(1[6-9]\d+),

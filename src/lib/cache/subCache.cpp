@@ -1142,6 +1142,7 @@ void subCacheSync(void)
   subCacheRefresh();
 
 
+#if 0
   //
   // 3. Compare lastNotificationTime/Failure/Success in savedSubV with the new cache-contents
   //
@@ -1222,7 +1223,78 @@ void subCacheSync(void)
 
     cSubP = cSubP->next;
   }
+#endif
 
+  // 3. Check if DB or local cache is newer, updating DB in the second case
+  cSubP = subCache.head;
+  while (cSubP != NULL)
+  {
+    CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
+
+    // Not NULL in some of this means "dirty" data to update in DB at the end
+    // Note that for count and failsCounter are special: they are update in DB
+    // using $inc and not $set and they are flushed during the cache refres process
+    int64_t*      lastNotificationTimeP = NULL;
+    int64_t*      lastFailureP          = NULL;
+    int64_t*      lastSuccessP          = NULL;
+    std::string*  failureReasonP        = NULL;
+    int64_t*      statusCodeP           = NULL;
+    std::string*  statusP               = NULL;
+    double*       statusLastChangeP     = NULL;
+
+    if (cssP != NULL)
+    {
+      if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastNotificationTime = cssP->lastNotificationTime;
+        lastNotificationTimeP = &cSubP->lastNotificationTime;
+      }
+
+      if (cssP->lastFailure > cSubP->lastFailure)
+      {
+        // cssP->lastFailure is newers than what's currently in DB => update in cSubP and DB
+        cSubP->lastFailure       = cssP->lastFailure;
+        cSubP->lastFailureReason = cssP->lastFailureReason;
+        lastFailureP   = &cSubP->lastFailure;
+        failureReasonP = &cSubP->lastFailureReason;
+      }
+
+      if (cssP->lastSuccess > cSubP->lastSuccess)
+      {
+        // cssP->lastSuccess is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastSuccess     = cssP->lastSuccess;
+        cSubP->lastSuccessCode = cssP->lastSuccessCode;
+        lastSuccessP = &cSubP->lastSuccess;
+        statusCodeP  = &cSubP->lastSuccessCode;
+      }
+
+      if (cssP->statusLastChange > cSubP->statusLastChange)
+      {
+        // cssP->status is newer than what's currently in DB => update in cSubP and DB
+        cSubP->status           = cssP->status;
+        cSubP->statusLastChange = cssP->statusLastChange;
+        statusP           = &cSubP->status;
+        statusLastChangeP = &cSubP->statusLastChange;
+      }
+
+      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+
+      mongoSubCountersUpdateOnSync(tenant,
+                                   cSubP->subscriptionId,
+                                   cssP->count,
+                                   cssP->failsCounter,
+                                   lastNotificationTimeP,
+                                   lastFailureP,
+                                   lastSuccessP,
+                                   failureReasonP,
+                                   statusCodeP,
+                                   statusP,
+                                   statusLastChangeP);
+    }
+
+    cSubP = cSubP->next;
+  }
 
   //
   // 6. Free the vector savedSubV
