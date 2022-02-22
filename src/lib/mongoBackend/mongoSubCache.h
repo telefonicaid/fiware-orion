@@ -88,11 +88,11 @@ extern void mongoSubCacheRefresh(const std::string& database);
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdate -
+* mongoSubUpdateOnNotif -
 *
 * Used in notification logic
 */
-extern void mongoSubCountersUpdate
+extern void mongoSubUpdateOnNotif
 (
   const std::string&  tenant,
   const std::string&  subId,
@@ -111,11 +111,11 @@ extern void mongoSubCountersUpdate
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateOnSync -
+* mongoSubUpdateOnCacheSync -
 *
 * Used in cache sync logic
 */
-extern void mongoSubCountersUpdateOnSync
+extern void mongoSubUpdateOnCacheSync
 (
   const std::string&  tenant,
   const std::string&  subId,

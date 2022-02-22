@@ -709,16 +709,18 @@ static void mongoSubCountersUpdateLastSuccess
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdate - update subscription counters and timestamps in mongo
+* mongoSubUpdateOnNotif - update subscription doc in mongo due to a notification
 *
 * Used in notification logic
 *
-* FIXME P5: maybe this and mongoSubCountersUpdateOnSync() should be unified. This is
-* an old function, used in the past also in cache sync logic but found problematic after Orion 3.4.0,
-* now only used for notification logic. Maybe the new approach in mongoSubCountersUpdateOnSync() could
-* be used also in this case.
+* Athough we are updating basically the same things (count, failsCounter, etc.),
+* we cannot use mongoSubUpdateOnCacheSync(). Note that in mongoSubUpdateOnCacheSync()
+* we start from a reference status in DB so we can decide what to update in a
+* single shot. However, in the notification case we don't know the status of the
+* DB so we need updates with a query part adapted to a possibly newer data in DB
+* (e.g. we use $max for lastNotificationTime).
 */
-void mongoSubCountersUpdate
+void mongoSubUpdateOnNotif
 (
   const std::string&  tenant,
   const std::string&  subId,
@@ -762,11 +764,11 @@ void mongoSubCountersUpdate
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateOnSync -
+* mongoSubUpdateOnCacheSync -
 *
 * Used in cache sync logic
 */
-void mongoSubCountersUpdateOnSync
+void mongoSubUpdateOnCacheSync
 (
   const std::string&  tenant,
   const std::string&  subId,
