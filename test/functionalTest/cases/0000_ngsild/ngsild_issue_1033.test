@@ -1,0 +1,264 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of entities in the GeoJSON format
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity pig003 with a location GeoProperty
+# 02. GET the pig without options (normalized is default output format)
+# 03. GET the pig with options=concise
+# 04. GET the pig with options=keyValues
+# 05. GET the pig with options=normalized
+#
+
+echo "01. Create entity pig003 with a location GeoProperty"
+echo "===================================================="
+payload='{
+  "id": "urn:ngsi-ld:Animal:pig003",
+  "type": "Animal",
+  "heartRate": {
+    "type": "Property",
+    "value": 63
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13.356, 52.514 ]
+    },
+    "observedAt": "2022-02-22T16:12:36.908Z",
+    "providedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Device:pig003"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the pig without options (normalized is default output format)"
+echo "====================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003 --out application/geo+json
+echo
+echo
+
+
+echo "03. GET the pig with options=concise"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003?options=concise --out application/geo+json
+echo
+echo
+
+
+echo "04. GET the pig with options=keyValues"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003?options=keyValues --out application/geo+json
+echo
+echo
+
+
+echo "05. GET the pig with options=normalized"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003?options=normalized --out application/geo+json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity pig003 with a location GeoProperty
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003
+Date: REGEX(.*)
+
+
+
+02. GET the pig without options (normalized is default output format)
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 459
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            13.356,
+            52.514
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:Animal:pig003",
+    "properties": {
+        "heartRate": {
+            "type": "Property",
+            "value": 63
+        },
+        "location": {
+            "observedAt": "2022-02-22T16:12:36.908Z",
+            "providedBy": {
+                "object": "urn:ngsi-ld:Device:pig003",
+                "type": "Relationship"
+            },
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.356,
+                    52.514
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Animal"
+    },
+    "type": "Feature"
+}
+
+
+03. GET the pig with options=concise
+====================================
+HTTP/1.1 200 OK
+Content-Length: 388
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            13.356,
+            52.514
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:Animal:pig003",
+    "properties": {
+        "heartRate": 63,
+        "location": {
+            "observedAt": "2022-02-22T16:12:36.908Z",
+            "providedBy": {
+                "object": "urn:ngsi-ld:Device:pig003"
+            },
+            "value": {
+                "coordinates": [
+                    13.356,
+                    52.514
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Animal"
+    },
+    "type": "Feature"
+}
+
+
+04. GET the pig with options=keyValues
+======================================
+HTTP/1.1 200 OK
+Content-Length: 286
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            13.356,
+            52.514
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:Animal:pig003",
+    "properties": {
+        "heartRate": 63,
+        "location": {
+            "coordinates": [
+                13.356,
+                52.514
+            ],
+            "type": "Point"
+        },
+        "type": "Animal"
+    },
+    "type": "Feature"
+}
+
+
+05. GET the pig with options=normalized
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 459
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            13.356,
+            52.514
+        ],
+        "type": "Point"
+    },
+    "id": "urn:ngsi-ld:Animal:pig003",
+    "properties": {
+        "heartRate": {
+            "type": "Property",
+            "value": 63
+        },
+        "location": {
+            "observedAt": "2022-02-22T16:12:36.908Z",
+            "providedBy": {
+                "object": "urn:ngsi-ld:Device:pig003",
+                "type": "Relationship"
+            },
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.356,
+                    52.514
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Animal"
+    },
+    "type": "Feature"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

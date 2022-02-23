@@ -74,7 +74,7 @@ static KjNode* geoPropertyNodeLookup(KjNode* geoPropertyNodes, KjNode* entityIdN
 //
 // kjGeojsonEntitiesTransform -
 //
-KjNode* kjGeojsonEntitiesTransform(KjNode* tree, bool keyValues)
+KjNode* kjGeojsonEntitiesTransform(KjNode* tree)
 {
   KjNode* geojsonTreeP        = kjObject(orionldState.kjsonP, NULL);
   KjNode* geojsonTypeP        = kjString(orionldState.kjsonP, "type", "FeatureCollection");
@@ -103,7 +103,7 @@ KjNode* kjGeojsonEntitiesTransform(KjNode* tree, bool keyValues)
       //   geoPropertyNodeReallyNotThere = true;
     }
 
-    KjNode* geojsonEntityP  = kjGeojsonEntityTransform(entityP, keyValues, geoPropertyNode);  // , geoPropertyNodeReallyNotThere
+    KjNode* geojsonEntityP  = kjGeojsonEntityTransform(entityP, geoPropertyNode);  // , geoPropertyNodeReallyNotThere
     kjChildAdd(geojsonFeatureArray, geojsonEntityP);
   }
 

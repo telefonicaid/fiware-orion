@@ -77,7 +77,7 @@ extern "C"
 //   ]
 // }
 //
-KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoPropertyNode)
+KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
 {
   //
   // 1. Find and remove 'id' and 'type' from the original entity
@@ -164,6 +164,14 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, bool keyValues, KjNode* geoProper
       }
       else
       {
+        if (orionldState.uriParamOptions.concise == true)
+        {
+          // In 'Concise' attribute format, there may be no type field
+          KjNode* valueP = kjLookup(geoPropertyP, "value");
+
+          if (valueP != NULL)
+            geoPropertyP = valueP;
+        }
         geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
         geoPropertyP->name = (char*) "geometry";
       }
