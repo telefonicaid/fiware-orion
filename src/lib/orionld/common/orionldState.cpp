@@ -107,11 +107,12 @@ char              mongoServerVersion[32];
 //
 // Variables for Mongo C Driver
 //
-mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;
-mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
-mongoc_collection_t*  mongoSubscriptionsCollectionP = NULL;
-mongoc_collection_t*  mongoContextsCollectionP      = NULL;  // The Context Cache module uses mongoc regardless
-sem_t                 mongoContextsSem;
+mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;    // Deprecated
+mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;    // Deprecated
+
+mongoc_uri_t*          mongocUri;
+mongoc_client_pool_t*  mongocPool;
+sem_t                  mongocContextsSem;
 
 
 

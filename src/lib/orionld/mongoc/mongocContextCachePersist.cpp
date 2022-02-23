@@ -32,7 +32,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // mongoContextsSem, mongoContextsCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState, mongocContextsSem
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocContextCachePersist.h"            // Own interface
 
@@ -48,12 +49,17 @@ void mongocContextCachePersist(KjNode* contextObject)
 
   mongocKjTreeToBson(contextObject, &bson);
 
-  sem_wait(&mongoContextsSem);
+  mongocConnectionGet();
+
+  if (orionldState.mongoc.contextsP == NULL)
+    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+
+  sem_wait(&mongocContextsSem);
 
   bson_error_t  mcError;
-  bool          r = mongoc_collection_insert_one(mongoContextsCollectionP, &bson, NULL, NULL, &mcError);
+  bool          r = mongoc_collection_insert_one(orionldState.mongoc.contextsP, &bson, NULL, NULL, &mcError);
 
-  sem_post(&mongoContextsSem);
+  sem_post(&mongocContextsSem);
 
   if (r == false)
     LM_E(("Database Error (persisting context: %s)", mcError.message));

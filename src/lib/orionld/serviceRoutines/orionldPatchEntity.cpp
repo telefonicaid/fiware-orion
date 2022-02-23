@@ -35,7 +35,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 

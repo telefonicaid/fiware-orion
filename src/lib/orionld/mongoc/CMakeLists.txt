@@ -22,6 +22,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     mongocInit.cpp
+    mongocConnectionGet.cpp
+    mongocConnectionRelease.cpp
     mongocEntityLookup.cpp
     mongocEntityUpdate.cpp
     mongocKjTreeFromBson.cpp

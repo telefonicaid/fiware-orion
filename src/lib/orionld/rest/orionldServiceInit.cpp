@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntities.h"              // orionldGetEntities
 #include "orionld/serviceRoutines/orionldGetEntity.h"                // orionldGetEntity
 #include "orionld/serviceRoutines/orionldPatchEntity.h"              // orionldPatchEntity
+#include "orionld/serviceRoutines/orionldPatchEntity2.h"             // orionldPatchEntity2
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"          // orionldDeleteAttribute
@@ -293,6 +294,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
   }
+  else if (serviceP->serviceRoutine == orionldPatchEntity2)
+  {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+  }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
@@ -487,6 +492,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     else if (serviceP->serviceRoutine == orionldPatchAttribute)
       serviceP->troeRoutine = troePatchAttribute;
     else if (serviceP->serviceRoutine == orionldPatchEntity)
+      serviceP->troeRoutine = troePatchEntity;
+    else if (serviceP->serviceRoutine == orionldPatchEntity2)
       serviceP->troeRoutine = troePatchEntity;
     else if (serviceP->serviceRoutine == orionldPostBatchCreate)
       serviceP->troeRoutine = troePostBatchCreate;

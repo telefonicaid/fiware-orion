@@ -243,9 +243,7 @@ bool orionldPostBatchUpsert(void)
       orionldState.contextP = contextP;
 
     // No Entity from DB needed as all attributes are always overwritten
-    // Is the entity typre expanded in pCheckEntity?
-
-    if (pCheckEntity(entityP, true) == false)
+    if (pCheckEntity(entityP, true, NULL) == false)
     {
       const char* entityId = (idNodeP == NULL)? "No entity::id" : (idNodeP->type == KjString)? idNodeP->value.s : "Invalid entity::id";
 

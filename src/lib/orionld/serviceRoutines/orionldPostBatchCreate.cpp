@@ -273,7 +273,7 @@ bool orionldPostBatchCreate(void)
       orionldState.contextP = contextP;
 
     // Entity ok, from a "repetition point of view", now, let's make sure it's correct!
-    if (pCheckEntity(entityP, true) == false)
+    if (pCheckEntity(entityP, true, NULL) == false)
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
       kjChildRemove(orionldState.requestTree, entityP);

@@ -36,11 +36,15 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/dotForEq.h"                             // dorForEq
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
+#include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
+
 
 
 // -----------------------------------------------------------------------------
@@ -108,6 +112,28 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
 
 // -----------------------------------------------------------------------------
 //
+// attrTypeFromDb -
+//
+// Look up the attribute in dbAttrsP, extract the attribute type and pass it to pCheckAttribute
+//
+static OrionldAttributeType attrTypeFromDb(KjNode* dbAttrsP, char* attrName)
+{
+  KjNode* attrP = kjLookup(dbAttrsP, attrName);
+
+  if (attrP == NULL)
+    return NoAttributeType;
+
+  KjNode* typeP = kjLookup(attrP, "type");
+  if (typeP == NULL)
+    return NoAttributeType;  // Really a DB Error but ... best effort?
+
+  return orionldAttributeType(typeP->value.s);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckEntity -
 //
 // When an entity is created (dbEntityP == NULL), the "type" and "id" are Mandatory:
@@ -127,7 +153,8 @@ static bool typeCheck(KjNode* attrP, KjNode* typeP)
 bool pCheckEntity
 (
   KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch          // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
+  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
+  KjNode*  dbAttrsP       // "attrs" member - all attributes - from database
 )
 {
   // Remove builtin timestamps, if present
@@ -170,8 +197,28 @@ bool pCheckEntity
       continue;
     }
 
-    LM_TMP(("KZ: Calling pCheckAttribute(%s)", attrP->name));
-    if (pCheckAttribute(attrP, true, NoAttributeType, false, NULL) == false)
+    OrionldAttributeType  aTypeFromDb  = NoAttributeType;
+    OrionldContextItem*   contextItemP = NULL;
+
+    //
+    // Before expanding we must check the validity of the attribute name
+    //
+    if (pCheckName(attrP->name) == false)
+      return false;
+    if (pCheckUri(attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
+      return false;
+    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &contextItemP);
+
+    if (dbAttrsP != NULL)
+    {
+      char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
+      dotForEq(attrName);
+      LM_TMP(("KZ: Calling attrTypeFromDb(%s)", attrName));
+      aTypeFromDb = attrTypeFromDb(dbAttrsP, attrName);
+      LM_TMP(("KZ: aTypeFromDb: %d", aTypeFromDb));
+    }
+
+    if (pCheckAttribute(attrP, true, aTypeFromDb, true, contextItemP) == false)
       return false;
   }
 

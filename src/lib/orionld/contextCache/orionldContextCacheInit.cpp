@@ -35,7 +35,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/common/orionldState.h"                         // dbHost, mongoContextsCollectionP, coreContextUrl
+#include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl
 #include "orionld/mongoc/mongocInit.h"                           // mongocInit
 #include "orionld/mongoc/mongocContextCacheGet.h"                // mongocContextCacheGet
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
