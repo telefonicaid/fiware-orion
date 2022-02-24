@@ -412,7 +412,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 *
 * notificationDataToGeoJson -
 */
-static void notificationDataToGeoJson(KjNode* notificationNodeP, bool keyValues)
+static void notificationDataToGeoJson(KjNode* notificationNodeP)
 {
   KjNode* dataP = kjLookup(notificationNodeP, "data");
 
@@ -420,7 +420,7 @@ static void notificationDataToGeoJson(KjNode* notificationNodeP, bool keyValues)
   {
     kjChildRemove(notificationNodeP, dataP);
 
-    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP, keyValues);
+    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP);
 
     geojsonTree->name = (char*) "data";
     kjChildAdd(notificationNodeP, geojsonTree);
@@ -547,10 +547,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       }
 
       if (httpInfo.mimeType == GEOJSON)
-      {
-        bool keyValues = (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
-        notificationDataToGeoJson(kjTree, keyValues);
-      }
+        notificationDataToGeoJson(kjTree);
 
       int   bufSize = kjFastRenderSize(kjTree);
       char* buf     = (char*) malloc(bufSize);

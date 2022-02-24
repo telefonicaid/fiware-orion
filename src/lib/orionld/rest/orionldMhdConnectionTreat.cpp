@@ -1168,9 +1168,9 @@ MHD_Result orionldMhdConnectionTreat(void)
     if ((orionldState.out.contentType == GEOJSON) && (serviceRoutineResult == true))
     {
       if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
-        orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues, orionldState.geoPropertyNode);
+        orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
       else if (orionldState.serviceP->serviceRoutine == orionldGetEntities)
-        orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues);
+        orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree);
       else
         LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
     }

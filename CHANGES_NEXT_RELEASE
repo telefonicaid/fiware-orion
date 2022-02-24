@@ -9,3 +9,4 @@
 * Issue #1016  Fixed bug related to wrong context in response when input context is an array with a single URL
 * Issue #280   Support for @type in the context
 * Issue #1030  Implemented 'Concise Output Format' support for GET /entities/{entityId} and GET /entities
+* Issue #1033  Concise GeoJSON returns an invalid Geometry
