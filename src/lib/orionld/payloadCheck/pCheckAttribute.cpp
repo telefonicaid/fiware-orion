@@ -96,53 +96,53 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
 {
   bool arrayReduction = true;
 
-  if (attrContextInfoP       == NULL)  return true;
-  if (attrContextInfoP->type == NULL)  return true;
-
-  if (strcmp(attrContextInfoP->type, "DateTime") == 0)
+  if ((attrContextInfoP != NULL) && (attrContextInfoP->type != NULL))
   {
-    if (attrP->type != KjString)
+    if (strcmp(attrContextInfoP->type, "DateTime") == 0)
     {
-      orionldError(OrionldBadRequestData,
-                   "JSON Type for attribute not according to @context @type field",
-                   attrP->name,
-                   400);
-      return false;
-    }
+      if (attrP->type != KjString)
+      {
+        orionldError(OrionldBadRequestData,
+                     "JSON Type for attribute not according to @context @type field",
+                     attrP->name,
+                     400);
+        return false;
+      }
 
-    if (parse8601Time(attrP->value.s) == -1)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Not a valid ISO8601 DateTime",
-                   attrP->name,
-                   400);
-      return false;
+      if (parse8601Time(attrP->value.s) == -1)
+      {
+        orionldError(OrionldBadRequestData,
+                     "Not a valid ISO8601 DateTime",
+                     attrP->name,
+                     400);
+        return false;
+      }
     }
-  }
-  else if (strcmp(attrContextInfoP->type, "@id") == 0)
-  {
-    if (attrP->type != KjString)
+    else if (strcmp(attrContextInfoP->type, "@id") == 0)
     {
-      orionldError(OrionldBadRequestData,
-                   "JSON Type for attribute not according to @context @type field",
-                   attrP->name,
-                   400);
-      return false;
-    }
+      if (attrP->type != KjString)
+      {
+        orionldError(OrionldBadRequestData,
+                     "JSON Type for attribute not according to @context @type field",
+                     attrP->name,
+                     400);
+        return false;
+      }
 
-    if (pCheckUri(attrP->value.s, true) == false)
-    {
-      orionldError(OrionldBadRequestData,
-                   "Not a valid URI",
-                   attrP->name,
-                   400);
-      return false;
+      if (pCheckUri(attrP->value.s, true) == false)
+      {
+        orionldError(OrionldBadRequestData,
+                     "Not a valid URI",
+                     attrP->name,
+                     400);
+        return false;
+      }
     }
+    else if (strcmp(attrContextInfoP->type, "@set") == 0)
+      arrayReduction = false;
+    else if (strcmp(attrContextInfoP->type, "@list") == 0)
+      arrayReduction = false;
   }
-  else if (strcmp(attrContextInfoP->type, "@set") == 0)
-    arrayReduction = false;
-  else if (strcmp(attrContextInfoP->type, "@list") == 0)
-    arrayReduction = false;
 
   //
   // Array Reduction
