@@ -193,6 +193,13 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Jan 28 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.5.0-1
+- Fix: avoid duplicated attributes and metadata in arrays in POST /v2/subscriptions and PATCH /v2/subscriptions/{subId} (#2101)
+- Fix: $each usage with $push operator to add several items to array (#744)
+- Fix: allow HTTPS certificates larger than 2048 bytes (#4012)
+- Fix: DateTime attribute macro rendering in custom notifications was numeric instead of ISO8601 (#3894)
+- Fix: buffer overflow problem in logs subsystem for from= field, causing crash in some cases (#3884)
+
 * Tue Dec 14 2021 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.4.0-1
 - Add: failsCounter subscription field, to count the number of consecutive notificaitons fails (#3541)
 - Add: maxFailsLimit subscription field, so subscription is automatically passed to inactive after that number of failed notification attemps (#3541)

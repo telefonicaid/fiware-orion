@@ -1313,7 +1313,7 @@ function orionCurl()
         # The self-made tool is able to detect duplicate JSON keys. We cannot use standard mjson.tool, as it
         # is unable to do so
         #
-        _response=$(echo $_response | python $SCRIPT_HOME/testJson.py)
+        _response=$(echo $_response | PYTHONIOENCODING=utf8 python $SCRIPT_HOME/jsonBeautifier.py)
         echo "$_response"
       else
         dMsg Unknown payloadCheckFormat

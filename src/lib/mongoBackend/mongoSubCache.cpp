@@ -201,7 +201,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
-      LM_W(("Runtime Error (got a subscription without id)"));
+      LM_E(("Runtime Error (got a subscription without id)"));
       continue;
     }
 
@@ -333,7 +333,7 @@ int mongoSubCacheItemInsert
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
-      LM_W(("Runtime Error (got a subscription without id)"));
+      LM_E(("Runtime Error (got a subscription without id)"));
       continue;
     }
 
@@ -555,7 +555,7 @@ static void mongoSubCountersUpdateCount
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
   }
 }
 
@@ -589,7 +589,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 
   if (orion::collectionUpdate(db, collection, id.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastNotification' for a subscription)"));
   }
 }
 
@@ -646,7 +646,7 @@ static void mongoSubCountersUpdateLastFailure
 
   if (orion::collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastFailure' for a subscription)"));
   }
 }
 
@@ -703,7 +703,7 @@ static void mongoSubCountersUpdateLastSuccess
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastSuccess' for a subscription)"));
   }
 }
 

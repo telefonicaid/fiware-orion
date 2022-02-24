@@ -47,7 +47,7 @@ accumulatorStart --pretty-print
 # 07. Dump & reset accumulator: see E2-auto [but also E1-user]
 #
 # 08. Create sub E.*/T with filter dateModified<2049-01-01
-# 09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
+# 09. Remove (with overrideMetadata) user dateModified from E1 (should not trigger notif) & reset accumulator
 # 10. Modify just attr value in E1 (should trigger 2 notif)
 # 11. Modify just attr value in E2 (should trigger 2 notif)
 # 12. Dump & reset accumulator: 2 notif E1-auto and 2 for E2-auto
@@ -189,15 +189,15 @@ echo
 echo
 
 
-echo "09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator"
-echo "==================================================================================="
+echo "09. Remove (with overrideMetadata) user dateModified from E1 (should not trigger notif) & reset accumulator"
+echo "==========================================================================================================="
 payload='{
   "A": {
     "value": "bar",
     "type": "Text"
   }
 }'
-orionCurl --url '/v2/entities/E1/attrs' --payload "$payload"
+orionCurl --url '/v2/entities/E1/attrs?options=overrideMetadata' --payload "$payload"
 accumulatorReset
 echo
 echo
@@ -422,8 +422,8 @@ Date: REGEX(.*)
 
 
 
-09. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
-===================================================================================
+09. Remove (with overrideMetadata) user dateModified from E1 (should not trigger notif) & reset accumulator
+===========================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
