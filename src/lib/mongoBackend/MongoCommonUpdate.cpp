@@ -1754,11 +1754,29 @@ static bool processOnChangeConditionForUpdateContext
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        if (caP->name == attrL[jx] && !caP->skip)
-        {
+        if (covered == true)
+        { 
+          if (caP->name == attrL[jx] && !caP->skip)
+          {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
            * cer.entity destructor does release() on the attrs vector */
-          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+            cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+          }
+          else
+          {
+            const std::string& _type = "NONE";
+            const std::string& _value = "null";
+            std::string attrName = attrL[jx];
+
+            cer.entity.attributeVector.push_back(new ContextAttribute(attrName, _type, _value));
+          }
+        }
+        else 
+        {
+          if (caP->name == attrL[jx] && !caP->skip)
+          {
+            cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+          }
         }
       }
     }
