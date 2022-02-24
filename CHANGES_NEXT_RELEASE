@@ -10,3 +10,4 @@
 * Issue #280   Support for @type in the context
 * Issue #1030  Implemented 'Concise Output Format' support for GET /entities/{entityId} and GET /entities
 * Issue #1033  Concise GeoJSON returns an invalid Geometry
+* Issue #1034  Fixed a bug abiut array reduction and Concise Attribute Format
