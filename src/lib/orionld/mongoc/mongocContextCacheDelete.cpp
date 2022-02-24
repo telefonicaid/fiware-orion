@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <bson/bson.h>                                           // bson_t, ...
+#include <mongoc/mongoc.h>                                       // mongoc driver
 
 extern "C"
 {
@@ -32,9 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // mongoContextsSem, mongoContextsCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState, mongoContextsSem
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocContextCacheDelete.h"             // Own interface
-
 
 
 // -----------------------------------------------------------------------------
@@ -45,15 +46,20 @@ void mongocContextCacheDelete(const char* id)
 {
   bson_t selector;
 
+  mongocConnectionGet();
+
+  if (orionldState.mongoc.contextsP == NULL)
+    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+
   bson_init(&selector);
   bson_append_utf8(&selector, "_id", 3, id, -1);
 
-  sem_wait(&mongoContextsSem);
+  sem_wait(&mongocContextsSem);
 
   bson_error_t  mcError;
-  bool          r = mongoc_collection_delete_one(mongoContextsCollectionP, &selector, NULL, NULL, &mcError);
+  bool          r = mongoc_collection_delete_one(orionldState.mongoc.contextsP, &selector, NULL, NULL, &mcError);
 
-  sem_post(&mongoContextsSem);
+  sem_post(&mongocContextsSem);
 
   if (r == false)
     LM_E(("Database Error (deleting context '%s': %s)", id, mcError.message));

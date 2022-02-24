@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
-
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,22 +22,20 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                     // KjNode
-}
+#include <unistd.h>                                              // NULL
+#include <mongoc/mongoc.h>                                       // mongoc driver
+
+#include "orionld/common/orionldState.h"                         // orionldState, mongocPool
+#include "orionld/mongoc/mongocConnectionGet.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckEntity -
+// mongocConnectionGet -
 //
-extern bool pCheckEntity
-(
-  KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
-  KjNode*  dbAttrsP       // "attrs" member - all attributes - fron database
-);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
+void mongocConnectionGet(void)
+{
+  if (orionldState.mongoc.client == NULL)
+    orionldState.mongoc.client = mongoc_client_pool_pop(mongocPool);
+}

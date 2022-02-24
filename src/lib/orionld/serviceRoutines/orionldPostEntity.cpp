@@ -56,7 +56,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri

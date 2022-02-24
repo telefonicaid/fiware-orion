@@ -36,7 +36,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // mongoContextsSem
+#include "orionld/common/orionldState.h"                         // orionldState, mongocContextsSem
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/contextCache/orionldContextCache.h"            // Own interface
 
@@ -54,9 +55,14 @@ KjNode* mongocContextCacheGet(void)
   bson_t*           query        = bson_new();       // Empty - to find all the contexts in the DB
   KjNode*           contextArray = kjArray(orionldState.kjsonP, NULL);
 
-  sem_wait(&mongoContextsSem);
+  mongocConnectionGet();
 
-  cursor = mongoc_collection_find_with_opts(mongoContextsCollectionP, query, NULL, NULL);
+  if (orionldState.mongoc.contextsP == NULL)
+    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+
+  sem_wait(&mongocContextsSem);
+
+  cursor = mongoc_collection_find_with_opts(orionldState.mongoc.contextsP, query, NULL, NULL);
 
   int matches = 0;
   while (mongoc_cursor_next(cursor, &bsonContextP))
@@ -74,7 +80,7 @@ KjNode* mongocContextCacheGet(void)
     kjChildAdd(contextArray, contextNodeP);
     ++matches;
   }
-  sem_post(&mongoContextsSem);
+  sem_post(&mongocContextsSem);
 
   bson_destroy(query);
   mongoc_cursor_destroy(cursor);

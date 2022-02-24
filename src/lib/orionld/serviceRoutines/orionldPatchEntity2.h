@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHENTITY2_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHENTITY2_H_
 
 /*
 *
@@ -25,22 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                     // KjNode
-}
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// pCheckEntity -
+// orionldPatchEntity2 -
 //
-extern bool pCheckEntity
-(
-  KjNode*  entityP,       // The entity from the incoming payload body
-  bool     batch,         // Batch operations have the Entity ID in the payload body - mandatory, Non-batch, the entity-id can't be present
-  KjNode*  dbAttrsP       // "attrs" member - all attributes - fron database
-);
+extern bool orionldPatchEntity2(void);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITY_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHENTITY2_H_

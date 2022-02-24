@@ -40,7 +40,6 @@ extern "C"
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeTypeName
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
@@ -97,12 +96,9 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
 {
   bool arrayReduction = true;
 
-  LM_TMP(("KZ: In pCheckTypeFromContext for %s", attrP->name));
-
   if (attrContextInfoP       == NULL)  return true;
   if (attrContextInfoP->type == NULL)  return true;
 
-  LM_TMP(("KZ: there is a type in the context object: %s", attrContextInfoP->type));
   if (strcmp(attrContextInfoP->type, "DateTime") == 0)
   {
     if (attrP->type != KjString)
@@ -153,12 +149,10 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
   //
   if ((attrP->type == KjArray) && (arrayReduction == true))
   {
-    LM_TMP(("KZ: It's an array, and arrayReduction is ON"));
     if ((attrP->value.firstChildP != NULL) && (attrP->value.firstChildP->next == NULL))
     {
       KjNode* arrayItemP = attrP->value.firstChildP;
 
-      LM_TMP(("KZ: Reducing the array of ONE item"));
       attrP->type      = arrayItemP->type;
       attrP->value     = arrayItemP->value;
       attrP->lastChild = arrayItemP->lastChild;  // Might be an array or object inside the array ...
@@ -296,12 +290,16 @@ inline bool pCheckAttributeArray
 //
 inline bool pCheckAttributeNull(KjNode* attrP)
 {
+#if 0
   LM_W(("RHS for attribute '%s' is NULL - that is forbidden in the NGSI-LD API", attrP->name));
   orionldError(OrionldBadRequestData,
                "The use of NULL value is banned in NGSI-LD",
                attrP->name,
                400);
   return false;
+#else
+  return true;
+#endif
 }
 
 
@@ -501,8 +499,6 @@ static bool pCheckAttributeObject
   OrionldAttributeType  attributeType = NoAttributeType;
   KjNode*               typeP;
 
-  LM_TMP(("KZ: The attribute '%s' is a JSON Object", attrP->name));
-
   // Check for errors in the input payload for the attribute type
   if (pCheckAttributeType(attrP, &typeP, false) == false)
     return false;
@@ -611,10 +607,8 @@ static bool pCheckAttributeObject
     {
       if (fieldP->type == KjArray)
       {
-        LM_TMP(("KZ: 'value' is a JSON %s - array reduction?", kjValueType(fieldP->type)));
         if ((fieldP->value.firstChildP != NULL) && (fieldP->value.firstChildP->next == NULL))
         {
-          LM_TMP(("KZ: YES - array reduction!"));
           fieldP->lastChild = fieldP->value.firstChildP->lastChild;  // Might be an array or object inside the array ...
           fieldP->type      = fieldP->value.firstChildP->type;
           fieldP->value     = fieldP->value.firstChildP->value;

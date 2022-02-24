@@ -32,8 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, mongoEntitiesCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
@@ -56,13 +57,19 @@ KjNode* mongocEntityLookup(const char* entityId)
   //
   // Create the filter for the query
   //
+  bson_init(&mongoFilter);
   bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
+
+  mongocConnectionGet();
+
+  if (orionldState.mongoc.entitiesP == NULL)
+    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
 
   //
   // Run the query
   //
   // semTake(&mongoEntitiesSem);
-  if ((mongoCursorP = mongoc_collection_find_with_opts(mongoEntitiesCollectionP, &mongoFilter, NULL, NULL)) == NULL)
+  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
     return NULL;

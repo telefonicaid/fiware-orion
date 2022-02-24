@@ -206,7 +206,7 @@ bool orionldPostBatchUpdate(void)
 
     // Checking the entity and turning it Normalized
     LM_TMP(("KZ: Calling pCheckEntity for the entity '%s'", entityId));
-    if (pCheckEntity(entityP, true) == false)
+    if (pCheckEntity(entityP, true, NULL) == false)  // NULL ... I could give the DB Entity, just it's a REPLACE - not needed
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, false);
       kjChildRemove(incomingTree, entityP);

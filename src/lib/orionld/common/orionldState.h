@@ -29,6 +29,7 @@
 #include <semaphore.h>                                           // sem_t
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 #include <microhttpd.h>                                          // MHD_Connection
+#include <bson/bson.h>                                           // bson_error_t
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -260,6 +261,20 @@ typedef struct OrionldStateIn
 
 // -----------------------------------------------------------------------------
 //
+// OrionldMongoC -
+//
+typedef struct OrionldMongoC
+{
+  mongoc_client_t*      client;
+  mongoc_collection_t*  contextsP;
+  mongoc_collection_t*  entitiesP;
+  bson_error_t          error;
+} OrionldMongoC;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionldConnectionState - the state of the connection
 //
 // This struct contains all the state of a connection, like the Kjson pointer, the pointer to
@@ -358,9 +373,11 @@ typedef struct OrionldConnectionState
   //
   // MongoDB stuff - Context Cache uses mongoc regardless of which mongo client lib is in use
   //
-  mongoc_uri_t*           mongoUri;
-  mongoc_client_t*        mongoClient;
-  mongoc_database_t*      mongoDatabase;
+  // mongoc_uri_t*           mongoUri;
+  // mongoc_client_t*        mongoClient;
+  // mongoc_database_t*      mongoDatabase;
+
+  OrionldMongoC           mongoc;
 
   //
   // Instructions for mongoBackend
@@ -527,10 +544,12 @@ extern char              mongoServerVersion[32];
 //
 // Global variables for Mongo C Driver
 //
-extern mongoc_collection_t*  mongoEntitiesCollectionP;
-extern mongoc_collection_t*  mongoRegistrationsCollectionP;
-extern mongoc_collection_t*  mongoContextsCollectionP;       // The Context Cache module uses mongoc regardless
-extern sem_t                 mongoContextsSem;
+extern mongoc_collection_t*  mongoEntitiesCollectionP;       // Deprecated
+extern mongoc_collection_t*  mongoRegistrationsCollectionP;  // Deprecated
+
+extern mongoc_uri_t*          mongocUri;
+extern mongoc_client_pool_t*  mongocPool;
+extern sem_t                  mongocContextsSem;
 
 
 
