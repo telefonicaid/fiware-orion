@@ -217,7 +217,7 @@ extern void subCacheItemInsert
   const std::string&                 georel,
   bool                               blacklist,
   bool                               onlyChanged,
-  bool                               covere
+  bool                               covered
 );
 
 

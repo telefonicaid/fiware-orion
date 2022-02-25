@@ -198,9 +198,9 @@ extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 
 /* ****************************************************************************
 *
-* setcovered -
+* setCovered -
 */
-extern void setcovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setCovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 /* ****************************************************************************

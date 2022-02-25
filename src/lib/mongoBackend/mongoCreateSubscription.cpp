@@ -163,7 +163,7 @@ std::string mongoCreateSubscription
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
-  setcovered(sub, &b);
+  setCovered(sub, &b);
 
   if (!sub.description.empty())
   {

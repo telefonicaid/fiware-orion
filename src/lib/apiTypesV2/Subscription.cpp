@@ -202,7 +202,6 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addBool("covered", this->covered);
   }
 
-
   return jh.str();
 }
 
