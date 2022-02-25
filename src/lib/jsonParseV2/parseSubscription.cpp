@@ -943,7 +943,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       subsP->notification.covered = coveredBool;
     }
   }
- 
+
   // metadata
   if (notification.HasMember("metadata"))
   {
