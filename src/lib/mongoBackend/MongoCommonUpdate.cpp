@@ -1768,11 +1768,11 @@ static bool processOnChangeConditionForUpdateContext
       }
     }
   }
-  if (covered == true)
+  if (covered)
   {
     for (unsigned int jx = 0; jx < attrL.size(); jx++)
     {
-      const std::string& _type = "NONE";
+      const std::string& _type = DEFAULT_ATTR_NULL_TYPE;
       const std::string& _value = "null";
       std::string attrName = attrL[jx];
 
