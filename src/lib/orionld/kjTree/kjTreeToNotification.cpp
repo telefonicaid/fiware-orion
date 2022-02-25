@@ -55,6 +55,7 @@ extern "C"
 // NGSI_V2_CUSTOM                            application/json
 // NGSI_LD_V1_NORMALIZED                     application/json, application/ld+json, application/geo+json
 // NGSI_LD_V1_KEYVALUES                      application/json, application/ld+json, application/geo+json
+// NGSI_LD_V1_CONCISE                        application/json, application/ld+json, application/geo+json
 // NGSI_LD_V1_V2_NORMALIZED                  application/json
 // NGSI_LD_V1_V2_KEYVALUES                   application/json
 // NGSI_LD_V1_V2_NORMALIZED_COMPACT          application/json
@@ -76,6 +77,7 @@ static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType acce
 
   case NGSI_LD_V1_NORMALIZED:
   case NGSI_LD_V1_KEYVALUES:
+  case NGSI_LD_V1_CONCISE:
     if ((accept != JSON) && (accept != JSONLD) && (accept != GEOJSON))
     {
       LM_W(("Bad Input (invalid notification-accept MimeType for an NGSI-LD notification) - '%s'", mimeTypeToLongString(accept)));
@@ -115,6 +117,7 @@ static bool formatExtract(char* format, ngsiv2::Subscription* subP)
 {
   if      (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
   else if (strcmp(format, "normalized")                    == 0) subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
+  else if (strcmp(format, "concise")                       == 0) subP->attrsFormat = NGSI_LD_V1_CONCISE;
   else if (strcmp(format, "x-ngsiv2-normalized")           == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
   else if (strcmp(format, "x-ngsiv2-keyValues")            == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES;
   else if (strcmp(format, "x-ngsiv2-normalized-compacted") == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;

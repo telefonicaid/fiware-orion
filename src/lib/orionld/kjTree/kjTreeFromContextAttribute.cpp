@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                            // NULL
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -32,8 +34,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/RenderFormat.h"                               // RenderFormat
-#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -84,6 +86,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       attrName = alias;
   }
 
+
+  //
+  // keyValues
+  //
   if ((renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
   {
     //
@@ -129,6 +135,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     return nodeP;
   }
 
+
+  //
+  // Normalized
+  //
   KjNode* aTopNodeP = kjObject(orionldState.kjsonP, attrName);  // Top node for the attribute
 
   if (aTopNodeP == NULL)
@@ -264,7 +274,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)
       {
-        if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
+        if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_CONCISE))
           valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
         else
           valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
