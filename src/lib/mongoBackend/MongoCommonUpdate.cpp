@@ -1560,7 +1560,6 @@ static bool addTriggeredSubscriptions_noCache
   //
   spathRegex = std::string("/") + spathRegex + "/";
 
-
   /* Build query */
   std::string entIdQ        = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
   std::string entTypeQ      = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
