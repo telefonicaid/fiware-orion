@@ -60,7 +60,7 @@ extern "C"
 // To PATCH an Entity:
 // 1. GET the entity from DB - in DB-Model style
 // 2. Convert the request payload to a DB-Model style Entity (includes modifiedAt but not createdAt) - dbModelFromApiXXX()
-// 3. Compare the two trees and come up with an array of changes (patchTree - output from orionldPatchXXX functions):
+// 3. Compare the two trees and come up with an array of changes (orionldEntityPatchTree - output from orionldPatchXXX functions):
 //    [
 //      { [ PATH ], TREE },
 //      { [ PATH ], TREE },
@@ -322,9 +322,9 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP)
 
 // -----------------------------------------------------------------------------
 //
-// outTreeItemAdd -
+// patchTreeItemAdd -
 //
-void outTreeItemAdd(KjNode* outTree, const char* path, KjNode* valueP)
+void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP)
 {
   KjNode* arrayItemP = kjObject(orionldState.kjsonP, NULL);
   KjNode* pathP      = kjString(orionldState.kjsonP, "PATH", path);
@@ -333,16 +333,16 @@ void outTreeItemAdd(KjNode* outTree, const char* path, KjNode* valueP)
   valueP->name = (char*) "TREE";
   kjChildAdd(arrayItemP, pathP);
   kjChildAdd(arrayItemP, valueP);
-  kjChildAdd(outTree, arrayItemP);
+  kjChildAdd(patchTree, arrayItemP);
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// patchTree -
+// orionldEntityPatchTree -
 //
-//   - if item exists in old but not in new it is kept (nothing added to 'outTree')
+//   - if item exists in old but not in new it is kept (nothing added to 'patchTree')
 //   - if item exists in new but not in old it is added
 //   - it item exists in both old and new:
 //     - if new's value is null             - REMOVE item
@@ -353,7 +353,7 @@ void outTreeItemAdd(KjNode* outTree, const char* path, KjNode* valueP)
 //
 // Might be a good idea to sort both trees before starting with the processing ...
 //
-KjNode* patchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* outTree)
+void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patchTree)
 {
   // <DEBUG>
   LM_TMP(("KZ: path: %s", path));
@@ -361,57 +361,58 @@ KjNode* patchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* outTree)
   LM_TMP(("KZ: new:  %s", (newP == NULL)? "NULL" : newP->name));
   // </DEBUG>
 
-  if (newP == NULL)
-    return NULL;
+  if (newP == NULL)  // Not sure this is ever a possibility ...
+    return;
 
   if (oldP == NULL)
   {
     char buf[1024];
     kjFastRender(newP, buf);
-    LM_TMP(("KZ: outTreeItemAdd(PATH: %s.%s, TREE: %s)", path, newP->name, buf));
-    outTreeItemAdd(outTree, path, newP);
-    return NULL;
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: %s)", path, newP->name, buf));
+    patchTreeItemAdd(patchTree, path, newP);
+    return;
   }
 
   // newP != NULL && oldP != NULL
   if (newP->type == KjNull)
   {
-    LM_TMP(("KZ: outTreeItemAdd(PATH: %s.%s, TREE: null - REMOVAL)", path, newP->name));
-    outTreeItemAdd(outTree, path, newP);
-    return NULL;
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: null - REMOVAL)", path, newP->name));
+    patchTreeItemAdd(patchTree, path, newP);
+    return;
   }
 
   if (newP->type != oldP->type)
   {
-    LM_TMP(("KZ: outTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-    outTreeItemAdd(outTree, path, newP);
-    return NULL;
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP);
+    return;
   }
 
-  if ((newP->type == KjString) || (newP->type == KjInt) || (newP->type == KjFloat) || (newP->type == KjBoolean))
+  bool change = false;
+  bool leave  = false;
+  if      (newP->type == KjString)   { if (strcmp(newP->value.s, oldP->value.s) != 0)  change = true; leave = true; }
+  else if (newP->type == KjInt)      { if (newP->value.i != oldP->value.i)             change = true; leave = true; }
+  else if (newP->type == KjFloat)    { if (newP->value.f != oldP->value.f)             change = true; leave = true; }
+  else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; leave = true; }
+
+  if (change == true)
   {
-    // Only patch if different
-    if (((newP->type == KjString)   && (strcmp(newP->value.s, oldP->value.s) != 0))  ||
-        ((newP->type == KjInt)      && (newP->value.i != oldP->value.i))             ||
-        ((newP->type == KjFloat)    && (newP->value.f != oldP->value.f))             ||
-        ((newP->type == KjBoolean)  && (newP->value.b != oldP->value.b)))
-    {
-      LM_TMP(("KZ: outTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-      outTreeItemAdd(outTree, path, newP);
-    }
-
-    return NULL;
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP);
   }
+
+  if (leave == true)
+    return;
 
   if (newP->type == KjArray)
   {
-    LM_TMP(("KZ: outTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-    outTreeItemAdd(outTree, path, newP);
-    return NULL;
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP);
+    return;
   }
 
   // Both are JSON Object - entering
-  // Careful about the newP linked lists - the recursive calls may call outTreeItemAdd and that removes items from the list
+  // Careful about the newP linked lists - the recursive calls may call patchTreeItemAdd and that removes items from the list
   //
   // Can't use the normal "for" - must be a "while and a next pointer"
   //
@@ -442,13 +443,11 @@ KjNode* patchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* outTree)
       newPath = newPathV;
     }
 
-    LM_TMP(("KZ: both objects - recursive call to patchTree('%s', path:'%s')", newItemP->name, newPath));
-    patchTree(oldItemP, newItemP, newPath, outTree);
+    LM_TMP(("KZ: both objects - recursive call to orionldEntityPatchTree('%s', path:'%s')", newItemP->name, newPath));
+    orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);
 
     newItemP = next;
   }
-
-  return outTree;
 }
 
 
@@ -534,20 +533,20 @@ bool orionldPatchEntity2(void)
   // orionldEntityPatch returns a KjNode array of objects describing the modifications for the patch.
   // For details, see "To PATCH an Entity" above.
   //
-  KjNode* outTree       = kjArray(orionldState.kjsonP, NULL);
+  KjNode* patchTree     = kjArray(orionldState.kjsonP, NULL);
   KjNode* dbAttrsObject = kjObject(orionldState.kjsonP, NULL);
   kjChildAdd(dbAttrsObject, dbAttrsP);
 
-  LM_TMP(("KZ: --------------------------- Before patchTree --------------------------"));
+  LM_TMP(("KZ: --------------------------- Before orionldEntityPatchTree --------------------------"));
   treePresent(dbAttrsObject, "KZ: DB-Attrs");
   treePresent(orionldState.requestTree, "KZ: Patch");
-  LM_TMP(("KZ: --------------------------- Calling patchTree -------------------------"));
+  LM_TMP(("KZ: --------------------------- Calling orionldEntityPatchTree -------------------------"));
   orionldState.requestTree->name = NULL;
-  KjNode* patchTreeP = patchTree(dbAttrsObject, orionldState.requestTree, NULL, outTree);
-  LM_TMP(("KZ: --------------------------- After patchTree ---------------------------"));
-  treePresent(patchTreeP, "KZ: PATCH TREE");
+  orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
+  LM_TMP(("KZ: --------------------------- After orionldEntityPatchTree ---------------------------"));
+  treePresent(patchTree, "KZ: PATCH TREE");
 
-  bool b = mongocEntityUpdate(entityId, patchTreeP);  // Added/Removed (sub-)attrs are found as arrays named ".added" and ".removed"
+  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found as arrays named ".added" and ".removed"
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!
