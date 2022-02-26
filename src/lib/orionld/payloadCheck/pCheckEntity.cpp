@@ -213,9 +213,7 @@ bool pCheckEntity
     {
       char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
       dotForEq(attrName);
-      LM_TMP(("KZ: Calling attrTypeFromDb(%s)", attrName));
       aTypeFromDb = attrTypeFromDb(dbAttrsP, attrName);
-      LM_TMP(("KZ: aTypeFromDb: %d", aTypeFromDb));
     }
 
     if (pCheckAttribute(attrP, true, aTypeFromDb, true, contextItemP) == false)
