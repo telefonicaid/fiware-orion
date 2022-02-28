@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
@@ -494,6 +495,23 @@ static void namesArrayRemovedToPatchTree(KjNode* patchTree, const char* path, Kj
 static void namesArrayMergeToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
 {
   LM_TMP(("KZ2: Something added, something removed - merge and $set array"));
+
+  for (KjNode* rmP = removedP->value.firstChildP; rmP != NULL; rmP = rmP->next)
+  {
+    KjNode* itemP = kjStringValueLookupInArray(namesP, rmP->value.s);
+    if (itemP)
+      kjChildRemove(namesP, itemP);
+  }
+
+  // Now add the strings in addedP:
+  if (namesP->value.firstChildP == NULL)  // Array is empty
+    namesP->value.firstChildP = addedP->value.firstChildP;
+  else
+    namesP->lastChild->next = addedP->value.firstChildP;
+
+  namesP->lastChild = addedP->lastChild;
+
+  patchTreeItemAdd(patchTree, path, namesP, NULL);
 }
 
 

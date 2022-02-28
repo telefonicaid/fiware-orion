@@ -50,6 +50,9 @@ brokerStart CB 0-255
 # 16. Patch E1, adding a Sub-Relationship R1 to P1
 # 17. See E1 in DB
 # 18. GET E1
+# 19. Patch E1, Delete P1, Add P2
+# 20. See E1 in DB
+# 21. GET E1
 #
 
 echo "01. Create an entity E1 with an attr P1"
@@ -222,6 +225,31 @@ echo
 
 
 echo "18. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "19. Patch E1, Delete P1, Add P2"
+echo "==============================="
+payload='{
+  "P1": null,
+  "P2": 20
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "20. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "21. GET E1"
 echo "=========="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
@@ -709,6 +737,63 @@ Date: REGEX(.*)
             "v4": "P1:v4-Step04: added",
             "v7": "P1:v7-Step07: added"
         }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+19. Patch E1, Delete P1, Add P2
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. See E1 in DB
+================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: 3.6.23
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"md" : {
+
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+21. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 62
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
     },
     "id": "urn:E1",
     "type": "T"
