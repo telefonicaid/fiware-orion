@@ -380,7 +380,7 @@ function localBrokerStart()
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CBHA" ]
   then
-    # CB-HA broker shares with main CB the database
+    # CB-HA broker uses same database than main CB
     mkdir -p $CBHA_LOG_DIR
     port=$CBHA_PORT
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CBHA_PORT  -pidpath $CBHA_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CBHA_LOG_DIR $extraParams"

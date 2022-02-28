@@ -86,7 +86,7 @@ There are a few special fields that need special care when refreshing the cache:
 * `lastSuccess` (and related field `lastSuccessCode`)
 * `status`
 
-These fields have a special treatment inside the subscription cache, to avoid to write to the database each and every time these fields change, i.e. when an update triggering the subscription occurs).
+These fields have a special treatment inside the subscription cache:
 
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
 * `count` and `failsCounter` in the subscription cache are set to zero at each sub-cache-refresh, so the `count` and `failsCounter` that are in the cache simply are accumulators and its accumulated values are added

@@ -519,7 +519,7 @@ static void mongoSubCountersUpdateFailsAndStatus
   else if (noCache)
   {
     // no fails mean notification ok, thus reseting the counter
-    // in noCache case, this is always done. In cache case, it will be donde
+    // in noCache case, this is always done. In cache case, it will be done
     // at cache refresh time (check mongoSubUpdateOnCacheSync())
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
