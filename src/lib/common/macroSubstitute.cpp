@@ -145,7 +145,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
   //
   if (from.size() > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large initial string, before substitution)"));
+    LM_E(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
     return false;
   }
@@ -160,7 +160,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
     if (macroEnd == std::string::npos)
     {
-      LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
+      LM_W(("macro end not found, syntax error, aborting substitution"));
       *to = "";
       return false;
     }
@@ -209,7 +209,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large final string, after substitution)"));
+    LM_E(("Runtime Error (too large final string, after substitution)"));
     *to = "";
     return false;
   }

@@ -527,6 +527,7 @@ static bool mergeAttrInfo
   orion::BSONObjBuilder*  toSet,
   orion::BSONObjBuilder*  toUnset,
   const bool&             forcedUpdate,
+  const bool&             overrideMetadata,
   ApiVersion              apiVersion
 )
 {
@@ -617,9 +618,11 @@ static bool mergeAttrInfo
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
+    // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+    // or can be simplified
+    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     std::set<std::string>  mdsSet;
 
-    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
@@ -630,7 +633,7 @@ static bool mergeAttrInfo
 
       mdSize++;
 
-      if (apiVersion != V2 || caP->onlyValue)
+      if (apiVersion != V2 || caP->onlyValue || !overrideMetadata)
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
@@ -763,23 +766,23 @@ static bool contextAttributeCustomMetadataToBson
 *
 * The isReplace boolean specifies how toSet has to be filled, either:
 *
-*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isPeplace = false)
+*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isReplace = false)
 *
 * or
 *
-*   { A1: { ... }, A2: { ... } }              (in the case of isPeplace = true)
+*   { A1: { ... }, A2: { ... } }              (in the case of isReplace = true)
 *
 * The former is to be used with { $set: <toSet> }, the later to be used with { attrs: <toSet> }
 *
-* In addition, in the case of isReplace, the attribute is added to toPush (otherwise, toPush is not
-* touched).
+* In addition, in the case of isReplace, the attribute is added to attrNamesAdd (otherwise, attrNamesAdd
+* is not touched).
 *
 * You may wonder why we need toUnset if this function is not related with delete attribute
 * logic. However, it's need to "clean" metadata in some cases.
 */
 static bool updateAttribute
 (
-  orion::BSONObj&           attrs,
+  orion::BSONObj*           attrsP,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
@@ -787,6 +790,7 @@ static bool updateAttribute
   bool*                     actualUpdate,
   bool                      isReplace,
   const bool&               forcedUpdate,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -840,15 +844,15 @@ static bool updateAttribute
   }
   else
   {
-    if (!attrs.hasField(effectiveName.c_str()))
+    if (!attrsP->hasField(effectiveName))
     {
       return false;
     }
 
     orion::BSONObj newAttr;
-    orion::BSONObj attr = getObjectFieldF(attrs, effectiveName);
+    orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, apiVersion);
+    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata, apiVersion);
   }
 
   return true;
@@ -875,13 +879,14 @@ static bool updateAttribute
 */
 static bool appendAttribute
 (
-  orion::BSONObj&           attrs,
+  orion::BSONObj*           attrsP,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
   bool*                     actualUpdate,
   const bool&               forcedUpdate,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion
 )
 {
@@ -889,9 +894,9 @@ static bool appendAttribute
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
 
   /* APPEND with existing attribute equals to UPDATE */
-  if (attrs.hasField(effectiveName.c_str()))
+  if (attrsP->hasField(effectiveName))
   {
-    updateAttribute(attrs, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, apiVersion);
+    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, overrideMetadata, apiVersion);
     return false;
   }
 
@@ -964,7 +969,7 @@ static bool deleteAttribute
 {
   std::string effectiveName = dbEncode(caP->name);
 
-  if (!attrs.hasField(effectiveName.c_str()))
+  if (!attrs.hasField(effectiveName))
   {
     return false;
   }
@@ -2104,7 +2109,8 @@ static void updateAttrInNotifyCer
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
   bool                    useDefaultType,
-  const std::string&      actionType
+  const std::string&      actionType,
+  const bool&             overrideMetadata
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -2169,20 +2175,18 @@ static void updateAttrInNotifyCer
       double now = getCurrentTime();
       caP->modDate = now;
 
-      /* Metadata. Note we clean any previous content as updating an attribute means that all
-       * its previous values are removed (this may change if someday PATCH /v2/entities/E/attrs/A/metadata
-       * is implemented) */
-      // FIXME P3: ensure that location and ID metadata are not problematic (current .test suite doesn't raise
-      // any problem, but maybe the specific case is not covered)
-      caP->metadataVector.release();
+      /* Metadata. The metadata previous content is "patched" by the metadata in the request.
+       * Exception: a cleanup is done if overrideMetadata option is used and we are not in
+       * only value modification case. */
+      if ((!targetAttr->onlyValue) && (overrideMetadata))
+      {
+        caP->metadataVector.release();
+      }
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
         Metadata* targetMdP = targetAttr->metadataVector[jx];
 
         /* Search for matching metadata in the CER attribute */
-        // FIXME P5: maybe this can be optimized, as we started with an empty caP->metadataVector so probably
-        // we can assume that every metadata is new and the "for" block is not needed (although I'm
-        // not fully sure... we should test)
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
@@ -2285,7 +2289,7 @@ static bool updateContextAttributeItem
 (
   ContextElementResponse*   cerP,
   ContextAttribute*         ca,
-  orion::BSONObj&           attrs,
+  orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
@@ -2300,13 +2304,14 @@ static bool updateContextAttributeItem
   bool*                     dateExpirationInPayload,
   bool                      isReplace,
   const bool&               forcedUpdate,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (updateAttribute(attrs, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, apiVersion))
+  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, overrideMetadata, apiVersion))
   {
     // Attribute was found
     *entityModified = (*actualUpdate) || (*entityModified);
@@ -2337,7 +2342,9 @@ static bool updateContextAttributeItem
     }
   }
   /* Check aspects related with location and date expiration */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion, oe)
+  /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
+   * i.e. if overrideMetadata is not in use */
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, apiVersion, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
     std::string details = std::string("action: UPDATE") +
@@ -2352,7 +2359,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
 
   return true;
 }
@@ -2369,7 +2376,7 @@ static bool updateContextAttributeItem
 static bool appendContextAttributeItem
 (
   ContextElementResponse*   cerP,
-  orion::BSONObj&           attrs,
+  orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
   const std::string&        entityDetail,
@@ -2382,18 +2389,21 @@ static bool appendContextAttributeItem
   orion::BSONObjBuilder*    geoJson,
   orion::BSONDate*          dateExpiration,
   const bool&               forcedUpdate,
+  const bool&               overrideMetadata,
   ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrs, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, apiVersion);
+  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, overrideMetadata, apiVersion);
 
   *entityModified = (*actualUpdate) || (*entityModified);
 
   /* Check aspects related with location */
-  if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
+  /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
+   * i.e. if overrideMetadata is not in use */
+  if (!processLocationAtAppendAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, actualAppend, geoJson,
                                         &err, apiVersion, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
@@ -2414,7 +2424,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType, overrideMetadata);
 
   return true;
 }
@@ -2448,7 +2458,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (!targetAttr->getLocation(apiVersion).empty())
+    if (!targetAttr->getLocation(&attrs, apiVersion).empty())
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
@@ -2528,6 +2538,7 @@ static bool processContextAttributeVector
   std::string                                     tenant,
   const std::vector<std::string>&                 servicePathV,
   const bool&                                     forcedUpdate,
+  const bool&                                     overrideMetadata,
   ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
@@ -2562,7 +2573,7 @@ static bool processContextAttributeVector
     {
       if (!updateContextAttributeItem(cerP,
                                       ca,
-                                      attrs,
+                                      &attrs,
                                       targetAttr,
                                       notifyCerP,
                                       entityDetail,
@@ -2577,6 +2588,7 @@ static bool processContextAttributeVector
                                       dateExpirationInPayload,
                                       action == ActionTypeReplace,
                                       forcedUpdate,
+                                      overrideMetadata,
                                       apiVersion,
                                       oe))
       {
@@ -2586,7 +2598,7 @@ static bool processContextAttributeVector
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
       if (!appendContextAttributeItem(cerP,
-                                      attrs,
+                                      &attrs,
                                       targetAttr,
                                       notifyCerP,
                                       entityDetail,
@@ -2599,6 +2611,7 @@ static bool processContextAttributeVector
                                       geoJson,
                                       dateExpiration,
                                       forcedUpdate,
+                                      overrideMetadata,
                                       apiVersion,
                                       oe))
       {
@@ -3323,6 +3336,7 @@ static unsigned int updateEntity
   bool*                           attributeNotExistingError,
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
+  const bool&                     overrideMetadata,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   unsigned int                    notifStartCounter,
@@ -3378,7 +3392,7 @@ static unsigned int updateEntity
   std::map<std::string, TriggeredSubscription*> subsToNotify;
 
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
-   * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
+   * we fill an empty locAttr. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
   std::string            locAttr = "";
   orion::BSONObj         currentGeoJson;
@@ -3491,6 +3505,7 @@ static unsigned int updateEntity
                                      tenant,
                                      servicePathV,
                                      forcedUpdate,
+                                     overrideMetadata,
                                      apiVersion,
                                      loopDetected,
                                      &(responseP->oe)))
@@ -3907,6 +3922,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
+  const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
@@ -4079,6 +4095,7 @@ unsigned int processContextElement
                              &attributeNotExistingError,
                              &attributeNotExistingList,
                              forcedUpdate,
+                             overrideMetadata,
                              apiVersion,
                              fiwareCorrelator,
                              notifStartCounter,

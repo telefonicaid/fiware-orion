@@ -736,7 +736,7 @@ function partExecute()
       exitCode=$?
       blockDiff='yes'
     else
-      $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
+      PYTHONIOENCODING=utf8 $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
       exitCode=$?
     fi
 

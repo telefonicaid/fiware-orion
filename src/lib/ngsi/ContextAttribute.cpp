@@ -47,6 +47,8 @@
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
+#include "mongoDriver/safeMongo.h"
+
 
 
 /* ****************************************************************************
@@ -549,8 +551,15 @@ ContextAttribute::ContextAttribute
 /* ****************************************************************************
 *
 * ContextAttribute::getLocation() -
+*
+* First argument in the attrs object from the DB, in order to search for ignoreType
+* attribute. Note this parameter is NULL is some of the following situations:
+*
+* - At entity creation time (as there is not attrs object in that case)
+* - If overrideMetadata option is used (as in this case existing medatada are goint to be deleted and
+*   doesn't count for looking ignoreTYpe)
 */
-std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
+std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const
 {
   if (apiVersion == V1)
   {
@@ -576,6 +585,61 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
     // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
     if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
+      // First lookup in the metadata included in the request
+      for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+      {
+        // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
+        if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+        {
+          if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
+          {
+            return "";
+          }
+          else  // false or not a boolean
+          {
+            return LOCATION_WGS84;
+          }
+        }
+      }
+
+      // If ignoreType has not yet found, second lookup in the existing metadata attributes
+      // (if attrP is not NULL and metadata array exists)
+      if (attrsP != NULL)
+      {
+        std::string effectiveName = dbEncode(name);
+        if (attrsP->hasField(effectiveName))
+        {
+          orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
+          if (attr.hasField(ENT_ATTRS_MD))
+          {
+            // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+            // or can be simplified
+            orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+            std::set<std::string>  mdsSet;
+
+            md.getFieldNames(&mdsSet);
+
+            for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
+            {
+              std::string  mdName = *i;
+              if (mdName == NGSI_MD_IGNORE_TYPE)
+              {
+                orion::BSONObj mdItem = getObjectFieldF(md, mdName);
+                orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
+                if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
+                {
+                  return "";
+                }
+                else  // false or not a boolean
+                {
+                  return LOCATION_WGS84;
+                }
+              }
+            }
+          }
+        }
+      }
+
       return LOCATION_WGS84;
     }
   }

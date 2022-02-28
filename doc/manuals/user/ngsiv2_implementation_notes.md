@@ -2,6 +2,7 @@
 
 * [Forbidden characters](#forbidden-characters)
 * [Update operators for attribute values](#update-operators-for-attribute-values)
+* [Metadata update semantics](#metadata-update-semantics)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
@@ -13,6 +14,7 @@
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
+* [`ignoreType` metadata](#ignoretype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
@@ -71,6 +73,28 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
+
+[Top](#top)
+
+## Metadata update semantics
+
+The metadata update semantics used by Orion Context Broker (and the
+related `overrideMetadata` option are detailed in
+[this section of the documentation](metadata.md#updating-metadata).
+
+Moreover, from NGSIv2 specification section "Partial Representations":
+
+> Attribute `metadata` may be omitted in requests, meaning that there are no metadata
+> elements associated to the attribute.
+
+Depending if `overrideMetadata` is used or not, this sentence has two interpretations:
+
+* If `overrideMetadata` is not used (default behaviour) it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **which need to be updated**"
+* If `overrideMetadata` is used it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **as a result of the the attribute update**"
 
 [Top](#top)
 
@@ -143,6 +167,48 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 > reported error on the response payload must be `NoResourcesAvailable`.
 
 In the case of Orion, that limit is one (1) attribute.
+
+However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
+location (more detail in [this section of the documentation](#ignoretype-metadata)). This disables Orion
+interpretation of that attribute as a location, so it doesn't count towards the limit.
+
+For instance:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}
+```
+
+Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
+of one non-informative location is not overpassed.
+
+If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
+is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
+the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
+part in geo-queries.
 
 [Top](#top)
 
@@ -303,6 +369,26 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
+
+[Top](#top)
+
+## `ignoreType` metadata
+
+Appart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
+Orion implements the `ignoreType` metadata.
+
+When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+semantics associated to the attribute type. Note that Orion ignored attribute type in general so
+this metadata is not needed most of the cases, but there are two cases in which attribute
+type has an special semantic for Orion (check NGSIv2 specification for details):
+
+* `DateTime`
+* Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
+mechanism to overcome the limit of only one geo-location per entity (more details
+in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
+for `ignoreType` in `DateTime` may come in the future.
 
 [Top](#top)
 

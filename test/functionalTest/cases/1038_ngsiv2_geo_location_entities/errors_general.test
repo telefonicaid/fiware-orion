@@ -227,13 +227,13 @@ echo
 01. Create entity with one geo:point and one geo:line -> fail
 =============================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 148
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
@@ -314,13 +314,13 @@ Date: REGEX(.*)
 04. Append a new geo:box attribute (attr2) -> fail
 ==================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 148
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
@@ -461,13 +461,13 @@ Date: REGEX(.*)
 09. Change attr2 type to geo:line again -> fail
 ===============================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 148
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
+    "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
     "error": "NoResourcesAvailable"
 }
 
