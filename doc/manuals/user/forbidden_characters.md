@@ -57,15 +57,17 @@ NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, att
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
 
-## Custom payload special treatment
+## Custom payload and heaers special treatment
 
 NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
 (see "Custom notifications" section in
 the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable)). Forbidden
 characters restrictions apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
-POST /v2/subscription or GET /v2/subscriptions.
+POST /v2/subscription or GET /v2/subscriptions. The same restrictions apply to the header values
+in `httpCustom.headers`.
 
-However, at notification time, any URL encoded characters in `httpCustom.payload` are decoded.
+However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
+of `httpCustom.headers` are decoded.
 
 Example:
 
@@ -75,7 +77,8 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Authorization": "Basic ABC...ABC%3D%3D"
   },
   "method": "PUT",
   "qs": {
@@ -86,7 +89,8 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 ```
 
 Note that the above payload value is the URL encoded version of this string:
-`{ "temperature": ${temperature}, "asString": "${temperature}" }`.
+`{ "temperature": ${temperature}, "asString": "${temperature}" }`. Note also that
+`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
 
 Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
 Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
@@ -94,6 +98,7 @@ Notification data is for entity with id `DC_S1-D41` and type `Room`, including a
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
 Content-Type: application/json 
 Content-Length: 43
 
