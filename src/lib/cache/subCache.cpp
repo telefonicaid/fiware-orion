@@ -1141,91 +1141,80 @@ void subCacheSync(void)
   //
   subCacheRefresh();
 
-
-  //
-  // 3. Compare lastNotificationTime/Failure/Success in savedSubV with the new cache-contents
-  //
+  // 3. Check if DB or local cache is newer, updating DB in the second case
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    // Note that -1 is the value that Notification constructor used as default in Subscription.h for
-    // lastNotification, lastFailure and lastSuccess
-    if (cssP != NULL)
-    {
-      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
-      {
-        // cssP->lastNotificationTime is older than what's currently in DB => throw away
-        cssP->lastNotificationTime = -1;
-      }
-
-      if (cssP->lastFailure < cSubP->lastFailure)
-      {
-        // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure       = -1;
-        cssP->lastFailureReason = "";
-      }
-
-      if (cssP->lastSuccess < cSubP->lastSuccess)
-      {
-        // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess     = -1;
-        cssP->lastSuccessCode = -1;
-      }
-
-      if (cssP->statusLastChange < cSubP->statusLastChange)
-      {
-        // cssP->status is older than what's currently in DB => throw away
-        cssP->status = "";
-      }
-    }
-
-    cSubP = cSubP->next;
-  }
-
-
-  //
-  // 4. Update 'count' and 'failsCounter' for each item in savedSubV where non-zero
-  // 5. Update 'lastNotificationTime/Failure/Success' for each item in savedSubV where non-zero
-  //
-  cSubP = subCache.head;
-  while (cSubP != NULL)
-  {
-    CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
+    // Not-NULL in some of this means "dirty" data to update in DB at the end
+    // Note that count and failsCounter are special: they are update in DB
+    // using $inc and not $set and they are flushed during the cache refresh process.
+    // There aren't pointer for them
+    int64_t*      lastNotificationTimeP = NULL;
+    int64_t*      lastFailureP          = NULL;
+    int64_t*      lastSuccessP          = NULL;
+    std::string*  failureReasonP        = NULL;
+    int64_t*      statusCodeP           = NULL;
+    std::string*  statusP               = NULL;
+    double*       statusLastChangeP     = NULL;
 
     if (cssP != NULL)
     {
+      if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastNotificationTime = cssP->lastNotificationTime;
+        lastNotificationTimeP = &cSubP->lastNotificationTime;
+      }
+
+      if (cssP->lastFailure > cSubP->lastFailure)
+      {
+        // cssP->lastFailure is newers than what's currently in DB => update in cSubP and DB
+        cSubP->lastFailure       = cssP->lastFailure;
+        cSubP->lastFailureReason = cssP->lastFailureReason;
+        lastFailureP   = &cSubP->lastFailure;
+        failureReasonP = &cSubP->lastFailureReason;
+      }
+
+      if (cssP->lastSuccess > cSubP->lastSuccess)
+      {
+        // cssP->lastSuccess is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastSuccess     = cssP->lastSuccess;
+        cSubP->lastSuccessCode = cssP->lastSuccessCode;
+        lastSuccessP = &cSubP->lastSuccess;
+        statusCodeP  = &cSubP->lastSuccessCode;
+      }
+
+      if (cssP->statusLastChange > cSubP->statusLastChange)
+      {
+        // cssP->status is newer than what's currently in DB => update in cSubP and DB
+        cSubP->status           = cssP->status;
+        cSubP->statusLastChange = cssP->statusLastChange;
+        statusP           = &cSubP->status;
+        statusLastChangeP = &cSubP->statusLastChange;
+      }
+
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
-      mongoSubCountersUpdate(tenant,
-                             cSubP->subscriptionId,
-                             cssP->count,
-                             cssP->failsCounter,
-                             cssP->lastNotificationTime,
-                             cssP->lastFailure,
-                             cssP->lastSuccess,
-                             cssP->lastFailureReason,
-                             cssP->lastSuccessCode,
-                             cssP->status,
-                             cssP->statusLastChange);
-
-      // Keeping all the non-flushable fields (i.e. all except count and failsCounter) in the sub cache
-      cSubP->lastNotificationTime = cssP->lastNotificationTime;
-      cSubP->lastFailure          = cssP->lastFailure;
-      cSubP->lastSuccess          = cssP->lastSuccess;
-      cSubP->lastFailureReason    = cssP->lastFailureReason;
-      cSubP->lastSuccessCode      = cssP->lastSuccessCode;
-      cSubP->status               = cssP->status;
-      cSubP->statusLastChange     = cssP->statusLastChange;
+      mongoSubUpdateOnCacheSync(tenant,
+                                cSubP->subscriptionId,
+                                cssP->count,
+                                cssP->failsCounter,
+                                lastNotificationTimeP,
+                                lastFailureP,
+                                lastSuccessP,
+                                failureReasonP,
+                                statusCodeP,
+                                statusP,
+                                statusLastChangeP);
     }
 
     cSubP = cSubP->next;
   }
 
-
   //
-  // 6. Free the vector savedSubV
+  // 5. Free the vector savedSubV
   //
   for (std::map<std::string, CachedSubSaved*>::iterator it = savedSubV.begin(); it != savedSubV.end(); ++it)
   {
@@ -1312,7 +1301,8 @@ void subNotificationErrorStatus
   // logic related with cache
   if (noCache)
   {
-    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+    // The field 'count' has already been taken care of (see processSubscriptions())
+    // It is not used taken into account in mongoSubUpdateOnNotif()
 
     time_t now = time(NULL);
 
@@ -1326,13 +1316,13 @@ void subNotificationErrorStatus
         status           = STATUS_INACTIVE;
         statusLastChange = getCurrentTime();
       }
-      // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status, statusLastChange);
+      // fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange);
     }
     else
     {
-      // count == 0 (inc is done in another part), fails = 0, lastFailure == -1, failureReason == "", status == ""
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "", -1);
+      // fails = 0, lastFailure == -1, failureReason == "", status == ""
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1);
     }
 
     return;
