@@ -57,7 +57,7 @@ NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, att
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
 [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
 
-## Custom payload and heaers special treatment
+## Custom payload and headers special treatment
 
 NGSIv2 provides a templating mechanism for subscriptions which allows to generate custom notifications
 (see "Custom notifications" section in
