@@ -157,24 +157,44 @@ static void mongocKjTreeToUpdateBson
 //
 // patchApply - 
 //
-bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP)
+bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, bson_t* pullP, int* pullsP, bson_t* pushP, int* pushesP)
 {
   for (KjNode* patchObject = patchTree->value.firstChildP; patchObject != NULL; patchObject = patchObject->next)
   {
     KjNode* pathNode  = kjLookup(patchObject, "PATH");
     KjNode* tree      = kjLookup(patchObject, "TREE");
+    KjNode* op        = kjLookup(patchObject, "op");
     char*   path      = pathNode->value.s;
     bson_t  compound;
 
-    if (tree->type == KjNull)
+    if (op != NULL)
+    {
+      if (strcmp(op->value.s, "PULL") == 0)
+      {
+        // if "op" == "PULL", then "tree" is an array of strings
+        for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
+        {
+          bson_append_utf8(pullP, path, -1, itemNameP->value.s, -1);
+          *pullsP += 1;
+        }
+      }
+      else if (strcmp(op->value.s, "PUSH") == 0)
+      {
+        // if "op" == "PUSH", then "tree" is an array of strings
+        for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
+        {
+          bson_append_utf8(pushP, path, -1, itemNameP->value.s, -1);
+          *pushesP += 1;
+        }
+      }
+    }
+    else if (tree->type == KjNull)
     {
       LM_TMP(("KZ: The node '%s' is to be REMOVED", path));
       bson_append_utf8(unsetP, path, -1, "", 0);
       *unsetsP += 1;
-      continue;
     }
-
-    if      (tree->type == KjString)   bson_append_utf8(setP,   path, -1, tree->value.s, -1);
+    else if (tree->type == KjString)   bson_append_utf8(setP,   path, -1, tree->value.s, -1);
     else if (tree->type == KjInt)      bson_append_int32(setP,  path, -1, tree->value.i);
     else if (tree->type == KjFloat)    bson_append_double(setP, path, -1, tree->value.f);
     else if (tree->type == KjBoolean)  bson_append_bool(setP,   path, -1, tree->value.b);
@@ -215,21 +235,41 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   bson_t reply;
   bson_t set;
   bson_t unset;
+  bson_t pull;
+  bson_t push;
   bson_t request;
-  int    unsets = 0;
+  int    unsets  = 0;
+  int    pulls   = 0;
+  int    pushes  = 0;
 
   bson_init(&set);
   bson_init(&unset);
+  bson_init(&pull);
+  bson_init(&push);
   bson_init(&request);
 
-  patchApply(patchTree, &set, &unset, &unsets);
+  patchApply(patchTree, &set, &unset, &unsets, &pull, &pulls, &push, &pushes);
 
   bson_append_document(&request, "$set", 4, &set);
+
   if (unsets > 0)
   {
     LM_TMP(("KZ: Adding %d unsets to the mongo request", unsets));
     bson_append_document(&request, "$unset", 6, &unset);
   }
+
+  if (pulls > 0)
+  {
+    LM_TMP(("KZ: Adding %d pulls to the mongo request", pulls));
+    bson_append_document(&request, "$pull", 5, &pull);
+  }
+
+  if (pushes > 0)
+  {
+    LM_TMP(("KZ: Adding %d pushes to the mongo request", pushes));
+    bson_append_document(&request, "$push", 5, &push);
+  }
+
 
   char* reqString = bson_as_canonical_extended_json(&request, NULL);
   LM_TMP(("KZ: request: %s", reqString));

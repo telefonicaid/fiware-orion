@@ -34,6 +34,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "common/globals.h"                                      // parse8601Time
 #include "orionld/mongoc/mongocEntityUpdate.h"                   // mongocEntityUpdate
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -45,13 +46,11 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 //
-// Just like the db pointers, we might need dbModel function pointers ...
-//
 // All db functions (all new ones anyway) should return an entity from DB AS IS, i.e. include the database model
 // Then we need functions to adapt to and from DB-Model:
 //
-// dbModelToApiEntity           - Strip Entity of extra DB model stuff and produce an NGSI-LD API Entity (attrNames is "hidden" as .attrNames)
-// dbModelToApiAttribute        - ... produce an NGSI-LD API Attribute (mdNames is "hidden as .mdNames)
+// dbModelToApiEntity           - Strip Entity of extra DB model stuff and produce an NGSI-LD API Entity (attrNames is "hidden" as .names)
+// dbModelToApiAttribute        - ... produce an NGSI-LD API Attribute (mdNames is "hidden as .names)
 // dbModelToApiSubAttribute     - ... produce an NGSI-LD API Sub-Attribute
 // dbModelFromApiEntity         - convert an NGSI-LD API Entity into an "Orion DB" Entity
 // dbModelFromApiAttribute      -
@@ -62,26 +61,25 @@ extern "C"
 // 2. Convert the request payload to a DB-Model style Entity (includes modifiedAt but not createdAt) - dbModelFromApiXXX()
 // 3. Compare the two trees and come up with an array of changes (orionldEntityPatchTree - output from orionldPatchXXX functions):
 //    [
-//      { [ PATH ], TREE },
-//      { [ PATH ], TREE },
+//      { PATH, TREE },
+//      { PATH, TREE },
 //      ...
 //    ]
 //
 //    E.g. (modification of a compound value of a sub-attr   +  addition of an attribute + removal of a sub-attr):
 //    [
 //      {
-//        "path": [ "attrs", "P1", "md", "Sub-R", "value", "F" ],
+//        "path": "attrs.P1.md.Sub-R.value.F",
 //        "tree": <KjNode tree of the new value>
 //      },
 //      {
-//        "path": [ "attrs", "P2" ]
+//        "path": "attrs.P2",
 //        "tree": <KjNode tree of the attribute - DB Model style>,
-//        "added": "attribute" || "sub-attribute"
 //      },
 //      {
 //        "path": [ "attrs", "P3", "md", "SP1" ]
 //        "tree": null,
-//        "removed": "sub-attribute"
+//        "op": "delete"
 //      }
 //    ]
 //
@@ -132,10 +130,95 @@ static KjNode* arrayAdd(KjNode* containerP, const char* name)
 
 
 
-bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* mdAddedV, KjNode* mdRemovedV, bool newAttribute)
+// -----------------------------------------------------------------------------
+//
+// dbModelFromApiSubAttribute -
+//
+// PARAMETERS
+//   - saP            pointer to the sub-attribute KjNode tree
+//   - 
+//   - mdAddedV       array of names of new metadata (sub-attributes)
+//   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
+//   - newAttribute   if true, the attribute is new and mdAddedV/mdRemovedV need not be used
+//
+bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool newAttribute)
 {
+  dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
+
+  KjNode* dbSubAttributeP = (dbMdP ==  NULL)? NULL : kjLookup(dbMdP, saP->name);    
+  if (saP->type == KjNull)
+  {
+    if (dbSubAttributeP == NULL)
+    {
+      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saP->name));
+      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saP->name, 404);
+      // Add to 207
+      return false;
+    }
+
+    LM_TMP(("KZ: '%s' has a  null RHS - to be removed", saP->name));
+    KjNode* saNameP = kjString(orionldState.kjsonP, NULL, saP->name);
+    kjChildAdd(mdRemovedV, saNameP);
+    return true;
+  }
+
+  if (strcmp(saP->name, "value") == 0)
+  {
+    return true;
+  }
+  else if ((strcmp(saP->name, "object") == 0) || (strcmp(saP->name, "languageMap") == 0))
+  {
+    saP->name = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
+  }
+  else if (strcmp(saP->name, "observedAt") == 0)
+  {
+    //
+    // observedAt is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
+    // Also, the string representation of the ISO8601 is turned into a floating point representation
+    // So, those two problems are fixed here:
+    //
+    double timestamp = parse8601Time(saP->value.s);
+    KjNode* valueP = kjFloat(orionldState.kjsonP, "value", timestamp);
+
+    saP->type = KjObject;
+    saP->value.firstChildP = valueP;
+    saP->lastChild         = valueP;
+
+    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be id "mdNames"
+    if (dbSubAttributeP == NULL)
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+  }
+  else if (strcmp(saP->name, "unitCode") == 0)
+  {
+    //
+    // unitCode is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
+    // So, that problem is fixed here:
+    //
+    KjNode* valueP = kjString(orionldState.kjsonP, "value", saP->value.s);
+
+    saP->type = KjObject;
+    saP->value.firstChildP = valueP;
+    saP->lastChild         = valueP;
+
+    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be id "mdNames"
+    if (dbSubAttributeP == NULL)
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+  }
+  else
+  {
+    if (dbSubAttributeP == NULL)
+    {
+      timestampAdd(saP, "creDate");
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+    }
+
+    // All sub-attrs get a "modifiedAt" (called "modDate" in Orion's database model
+    timestampAdd(saP, "modDate");
+  }
+
   return true;
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -164,12 +247,12 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
   dotForEq(attrP->name);  // Orion DB-Model states that dots are replaced for equal signs in attribute names
   LM_TMP(("KZ: Attribute: %s", attrP->name));
+
   if (attrP->type == KjNull)
   {
-    LM_TMP(("KZ: '%s' has a  null RHS - to be removed", attrP->name));
+    LM_TMP(("KZ: '%s' has a null RHS - to be removed", attrP->name));
     KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrP->name);
     kjChildAdd(attrRemovedV, attrNameP);
-    dotForEq(attrNameP->name);  // Already done?
   }
   else
   {
@@ -181,7 +264,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     attrP->lastChild         = NULL;
 
     // Move special fields back to "attrP"
-    const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId", "observedAt", "unitCode" };
+    const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId" };  // observedAt+unitCode are mds (db-model)
     for (unsigned int ix = 0; ix < K_VEC_SIZE(specialV); ix++)
     {
       KjNode* nodeP = kjLookup(mdP, specialV[ix]);
@@ -201,11 +284,9 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
   bool     newAttribute = false;
-  char*    attrNameEq   = kaStrdup(&orionldState.kalloc, attrP->name);
 
-  dotForEq(attrNameEq);
-
-  if (kjLookup(dbAttrsP, attrNameEq) == NULL)  // Attribute does not exist already
+  KjNode* dbAttrP = kjLookup(dbAttrsP, attrP->name);
+  if (dbAttrP == NULL)  // Attribute does not exist already
   {
     if (attrP->type == KjNull)
     {
@@ -216,11 +297,19 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     }
 
     timestampAdd(attrP, "creDate");
-    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrNameEq));
+    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrP->name));
     newAttribute = true;  // For new attributes, no need to populate .added" and ".removed" - all sub.attr are "added"
   }
   else
   {
+    KjNode* mdNamesP = kjLookup(dbAttrP, "mdNames");
+
+    if (mdNamesP == NULL)
+      LM_X(1, ("Fatal Error (database currupt? No 'mdNames' field in DB Attribute"));
+
+    mdNamesP->name = (char*) ".names";
+    kjChildAdd(attrP, mdNamesP);
+
     mdAddedP   = arrayAdd(attrP, ".added");
     mdRemovedP = arrayAdd(attrP, ".removed");
   }
@@ -229,12 +318,16 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   if (attrP->type == KjNull)
     return true;
 
+  // Sub-Attributes
+  KjNode* mdV = (newAttribute == true)? NULL : kjLookup(dbAttrP, "md");
   LM_TMP(("KZ: Loop over sub-attributes (contents of 'mdP')"));
   for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
   {
     LM_TMP(("KZ: sub-attribute '%s'", subP->name));
-    dbModelFromApiSubAttribute(subP, mdAddedP, mdRemovedP, newAttribute);
+    dbModelFromApiSubAttribute(subP, mdV, mdAddedP, mdRemovedP, newAttribute);
   }
+
+  kjChildAdd(attrP, mdP);
   treePresent(attrP, "KZ: Attribute with PROCESSED sub-attributes");
 
   return true;
@@ -270,10 +363,10 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 //
 //   * Sub-Attribute Level (dbModelSubAttribute)
 //
-bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP)
+bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP)
 {
   KjNode*      nodeP;
-  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate", "attrNames" };
+  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate" };
 
   //
   // Remove any non-attribute nodes
@@ -286,6 +379,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP)
       kjChildRemove(entityP, nodeP);
   }
 
+
   //
   // Create the "attrs" field and move all attributes from entityP to there ("attrs")
   // Then move "attrs" inside entityP
@@ -297,6 +391,14 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP)
   // Make "attrs" the only child (thus far) of entityP
   entityP->value.firstChildP  = attrsP;
   entityP->lastChild          = attrsP;
+
+  // Rename "attrNames" to ".names" and add it to the entity
+  if (dbAttrNamesP == NULL)
+    LM_X(1, ("Fatal Error (database currupt? No 'attrNames' field in DB Entity"));
+
+  dbAttrNamesP->name = (char*) ".names";
+  // Now we can add "attrNames"
+  kjChildAdd(entityP, dbAttrNamesP);
 
   // Adding members necessary for the DB Model
   timestampAdd(entityP, "modDate");
@@ -324,16 +426,80 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP)
 //
 // patchTreeItemAdd -
 //
-void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP)
+void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP, const char* op)
 {
   KjNode* arrayItemP = kjObject(orionldState.kjsonP, NULL);
   KjNode* pathP      = kjString(orionldState.kjsonP, "PATH", path);
 
-  // I steal valueP here - careful ...
+  // valueP is STOLEN here - careful with its previous linked list ...
   valueP->name = (char*) "TREE";
   kjChildAdd(arrayItemP, pathP);
   kjChildAdd(arrayItemP, valueP);
+
+  if (op != NULL)
+  {
+    KjNode* opP = kjString(orionldState.kjsonP, "op", op);
+    kjChildAdd(arrayItemP, opP);
+  }
+
   kjChildAdd(patchTree, arrayItemP);
+}
+
+
+
+static void namesArrayAddedToPatchTree(KjNode* patchTree, const char* path, KjNode* addedP)
+{
+  LM_TMP(("KZ2: Something added, nothing removed - $push to array"));
+  patchTreeItemAdd(patchTree, path, addedP, "PUSH");
+}
+
+static void namesArrayRemovedToPatchTree(KjNode* patchTree, const char* path, KjNode* removedP)
+{
+  LM_TMP(("KZ2: Nothing added, somehing removed - $pull from array"));
+
+  patchTreeItemAdd(patchTree, path, removedP, "PULL");
+}
+
+static void namesArrayMergeToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
+{
+  LM_TMP(("KZ2: Something added, something removed - merge and $set array"));
+}
+
+
+
+static void namesToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
+{
+  LM_TMP(("KZ2 -------------- Found a names array. path: '%s'", path));
+
+  treePresent(namesP,   "KZ2: names");
+  treePresent(addedP,   "KZ2: added");
+  treePresent(removedP, "KZ2: removed");
+
+  // Fix the attrNames/mdNames $set/$pull/$pop
+  char* namesPath;
+
+  if (path == NULL)
+    namesPath = (char*) "attrNames";
+  else
+  {
+    int namesPathLen = ((path != NULL)? strlen(path) + 1 : 0) + 8;  // 8: strlen("mdNames") + 1
+
+    namesPath = kaAlloc(&orionldState.kalloc, namesPathLen);
+    snprintf(namesPath, namesPathLen, "%s.mdNames", path);
+  }
+
+  LM_TMP(("KZ2: Fix %s", namesPath));
+
+  bool added   = false;
+  bool removed = false;
+
+  if ((addedP   != NULL) && (addedP->value.firstChildP   != NULL))  added   = true;
+  if ((removedP != NULL) && (removedP->value.firstChildP != NULL))  removed = true;
+
+  if      ((added == false)  && (removed == false))   LM_TMP(("KZ2: Nothing added, nothing removed - nothing needs to be done!"));
+  else if ((added == true)   && (removed == false))   namesArrayAddedToPatchTree(patchTree,   namesPath, addedP);
+  else if ((added == false)  && (removed == true))    namesArrayRemovedToPatchTree(patchTree, namesPath, removedP);
+  else if ((added == true)   && (removed == true))    namesArrayMergeToPatchTree(patchTree,   namesPath, namesP, addedP, removedP);
 }
 
 
@@ -368,23 +534,23 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   {
     char buf[1024];
     kjFastRender(newP, buf);
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: %s)", path, newP->name, buf));
-    patchTreeItemAdd(patchTree, path, newP);
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: %s)", path, buf));
+    patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
 
   // newP != NULL && oldP != NULL
   if (newP->type == KjNull)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: null - REMOVAL)", path, newP->name));
-    patchTreeItemAdd(patchTree, path, newP);
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: null - REMOVAL)", path));
+    patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
 
   if (newP->type != oldP->type)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-    patchTreeItemAdd(patchTree, path, newP);
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
 
@@ -397,8 +563,8 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
   if (change == true)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-    patchTreeItemAdd(patchTree, path, newP);
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP, NULL);
   }
 
   if (leave == true)
@@ -406,8 +572,8 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
   if (newP->type == KjArray)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s.%s, TREE: <JSON %s>)", path, newP->name, kjValueType(newP->type)));
-    patchTreeItemAdd(patchTree, path, newP);
+    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
+    patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
 
@@ -416,13 +582,23 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   //
   // Can't use the normal "for" - must be a "while and a next pointer"
   //
-  KjNode* newItemP = newP->value.firstChildP;
+  KjNode* newItemP   = newP->value.firstChildP;
   KjNode* next;
+  KjNode* namesP     = NULL;
+  KjNode* addedP     = NULL;
+  KjNode* removedP   = NULL;
+
   while (newItemP != NULL)
   {
     // Skip "hidden" fields
     if (newItemP->name[0] == '.')
     {
+      LM_TMP(("KZ2: Skipping '%s' of '%s'", newItemP->name, path));
+
+      if      (strcmp(newItemP->name, ".names")   == 0) namesP   = newItemP;
+      else if (strcmp(newItemP->name, ".added")   == 0) addedP   = newItemP;
+      else if (strcmp(newItemP->name, ".removed") == 0) removedP = newItemP;
+
       newItemP = newItemP->next;
       continue;
     }
@@ -448,6 +624,9 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
     newItemP = next;
   }
+
+  if (namesP != NULL)
+    namesToPatchTree(patchTree, path, namesP, addedP, removedP);
 }
 
 
@@ -513,7 +692,8 @@ bool orionldPatchEntity2(void)
   //        I extract the part that is to be forwarded from the tree before I destroy
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
-  dbModelFromApiEntity(orionldState.requestTree, dbAttrsP);
+  KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
+  dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP);
 
 
   
@@ -543,8 +723,8 @@ bool orionldPatchEntity2(void)
   LM_TMP(("KZ: --------------------------- Calling orionldEntityPatchTree -------------------------"));
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
-  LM_TMP(("KZ: --------------------------- After orionldEntityPatchTree ---------------------------"));
-  treePresent(patchTree, "KZ: PATCH TREE");
+  LM_TMP(("KZ2: --------------------------- After orionldEntityPatchTree ---------------------------"));
+  treePresent(patchTree, "KZ2: PATCH TREE");
 
   bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found as arrays named ".added" and ".removed"
   if (b == false)
