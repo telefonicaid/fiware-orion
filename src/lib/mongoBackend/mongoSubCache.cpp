@@ -491,14 +491,13 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateCount -
+* mongoSubCountersUpdateFailsAndStatus -
 */
-static void mongoSubCountersUpdateCount
+static void mongoSubCountersUpdateFailsAndStatus
 (
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
-  long long           count,
   long long           fails,
   const std::string&  status,
   double              statusLastChange
@@ -512,21 +511,16 @@ static void mongoSubCountersUpdateCount
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
-  if (count > 0)
-  {
-    incB.append(CSUB_COUNT, count);
-  }
 
   if (fails > 0)
   {
     incB.append(CSUB_FAILSCOUNTER, fails);
   }
-  else if ((noCache) || (count > 0))
+  else if (noCache)
   {
     // no fails mean notification ok, thus reseting the counter
-    // in noCache case, this is always done. In cache case, the the count > 0 check is needed
-    // to ensure that at least one notification has been sent in since last cache refresh
-    // see cases/3541_subscription_max_fails_limit/failsCounter_keeps_after_cache_refresh_cycles.test
+    // in noCache case, this is always done. In cache case, it will be donde
+    // at cache refresh time (check mongoSubUpdateOnCacheSync())
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
@@ -713,7 +707,7 @@ static void mongoSubCountersUpdateLastSuccess
 *
 * Used in notification logic
 *
-* Athough we are updating basically the same things (count, failsCounter, etc.),
+* Although we are updating basically the same things (lastNotificationTime, lastSuccess, etc.),
 * we cannot use mongoSubUpdateOnCacheSync(). Note that in mongoSubUpdateOnCacheSync()
 * we start from a reference status in DB so we can decide what to update in a
 * single shot. However, in the notification case we don't know the status of the
@@ -724,7 +718,6 @@ void mongoSubUpdateOnNotif
 (
   const std::string&  tenant,
   const std::string&  subId,
-  long long           count,
   long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
@@ -743,7 +736,7 @@ void mongoSubUpdateOnNotif
 
   std::string db = composeDatabaseName(tenant);
 
-  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status, statusLastChange);
+  mongoSubCountersUpdateFailsAndStatus(db, COL_CSUBS, subId, failsCounter, status, statusLastChange);
 
   if (lastNotificationTime > 0)
   {

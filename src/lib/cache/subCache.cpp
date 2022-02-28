@@ -1301,7 +1301,8 @@ void subNotificationErrorStatus
   // logic related with cache
   if (noCache)
   {
-    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubUpdateOnNotif()
+    // The field 'count' has already been taken care of (see processSubscriptions())
+    // It is not used taken into account in mongoSubUpdateOnNotif()
 
     time_t now = time(NULL);
 
@@ -1315,13 +1316,13 @@ void subNotificationErrorStatus
         status           = STATUS_INACTIVE;
         statusLastChange = getCurrentTime();
       }
-      // count == 0 (inc is done in another part), fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, 1, now, now, -1, failureReason, -1, status, statusLastChange);
+      // fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange);
     }
     else
     {
-      // count == 0 (inc is done in another part), fails = 0, lastFailure == -1, failureReason == "", status == ""
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, 0, now, -1, now, "", statusCode, "", -1);
+      // fails = 0, lastFailure == -1, failureReason == "", status == ""
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1);
     }
 
     return;
