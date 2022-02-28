@@ -143,9 +143,14 @@ static KjNode* arrayAdd(KjNode* containerP, const char* name)
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool newAttribute)
 {
+  LM_TMP(("KZ3: In dbModelFromApiSubAttribute for sub-attr '%s'", saP->name));
+
+  char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Needed for mdAddedV, mdRemovedV
+
   dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
 
   KjNode* dbSubAttributeP = (dbMdP ==  NULL)? NULL : kjLookup(dbMdP, saP->name);    
+
   if (saP->type == KjNull)
   {
     if (dbSubAttributeP == NULL)
@@ -157,8 +162,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     }
 
     LM_TMP(("KZ: '%s' has a  null RHS - to be removed", saP->name));
-    KjNode* saNameP = kjString(orionldState.kjsonP, NULL, saP->name);
-    kjChildAdd(mdRemovedV, saNameP);
+    kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
     return true;
   }
 
@@ -168,6 +172,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
   }
   else if ((strcmp(saP->name, "object") == 0) || (strcmp(saP->name, "languageMap") == 0))
   {
+    LM_TMP(("KZ3: Changing 'object' to 'value'"));
     saP->name = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
   }
   else if (strcmp(saP->name, "observedAt") == 0)
@@ -178,7 +183,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     // So, those two problems are fixed here:
     //
     double timestamp = parse8601Time(saP->value.s);
-    KjNode* valueP = kjFloat(orionldState.kjsonP, "value", timestamp);
+    KjNode* valueP   = kjFloat(orionldState.kjsonP, "value", timestamp);
 
     saP->type = KjObject;
     saP->value.firstChildP = valueP;
@@ -206,17 +211,28 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
   }
   else
   {
+    LM_TMP(("KZ3: THIS is a sub-attr (%s) - change to 'value' if 'type == object/languageMap", saP->name));
+
+    // If object or languageMap exist, change name to value
+    KjNode* valueP = kjLookup(saP, "object");
+
+    if (valueP == NULL)
+      valueP = kjLookup(saP, "languageMap");
+
+    if (valueP != NULL)
+      valueP->name = (char*) "value";
+
+    // If the sub-attr didn't exist, it needs a "createdAt"
     if (dbSubAttributeP == NULL)
     {
-      timestampAdd(saP, "creDate");
-      // The "mdNames" array stores the sub-attribute names in their original names, with dots - undo
-      char* saName = kaStrdup(&orionldState.kalloc, saP->name);
-      eqForDot(saName);
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saName));
+      timestampAdd(saP, "createdAt");
+
+      // The "mdNames" array stores the sub-attribute names in their original names, with dots - saDotName
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
     }
 
-    // All sub-attrs get a "modifiedAt" (called "modDate" in Orion's database model
-    timestampAdd(saP, "modDate");
+    // All sub-attrs get a "modifiedAt"
+    timestampAdd(saP, "modifiedAt");
   }
 
   return true;
@@ -248,13 +264,14 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 {
   KjNode* mdP = NULL;
 
+  char* attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);  // Needed for attrAddedV, attrRemovedV
   dotForEq(attrP->name);  // Orion DB-Model states that dots are replaced for equal signs in attribute names
   LM_TMP(("KZ: Attribute: %s", attrP->name));
 
   if (attrP->type == KjNull)
   {
     LM_TMP(("KZ: '%s' has a null RHS - to be removed", attrP->name));
-    KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrP->name);
+    KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrDotName);
     kjChildAdd(attrRemovedV, attrNameP);
   }
   else
@@ -301,10 +318,8 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
     timestampAdd(attrP, "creDate");
 
-    // The "attrNames" array stores the sub-attribute names in their original names, with dots - undo
-    char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
-    eqForDot(attrName);
-    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrName));
+    // The "attrNames" array stores the sub-attribute names in their original names, with dots - attrDotName
+    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrDotName));
 
     newAttribute = true;  // For new attributes, no need to populate .added" and ".removed" - all sub.attr are "added"
   }
@@ -313,9 +328,13 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     KjNode* mdNamesP = kjLookup(dbAttrP, "mdNames");
 
     if (mdNamesP == NULL)
-      LM_X(1, ("Fatal Error (database currupt? No 'mdNames' field in DB Attribute"));
+    {
+      // No 'mdNames' field in DB Attribute - must be the attr had zero sub-attrs before this
+      mdNamesP = kjArray(orionldState.kjsonP, ".names");
+    }
+    else
+      mdNamesP->name = (char*) ".names";
 
-    mdNamesP->name = (char*) ".names";
     kjChildAdd(attrP, mdNamesP);
 
     mdAddedP   = arrayAdd(attrP, ".added");
@@ -402,9 +421,13 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
 
   // Rename "attrNames" to ".names" and add it to the entity
   if (dbAttrNamesP == NULL)
-    LM_X(1, ("Fatal Error (database currupt? No 'attrNames' field in DB Entity"));
+  {
+    // No 'attrNames' field in DB Entity - must be the entity had zero attrs before this
+    dbAttrNamesP = kjArray(orionldState.kjsonP, ".names");
+  }
+  else
+    dbAttrNamesP->name = (char*) ".names";
 
-  dbAttrNamesP->name = (char*) ".names";
   // Now we can add "attrNames"
   kjChildAdd(entityP, dbAttrNamesP);
 
