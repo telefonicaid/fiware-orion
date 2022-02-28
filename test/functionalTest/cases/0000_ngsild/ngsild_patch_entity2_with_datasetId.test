@@ -41,6 +41,9 @@ brokerStart CB 0-255
 # 07. Patch E1, adding P1:observedAt
 # 08. See E1 in DB
 # 09. GET E1
+# 10. Patch E1, adding a Relationship R1
+# 11. See E1 in DB
+# 12. GET E1
 #
 
 echo "01. Create an entity E1 with an attr P1"
@@ -134,6 +137,33 @@ echo
 
 
 echo "09. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "10. Patch E1, adding a Relationship R1"
+echo "======================================"
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:E2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "12. GET E1"
 echo "=========="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
@@ -362,6 +392,98 @@ Date: REGEX(.*)
             "v4": "P1:v4-Step04: added",
             "v7": "P1:v7-Step07: added"
         }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+10. Patch E1, adding a Relationship R1
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. See E1 in DB
+================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: 3.6.23
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added",
+				"v7" : "P1:v7-Step07: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step7"
+				},
+				"observedAt" : {
+					"value" : 1646008680.007
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+			"type" : "Relationship",
+			"value" : "urn:E2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"md" : {
+				
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+12. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 279
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-02-28T00:38:00.007Z",
+        "type": "Property",
+        "unitCode": "step7",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added",
+            "v7": "P1:v7-Step07: added"
+        }
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
     },
     "id": "urn:E1",
     "type": "T"

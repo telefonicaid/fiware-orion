@@ -209,7 +209,10 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if (dbSubAttributeP == NULL)
     {
       timestampAdd(saP, "creDate");
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+      // The "mdNames" array stores the sub-attribute names in their original names, with dots - undo
+      char* saName = kaStrdup(&orionldState.kalloc, saP->name);
+      eqForDot(saName);
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saName));
     }
 
     // All sub-attrs get a "modifiedAt" (called "modDate" in Orion's database model
@@ -297,7 +300,12 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     }
 
     timestampAdd(attrP, "creDate");
-    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrP->name));
+
+    // The "attrNames" array stores the sub-attribute names in their original names, with dots - undo
+    char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
+    eqForDot(attrName);
+    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrName));
+
     newAttribute = true;  // For new attributes, no need to populate .added" and ".removed" - all sub.attr are "added"
   }
   else
