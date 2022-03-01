@@ -537,6 +537,7 @@ extern bool              orionldStartup;           // For now, only used inside 
 extern bool              idIndex;                  // From orionld.cpp
 extern bool              noNotifyFalseUpdate;      // From orionld.cpp
 extern char              mongoServerVersion[32];
+extern bool              experimental;             // From orionld.cpp
 
 
 

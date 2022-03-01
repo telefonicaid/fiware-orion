@@ -714,6 +714,12 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 //
 bool orionldPatchEntity2(void)
 {
+  if (experimental == false)
+  {
+    orionldError(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath, 404);
+    return false;
+  }
+
   char*    entityId    = orionldState.wildcard[0];
   KjNode*  dbEntityP;
   char     buf[4096];  // DEBUG

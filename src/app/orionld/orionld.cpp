@@ -218,6 +218,7 @@ bool            forwarding;
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
+bool            experimental;
 
 
 
@@ -292,7 +293,7 @@ bool            noswap;
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
-
+#define EXPERIMENTAL_DESC      "enable experimental implementation"
 
 
 /* ****************************************************************************
@@ -366,6 +367,11 @@ PaArgument paArgs[] =
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
+#ifdef DEBUG
+  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  true,            false,  true,             EXPERIMENTAL_DESC        },
+#else
+  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
+#endif
 
   PA_END_OF_ARGS
 };
