@@ -12,3 +12,4 @@
 * Issue #1015  Implemented 'Concise Output Format' support for Notifications
 * Issue #1033  Fixed a bug about Concise GeoJSON returning an Invalid Geometry
 * Issue #1034  Fixed a bug about Array Reduction and Concise Attribute Format
+* Issue #280   Implemented the new PATCH /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding

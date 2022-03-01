@@ -52,6 +52,9 @@ SET (SOURCES
     kjSort.cpp
     kjChildCount.cpp
     kjEntityNormalizedToConcise.cpp
+    kjTreeLog.cpp
+    kjTimestampAdd.cpp
+    kjArrayAdd.cpp
 )
 
 # Include directories

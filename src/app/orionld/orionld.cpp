@@ -367,11 +367,7 @@ PaArgument paArgs[] =
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
-#ifdef DEBUG
-  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  true,            false,  true,             EXPERIMENTAL_DESC        },
-#else
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
-#endif
 
   PA_END_OF_ARGS
 };
@@ -890,7 +886,6 @@ int main(int argC, char* argV[])
     mlockall(MCL_CURRENT | MCL_FUTURE);
   }
 
-
   //
   // Set portNo
   //
@@ -1088,7 +1083,7 @@ int main(int argC, char* argV[])
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_K(("Initialization ready - accepting REST requests on port %d", port));
+  LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
 
   if (socketService == true)
   {
