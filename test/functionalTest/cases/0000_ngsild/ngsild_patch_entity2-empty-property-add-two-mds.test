@@ -26,11 +26,9 @@ Update an entity using Real PATCH - add two sub-attributes to a Property with no
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
-#
-# No datasetId for now.
 #
 # 01. Create an entity E1 with an attr P1 without sub-attributes
 # 02. See E1 in mongo

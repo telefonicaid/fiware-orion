@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update an entity with datasetIds using Real PATCH
+Update an entity using "Real PATCH"
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 #
@@ -59,10 +59,10 @@ brokerStart CB 0-255
 # 25. Patch E1, Add two sub-properties to R2
 # 26. See E1 in DB
 # 27. GET E1
-# 28. Patch E1, Add delete sub-properties from R2
+# 28. Patch E1, Delete the two sub-properties from R2
 # 29. See E1 in DB
 # 30. GET E1
-# 31. Patch E1, Delete the two properties R2 and P3
+# 31. Patch E1, Delete the three properties P2, P3, and R2
 # 32. See E1 in DB
 # 33. GET E1
 #
@@ -320,38 +320,55 @@ echo
 echo
 
 
-echo "28. Patch E1, Add delete sub-properties from R2"
-echo "==============================================="
+echo "28. Patch E1, Delete the two sub-properties from R2"
+echo "==================================================="
+payload='{
+  "R2": {
+    "R2P1": { "@type": "@json", "@value": null },
+    "R2R1": { "@type": "@json", "@value": null }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "29. See E1 in DB"
 echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
 
 echo "30. GET E1"
 echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
 echo
 
 
-echo "31. Patch E1, Delete the two properties R2 and P3"
-echo "================================================="
+echo "31. Patch E1, Delete the three properties P2, P3, and R2"
+echo "========================================================"
+payload='{
+  "P2": { "@type": "@json", "@value": null },
+  "P3": { "@type": "@json", "@value": null },
+  "R2": { "@type": "@json", "@value": null }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "32. See E1 in DB"
 echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
 
 echo "33. GET E1"
 echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
 echo
 
@@ -1079,28 +1096,129 @@ Date: REGEX(.*)
 }
 
 
-28. Patch E1, Add delete sub-properties from R2
-===============================================
+28. Patch E1, Delete the two sub-properties from R2
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
 
 
 29. See E1 in DB
 ================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"value" : 22,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R2" : {
+			"type" : "Relationship",
+			"value" : "urn:E22",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ],
+			"md" : {
+				
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 30. GET E1
 ==========
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "P3": {
+        "type": "Property",
+        "value": 22
+    },
+    "R2": {
+        "object": "urn:E22",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
 
 
-31. Patch E1, Delete the two properties R2 and P3
-=================================================
+31. Patch E1, Delete the three properties P2, P3, and R2
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
 
 
 32. See E1 in DB
 ================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [ ],
+	"attrs" : {
+		
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 33. GET E1
 ==========
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:E1",
+    "type": "T"
+}
 
 
 --TEARDOWN--
