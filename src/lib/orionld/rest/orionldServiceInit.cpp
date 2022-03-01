@@ -297,6 +297,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldPatchEntity2)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {

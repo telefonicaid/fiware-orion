@@ -1,0 +1,1108 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity with datasetIds using Real PATCH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+#
+# No datasetId for now.
+#
+# 01. Create an entity E1 with an attr P1
+# 02. See E1 in DB
+# 03. GET E1
+# 04. Patch E1, removing P1:observedAt
+# 05. See E1 in DB
+# 06. GET E1
+# 07. Patch E1, adding P1:observedAt
+# 08. See E1 in DB
+# 09. GET E1
+# 10. Patch E1, adding a Relationship R1
+# 11. See E1 in DB
+# 12. GET E1
+# 13. Patch E1, removing the Relationship R1
+# 14. See E1 in DB
+# 15. GET E1
+# 16. Patch E1, adding a Sub-Relationship R1 to P1
+# 17. See E1 in DB
+# 18. GET E1
+# 19. Patch E1, Delete P1, Add P2
+# 20. See E1 in DB
+# 21. GET E1
+# 22. Patch E1, Add two properties R2 and P3
+# 23. See E1 in DB
+# 24. GET E1
+# 25. Patch E1, Add two sub-properties to R2
+# 26. See E1 in DB
+# 27. GET E1
+# 28. Patch E1, Add delete sub-properties from R2
+# 29. See E1 in DB
+# 30. GET E1
+# 31. Patch E1, Delete the two properties R2 and P3
+# 32. See E1 in DB
+# 33. GET E1
+#
+
+echo "01. Create an entity E1 with an attr P1"
+echo "======================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "v1": "P1:v1-Step01: to-be-changed",
+      "v2": "P1:v2-Step01: to-stay",
+      "v3": "P1:v3-Step01: to-be-removed"
+    },
+    "observedAt": "2022-02-24T17:45:00.001Z",
+    "unitCode": "step1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. Patch E1, updating P1 - P1.observedAt isn't removed as it's a metadata - need to add '.md.observedAt"
+echo "========================="
+payload='{
+  "P1": {
+    "value": {
+      "v1": "P1:v1-Step04: changed",
+      "v3": null,
+      "v4": "P1:v4-Step04: added"
+    },
+    "observedAt": null,
+    "unitCode": "step4"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "07. Patch E1, adding P1:observedAt"
+echo "=================================="
+payload='{
+  "P1": {
+    "value": {
+      "v7": "P1:v7-Step07: added"
+    },
+    "observedAt": "2022-02-28T00:38:00.007Z",
+    "unitCode": "step7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "09. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "10. Patch E1, adding a Relationship R1"
+echo "======================================"
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:E2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "12. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "13. Patch E1, removing the Relationship R1"
+echo "=========================================="
+payload='{
+  "R1": null
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "15. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "16. Patch E1, adding a Sub-Relationship R1 to P1"
+echo "================================================"
+payload='{
+  "P1": {
+    "R1": {
+      "object": "urn:E2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "17. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "18. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "19. Patch E1, Delete P1, Add P2"
+echo "==============================="
+payload='{
+  "P1": null,
+  "P2": 20
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "20. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "21. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "22. Patch E1, Add two properties R2 and P3"
+echo "=========================================="
+payload='{
+  "R2": { "object": "urn:E22" },
+  "P3": 22
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "23. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "24. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "25. Patch E1, Add two sub-properties to R2"
+echo "=========================================="
+payload='{
+  "R2": {
+    "R2P1": 25,
+    "R2R1": { "object": "urn:E22" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "26. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "27. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "28. Patch E1, Add delete sub-properties from R2"
+echo "==============================================="
+echo
+echo
+
+
+echo "29. See E1 in DB"
+echo "================"
+echo
+echo
+
+
+echo "30. GET E1"
+echo "=========="
+echo
+echo
+
+
+echo "31. Patch E1, Delete the two properties R2 and P3"
+echo "================================================="
+echo
+echo
+
+
+echo "32. See E1 in DB"
+echo "================"
+echo
+echo
+
+
+echo "33. GET E1"
+echo "=========="
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attr P1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step01: to-be-changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v3" : "P1:v3-Step01: to-be-removed"
+			},
+			"md" : {
+				"observedAt" : {
+					"value" : 1645724700.001
+				},
+				"unitCode" : {
+					"value" : "step1"
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"unitCode"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 219
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-02-24T17:45:00.001Z",
+        "type": "Property",
+        "unitCode": "step1",
+        "value": {
+            "v1": "P1:v1-Step01: to-be-changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v3": "P1:v3-Step01: to-be-removed"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. Patch E1, updating P1 - P1.observedAt isn't removed as it's a metadata - need to add '.md.observedAt
+=========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step4"
+				}
+			},
+			"mdNames" : [
+				"unitCode"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+06. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 165
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "unitCode": "step4",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. Patch E1, adding P1:observedAt
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added",
+				"v7" : "P1:v7-Step07: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step7"
+				},
+				"observedAt" : {
+					"value" : 1646008680.007
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+09. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-02-28T00:38:00.007Z",
+        "type": "Property",
+        "unitCode": "step7",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added",
+            "v7": "P1:v7-Step07: added"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+10. Patch E1, adding a Relationship R1
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added",
+				"v7" : "P1:v7-Step07: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step7"
+				},
+				"observedAt" : {
+					"value" : 1646008680.007
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+			"type" : "Relationship",
+			"value" : "urn:E2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+12. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 279
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-02-28T00:38:00.007Z",
+        "type": "Property",
+        "unitCode": "step7",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added",
+            "v7": "P1:v7-Step07: added"
+        }
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+13. Patch E1, removing the Relationship R1
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added",
+				"v7" : "P1:v7-Step07: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step7"
+				},
+				"observedAt" : {
+					"value" : 1646008680.007
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+15. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-02-28T00:38:00.007Z",
+        "type": "Property",
+        "unitCode": "step7",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added",
+            "v7": "P1:v7-Step07: added"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+16. Patch E1, adding a Sub-Relationship R1 to P1
+================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+17. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"v1" : "P1:v1-Step04: changed",
+				"v2" : "P1:v2-Step01: to-stay",
+				"v4" : "P1:v4-Step04: added",
+				"v7" : "P1:v7-Step07: added"
+			},
+			"md" : {
+				"unitCode" : {
+					"value" : "step7"
+				},
+				"observedAt" : {
+					"value" : 1646008680.007
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+					"value" : "urn:E2",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			},
+			"mdNames" : [
+				"unitCode",
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+18. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 279
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "observedAt": "2022-02-28T00:38:00.007Z",
+        "type": "Property",
+        "unitCode": "step7",
+        "value": {
+            "v1": "P1:v1-Step04: changed",
+            "v2": "P1:v2-Step01: to-stay",
+            "v4": "P1:v4-Step04: added",
+            "v7": "P1:v7-Step07: added"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+19. Patch E1, Delete P1, Add P2
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+21. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 62
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+22. Patch E1, Add two properties R2 and P3
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+23. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"value" : 22,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R2" : {
+			"type" : "Relationship",
+			"value" : "urn:E22",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+24. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "P3": {
+        "type": "Property",
+        "value": 22
+    },
+    "R2": {
+        "object": "urn:E22",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+25. Patch E1, Add two sub-properties to R2
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+26. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"value" : 22,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R2" : {
+			"type" : "Relationship",
+			"value" : "urn:E22",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/R2P1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R2R1"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R2P1" : {
+					"type" : "Property",
+					"value" : 25,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/R2R1" : {
+					"value" : "urn:E22",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+27. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 234
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "P3": {
+        "type": "Property",
+        "value": 22
+    },
+    "R2": {
+        "R2P1": {
+            "type": "Property",
+            "value": 25
+        },
+        "R2R1": {
+            "object": "urn:E22",
+            "type": "Relationship"
+        },
+        "object": "urn:E22",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+28. Patch E1, Add delete sub-properties from R2
+===============================================
+
+
+29. See E1 in DB
+================
+
+
+30. GET E1
+==========
+
+
+31. Patch E1, Delete the two properties R2 and P3
+=================================================
+
+
+32. See E1 in DB
+================
+
+
+33. GET E1
+==========
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -475,6 +476,49 @@ bool multiAttributeArray(KjNode* attrArrayP, bool* errorP)
 }
 
 
+
+// -----------------------------------------------------------------------------
+//
+// jsonldNullObject -
+//
+// { "@type": "@json", "@value": null }
+//
+bool jsonldNullObject(KjNode* attrP, KjNode* typeP)
+{
+  if ((strcmp(typeP->name, "@type") == 0) && (typeP->type == KjString))
+  {
+    if (strcmp(typeP->value.s, "@json") == 0)
+    {
+      KjNode* atValueP = kjLookup(attrP, "@value");
+
+      if ((atValueP != NULL) && (atValueP->type = KjNull))
+      {
+        //
+        // All good so far - both items present
+        // Now, is that all?
+        //
+        int items = 0;
+        for (KjNode* itemP = attrP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+        {
+          ++items;
+        }
+
+        if (items == 2)  // All good - it's a JSON-LD NULL object
+        {
+          attrP->type    = KjNull;
+          attrP->value.i = 0;
+
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // pCheckAttributeObject -
@@ -515,6 +559,15 @@ static bool pCheckAttributeObject
   //
   if (typeP != NULL)  // Attribute Type given in incoming payload
   {
+    //
+    // Check for the special JSON-LD null object - only valid for PATCH /entities/{eId} ...
+    //
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) != 0)
+    {
+      if (jsonldNullObject(attrP, typeP) == true)
+        return true;
+    }
+
     //
     // If type is in the payload:
     //   Is it valid?
