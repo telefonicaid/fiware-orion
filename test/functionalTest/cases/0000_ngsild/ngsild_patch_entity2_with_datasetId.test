@@ -53,6 +53,18 @@ brokerStart CB 0-255
 # 19. Patch E1, Delete P1, Add P2
 # 20. See E1 in DB
 # 21. GET E1
+# 22. Patch E1, Add two properties R2 and P3
+# 23. See E1 in DB
+# 24. GET E1
+# 25. Patch E1, Add two sub-properties to R2
+# 26. See E1 in DB
+# 27. GET E1
+# 28. Patch E1, Add delete sub-properties from R2
+# 29. See E1 in DB
+# 30. GET E1
+# 31. Patch E1, Delete the two properties R2 and P3
+# 32. See E1 in DB
+# 33. GET E1
 #
 
 echo "01. Create an entity E1 with an attr P1"
@@ -252,6 +264,94 @@ echo
 echo "21. GET E1"
 echo "=========="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "22. Patch E1, Add two properties R2 and P3"
+echo "=========================================="
+payload='{
+  "R2": { "object": "urn:E22" },
+  "P3": 22
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "23. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "24. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "25. Patch E1, Add two sub-properties to R2"
+echo "=========================================="
+payload='{
+  "R2": {
+    "R2P1": 25,
+    "R2R1": { "object": "urn:E22" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "26. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "27. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "28. Patch E1, Add delete sub-properties from R2"
+echo "==============================================="
+echo
+echo
+
+
+echo "29. See E1 in DB"
+echo "================"
+echo
+echo
+
+
+echo "30. GET E1"
+echo "=========="
+echo
+echo
+
+
+echo "31. Patch E1, Delete the two properties R2 and P3"
+echo "================================================="
+echo
+echo
+
+
+echo "32. See E1 in DB"
+echo "================"
+echo
+echo
+
+
+echo "33. GET E1"
+echo "=========="
 echo
 echo
 
@@ -535,9 +635,7 @@ MongoDB server version: 3.6.23
 			"value" : "urn:E2",
 			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
-			"md" : {
-				
-			}
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -770,9 +868,7 @@ MongoDB server version: 3.6.23
 			"value" : 20,
 			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
-			"md" : {
-
-			}
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -798,6 +894,213 @@ Date: REGEX(.*)
     "id": "urn:E1",
     "type": "T"
 }
+
+
+22. Patch E1, Add two properties R2 and P3
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+23. See E1 in DB
+================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: 3.6.23
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"value" : 22,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R2" : {
+			"type" : "Relationship",
+			"value" : "urn:E22",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+24. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "P3": {
+        "type": "Property",
+        "value": 22
+    },
+    "R2": {
+        "object": "urn:E22",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+25. Patch E1, Add two sub-properties to R2
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+26. See E1 in DB
+================
+MongoDB shell version v3.6.23
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: 3.6.23
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"value" : 20,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"value" : 22,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R2" : {
+			"type" : "Relationship",
+			"value" : "urn:E22",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/R2P1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R2R1"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R2P1" : {
+					"type" : "Property",
+					"value" : 25,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/R2R1" : {
+					"value" : "urn:E22",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+27. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 234
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 20
+    },
+    "P3": {
+        "type": "Property",
+        "value": 22
+    },
+    "R2": {
+        "R2P1": {
+            "type": "Property",
+            "value": 25
+        },
+        "R2R1": {
+            "object": "urn:E22",
+            "type": "Relationship"
+        },
+        "object": "urn:E22",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+28. Patch E1, Add delete sub-properties from R2
+===============================================
+
+
+29. See E1 in DB
+================
+
+
+30. GET E1
+==========
+
+
+31. Patch E1, Delete the two properties R2 and P3
+=================================================
+
+
+32. See E1 in DB
+================
+
+
+33. GET E1
+==========
 
 
 --TEARDOWN--

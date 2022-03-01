@@ -31,6 +31,7 @@ brokerStart CB 0-255
 --SHELL--
 #
 # 01. Create an entity E1 with 3 attributes, P1=1, P2=1 and R1=urn:E1, etc ...
+# 01. See E1 in DB
 # 02. Patch E1, setting P1=2, P2="P2", R1=urn:E2
 # 03. See E1 in DB
 # 04. GET E1
@@ -42,7 +43,7 @@ brokerStart CB 0-255
 # 10. See E1 in DB
 # 11. GET E1
 # 12. Patch E1:P3, inside value, changing 'a' from 'compound' to 'ComPouND'
-# 13. GET E1 - WARNING - PATCH on attr value does a REPLACE, not a PATCH - must be FIXED
+# 13. GET E1
 #
 
 echo "01. Create an entity E1 with 3 attributes, P1=1, P2=1 and R1=urn:E1, etc ..."
@@ -58,6 +59,13 @@ payload='{
   "R1": { "object": "urn:E1" }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "01. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
@@ -160,8 +168,8 @@ echo
 echo
 
 
-echo "13. GET E1 - WARNING - PATCH on attr value does a REPLACE, not a PATCH - must be FIXED"
-echo "======================================================================================"
+echo "13. GET E1"
+echo "=========="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise
 echo
 echo
@@ -175,6 +183,76 @@ Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:E1
 Date: REGEX(.*)
 
+
+
+01. See E1 in DB
+================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/B1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/B1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : false,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:E1",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 02. Patch E1, setting P1=2, P2="P2", R1=urn:E2
@@ -251,11 +329,11 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {
-			"creDate" : REGEX(.*),
-			"mdNames" : [ ],
-			"modDate" : REGEX(.*),
 			"type" : "Property",
-			"value" : 3.14
+			"value" : 3.14,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -389,11 +467,11 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {
-			"creDate" : REGEX(.*),
-			"mdNames" : [ ],
-			"modDate" : REGEX(.*),
 			"type" : "Property",
-			"value" : 3.14
+			"value" : 3.14,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -530,11 +608,11 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {
-			"creDate" : REGEX(.*),
-			"mdNames" : [ ],
-			"modDate" : REGEX(.*),
 			"type" : "Property",
-			"value" : 3.14
+			"value" : 3.14,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -578,10 +656,10 @@ Date: REGEX(.*)
 
 
 
-13. GET E1 - WARNING - PATCH on attr value does a REPLACE, not a PATCH - must be FIXED
-======================================================================================
+13. GET E1
+==========
 HTTP/1.1 200 OK
-Content-Length: 107
+Content-Length: 117
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -591,6 +669,7 @@ Date: REGEX(.*)
     "F1": 3.14,
     "P2": "2",
     "P3": {
+        "P3": "is",
         "a": "ComPouND"
     },
     "P4": [

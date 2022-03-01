@@ -137,12 +137,11 @@ static KjNode* arrayAdd(KjNode* containerP, const char* name)
 //
 // PARAMETERS
 //   - saP            pointer to the sub-attribute KjNode tree
-//   - 
+//   - dbMdP          array of names od alreadty existing metadata (from DB)
 //   - mdAddedV       array of names of new metadata (sub-attributes)
 //   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
-//   - newAttribute   if true, the attribute is new and mdAddedV/mdRemovedV need not be used
 //
-bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool newAttribute)
+bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV)
 {
   LM_TMP(("KZ3: In dbModelFromApiSubAttribute for sub-attr '%s'", saP->name));
 
@@ -150,7 +149,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
   dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
 
-  KjNode* dbSubAttributeP = (dbMdP ==  NULL)? NULL : kjLookup(dbMdP, saP->name);    
+  KjNode* dbSubAttributeP = (dbMdP == NULL)? NULL : kjLookup(dbMdP, saP->name);
 
   if (saP->type == KjNull)
   {
@@ -212,7 +211,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
   }
   else
   {
-    LM_TMP(("KZ3: THIS is a sub-attr (%s) - change to 'value' if 'type == object/languageMap", saP->name));
+    LM_TMP(("KZ4: THIS is a sub-attr (%s) - change to 'value' if 'type == object/languageMap", saP->name));
 
     // If object or languageMap exist, change name to value
     KjNode* valueP = kjLookup(saP, "object");
@@ -263,51 +262,51 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 //
 bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV)
 {
-  KjNode* mdP = NULL;
+  KjNode* mdP         = NULL;
+  char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);  // Needed for attrAddedV, attrRemovedV
 
-  char* attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);  // Needed for attrAddedV, attrRemovedV
   dotForEq(attrP->name);  // Orion DB-Model states that dots are replaced for equal signs in attribute names
-  LM_TMP(("KZ: Attribute: %s", attrP->name));
 
   if (attrP->type == KjNull)
   {
     LM_TMP(("KZ: '%s' has a null RHS - to be removed", attrP->name));
     KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrDotName);
     kjChildAdd(attrRemovedV, attrNameP);
+    return true;
   }
-  else
+
+  // Move everything into "md", leaving attrP EMPTY
+  mdP = kjObject(orionldState.kjsonP, "md");
+  mdP->value.firstChildP   = attrP->value.firstChildP;
+  mdP->lastChild           = attrP->lastChild;
+  attrP->value.firstChildP = NULL;
+  attrP->lastChild         = NULL;
+
+  // Move special fields back to "attrP"
+  const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId" };  // observedAt+unitCode are mds (db-model)
+  for (unsigned int ix = 0; ix < K_VEC_SIZE(specialV); ix++)
   {
-    // Move everything into "md", leaving attrP EMPTY
-    mdP = kjObject(orionldState.kjsonP, "md");
-    mdP->value.firstChildP   = attrP->value.firstChildP;
-    mdP->lastChild           = attrP->lastChild;
-    attrP->value.firstChildP = NULL;
-    attrP->lastChild         = NULL;
-
-    // Move special fields back to "attrP"
-    const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId" };  // observedAt+unitCode are mds (db-model)
-    for (unsigned int ix = 0; ix < K_VEC_SIZE(specialV); ix++)
+    KjNode* nodeP = kjLookup(mdP, specialV[ix]);
+    if (nodeP != NULL)
     {
-      KjNode* nodeP = kjLookup(mdP, specialV[ix]);
-      if (nodeP != NULL)
-      {
-        if ((ix == 2) || (ix == 3))         // "object", "languageMap", change name to "value" (Orion's DB model)
-          nodeP->name = (char*) "value";
+      if ((ix == 2) || (ix == 3))         // "object", "languageMap", change name to "value" (Orion's DB model)
+        nodeP->name = (char*) "value";
 
-        kjChildRemove(mdP, nodeP);
-        kjChildAdd(attrP, nodeP);
-      }
+      kjChildRemove(mdP, nodeP);
+      kjChildAdd(attrP, nodeP);
     }
-
-    timestampAdd(attrP, "modDate");
   }
+
+  // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
+  timestampAdd(attrP, "modDate");
 
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
-  bool     newAttribute = false;
+  KjNode*  mdNamesP     = NULL;
+  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrP->name);
+  KjNode*  dbMdP        = NULL;
 
-  KjNode* dbAttrP = kjLookup(dbAttrsP, attrP->name);
-  if (dbAttrP == NULL)  // Attribute does not exist already
+  if (dbAttrP == NULL)  // Attribute does not already exist
   {
     if (attrP->type == KjNull)
     {
@@ -322,41 +321,59 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     // The "attrNames" array stores the sub-attribute names in their original names, with dots - attrDotName
     kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrDotName));
 
-    newAttribute = true;  // For new attributes, no need to populate .added" and ".removed" - all sub.attr are "added"
+    // All attributes have a field 'mdNames' - it's an array
+    mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
+    kjChildAdd(attrP, mdNamesP);
+
+    LM_TMP(("KX: the attribute is NEW - if it has any sub-attributes, the entire 'md' needs to be included, never mind .added, .removed etc"));
   }
   else
   {
-    KjNode* mdNamesP = kjLookup(dbAttrP, "mdNames");
+    // The attribute is not new, but, perhaps it didn't have any sub-attrs before but now it does?
+    // If so, never mind .added, .removed etc, what we need is to include the entire "md"
+    //
+    dbMdP    = kjLookup(dbAttrP, "md");
+    mdNamesP = kjLookup(dbAttrP, "mdNames");
 
     if (mdNamesP == NULL)
     {
-      // No 'mdNames' field in DB Attribute - must be the attr had zero sub-attrs before this
+      //
+      // No 'mdNames' field in DB Attribute?
+      // That's a DB Error.
+      // Never mind, let's just silently fix it
+      //
       mdNamesP = kjArray(orionldState.kjsonP, ".names");
     }
     else
-      mdNamesP->name = (char*) ".names";
+    {
+      kjChildRemove(dbAttrP, mdNamesP);
+      mdNamesP->name = (char*) ".names";  // We hijack the 'mdNames' array for the compilation of the Patch Tree
+    }
 
     kjChildAdd(attrP, mdNamesP);
 
-    mdAddedP   = arrayAdd(attrP, ".added");
-    mdRemovedP = arrayAdd(attrP, ".removed");
+    mdAddedP   = arrayAdd(attrP, ".added");    // FIXME: Should not be needed if dbMdP == NULL
+    mdRemovedP = arrayAdd(attrP, ".removed");  // FIXME: Should not be needed if dbMdP == NULL
   }
 
-  treePresent(attrP, "KZ: Attribute with unprocessed sub-attributes");
+  treePresent(attrP, "KZ4: Attribute with unprocessed sub-attributes");
   if (attrP->type == KjNull)
     return true;
 
   // Sub-Attributes
-  KjNode* mdV = (newAttribute == true)? NULL : kjLookup(dbAttrP, "md");
   LM_TMP(("KZ: Loop over sub-attributes (contents of 'mdP')"));
   for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
   {
-    LM_TMP(("KZ: sub-attribute '%s'", subP->name));
-    dbModelFromApiSubAttribute(subP, mdV, mdAddedP, mdRemovedP, newAttribute);
+    LM_TMP(("KZ5: sub-attribute '%s'", subP->name));
+    dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP);
   }
 
-  kjChildAdd(attrP, mdP);
-  treePresent(attrP, "KZ: Attribute with PROCESSED sub-attributes");
+  if (mdP->value.firstChildP != NULL)
+  {
+    LM_TMP(("KY: putting 'md' inside attr"));
+    kjChildAdd(attrP, mdP);
+  }
+  treePresent(attrP, "KY: Attribute with PROCESSED sub-attributes");
 
   return true;
 }
@@ -447,7 +464,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV);
   }
 
-  treePresent(entityP, "KZ: DB-prepped Entity with PROCESSED attributes");
+  treePresent(entityP, "KY: DB-prepped Entity with PROCESSED attributes");
 
   return true;
 }
@@ -744,8 +761,6 @@ bool orionldPatchEntity2(void)
   KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
   dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP);
 
-
-  
   //
   // orionldEntityPatch - patching the entity
   //
@@ -766,9 +781,9 @@ bool orionldPatchEntity2(void)
   KjNode* dbAttrsObject = kjObject(orionldState.kjsonP, NULL);
   kjChildAdd(dbAttrsObject, dbAttrsP);
 
-  LM_TMP(("KZ: --------------------------- Before orionldEntityPatchTree --------------------------"));
-  treePresent(dbAttrsObject, "KZ: DB-Attrs");
-  treePresent(orionldState.requestTree, "KZ: Patch");
+  LM_TMP(("KY: --------------------------- Before orionldEntityPatchTree --------------------------"));
+  treePresent(dbAttrsObject, "KY: DB-Attrs");
+  treePresent(orionldState.requestTree, "KY: Patch");
   LM_TMP(("KZ: --------------------------- Calling orionldEntityPatchTree -------------------------"));
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);

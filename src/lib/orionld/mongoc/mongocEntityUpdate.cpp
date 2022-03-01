@@ -155,7 +155,7 @@ static void mongocKjTreeToUpdateBson
 
 // -----------------------------------------------------------------------------
 //
-// patchApply - 
+// patchApply -
 //
 bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, bson_t* pullP, int* pullsP, bson_t* pushP, int* pushesP)
 {
@@ -172,20 +172,38 @@ bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, b
       if (strcmp(op->value.s, "PULL") == 0)
       {
         // if "op" == "PULL", then "tree" is an array of strings
+        // { $pull: { fruits: { $in: [ "apples", "oranges" ] }}
+        bson_t inBson;
+        bson_t commaArrayBson;
+
+        bson_append_document_begin(pullP, path, -1,  &inBson);
+        bson_append_array_begin(&inBson, "$in", -1, &commaArrayBson);
+
         for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
         {
-          bson_append_utf8(pullP, path, -1, itemNameP->value.s, -1);
+          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);
           *pullsP += 1;
         }
+        bson_append_array_end(&inBson, &commaArrayBson);
+        bson_append_document_end(pullP, &inBson);
       }
       else if (strcmp(op->value.s, "PUSH") == 0)
       {
         // if "op" == "PUSH", then "tree" is an array of strings
+        // { $push: { fruits: { $in: [ "apples", "oranges" ] }}
+        bson_t eachBson;
+        bson_t commaArrayBson;
+
+        bson_append_document_begin(pushP, path, -1,  &eachBson);
+        bson_append_array_begin(&eachBson, "$each", -1, &commaArrayBson);
+
         for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
         {
-          bson_append_utf8(pushP, path, -1, itemNameP->value.s, -1);
+          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);
           *pushesP += 1;
         }
+        bson_append_array_end(&eachBson, &commaArrayBson);
+        bson_append_document_end(pushP, &eachBson);
       }
     }
     else if (tree->type == KjNull)
@@ -233,7 +251,7 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   bson_append_utf8(&selector, "_id.id", 6, entityId, -1);
 
   bson_t reply;
-  bson_t set;
+  bson_t set;    // No counter needed - there's always at least one 'set' - modDate on the Entity
   bson_t unset;
   bson_t pull;
   bson_t push;
