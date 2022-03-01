@@ -444,9 +444,9 @@ Date: REGEX(.*)
 
 05. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -515,9 +515,9 @@ Date: REGEX(.*)
 
 08. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -593,9 +593,9 @@ Date: REGEX(.*)
 
 11. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -683,9 +683,9 @@ Date: REGEX(.*)
 
 14. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -761,9 +761,9 @@ Date: REGEX(.*)
 
 17. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -850,9 +850,9 @@ Date: REGEX(.*)
 
 20. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -905,9 +905,9 @@ Date: REGEX(.*)
 
 23. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -984,9 +984,9 @@ Date: REGEX(.*)
 
 26. See E1 in DB
 ================
-MongoDB shell version v3.6.23
-connecting to: mongodb://localhost:27017/ftest
-MongoDB server version: 3.6.23
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
