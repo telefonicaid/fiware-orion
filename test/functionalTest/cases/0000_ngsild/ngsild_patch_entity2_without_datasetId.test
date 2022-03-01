@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update an entity with datasetIds using Real PATCH
+Update an entity using "Real PATCH"
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 #
