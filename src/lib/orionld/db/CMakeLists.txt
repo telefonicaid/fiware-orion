@@ -27,6 +27,9 @@ SET (SOURCES
     dbEntityAttributesGet.cpp
     dbGeoIndexAdd.cpp
     dbGeoIndexLookup.cpp
+    dbModelFromApiEntity.cpp
+    dbModelFromApiAttribute.cpp
+    dbModelFromApiSubAttribute.cpp
 )
 
 # Include directories
