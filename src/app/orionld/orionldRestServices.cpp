@@ -67,6 +67,7 @@
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"
 #include "orionld/serviceRoutines/orionldPostContexts.h"
 #include "orionld/serviceRoutines/orionldDeleteContext.h"
+#include "orionld/serviceRoutines/orionldCorsOptions.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -150,7 +151,7 @@ static const int patchServices = (sizeof(patchServiceV) / sizeof(patchServiceV[0
 //
 static OrionLdRestServiceSimplified deleteServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs/*",            orionldDeleteAttribute    },  // Very important that orionldDeleteAttribute comes before orionldDeleteEntity
+  { "/ngsi-ld/v1/entities/*/attrs/*",            orionldDeleteAttribute    },
   { "/ngsi-ld/v1/entities/*",                    orionldDeleteEntity       },
   { "/ngsi-ld/v1/subscriptions/*",               orionldDeleteSubscription },
   { "/ngsi-ld/v1/csourceRegistrations/*",        orionldDeleteRegistration },
@@ -165,17 +166,44 @@ static const int deleteServices = (sizeof(deleteServiceV) / sizeof(deleteService
 
 // -----------------------------------------------------------------------------
 //
+// optionsServiceV -
+//
+static OrionLdRestServiceSimplified optionsServiceV[] =
+{
+  { "/ngsi-ld/v1/entities/*/attrs/*",      orionldCorsOptions    },
+  { "/ngsi-ld/v1/entities/*/attrs",        orionldCorsOptions    },
+  { "/ngsi-ld/v1/entities/*",              orionldCorsOptions    },
+  { "/ngsi-ld/v1/entities",                orionldCorsOptions    },
+  { "/ngsi-ld/v1/types/*",                 orionldCorsOptions    },
+  { "/ngsi-ld/v1/types",                   orionldCorsOptions    },
+  { "/ngsi-ld/v1/attributes/*",            orionldCorsOptions    },
+  { "/ngsi-ld/v1/attributes",              orionldCorsOptions    },
+  { "/ngsi-ld/v1/subscriptions/*",         orionldCorsOptions    },
+  { "/ngsi-ld/v1/subscriptions",           orionldCorsOptions    },
+  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldCorsOptions    },
+  { "/ngsi-ld/v1/csourceRegistrations",    orionldCorsOptions    },
+  { "/ngsi-ld/v1/jsonldContexts/*",        orionldCorsOptions    },
+  { "/ngsi-ld/v1/jsonldContexts",          orionldCorsOptions    },
+  { "/ngsi-ld/v1/temporal/entities/*",     orionldCorsOptions    },
+  { "/ngsi-ld/v1/temporal/entities",       orionldCorsOptions    }
+};
+static const int optionsServices = (sizeof(optionsServiceV) / sizeof(optionsServiceV[0]));
+
+
+
+// -----------------------------------------------------------------------------
+//
 // restServiceVV -
 //
 OrionLdRestServiceSimplifiedVector restServiceVV[] =
 {
-  { getServiceV,    getServices     },
-  { NULL,           0               },
-  { postServiceV,   postServices    },
-  { deleteServiceV, deleteServices  },
-  { patchServiceV,  patchServices   },
-  { NULL,           0               },
-  { NULL,           0               },
-  { NULL,           0               },
-  { NULL,           0               }
+  { getServiceV,      getServices      },
+  { NULL,             0                },
+  { postServiceV,     postServices     },
+  { deleteServiceV,   deleteServices   },
+  { patchServiceV,    patchServices    },
+  { NULL,             0                },
+  { optionsServiceV,  optionsServices  },
+  { NULL,             0                },
+  { NULL,             0                }
 };

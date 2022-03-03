@@ -116,7 +116,7 @@ bool orionldHeaderSetInit(OrionldHeaderSet* setP, int headers)
 //
 // orionldHeaderAdd -
 //
-int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, char* sValue, int iValue)
+int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, const char* sValue, int iValue)
 {
   if (setP->ix >= setP->size)  // Reallocation needed (add 3)
   {

@@ -981,10 +981,14 @@ MHD_Result orionldMhdConnectionInit
 
 
   //
-  // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
-  // If any other verb is used, even if a valid REST Verb, a generic error will be returned
+  // NGSI-LD only accepts the verbs POST, GET, DELETE, PATCH, and OPTIONS (if CORS is enabled)
+  // If any other verb is used, even if a valid REST Verb, like HEAD, a generic error will be returned
   //
-  if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
+  if ((orionldState.verb != POST)    &&
+      (orionldState.verb != GET)     &&
+      (orionldState.verb != DELETE)  &&
+      (orionldState.verb != PATCH)   &&
+      (orionldState.verb != OPTIONS))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
     orionldState.httpStatusCode = 400;

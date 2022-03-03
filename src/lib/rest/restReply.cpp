@@ -126,33 +126,36 @@ void restReply(ConnectionInfo* ciP, const char* answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
+  if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    // Only GET method is supported for V1 API
-    if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
+    if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
     {
-      //
-      // If any origin is allowed, the header is sent always with "any" as value
-      // If a specific origin is allowed, the header is only sent if the origins match
-      //
-      char* allowOrigin  = NULL;
-
-      if      (strcmp(corsOrigin, "__ALL")                == 0)  allowOrigin = (char*) "*";
-      else if (strcmp(orionldState.in.origin, corsOrigin) == 0)  allowOrigin = corsOrigin;
-
-      // If the origin is not allowed, no headers are added to the response
-      if (allowOrigin != NULL)
+      // Only GET method is supported for V1 API
+      if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
       {
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN,   allowOrigin);
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+        //
+        // If any origin is allowed, the header is sent always with "any" as value
+        // If a specific origin is allowed, the header is only sent if the origins match
+        //
+        char* allowOrigin  = NULL;
 
-        if (orionldState.verb == OPTIONS)
+        if      (strcmp(corsOrigin, "__ALL")                == 0)  allowOrigin = (char*) "*";
+        else if (strcmp(orionldState.in.origin, corsOrigin) == 0)  allowOrigin = corsOrigin;
+
+        // If the origin is not allowed, no headers are added to the response
+        if (allowOrigin != NULL)
         {
-          char maxAge[16];
-          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN,   allowOrigin);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE,       maxAge);
+          if (orionldState.verb == OPTIONS)
+          {
+            char maxAge[16];
+            snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+
+            MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+            MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE,       maxAge);
+          }
         }
       }
     }

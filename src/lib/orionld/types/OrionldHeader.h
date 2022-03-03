@@ -119,6 +119,6 @@ extern bool orionldHeaderSetInit(OrionldHeaderSet* setP, int headers);
 //
 // orionldHeaderAdd -
 //
-extern int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, char* sValue, int iValue);
+extern int orionldHeaderAdd(OrionldHeaderSet* setP, OrionldHeaderType type, const char* sValue, int iValue);
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDHEADER_H_
