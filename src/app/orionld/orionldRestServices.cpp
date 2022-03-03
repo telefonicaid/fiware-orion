@@ -67,7 +67,7 @@
 #include "orionld/serviceRoutines/orionldPostTemporalEntities.h"
 #include "orionld/serviceRoutines/orionldPostContexts.h"
 #include "orionld/serviceRoutines/orionldDeleteContext.h"
-#include "orionld/serviceRoutines/orionldCorsOptions.h"
+#include "orionld/serviceRoutines/orionldOptions.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -170,22 +170,28 @@ static const int deleteServices = (sizeof(deleteServiceV) / sizeof(deleteService
 //
 static OrionLdRestServiceSimplified optionsServiceV[] =
 {
-  { "/ngsi-ld/v1/entities/*/attrs/*",      orionldCorsOptions    },
-  { "/ngsi-ld/v1/entities/*/attrs",        orionldCorsOptions    },
-  { "/ngsi-ld/v1/entities/*",              orionldCorsOptions    },
-  { "/ngsi-ld/v1/entities",                orionldCorsOptions    },
-  { "/ngsi-ld/v1/types/*",                 orionldCorsOptions    },
-  { "/ngsi-ld/v1/types",                   orionldCorsOptions    },
-  { "/ngsi-ld/v1/attributes/*",            orionldCorsOptions    },
-  { "/ngsi-ld/v1/attributes",              orionldCorsOptions    },
-  { "/ngsi-ld/v1/subscriptions/*",         orionldCorsOptions    },
-  { "/ngsi-ld/v1/subscriptions",           orionldCorsOptions    },
-  { "/ngsi-ld/v1/csourceRegistrations/*",  orionldCorsOptions    },
-  { "/ngsi-ld/v1/csourceRegistrations",    orionldCorsOptions    },
-  { "/ngsi-ld/v1/jsonldContexts/*",        orionldCorsOptions    },
-  { "/ngsi-ld/v1/jsonldContexts",          orionldCorsOptions    },
-  { "/ngsi-ld/v1/temporal/entities/*",     orionldCorsOptions    },
-  { "/ngsi-ld/v1/temporal/entities",       orionldCorsOptions    }
+  { "/ngsi-ld/v1/entities/*/attrs/*",              orionldOptions },
+  { "/ngsi-ld/v1/entities/*/attrs",                orionldOptions },
+  { "/ngsi-ld/v1/entities/*",                      orionldOptions },
+  { "/ngsi-ld/v1/entities",                        orionldOptions },
+  { "/ngsi-ld/v1/entityOperations/create",         orionldOptions },
+  { "/ngsi-ld/v1/entityOperations/upsert",         orionldOptions },
+  { "/ngsi-ld/v1/entityOperations/update",         orionldOptions },
+  { "/ngsi-ld/v1/entityOperations/delete",         orionldOptions },
+  { "/ngsi-ld/v1/entityOperations/query",          orionldOptions },
+  { "/ngsi-ld/v1/types/*",                         orionldOptions },
+  { "/ngsi-ld/v1/types",                           orionldOptions },
+  { "/ngsi-ld/v1/attributes/*",                    orionldOptions },
+  { "/ngsi-ld/v1/attributes",                      orionldOptions },
+  { "/ngsi-ld/v1/subscriptions/*",                 orionldOptions },
+  { "/ngsi-ld/v1/subscriptions",                   orionldOptions },
+  { "/ngsi-ld/v1/csourceRegistrations/*",          orionldOptions },
+  { "/ngsi-ld/v1/csourceRegistrations",            orionldOptions },
+  { "/ngsi-ld/v1/jsonldContexts/*",                orionldOptions },
+  { "/ngsi-ld/v1/jsonldContexts",                  orionldOptions },
+  { "/ngsi-ld/v1/temporal/entities/*",             orionldOptions },
+  { "/ngsi-ld/v1/temporal/entities",               orionldOptions },
+  { "/ngsi-ld/v1/temporal/entityOperations/query", orionldOptions }
 };
 static const int optionsServices = (sizeof(optionsServiceV) / sizeof(optionsServiceV[0]));
 

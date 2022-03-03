@@ -69,7 +69,8 @@ const char* orionldHeaderName[] = {
   "Access-Control-Allow-Headers",
   "Access-Control-Allow-Methods",
   "Access-Control-Max-Age",
-  "Access-Control-Expose-Headers"
+  "Access-Control-Expose-Headers",
+  "Accept-Patch"
 };
 
 

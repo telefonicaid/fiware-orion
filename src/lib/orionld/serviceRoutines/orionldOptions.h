@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDCORSOPTIONS_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDCORSOPTIONS_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDOPTIONS_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDOPTIONS_H_
 
 /*
 *
@@ -30,8 +30,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldCorsOptions -
+// orionldOptions -
 //
-extern bool orionldCorsOptions(void);
+extern bool orionldOptions(void);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDCORSOPTIONS_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDOPTIONS_H_

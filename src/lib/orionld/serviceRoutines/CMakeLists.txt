@@ -65,7 +65,7 @@ SET (SOURCES
     orionldPostNotify.cpp
     orionldGetPing.cpp
     orionldPatchEntity2.cpp
-    orionldCorsOptions.cpp
+    orionldOptions.cpp
 )
 
 # Include directories
