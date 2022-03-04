@@ -115,18 +115,15 @@ aarch64 アーキテクチャの場合、yum を使用して libxslt をイン�
         sudo yum install curl nc valgrind bc
         sudo pip2 install virtualenv
 
-aarch64 アーキテクチャの場合、さらに yum で、python2-devel, rpm-build と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
-
-
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python2
+        virtualenv /opt/ft_env --python=/usr/bin/python3
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -289,8 +286,6 @@ aarch64 アーキテクチャの場合、`.-configure` を `--build=arm-linux` �
         sudo pip install --upgrade pip 
         pip install virtualenv
 
-aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `libffi-dev` をインストールします。これは、pyOpenSSL をビルドするときに必要です。
-
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスに
 インストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることも
 できますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh`
@@ -303,7 +298,7 @@ aarch64 アーキテクチャの場合、さらに apt で、`python2-dev` と `
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 

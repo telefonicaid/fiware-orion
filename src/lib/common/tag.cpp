@@ -53,7 +53,7 @@ char* htmlEscape(const char* s)
   
   if (out == NULL)
   {
-    LM_E(("Internal Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    LM_E(("Runtime Error (allocating %d bytes: %s)", newLen, strerror(errno)));
     return NULL;
   }
 

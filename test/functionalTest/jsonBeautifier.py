@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: latin-1 -*-
 # Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -43,7 +43,8 @@ for line in sys.stdin:
     data += line
 
 try:
+    # See https://stackoverflow.com/a/18337754/1485926 about the ensure_ascii + encode + decode trick
     doc = json.loads(data, object_pairs_hook=dict_raise_on_duplicates)
-    print json.dumps(doc, indent=4, sort_keys=True)
+    print (json.dumps(doc, indent=4, sort_keys=True, ensure_ascii=False).encode('utf-8').decode('utf-8'))
 except ValueError as e:
-    print str(e)
+    print (str(e))
