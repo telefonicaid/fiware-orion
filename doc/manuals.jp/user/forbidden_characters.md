@@ -44,11 +44,16 @@ GET /v2/entities/E%253C01%253E
 
 NGSIv2 では、ID フィールド (エンティティ ID/型, 属性名/型, メタデータ名/型など) の構文制限が導入されています。これについては、[NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Field syntax restrictions" のセクションで説明しています。
 
-## カスタムペイロード特別扱い
+## カスタム・ペイロードとヘッダの特別扱い
 
-NGSIv2 はカスタム通知を生成するサブスクリプションのためのテンプレート・メカニズムを提供します ([NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Custom notifications" を参照)。禁止された文字の制限は、POST/v2/subscription または GET/v2/subscriptions のような、NGSIv2 API オペレーションの `httpCustom.payload` フィールドに適用されます。
+NGSIv2 はカスタム通知を生成するサブスクリプションのためのテンプレート・メカニズムを
+提供します ([NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の
+"Custom notifications" を参照)。禁止された文字の制限は、POST/v2/subscription または
+GET/v2/subscriptions のような、NGSIv2 API オペレーションの `httpCustom.payload`
+フィールドに適用されます。`httpCustom.headers` で同じ制限がヘッダ値に適用されます。
 
-ただし、通知時に、`httpCustom.payload` の中の URL でエンコードされた文字はすべてデコードされます。
+ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値で URL
+エンコードされた文字はすべてデコードされます。
 
 例 :
 
@@ -58,7 +63,8 @@ NGSIv2 はカスタム通知を生成するサブスクリプションのため�
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Authorization": "Basic ABC...ABC%3D%3D"
   },
   "method": "PUT",
   "qs": {
@@ -69,12 +75,14 @@ NGSIv2 はカスタム通知を生成するサブスクリプションのため�
 ```
 
 上記ペイロード値は、この文字列の URL エンコードされたバージョンであることに注意してください :
-`{ "temperature": ${temperature}, "asString": "${temperature}" }`.
+`{ "temperature": ${temperature}, "asString": "${temperature}" }`。`"Basic ABC...ABC%3D%3D"`
+は、この文字列のURLエンコードされたバージョンであることに注意してください: `"Basic ABC...ABC=="`
 
 さて、NGSIv2 実装がこのサブスクリプションに関連する通知をトリガすることを考えてみましょう。通知データは、id が `DC_S1-D41`、型が `Room` で、値が 23.4 の temperature という名前の属性を含むエンティティ用です。テンプレートを適用した結果の通知は次のようになります :
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
 Content-Type: application/json 
 Content-Length: 43
 
