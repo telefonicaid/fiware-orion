@@ -51,7 +51,16 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
     }
     else if (vec[ix]->valueType == orion::ValueTypeNumber)
     {
-      *valueP = double2string(vec[ix]->numberValue);
+      bool isDateType = ((vec[ix]->type == DATE_TYPE) || (vec[ix]->type == DATE_TYPE_ALT))? true : false;
+
+      if (isDateType)
+      {
+        *valueP = isodate2str(vec[ix]->numberValue);
+      }
+      else
+      {
+        *valueP = double2string(vec[ix]->numberValue);
+      }
     }
     else if (vec[ix]->valueType == orion::ValueTypeBoolean)
     {
@@ -136,7 +145,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
   //
   if (from.size() > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large initial string, before substitution)"));
+    LM_E(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
     return false;
   }
@@ -151,7 +160,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
     if (macroEnd == std::string::npos)
     {
-      LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
+      LM_W(("macro end not found, syntax error, aborting substitution"));
       *to = "";
       return false;
     }
@@ -200,7 +209,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large final string, after substitution)"));
+    LM_E(("Runtime Error (too large final string, after substitution)"));
     *to = "";
     return false;
   }
