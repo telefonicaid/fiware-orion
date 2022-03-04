@@ -79,6 +79,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
+#include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
@@ -1243,15 +1244,27 @@ MHD_Result orionldMhdConnectionTreat(void)
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
 
-        PERFORMANCE(troeStart);
 
+        //
+        // Special case - Entity creation with no attribute
+        // As both the entity id and the entity type have been removed from the payload body, the payload body is now empty.
+        // We still have to record the creation of the entity in the TRoE database!
         //
         // If the incoming request an empty array/object, then don't call the TRoE routine
+        // - EXCEPT if it's a POST /entities request (service routine is orionldPostEntities)
         //
-        if ((orionldState.verb == DELETE) || ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL)))
-          orionldState.serviceP->troeRoutine();
+        bool invokeTroe = false;
 
-        PERFORMANCE(troeEnd);
+        if (orionldState.verb == DELETE)                                                                  invokeTroe = true;
+        if (orionldState.serviceP->serviceRoutine == orionldPostEntities)                                 invokeTroe = true;
+        if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  invokeTroe = true;
+
+        if (invokeTroe == true)
+        {
+          PERFORMANCE(troeStart);
+          orionldState.serviceP->troeRoutine();
+          PERFORMANCE(troeEnd);
+        }
       }
     }
   }

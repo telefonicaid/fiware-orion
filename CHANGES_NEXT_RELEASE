@@ -14,3 +14,4 @@
 * Issue #1034  Fixed a bug about Array Reduction and Concise Attribute Format
 * Issue #280   Implemented the new PATCH /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
 * Issue #280   Implemented support for the OPTIONS method for all NGSI-LD API endpoints
+* Issue #1045  Fixed bug related to TRoE and creation of entity without attributes
