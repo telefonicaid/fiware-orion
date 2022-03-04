@@ -1770,13 +1770,12 @@ static bool processOnChangeConditionForUpdateContext
   }
   if (covered)
   {
-    for (unsigned int jx = 0; jx < attrL.size(); jx++)
+    for (unsigned int ix = 0; ix < attrL.size(); ix++)
     {
-      const std::string& _type = DEFAULT_ATTR_NULL_TYPE;
-      const std::string& _value = "null";
-      std::string attrName = attrL[jx];
-
-      cer.entity.attributeVector.push_back(new ContextAttribute(attrName, _type, _value));
+      std::string attrName = attrL[ix];
+      ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+      caP->valueType = orion::ValueTypeNull;
+      cer.entity.attributeVector.push_back(caP);
     }
   }
 

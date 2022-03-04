@@ -217,7 +217,6 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
     {
        subP->notification.covered = cSubP->covered;
     }
-
   }
   cacheSemGive(__FUNCTION__, "get notification info");
 }

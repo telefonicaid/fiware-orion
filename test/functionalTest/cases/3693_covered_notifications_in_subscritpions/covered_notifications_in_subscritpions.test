@@ -337,7 +337,7 @@ Date: REGEX(.*)
 ============================================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 253
+Content-Length: 249
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -350,13 +350,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "brightness": {
                 "metadata": {},
-                "type": "NONE",
-                "value": "null"
+                "type": "None",
+                "value": null
             },
             "humudity": {
                 "metadata": {},
-                "type": "NONE",
-                "value": "null"
+                "type": "None",
+                "value": null
             },
             "id": "Room1",
             "temperature": {
