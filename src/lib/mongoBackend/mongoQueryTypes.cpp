@@ -655,7 +655,6 @@ HttpStatusCode mongoEntityTypes
       *totalTypesP = docs;
       char detailsMsg[256];
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
-
       responseP->statusCode.fill(SccOk, detailsMsg);
     }
     else

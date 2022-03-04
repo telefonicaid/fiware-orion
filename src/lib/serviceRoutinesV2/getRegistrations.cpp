@@ -87,7 +87,7 @@ std::string getRegistrations
     ciP->httpHeaderValue.push_back(double2string(count));
   }
 
-    TIMED_RENDER(out = vectorToJson(registrationV));
+  TIMED_RENDER(out = vectorToJson(registrationV));
 
   return out;
 }

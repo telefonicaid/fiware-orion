@@ -87,7 +87,6 @@ std::string getAllSubscriptions
   }
 
   std::string out;
-
   TIMED_RENDER(out = vectorToJson(subs));
 
   return out;
