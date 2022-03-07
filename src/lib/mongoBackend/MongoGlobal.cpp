@@ -1560,51 +1560,53 @@ bool entitiesQuery
   int             errType;
   std::string     nextErr;
 
-  while (cursor.next(&r, &errType, &nextErr))
+  if (limit != 0)
   {
-    alarmMgr.dbErrorReset();
-
-    // Build CER from BSON retrieved from DB
-    docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
-
-    // Add builtin attributes and metadata (only in NGSIv2)
-    if (apiVersion == V2)
+    while (cursor.next(&r, &errType, &nextErr))
     {
-      addBuiltins(cer);
-    }
+      alarmMgr.dbErrorReset();
 
-    /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
-    for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-    {
-      bool         found     = false;
-      std::string  attrName  = attrL[ix];
+      // Build CER from BSON retrieved from DB
+      docs++;
+      LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+      ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
-      /* The special case "*" is not taken into account*/
-      if (attrName == ALL_ATTRS)
+      // Add builtin attributes and metadata (only in NGSIv2)
+      if (apiVersion == V2)
       {
-        continue;
+        addBuiltins(cer);
       }
 
-      for (unsigned int jx = 0; jx < cer->entity.attributeVector.size(); ++jx)
+      /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
+      for (unsigned int ix = 0; ix < attrL.size(); ++ix)
       {
-        if (attrName == cer->entity.attributeVector[jx]->name)
+        bool         found     = false;
+        std::string  attrName  = attrL[ix];
+
+        /* The special case "*" is not taken into account*/
+        if (attrName == ALL_ATTRS)
         {
-          found = true;
-          break;
+          continue;
+        }
+
+        for (unsigned int jx = 0; jx < cer->entity.attributeVector.size(); ++jx)
+        {
+          if (attrName == cer->entity.attributeVector[jx]->name)
+          {
+            found = true;
+            break;
+          }
+        }
+
+        if (!found)
+        {
+          ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
+          cer->entity.attributeVector.push_back(caP);
         }
       }
-
-      if (!found)
-      {
-        ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
-        cer->entity.attributeVector.push_back(caP);
-      }
+      cer->statusCode.fill(SccOk);
+      cerV->push_back(cer);
     }
-
-    cer->statusCode.fill(SccOk);
-    cerV->push_back(cer);
   }
 
   orion::releaseMongoConnection(connection);

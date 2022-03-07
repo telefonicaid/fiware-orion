@@ -627,9 +627,12 @@ HttpStatusCode mongoEntityTypes
         entityType->contextAttributeVector.push_back(caP);
       }
     }
-
-    responseP->entityTypeVector.push_back(entityType);
+    if (limit != 0)
+    {
+      responseP->entityTypeVector.push_back(entityType);
+    }
   }
+
   orion::releaseMongoConnection(connection);
 
   // Get count if user requested (i.e. if totalTypesP is not NULL)
