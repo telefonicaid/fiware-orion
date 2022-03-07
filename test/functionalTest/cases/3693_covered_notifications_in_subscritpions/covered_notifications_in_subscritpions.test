@@ -37,11 +37,16 @@ accumulatorStart --pretty-print
 # 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 # 05. Dump the accumulator, see the missing attribute in the notification added with value "null" and type "NONE".
 # 06. POST /v2/entities, to create Room2 with temperature and pressure.
-# 07. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.
-# 08. GET /v2/subscriptions/subscription_id, to check the covered=false.
+# 07. POST /v2/subscriptions, to create subscription with covered=true and some attributes in attrs which is not present in entities.
+# 08. GET /v2/subscriptions/subscription_id, to check the covered=true.
 # 09. PATCH /v2/entities/Room2/attrs, to update the value of pressure attribute.
-# 10. Dump the accumulator, see the no missing attribute in the notification added.
-# 11. POST /v2/subscriptions, to create subscription with covered=foo and see error.
+# 10. Dump the accumulator, see the missing attribute in the notification added with value "null" and type "NONE".
+# 11. POST /v2/entities, to create Room3 with temperature and pressure.
+# 12. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.
+# 13. GET /v2/subscriptions/subscription_id, to check the covered=false.
+# 14. PATCH /v2/entities/Room2/attrs, to update the value of pressure attribute.
+# 15. Dump the accumulator, see the no missing attribute in the notification added.
+# 16. POST /v2/subscriptions, to create subscription with covered=foo and see error.
 #
 
 
@@ -156,14 +161,105 @@ echo
 
 
 
-echo '07. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.'
-echo '===================================================================================================================================='
+echo '07. POST /v2/subscriptions, to create subscription with covered=true and some attributes in attrs which is not present in entities.'
+echo '==================================================================================================================================='
 payload='{
   "description": "A subscription to get info about Room2",
   "subject": {
     "entities": [
       {
         "id": "Room2",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "pressure",
+      "brightness"
+    ],
+    "covered": true
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+
+echo '08. GET /v2/subscriptions/subscription_id, to check the covered=true.'
+echo '====================================================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+
+echo '09. PATCH /v2/entities/Room2/attrs, to update the value of pressure attribute.'
+echo '=============================================================================='
+payload='{
+  "temperature": {
+    "value": 24,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 740,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/Room2/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo "10. Dump the accumulator, see the missing attribute in the notification added with value null and type NONE."
+echo "============================================================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+
+echo '11. POST /v2/entities, to create Room3 with temperature and pressure.'
+echo '====================================================================='
+payload='{
+  "id": "Room3",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Float"
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Integer"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+
+echo '12. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.'
+echo '===================================================================================================================================='
+payload='{
+  "description": "A subscription to get info about Room3",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room3",
         "type": "Room"
       }
     ],
@@ -192,7 +288,7 @@ echo
 
 
 
-echo '08. GET /v2/subscriptions/subscription_id, to check the covered=false.'
+echo '13. GET /v2/subscriptions/subscription_id, to check the covered=false.'
 echo '======================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -200,7 +296,7 @@ echo
 
 
 
-echo '09. PATCH /v2/entities/Room2/attrs, to update the value of pressure attribute.'
+echo '14. PATCH /v2/entities/Room3/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -212,13 +308,13 @@ payload='{
     "type": "Float"
   }
 }'
-orionCurl --url /v2/entities/Room2/attrs --payload "$payload" -X PATCH
+orionCurl --url /v2/entities/Room3/attrs --payload "$payload" -X PATCH
 echo
 echo
 
 
 
-echo "10. Dump the accumulator, see the no missing attribute in the notification added."
+echo "15. Dump the accumulator, see the no missing attribute in the notification added."
 echo "================================================================================="
 accumulatorDump
 accumulatorReset
@@ -227,7 +323,7 @@ echo
 
 
 
-echo '11. POST /v2/subscriptions, to create subscription with covered=foo and see error.'
+echo '16. POST /v2/subscriptions, to create subscription with covered=foo and see error.'
 echo '=================================================================================='
 payload='{
   "description": "A subscription to get info about Room1",
@@ -257,7 +353,6 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
-subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
@@ -382,8 +477,8 @@ Date: REGEX(.*)
 
 
 
-07. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.
-====================================================================================================================================
+07. POST /v2/subscriptions, to create subscription with covered=true and some attributes in attrs which is not present in entities.
+===================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -392,10 +487,10 @@ Date: REGEX(.*)
 
 
 
-08. GET /v2/subscriptions/subscription_id, to check the covered=false.
-======================================================================
+08. GET /v2/subscriptions/subscription_id, to check the covered=true.
+=====================================================================
 HTTP/1.1 200 OK
-Content-Length: 358
+Content-Length: 373
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -406,10 +501,11 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [
             "temperature",
-            "humudity",
+            "pressure",
             "brightness"
         ],
         "attrsFormat": "normalized",
+        "covered": true,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -440,11 +536,11 @@ Date: REGEX(.*)
 
 
 
-10. Dump the accumulator, see the no missing attribute in the notification added.
-=================================================================================
+10. Dump the accumulator, see the missing attribute in the notification added with value null and type NONE.
+============================================================================================================
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
-Content-Length: 139
+Content-Length: 249
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -455,7 +551,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
+            "brightness": {
+                "metadata": {},
+                "type": "None",
+                "value": null
+            },
             "id": "Room2",
+            "pressure": {
+                "metadata": {},
+                "type": "Float",
+                "value": 740
+            },
             "temperature": {
                 "metadata": {},
                 "type": "Float",
@@ -469,7 +575,104 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
-11. POST /v2/subscriptions, to create subscription with covered=foo and see error.
+11. POST /v2/entities, to create Room3 with temperature and pressure.
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room3?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities.
+====================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+13. GET /v2/subscriptions/subscription_id, to check the covered=false.
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 358
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "A subscription to get info about Room3",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "pressure"
+            ]
+        },
+        "entities": [
+            {
+                "id": "Room3",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+14. PATCH /v2/entities/Room3/attrs, to update the value of pressure attribute.
+==============================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+15. Dump the accumulator, see the no missing attribute in the notification added.
+=================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 139
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "Room3",
+            "temperature": {
+                "metadata": {},
+                "type": "Float",
+                "value": 24
+            },
+            "type": "Room"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+16. POST /v2/subscriptions, to create subscription with covered=foo and see error.
 ==================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 60
