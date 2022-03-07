@@ -378,6 +378,12 @@ function localBrokerStart()
   then
     port=$CB_PORT
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+  elif [ "$role" == "CBHA" ]
+  then
+    # CB-HA broker uses same database than main CB
+    mkdir -p $CBHA_LOG_DIR
+    port=$CBHA_PORT
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CBHA_PORT  -pidpath $CBHA_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CBHA_LOG_DIR $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
@@ -470,6 +476,9 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
+  elif [ "$role" == "CBHA" ]
+  then
+    port=$CBHA_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -623,6 +632,10 @@ function brokerStop
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+  elif [ "$role" == "CBHA" ]
+  then
+    pidFile=$CBHA_PID_FILE
+    port=$CBHA_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
@@ -1313,7 +1326,7 @@ function orionCurl()
         # The self-made tool is able to detect duplicate JSON keys. We cannot use standard mjson.tool, as it
         # is unable to do so
         #
-        _response=$(echo $_response | python $SCRIPT_HOME/testJson.py)
+        _response=$(echo $_response | PYTHONIOENCODING=utf8 python $SCRIPT_HOME/jsonBeautifier.py)
         echo "$_response"
       else
         dMsg Unknown payloadCheckFormat

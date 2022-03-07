@@ -292,7 +292,7 @@ Date: REGEX(.*)
     "address": {
         "metadata": {},
         "type": "Text",
-        "value": "Avenida de Espa\u00f1a, 2"
+        "value": "Avenida de España, 2"
     },
     "areaServed": {
         "metadata": {},
