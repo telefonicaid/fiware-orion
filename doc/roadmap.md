@@ -49,8 +49,13 @@ after next planned release:
 
 - Advanced query language
 - Signed entities
-- Expressions Language support help wanted ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004))
+- Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes)
+ supported by a Expressions Language - help wanted 
+([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)),
+([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815))
 - Rework commands
+- Service provisioning API (pools, etc.) 
+(based in [#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
 
 ## Long term
 
@@ -74,6 +79,8 @@ The following list contains all features that were in the roadmap and have alrea
 ([3.2.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.2.0))
 - Unrestricted text attributes ([#3550](https://github.com/telefonicaid/fiware-orion/issues/3550)) 
 ([3.2.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.2.0))
+- Service provisioning CLI (pools, etc.) ([#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
+([3.1.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.1.0))
 - Migration from legacy to new MongoDB driver ([#3132](https://github.com/telefonicaid/fiware-orion/issues/3132))
 ([3.0.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.0.0))
 - Improvements and fixed based on pentesting reports (
