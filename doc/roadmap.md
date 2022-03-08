@@ -62,7 +62,7 @@ you wish to get involved in the implementation or influence the roadmap
 - Performance improvements in the notifications system ([#3461](https://github.com/telefonicaid/fiware-orion/issues/3461))
 - Improve performance in update (connection-oriented, lightweight ingestion, etc.)
 
-## Features included
+## Features already completed
 
 The following list contains all features that were in the roadmap and have already been implemented.
 
