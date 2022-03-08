@@ -66,12 +66,16 @@ you wish to get involved in the implementation or influence the roadmap
 
 The following list contains all features that were in the roadmap and have already been implemented.
 
-- Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842))
-- Migration from legacy to new MongoDB driver ([#3132](https://github.com/telefonicaid/fiware-orion/issues/3132))
+- Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842)) 
+([3.3.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.3.0))
 - Attribute update operators (inc, push, etc.) ([#3814](https://github.com/telefonicaid/fiware-orion/issues/3814))
-- MQTT notifications (community) ([#3001](https://github.com/telefonicaid/fiware-orion/issues/3001))
-- Unrestricted text attributes ([#3550](https://github.com/telefonicaid/fiware-orion/issues/3550))
-- Notification flow control ([#3568](https://github.com/telefonicaid/fiware-orion/issues/3568))
+([3.3.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.3.0))
+- MQTT notifications (community) ([#3001](https://github.com/telefonicaid/fiware-orion/issues/3001)) 
+([3.2.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.2.0))
+- Unrestricted text attributes ([#3550](https://github.com/telefonicaid/fiware-orion/issues/3550)) 
+([3.2.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.2.0))
+- Migration from legacy to new MongoDB driver ([#3132](https://github.com/telefonicaid/fiware-orion/issues/3132))
+([3.0.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.0.0))
 - Improvements and fixed based on pentesting reports (
 [#3603](https://github.com/telefonicaid/fiware-orion/issues/3603),
 [#3604](https://github.com/telefonicaid/fiware-orion/issues/3604),
@@ -80,7 +84,9 @@ The following list contains all features that were in the roadmap and have alrea
 [#3607](https://github.com/telefonicaid/fiware-orion/issues/3607),
 [#3608](https://github.com/telefonicaid/fiware-orion/issues/3608),
 [#3609](https://github.com/telefonicaid/fiware-orion/issues/3609))
-- Performance improvements in the notifications system ([#3461](https://github.com/telefonicaid/fiware-orion/issues/3461))
+([2.4.0](https://github.com/telefonicaid/fiware-orion/releases/tag/2.4.0))
+- Notification flow control ([#3568](https://github.com/telefonicaid/fiware-orion/issues/3568))
+([2.4.0](https://github.com/telefonicaid/fiware-orion/releases/tag/2.4.0))
 
 
 
