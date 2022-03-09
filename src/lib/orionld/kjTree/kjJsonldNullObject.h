@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJJSONLDNULLOBJECT_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJJSONLDNULLOBJECT_H_
+
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,38 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdio.h>                                                  // sprintf
-#include <string.h>                                                 // strlen
-#include <time.h>                                                   // time, gmtime_r
-
-#include "logMsg/logMsg.h"                                          // LM_*
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// numberToDate -
+// kjJsonldNullObject -
 //
-bool numberToDate(double timestamp, char* date, int dateLen)
-{
-  struct tm  tm;
-  time_t     fromEpoch = (time_t) timestamp;
-  double     millis    = timestamp - fromEpoch;
+// { "@type": "@json", "@value": null }
+//
+extern bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP);
 
-  gmtime_r(&fromEpoch, &tm);
-  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
-
-  int sLen = strlen(date);
-  if (sLen + 5 >= dateLen)
-  {
-    LM_E(("Internal Error (not enough room for the decimals of the timestamp)"));
-    return false;
-  }
-
-  int dMicros  = (int) (millis * 1000000) + 1;
-  int dMillis  = dMicros / 1000;
-
-  snprintf(&date[sLen], dateLen - sLen, ".%03dZ", dMillis);
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJJSONLDNULLOBJECT_H_

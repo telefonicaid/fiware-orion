@@ -1,0 +1,330 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH of Property and Sub-Property with observedAt+unitCode
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 0 IPv4 -experimental -troe
+
+--SHELL--
+
+#
+# NOTE
+#   POST /entities  doesn't support third level properties (Sub-Sub-Property), so, in step 01, PP's "observedAt" and "unitCode"
+#   aren't stored in mongo - they're simply ignored.
+#   The new PATCH /entities/{entitiYd} DOES support it and the two are afdded to mongo in step 03
+#
+#   Some day I need to fix this - no one has complained still (which seems like a miravle right now ...)
+#
+#
+# 01. Create an entity E1 with a Property P with observedAt+unitCode AND a Sub-Property PP also with observedAt+unitCode
+# 02. See E1 in DB
+# 03. GET E1
+# 04. PATCH E1 modifying P's and PP's observedAt+unitCode
+# 05. See E1 in DB
+# 06. GET E1
+# 07. See E1 in the temporal database
+# 08. See the attributes in the temporal database
+# 09. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity E1 with a Property P with observedAt+unitCode AND a Sub-Property PP also with observedAt+unitCode"
+echo "======================================================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P": {
+    "observedAt": "2022-03-08T00:14:00.001Z",
+    "unitCode": "Celsius",
+    "value": 25,
+    "PP":  {
+      "observedAt": "2022-03-08T00:14:00.002Z",
+      "unitCode": "Fahrenheit",
+      "value": 77
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. PATCH E1 modifying P's and PP's observedAt+unitCode"
+echo "======================================================="
+payload='{
+  "P": {
+    "observedAt": "2022-03-08T00:15:00.001Z",
+    "unitCode": "Fahrenheit",
+    "value": 78,
+    "PP":  {
+      "observedAt": "2022-03-08T00:15:00.002Z",
+      "unitCode": "Celsius",
+      "value": 26
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. See E1 in DB"
+echo "================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "07. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "08. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,observedAt,datasetId,text,number,boolean,ts FROM attributes"
+echo
+echo
+
+
+echo "09. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitCode,observedAt,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a Property P with observedAt+unitCode AND a Sub-Property PP also with observedAt+unitCode
+======================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in DB
+================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 25,
+			"md" : {
+				"observedAt" : {
+					"value" : 1646698440.001
+				},
+				"unitCode" : {
+					"value" : "Celsius"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/PP" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : 77
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"unitCode",
+				"https://uri.etsi.org/ngsi-ld/default-context/PP"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P": {
+        "PP": {
+            "type": "Property",
+            "value": 77
+        },
+        "observedAt": "2022-03-08T00:14:00.001Z",
+        "type": "Property",
+        "unitCode": "Celsius",
+        "value": 25
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. PATCH E1 modifying P's and PP's observedAt+unitCode
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See E1 in DB
+================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 78,
+			"md" : {
+				"observedAt" : {
+					"value" : 1646698440.001
+				},
+				"unitCode" : {
+					"value" : "Fahrenheit"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/PP" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : 26
+					"observedAt" : "2022-03-08T00:15:00.002Z",
+					"unitCode" : "Celsius"
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"unitCode",
+				"https://uri.etsi.org/ngsi-ld/default-context/PP"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+06. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 222
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P": {
+        "PP": {
+            "observedAt": "2022-03-08T00:15:00.002Z",
+            "type": "Property",
+            "unitCode": "Celsius",
+            "value": 26
+        },
+        "observedAt": "2022-03-08T00:15:00.001Z",
+        "type": "Property",
+        "unitCode": "Fahrenheit",
+        "value": 78
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. See E1 in the temporal database
+===================================
+opmode,id,type,ts
+Create,urn:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(.*)
+
+
+08. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,observedat,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:E1,t,Celsius,2022-03-08 00:14:00.001,None,,25,,REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:E1,t,Fahrenheit,2022-03-08 00:14:00.001,None,,78,,REGEX(.*)
+
+
+09. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,observedat,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),Fahrenheit,2022-03-08 00:14:00.002,,77,
+https://uri=etsi=org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),Celsius,2022-03-08 00:15:00.002,,26,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

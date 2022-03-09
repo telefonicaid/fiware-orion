@@ -27,6 +27,7 @@ SET (SOURCES
     troeDeleteEntity.cpp
     troePatchAttribute.cpp
     troePatchEntity.cpp
+    troePatchEntity2.cpp
     troePostBatchCreate.cpp
     troePostBatchDelete.cpp
     troePostBatchUpdate.cpp
@@ -55,12 +56,13 @@ SET (SOURCES
     pgAppend.cpp
     pgEntityBuild.cpp
     pgAttributeBuild.cpp
+    pgAttributeAppend.cpp
     pgAttributesBuild.cpp
     pgSubAttributeBuild.cpp
+    pgSubAttributeAppend.cpp
     pgQuotedString.cpp
     pgCommands.cpp
     pgEntityAppend.cpp
-    pgAttributeAppend.cpp
     pgConnect.cpp
     pgConnectionPools.cpp
     pgConnectionPoolsPresent.cpp

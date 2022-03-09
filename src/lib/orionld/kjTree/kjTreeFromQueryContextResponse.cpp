@@ -311,7 +311,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
       }
       else  // Normalized   AND    Concise  - concise is dealt with later!
       {
-        LM_TMP(("KZ: Normalized"));
         //
         // NOT keyValues - create entire attribute tree
         //

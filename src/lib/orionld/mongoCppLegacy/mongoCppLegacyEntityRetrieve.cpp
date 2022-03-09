@@ -386,9 +386,6 @@ KjNode* mongoCppLegacyEntityRetrieve
   KjNode* attrTree  = NULL;
   KjNode* dbTree    = NULL;
 
-  LM_TMP(("KZ: concise:   %d", concise));
-  LM_TMP(("KZ: keyValues: %d", keyValues));
-
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
   //
