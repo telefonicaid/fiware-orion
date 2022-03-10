@@ -106,7 +106,7 @@ def ignore(root, file):
         return True
 
     # Some files in docker/ directory are not processed
-    if 'docker' in root and file in ['Dockerfile', 'Dockerfile.alpine', 'docker-compose.yml']:
+    if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
         return True
     if 'hooks' in root and file in ['build']:
         return True
