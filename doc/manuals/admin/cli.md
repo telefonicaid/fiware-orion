@@ -16,10 +16,6 @@ To know all the possible options, have a look at the next section.
 
 ## Command line options
 
-Command line options can be used directly (in the case of running from
-the command line) or indirectly
-through the different fields in /etc/sysconfig/contextBroker (in the
-case of running [as a system service](running.md)).
 To obtain a list of available options, use:
 
     contextBroker -u

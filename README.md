@@ -119,7 +119,7 @@ Build and Install documentation for Orion Context Broker can be found at
 ## Running
 
 How to run Orion Context Broker can be found at
-[the corresponding section of the Admin Manual](doc/manuals/admin/running.md).
+[this document](docker/README.md).
 
 [Top](#top)
 
