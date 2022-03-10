@@ -222,7 +222,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/P4,urn:ngsi-ld:attribute:ins
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,Number,t,Celsius,None,,26,
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,MODIFIED,,
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P5,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,ADDED ATTR,,
-Delete,https://uri.etsi.org/ngsi-ld/default-context/P3,urn:delete,urn:E1,,,,None,,,
+Delete,https://uri.etsi.org/ngsi-ld/default-context/P3,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,,,,None,,,
 
 
 07. See the sub-attributes in the temporal database

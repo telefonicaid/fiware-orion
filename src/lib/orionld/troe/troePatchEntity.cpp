@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
@@ -82,7 +83,9 @@ bool troePatchEntity(void)
         if (dotP == NULL)
         {
           LM_TMP(("KZ: DELETE ATTRIBUTE %s", attrName));
-          pgAttributeAppend(&attributesBuffer, "urn:delete", attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
+          char instanceId[80];
+          uuidGenerate(instanceId, sizeof(instanceId), true);
+          pgAttributeAppend(&attributesBuffer, instanceId, attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
         }
         else
         {
