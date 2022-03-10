@@ -1,6 +1,6 @@
-FROM centos:centos8.4.2105
+FROM debian:11.2-slim
 
-ADD mongodb.repo /etc/yum.repos.d/
+ADD mongodb-org.list /etc/apt/sources.list.d/
 ADD build.sh /opt/bin/
 ADD build-dep.sh /opt/bin/
 ADD makefile /opt/archive/

@@ -19,36 +19,41 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 #
-# Author: Dmitrii Demin
+# Author:               Dmitrii Demin
+# Re-worked for Debian: Fermín Galán
 
-# FIXME: default yum repositories has been changed to vault due to CentOS 8 EOL on February 1st, 2022
-# This is just a temporal solution so the build doesn't break while we find a new distro to use
+# Install security updates
+apt-get -y update
+apt-get -y upgrade
 # FIXME: python2 required by an installation script in GMock. Sad but true :(
-sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
-sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-yum upgrade -y
-yum -y install epel-release
-yum -y install \
-  bc \
-  boost-devel \
-  bzip2 \
-  cmake \
-  gcc-c++ \
-  git \
-  gnutls-devel \
-  libgcrypt-devel \
-  libcurl-devel \
-  openssl-devel \
-  libuuid-devel \
-  make \
-  valgrind \
-  mongodb-org-shell \
-  nc \
+# Install dependencies
+apt-get -y install \
+  curl \
+  gnupg \
   python2 \
   python3 \
-  rpm-build \
-  tar \
-  cyrus-sasl-devel
+  python3-pip \
+  netcat \
+  bc \
+  valgrind \
+  cmake \
+  libssl-dev \
+  git \
+  g++ \
+  libcurl4-openssl-dev \
+  libboost-dev \
+  libboost-regex-dev \
+  libboost-filesystem-dev \
+  libboost-thread-dev \
+  uuid-dev \
+  libgnutls28-dev \
+  libsasl2-dev \
+  libgcrypt-dev
+
+echo "INSTALL: MongoDB shell" \
+&& curl -L https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add - \
+&& apt-get -y update \
+&& apt-get -y install mongodb-org-shell
 
 echo "INSTALL: python special dependencies" \
 && cd /opt \
@@ -101,9 +106,7 @@ echo "INSTALL: mosquitto" \
 
 ldconfig
 
-yum -y remove \
-&& yum -y clean all \
-&& rm -rf /var/cache/yum \
+apt-get -y clean \
 && rm -Rf /opt/mongo-c-driver-1.17.4 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.70 \
