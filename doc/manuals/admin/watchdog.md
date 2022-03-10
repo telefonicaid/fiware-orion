@@ -13,13 +13,9 @@ and starts it again if is not working and/or send you a notification
 email) or use existing tools. This section includes a procedure using
 [Monit](http://mmonit.com/monit/).
 
-First of all, install the RPMs available at
-<http://rpmfind.net/linux/rpm2html/search.php?query=monit>. The
-following procedure has been prepared considering
-monit-5.1.1-4.el6.x86\_64.rpm, although it also should work with other
-versions of the RPM.
+First of all, install monit:
 
-    sudo rpm -i monit-5.2.5-1.el5.rf.x86_64.rpm
+    sudo apt-get install monit
 
 Create a directory for monit stuff, eg:
 

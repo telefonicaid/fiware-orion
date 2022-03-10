@@ -169,9 +169,8 @@ modifying their duration.
 
 However, expired registrations/subscriptions consume space in the
 database, so they can be "purged" from time to time. In order to help
-you in that task, the garbage-collector.py script is provided along with
-the Orion Context Broker (in
-/usr/share/contextBroker/garbage-collector.py after installing the RPM).
+you in that task, the [garbage-collector.py script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/managedb/garbage-collector.py) is provided along with
+the Orion Context Broker.
 
 The garbage-collector.py looks for expired documents in registrations and
 csubs collection, "marking" them with the following field:
