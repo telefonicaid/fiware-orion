@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_TROE_PGSUBATTRIBUTEAPPEND_H_
+#define SRC_LIB_ORIONLD_TROE_PGSUBATTRIBUTEAPPEND_H_
+
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,38 +25,32 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdio.h>                                                  // sprintf
-#include <string.h>                                                 // strlen
-#include <time.h>                                                   // time, gmtime_r
+extern "C"
+{
+#include "kjson/KjNode.h"                                           // KjNode
+}
 
-#include "logMsg/logMsg.h"                                          // LM_*
+#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
 
 
 
 // -----------------------------------------------------------------------------
 //
-// numberToDate -
+// pgSubAttributeAppend - MOVE to its own module!
 //
-bool numberToDate(double timestamp, char* date, int dateLen)
-{
-  struct tm  tm;
-  time_t     fromEpoch = (time_t) timestamp;
-  double     millis    = timestamp - fromEpoch;
+extern void pgSubAttributeAppend
+(
+  PgAppendBuffer*  subAttributesBufferP,
+  const char*      instanceId,
+  char*            subAttributeName,
+  const char*      entityId,
+  const char*      attrInstanceId,
+  char*            attrDatasetId,  // might be NULL, but can't be in the DB
+  const char*      type,
+  char*            observedAt,     // Can be NULL
+  char*            unitCode,       // Can be NULL
+  KjNode*          valueNodeP,
+  const char*      object
+);
 
-  gmtime_r(&fromEpoch, &tm);
-  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
-
-  int sLen = strlen(date);
-  if (sLen + 5 >= dateLen)
-  {
-    LM_E(("Internal Error (not enough room for the decimals of the timestamp)"));
-    return false;
-  }
-
-  int dMicros  = (int) (millis * 1000000) + 1;
-  int dMillis  = dMicros / 1000;
-
-  snprintf(&date[sLen], dateLen - sLen, ".%03dZ", dMillis);
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_TROE_PGSUBATTRIBUTEAPPEND_H_

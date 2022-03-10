@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TROE_PGATTRIBUTEAPPEND_H_
-#define SRC_LIB_ORIONLD_TROE_PGATTRIBUTEAPPEND_H_
+#ifndef SRC_LIB_ORIONLD_TROE_TROEPATCHENTITY2_H_
+#define SRC_LIB_ORIONLD_TROE_TROEPATCHENTITY2_H_
 
 /*
 *
-* Copyright 2021 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,33 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                           // KjNode
-}
-
-#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pgAttributeAppend -
+// troePatchEntity2 -
 //
-extern void pgAttributeAppend
-(
-  PgAppendBuffer*  attributesBufferP,
-  const char*      instanceId,
-  char*            attributeName,
-  const char*      opMode,
-  const char*      entityId,
-  char*            type,
-  char*            observedAt,    // Can be NULL
-  bool             subProperties,
-  char*            unitCode,      // Can be NULL
-  char*            datasetId,     // Can be NULL
-  KjNode*          valueNodeP,
-  char*            object
-);
+extern bool troePatchEntity2(void);
 
-#endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTEAPPEND_H_
+#endif  // SRC_LIB_ORIONLD_TROE_TROEPATCHENTITY2_H_

@@ -55,6 +55,7 @@ SET (SOURCES
     kjTreeLog.cpp
     kjTimestampAdd.cpp
     kjArrayAdd.cpp
+    kjJsonldNullObject.cpp
 )
 
 # Include directories

@@ -31,7 +31,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/db/dbModelFromApiAttribute.h"                  // dbModelFromApiAttribute
@@ -113,8 +112,6 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   KjNode* attrAddedV   = kjArrayAdd(entityP, ".added");
   KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");  // Not really necessary ... the RHS == null already tells the next layer
 
-  kjTreeLog(entityP, "KZ: DB-prepped Entity with unprocessed attributes");
-
   //
   // Loop over the "attrs" member of entityP and call dbModelFromApiAttribute for every attribute
   //
@@ -122,8 +119,6 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   {
     dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV);
   }
-
-  kjTreeLog(entityP, "KY: DB-prepped Entity with PROCESSED attributes");
 
   return true;
 }

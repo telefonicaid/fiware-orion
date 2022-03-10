@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjRender.h"                                    // kjRender
 }
 
@@ -39,6 +40,8 @@ extern "C"
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgAttributeAppend.h"                    // pgAttributeAppend
+#include "orionld/troe/pgSubAttributeAppend.h"                 // pgSubAttributeAppend
 #include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePatchEntity.h"                      // Own interface
 
@@ -62,6 +65,48 @@ bool troePatchEntity(void)
   pgAppend(&subAttributesBuffer, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
   pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, "Replace", &subAttributesBuffer);
+
+  if (orionldState.patchTree != NULL)
+  {
+    LM_TMP(("KZ: ------- To Be Marked as Deleted ----------------"));
+    for (KjNode* patchP = orionldState.patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+    {
+      KjNode* pathNode = kjLookup(patchP, "PATH");
+      KjNode* treeNode = kjLookup(patchP, "TREE");
+
+      if ((treeNode != NULL) && (treeNode->type == KjNull))
+      {
+        char* attrName = pathNode->value.s;
+        char* dotP     = strchr(attrName, '.');
+
+        if (dotP == NULL)
+        {
+          LM_TMP(("KZ: DELETE ATTRIBUTE %s", attrName));
+          pgAttributeAppend(&attributesBuffer, "urn:delete", attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
+        }
+        else
+        {
+          char* subAttrName = &dotP[1];
+
+          *dotP = 0;
+          dotP  = strchr(subAttrName, '.');
+
+          if (dotP == NULL)
+          {
+            if ((strcmp(subAttrName, "value")      != 0) &&
+                (strcmp(subAttrName, "unitCode")   != 0) &&
+                (strcmp(subAttrName, "observedAt") != 0) &&
+                (strcmp(subAttrName, "datasetId")  != 0))
+            {
+              LM_TMP(("KZ: DELETE SUB-ATTRIBUTE %s", subAttrName));
+              pgSubAttributeAppend(&subAttributesBuffer, "urn:delete", subAttrName, entityId, "urn:attr-instance:unknown", NULL, "String", NULL, NULL, NULL, NULL);
+            }
+          }
+        }
+      }
+    }
+    LM_TMP(("KZ: ------------------------------------------------"));
+  }
 
   char* sqlV[2];
   int   sqlIx = 0;

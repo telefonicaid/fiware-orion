@@ -38,7 +38,6 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/db/dbModelFromApiSubAttribute.h"               // dbModelFromApiSubAttribute
 #include "orionld/db/dbModelFromApiAttribute.h"                  // Own interface
 
@@ -73,7 +72,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
   if (attrP->type == KjNull)
   {
-    LM_TMP(("KZ: '%s' has a null RHS - to be removed", attrP->name));
     KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrDotName);
     kjChildAdd(attrRemovedV, attrNameP);
     return true;
@@ -128,8 +126,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     // All attributes have a field 'mdNames' - it's an array
     mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
     kjChildAdd(attrP, mdNamesP);
-
-    LM_TMP(("KX: the attribute is NEW - if it has any sub-attributes, the entire 'md' needs to be included, never mind .added, .removed etc"));
   }
   else
   {
@@ -156,28 +152,24 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
     kjChildAdd(attrP, mdNamesP);
 
-    mdAddedP   = kjArrayAdd(attrP, ".added");    // FIXME: Should not be needed if dbMdP == NULL
-    mdRemovedP = kjArrayAdd(attrP, ".removed");  // FIXME: Should not be needed if dbMdP == NULL
+    // if (dbMdP != NULL)  // .added/.removed should not be needed if dbMdP == NULL ...
+    {
+      mdAddedP   = kjArrayAdd(attrP, ".added");
+      mdRemovedP = kjArrayAdd(attrP, ".removed");
+    }
   }
 
-  kjTreeLog(attrP, "KZ4: Attribute with unprocessed sub-attributes");
   if (attrP->type == KjNull)
     return true;
 
   // Sub-Attributes
-  LM_TMP(("KZ: Loop over sub-attributes (contents of 'mdP')"));
   for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
   {
-    LM_TMP(("KZ5: sub-attribute '%s'", subP->name));
     dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP);
   }
 
   if (mdP->value.firstChildP != NULL)
-  {
-    LM_TMP(("KY: putting 'md' inside attr"));
     kjChildAdd(attrP, mdP);
-  }
-  kjTreeLog(attrP, "KY: Attribute with PROCESSED sub-attributes");
 
   return true;
 }

@@ -403,7 +403,8 @@ typedef struct OrionldConnectionState
   KjNode*                 batchEntities;
   KjNode*                 dbAttrWithDatasetsP;  // Used in TRoE for DELETE Attribute with ?deleteAll=true
   TroeMode                troeOpMode;           // Used in troePostEntities as both POST /entities and POST /temporal/entities use troePostEntities
-
+  KjNode*                 patchBase;            // Used in troePatchEntity2 as base to where apply the patchTree and then REPLACE those attrs in postgres
+  KjNode*                 patchTree;            // Used in troePatchEntity (set by troePatchEntity2) for inclusion of deleted attrs/sub-attrs
 
   //
   // GeoJSON - help vars for the case:

@@ -51,8 +51,6 @@ extern "C"
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV)
 {
-  LM_TMP(("KZ3: In dbModelFromApiSubAttribute for sub-attr '%s'", saP->name));
-
   char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Needed for mdAddedV, mdRemovedV
 
   dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
@@ -69,20 +67,14 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
       return false;
     }
 
-    LM_TMP(("KZ: '%s' has a  null RHS - to be removed", saP->name));
     kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
     return true;
   }
 
   if (strcmp(saP->name, "value") == 0)
-  {
     return true;
-  }
   else if ((strcmp(saP->name, "object") == 0) || (strcmp(saP->name, "languageMap") == 0))
-  {
-    LM_TMP(("KZ3: Changing 'object' to 'value'"));
     saP->name = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
-  }
   else if (strcmp(saP->name, "observedAt") == 0)
   {
     //
@@ -90,15 +82,18 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     // Also, the string representation of the ISO8601 is turned into a floating point representation
     // So, those two problems are fixed here:
     //
-    double timestamp = parse8601Time(saP->value.s);
-    KjNode* valueP   = kjFloat(orionldState.kjsonP, "value", timestamp);
+    if (saP->type == KjString)
+    {
+      double timestamp = parse8601Time(saP->value.s);
+      KjNode* valueP   = kjFloat(orionldState.kjsonP, "value", timestamp);
 
-    saP->type = KjObject;
-    saP->value.firstChildP = valueP;
-    saP->lastChild         = valueP;
+      saP->type = KjObject;
+      saP->value.firstChildP = valueP;
+      saP->lastChild         = valueP;
+    }
 
-    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be id "mdNames"
-    if (dbSubAttributeP == NULL)
+    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
+    if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
       kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
   }
   else if (strcmp(saP->name, "unitCode") == 0)
@@ -107,20 +102,21 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     // unitCode is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
     // So, that problem is fixed here:
     //
-    KjNode* valueP = kjString(orionldState.kjsonP, "value", saP->value.s);
+    if (saP->type == KjString)
+    {
+      KjNode* valueP = kjString(orionldState.kjsonP, "value", saP->value.s);
 
-    saP->type = KjObject;
-    saP->value.firstChildP = valueP;
-    saP->lastChild         = valueP;
+      saP->type = KjObject;
+      saP->value.firstChildP = valueP;
+      saP->lastChild         = valueP;
+    }
 
-    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be id "mdNames"
-    if (dbSubAttributeP == NULL)
+    // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
+    if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
       kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
   }
   else
   {
-    LM_TMP(("KZ4: THIS is a sub-attr (%s) - change to 'value' if 'type == object/languageMap", saP->name));
-
     // If object or languageMap exist, change name to value
     KjNode* valueP = kjLookup(saP, "object");
 

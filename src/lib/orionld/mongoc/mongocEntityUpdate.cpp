@@ -64,8 +64,6 @@ static void mongocKjTreeToUpdateBson
 {
   char path[1024];
 
-  LM_TMP(("KZ: ------------------- bsonPath == '%s'", bsonPath));
-
   for (KjNode* attrP = tree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if      (strcmp(attrP->name, "scope")      == 0)  {}
@@ -74,8 +72,6 @@ static void mongocKjTreeToUpdateBson
     else
       dotForEq(attrP->name);
 
-    LM_TMP(("KZ: Level %d member '%s' is a JSON %s", level, attrP->name, kjValueType(attrP->type)));
-
     if (attrP->type == KjObject)
     {
       int jx = 0;
@@ -83,7 +79,6 @@ static void mongocKjTreeToUpdateBson
       for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
       {
         bool isValue = false;
-        LM_TMP(("KZ: Level %d member %d (%s) is a JSON %s", level, jx, subAttrP->name, kjValueType(subAttrP->type)));
 
         if      (strcmp(subAttrP->name, "value")     == 0)     { isValue = true; }
 //      else if (strcmp(subAttrP->name, "type")      == 0)     { continue; }  - needed only if the attribute did not previously exist
@@ -125,10 +120,6 @@ static void mongocKjTreeToUpdateBson
 
             mongocKjTreeToBson(subAttrP, &compound);
             bson_append_array(setP, path, pathLen, &compound);
-          }
-          else
-          {
-            LM_TMP(("KZ: %s has an array as RHS ...", path));
           }
         }
 
@@ -205,10 +196,16 @@ bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, b
         bson_append_array_end(&eachBson, &commaArrayBson);
         bson_append_document_end(pushP, &eachBson);
       }
+      else if (strcmp(op->value.s, "DELETE") == 0)
+      {
+        LM_TMP(("KZ: DELETE '%s'", path));
+        bson_append_utf8(unsetP, path, -1, "", 0);
+        *unsetsP += 1;
+      }
     }
     else if (tree->type == KjNull)
     {
-      LM_TMP(("KZ: The node '%s' is to be REMOVED", path));
+      LM_TMP(("KZ: UNSET '%s'", path));
       bson_append_utf8(unsetP, path, -1, "", 0);
       *unsetsP += 1;
     }
@@ -271,28 +268,15 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   bson_append_document(&request, "$set", 4, &set);
 
   if (unsets > 0)
-  {
-    LM_TMP(("KZ: Adding %d unsets to the mongo request", unsets));
     bson_append_document(&request, "$unset", 6, &unset);
-  }
 
   if (pulls > 0)
-  {
-    LM_TMP(("KZ: Adding %d pulls to the mongo request", pulls));
     bson_append_document(&request, "$pull", 5, &pull);
-  }
 
   if (pushes > 0)
-  {
-    LM_TMP(("KZ: Adding %d pushes to the mongo request", pushes));
     bson_append_document(&request, "$push", 5, &push);
-  }
 
-
-  char* reqString = bson_as_canonical_extended_json(&request, NULL);
-  LM_TMP(("KZ: request: %s", reqString));
   bool b = mongoc_collection_update_one(orionldState.mongoc.entitiesP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
-
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;
@@ -300,9 +284,7 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
     return false;
   }
 
-  bson_error_t* errP = &orionldState.mongoc.error;
-  LM_TMP(("KZ: mongoc updating entity '%s': [%d.%d]: '%s'", entityId, errP->domain, errP->code, errP->message));
-
+  // bson_error_t* errP = &orionldState.mongoc.error;
   //
   // FIXME:  MUST go inside 'reply' and make sure it worked
   //
@@ -310,7 +292,6 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   //   { "modifiedCount" : { "$numberInt" : "1" }, "matchedCount" : { "$numberInt" : "1" }, "upsertedCount" : { "$numberInt" : "0" } }
   //
   // char* s = bson_as_canonical_extended_json(&reply, NULL);
-  // LM_TMP(("KZ: reply: %s", s));
 
   return true;
 }

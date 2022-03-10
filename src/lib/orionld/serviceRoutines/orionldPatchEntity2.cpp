@@ -24,10 +24,12 @@
 */
 extern "C"
 {
+#include "kbase/kMacros.h"                                       // K_VEC_SIZE
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kjson/kjRender.h"                                      // kjFastRender
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -39,7 +41,9 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
@@ -128,8 +132,6 @@ void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP, const
 //
 static void namesArrayMergeToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
 {
-  LM_TMP(("KZ2: Something added, something removed - merge and $set array"));
-
   for (KjNode* rmP = removedP->value.firstChildP; rmP != NULL; rmP = rmP->next)
   {
     KjNode* itemP = kjStringValueLookupInArray(namesP, rmP->value.s);
@@ -156,10 +158,6 @@ static void namesArrayMergeToPatchTree(KjNode* patchTree, const char* path, KjNo
 //
 static void namesToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
 {
-  kjTreeLog(namesP,   "KZ2: names");
-  kjTreeLog(addedP,   "KZ2: added");
-  kjTreeLog(removedP, "KZ2: removed");
-
   // Fix the attrNames/mdNames $set/$pull/$pop
   char* namesPath;
 
@@ -203,27 +201,38 @@ static void namesToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP
 //
 void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patchTree)
 {
-  LM_TMP(("KZ: path: %s", path));
-
   if (newP == NULL)  // Not sure this is ever a possibility ...
     return;
 
-  if (oldP == NULL)  // It's NEW - didn't exist - simply ADD
+  if (oldP == NULL)  // It's NEW - doesn't exist in OLD - simply ADD
   {
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
 
-  if (newP->type == KjNull)  // NULL as RHS means REMOVAL
+  //
+  // In JSON-LD, null is expressed in a different way ...
+  //
+  if (newP->type == KjObject)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: null - FOR REMOVAL)", path));
-    patchTreeItemAdd(patchTree, path, newP, NULL);
+    KjNode* typeP = kjLookup(newP, "@type");  // If it's an object, and it has a @type member - might be a JSON-LD null
+    if (typeP)
+      kjJsonldNullObject(newP, typeP);
+  }
+
+
+  //
+  // NULL as RHS means REMOVAL
+  //
+  if (newP->type == KjNull)
+  {
+    LM_TMP(("KZ: newP->type == KjNull"));
+    patchTreeItemAdd(patchTree, path, newP, "DELETE");
     return;
   }
 
   if (newP->type != oldP->type)  // Different type?  - overwrite the old
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
@@ -237,17 +246,13 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; leave = true; }
 
   if (change == true)
-  {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
     patchTreeItemAdd(patchTree, path, newP, NULL);
-  }
 
   if (leave == true)
     return;
 
   if (newP->type == KjArray)  // If it's an Array, we replace the old array (by definition)
   {
-    LM_TMP(("KZ: patchTreeItemAdd(PATH: %s, TREE: <JSON %s>)", path, kjValueType(newP->type)));
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
@@ -269,8 +274,6 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
     // Skip "hidden" fields
     if (newItemP->name[0] == '.')
     {
-      LM_TMP(("KZ2: Skipping '%s' of '%s'", newItemP->name, path));
-
       if      (strcmp(newItemP->name, ".names")   == 0) namesP   = newItemP;
       else if (strcmp(newItemP->name, ".added")   == 0) addedP   = newItemP;
       else if (strcmp(newItemP->name, ".removed") == 0) removedP = newItemP;
@@ -295,7 +298,6 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
       newPath = newPathV;
     }
 
-    LM_TMP(("KZ: both objects - recursive call to orionldEntityPatchTree('%s', path:'%s')", newItemP->name, newPath));
     orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);
 
     newItemP = next;
@@ -303,6 +305,93 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
   if (namesP != NULL)
     namesToPatchTree(patchTree, path, namesP, addedP, removedP);
+}
+
+
+
+void dbModelToApiSubAttribute(KjNode* subP)
+{
+  //
+  // Remove unwanted parts of the sub-attribute from DB
+  //
+  const char* unwanted[] = { "createdAt", "modifiedAt" };
+
+  for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
+  {
+    KjNode* nodeP = kjLookup(subP, unwanted[ix]);
+
+    if (nodeP != NULL)
+      kjChildRemove(subP, nodeP);
+  }
+}
+
+
+
+void dbModelToApiAttribute(KjNode* attrP)
+{
+  //
+  // Remove unwanted parts of the attribute from DB
+  //
+  const char* unwanted[] = { "mdNames", "creDate", "modDate" };
+
+  for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
+  {
+    KjNode* nodeP = kjLookup(attrP, unwanted[ix]);
+
+    if (nodeP != NULL)
+      kjChildRemove(attrP, nodeP);
+  }
+
+  KjNode* observedAtP = kjLookup(attrP, "observedAt");
+  KjNode* unitCodeP   = kjLookup(attrP, "unitCode");
+
+  if (observedAtP != NULL)
+  {
+    char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+    numberToDate(observedAtP->value.firstChildP->value.f, dateTimeBuf, 32);
+    observedAtP->type      = KjString;
+    observedAtP->value.s   = dateTimeBuf;
+    observedAtP->lastChild = NULL;
+  }
+
+  if (unitCodeP != NULL)
+  {
+    unitCodeP->type      = KjString;
+    unitCodeP->value.s   = unitCodeP->value.firstChildP->value.s;
+    unitCodeP->lastChild = NULL;
+  }
+
+  //
+  // Sub-Attributes
+  //
+  KjNode* mdP = kjLookup(attrP, "md");
+  if (mdP != NULL)
+  {
+    kjChildRemove(attrP, mdP);  // The content of mdP is added to attrP at the end of the if
+
+    // Special Sub-Attrs: unitCode + observedAt
+    for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
+    {
+      if (strcmp(subP->name, "unitCode") == 0)
+      {
+        subP->type  = subP->value.firstChildP->type;
+        subP->value = subP->value.firstChildP->value;
+      }
+      else if (strcmp(subP->name, "observedAt") == 0)  // Part of Sub-Attribute
+      {
+        subP->type  = subP->value.firstChildP->type;
+        subP->value = subP->value.firstChildP->value;  // + convert to iso8601 string
+      }
+      else
+        dbModelToApiSubAttribute(subP);
+    }
+
+    //
+    // Move all metadata (sub-attrs) up one level
+    //
+    attrP->lastChild->next = mdP->value.firstChildP;
+    attrP->lastChild       = mdP->lastChild;
+  }
 }
 
 
@@ -342,7 +431,6 @@ bool orionldPatchEntity2(void)
   }
 
   KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
-  LM_TMP(("KZ: Calling pCheckEntity with dbAttrsP at %p", dbAttrsP));
 
   //
   // FIXME: change pCheckEntity param no 3 to be not only the attributes, but the entire entity (dbEntityP)
@@ -351,6 +439,33 @@ bool orionldPatchEntity2(void)
   {
     LM_W(("Invalid payload body. %s: %s", orionldState.pd.title, orionldState.pd.detail));
     return false;
+  }
+
+  //
+  // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
+  // but, with their current value in the database.
+  // That tree needs to be trimmed
+  //
+  if (troe)
+  {
+    KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
+
+    for (KjNode* patchedAttrP = orionldState.requestTree->value.firstChildP; patchedAttrP != NULL; patchedAttrP = patchedAttrP->next)
+    {
+      KjNode* dbAttrP;
+      dotForEq(patchedAttrP->name);
+
+      if ((dbAttrP = kjLookup(dbAttrsP, patchedAttrP->name)) != NULL)
+      {
+        KjNode* troeAttrP = kjClone(orionldState.kjsonP, dbAttrP);
+
+        dbModelToApiAttribute(troeAttrP);
+        kjChildAdd(troeTree, troeAttrP);
+      }
+      eqForDot(patchedAttrP->name);
+    }
+
+    orionldState.patchBase = troeTree;
   }
 
   //
@@ -397,5 +512,9 @@ bool orionldPatchEntity2(void)
   }
 
   orionldState.httpStatusCode = 204;
+
+  if (troe)
+    orionldState.requestTree = patchTree;
+
   return true;
 }

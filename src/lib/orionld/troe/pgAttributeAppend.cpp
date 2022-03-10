@@ -35,6 +35,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/eqForDot.h"                           // eqForDot
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgQuotedString.h"                       // pgQuotedString
@@ -81,7 +82,7 @@ void pgAttributeAppend
 (
   PgAppendBuffer*  attributesBufferP,
   const char*      instanceId,
-  const char*      attributeName,
+  char*            attributeName,
   const char*      opMode,
   const char*      entityId,
   char*            type,
@@ -100,6 +101,8 @@ void pgAttributeAppend
 
   observedAt = (observedAt == NULL)? (char*) "null" : pgQuotedString(observedAt);
   unitCode   = (unitCode   == NULL)? (char*) "null" : pgQuotedString(unitCode);
+
+  eqForDot(attributeName);
 
   if (datasetId == NULL)
     datasetId  = (char*) "None";
