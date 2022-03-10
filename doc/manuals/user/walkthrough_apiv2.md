@@ -128,6 +128,9 @@ Note this script requires Flask version 2.0.2 and paho-mqtt version 1.6.1, which
 `pip install Flask==2.0.2` and `pip install paho-mqtt==1.6.1`. In addition, it is recommended to use
 Python 3.10.x In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
+More information about installing the accumulator (including an alternative based in docker) can be checked
+in [this documentation piece](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/README.md#how-to-install-accumulator-serverpy).
+
 [Top](#top)
 
 ### Issuing commands to the broker
