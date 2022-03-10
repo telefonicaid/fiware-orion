@@ -1,6 +1,5 @@
 FROM debian:11.2-slim
 
-ADD mongodb-org.list /etc/apt/sources.list.d/
 ADD build.sh /opt/bin/
 ADD build-dep.sh /opt/bin/
 ADD makefile /opt/archive/
