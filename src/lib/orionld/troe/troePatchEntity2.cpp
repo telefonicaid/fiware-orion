@@ -144,7 +144,7 @@ int pathComponentsFix(char** compV, int components, bool* skipP)
       ++oldIx;  // Jump over "md"
       continue;
     }
-#if 0
+#if 1
     if ((oldIx == 4) && strcmp(compV[oldIx], "value") == 0)  // This will change once I eat the "value" object in dbModel function
     {
       if (strcmp(compV[3], "observedAt") == 0)
@@ -228,8 +228,7 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
 
   KjNode*  parentP         = NULL;
   bool     onlyLastMissing = false;
-  KjNode*  nodeP           = kjNavigate(patchBase, compV, &parentP, &onlyLastMissing);  // &compV[1]: Stepping over "attrs"
-
+  KjNode*  nodeP           = kjNavigate(patchBase, compV, &parentP, &onlyLastMissing);
 
   // Remove non-wanted parts of objects
   if (treeNode->type == KjObject)
@@ -266,7 +265,7 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
     return;
   }
 
-  LM_TMP(("KZ: Replacing old with new"));
+  LM_TMP(("KZ: Replacing treeNode (%s: %s) with patchNodeP (%s: %s)", treeNode->name, kjValueType(treeNode->type), nodeP->name, kjValueType(nodeP->type)));
   treeNode->name = nodeP->name;
   kjChildRemove(parentP, nodeP);
   kjChildRemove(patchP, treeNode);
@@ -300,6 +299,7 @@ bool troePatchEntity2(void)
   //
   orionldState.requestTree = patchBase;
   orionldState.patchTree   = patchTree;
+
   troePatchEntity();
 
   return true;

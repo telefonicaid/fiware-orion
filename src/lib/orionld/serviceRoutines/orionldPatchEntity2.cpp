@@ -204,7 +204,7 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   if (newP == NULL)  // Not sure this is ever a possibility ...
     return;
 
-  if (oldP == NULL)  // It's NEW - didn't exist - simply ADD
+  if (oldP == NULL)  // It's NEW - doesn't exist in OLD - simply ADD
   {
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;

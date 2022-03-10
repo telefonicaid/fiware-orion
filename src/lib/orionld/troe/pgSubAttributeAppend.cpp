@@ -34,6 +34,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/eqForDot.h"                           // eqForDot
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgQuotedString.h"                       // pgQuotedString
@@ -79,7 +80,7 @@ void pgSubAttributeAppend
 (
   PgAppendBuffer*  subAttributesBufferP,
   const char*      instanceId,
-  const char*      subAttributeName,
+  char*            subAttributeName,
   const char*      entityId,
   const char*      attrInstanceId,
   char*            attrDatasetId,  // might be NULL, but can't be in the DB
@@ -93,6 +94,8 @@ void pgSubAttributeAppend
   int         bufSize = 20480;
   char*       buf     = kaAlloc(&orionldState.kalloc, bufSize);
   const char* comma   = (subAttributesBufferP->values != 0)? "," : "";
+
+  eqForDot(subAttributeName);
 
   attrDatasetId = (attrDatasetId == NULL)? (char*) "'None'" : pgQuotedString(attrDatasetId);
   observedAt    = (observedAt    == NULL)? (char*) "null"   : pgQuotedString(observedAt);

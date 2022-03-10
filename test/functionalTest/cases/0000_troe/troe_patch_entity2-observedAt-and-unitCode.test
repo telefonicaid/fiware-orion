@@ -90,7 +90,7 @@ echo "04. PATCH E1 modifying P's and PP's observedAt+unitCode"
 echo "======================================================="
 payload='{
   "P": {
-    "observedAt": "2022-03-08T00:15:00.001Z",
+    "observedAt": "2022-03-08T00:15:00.444Z",
     "unitCode": "Fahrenheit",
     "value": 78,
     "PP":  {
@@ -251,7 +251,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 78,
 			"md" : {
 				"observedAt" : {
-					"value" : 1646698440.001
+					"value" : 1646698500.444
 				},
 				"unitCode" : {
 					"value" : "Fahrenheit"
@@ -260,7 +260,7 @@ MongoDB server version: REGEX(.*)
 					"createdAt" : REGEX(.*),
 					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
-					"value" : 26
+					"value" : 26,
 					"observedAt" : "2022-03-08T00:15:00.002Z",
 					"unitCode" : "Celsius"
 				}
@@ -295,7 +295,7 @@ Date: REGEX(.*)
             "unitCode": "Celsius",
             "value": 26
         },
-        "observedAt": "2022-03-08T00:15:00.001Z",
+        "observedAt": "2022-03-08T00:15:00.444Z",
         "type": "Property",
         "unitCode": "Fahrenheit",
         "value": 78
@@ -315,14 +315,14 @@ Create,urn:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(.*)
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,observedat,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:E1,t,Celsius,2022-03-08 00:14:00.001,None,,25,,REGEX(.*)
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:E1,t,Fahrenheit,2022-03-08 00:14:00.001,None,,78,,REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:E1,t,Fahrenheit,2022-03-08 00:15:00.444,None,,78,,REGEX(.*)
 
 
 09. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,attrinstanceid,unitcode,observedat,text,number,boolean
 https://uri.etsi.org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),Fahrenheit,2022-03-08 00:14:00.002,,77,
-https://uri=etsi=org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),Celsius,2022-03-08 00:15:00.002,,26,
+https://uri.etsi.org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),Celsius,2022-03-08 00:15:00.002,,26,
 
 
 --TEARDOWN--

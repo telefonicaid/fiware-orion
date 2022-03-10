@@ -42,7 +42,7 @@ extern void pgAttributeAppend
 (
   PgAppendBuffer*  attributesBufferP,
   const char*      instanceId,
-  const char*      attributeName,
+  char*            attributeName,
   const char*      opMode,
   const char*      entityId,
   char*            type,

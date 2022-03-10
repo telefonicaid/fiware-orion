@@ -219,17 +219,17 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/P1,urn:ngsi-ld:attribute:ins
 Create,https://uri.etsi.org/ngsi-ld/default-context/P2,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,to be updated,,
 Create,https://uri.etsi.org/ngsi-ld/default-context/P3,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,to be deleted,,
 Create,https://uri.etsi.org/ngsi-ld/default-context/P4,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,TO BE KEPT INTACT,,
-Replace,https://uri=etsi=org/ngsi-ld/default-context/P1,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,Number,t,Celsius,None,,26,
-Replace,https://uri=etsi=org/ngsi-ld/default-context/P2,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,MODIFIED,,
-Replace,https://uri=etsi=org/ngsi-ld/default-context/P5,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,ADDED ATTR,,
-Delete,https://uri=etsi=org/ngsi-ld/default-context/P3,urn:delete,urn:E1,,,,None,,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,Number,t,Celsius,None,,26,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,MODIFIED,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P5,urn:ngsi-ld:attribute:instance:REGEX(.*),urn:E1,String,f,,None,ADDED ATTR,,
+Delete,https://uri.etsi.org/ngsi-ld/default-context/P3,urn:delete,urn:E1,,,,None,,,
 
 
 07. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
 https://uri.etsi.org/ngsi-ld/default-context/Sub-P,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,24,
-https://uri=etsi=org/ngsi-ld/default-context/Sub-P,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,24,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,Number,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,24,
 
 
 --TEARDOWN--

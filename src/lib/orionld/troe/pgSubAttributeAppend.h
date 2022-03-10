@@ -42,7 +42,7 @@ extern void pgSubAttributeAppend
 (
   PgAppendBuffer*  subAttributesBufferP,
   const char*      instanceId,
-  const char*      subAttributeName,
+  char*            subAttributeName,
   const char*      entityId,
   const char*      attrInstanceId,
   char*            attrDatasetId,  // might be NULL, but can't be in the DB
