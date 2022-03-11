@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription changeType entityCreate
+Subscription operations entityCreate
 
 --SHELL-INIT--
 dbInit CB
@@ -51,7 +51,7 @@ payload='{
     ]
   },
   "condition": {
-    "changeType": [ "entityCreate" ]
+    "operations": [ "entityCreate" ]
   },
   "notification": {
     "http": {

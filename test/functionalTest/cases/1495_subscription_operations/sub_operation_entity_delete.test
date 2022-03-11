@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription changeType entityChange
+Subscription operations entityDelete
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for entity type T with entityUpdate
+# 01. Create subscription for entity type T with entityDelete
 # 02. Create entity E/T (no notif)
-# 03. Update entity E/T without actual change (notif)
-# 04. Update entity E/T with actual change (notif)
-# 05. Delete entity E/T (no notif)
-# 06. Dump accumulator: see two E/T notifications (A=1 and A=2) with entityStatus updated
+# 03. Update entity E/T without actual change (no notif)
+# 04. Update entity E/T with actual change (no notif)
+# 05. Delete entity E/T (notif)
+# 06. Dump accumulator: see E/T notification with entityStatus deleted
 #
 
-echo "01. Create subscription for entity type T with entityUpdate"
+echo "01. Create subscription for entity type T with entityDelete"
 echo "==========================================================="
 payload='{
   "subject": {
@@ -51,7 +51,7 @@ payload='{
     ]
   },
   "condition": {
-    "changeType": [ "entityUpdate" ]
+    "operations": [ "entityDelete" ]
   },
   "notification": {
     "http": {
@@ -80,8 +80,8 @@ echo
 echo
 
 
-echo "03. Update entity E/T without actual change (notif)"
-echo "==================================================="
+echo "03. Update entity E/T without actual change (no notif)"
+echo "======================================================"
 payload='{
   "A": {
     "value": 1,
@@ -93,8 +93,8 @@ echo
 echo
 
 
-echo "04. Update entity E/T with actual change (notif)"
-echo "================================================"
+echo "04. Update entity E/T with actual change (no notif)"
+echo "==================================================="
 payload='{
   "A": {
     "value": 2,
@@ -106,22 +106,22 @@ echo
 echo
 
 
-echo "05. Delete entity E/T (no notif)"
-echo "================================"
+echo "05. Delete entity E/T (notif)"
+echo "============================="
 orionCurl --url /v2/entities/E -X DELETE
 echo
 echo
 
 
-echo "06. Dump accumulator: see two E/T notifications (A=1 and A=2) with entityStatus updated"
-echo "======================================================================================="
+echo "06. Dump accumulator: see E/T notification with entityStatus deleted"
+echo "===================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create subscription for entity type T with entityUpdate
+01. Create subscription for entity type T with entityDelete
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -141,7 +141,15 @@ Date: REGEX(.*)
 
 
 
-03. Update entity E/T without actual change (notif)
+03. Update entity E/T without actual change (no notif)
+======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Update entity E/T with actual change (no notif)
 ===================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -149,54 +157,16 @@ Date: REGEX(.*)
 
 
 
-04. Update entity E/T with actual change (notif)
-================================================
+05. Delete entity E/T (notif)
+=============================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Delete entity E/T (no notif)
-================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. Dump accumulator: see two E/T notifications (A=1 and A=2) with entityStatus updated
-=======================================================================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: x
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {},
-                "type": "Number",
-                "value": 1
-            },
-            "entityStatus": {
-                "metadata": {}
-                "type": "Text",
-                "value": "updated"
-            },
-            "id": "E",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
+06. Dump accumulator: see E/T notification with entityStatus deleted
+====================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: x
@@ -218,7 +188,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "entityStatus": {
                 "metadata": {}
                 "type": "Text",
-                "value": "updated"
+                "value": "deleted"
             },
             "id": "E",
             "type": "T"
