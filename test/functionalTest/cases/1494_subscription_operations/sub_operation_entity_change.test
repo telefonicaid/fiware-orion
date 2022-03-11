@@ -48,10 +48,10 @@ payload='{
         "idPattern" : ".*",
         "type": "T"
       }
-    ]
-  },
-  "condition": {
-    "operations": [ "entityChange" ]
+    ],
+    "condition": {
+      "operations": [ "entityChange" ]
+    }
   },
   "notification": {
     "http": {

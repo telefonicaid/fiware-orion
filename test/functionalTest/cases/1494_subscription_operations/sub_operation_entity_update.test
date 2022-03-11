@@ -48,11 +48,11 @@ payload='{
         "idPattern" : ".*",
         "type": "T"
       }
-    ]
-  },
-  "condition": {
-    "operations": [ "entityUpdate" ]
-  },
+    ],
+    "condition": {
+      "operations": [ "entityUpdate" ]
+    }
+  },  
   "notification": {
     "http": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
