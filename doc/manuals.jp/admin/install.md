@@ -11,7 +11,7 @@
 <a name="introduction"></a>
 ## イントロダクション
 
-推奨される手順は、公式の [Docker Hub の Orion docker コンテナ](https://hub.docker.com/repository/docker/telefonicaiot/fiware-orion) を使用してインストールすることです。詳細については、[このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/docker/README.md)を参照してください。
+推奨される手順は、公式の [Docker Hub の Orion docker コンテナ](https://hub.docker.com/repository/docker/telefonicaiot/fiware-orion) を使用してインストールすることです。詳細については、[このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/docker/README.jp.md)を参照してください。
 
 ただし、Docker 化されたインフラストラクチャがない場合は、ソースからビルドをインストールすることをお勧めします。
 [このドキュメント](build_source.md)を確認してください。
@@ -22,7 +22,7 @@
 Docker hub で公式の Orion docker コンテナを使用してインストールする場合は、次のものが必要です:
 
 * [Docker](https://docs.docker.com/engine/install/)
-* [Docker compose](https://docs.docker.com/compose/install/) (not strictly needed, but strongly recommended) 
+* [Docker compose](https://docs.docker.com/compose/install/) (厳密には必要ありませんが、強くお勧めします)
 
 必要なソースから ビルドした Orion をインストールする場合：
 
