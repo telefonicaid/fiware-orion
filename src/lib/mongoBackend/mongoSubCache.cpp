@@ -253,7 +253,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
       ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
       if (op == ngsiv2::SubOp::Unknown)
       {
-        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown subscription operation found in database)"));
       }
       else
       {
@@ -470,7 +470,7 @@ int mongoSubCacheItemInsert
       ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
       if (op == ngsiv2::SubOp::Unknown)
       {
-        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown subscription operation found in database)"));
       }
       else
       {

@@ -88,7 +88,7 @@ std::string subOperation2string(ngsiv2::SubOp op)
   }
   else
   {
-    LM_E(("Runtime Error (uknown sub operation)"));
+    LM_E(("Runtime Error (unknown sub operation)"));
     return "Unknown";
   }
 }

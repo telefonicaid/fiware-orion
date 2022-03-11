@@ -130,7 +130,7 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
       ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
       if (op == ngsiv2::SubOp::Unknown)
       {
-        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown subscription operation found in database)"));
       }
       else
       {
