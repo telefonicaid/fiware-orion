@@ -1022,6 +1022,7 @@ static std::string parseNotifyConditionVector
     }
   }
 
+  // Expression
   if (condition.HasMember("expression"))
   {
     std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
@@ -1029,6 +1030,36 @@ static std::string parseNotifyConditionVector
     if (r != "OK")
     {
       return badInput(ciP, r);
+    }
+  }
+
+  // Operations
+  if (condition.HasMember("operations"))
+  {
+    std::string errorString;
+    std::vector<std::string> operationStrings;
+    bool        b = parseStringVector(&operationStrings,
+                                      condition["operations"],
+                                      "operations",
+                                      true,
+                                      true,
+                                      &errorString);
+    if (b == false)
+    {
+      return badInput(ciP, errorString);
+    }
+
+    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    {
+      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
+      if (op == ngsiv2::SubOp::Unknown)
+      {
+        return badInput(ciP, "unknown subscription operation: " + operationStrings[ix]);
+      }
+      else
+      {
+        subsP->subject.condition.operations.push_back(op);
+      }
     }
   }
 

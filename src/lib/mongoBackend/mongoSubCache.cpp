@@ -240,6 +240,27 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
+  //
+  // 09. Fill in cSubP->subOp from subOpV
+  //
+  if (sub.hasField(CSUB_OPERATIONS))
+  {
+    std::vector<std::string> operationStrings;
+    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
+
+    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    {
+      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
+      if (op == ngsiv2::SubOp::Unknown)
+      {
+        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+      }
+      else
+      {
+        cSubP->subOpV.push_back(op);
+      }
+    }
+  }
 
   subCacheItemInsert(cSubP);
 
@@ -435,6 +456,28 @@ int mongoSubCacheItemInsert
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+
+  //
+  // 09. Fill in cSubP->subOp from subOpV
+  //
+  if (sub.hasField(CSUB_OPERATIONS))
+  {
+    std::vector<std::string> operationStrings;
+    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
+
+    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    {
+      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
+      if (op == ngsiv2::SubOp::Unknown)
+      {
+        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+      }
+      else
+      {
+        cSubP->subOpV.push_back(op);
+      }
+    }
+  }
 
   subCacheItemInsert(cSubP);
 

@@ -92,6 +92,7 @@
 #define CSUB_EXPR_GEOM               "geometry"
 #define CSUB_EXPR_COORDS             "coords"
 #define CSUB_EXPR_GEOREL             "georel"
+#define CSUB_OPERATIONS              "ops"
 
 #define CSUB_THROTTLING              "throttling"
 #define CSUB_MAXFAILSLIMIT           "maxFailsLimit"

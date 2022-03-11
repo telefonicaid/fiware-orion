@@ -34,6 +34,67 @@
 
 
 
+/* ****************************************************************************
+*
+* parseSubscriptionOperation -
+*/
+ngsiv2::SubOp parseSubscriptionOperation(const std::string& op)
+{
+  if (op == "entityChange")
+  {
+    return ngsiv2::SubOp::EntityChange;
+  }
+  else if (op == "entityUpdate")
+  {
+    return ngsiv2::SubOp::EntityUpdate;
+  }
+  else if (op == "entityCreate")
+  {
+    return ngsiv2::SubOp::EntityCreate;
+  }
+  else if (op == "entityDelete")
+  {
+    return ngsiv2::SubOp::EntityDelete;
+  }
+  else
+  {
+    return ngsiv2::SubOp::Unknown;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* operation2string -
+*/
+std::string subOperation2string(ngsiv2::SubOp op)
+{
+  if (op == ngsiv2::SubOp::EntityChange)
+  {
+    return "entityChange";
+  }
+  else if (op == ngsiv2::SubOp::EntityUpdate)
+  {
+    return "entityUpdate";
+  }
+  else if (op == ngsiv2::SubOp::EntityCreate)
+  {
+    return "entityCreate";
+  }
+  else if (op == ngsiv2::SubOp::EntityDelete)
+  {
+    return "entityDelete";
+  }
+  else
+  {
+    LM_E(("Runtime Error (uknown sub operation)"));
+    return "Unknown";
+  }
+}
+
+
+
 namespace ngsiv2
 {
 /* ****************************************************************************
@@ -239,6 +300,17 @@ std::string Condition::toJson()
   std::string expressionString = jhe.str();
 
   if (expressionString != "{}")         jh.addRaw("expression", expressionString);
+
+  JsonVectorHelper jhv;
+
+  for (unsigned int ix = 0 ; ix < this->operations.size(); ix++)
+  {
+    jhv.addString(subOperation2string(this->operations[ix]));
+  }
+
+  std::string operationsString = jhv.str();
+
+  if (operationsString != "[]")         jh.addRaw("operations", operationsString);
 
   return jh.str();
 }

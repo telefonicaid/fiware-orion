@@ -120,6 +120,25 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
   // Condition
   setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
+  if (r.hasField(CSUB_OPERATIONS))
+  {
+    std::vector<std::string> operationStrings;
+    setStringVectorF(r, CSUB_OPERATIONS, &operationStrings);
+
+    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    {
+      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
+      if (op == ngsiv2::SubOp::Unknown)
+      {
+        LM_E(("Runtime Error (uknown subscription operation found in database)"));
+      }
+      else
+      {
+        s->subject.condition.operations.push_back(op);
+      }
+    }
+  }
+
   if (r.hasField(CSUB_EXPR))
   {
     orion::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);

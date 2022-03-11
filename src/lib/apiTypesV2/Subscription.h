@@ -53,6 +53,21 @@ typedef enum NotificationType
 
 /* ****************************************************************************
 *
+* SubOp -
+*/
+typedef enum SubOp
+{
+  EntityChange,
+  EntityUpdate,
+  EntityCreate,
+  EntityDelete,
+  Unknown
+} SubOp;
+
+
+
+/* ****************************************************************************
+*
 * Notification -
 */
 struct Notification
@@ -103,6 +118,7 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
+  std::vector<SubOp>        operations;
   std::string               toJson();
 };
 
@@ -143,5 +159,23 @@ struct Subscription
 };
 
 }  // end namespace
+
+
+
+/* ****************************************************************************
+*
+* parseSubscriptionOperation -
+*/
+extern ngsiv2::SubOp parseSubscriptionOperation(const std::string& op);
+
+
+
+/* ****************************************************************************
+*
+* operation2string -
+*/
+extern std::string subOperation2string(ngsiv2::SubOp op);
+
+
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_

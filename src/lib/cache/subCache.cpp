@@ -743,6 +743,7 @@ void subCacheItemInsert
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
+  const std::vector<ngsiv2::SubOp>&  subOps,
   const char*                        subscriptionId,
   int64_t                            expirationTime,
   int64_t                            maxFailsLimit,
@@ -802,6 +803,7 @@ void subCacheItemInsert
   cSubP->httpInfo              = httpInfo;
   cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
+  cSubP->subOpV                = subOps;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
