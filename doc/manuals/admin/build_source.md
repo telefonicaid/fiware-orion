@@ -98,7 +98,7 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
