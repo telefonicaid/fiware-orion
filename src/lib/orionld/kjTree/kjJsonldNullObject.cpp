@@ -49,7 +49,7 @@ bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
     {
       KjNode* atValueP = kjLookup(attrP, "@value");
 
-      if ((atValueP != NULL) && (atValueP->type = KjNull))
+      if ((atValueP != NULL) && (atValueP->type == KjNull))
       {
         //
         // All good so far - both items present
@@ -63,7 +63,7 @@ bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
 
         if (items == 2)  // All good - it's a JSON-LD NULL object
         {
-          LM_TMP(("XXXXXXXXXXXXXXXXXXXXXXXXXX JSON-LD NULL object modified to a normal JSON null"));
+          LM_TMP(("XXXXXXXXXXXXXXXXXXXXXXXXXX JSON-LD NULL object for '%s' has been modified to a normal JSON null", attrP->name));
           attrP->type    = KjNull;
           attrP->value.i = 0;
 

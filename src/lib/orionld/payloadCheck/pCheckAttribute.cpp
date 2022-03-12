@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
 #include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
@@ -641,10 +642,18 @@ static bool pCheckAttributeObject
     bool geoJsonValue = false;
 
     attributeType = orionldAttributeType(typeP->value.s);
-    if ((attributeType == NoAttributeType) && (isGeoJsonValue(attrP)))
+    if (attributeType == NoAttributeType)
     {
-      attributeType = GeoProperty;
-      geoJsonValue  = true;
+      if (isGeoJsonValue(attrP))
+      {
+        attributeType = GeoProperty;
+        geoJsonValue  = true;
+      }
+      else
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for /type/", typeP->value.s, 400);
+        return false;
+      }
     }
 
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != attrTypeFromDb))
@@ -814,7 +823,6 @@ static bool pCheckAttributeObject
     }
     else
     {
-      LM_TMP(("KZ: Recursive call to pCheckAttribute for field '%s' - should I expand the sub-attr here?", fieldP->name));
       if (pCheckAttribute(fieldP, false, NoAttributeType, false, NULL) == false)
         return false;
     }
@@ -972,7 +980,10 @@ bool pCheckAttribute
     if (pCheckUri(attrP->name, attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
       return false;
 
-    attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
+    if (isAttribute)
+      attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
+    else
+      attrP->name = orionldSubAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
   }
 
   if (pCheckTypeFromContext(attrP, attrContextInfoP) == false)
