@@ -131,7 +131,7 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
         return false;
       }
 
-      if (pCheckUri(attrP->value.s, true) == false)
+      if (pCheckUri(attrP->value.s, attrP->name, true) == false)
       {
         orionldError(OrionldBadRequestData,
                      "Not a valid URI",
@@ -393,12 +393,115 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
 }
 
 
-
-bool unitCodeCheck(KjNode* fieldP) { return true; }
-bool datasetIdCheck(KjNode* fieldP) { return true; }
-bool timestampCheck(KjNode* fieldP) { return true; }
-bool objectCheck(KjNode* fieldP) { return true; }
+// -----------------------------------------------------------------------------
+//
+// FIXME - IMPLEMENT
+//
 bool languageMapCheck(KjNode* fieldP) { return true; }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// datasetIdCheck -
+//
+bool datasetIdCheck(KjNode* fieldP)
+{
+  if (fieldP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    return false;
+  }
+
+  if (pCheckUri(fieldP->value.s, fieldP->name, true) == false)
+    return false;
+
+  return true;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// objectCheck -
+//
+bool objectCheck(KjNode* fieldP)
+{
+  if (fieldP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    return false;
+  }
+
+  if (pCheckUri(fieldP->value.s, fieldP->name, true) == false)
+    return false;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// stringArrayCheck -
+//
+// NOTE
+//   A Relationship must have an "object field that is a string that is a valid URI.
+//   However, Orion-LD (against the ETSI NGSI-LD API spec) allows for the "object" field to also ne an array of URIs.
+//   Once datasetId is fully implemented, this will no longer be allowed.
+//
+bool stringArrayCheck(KjNode* arrayP)
+{
+  if (arrayP->type != KjArray)
+    return false;
+
+  for (KjNode* uriP = arrayP->value.firstChildP; uriP != NULL; uriP = uriP->next)
+  {
+    if (objectCheck(uriP) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// unitCodeCheck -
+//
+bool unitCodeCheck(KjNode* fieldP)
+{
+  if (fieldP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// timestampCheck -
+//
+bool timestampCheck(KjNode* fieldP)
+{
+  if (fieldP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string (so, not a valid timestamp)", fieldP->name, 400);
+    return false;
+  }
+
+  if (parse8601Time(fieldP->value.s) == -1)
+  {
+    orionldError(OrionldBadRequestData, "Not a valid ISO8601 DateTime", fieldP->name, 400);
+    return false;
+  }
+
+  return true;
+}
 
 
 
@@ -611,6 +714,38 @@ static bool pCheckAttributeObject
   {
     next = fieldP->next;
 
+    if (fieldP->type == KjNull)  // Pure JSON null ... ?   OR, was it a JDON-LD null object that has been translated already?
+    {
+      if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
+      {
+        orionldError(OrionldBadRequestData, "null is not allowed as RHS in a JSON-LD document", fieldP->name, 400);
+        return false;
+      }
+      fieldP = next;
+      continue;
+    }
+
+    // JSON-LD null ?
+    if (fieldP->type == KjObject)
+    {
+      KjNode* typeP = kjLookup(fieldP, "@type");
+
+      if ((typeP != NULL) && (kjJsonldNullObject(fieldP, typeP) == true))
+        typeP->type = KjNull;
+    }
+
+    if (fieldP->type == KjNull)  // JSON-LD null
+    {
+      if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
+      {
+        orionldError(OrionldBadRequestData, "RHS as NULL not allowed", fieldP->name, 400);
+        return false;
+      }
+
+      fieldP = next;
+      continue;  // NULL, all good. Next!
+    }
+
     if (fieldP == typeP)
     {
       // The value/object/languageMap is left as is
@@ -640,7 +775,7 @@ static bool pCheckAttributeObject
     {
       if (attributeType == Relationship)
       {
-        if (objectCheck(fieldP) == false)
+        if ((objectCheck(fieldP) == false) && (stringArrayCheck(fieldP) == false))  // Until datasetId is fully implemented - string array allowed for Relationship
           return false;
       }
       else
@@ -679,6 +814,7 @@ static bool pCheckAttributeObject
     }
     else
     {
+      LM_TMP(("KZ: Recursive call to pCheckAttribute for field '%s' - should I expand the sub-attr here?", fieldP->name));
       if (pCheckAttribute(fieldP, false, NoAttributeType, false, NULL) == false)
         return false;
     }
@@ -833,7 +969,7 @@ bool pCheckAttribute
   {
     if (pCheckName(attrP->name) == false)
       return false;
-    if (pCheckUri(attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
+    if (pCheckUri(attrP->name, attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
       return false;
 
     attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);

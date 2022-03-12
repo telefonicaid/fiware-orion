@@ -29,6 +29,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildRemove, kjArray, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
@@ -117,7 +119,11 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   //
   for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV);
+    if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV) == false)
+    {
+      LM_W(("dbModelFromApiAttribute: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+      return false;
+    }
   }
 
   return true;

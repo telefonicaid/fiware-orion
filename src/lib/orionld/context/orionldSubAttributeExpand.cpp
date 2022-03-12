@@ -57,7 +57,6 @@ char* orionldSubAttributeExpand
   else if (strcmp(shortName, "location")   == 0) return shortName;
   else if (strcmp(shortName, "observedAt") == 0) return shortName;
   else if (strcmp(shortName, "unitCode")   == 0) return shortName;
-  else if (strcmp(shortName, "datasetId")  == 0) return shortName;
 
   return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
 }

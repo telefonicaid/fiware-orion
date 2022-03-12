@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
+#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/db/dbModelFromApiSubAttribute.h"               // dbModelFromApiSubAttribute
 #include "orionld/db/dbModelFromApiAttribute.h"                  // Own interface
 
@@ -165,7 +166,9 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   // Sub-Attributes
   for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
   {
-    dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP);
+    subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
+    if (dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP) == false)
+      return false;
   }
 
   if (mdP->value.firstChildP != NULL)

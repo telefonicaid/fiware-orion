@@ -43,18 +43,18 @@ extern char validUriChars[256];  // From pcheckUri.cpp
 //
 // pCheckUri - newer version of pcheckUri - accepting OrionldProblemDetails as input/output
 //
-bool pCheckUri(const char* uri, bool mustBeUri)
+bool pCheckUri(const char* uri, const char* name, bool mustBeUri)
 {
   bool hasColon = false;
 
   if (uri == NULL)
   {
-    orionldError(OrionldBadRequestData, "No URI", "no details", 400);
+    orionldError(OrionldBadRequestData, "No URI", name, 400);
     return false;
   }
   else if (*uri == 0)
   {
-    orionldError(OrionldBadRequestData, "Empty URI", "no details", 400);
+    orionldError(OrionldBadRequestData, "Empty URI", name, 400);
     return false;
   }
 
@@ -75,7 +75,7 @@ bool pCheckUri(const char* uri, bool mustBeUri)
   //
   if ((mustBeUri == true) && (hasColon == false))
   {
-    orionldError(OrionldBadRequestData, "Invalid URI", "No colon present", 400);
+    orionldError(OrionldBadRequestData, "Invalid URI - no colon present", name, 400);
     return false;
   }
 
@@ -91,7 +91,7 @@ bool pCheckUri(const char* uri, bool mustBeUri)
     {
       if (*s == ' ')
       {
-        orionldError(OrionldBadRequestData, "Invalid URI/Shortname", "whitespace in shortname", 400);
+        orionldError(OrionldBadRequestData, "Invalid URI/Shortname - whitespace present", name, 400);
         return false;
       }
 
@@ -104,7 +104,7 @@ bool pCheckUri(const char* uri, bool mustBeUri)
     {
       if (validUriChars[(unsigned char) *s] == false)
       {
-        orionldError(OrionldBadRequestData, "Invalid URI", "invalid character", 400);
+        orionldError(OrionldBadRequestData, "Invalid URI - invalid character", name, 400);
         LM_W(("Bad Input (invalid character in URI '%s', at position %d (0x%x)", uri, (int) (s - uri),  *s & 0xFF));
         return false;
       }

@@ -101,7 +101,7 @@ do                                                                              
   int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                       \
   const char* title = (_title == NULL)? "Invalid URI"         : _title;                      \
                                                                                              \
-  if (pCheckUri(uri, mustBeUri) == false)                                                    \
+  if (pCheckUri(uri, uri, mustBeUri) == false)                                               \
   {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \

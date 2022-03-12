@@ -85,7 +85,15 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if (saP->type == KjString)
     {
       double timestamp = parse8601Time(saP->value.s);
-      KjNode* valueP   = kjFloat(orionldState.kjsonP, "value", timestamp);
+
+      if (timestamp < 0)
+      {
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", saP->value.s, 400);
+        LM_W(("Bad Request (Invalid ISO8601 timestamp: %s)", saP->value.s));
+        return false;
+      }
+
+      KjNode* valueP = kjFloat(orionldState.kjsonP, "value", timestamp);
 
       saP->type = KjObject;
       saP->value.firstChildP = valueP;
@@ -132,7 +140,8 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
       kjTimestampAdd(saP, "createdAt");
 
       // The "mdNames" array stores the sub-attribute names in their original names, with dots - saDotName
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
+      if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
+        kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
     }
 
     // All sub-attrs get a "modifiedAt"
