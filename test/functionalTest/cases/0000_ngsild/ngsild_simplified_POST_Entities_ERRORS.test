@@ -514,13 +514,13 @@ Date: REGEX(.*)
 06. Attempt to create an Entity with a GeoProperty that has a duplicated 'type' - see failure
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Point",
-    "title": "Invalid type for attribute",
+    "title": "Invalid value for /type/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
