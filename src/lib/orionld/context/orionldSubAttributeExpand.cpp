@@ -51,12 +51,13 @@ char* orionldSubAttributeExpand
   if (orionldContextItemAlreadyExpanded(shortName) == true)
     return shortName;
 
-  if      (strcmp(shortName, "type")       == 0) return shortName;
-  else if (strcmp(shortName, "value")      == 0) return shortName;
-  else if (strcmp(shortName, "object")     == 0) return shortName;
-  else if (strcmp(shortName, "location")   == 0) return shortName;
-  else if (strcmp(shortName, "observedAt") == 0) return shortName;
-  else if (strcmp(shortName, "unitCode")   == 0) return shortName;
+  if      (strcmp(shortName, "type")        == 0) return shortName;
+  else if (strcmp(shortName, "value")       == 0) return shortName;
+  else if (strcmp(shortName, "object")      == 0) return shortName;
+  else if (strcmp(shortName, "location")    == 0) return shortName;
+  else if (strcmp(shortName, "observedAt")  == 0) return shortName;
+  else if (strcmp(shortName, "unitCode")    == 0) return shortName;
+  else if (strcmp(shortName, "coordinates") == 0) return shortName;
 
   return orionldContextItemExpand(contextP, shortName, useDefaultUrlIfNotFound, contextItemPP);
 }
