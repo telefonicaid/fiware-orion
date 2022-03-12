@@ -426,13 +426,13 @@ Date: REGEX(.*)
 12. Add a datasetId, that is not a string - see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 110
+Content-Length: 126
 Content-Type: application/json
 Date:REGEX(.*)
 
 {
     "detail": "datasetId",
-    "title": "Not a JSON String",
+    "title": "Invalid JSON type - not a string",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

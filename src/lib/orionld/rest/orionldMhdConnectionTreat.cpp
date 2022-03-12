@@ -670,7 +670,7 @@ static bool pCheckUriParamId(void)
 
   for (int item = 0; item < items; item++)
   {
-    if (pCheckUri(orionldState.in.idList.array[item], true) == false)
+    if (pCheckUri(orionldState.in.idList.array[item], "Entity ID in URI param", true) == false)
       return false;
   }
 

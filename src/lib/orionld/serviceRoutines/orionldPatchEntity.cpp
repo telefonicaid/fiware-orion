@@ -77,7 +77,7 @@ bool orionldPatchEntity(void)
   char* detail;
 
   // 1. Is the Entity ID in the URL a valid URI?
-  if (pCheckUri(entityId, true) == false)
+  if (pCheckUri(entityId, "Entity ID from URL PATH", true) == false)
     return false;
 
   // 2. Is the payload not a JSON object?
@@ -169,7 +169,7 @@ bool orionldPatchEntity(void)
     }
     else
     {
-      if (pCheckUri(newAttrP->name, false) == false)
+      if (pCheckUri(newAttrP->name, newAttrP->name, false) == false)
       {
         attributeNotUpdated(notUpdatedP, shortName, "invalid attribute name", NULL);
         newAttrP = next;

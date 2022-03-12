@@ -58,7 +58,7 @@ bool pCheckEntityId(KjNode* idNodeP, bool mandatory, char** entityIdP)
     return false;
   }
 
-  if (pCheckUri(idNodeP->value.s, true) == false)
+  if (pCheckUri(idNodeP->value.s, idNodeP->name, true) == false)
     return false;
 
   *entityIdP = idNodeP->value.s;

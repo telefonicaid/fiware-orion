@@ -226,7 +226,6 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   //
   if (newP->type == KjNull)
   {
-    LM_TMP(("KZ: newP->type == KjNull"));
     patchTreeItemAdd(patchTree, path, newP, "DELETE");
     return;
   }
@@ -474,7 +473,11 @@ bool orionldPatchEntity2(void)
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
   KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-  dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP);
+  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP) == false)
+  {
+    LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    return false;
+  }
 
   //
   // Due to the questionable database model of Orion (that Orion-LD has inherited - backwards compatibility),

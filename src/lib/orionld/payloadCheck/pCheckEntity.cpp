@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
+#include "orionld/payloadCheck/pcheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // Own interface
 
@@ -205,7 +206,7 @@ bool pCheckEntity
     //
     if (pCheckName(attrP->name) == false)
       return false;
-    if (pCheckUri(attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
+    if (pCheckUri(attrP->name, attrP->name, false) == false)  // FIXME: Both pCheckName and pCheckUri check for forbidden chars ...
       return false;
     attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &contextItemP);
 
