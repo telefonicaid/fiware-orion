@@ -116,10 +116,14 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   {
     if (attrP->type == KjNull)
     {
+      // Apparently this is OK
+#if 1
+      return true;  // Just ignore it
+#else
       LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrEqName));
       orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrEqName, 404);
-      // Add to 207
       return false;
+#endif
     }
 
     kjTimestampAdd(attrP, "creDate");
@@ -167,11 +171,23 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     return true;
 
   // Sub-Attributes
-  for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
+  KjNode* subP = mdP->value.firstChildP;
+  KjNode* next;
+
+  while (subP != NULL)
   {
+    bool ignore = false;
+
+    next = subP->next;
+
     subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
-    if (dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP) == false)
+    if (dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP, &ignore) == false)
       return false;
+
+    if (ignore == true)
+      kjChildRemove(mdP, subP);
+
+    subP = next;
   }
 
   if (mdP->value.firstChildP != NULL)

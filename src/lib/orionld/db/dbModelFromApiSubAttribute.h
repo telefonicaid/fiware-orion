@@ -42,6 +42,6 @@ extern "C"
 //   - mdAddedV       array of names of new metadata (sub-attributes)
 //   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
 //
-extern bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV);
+extern bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELFROMAPISUBATTRIBUTE_H_

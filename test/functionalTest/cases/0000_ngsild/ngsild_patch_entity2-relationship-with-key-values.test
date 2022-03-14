@@ -1,0 +1,182 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity using Real PATCH - modiry a relationship with key-values
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an entity E1 with a Relationship R1
+# 02. PATCH E1, modifying R1 using key-values
+# 03. GET E1, see the new value of R1
+#
+# Error Handling:
+# 04. PATCH E1, modifying R1 using key-values, attempt with a non-string RHS - see error
+# 05. PATCH E1, modifying R1 using key-values, attempt with a string RHS that is not a valid URI - see error
+# 06. GET E1, see the value of R1 is still as after step 02
+#
+
+echo "01. Create an entity E1 with a Relationship R1"
+echo "=============================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "R1": { "object": "urn:R1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH E1,	modifying R1 using key-values"
+echo "==========================================="
+payload='{
+  "R1": "urn:R2"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1, see the new value of R1"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. PATCH E1, modifying R1 using key-values, attempt with a non-string RHS - see error"
+echo "======================================================================================"
+payload='{
+  "R1": 4
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. PATCH E1, modifying R1 using key-values, attempt with a string RHS that is not a valid URI - see error"
+echo "=========================================================================================================="
+payload='{
+  "R1": "R5"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. GET E1, see the value of R1 is still as after step 02"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a Relationship R1
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. PATCH E1,	modifying R1 using key-values
+===========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET E1, see the new value of R1
+===================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "R1": {
+        "object": "urn:R2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. PATCH E1, modifying R1 using key-values, attempt with a non-string RHS - see error
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 182
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Attempt to transform a Relationship into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. PATCH E1, modifying R1 using key-values, attempt with a string RHS that is not a valid URI - see error
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 170
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "PATCH of Relationship - not a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. GET E1, see the value of R1 is still as after step 02
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "R1": {
+        "object": "urn:R2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
