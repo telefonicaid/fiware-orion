@@ -45,6 +45,7 @@ extern "C"
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
 #include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
+#include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -185,6 +186,31 @@ inline bool pCheckAttributeString
 )
 {
   PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb);
+
+  // Special case:
+  //   options=keyValues is set
+  //   The service routine is orionldPatchEntity2
+  //   The attribute already exists in the DB
+  //   The attribute is a Relationship in the DB
+  //   The new value is a JSON String, that is a valid URI
+  //
+  // If all those are fulfilled, then the value (object) of the Relationship will be modified
+  //
+  if ((orionldState.uriParamOptions.keyValues == true)                &&
+      (orionldState.serviceP->serviceRoutine  == orionldPatchEntity2) &&
+      (attrTypeFromDb                         == Relationship))
+  {
+    if (pCheckUri(attrP->value.s, attrP->name, true) == false)
+    {
+      orionldError(OrionldBadRequestData, "PATCH of Relationship - not a valid URI", attrP->name, 400);
+      return false;
+    }
+
+    KjNode* valueP = kjString(orionldState.kjsonP, "value", attrP->value.s);  // "value" or "object" ... ?
+    pCheckAttributeTransform(attrP, "Relationship", valueP);
+    return true;
+  }
+
   PCHECK_NOT_A_PROPERTY(attrP, attrTypeFromDb);
 
   KjNode* valueP = kjString(orionldState.kjsonP, "value", attrP->value.s);
@@ -678,7 +704,7 @@ static bool pCheckAttributeObject
     if (valueAndTypeCheck(attrP, attributeType, attrTypeFromDb != NoAttributeType) == false)
       LM_RE(false, ("valueAndTypeCheck failed"));
   }
-  else  // type is not there - try to guess the type, if not already known from the DB
+  else  // Attribute Type is not there - try to guess the type, if not already known from the DB
   {
     KjNode* valueP       = kjLookup(attrP, "value");
     KjNode* objectP      = kjLookup(attrP, "object");
