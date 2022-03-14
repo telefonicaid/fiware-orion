@@ -2610,7 +2610,7 @@ static bool processContextAttributeVector
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
   std::vector<std::string>  attributes;
-  ngsiv2::SubOp             mode;
+  ngsiv2::SubOp             mode = ngsiv2::SubOp::EntityChange;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2720,7 +2720,10 @@ static bool processContextAttributeVector
     attributes.push_back(ca->name);
 
     /* Mode depends on update kind */
-    mode = actualUpdate? ngsiv2::SubOp::EntityChange : ngsiv2::SubOp::EntityUpdate;
+    if (!actualUpdate)
+    {
+      mode = ngsiv2::SubOp::EntityUpdate;
+    }
   }
 
   /* Add triggered subscriptions */
