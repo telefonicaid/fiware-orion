@@ -117,13 +117,22 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   //
   // Loop over the "attrs" member of entityP and call dbModelFromApiAttribute for every attribute
   //
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  KjNode* attrP = attrsP->value.firstChildP;
+  KjNode* next;
+  while (attrP != NULL)
   {
-    if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV) == false)
+    bool ignore = false;
+
+    next = attrP->next;
+    if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, &ignore) == false)
     {
-      LM_W(("dbModelFromApiAttribute: %s: %s", orionldState.pd.title, orionldState.pd.detail));
-      return false;
+      if (ignore == true)
+        kjChildRemove(attrsP, attrP);
+      else
+        return false;
     }
+
+    attrP = next;
   }
 
   return true;

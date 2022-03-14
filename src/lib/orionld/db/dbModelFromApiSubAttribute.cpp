@@ -61,7 +61,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
   {
     if (dbSubAttributeP == NULL)
     {
-      // Apparently this is OK
+      // Apparently it's OK to try to delete an attribute that does not exist (RFC 7396))
 #if 1
       *ignoreP = true;
       return true;  // Just ignore it

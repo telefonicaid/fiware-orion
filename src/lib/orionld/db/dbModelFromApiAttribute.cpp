@@ -64,7 +64,7 @@ extern "C"
 //   * "modDate"  is added
 //   * "creDate"  is added iff the attribute did not previously exist
 //
-bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV)
+bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP)
 {
   KjNode* mdP         = NULL;
   char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
@@ -116,8 +116,9 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   {
     if (attrP->type == KjNull)
     {
-      // Apparently this is OK
+      // Apparently it's OK to try to delete an attribute that does not exist
 #if 1
+      *ignoreP = true;
       return true;  // Just ignore it
 #else
       LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrEqName));
