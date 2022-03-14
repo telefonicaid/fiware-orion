@@ -50,7 +50,7 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/db/dbModelFromApiEntity.h"                     // dbModelFromApiEntity
-#include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
+#include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
 
 
@@ -206,7 +206,10 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
   if (oldP == NULL)  // It's NEW - doesn't exist in OLD - simply ADD
   {
-    patchTreeItemAdd(patchTree, path, newP, NULL);
+    // Except if it's a NULL. If NULL, then it is ignored
+    if (newP->type != KjNull)
+      patchTreeItemAdd(patchTree, path, newP, NULL);
+
     return;
   }
 
