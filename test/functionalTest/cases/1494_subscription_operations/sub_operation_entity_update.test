@@ -31,6 +31,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
+# FIXME PR: entitySatatus not yet working
+#
 # 01. Create subscription for entity type T with entityUpdate
 # 02. Create entity E/T (no notif)
 # 03. Update entity E/T without actual change (notif)
@@ -88,7 +90,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
@@ -101,7 +103,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
@@ -169,7 +171,7 @@ Date: REGEX(.*)
 =============================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: x
+Content-Length: 122
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -185,11 +187,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "Number",
                 "value": 1
             },
-            "entityStatus": {
-                "metadata": {}
-                "type": "Text",
-                "value": "entityUpdate"
-            },
             "id": "E",
             "type": "T"
         }
@@ -199,7 +196,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: x
+Content-Length: 122
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -214,11 +211,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 2
-            },
-            "entityStatus": {
-                "metadata": {}
-                "type": "Text",
-                "value": "entityChange"
             },
             "id": "E",
             "type": "T"

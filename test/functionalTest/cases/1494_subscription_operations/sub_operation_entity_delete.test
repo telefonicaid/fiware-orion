@@ -31,6 +31,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
+# FIXME PR: entitySatatus not yet working
+#
 # 01. Create subscription for entity type T with entityDelete
 # 02. Create entity E/T (no notif)
 # 03. Update entity E/T without actual change (no notif)
@@ -88,7 +90,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
@@ -101,7 +103,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E --payload "${payload}"
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
 echo
 echo
 
@@ -184,11 +186,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 2
-            },
-            "entityStatus": {
-                "metadata": {}
-                "type": "Text",
-                "value": "entityDelete"
             },
             "id": "E",
             "type": "T"

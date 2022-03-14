@@ -120,6 +120,7 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
   // Condition
   setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
+  // Operations
   if (r.hasField(CSUB_OPERATIONS))
   {
     std::vector<std::string> operationStrings;
@@ -139,6 +140,7 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     }
   }
 
+  // Expression
   if (r.hasField(CSUB_EXPR))
   {
     orion::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);

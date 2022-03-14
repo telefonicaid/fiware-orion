@@ -393,6 +393,41 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
+* matchOperation -
+*
+*/
+static bool matchOperation(CachedSubscription* cSubP, ngsiv2::SubOp mode)
+{
+  // If subOpV size == 0 default mode is update and create
+  if ((cSubP->subOpV.size() == 0) && (mode != ngsiv2::SubOp::EntityUpdate) && (mode != ngsiv2::SubOp::EntityCreate))
+  {
+    return false;
+  }
+  for (unsigned int ix = 0; ix < cSubP->subOpV.size(); ix++)
+  {
+    ngsiv2::SubOp subOp = cSubP->subOpV[ix];
+
+    // EntityUpdate is special, it is a "sub-mode" of EntityChange
+    if (mode == ngsiv2::SubOp::EntityChange)
+    {
+      if ((subOp == ngsiv2::SubOp::EntityUpdate) || (subOp == ngsiv2::SubOp::EntityChange))
+      {
+        return true;
+      }
+    }
+    else if (subOp == mode)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * subMatch -
 */
 static bool subMatch
@@ -402,9 +437,16 @@ static bool subMatch
   const char*                      servicePath,
   const char*                      entityId,
   const char*                      entityType,
-  const std::vector<std::string>&  attrV
+  const std::vector<std::string>&  attrV,
+  ngsiv2::SubOp                    mode
 )
 {
+  // Check mode
+  if (!matchOperation(cSubP, mode))
+  {
+    return false;
+  }
+
   //
   // Check to filter out due to tenant - only valid if Broker has started with -multiservice option
   //
@@ -477,6 +519,7 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  ngsiv2::SubOp                      mode,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -488,7 +531,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, mode))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -512,6 +555,7 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attrV,
+  ngsiv2::SubOp                      mode,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -519,7 +563,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, mode))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
