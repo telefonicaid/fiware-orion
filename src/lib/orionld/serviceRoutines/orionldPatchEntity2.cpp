@@ -197,7 +197,7 @@ static void namesToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP
 //     - if Array                           - new REPLACES old item
 //     - If Object (both of them)           - recursive call
 //
-// Might be a good idea to sort both trees before starting with the processing ...
+// Might be a good idea to sort both trees before starting to process ...
 //
 void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patchTree)
 {
@@ -236,18 +236,18 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
     return;
   }
 
-  bool change = false;
-  bool leave  = false;  // We're done if it's a SIMPLE TYPE (String, Number, Bool)
+  bool change       = false;
+  bool nonCompound  = false;  // We're done if it's a SIMPLE TYPE (String, Number, Bool)
 
-  if      (newP->type == KjString)   { if (strcmp(newP->value.s, oldP->value.s) != 0)  change = true; leave = true; }
-  else if (newP->type == KjInt)      { if (newP->value.i != oldP->value.i)             change = true; leave = true; }
-  else if (newP->type == KjFloat)    { if (newP->value.f != oldP->value.f)             change = true; leave = true; }
-  else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; leave = true; }
+  if      (newP->type == KjString)   { if (strcmp(newP->value.s, oldP->value.s) != 0)  change = true; nonCompound = true; }
+  else if (newP->type == KjInt)      { if (newP->value.i != oldP->value.i)             change = true; nonCompound = true; }
+  else if (newP->type == KjFloat)    { if (newP->value.f != oldP->value.f)             change = true; nonCompound = true; }
+  else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; nonCompound = true; }
 
   if (change == true)
     patchTreeItemAdd(patchTree, path, newP, NULL);
 
-  if (leave == true)
+  if (nonCompound == true)
     return;
 
   if (newP->type == KjArray)  // If it's an Array, we replace the old array (by definition)
@@ -262,21 +262,17 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
   // Careful with the linked lists of newP - the recursive calls may invoke patchTreeItemAdd and that REMOVES ITEMS FROM A LIST
   // => Can't use the normal "for" - must be a "while and a next pointer"
   //
+  KjNode* namesP     = kjLookup(newP, ".names");
+  KjNode* addedP     = kjLookup(newP, ".added");
+  KjNode* removedP   = kjLookup(newP, ".removed");
   KjNode* newItemP   = newP->value.firstChildP;
   KjNode* next;
-  KjNode* namesP     = NULL;
-  KjNode* addedP     = NULL;
-  KjNode* removedP   = NULL;
 
   while (newItemP != NULL)
   {
     // Skip "hidden" fields
     if (newItemP->name[0] == '.')
     {
-      if      (strcmp(newItemP->name, ".names")   == 0) namesP   = newItemP;
-      else if (strcmp(newItemP->name, ".added")   == 0) addedP   = newItemP;
-      else if (strcmp(newItemP->name, ".removed") == 0) removedP = newItemP;
-
       newItemP = newItemP->next;
       continue;
     }
@@ -501,7 +497,7 @@ bool orionldPatchEntity2(void)
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
 
-  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found as arrays named ".added" and ".removed"
+  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!

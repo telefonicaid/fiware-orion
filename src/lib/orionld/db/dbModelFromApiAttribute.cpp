@@ -67,14 +67,17 @@ extern "C"
 bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV)
 {
   KjNode* mdP         = NULL;
-  char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);  // Needed for attrAddedV, attrRemovedV
+  char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
+  char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
 
-  dotForEq(attrP->name);  // Orion DB-Model states that dots are replaced for equal signs in attribute names
+  // attrP->name is cloned as we can't destroy the context (expansion of attr name comes from there)
+  dotForEq(attrEqName);      // Orion DB-Model states that dots are replaced for equal signs in attribute names
+  attrP->name = attrEqName;  // Cause, that's the name of the attribute in the database
 
   if (attrP->type == KjNull)
   {
-    KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrDotName);
-    kjChildAdd(attrRemovedV, attrNameP);
+    KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, attrDotName);
+    kjChildAdd(attrRemovedV, attrNameNodeP);
     return true;
   }
 
@@ -106,15 +109,15 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
   KjNode*  mdNamesP     = NULL;
-  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrP->name);
+  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrEqName);
   KjNode*  dbMdP        = NULL;
 
   if (dbAttrP == NULL)  // Attribute does not already exist
   {
     if (attrP->type == KjNull)
     {
-      LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrP->name));
-      orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrP->name, 404);
+      LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrEqName));
+      orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrEqName, 404);
       // Add to 207
       return false;
     }
