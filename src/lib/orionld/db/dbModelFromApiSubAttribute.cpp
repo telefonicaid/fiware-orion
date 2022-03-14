@@ -49,7 +49,7 @@ extern "C"
 //   - mdAddedV       array of names of new metadata (sub-attributes)
 //   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
 //
-bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV)
+bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
   char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Needed for mdAddedV, mdRemovedV
 
@@ -61,10 +61,16 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
   {
     if (dbSubAttributeP == NULL)
     {
+      // Apparently this is OK
+#if 1
+      *ignoreP = true;
+      return true;  // Just ignore it
+#else
       LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saP->name));
       orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saP->name, 404);
       // Add to 207
       return false;
+#endif
     }
 
     kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));

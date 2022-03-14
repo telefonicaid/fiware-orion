@@ -1,0 +1,179 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity using Real PATCH - non-existing sub-attribute is null
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an entity E1 with a Relationship 'controlledAsset'
+# 02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+# 03. GET E1, see it unaffected by step 2
+# 04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - that's OK
+# 05. GET E1, see the changes from step 4
+#
+
+echo "01. Create an entity E1 with a Relationship 'controlledAsset'"
+echo "============================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "batteryLevel": {
+    "value": 0.8,
+    "unitCode": "C62"
+  },
+  "controlledAsset": {
+    "object": "urn:ngsi-ld:Building:barn002"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error"
+echo "=========================================================================================================================================="
+payload='{
+  "controlledAsset": {
+    "observedAt": "XXXX",
+    "valid": {"@type" :"@json", "@value" : null}
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1, see it unaffected by step 2"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error"
+echo "======================================================================================================================================="
+payload='{
+  "controlledAsset": {
+    "observedAt": "2022-03-14T15:49:00.123Z",
+    "valid": {"@type" :"@json", "@value" : null}
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+
+echo "05. GET E1, see the changes from step 4"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a Relationship 'controlledAsset'
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+==========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Not a valid ISO8601 DateTime",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET E1, see it unaffected by step 2
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "batteryLevel": {
+        "type": "Property",
+        "unitCode": "C62",
+        "value": 0.8
+    },
+    "controlledAsset": {
+        "object": "urn:ngsi-ld:Building:barn002",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+=======================================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET E1, see the changes from step 4
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 212
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "batteryLevel": {
+        "type": "Property",
+        "unitCode": "C62",
+        "value": 0.8
+    },
+    "controlledAsset": {
+        "object": "urn:ngsi-ld:Building:barn002",
+        "observedAt": "2022-03-14T15:49:00.123Z",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
