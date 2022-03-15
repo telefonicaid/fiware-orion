@@ -38,8 +38,9 @@ brokerStart CB 0 IPv4 -experimental
 # 05. GET the entity, see it as created in step 01
 # 06. PATCH the entity adding batteryLevel an invalid 'observedAt' - see error but no crash!
 # 07. GET the entity, see it as created in step 01
+# 08. PATCH the entity with a correct batteryLevel, and with the tutorial context
+# 09. GET the entity, see the changes, and especially, make sure batteryLevel is compacted correctly
 #
-
 
 echo "01. Create an entity TemperatureSensor:001 with two attributes"
 echo "=============================================================="
@@ -114,6 +115,29 @@ echo
 echo "07. GET the entity, see it as created in step 01"
 echo "================================================"
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+echo
+echo
+
+
+echo "08. PATCH the entity with a correct batteryLevel, and with the tutorial context"
+echo "==============================================================================="
+payload='{
+  "batteryLevel": {
+    "value": 7,
+    "observedAt": "1970-12-31T23:50:59.000Z",
+    "providedBy": {
+      "object": "urn:E1"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -X PATCH --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "09. GET the entity, see the changes, and especially, make sure batteryLevel is compacted correctly"
+echo "=================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -225,6 +249,45 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Date: REGEX(.*)
 
 {
+    "category": {
+        "type": "Property",
+        "value": "sensor"
+    },
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+08. PATCH the entity with a correct batteryLevel, and with the tutorial context
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. GET the entity, see the changes, and especially, make sure batteryLevel is compacted correctly
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 319
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "batteryLevel": {
+        "observedAt": "1970-12-31T23:50:59.000Z",
+        "providedBy": {
+            "object": "urn:E1",
+            "type": "Relationship"
+        },
+        "type": "Property",
+        "value": 7
+    },
     "category": {
         "type": "Property",
         "value": "sensor"
