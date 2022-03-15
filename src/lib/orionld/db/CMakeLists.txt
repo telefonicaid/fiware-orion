@@ -30,6 +30,8 @@ SET (SOURCES
     dbModelFromApiEntity.cpp
     dbModelFromApiAttribute.cpp
     dbModelFromApiSubAttribute.cpp
+    dbModelToApiAttribute.cpp
+    dbModelToApiSubAttribute.cpp
 )
 
 # Include directories

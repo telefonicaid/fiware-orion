@@ -58,7 +58,7 @@ bool pCheckEntityType(KjNode* typeNodeP, bool mandatory, char** entityTypeP)
     return false;
   }
 
-  if (pCheckUri(typeNodeP->value.s, false) == false)
+  if (pCheckUri(typeNodeP->value.s, "Entity Type", false) == false)
     return false;
 
   *entityTypeP = typeNodeP->value.s;

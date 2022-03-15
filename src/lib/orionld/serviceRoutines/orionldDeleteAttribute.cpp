@@ -171,13 +171,13 @@ bool orionldDeleteAttribute(void)
   //
   // Make sure the Entity ID is a valid URI
   //
-  if (pCheckUri(entityId, true) == false)
+  if (pCheckUri(entityId, "Entity ID from URL PATH", true) == false)
     return false;
 
   //
   // Make sure the Attribute Name is valid
   //
-  if (pCheckUri(attrName, false) == false)
+  if (pCheckUri(attrName, "Attribute Name from URL PATH", false) == false)
     return false;
 
 

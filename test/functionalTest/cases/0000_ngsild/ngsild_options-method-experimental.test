@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,47 +21,35 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Creation Error - should reject an entity which node type is not recognized
+OPTIONS method for all API endpoints
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with an attribute that has an invalid type
+# 01. OPTIONS request for /entities/{entityId}
 #
 
-echo "01. POST /ngsi-ld/v1/entities with an attribute that has an invalid type"
-echo "========================================================================"
-payload='{
-  "id": "urn:ngsi-ld:T4:9000",
-  "type": "T",
-  "P1": {
-    "type": "abcdef",
-    "value": 34
-  }
-}'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo "01. OPTIONS request for /entities/{entityId}"
+echo "============================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X OPTIONS
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /ngsi-ld/v1/entities with an attribute that has an invalid type
-========================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 114
-Content-Type: application/json
+01. OPTIONS request for /entities/{entityId}
+============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json, application/merge-patch+json
 Date: REGEX(.*)
 
-{
-    "detail": "abcdef",
-    "title": "Invalid value for /type/",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
 --TEARDOWN--

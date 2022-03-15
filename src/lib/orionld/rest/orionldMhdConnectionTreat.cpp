@@ -670,7 +670,7 @@ static bool pCheckUriParamId(void)
 
   for (int item = 0; item < items; item++)
   {
-    if (pCheckUri(orionldState.in.idList.array[item], true) == false)
+    if (pCheckUri(orionldState.in.idList.array[item], "Entity ID in URI param", true) == false)
       return false;
   }
 
@@ -883,13 +883,18 @@ MHD_Result orionldMhdConnectionTreat(void)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
+  // If OPTIONS verb, we skip all checks, go straight to the service routine
+  if (orionldState.verb == OPTIONS)
+    goto serviceRoutine;
+
   //
   // Predetected Error from orionldMhdConnectionInit?
   //
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
-  if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT) && (orionldState.verb != OPTIONS))
+  // if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT) && (orionldState.verb != OPTIONS))
+  if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT))
   {
     LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
     orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb));
@@ -1059,6 +1064,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Call the SERVICE ROUTINE
   //
   PERFORMANCE(serviceRoutineStart);
+ serviceRoutine:
   serviceRoutineResult = orionldState.serviceP->serviceRoutine();
   PERFORMANCE(serviceRoutineEnd);
 

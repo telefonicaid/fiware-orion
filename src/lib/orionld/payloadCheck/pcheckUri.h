@@ -33,7 +33,7 @@
 //
 // pCheckUri -
 //
-extern bool pCheckUri(const char* uri, bool mustBeUri);
+extern bool pCheckUri(const char* uri, const char* name, bool mustBeUri);
 
 
 

@@ -29,6 +29,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildRemove, kjArray, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
@@ -115,9 +117,22 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   //
   // Loop over the "attrs" member of entityP and call dbModelFromApiAttribute for every attribute
   //
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  KjNode* attrP = attrsP->value.firstChildP;
+  KjNode* next;
+  while (attrP != NULL)
   {
-    dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV);
+    bool ignore = false;
+
+    next = attrP->next;
+    if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, &ignore) == false)
+    {
+      if (ignore == true)
+        kjChildRemove(attrsP, attrP);
+      else
+        return false;
+    }
+
+    attrP = next;
   }
 
   return true;

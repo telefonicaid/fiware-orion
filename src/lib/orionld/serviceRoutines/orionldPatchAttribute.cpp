@@ -721,13 +721,13 @@ bool orionldPatchAttribute(void)
   //
   // 1.1 Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if (pCheckUri(entityId, true) == false)
+  if (pCheckUri(entityId, "Entity ID from URL PATH", true) == false)
     return false;
 
   //
   // 1.2 Make sure the attrName (orionldState.wildcard[1]) is a valid NAME or URI
   //
-  if (pCheckUri(attrName, false) == false)
+  if (pCheckUri(attrName, "Attribute Name from URL PATH", false) == false)
     return false;
 
 
@@ -824,7 +824,7 @@ bool orionldPatchAttribute(void)
   if (datasetIdP != NULL)
   {
     PCHECK_STRING(datasetIdP, 0, NULL, "datasetId", 400);
-    if (pCheckUri(datasetIdP->value.s, true) == false)
+    if (pCheckUri(datasetIdP->value.s, "datasetId", true) == false)
       return false;
 
     return orionldPatchAttributeWithDatasetId(inAttribute, entityId, attrName, attrNameExpandedEq, datasetIdP->value.s);

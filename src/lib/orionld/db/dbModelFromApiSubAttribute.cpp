@@ -49,33 +49,41 @@ extern "C"
 //   - mdAddedV       array of names of new metadata (sub-attributes)
 //   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
 //
-bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV)
+bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
-  char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Needed for mdAddedV, mdRemovedV
+  char* saEqName  = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
+  char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
 
-  dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
+  dotForEq(saEqName);      // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
+  saP->name = saEqName;
 
-  KjNode* dbSubAttributeP = (dbMdP == NULL)? NULL : kjLookup(dbMdP, saP->name);
+  KjNode* dbSubAttributeP = (dbMdP == NULL)? NULL : kjLookup(dbMdP, saEqName);
 
   if (saP->type == KjNull)
   {
     if (dbSubAttributeP == NULL)
     {
-      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saP->name));
-      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saP->name, 404);
+      // Apparently it's OK to try to delete an attribute that does not exist (RFC 7396))
+#if 1
+      *ignoreP = true;
+      return true;  // Just ignore it
+#else
+      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saDotName));
+      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saDotName, 404);
       // Add to 207
       return false;
+#endif
     }
 
     kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
     return true;
   }
 
-  if (strcmp(saP->name, "value") == 0)
+  if (strcmp(saDotName, "value") == 0)
     return true;
-  else if ((strcmp(saP->name, "object") == 0) || (strcmp(saP->name, "languageMap") == 0))
-    saP->name = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
-  else if (strcmp(saP->name, "observedAt") == 0)
+  else if ((strcmp(saDotName, "object") == 0) || (strcmp(saDotName, "languageMap") == 0))
+    saDotName = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
+  else if (strcmp(saDotName, "observedAt") == 0)
   {
     //
     // observedAt is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
@@ -85,7 +93,15 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if (saP->type == KjString)
     {
       double timestamp = parse8601Time(saP->value.s);
-      KjNode* valueP   = kjFloat(orionldState.kjsonP, "value", timestamp);
+
+      if (timestamp < 0)
+      {
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", saP->value.s, 400);
+        LM_W(("Bad Request (Invalid ISO8601 timestamp: %s)", saP->value.s));
+        return false;
+      }
+
+      KjNode* valueP = kjFloat(orionldState.kjsonP, "value", timestamp);
 
       saP->type = KjObject;
       saP->value.firstChildP = valueP;
@@ -94,9 +110,9 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
     // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
-  else if (strcmp(saP->name, "unitCode") == 0)
+  else if (strcmp(saDotName, "unitCode") == 0)
   {
     //
     // unitCode is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
@@ -113,7 +129,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
     // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
   else
   {
@@ -132,7 +148,8 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
       kjTimestampAdd(saP, "createdAt");
 
       // The "mdNames" array stores the sub-attribute names in their original names, with dots - saDotName
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
+      if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
+        kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
     }
 
     // All sub-attrs get a "modifiedAt"

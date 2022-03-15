@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
+#include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/db/dbModelFromApiSubAttribute.h"               // dbModelFromApiSubAttribute
 #include "orionld/db/dbModelFromApiAttribute.h"                  // Own interface
 
@@ -63,17 +64,20 @@ extern "C"
 //   * "modDate"  is added
 //   * "creDate"  is added iff the attribute did not previously exist
 //
-bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV)
+bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP)
 {
   KjNode* mdP         = NULL;
-  char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);  // Needed for attrAddedV, attrRemovedV
+  char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
+  char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
 
-  dotForEq(attrP->name);  // Orion DB-Model states that dots are replaced for equal signs in attribute names
+  // attrP->name is cloned as we can't destroy the context (expansion of attr name comes from there)
+  dotForEq(attrEqName);      // Orion DB-Model states that dots are replaced for equal signs in attribute names
+  attrP->name = attrEqName;  // Cause, that's the name of the attribute in the database
 
   if (attrP->type == KjNull)
   {
-    KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrDotName);
-    kjChildAdd(attrRemovedV, attrNameP);
+    KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, attrDotName);
+    kjChildAdd(attrRemovedV, attrNameNodeP);
     return true;
   }
 
@@ -105,17 +109,22 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
   KjNode*  mdNamesP     = NULL;
-  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrP->name);
+  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrEqName);
   KjNode*  dbMdP        = NULL;
 
   if (dbAttrP == NULL)  // Attribute does not already exist
   {
     if (attrP->type == KjNull)
     {
-      LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrP->name));
-      orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrP->name, 404);
-      // Add to 207
+      // Apparently it's OK to try to delete an attribute that does not exist
+#if 1
+      *ignoreP = true;
+      return true;  // Just ignore it
+#else
+      LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrEqName));
+      orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrEqName, 404);
       return false;
+#endif
     }
 
     kjTimestampAdd(attrP, "creDate");
@@ -163,9 +172,23 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     return true;
 
   // Sub-Attributes
-  for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
+  KjNode* subP = mdP->value.firstChildP;
+  KjNode* next;
+
+  while (subP != NULL)
   {
-    dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP);
+    bool ignore = false;
+
+    next = subP->next;
+
+    subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
+    if (dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP, &ignore) == false)
+      return false;
+
+    if (ignore == true)
+      kjChildRemove(mdP, subP);
+
+    subP = next;
   }
 
   if (mdP->value.firstChildP != NULL)

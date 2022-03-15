@@ -239,8 +239,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
-Accept-Patch: application/json, application/ld+json, application/merge-patch+json
+Allow: GET,DELETE,OPTIONS
 Date: REGEX(.*)
 
 

@@ -299,6 +299,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {

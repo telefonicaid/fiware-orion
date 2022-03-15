@@ -22,55 +22,37 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strcmp
-
 extern "C"
 {
+#include "kbase/kMacros.h"                                       // K_VEC_SIZE
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "orionld/kjTree/kjJsonldNullObject.h"                   // Own interface
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/db/dbModelToApiSubAttribute.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjJsonldNullObject -
+// dbModelToApiSubAttribute -
 //
-// { "@type": "@json", "@value": null }
-//
-bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
+void dbModelToApiSubAttribute(KjNode* subP)
 {
-  if ((strcmp(typeP->name, "@type") == 0) && (typeP->type == KjString))
+  //
+  // Remove unwanted parts of the sub-attribute from DB
+  //
+  const char* unwanted[] = { "createdAt", "modifiedAt" };
+
+  for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
-    if (strcmp(typeP->value.s, "@json") == 0)
-    {
-      KjNode* atValueP = kjLookup(attrP, "@value");
+    KjNode* nodeP = kjLookup(subP, unwanted[ix]);
 
-      if ((atValueP != NULL) && (atValueP->type == KjNull))
-      {
-        //
-        // All good so far - both items present
-        // Now, is that all?
-        //
-        int items = 0;
-        for (KjNode* itemP = attrP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-        {
-          ++items;
-        }
-
-        if (items == 2)  // All good - it's a JSON-LD NULL object
-        {
-          attrP->type    = KjNull;
-          attrP->value.i = 0;
-
-          return true;
-        }
-      }
-    }
+    if (nodeP != NULL)
+      kjChildRemove(subP, nodeP);
   }
-
-  return false;
 }

@@ -43,7 +43,6 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
@@ -53,45 +52,38 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/db/dbModelFromApiEntity.h"                     // dbModelFromApiEntity
-#include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
+#include "orionld/db/dbModelToApiAttribute.h"                    // dbModelToApiAttribute
+#include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
 
 
-//
-// All db functions (all new ones anyway) should return an entity from DB AS IS, i.e. include the database model
-// Then we need functions to adapt to and from DB-Model:
-//
-// dbModelToApiEntity           - Strip Entity of extra DB model stuff and produce an NGSI-LD API Entity (attrNames is "hidden" as .names)
-// dbModelToApiAttribute        - ... produce an NGSI-LD API Attribute (mdNames is "hidden as .names)
-// dbModelToApiSubAttribute     - ... produce an NGSI-LD API Sub-Attribute
-// dbModelFromApiEntity         - convert an NGSI-LD API Entity into an "Orion DB" Entity
-// dbModelFromApiAttribute      -
-// dbModelFromApiSubAttribute   -
 //
 // To PATCH an Entity:
 // 1. GET the entity from DB - in DB-Model style
 // 2. Convert the request payload to a DB-Model style Entity (includes modifiedAt but not createdAt) - dbModelFromApiXXX()
 // 3. Compare the two trees and come up with an array of changes (orionldEntityPatchTree - output from orionldPatchXXX functions):
 //    [
-//      { PATH, TREE },
-//      { PATH, TREE },
+//      { PATH, TREE, op },
+//      { PATH, TREE, op },
 //      ...
 //    ]
 //
-//    E.g. (modification of a compound value of a sub-attr   +  addition of an attribute + removal of a sub-attr):
+//    E.g. (P1: modification of a compound value of a sub-attr   +  P2: addition of an attribute + P3: removal of a sub-attr):
 //    [
 //      {
-//        "path": "attrs.P1.md.Sub-R.value.F",
-//        "tree": <KjNode tree of the new value>
+//        "PATH": "attrs.P1.md.Sub-R.value.F",
+//        "TREE": <KjNode tree of the new value>,
+//        "op": "Modify" - Not needed - that is the default
 //      },
 //      {
-//        "path": "attrs.P2",
-//        "tree": <KjNode tree of the attribute - DB Model style>,
+//        "PATH": "attrs.P2",
+//        "TREE": <KjNode tree of the attribute - DB Model style>,
+//        "op": "Add" - Not needed - "modify" and "add" is the same for mongo - REPLACE/APPEND
 //      },
 //      {
-//        "path": [ "attrs", "P3", "md", "SP1" ]
-//        "tree": null,
-//        "op": "delete"
+//        "PATH": "attrs.P3.md.SP1",
+//        "TREE": null,
+//        "op": "delete"  - Not needed - "TREE" is null, so, the Delete info is already present
 //      }
 //    ]
 //
@@ -108,7 +100,7 @@ extern "C"
 //
 // patchTreeItemAdd -
 //
-void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP, const char* op)
+static void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP, const char* op)
 {
   KjNode* arrayItemP = kjObject(orionldState.kjsonP, NULL);
   KjNode* pathP      = kjString(orionldState.kjsonP, "PATH", path);
@@ -131,13 +123,14 @@ void patchTreeItemAdd(KjNode* patchTree, const char* path, KjNode* valueP, const
 
 // -----------------------------------------------------------------------------
 //
-// namesArrayMergeToPatchTree -
+// namesArrayMergeToPatchTree - only used if we both add and delete attrs in the same operation
 //
 static void namesArrayMergeToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP, KjNode* addedP, KjNode* removedP)
 {
   for (KjNode* rmP = removedP->value.firstChildP; rmP != NULL; rmP = rmP->next)
   {
     KjNode* itemP = kjStringValueLookupInArray(namesP, rmP->value.s);
+
     if (itemP)
       kjChildRemove(namesP, itemP);
   }
@@ -200,16 +193,19 @@ static void namesToPatchTree(KjNode* patchTree, const char* path, KjNode* namesP
 //     - if Array                           - new REPLACES old item
 //     - If Object (both of them)           - recursive call
 //
-// Might be a good idea to sort both trees before starting with the processing ...
+// Might be a good idea to sort both trees before starting to process ...
 //
-void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patchTree)
+static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patchTree)
 {
   if (newP == NULL)  // Not sure this is ever a possibility ...
     return;
 
   if (oldP == NULL)  // It's NEW - doesn't exist in OLD - simply ADD
   {
-    patchTreeItemAdd(patchTree, path, newP, NULL);
+    // Except if it's a NULL. If NULL, then it is ignored
+    if (newP->type != KjNull)
+      patchTreeItemAdd(patchTree, path, newP, NULL);
+
     return;
   }
 
@@ -239,18 +235,18 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
     return;
   }
 
-  bool change = false;
-  bool leave  = false;  // We're done if it's a SIMPLE TYPE (String, Number, Bool)
+  bool change       = false;
+  bool nonCompound  = false;  // We're done if it's a SIMPLE TYPE (String, Number, Bool)
 
-  if      (newP->type == KjString)   { if (strcmp(newP->value.s, oldP->value.s) != 0)  change = true; leave = true; }
-  else if (newP->type == KjInt)      { if (newP->value.i != oldP->value.i)             change = true; leave = true; }
-  else if (newP->type == KjFloat)    { if (newP->value.f != oldP->value.f)             change = true; leave = true; }
-  else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; leave = true; }
+  if      (newP->type == KjString)   { if (strcmp(newP->value.s, oldP->value.s) != 0)  change = true; nonCompound = true; }
+  else if (newP->type == KjInt)      { if (newP->value.i != oldP->value.i)             change = true; nonCompound = true; }
+  else if (newP->type == KjFloat)    { if (newP->value.f != oldP->value.f)             change = true; nonCompound = true; }
+  else if (newP->type == KjBoolean)  { if (newP->value.b != oldP->value.b)             change = true; nonCompound = true; }
 
   if (change == true)
     patchTreeItemAdd(patchTree, path, newP, NULL);
 
-  if (leave == true)
+  if (nonCompound == true)
     return;
 
   if (newP->type == KjArray)  // If it's an Array, we replace the old array (by definition)
@@ -259,27 +255,26 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
     return;
   }
 
-  // Both are JSON Object - entering to find differences
+  // Both newP and oldP are JSON OBJECT - entering inside the objects to find differences
+
+  KjNode* namesP     = kjLookup(newP, ".names");
+  KjNode* addedP     = kjLookup(newP, ".added");
+  KjNode* removedP   = kjLookup(newP, ".removed");
+
+
 
   //
-  // Careful with the linked lists of newP - the recursive calls may invoke patchTreeItemAdd and that REMOVES ITEMS FROM A LIST
+  // CAREFUL with the linked lists of newP - the recursive calls may invoke patchTreeItemAdd and that *REMOVES ITEMS FROM A LIST*
   // => Can't use the normal "for" - must be a "while and a next pointer"
   //
   KjNode* newItemP   = newP->value.firstChildP;
   KjNode* next;
-  KjNode* namesP     = NULL;
-  KjNode* addedP     = NULL;
-  KjNode* removedP   = NULL;
 
   while (newItemP != NULL)
   {
     // Skip "hidden" fields
     if (newItemP->name[0] == '.')
     {
-      if      (strcmp(newItemP->name, ".names")   == 0) namesP   = newItemP;
-      else if (strcmp(newItemP->name, ".added")   == 0) addedP   = newItemP;
-      else if (strcmp(newItemP->name, ".removed") == 0) removedP = newItemP;
-
       newItemP = newItemP->next;
       continue;
     }
@@ -307,93 +302,6 @@ void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNode* patc
 
   if (namesP != NULL)
     namesToPatchTree(patchTree, path, namesP, addedP, removedP);
-}
-
-
-
-void dbModelToApiSubAttribute(KjNode* subP)
-{
-  //
-  // Remove unwanted parts of the sub-attribute from DB
-  //
-  const char* unwanted[] = { "createdAt", "modifiedAt" };
-
-  for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
-  {
-    KjNode* nodeP = kjLookup(subP, unwanted[ix]);
-
-    if (nodeP != NULL)
-      kjChildRemove(subP, nodeP);
-  }
-}
-
-
-
-void dbModelToApiAttribute(KjNode* attrP)
-{
-  //
-  // Remove unwanted parts of the attribute from DB
-  //
-  const char* unwanted[] = { "mdNames", "creDate", "modDate" };
-
-  for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
-  {
-    KjNode* nodeP = kjLookup(attrP, unwanted[ix]);
-
-    if (nodeP != NULL)
-      kjChildRemove(attrP, nodeP);
-  }
-
-  KjNode* observedAtP = kjLookup(attrP, "observedAt");
-  KjNode* unitCodeP   = kjLookup(attrP, "unitCode");
-
-  if (observedAtP != NULL)
-  {
-    char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
-    numberToDate(observedAtP->value.firstChildP->value.f, dateTimeBuf, 32);
-    observedAtP->type      = KjString;
-    observedAtP->value.s   = dateTimeBuf;
-    observedAtP->lastChild = NULL;
-  }
-
-  if (unitCodeP != NULL)
-  {
-    unitCodeP->type      = KjString;
-    unitCodeP->value.s   = unitCodeP->value.firstChildP->value.s;
-    unitCodeP->lastChild = NULL;
-  }
-
-  //
-  // Sub-Attributes
-  //
-  KjNode* mdP = kjLookup(attrP, "md");
-  if (mdP != NULL)
-  {
-    kjChildRemove(attrP, mdP);  // The content of mdP is added to attrP at the end of the if
-
-    // Special Sub-Attrs: unitCode + observedAt
-    for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
-    {
-      if (strcmp(subP->name, "unitCode") == 0)
-      {
-        subP->type  = subP->value.firstChildP->type;
-        subP->value = subP->value.firstChildP->value;
-      }
-      else if (strcmp(subP->name, "observedAt") == 0)  // Part of Sub-Attribute
-      {
-        subP->type  = subP->value.firstChildP->type;
-        subP->value = subP->value.firstChildP->value;  // + convert to iso8601 string
-      }
-      else
-        dbModelToApiSubAttribute(subP);
-    }
-
-    //
-    // Move all metadata (sub-attrs) up one level
-    //
-    attrP->lastChild->next = mdP->value.firstChildP;
-    attrP->lastChild       = mdP->lastChild;
-  }
 }
 
 
@@ -601,7 +509,11 @@ bool orionldPatchEntity2(void)
   //        * create a KjNode array with all toplevel field names
   //        * sort out non-attribute names (id, type, scope, ...)
   //
-  //        Perhaps later ...
+  //        All that is done by pCheckEntity, but pCheckEntity needs the DB Entity :(
+  //        The chicken and the egg ...
+  //
+  //        Not really worth it.
+  //        At least, postponed (not forgotten) for now.
   //
   dbEntityP = mongocEntityLookup(entityId);
 
@@ -662,7 +574,11 @@ bool orionldPatchEntity2(void)
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
   KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-  dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP);
+  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP) == false)
+  {
+    LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    return false;
+  }
 
 
   //
@@ -687,7 +603,7 @@ bool orionldPatchEntity2(void)
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
 
-  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found as arrays named ".added" and ".removed"
+  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!

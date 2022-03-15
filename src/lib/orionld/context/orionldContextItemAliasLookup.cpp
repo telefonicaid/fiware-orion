@@ -43,15 +43,18 @@ char* orionldContextItemAliasLookup
 (
   OrionldContext*       contextP,
   const char*           longName,
-  bool*                 valueMayBeCompactedP,
+  bool*                 valueMayBeCompactedP,   // FIXME: Remove!
   OrionldContextItem**  contextItemPP
 )
 {
   OrionldContextItem* contextItemP;
 
   // 0. Set output values to false/NULL
+#if 0
+  // Old stuff that may come in use later
   if (valueMayBeCompactedP != NULL)
     *valueMayBeCompactedP = false;
+#endif
 
   if (contextItemPP != NULL)
     *contextItemPP = NULL;
@@ -72,13 +75,16 @@ char* orionldContextItemAliasLookup
   if (contextItemP == NULL)
     return (char*) longName;
 
+#if 0
   // 5. Can the value be compacted?
+
+  // Old stuff that may come in use later
   if ((valueMayBeCompactedP != NULL) && (contextItemP->type != NULL))
   {
     if (strcmp(contextItemP->type, "@vocab") == 0)
       *valueMayBeCompactedP = true;
   }
-
+#endif
 
   // 6. Give back the pointer to the contextItem, if asked for
   if (contextItemPP != NULL)

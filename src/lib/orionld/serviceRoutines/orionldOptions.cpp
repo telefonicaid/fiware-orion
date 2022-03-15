@@ -56,6 +56,10 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
     OrionLdRestService* serviceP;
     if ((serviceP = orionldServiceLookup(&orionldRestServiceV[verbNo])) != NULL)
     {
+      // PATCH Entity2 is only active if broker is started with -experimental
+      if ((serviceP->serviceRoutine == orionldPatchEntity2) && (experimental == false))
+        continue;
+
       bitmask |= (1 << verbNo);
 
       if (verbNo == PATCH)

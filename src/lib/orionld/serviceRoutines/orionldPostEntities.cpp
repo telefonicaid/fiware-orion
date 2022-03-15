@@ -103,7 +103,7 @@ static KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attribute
         return NULL;
       }
 
-      if (pCheckUri(datasetIdP->value.s, true) == false)
+      if (pCheckUri(datasetIdP->value.s, "datasetId", true) == false)
       {
         orionldError(OrionldBadRequestData, "Not a URI", "datasetId", 400);
         return NULL;
