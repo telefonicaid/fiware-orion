@@ -51,11 +51,13 @@ extern "C"
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
-  char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Needed for mdAddedV, mdRemovedV
+  char* saEqName  = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
+  char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
 
-  dotForEq(saP->name);  // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
+  dotForEq(saEqName);      // Orion DB-Model states that dots are replaced for equal signs in sub-attribute names
+  saP->name = saEqName;
 
-  KjNode* dbSubAttributeP = (dbMdP == NULL)? NULL : kjLookup(dbMdP, saP->name);
+  KjNode* dbSubAttributeP = (dbMdP == NULL)? NULL : kjLookup(dbMdP, saEqName);
 
   if (saP->type == KjNull)
   {
@@ -66,8 +68,8 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
       *ignoreP = true;
       return true;  // Just ignore it
 #else
-      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saP->name));
-      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saP->name, 404);
+      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saDotName));
+      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saDotName, 404);
       // Add to 207
       return false;
 #endif
@@ -77,11 +79,11 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     return true;
   }
 
-  if (strcmp(saP->name, "value") == 0)
+  if (strcmp(saDotName, "value") == 0)
     return true;
-  else if ((strcmp(saP->name, "object") == 0) || (strcmp(saP->name, "languageMap") == 0))
-    saP->name = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
-  else if (strcmp(saP->name, "observedAt") == 0)
+  else if ((strcmp(saDotName, "object") == 0) || (strcmp(saDotName, "languageMap") == 0))
+    saDotName = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
+  else if (strcmp(saDotName, "observedAt") == 0)
   {
     //
     // observedAt is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
@@ -108,9 +110,9 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
     // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
-  else if (strcmp(saP->name, "unitCode") == 0)
+  else if (strcmp(saDotName, "unitCode") == 0)
   {
     //
     // unitCode is stored as a JSON object, as any other sub-attribute (my mistake, bad idea but too late now)
@@ -127,7 +129,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
     // Also, these two special sub-attrs have no creDate/modDate but they're still sub-attrs, need to be in "mdNames"
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
-      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saP->name));
+      kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
   else
   {
