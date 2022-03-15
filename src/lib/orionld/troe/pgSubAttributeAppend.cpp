@@ -103,7 +103,6 @@ void pgSubAttributeAppend
 
   if (type == NULL)
   {
-    LM_TMP(("KZ: UnchangedType"));
     snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, 'UnchangedType', '%s', null, null, null, null, null, null, null, null, null, null, '%s')",
              comma, instanceId, subAttributeName, entityId, attrInstanceId, attrDatasetId, observedAt, unitCode, object, orionldState.requestTimeString);
   }
@@ -209,7 +208,6 @@ void pgSubAttributeAppend
     }
   }
 
-  LM_TMP(("KZ: Calling pgAppend"));
   pgAppend(subAttributesBufferP, buf, 0);
   subAttributesBufferP->values += 1;
 }

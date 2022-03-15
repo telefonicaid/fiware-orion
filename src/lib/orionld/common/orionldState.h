@@ -55,6 +55,7 @@ extern "C"
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
+#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
@@ -364,9 +365,15 @@ typedef struct OrionldConnectionState
   //
   void*                   delayedFreePointer;
 
-  int                     notificationRecords;
-  OrionldNotificationInfo notificationInfo[16];
-  bool                    notify;
+  //
+  // Notifications
+  //
+  int                     notificationRecords;   // Old
+  OrionldNotificationInfo notificationInfo[16];  // Old
+  bool                    notify;                // Old
+  OrionldAlteration*      alterations;
+
+
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
 

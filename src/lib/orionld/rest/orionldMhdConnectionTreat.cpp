@@ -889,7 +889,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
-  if ((orionldState.in.contentLength > 0) && ((orionldState.verb != POST) && (orionldState.verb != PATCH)))
+  if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT) && (orionldState.verb != OPTIONS))
   {
     LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
     orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb));
@@ -899,14 +899,19 @@ MHD_Result orionldMhdConnectionTreat(void)
 
   //
   // Any URI param given but not supported?
+  // No validity check if OPTIONS verb is used
   //
-  char* detail;
-  if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+  if (orionldState.verb != OPTIONS)
   {
-    LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
-    orionldState.httpStatusCode = 400;
-    goto respond;
+    LM_TMP(("orionldState.verb: %d", orionldState.verb));
+    char* detail;
+    if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+    {
+      LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
+      orionldState.httpStatusCode = 400;
+      goto respond;
+    }
   }
 
   //

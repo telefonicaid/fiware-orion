@@ -63,7 +63,6 @@ bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
 
         if (items == 2)  // All good - it's a JSON-LD NULL object
         {
-          LM_TMP(("XXXXXXXXXXXXXXXXXXXXXXXXXX JSON-LD NULL object modified to a normal JSON null"));
           attrP->type    = KjNull;
           attrP->value.i = 0;
 

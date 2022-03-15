@@ -108,10 +108,10 @@ payload='{
   "P1": {
     "value": {
       "v1": "P1:v1-Step04: changed",
-      "v3": null,
+      "v3": { "@type": "@json", "@value": null },
       "v4": "P1:v4-Step04: added"
     },
-    "observedAt": null,
+    "observedAt": { "@type": "@json", "@value": null },
     "unitCode": "step4"
   }
 }'
@@ -194,7 +194,7 @@ echo
 echo "13. Patch E1, removing the Relationship R1"
 echo "=========================================="
 payload='{
-  "R1": null
+  "R1": { "@type": "@json", "@value": null }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
@@ -246,7 +246,7 @@ echo
 echo "19. Patch E1, Delete P1, Add P2"
 echo "==============================="
 payload='{
-  "P1": null,
+  "P1": { "@type": "@json", "@value": null },
   "P2": 20
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"

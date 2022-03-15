@@ -198,14 +198,12 @@ bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, b
       }
       else if (strcmp(op->value.s, "DELETE") == 0)
       {
-        LM_TMP(("KZ: DELETE '%s'", path));
         bson_append_utf8(unsetP, path, -1, "", 0);
         *unsetsP += 1;
       }
     }
     else if (tree->type == KjNull)
     {
-      LM_TMP(("KZ: UNSET '%s'", path));
       bson_append_utf8(unsetP, path, -1, "", 0);
       *unsetsP += 1;
     }
@@ -280,7 +278,7 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;
-    LM_E(("KZ: mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
+    LM_E(("mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
     return false;
   }
 

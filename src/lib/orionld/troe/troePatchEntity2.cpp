@@ -204,27 +204,17 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
   if (treeNode == NULL)           return;
   if (pathNode->type != KjString) return;
 
-  char* path = pathNode->value.s;
-  LM_TMP(("KZ: PATH: '%s'", path));
   char* compV[7];
+  bool  skip       = false;
+  char* path       = pathNode->value.s;
   int   components = pathComponentsSplit(path, compV);
   char  buf[512];
 
-  LM_TMP(("KZ: Split component array: %s (%d components)", pathArrayJoin(buf, compV, components), components));
-
-  bool  skip = false;
-
   components = pathComponentsFix(compV, components, &skip);
   if (skip)
-  {
-    LM_TMP(("KZ: ------- Skipped ----------"));
     return;
-  }
 
-  pathNode->value.s = kaStrdup(&orionldState.kalloc, pathArrayJoin(buf, compV, components));
-  LM_TMP(("KZ: Fixed component array: %s (%d components)", pathNode->value.s, components));
-  LM_TMP(("KZ: -----------------"));
-
+  pathNode->value.s = kaStrdup(&orionldState.kalloc, pathArrayJoin(buf, compV, components));  // FIXME: buf is 512 bytes long ...
 
   KjNode*  parentP         = NULL;
   bool     onlyLastMissing = false;
@@ -249,23 +239,20 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
     {
       kjChildRemove(patchP, treeNode);
       treeNode->name = compV[components - 1];
-      LM_TMP(("KZ: Adding tree '%s' to parent '%s'", treeNode->name, parentP->name));
       kjChildAdd(parentP, treeNode);
     }
     else
-      LM_E(("KZ: Did not find the immediate parent (parent: '%s')", (parentP != NULL)? parentP->name : "no parent"));
+      LM_E(("Did not find the immediate parent (parent: '%s')", (parentP != NULL)? parentP->name : "no parent"));
 
     return;
   }
 
   if (treeNode->type == KjNull)
   {
-    LM_TMP(("KZ: Removing '%s' from '%s' of patchBase", path, parentP->name));
     kjChildRemove(parentP, nodeP);
     return;
   }
 
-  LM_TMP(("KZ: Replacing treeNode (%s: %s) with patchNodeP (%s: %s)", treeNode->name, kjValueType(treeNode->type), nodeP->name, kjValueType(nodeP->type)));
   treeNode->name = nodeP->name;
   kjChildRemove(parentP, nodeP);
   kjChildRemove(patchP, treeNode);
@@ -283,15 +270,15 @@ bool troePatchEntity2(void)
   KjNode* patchTree = orionldState.requestTree;
   KjNode* patchBase = orionldState.patchBase;
 
-  kjTreeLog(orionldState.patchBase, "KZ: patchBase");
-  kjTreeLog(patchTree, "KZ: patchTree");
+  // kjTreeLog(orionldState.patchBase, "KZ: patchBase");
+  // kjTreeLog(patchTree, "KZ: patchTree");
 
   for (KjNode* patchP = patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
   {
     patchApply(patchBase, patchP);
   }
 
-  kjTreeLog(patchBase, "KZ: patched result");
+  // kjTreeLog(patchBase, "KZ: patched result");
 
   //
   // No need to reimplement what troePatchEntity already implement - push to the TRoE DB
