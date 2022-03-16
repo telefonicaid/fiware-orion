@@ -62,6 +62,7 @@ public:
                                 const std::string&               tenant,
                                 long long                        maxFailsLimit,
                                 long long                        failsCounter,
+                                bool                             notifyOnMetadataChange,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
                                 unsigned int                     correlatorCounter,

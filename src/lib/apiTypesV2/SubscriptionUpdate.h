@@ -46,6 +46,7 @@ class SubscriptionUpdate : public Subscription
   bool  throttlingProvided;
   bool  blacklistProvided;
   bool  onlyChangedProvided;
+  bool  notifyOnMetadataChangeProvided;
   bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
   SubscriptionUpdate():
@@ -57,6 +58,7 @@ class SubscriptionUpdate : public Subscription
     throttlingProvided(false),
     blacklistProvided(false),
     onlyChangedProvided(false),
+    notifyOnMetadataChangeProvided(true),
     fromNgsiv1(false)
   {
     descriptionProvided = false;

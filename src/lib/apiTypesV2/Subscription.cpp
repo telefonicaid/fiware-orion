@@ -197,6 +197,11 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("failsCounter", this->failsCounter);
   }
 
+  if (this->notifyOnMetadataChange)
+  {
+    jh.addBool("notifyOnMetadataChange", this->notifyOnMetadataChange);
+  }
+
   return jh.str();
 }
 

@@ -56,6 +56,7 @@ class TriggeredSubscription
   long long                 throttling;
   long long                 maxFailsLimit;
   long long                 failsCounter;
+  bool                      notifyOnMetadataChange;
   long long                 lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
@@ -78,6 +79,7 @@ class TriggeredSubscription
   TriggeredSubscription(long long                _throttling,
                         long long                _maxFailsLimit,
                         long long                _failsCounter,
+                        bool                     _notifyOnMetadataChange,
                         long long                _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,

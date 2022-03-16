@@ -196,6 +196,13 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, orion::BSONObjBuilder*
 extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
+/* ****************************************************************************
+*
+* setNotifyOnMetadataChange -
+*/
+extern void setNotifyOnMetadataChange(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
 
 /* ****************************************************************************
 *

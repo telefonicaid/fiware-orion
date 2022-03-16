@@ -117,6 +117,7 @@ struct CachedSubscription
   int64_t                     lastSuccess;  // timestamp of last successful notification
   std::string                 lastFailureReason;
   int64_t                     lastSuccessCode;
+  bool                        notifyOnMetadataChange;
   struct CachedSubscription*  next;
 };
 
@@ -215,6 +216,7 @@ extern void subCacheItemInsert
   const std::string&                 coords,
   const std::string&                 georel,
   bool                               blacklist,
+  bool                               notifyOnMetadataChange,
   bool                               onlyChanged
 );
 

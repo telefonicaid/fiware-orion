@@ -288,7 +288,6 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
 
     orion::BSONObj md1Item = getObjectFieldF(md1, currentMd);
     orion::BSONObj md2Item = getObjectFieldF(md2, currentMd);
-
     if (!equalMetadataValues(md1Item, md2Item))
     {
       return false;
@@ -622,7 +621,7 @@ static bool mergeAttrInfo
     // or can be simplified
     md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     std::set<std::string>  mdsSet;
-
+ 
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
@@ -666,8 +665,10 @@ static bool mergeAttrInfo
   }
 
   /* Was it an actual update? */
-  bool actualUpdate;
-
+  //anjali
+  //bool actualUpdate;
+  enum actualUpdate {value, onlyMetadata, None };
+  actualUpdate ac = None; 
   if (caP->compoundValueP == NULL)
   {
     /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
@@ -678,36 +679,179 @@ static bool mergeAttrInfo
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-    actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((!caP->type.empty()) &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
-                    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+  //    orion::BSONObj sub;
+  //    bool notifyOnMetadataChange  = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+//naveen code modification ends.
+
+//started new code
+//
+/*if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)) && equalMetadata(md, mdNew))
+{ 
+   actualUpdate = value;            
+//   actualUpdate = true;
+}
+else
+{
+   actualUpdate = onlyMetadata;
+ //  actualUpdate = true;
+}*/
+
+
+/*else
+{
+  if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
+  actualUpdate = true;
+  else
+  {
+   if (mdNew.nFields() != mdSize)
+   {
+    actualUpdate = onlyMetadata;
+    actualUpdate = true;
+   }
+   else
+   {    
+    if((!equalMetadata(md, mdNew)))
+    {
+     actualUpdate = onlyMetadata;
+     actualUpdate = true;
+    }
+    else
+    {
+     actualUpdate = false;
+     actualUpdate = None;
+    }
   }
+}*/
+/*else
+{
+  if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
+  {
+    actualUpdate = true;
+  }
+  else 
+  {
+    if (mdNew.nFields() != mdSize)
+    {                                       
+       actualUpdate = true;
+    }
+    else
+    {
+      if((!equalMetadata(md, mdNew)))
+      {
+        actualUpdate = true;
+      }
+      else 
+      {
+     /   actualUpdate = true;
+     // }
+  //  }
+ // }
+//actualUpdate = false;
+}*/
+
+
+//new code using switch
+
+/*enum actualUpdate {None, onlyMetadata, value};
+actualUpdate ap = None;
+
+switch (ap)
+{
+  case None : 
+  if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)))
+  {
+    return true;
+  }
+  break;
+
+  case onlyMetadata :
+  if((!equalMetadata(md, mdNew)))
+  {
+    return true;
+  }
+  break;
+  
+  case value :
+  if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)))
+  {
+    return true;
+  }
+  break;
+}*/
+
+// anjali new code
+if (ac == value)
+{
+     attrValueChanges(attr, caP, forcedUpdate, apiVersion);
+     !caP->type.empty() && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type);
+}
+else if (ac == onlyMetadata)
+{
+    //(mdNew.nFields() != mdSize)
+    //(!equalMetadata(md, mdNew))
+    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew);
+}
+
+/*if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
+{
+     ac = value;
+     LM_E(("anjali 22 ac = value %d)", update));
+}
+else
+{
+if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
+{
+   update = value;
+   LM_E(("anjali 22 ac = valueTypeMeta %d)", update));
+}
+else 
+{
+    if (mdNew.nFields() != mdSize)
+    {
+        update = onlyMetadata;
+        LM_E(("anjali123 ac = metadata %d)", update));
+    }
+    else
+    {
+        if(!equalMetadata(md, mdNew))
+        {
+            update = onlyMetadata;
+            LM_E(("anjali123 ac = metadata %d)", update));
+        }
+        else
+        {
+           update = None;
+           LM_E(("anjali22 ac = none %d)", update));
+        }
+    }
+}
+}
+}*/
+}
   else
   {
     // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
     // has really changed its value (many levels have to be traversed). Until we can develop the
     // matching logic, we consider actualUpdate always true.
     //
-    actualUpdate = true;
+    ac = value;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
-  if (actualUpdate)
+  if (ac != None)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
   }
   else
   {
-    /* The hasField() check is needed to preserve compatibility with entities that were created
+   /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
       toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
-
-  return actualUpdate;
+  return ac;
 }
 
 
@@ -757,7 +901,7 @@ static bool contextAttributeCustomMetadataToBson
 
 /* ****************************************************************************
 *
-* updateAttribute -
+*updateAttribute -
 *
 * Returns true if an attribute was found, false otherwise. If true,
 * the "actualUpdate" argument (passed by reference) is set to true in the case that the
@@ -787,7 +931,7 @@ static bool updateAttribute
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
-  bool*                     actualUpdate,
+  bool*             actualUpdate,
   bool                      isReplace,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
@@ -1119,6 +1263,7 @@ static bool addTriggeredSubscriptions_withCache
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
                                                            cSubP->maxFailsLimit,
                                                            cSubP->failsCounter,
+                                                           cSubP->notifyOnMetadataChange,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
@@ -1547,6 +1692,7 @@ static bool addTriggeredSubscriptions_noCache
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
+      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true; 
 
       httpInfo.fill(sub);
       mqttInfo.fill(sub);
@@ -1563,6 +1709,7 @@ static bool addTriggeredSubscriptions_noCache
           throttling,
           maxFailsLimit,
           failsCounter,
+          notifyOnMetadataChange,
           lastNotification,
           renderFormat,
           httpInfo,
@@ -1725,7 +1872,8 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
-  bool                             blacklist = false
+  bool                             blacklist = false,
+  bool                             notifyOnMetadataChange = true
 )
 {
   NotifyContextRequest   ncr;
@@ -1761,11 +1909,27 @@ static bool processOnChangeConditionForUpdateContext
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
            * cer.entity destructor does release() on the attrs vector */
           cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+          //LM_T(LmtMongo, ("anjali Subscription notifyOnMetadataChange: %s", notifyOnMetadataChange ? "true" : "false"));
         }
       }
     }
   }
-
+  // anjali
+  // tifyOnMetadataChange
+  //actualUpdate ac;
+  /*if (onlyMetadata && notifyOnMetadataChange == false)
+  {
+    LM_E(("anjali22 ac = valueTypeMeta %d)", onlyMetadata));
+    return false;
+  }*/
+  /*else if (onlyMetadata  && notifyOnMetadataChange == true)
+  {
+    return true;
+  }
+  else
+  {
+    return true;
+  }*/
   /* Early exit without sending notification if attribute list is empty */
   if (cer.entity.attributeVector.size() == 0)
   {
@@ -1789,6 +1953,7 @@ static bool processOnChangeConditionForUpdateContext
                                           tenant,
                                           maxFailsLimit,
                                           failsCounter,
+                                          notifyOnMetadataChange,
                                           xauthToken,
                                           fiwareCorrelator,
                                           correlatorCounter,
@@ -1850,6 +2015,14 @@ static unsigned int processSubscriptions
         continue;
       }
     }
+    if ((tSubP->notifyOnMetadataChange == false) && (value))
+    {
+        LM_T(LmtMongo, ("zzz blocked due , current time is: %s", value));
+        LM_T(LmtSubCache, ("zzz '%s' due to throttling, current time is: %l", tSubP->notifyOnMetadataChange, value));
+
+     //   continue;
+    }
+
 
     /* Check 2: String Filters */
     if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
@@ -1940,8 +2113,8 @@ static unsigned int processSubscriptions
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
                                                                 notification,
-                                                                tSubP->blacklist);
-
+                                                                tSubP->blacklist,
+                                                                tSubP->notifyOnMetadataChange);
     if (notificationSent)
     {
       notifSent++;
@@ -2035,9 +2208,7 @@ static unsigned int processSubscriptions
       }
     }
   }
-
   releaseTriggeredSubscriptions(&subs);
-
   return notifSent;
 }
 
@@ -2563,7 +2734,7 @@ static bool processContextAttributeVector
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
-    setResponseMetadata(targetAttr, ca);
+ //   setResponseMetadata(targetAttr, ca);
     cerP->entity.attributeVector.push_back(ca);
 
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and

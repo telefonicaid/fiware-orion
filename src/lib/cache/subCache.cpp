@@ -762,6 +762,7 @@ void subCacheItemInsert
   const std::string&                 coords,
   const std::string&                 georel,
   bool                               blacklist,
+  bool                               notifyOnMetadataChange,
   bool                               onlyChanged
 )
 {
@@ -803,6 +804,7 @@ void subCacheItemInsert
   cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
+  cSubP->notifyOnMetadataChange = notifyOnMetadataChange;
   cSubP->metadata              = metadata;
 
 

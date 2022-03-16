@@ -117,6 +117,7 @@ static void insertInCache
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
                      sub.notification.blacklist,
+                     sub.notification.notifyOnMetadataChange,
                      sub.notification.onlyChanged);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
@@ -161,6 +162,7 @@ std::string mongoCreateSubscription
   setAttrs(sub, &b);
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
+  setNotifyOnMetadataChange(sub, &b);
   setOnlyChanged(sub, &b);
 
   if (!sub.description.empty())

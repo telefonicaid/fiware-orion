@@ -63,6 +63,7 @@ struct Notification
   bool                     onlyChanged;
   long long                timesSent;
   long long                failsCounter;
+  bool                     notifyOnMetadataChange;
   long long                maxFailsLimit;
   long long                lastNotification;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
@@ -81,6 +82,7 @@ struct Notification
     onlyChanged(false),
     timesSent(0),
     failsCounter(0),
+    notifyOnMetadataChange(true),
     maxFailsLimit(-1),
     lastNotification(-1),
     httpInfo(),
@@ -130,6 +132,7 @@ struct Subscription
   std::string   id;
   std::string   description;
   bool          descriptionProvided;
+  bool          notifyOnMetadataChange;
   Subject       subject;
   long long     expires;
   std::string   status;

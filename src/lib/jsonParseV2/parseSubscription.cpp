@@ -476,7 +476,7 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   {
     return badInput(ciP, timeoutOpt.error);
   }
-  if (timeoutOpt.given)
+  /*if (timeoutOpt.given)
   {
     if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
     {
@@ -486,7 +486,7 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     {
       subsP->notification.httpInfo.timeout = timeoutOpt.value;
     }
-  }
+  }*/
   else
   {
     subsP->notification.httpInfo.timeout = 0;
@@ -941,6 +941,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     if (b == false)
     {
       return badInput(ciP, errorString);
+    }
+  }
+
+  // notifyOnMetadataChange
+  if (notification.HasMember("notifyOnMetadataChange"))
+  {
+    Opt<bool> notifyOnMetadataChangeOpt = getBoolOpt(notification, "notifyOnMetadataChange");
+    if (!notifyOnMetadataChangeOpt.ok())
+    {
+      return badInput(ciP, notifyOnMetadataChangeOpt.error);
+    }
+    else if (notifyOnMetadataChangeOpt.given)
+    {
+      bool notifyOnMetadataChangeBool = notifyOnMetadataChangeOpt.value;
+      subsP->notifyOnMetadataChangeProvided = true;
+      subsP->notification.notifyOnMetadataChange = notifyOnMetadataChangeBool;
     }
   }
 

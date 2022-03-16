@@ -120,6 +120,7 @@
 #define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"
 #define CSUB_LASTSUCCESSCODE         "lastSuccessCode"
+#define CSUB_NOTIFYONMETADATACHANGE  "notifyOnMetadataChange"
 
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"

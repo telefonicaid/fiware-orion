@@ -180,6 +180,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
   nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
   nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESSCODE)  : -1;
+  nP->notifyOnMetadataChange = r.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(r, CSUB_NOTIFYONMETADATACHANGE) : true;
 
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
@@ -211,6 +212,12 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       subP->notification.lastSuccess     = cSubP->lastSuccess;
       subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
     }
+
+/*    if (cSubP->notifyOnMetadataChange > subP->notification.notifyOnMetadataChange)
+    {
+       subP->notification.notifyOnMetadataChange = cSubP->notifyOnMetadataChange;
+    }*/
+
   }
   cacheSemGive(__FUNCTION__, "get notification info");
 }
